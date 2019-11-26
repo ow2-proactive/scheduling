@@ -28,10 +28,12 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.client.utils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.*;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.*;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.VFS;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 
@@ -102,18 +104,46 @@ public class Zipper {
 
     public static class ZIP {
 
+        private static List<File> findFiles(File root, FileSelector selector) {
+            List<File> listFiles = new ArrayList<>();
+            try {
+                FileObject rootObject = VFS.getManager().toFileObject(root);
+                FileObject[] fos = rootObject.findFiles(selector);
+
+                for (FileObject fo : fos) {
+                    listFiles.add(new File(fo.getName().getPath()));
+                }
+            } catch (Exception e) {
+                logger.error("An error occurred while zipping files: ", e);
+            }
+
+            return listFiles;
+        }
+
+        private static ImmutableList<File> filterNotEmpty(File root, List<String> includes, List<String> excludes) {
+            FileSelector fileSelector = new FileSelector();
+            fileSelector.addIncludes(includes);
+            fileSelector.addExcludes(excludes);
+
+            return (ImmutableList<File>) findFiles(root, fileSelector);
+        }
+
+        private static ImmutableList<File> filterEmpty(File root) {
+            FluentIterable<File> fi = Files.fileTreeTraverser().postOrderTraversal(root);
+            return fi.filter(new FilesOnlyPredicate()).toList();
+        }
+
         public static void zip(File root, List<String> includes, List<String> excludes, OutputStream os)
                 throws IOException {
+            logger.trace("Includes list : " + includes.toString());
+            logger.trace("Excludes list : " + excludes.toString());
             checkNotNull(root);
             checkNotNull(os);
-            FluentIterable<File> fi = Files.fileTreeTraverser().postOrderTraversal(root);
-            ImmutableList<File> fileList = nullOrEmpty(includes) && nullOrEmpty(excludes)
-                                                                                          ? fi.filter(new FilesOnlyPredicate())
-                                                                                              .toList()
-                                                                                          : fi.filter(new FileSelectionPredicate(root,
-                                                                                                                                 includes,
-                                                                                                                                 excludes))
-                                                                                              .toList();
+            ImmutableList<File> fileList = nullOrEmpty(includes) && nullOrEmpty(excludes) ? filterEmpty(root)
+                                                                                          : filterNotEmpty(root,
+                                                                                                           includes,
+                                                                                                           excludes);
+            logger.trace("Zipping files :" + fileList);
             zipFiles(fileList, root.getAbsolutePath(), os);
         }
 
@@ -232,39 +262,11 @@ public class Zipper {
     private static class FilesOnlyPredicate implements Predicate<File> {
         @Override
         public boolean apply(File file) {
+            boolean answer = !file.isDirectory();
+            if (logger.isTraceEnabled()) {
+                logger.trace("Analysing file " + file + " : " + answer);
+            }
             return !file.isDirectory();
         }
     }
-
-    private static class FileSelectionPredicate implements Predicate<File> {
-
-        private File root;
-
-        private List<String> includes;
-
-        private List<String> excludes;
-
-        public FileSelectionPredicate(File root, List<String> includes, List<String> excludes) {
-            this.root = root;
-            this.includes = includes;
-            this.excludes = excludes;
-        }
-
-        @Override
-        public boolean apply(File file) {
-            Path pathRelativeToRoot = root.toPath().relativize(file.toPath());
-
-            FileSelector selector = new FileSelector(includes, excludes);
-
-            boolean answer = !file.isDirectory() && selector.matches(pathRelativeToRoot);
-            if (logger.isTraceEnabled()) {
-                logger.trace("Analysing file " + file + " for selector " + selector + " : " + answer);
-                logger.trace("Path relative to root : " + pathRelativeToRoot);
-            }
-
-            return answer;
-        }
-
-    }
-
 }
