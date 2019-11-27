@@ -375,7 +375,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
             logger.debug("Pushing files for job " + jname + " from " + localInputFolderPath + " to " + remotePath);
             TaskFlowJob tfj = job;
             for (Task task : tfj.getTasks()) {
-                uploadInputFilesForTask(localInputFolderPath, remotePath, task);
+                if (task.getInputFilesList() != null) {
+                    uploadInputFilesForTask(localInputFolderPath, remotePath, task);
+                }
             }
             logger.debug("Finished push operation from " + localInputFolderPath + " to " + remotePath);
 
