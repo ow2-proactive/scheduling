@@ -80,6 +80,7 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
             throws JobValidationException {
         if (variable.getModel() != null && !variable.getModel().trim().isEmpty()) {
             String model = variable.getModel().trim();
+            context.setVariableName(variable.getName());
 
             try {
                 new ModelValidator(model).validate(variable.getValue(), context);

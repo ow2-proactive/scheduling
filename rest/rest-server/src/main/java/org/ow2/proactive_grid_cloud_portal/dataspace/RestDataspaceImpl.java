@@ -486,8 +486,8 @@ public class RestDataspaceImpl {
     }
 
     public Session checkSessionValidity(String sessionId) throws NotConnectedRestException {
-        Session session = Strings.isNullOrEmpty(sessionId) ? null : sessions.get(sessionId);
-        if (session == null || session.getScheduler() == null) {
+        Session session = sessions.get(sessionId);
+        if (session.getScheduler() == null) {
             throw new NotConnectedRestException("User not authenticated or session timeout.");
         }
         return session;

@@ -29,6 +29,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import javax.security.auth.Subject;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
@@ -1528,6 +1530,13 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return a user data object
      */
     UserData getCurrentUserData() throws NotConnectedException;
+
+    /**
+     * Returns the current user JaaS subject
+     * @return jaas subject
+     * @throws NotConnectedException
+     */
+    Subject getSubject() throws NotConnectedException;
 
     /**
      * Returns the scheduler properties associated with the user currently connected

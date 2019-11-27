@@ -29,7 +29,7 @@
     <context-param>
         <param-name>resteasy.resources</param-name>
         <param-value>
-            org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest,org.ow2.proactive_grid_cloud_portal.studio.StudioRest,org.ow2.proactive_grid_cloud_portal.rm.RMRest,org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl
+            org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest,org.ow2.proactive_grid_cloud_portal.studio.StudioRest,org.ow2.proactive_grid_cloud_portal.rm.RMRest,org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl,org.ow2.proactive_grid_cloud_portal.common.CommonRest
         </param-value>
     </context-param>
 
@@ -111,6 +111,11 @@
     <servlet-mapping>
         <servlet-name>resteasy-servlet</servlet-name>
         <url-pattern>/studio/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>resteasy-servlet</servlet-name>
+        <url-pattern>/common/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

@@ -140,6 +140,11 @@ public class SchedulerConstants {
     public static final String CREDENTIALS_VARIABLE = "credentials";
 
     /**
+     * The variable used to get or set the task progress
+     */
+    public static final String PROGRESS_BINDING_NAME = "progress";
+
+    /**
      * The Application ID used by the scheduler for local Dataspaces
      */
     public static String SCHEDULER_DATASPACE_APPLICATION_ID = "0";

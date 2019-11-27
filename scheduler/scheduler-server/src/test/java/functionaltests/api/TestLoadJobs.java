@@ -245,7 +245,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         PAActiveObject.terminateActiveObject(eventReceiver, true);
 
         // connect as a user who can see only its own jobs
-        cred = Credentials.createCredentials(new CredData("guest", "pwd"), auth.getPublicKey());
+        cred = Credentials.createCredentials(new CredData("user", "pwd"), auth.getPublicKey());
         scheduler = auth.login(cred);
 
         monitorsHandler = new SchedulerMonitorsHandler();

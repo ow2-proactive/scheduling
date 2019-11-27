@@ -38,6 +38,7 @@ import org.mockito.Matchers;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 
 public class SessionStoreTest {
@@ -57,7 +58,7 @@ public class SessionStoreTest {
         sessionStore.setClock(clock);
     }
 
-    @Test
+    @Test(expected = NotConnectedRestException.class)
     public void testNoSessionWhenNotLoggedIn() throws Exception {
         assertNull(sessionStore.get("unknownSession"));
     }

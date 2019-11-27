@@ -38,6 +38,10 @@ import org.jasypt.salt.RandomSaltGenerator;
 
 public class PropertyDecrypter {
 
+    public static final String ENCRYPTION_PREFIX = "ENC(";
+
+    public static final String ENCRYPTION_SUFFIX = ")";
+
     private static StandardPBEStringEncryptor encryptor = null;
 
     public static synchronized StringEncryptor getDefaultEncryptor() {
@@ -55,6 +59,24 @@ public class PropertyDecrypter {
             encryptor.setKeyObtentionIterations(1000);
         }
         return encryptor;
+    }
+
+    public static String encryptData(String data) {
+        StringEncryptor encryptor = getDefaultEncryptor();
+        if (encryptor == null || data == null || data.isEmpty() || data.startsWith(ENCRYPTION_PREFIX)) {
+            return data;
+        } else {
+            return ENCRYPTION_PREFIX + encryptor.encrypt(data) + ENCRYPTION_SUFFIX;
+        }
+    }
+
+    public static String decryptData(String data) {
+        StringEncryptor encryptor = getDefaultEncryptor();
+        if ((encryptor != null) && (data != null) && data.startsWith(ENCRYPTION_PREFIX)) {
+            return encryptor.decrypt(data.substring(ENCRYPTION_PREFIX.length(),
+                                                    data.length() - ENCRYPTION_SUFFIX.length()));
+        }
+        return data;
     }
 
     public static Properties getDecryptableProperties() {

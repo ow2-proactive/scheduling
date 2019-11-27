@@ -72,6 +72,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.security.auth.Subject;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -1673,6 +1675,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public UserData getCurrentUserData() throws NotConnectedException {
         return frontendState.getCurrentUserData();
+    }
+
+    @Override
+    @ImmediateService
+    public Subject getSubject() throws NotConnectedException {
+        return frontendState.getSubject();
     }
 
     @Override

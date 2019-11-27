@@ -87,7 +87,9 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
                                                               rmNodeClient,
                                                               userSpaceClient,
                                                               globalSpaceClient,
-                                                              Collections.<String, String> emptyMap());
+                                                              Collections.<String, String> emptyMap(),
+                                                              outputSink,
+                                                              errorSink);
 
         forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, errorSink);
 
