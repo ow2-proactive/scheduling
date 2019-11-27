@@ -173,9 +173,8 @@ public class TaskDBUtils {
 
     private static void setQueryParameters(Set<TaskStatus> taskStatuses, boolean hasUser, boolean hasTag,
             boolean hasDateFrom, boolean hasDateTo, Query query, DBTaskDataParameters params) {
-        //        query.setParameterList("taskStatus", new ArrayList(taskStatuses));
+        query.setParameterList("taskStatus", taskStatuses);
 
-        query.setParameterList("taskStatus", Arrays.asList(TaskStatus.values()));
         if (hasUser) {
             query.setParameter("user", params.getUser());
         }
