@@ -57,6 +57,8 @@ public class DBTaskDataParameters {
     private SortSpecifierContainer sortParams;
 
     public DBTaskDataParameters() {
+        this.status = TaskStatus.taskStatuses(true, true, true);
+        this.sortParams = new SortSpecifierContainer();
     }
 
     DBTaskDataParameters(String user, String tag, long from, long to, int offset, int limit, Set<TaskStatus> statuses,
