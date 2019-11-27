@@ -28,6 +28,8 @@ package org.ow2.proactive_grid_cloud_portal.common;
 import java.security.KeyException;
 import java.security.Permission;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
@@ -109,8 +111,30 @@ public class CommonRest implements CommonRestInterface {
     }
 
     @Override
+    public List<String> portalsAccesses(String sessionId, List<String> portals) throws RestException {
+        Scheduler scheduler = checkAccess(sessionId);
+        if (portals == null || portals.isEmpty()) {
+            throw new RestException("Invalid \"portals\" parameter : " + portals);
+        }
+        List<String> answer = new ArrayList<>(portals.size());
+        for (String portal : portals) {
+            try {
+                checkPermission(scheduler.getSubject(),
+                                new PortalAccessPermission(portal),
+                                "Acess to portal " + portal + " is disabled");
+                answer.add(portal);
+            } catch (PermissionException e) {
+                // access to portal is disabled, thus the answer will not contain it.
+            } catch (NotConnectedException e) {
+                throw new NotConnectedRestException("you are not connected to the scheduler, you should log on first");
+            }
+        }
+        return answer;
+    }
+
+    @Override
     public boolean portalAccess(String sessionId, String portal) throws NotConnectedRestException {
-        Scheduler scheduler = checkAccess(sessionId, "EMPTY");
+        Scheduler scheduler = checkAccess(sessionId);
 
         try {
             return checkPermission(scheduler.getSubject(),
@@ -132,7 +156,7 @@ public class CommonRest implements CommonRestInterface {
      * NotConnectedRestException, if no such mapping exists.
      * @throws NotConnectedRestException
      */
-    private Scheduler checkAccess(String sessionId, String path) throws NotConnectedRestException {
+    private Scheduler checkAccess(String sessionId) throws NotConnectedRestException {
         Session session = sessionStore.get(sessionId);
 
         Scheduler schedulerProxy = session.getScheduler();
