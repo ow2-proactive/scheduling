@@ -29,17 +29,10 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.io.IOException;
 import java.security.KeyException;
+import java.util.List;
 
 import javax.security.auth.login.LoginException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -79,6 +72,11 @@ public interface CommonRestInterface {
     @GET
     @Path("currentuserdata")
     UserData currentUserData(@HeaderParam("sessionid") String sessionId);
+
+    @GET
+    @Path("permissions/portals")
+    List<String> portalsAccesses(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("portals") List<String> portals) throws RestException;
 
     @GET
     @Path("permissions/portals/{portal}")
