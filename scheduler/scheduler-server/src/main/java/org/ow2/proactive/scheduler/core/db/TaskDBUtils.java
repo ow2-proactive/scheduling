@@ -173,9 +173,14 @@ public class TaskDBUtils {
             for (int i = 0; i < items.size(); i++) {
                 SortSpecifierContainer.SortSpecifierItem item = items.get(i);
                 String order = "ascending".compareTo(item.getOrder().toString()) == 0 ? "ASC" : "DESC";
-                result.append("T." + item.getField() + " " + order);
-                if (i < items.size() - 1)
+                if (item.getField().equalsIgnoreCase("jobid") || item.getField().equalsIgnoreCase("taskid")) {
+                    result.append("T.id." + item.getField() + " " + order);
+                } else {
+                    result.append("T." + item.getField() + " " + order);
+                }
+                if (i < items.size() - 1) {
                     result.append(",");
+                }
             }
             result.append(" ");
         }

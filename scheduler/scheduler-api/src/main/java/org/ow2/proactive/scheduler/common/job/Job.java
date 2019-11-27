@@ -119,6 +119,8 @@ public abstract class Job extends CommonAttribute {
      */
     private String jobContent = null;
 
+    private Long parentId = null;
+
     /**
      * ProActive Empty Constructor
      */
@@ -421,5 +423,13 @@ public abstract class Job extends CommonAttribute {
 
     public void setJobContent(String jobContent) {
         this.jobContent = jobContent;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 }

@@ -129,12 +129,15 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
                                       @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
                                       @Index(name = "JOB_DATA_START_TIME", columnList = "START_TIME"),
-                                      @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"), })
+                                      @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"),
+                                      @Index(name = "JOB_PARENT_JOB_ID", columnList = "PARENT_JOB_ID") })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
 
     private Long id;
+
+    private Long parentId;
 
     private List<TaskData> tasks;
 
@@ -315,6 +318,7 @@ public class JobData implements Serializable {
         jobRuntimeData.addJobContent(job.getTaskFlowJob());
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
+        jobRuntimeData.setParentId(job.getParentId());
 
         return jobRuntimeData;
     }
@@ -339,6 +343,15 @@ public class JobData implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Column(name = "PARENT_JOB_ID", nullable = true)
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
