@@ -1324,7 +1324,7 @@ public class SchedulerDBManager {
         });
     }
 
-    public void updateTaskStatusAndSchedulerTime(final EligibleTaskDescriptorImpl task, final TaskStatus newStatus,
+    public void updateTaskStatusAndScheduledTime(final EligibleTaskDescriptorImpl task, final TaskStatus newStatus,
             final long scheduledTime) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
 

@@ -272,7 +272,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         });
 
         notPendingYet.forEach(task -> {
-            getDBManager().updateTaskStatusAndSchedulerTime(task,
+            getDBManager().updateTaskStatusAndScheduledTime(task,
                                                             TaskStatus.PENDING,
                                                             task.getInternal().getScheduledTime());
         });

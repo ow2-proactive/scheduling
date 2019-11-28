@@ -1573,7 +1573,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             int offset, int limit) throws NotConnectedException, PermissionException {
         String userName = null;
         if (mytasks) {
-            userName = frontendState.checkPermission("frontendState", "You do not have permission to use frontendState")
+            userName = frontendState.checkPermission("getTaskIds", "You do not have permission to use frontendState")
                                     .getUsername();
         }
         Page<TaskInfo> pTaskInfo = dbManager.getTasks(from, to, taskTag, offset, limit, userName, taskStatuses);
@@ -1592,7 +1592,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
         String userName = null;
         if (mytasks) {
-            userName = frontendState.checkPermission("frontendState", "You do not have permission to use frontendState")
+            userName = frontendState.checkPermission("getTaskStates", "You do not have permission to use frontendState")
                                     .getUsername();
         }
         return dbManager.getTaskStates(from, to, taskTag, offset, limit, userName, statusFilter, sortParams);
