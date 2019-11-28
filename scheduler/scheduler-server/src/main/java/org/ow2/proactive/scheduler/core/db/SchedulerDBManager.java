@@ -1324,6 +1324,25 @@ public class SchedulerDBManager {
         });
     }
 
+    public void updateTaskStatusAndSchedulerTime(final EligibleTaskDescriptorImpl task, final TaskStatus newStatus,
+            final long scheduledTime) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+
+            final DBTaskId dbTaskId = taskId(task.getInternal());
+
+            Query query = session.createQuery("update TaskData task " +
+                                              "set task.taskStatus = :newStatus, task.scheduledTime = :newTime " +
+                                              "where task.id = :taskId")
+                                 .setParameter("newStatus", newStatus)
+                                 .setParameter("newTime", scheduledTime)
+                                 .setParameter("taskId", dbTaskId);
+
+            query.executeUpdate();
+
+            return null;
+        });
+    }
+
     public void updateTaskStatus(final EligibleTaskDescriptorImpl task, final TaskStatus newStatus) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
 

@@ -194,13 +194,13 @@ public enum TaskStatus implements java.io.Serializable {
     public static List<String> wrapIntoAggregatedStatuses(Set<TaskStatus> actualStatuses) {
         return actualStatuses.stream().map(x -> {
             if (x.equals(TaskStatus.SUBMITTED)) {
-                return "submitted";
+                return TaskStatus.SUBMITTED.name;
             } else if (x.equals(TaskStatus.PENDING)) {
-                return "pending";
+                return TaskStatus.PENDING.name;
             } else if (TaskStatus.RUNNING_TASKS.contains(x)) {
-                return "current";
+                return TaskStatus.RUNNING.name;
             } else if (TaskStatus.FINISHED_TASKS.contains(x)) {
-                return "past";
+                return TaskStatus.FINISHED.name;
             } else if (TaskStatus.ERROR_TASKS.contains(x)) {
                 return "error";
             } else {
@@ -221,16 +221,16 @@ public enum TaskStatus implements java.io.Serializable {
         List<String> aggregatedStatuses = new LinkedList<>();
 
         if (pending) {
-            aggregatedStatuses.add("Submitted");
-            aggregatedStatuses.add("Pending");
+            aggregatedStatuses.add(TaskStatus.SUBMITTED.name);
+            aggregatedStatuses.add(TaskStatus.PENDING.name);
         }
 
         if (running) {
-            aggregatedStatuses.add("Running");
+            aggregatedStatuses.add(TaskStatus.RUNNING.name);
         }
 
         if (finished) {
-            aggregatedStatuses.add("Finished");
+            aggregatedStatuses.add(TaskStatus.FINISHED.name);
         }
 
         return TaskStatus.expandAggregatedStatusesToRealStatuses(aggregatedStatuses);

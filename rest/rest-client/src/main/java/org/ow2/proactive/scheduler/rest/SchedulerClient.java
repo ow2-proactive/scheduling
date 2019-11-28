@@ -1217,9 +1217,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                            from,
                                            to,
                                            mytasks,
-                                           statusFilter.stream()
-                                                       .map(TaskStatus::toString)
-                                                       .collect(Collectors.joining(";")),
+                                           TaskStatus.statusFilterString(statusFilter),
                                            offset,
                                            limit,
                                            sortContainer);
