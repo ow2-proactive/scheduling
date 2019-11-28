@@ -221,6 +221,7 @@ public enum TaskStatus implements java.io.Serializable {
         List<String> aggregatedStatuses = new LinkedList<>();
 
         if (pending) {
+            aggregatedStatuses.add("Submitted");
             aggregatedStatuses.add("Pending");
         }
 

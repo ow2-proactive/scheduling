@@ -213,9 +213,7 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
     @Test
     public void testGetTotalNumberOfTasksPendingRunningNotFinished() {
         DBTaskDataParameters builder = new DBTaskDataParameters();
-        builder.setStatus(TaskStatus.expandAggregatedStatusesToRealStatuses(Arrays.asList("Pending",
-                                                                                          "Running",
-                                                                                          "Finished")));
+        builder.setStatus(TaskStatus.taskStatuses(true, true, false));
 
         assertTotalNumberOfTasks(builder, 0);
     }
