@@ -85,7 +85,7 @@ public class TaskInfoImpl implements TaskInfo {
     @Override
     public String[] getExecutionHostNameList() {
         return (executionHostName == null || executionHostName.isEmpty()) ? EMPTY_STRING_ARRAY
-                                                                          : executionHostName.split(",");
+                                                                          : executionHostName.split("[\\s,]+");
     }
 
     public void setFinishedTime(long finishedTime) {
