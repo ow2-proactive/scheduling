@@ -264,10 +264,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                                            .equals(TaskStatus.PENDING))
                                                                       .collect(Collectors.toList());
 
-        notPendingYet.forEach(task -> task.getInternal().setStatus(TaskStatus.PENDING));
+        notPendingYet.forEach(task -> {
+            if (task.getInternal().getScheduledTime() == -1) {
+                task.getInternal().setScheduledTime(System.currentTimeMillis());
+            }
+            task.getInternal().setStatus(TaskStatus.PENDING);
+        });
 
         notPendingYet.forEach(task -> {
-            getDBManager().updateTaskStatus(task, TaskStatus.PENDING);
+            getDBManager().updateTaskStatusAndScheduledTime(task,
+                                                            TaskStatus.PENDING,
+                                                            task.getInternal().getScheduledTime());
         });
 
     }

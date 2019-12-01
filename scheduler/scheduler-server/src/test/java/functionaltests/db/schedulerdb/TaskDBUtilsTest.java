@@ -27,6 +27,7 @@ package functionaltests.db.schedulerdb;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -130,111 +131,109 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
 
     @Test
     public void testGetTotalNumberOfTasksFromParameter1() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(getTimeRelativeToReference(-NB_JOBS));
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS);
+        assertTotalNumberOfTasks(builder, NB_JOBS);
     }
 
     @Test
     public void testGetTotalNumberOfTasksFromParameter2() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(getTimeRelativeToReference(-NB_JOBS - 1));
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS);
+        assertTotalNumberOfTasks(builder, NB_JOBS);
     }
 
     @Test
     public void testGetTotalNumberOfTasksFromParameter3() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(getTimeRelativeToReference(0));
 
-        assertTotalNumberOfTasks(builder.build(), 0);
+        assertTotalNumberOfTasks(builder, 0);
     }
 
     @Test
     public void testGetTotalNumberOfTasksFromParameter4() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(getTimeRelativeToReference(-NB_JOBS / 2));
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS / 2);
+        assertTotalNumberOfTasks(builder, NB_JOBS / 2);
     }
 
     @Test
     public void testGetTotalNumberOfTasksToParameter1() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setTo(getTimeRelativeToReference(0));
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS);
+        assertTotalNumberOfTasks(builder, NB_JOBS);
     }
 
     @Test
     public void testGetTotalNumberOfTasksToParameter2() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(getTimeRelativeToReference(-1));
 
-        assertTotalNumberOfTasks(builder.build(), 1);
+        assertTotalNumberOfTasks(builder, 1);
     }
 
     @Test
     public void testGetTotalNumberOfTasksToParameter3() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(getTimeRelativeToReference(-NB_JOBS - 1));
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS);
+        assertTotalNumberOfTasks(builder, NB_JOBS);
     }
 
     @Test
     public void testGetTotalNumberOfTasksToParameter4() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(getTimeRelativeToReference(-NB_JOBS / 2));
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS / 2);
+        assertTotalNumberOfTasks(builder, NB_JOBS / 2);
     }
 
     @Test
     public void testGetTotalNumberOfTasksFromAndToParameter() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(getTimeRelativeToReference((int) (-NB_JOBS * 0.25)));
         builder.setTo(getTimeRelativeToReference(0));
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS / 4);
+        assertTotalNumberOfTasks(builder, NB_JOBS / 4);
     }
 
     @Test
     public void testGetTotalNumberOfTasksUserParameter() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setUser(DEMO_USERNAME);
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS_AS_DEMO_USER);
+        assertTotalNumberOfTasks(builder, NB_JOBS_AS_DEMO_USER);
     }
 
     @Test
     public void testGetTotalNumberOfTasksPendingRunningNotFinished() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
-        builder.setPending(true);
-        builder.setRunning(true);
-        builder.setFinished(false);
+        DBTaskDataParameters builder = new DBTaskDataParameters();
+        builder.setStatus(TaskStatus.taskStatuses(true, true, false));
 
-        assertTotalNumberOfTasks(builder.build(), 0);
+        assertTotalNumberOfTasks(builder, 0);
     }
 
     @Test
     public void testGetTotalNumberOfTasksLimitZeroOffsetZero() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setLimit(0);
         builder.setLimit(0);
 
-        assertTotalNumberOfTasks(builder.build(), NB_JOBS);
+        assertTotalNumberOfTasks(builder, NB_JOBS);
     }
 
     @Test
     public void testTaskInfoSessionWork() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setOffset(2);
         builder.setLimit(NB_JOBS - 1);
 
-        SessionWork<List<TaskInfo>> taskInfoSessionWork = TaskDBUtils.taskInfoSessionWork(builder.build());
+        SessionWork<List<TaskInfo>> taskInfoSessionWork = TaskDBUtils.taskInfoSessionWork(builder);
 
         List<TaskInfo> result = run(taskInfoSessionWork);
         assertThat(result).hasSize(NB_JOBS - 2);
@@ -242,11 +241,11 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
 
     @Test
     public void testTaskStateSessionWork() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setOffset(2);
         builder.setLimit(NB_JOBS - 1);
 
-        SessionWork<List<TaskState>> taskStateSessionWork = TaskDBUtils.taskStateSessionWork(builder.build());
+        SessionWork<List<TaskState>> taskStateSessionWork = TaskDBUtils.taskStateSessionWork(builder);
 
         List<TaskState> result = run(taskStateSessionWork);
         assertThat(result).hasSize(NB_JOBS - 2);
@@ -254,10 +253,10 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
 
     @Test
     public void testGetScheduledTasks() {
-        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        DBTaskDataParameters builder = new DBTaskDataParameters();
         builder.setFrom(SCHEDULED_TIME);
         builder.setTo(SCHEDULED_TIME);
-        SessionWork<List<TaskState>> taskStateSessionWork = TaskDBUtils.taskStateSessionWork(builder.build());
+        SessionWork<List<TaskState>> taskStateSessionWork = TaskDBUtils.taskStateSessionWork(builder);
         List<TaskState> result = run(taskStateSessionWork);
         assertThat(result).hasSize(1);
     }

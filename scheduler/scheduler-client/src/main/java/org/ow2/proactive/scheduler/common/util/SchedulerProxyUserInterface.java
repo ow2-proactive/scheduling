@@ -77,6 +77,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -751,26 +752,17 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit) throws SchedulerException {
-        return uischeduler.getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
+            int offset, int limit) throws SchedulerException {
+        return uischeduler.getTaskIds(taskTag, from, to, mytasks, taskStatuses, offset, limit);
     }
 
     @Override
     @ImmediateService
-    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
+            Set<TaskStatus> statusFilter, int offset, int limit, SortSpecifierContainer sortParams)
             throws SchedulerException {
-        return uischeduler.getTaskStates(taskTag,
-                                         from,
-                                         to,
-                                         mytasks,
-                                         running,
-                                         pending,
-                                         finished,
-                                         offset,
-                                         limit,
-                                         sortParams);
+        return uischeduler.getTaskStates(taskTag, from, to, mytasks, statusFilter, offset, limit, sortParams);
     }
 
     @Override

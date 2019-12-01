@@ -270,18 +270,15 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag, final int offset,
-            final int limit, final String user, final boolean pending, final boolean running, final boolean finished,
-            SortSpecifierContainer sortParams) {
+            final int limit, final String user, Set<TaskStatus> statusFilter, SortSpecifierContainer sortParams) {
 
-        DBTaskDataParameters parameters = new DBTaskDataParameters(tag,
+        DBTaskDataParameters parameters = new DBTaskDataParameters(user,
+                                                                   tag,
                                                                    from,
                                                                    to,
                                                                    offset,
                                                                    limit,
-                                                                   user,
-                                                                   pending,
-                                                                   running,
-                                                                   finished,
+                                                                   statusFilter,
                                                                    sortParams);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskState> lTasks = executeReadOnlyTransaction(TaskDBUtils.taskStateSessionWork(parameters));
@@ -290,17 +287,15 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskInfo> getTasks(final long from, final long to, final String tag, final int offset, final int limit,
-            final String user, final boolean pending, final boolean running, final boolean finished) {
+            final String user, Set<TaskStatus> statusFilter) {
 
-        DBTaskDataParameters parameters = new DBTaskDataParameters(tag,
+        DBTaskDataParameters parameters = new DBTaskDataParameters(user,
+                                                                   tag,
                                                                    from,
                                                                    to,
                                                                    offset,
                                                                    limit,
-                                                                   user,
-                                                                   pending,
-                                                                   running,
-                                                                   finished,
+                                                                   statusFilter,
                                                                    SortSpecifierContainer.EMPTY_CONTAINER);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskInfo> lTaskInfo = executeReadOnlyTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
@@ -1324,6 +1319,25 @@ public class SchedulerDBManager {
             for (TaskState task : job.getTasks()) {
                 updateScheduledTime(job.getId().longValue(), task.getId().longValue(), scheduledTime);
             }
+
+            return null;
+        });
+    }
+
+    public void updateTaskStatusAndScheduledTime(final EligibleTaskDescriptorImpl task, final TaskStatus newStatus,
+            final long scheduledTime) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+
+            final DBTaskId dbTaskId = taskId(task.getInternal());
+
+            Query query = session.createQuery("update TaskData task " +
+                                              "set task.taskStatus = :newStatus, task.scheduledTime = :newTime " +
+                                              "where task.id = :taskId")
+                                 .setParameter("newStatus", newStatus)
+                                 .setParameter("newTime", scheduledTime)
+                                 .setParameter("taskId", dbTaskId);
+
+            query.executeUpdate();
 
             return null;
         });

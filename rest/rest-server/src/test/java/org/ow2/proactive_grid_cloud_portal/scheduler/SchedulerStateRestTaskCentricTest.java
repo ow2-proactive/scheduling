@@ -30,6 +30,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.ow2.proactive.scheduler.common.task.TaskStatus.statusFilterString;
+import static org.ow2.proactive.scheduler.common.task.TaskStatus.taskStatuses;
 import static org.ow2.proactive_grid_cloud_portal.scheduler.RestTestUtils.newTaskState;
 
 import java.util.ArrayList;
@@ -79,9 +81,21 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
         String jobIdStr = "1";
         Page<TaskId> expectedPage = RestTestUtils.newMockedTaskIdPage(jobIdStr, nbTasks, null);
 
-        when(mockOfScheduler.getTaskIds(null, 0, 0, false, true, true, true, 0, 50)).thenReturn(expectedPage);
+        when(mockOfScheduler.getTaskIds(null,
+                                        0,
+                                        0,
+                                        false,
+                                        taskStatuses(true, true, true),
+                                        0,
+                                        50)).thenReturn(expectedPage);
 
-        RestPage<String> page = restInterface.getTaskIds(sessionId, 0, 0, false, true, true, true, 0, 50);
+        RestPage<String> page = restInterface.getTaskIds(sessionId,
+                                                         0,
+                                                         0,
+                                                         false,
+                                                         statusFilterString(taskStatuses(true, true, true)),
+                                                         0,
+                                                         50);
 
         RestTestUtils.assertTasks(nbTasks, jobIdStr, page);
     }
@@ -93,16 +107,20 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
         String tag = "TAG-TEST";
         Page<TaskId> expectedPage = RestTestUtils.newMockedTaskIdPage(jobIdStr, nbTasks, tag);
 
-        when(mockOfScheduler.getTaskIds(tag, 0, 0, false, true, true, true, 0, nbTasks)).thenReturn(expectedPage);
+        when(mockOfScheduler.getTaskIds(tag,
+                                        0,
+                                        0,
+                                        false,
+                                        taskStatuses(true, true, true),
+                                        0,
+                                        nbTasks)).thenReturn(expectedPage);
 
         RestPage<String> page = restInterface.getTaskIdsByTag(sessionId,
                                                               tag,
                                                               0,
                                                               0,
                                                               false,
-                                                              true,
-                                                              true,
-                                                              true,
+                                                              statusFilterString(taskStatuses(true, true, true)),
                                                               0,
                                                               nbTasks);
 
@@ -121,9 +139,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                                            anyLong(),
                                            anyLong(),
                                            anyBoolean(),
-                                           anyBoolean(),
-                                           anyBoolean(),
-                                           anyBoolean(),
+                                           anySet(),
                                            anyInt(),
                                            anyInt(),
                                            any(SortSpecifierContainer.class))).thenReturn(expectedPage);
@@ -132,9 +148,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                                                                    0,
                                                                    0,
                                                                    false,
-                                                                   true,
-                                                                   true,
-                                                                   true,
+                                                                   statusFilterString(taskStatuses(true, true, true)),
                                                                    0,
                                                                    nbTasksInPage,
                                                                    null);
@@ -154,9 +168,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                                            anyLong(),
                                            anyLong(),
                                            anyBoolean(),
-                                           anyBoolean(),
-                                           anyBoolean(),
-                                           anyBoolean(),
+                                           anySet(),
                                            anyInt(),
                                            anyInt(),
                                            any(SortSpecifierContainer.class))).thenReturn(expectedPage);
@@ -166,9 +178,9 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                                                                         0,
                                                                         0,
                                                                         false,
-                                                                        true,
-                                                                        true,
-                                                                        true,
+                                                                        statusFilterString(taskStatuses(true,
+                                                                                                        true,
+                                                                                                        true)),
                                                                         0,
                                                                         nbTasksInPage,
                                                                         new SortSpecifierContainer());
@@ -188,9 +200,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                                            anyLong(),
                                            anyLong(),
                                            anyBoolean(),
-                                           anyBoolean(),
-                                           anyBoolean(),
-                                           anyBoolean(),
+                                           anySet(),
                                            anyInt(),
                                            anyInt(),
                                            any(SortSpecifierContainer.class))).thenReturn(expectedPage);
@@ -200,9 +210,9 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                                                                         0,
                                                                         0,
                                                                         false,
-                                                                        true,
-                                                                        true,
-                                                                        true,
+                                                                        statusFilterString(taskStatuses(true,
+                                                                                                        true,
+                                                                                                        true)),
                                                                         0,
                                                                         nbTasksInPage,
                                                                         new SortSpecifierContainer(".id.taskId,descending"));
@@ -229,9 +239,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                                            anyLong(),
                                            anyLong(),
                                            anyBoolean(),
-                                           anyBoolean(),
-                                           anyBoolean(),
-                                           anyBoolean(),
+                                           anySet(),
                                            anyInt(),
                                            anyInt(),
                                            any(SortSpecifierContainer.class))).thenReturn(expectedPage);
@@ -241,9 +249,9 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                                                                         0,
                                                                         0,
                                                                         false,
-                                                                        true,
-                                                                        true,
-                                                                        true,
+                                                                        statusFilterString(taskStatuses(true,
+                                                                                                        true,
+                                                                                                        true)),
                                                                         0,
                                                                         nbTasksInPage,
                                                                         new SortSpecifierContainer(".jobData.id,ascending"));

@@ -170,7 +170,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             logger.debug("For job considering licenses " + requiredLicenses);
 
             // Do not execute if one of the required license can not be obtained
-            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split(",")));
+            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split("[\\s,]+")));
             for (String requiredLicense : requiredLicensesSet) {
 
                 if (!licenseSynchronization.containsLicense(requiredLicense)) {
@@ -226,7 +226,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             logger.debug("For task considering licenses " + requiredLicenses);
 
             // Do not execute if one of the required license can not be obtained
-            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split(",")));
+            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split("[\\s,]+")));
             for (String requiredLicense : requiredLicensesSet) {
 
                 if (!licenseSynchronization.containsLicense(requiredLicense)) {
@@ -282,7 +282,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         if (requiredLicenses != null) {
 
             logger.debug("Try to get tokens for licenses " + requiredLicenses);
-            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split(",")));
+            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split("[\\s,]+")));
             for (String requiredLicense : requiredLicensesSet) {
 
                 if (!licenseSynchronization.containsJobId(requiredLicense,

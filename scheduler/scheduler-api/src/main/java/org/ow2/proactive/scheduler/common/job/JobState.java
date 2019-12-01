@@ -249,7 +249,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     }
 
     private List<TaskState> filterByStatus(List<TaskState> tasks, String statusFilter) {
-        List<String> aggregatedStatuses = Arrays.asList(statusFilter.split(";"));
+        List<String> aggregatedStatuses = Arrays.asList(statusFilter.split("[\\s;]+"));
 
         Set<TaskStatus> goodTaskStatuses = TaskStatus.expandAggregatedStatusesToRealStatuses(aggregatedStatuses);
 

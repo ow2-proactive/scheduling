@@ -107,7 +107,7 @@ class LoadPackages {
         package_loader.loginAdminUserCredToSchedulerAndGetSessionId()
 
         // Create buckets following the ordered bucket list
-        new File(examples_dir, "ordered_bucket_list").text.split(",").each { bucket ->
+        new File(examples_dir, "ordered_bucket_list").text.split("[\\s,]+").each { bucket ->
             package_loader.createBucketIfNotExist(bucket)
         }
 
