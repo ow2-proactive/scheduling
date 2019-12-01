@@ -2,13 +2,13 @@ dependencies {
     compile("org.objectweb.proactive:programming-extension-dataspaces-common:${programmingVersion}")
 
     compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
-    compile 'org.apache.commons:commons-collections4:4.0'
+    compile 'org.apache.commons:commons-collections4:4.4'
     compile 'msv:isorelax:20050913'
     compile 'msv:msv:20050913'
     compile 'commons-io:commons-io:2.5'
     compile group: 'org.springframework', name: 'spring-expression', version: '4.2.5.RELEASE'
-    compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.12'
-    compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.12'
+    compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.13'
+    compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
     compile 'com.googlecode.json-simple:json-simple:1.1'
 
     compile 'joda-time:joda-time:2.9.1'
