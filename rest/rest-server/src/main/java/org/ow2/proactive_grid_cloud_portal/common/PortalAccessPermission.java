@@ -59,7 +59,7 @@ public class PortalAccessPermission extends ClientPermission {
         } else if (portals.equals("*")) {
             allPortals = true;
         } else {
-            portalsAccess = Sets.newHashSet(portals.split("[\\s,]+"));
+            portalsAccess = Sets.newHashSet(portals.split("\\s*,\\s*"));
         }
     }
 

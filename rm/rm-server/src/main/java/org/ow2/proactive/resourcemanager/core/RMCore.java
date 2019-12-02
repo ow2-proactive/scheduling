@@ -3031,7 +3031,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             mapping = Files.readAllLines(Paths.get(fileName))
                            .stream()
-                           .map(line -> line.split(","))
+                           .map(line -> line.split("\\s*,\\s*"))
                            .filter(array -> array.length > 1)
                            .map(Arrays::asList)
                            .collect(Collectors.toMap(list -> list.get(0).trim(), list -> list.subList(1, list.size())

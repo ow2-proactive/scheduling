@@ -81,8 +81,8 @@ public final class SortSpecifierContainer implements Serializable {
     public SortSpecifierContainer(String values) {
         sortParameters = new ArrayList<>();
         if (values != null && "".compareTo(values) != 0) {
-            for (String s : values.split(";")) {
-                String[] sortParam = s.split(",");
+            for (String s : values.split("\\s*;\\s*")) {
+                String[] sortParam = s.split("\\s*,\\s*");
                 add(sortParam[0], sortParam[1]);
             }
         }

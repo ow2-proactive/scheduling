@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.common;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 
@@ -52,6 +53,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.SchedulerUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
@@ -1427,12 +1429,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param mytasks
      *            <code>True</code> will only fetch the user tasks,
      *            <code>False</code> will fetch everyones.
-     * @param running
-     *            fetch the running tasks.
-     * @param pending
-     *            fetch the pending tasks.
-     * @param finished
-     *            fetch the finished tasks.
+     * @param taskStatuses
+     *            Set of task statuses which is used as filter
      * @param offset
      *            the starting task to include in the paginated list.
      * @param limit
@@ -1440,11 +1438,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *            the paginated list.
      * @return the paginated list of tasks names satisfying the given criterias.
      *         The total number of tasks (without pagination() is also returned.
-     * @throws NotConnectedException
-     * @throws PermissionException
      */
-    Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending,
-            boolean finished, int offset, int limit) throws SchedulerException;
+    Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
+            int offset, int limit) throws SchedulerException;
 
     /**
      * Retrieve a taskstates list from the scheduler.
@@ -1460,12 +1456,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param mytasks
      *            <code>True</code> will only fetch the user tasks,
      *            <code>False</code> will fetch everyones.
-     * @param running
-     *            fetch the running tasks.
-     * @param pending
-     *            fetch the pending tasks.
-     * @param finished
-     *            fetch the finished tasks.
      * @param offset
      *            the starting task to include in the paginated list.
      * @param limit
@@ -1473,11 +1463,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *            the paginated list.
      * @return the paginated list of taskstates satisfying the given criterias.
      *         The total number of tasks (without pagination() is also returned.
-     * @throws NotConnectedException
-     * @throws PermissionException
      */
-    Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending,
-            boolean finished, int offset, int limit, SortSpecifierContainer sortParams) throws SchedulerException;
+    Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> statusFilter,
+            int offset, int limit, SortSpecifierContainer sortParams) throws SchedulerException;
 
     /**
      * Retrieve a job info by it id.
@@ -1485,9 +1473,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param jobId
      *            the id of the job we want to fetch info.
      * @return the <code>JobInfo</code> associated to the given id
-     * @throws UnknownJobException
-     * @throws NotConnectedException
-     * @throws PermissionException
      */
     JobInfo getJobInfo(String jobId) throws SchedulerException;
 
@@ -1499,9 +1484,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *            id of the job that needs to be updated
      * @param startAt
      *            its value should be ISO 8601 compliant
-     * @throws NotConnectedException
-     * @throws UnknownJobException
-     * @throws PermissionException
      */
     boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException;
