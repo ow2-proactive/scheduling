@@ -110,7 +110,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
     }
 
     private Integer valueAsInt(String nameValue) {
-        return Integer.valueOf(nameValue.split("[\\s=]+")[1]);
+        return Integer.valueOf(nameValue.split("\\s*=\\s*")[1]);
     }
 
 }

@@ -68,9 +68,9 @@ public class EvalScriptCommand extends AbstractCommand implements Command {
 
     private Map<String, String> bindings(String bindingString) {
         Map<String, String> bindings = new HashMap<>();
-        String[] pairs = bindingString.split("[\\s,]+");
+        String[] pairs = bindingString.split("\\s*,\\s*");
         for (String pair : pairs) {
-            String[] nameValue = pair.split("[\\s=]+");
+            String[] nameValue = pair.split("\\s*=\\s*");
             bindings.put(nameValue[0], nameValue[1]);
         }
         return bindings;
