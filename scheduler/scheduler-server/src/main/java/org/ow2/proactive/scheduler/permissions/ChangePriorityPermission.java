@@ -48,7 +48,7 @@ public class ChangePriorityPermission extends ClientPermission {
      */
     public ChangePriorityPermission(String priorities) {
         super("change priority");
-        String[] split = priorities.split("[\\s,]+");
+        String[] split = priorities.split("\\s*,\\s*");
         this.priorities = new int[split.length];
         for (int i = 0; i < split.length; i++) {
             this.priorities[i] = Integer.parseInt(split[i]);

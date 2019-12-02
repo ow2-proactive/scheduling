@@ -57,7 +57,9 @@ public class ListParserValidator extends BaseParserValidator<String> {
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
         String commaSeparatedValuesString = parseAndGetOneGroup(model, LIST_REGEXP);
 
-        String[] stringValues = commaSeparatedValuesString.split("[\\s,]+");
+        // TODO A better regexp would be "\\s*,\\s*". Unfortunately, changing this requires to change all the portals
+        // specific code to this model
+        String[] stringValues = commaSeparatedValuesString.split(",");
         ImmutableList.Builder<String> listBuilder = new ImmutableList.Builder<>();
         if (ImmutableSet.copyOf(stringValues).size() < stringValues.length) {
             throw new ModelSyntaxException("Duplicate value in LIST");

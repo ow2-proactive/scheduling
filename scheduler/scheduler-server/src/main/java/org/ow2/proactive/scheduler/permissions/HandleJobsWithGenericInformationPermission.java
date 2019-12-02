@@ -56,7 +56,7 @@ public class HandleJobsWithGenericInformationPermission extends ClientPermission
     public HandleJobsWithGenericInformationPermission(String keysValuesCommaSeparated) {
         super(DESCRIPTION);
         if (keysValuesCommaSeparated != null) {
-            String[] keysValues = keysValuesCommaSeparated.split("[\\s,]+");
+            String[] keysValues = keysValuesCommaSeparated.split("\\s*,\\s*");
             populateGenericInformation(keysValues);
         }
 
