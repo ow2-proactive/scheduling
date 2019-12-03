@@ -39,7 +39,7 @@ import org.ow2.proactive.permissions.ClientPermission;
 public class HandleJobsWithBucketNamePermission extends ClientPermission {
     private final static String DESCRIPTION = "Handle Jobs that contains specific 'bucket_name' in Generic Information";
 
-    private final static String BUCKET_NAME = "bucket_name";
+    public final static String BUCKET_NAME = "bucket_name";
 
     private Set<String> allowedBuckets = new HashSet<>();
 
