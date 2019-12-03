@@ -78,6 +78,7 @@ import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
 import org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission;
 import org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission;
+import org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission;
 import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -430,15 +431,21 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @throws PermissionException
      *             if permission is denied
      */
-    void handleJobsWithGenericInformationPermission(Map<String, String> genericInformation, UserIdentificationImpl ui,
-            String errorMessage) throws PermissionException {
+    private void handleJobsWithGenericInformationPermission(Map<String, String> genericInformation,
+            UserIdentificationImpl ui, String errorMessage) throws PermissionException {
         ui.checkPermission(new HandleJobsWithGenericInformationPermission(genericInformation),
                            ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
     }
 
-    void handleJobBucketNameGenericInformationPermission(Map<String, String> genericInformation,
+    private void handleJobBucketNameGenericInformationPermission(Map<String, String> genericInformation,
             UserIdentificationImpl ui, String errorMessage) throws PermissionException {
         ui.checkPermission(new HandleJobsWithBucketNamePermission(genericInformation),
+                           ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
+    }
+
+    private void handleJobGroupNameGenericInformationPermission(Map<String, String> genericInformation,
+            UserIdentificationImpl ui, String errorMessage) throws PermissionException {
+        ui.checkPermission(new HandleJobsWithGroupNamePermission(genericInformation),
                            ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
     }
 
@@ -760,7 +767,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                              () -> handleJobBucketNameGenericInformationPermission(identifiedJob.getGenericInformation(),
                                                                                    checkPermission(methodName,
                                                                                                    errorMessage),
-                                                                                   errorMessage));
+                                                                                   errorMessage),
+                             // if group name is allows
+                             () -> handleJobGroupNameGenericInformationPermission(identifiedJob.getGenericInformation(),
+                                                                                  checkPermission(methodName,
+                                                                                                  errorMessage),
+                                                                                  errorMessage));
     }
 
     void checkPermissionChain(
