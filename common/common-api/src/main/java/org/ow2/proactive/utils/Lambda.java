@@ -239,7 +239,11 @@ public class Lambda {
     @FunctionalInterface
     public interface RunnableThatThrows {
         void run() throws Exception;
+    }
 
+    @FunctionalInterface
+    public interface RunnableThatThrowsException<T extends Throwable> {
+        void run() throws T;
     }
 
     @FunctionalInterface
