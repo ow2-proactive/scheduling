@@ -83,7 +83,6 @@ import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Lambda;
 import org.ow2.proactive.utils.Lambda.RunnableThatThrows3Exceptions;
-import org.ow2.proactive.utils.Lambda.RunnableThatThrowsException;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
