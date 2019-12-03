@@ -88,6 +88,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestEx
 @Path("/scheduler/")
 public interface SchedulerRestInterface {
 
+    String defaultStatusFilter = "running;pending;finished";
+
     /**
      * Returns the ids of the current jobs under a list of string.
      * 
@@ -470,7 +472,7 @@ public interface SchedulerRestInterface {
     RestPage<String> getTaskIds(@HeaderParam("sessionid") String sessionId,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
-            @QueryParam("statusFilter") @DefaultValue("") String statusFilter,
+            @QueryParam("statusFilter") @DefaultValue(value = defaultStatusFilter) String statusFilter,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit)
             throws RestException;
 
@@ -513,7 +515,7 @@ public interface SchedulerRestInterface {
     RestPage<String> getTaskIdsByTag(@HeaderParam("sessionid") String sessionId, @PathParam("tasktag") String taskTag,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
-            @QueryParam("statusFilter") @DefaultValue("") String statusFilter,
+            @QueryParam("statusFilter") @DefaultValue(value = defaultStatusFilter) String statusFilter,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit)
             throws RestException;
 
@@ -725,7 +727,7 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getTaskStates(@HeaderParam("sessionid") String sessionId,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
-            @QueryParam("statusFilter") @DefaultValue("") String statusFilter,
+            @QueryParam("statusFilter") @DefaultValue(value = defaultStatusFilter) String statusFilter,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("sortparameters") SortSpecifierContainer sortParams) throws RestException;
 
@@ -770,7 +772,7 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("tasktag") String taskTag, @QueryParam("from") @DefaultValue("0") long from,
             @QueryParam("to") @DefaultValue("0") long to, @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
-            @QueryParam("statusFilter") @DefaultValue("") String statusFilter,
+            @QueryParam("statusFilter") @DefaultValue(value = defaultStatusFilter) String statusFilter,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("sortparameters") SortSpecifierContainer sortParams) throws RestException;
 
