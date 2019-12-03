@@ -37,6 +37,7 @@ buildscript {
         classpath "org.ow2.proactive:coding-rules:1.0.0"
 
         classpath 'com.github.jk1:gradle-license-report:1.9'
+    classpath "gradle.plugin.net.ossindex:ossindex-gradle-plugin:0.4.11"
 
         delete "gradle/ext"
         ant.unjar src: configurations.classpath.find { it.name.startsWith("coding-rules") }, dest: 'gradle/ext'
@@ -66,6 +67,7 @@ def custom ={ "$rootDir/gradle/${it}.gradle"}
 apply plugin: 'java'
 apply plugin: 'org.sonarqube'
 apply plugin: 'com.github.jk1.dependency-license-report'
+apply plugin: 'net.ossindex.audit'
 apply from: "$rootDir/gradle/ext/coding-format.gradle"
 
 archivesBaseName = 'scheduling' // in case current folder is not named scheduling
@@ -88,7 +90,7 @@ allprojects {
     apply plugin: 'maven'
     apply plugin: 'project-report'
     apply plugin: 'com.github.jk1.dependency-license-report'
-
+    apply plugin: 'net.ossindex.audit'
 
     group = 'org.ow2.proactive'
     version = schedulingVersion
@@ -137,6 +139,7 @@ configure(javaSubprojects) {
     apply plugin: 'java'
     apply plugin: 'format'
     apply plugin: 'jacoco'
+    apply plugin: 'net.ossindex.audit'
 
 
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -150,7 +153,7 @@ configure(javaSubprojects) {
 
         runtime 'org.slf4j:slf4j-log4j12:1.7.12'
 
-        testCompile 'com.google.truth:truth:0.27'
+        testCompile 'com.google.truth:truth:0.30'
         testCompile 'junit:junit:4.12'
         testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
 
@@ -160,7 +163,7 @@ configure(javaSubprojects) {
         testCompile 'org.apache.commons:commons-lang3:3.4'
 
         testCompile 'org.postgresql:postgresql:42.0.0'
-        testCompile 'mysql:mysql-connector-java:8.0.11'
+        testCompile 'mysql:mysql-connector-java:8.0.18'
         testCompile 'com.microsoft.sqlserver:mssql-jdbc:7.1.2.jre8-preview'
 
     }
@@ -199,6 +202,14 @@ configure(javaSubprojects) {
             )
         }
     }
+
+    audit {
+        failOnError = false
+        rateLimitAsError = false
+        cache = System.getProperty("java.io.tmpdir") + File.separator + "ossindex.cache"
+    }
+
+    compileJava.dependsOn 'audit'
 }
 
 
