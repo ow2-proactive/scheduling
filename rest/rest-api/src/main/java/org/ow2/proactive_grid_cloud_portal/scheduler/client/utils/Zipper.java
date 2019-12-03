@@ -159,9 +159,11 @@ public class Zipper {
                 ZipOutputStream zos = new ZipOutputStream(os);
                 closer.register(zos);
                 for (File file : files) {
-                    FileInputStream inputStream = new FileInputStream(file);
-                    closer.register(inputStream);
-                    writeZipEntry(zipEntry(basepath, file), inputStream, zos);
+                    if (file.isFile()) {
+                        FileInputStream inputStream = new FileInputStream(file);
+                        closer.register(inputStream);
+                        writeZipEntry(zipEntry(basepath, file), inputStream, zos);
+                    }
                 }
             } catch (IOException ioe) {
                 throw closer.rethrow(ioe);
