@@ -163,6 +163,10 @@ public class Zipper {
                         FileInputStream inputStream = new FileInputStream(file);
                         closer.register(inputStream);
                         writeZipEntry(zipEntry(basepath, file), inputStream, zos);
+                    } else {
+                        ZipEntry ze = zipEntry(basepath, file);
+                        logger.trace("Adding directory zip entry: " + ze.toString());
+                        zos.putNextEntry(ze);
                     }
                 }
             } catch (IOException ioe) {
@@ -176,7 +180,7 @@ public class Zipper {
             Closer closer = Closer.create();
             closer.register(is);
             try {
-                logger.trace("Adding zip entry: " + zipEntry.toString());
+                logger.trace("Adding file zip entry: " + zipEntry.toString());
                 zos.putNextEntry(zipEntry);
                 ByteStreams.copy(is, zos);
                 zos.flush();
@@ -231,6 +235,7 @@ public class Zipper {
                            basepath.equals(file.getAbsolutePath())) ? file.getPath()
                                                                     : file.getAbsolutePath()
                                                                           .substring(basepath.length() + 1);
+            name = file.isDirectory() ? name.concat("/") : name;
             return new ZipEntry(name);
         }
     }
