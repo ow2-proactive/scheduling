@@ -61,6 +61,18 @@ public class HandleJobsWithBucketNamePermissionTest {
     }
 
     @Test
+    public void testThatJobForbiden2Buckets() {
+        HandleJobsWithBucketNamePermission fromSecutiryFile = new HandleJobsWithBucketNamePermission("uno,dos,trez");
+
+        Map<String, String> genericInfo = new HashMap<>();
+        genericInfo.put(HandleJobsWithBucketNamePermission.BUCKET_NAME, "uno,dos");
+
+        HandleJobsWithBucketNamePermission persmissionFromJob = new HandleJobsWithBucketNamePermission(genericInfo);
+
+        assertFalse(fromSecutiryFile.implies(persmissionFromJob));
+    }
+
+    @Test
     public void testOtherPermissionClassDoesNotBrakeIn() {
         HandleJobsWithBucketNamePermission fromSecutiryFile = new HandleJobsWithBucketNamePermission("uno,dos,trez");
 

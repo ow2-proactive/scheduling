@@ -82,6 +82,7 @@ import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Lambda;
+import org.ow2.proactive.utils.Lambda.RunnableThatThrows3Exceptions;
 import org.ow2.proactive.utils.Lambda.RunnableThatThrowsException;
 
 
@@ -763,10 +764,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                                                                                    errorMessage));
     }
 
-    void checkPermissionChain(RunnableThatThrowsException<SchedulerException>... checks)
+    void checkPermissionChain(
+            RunnableThatThrows3Exceptions<PermissionException, NotConnectedException, UnknownJobException>... checks)
             throws NotConnectedException, UnknownJobException, PermissionException {
         for (int i = 0; i < checks.length; ++i) {
-            RunnableThatThrowsException<SchedulerException> check = checks[i];
+            RunnableThatThrows3Exceptions<PermissionException, NotConnectedException, UnknownJobException> check = checks[i];
             try {
                 check.run();
             } catch (PermissionException pe) {
@@ -778,8 +780,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             } catch (NotConnectedException | UnknownJobException se) {
                 // we failed and we cannot continue
                 throw se;
-            } catch (Exception e) {
-                // we should not go here
             }
             break; // all good
         }
