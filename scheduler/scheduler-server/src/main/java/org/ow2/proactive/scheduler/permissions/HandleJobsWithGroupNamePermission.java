@@ -39,28 +39,28 @@ import org.ow2.proactive.permissions.ClientPermission;
 public class HandleJobsWithGroupNamePermission extends ClientPermission {
     private final static String DESCRIPTION = "Handle Jobs that contains specific 'group' in Generic Information";
 
-    public final static String BUCKET_NAME = "group";
+    public final static String GROUP = "group";
 
-    private Set<String> allowedBuckets = new HashSet<>();
+    private Set<String> allowedGroups = new HashSet<>();
 
     // permission created by the security file
-    public HandleJobsWithGroupNamePermission(String bucketsCommaSeparated) {
+    public HandleJobsWithGroupNamePermission(String groupsCommaSeparated) {
         super(DESCRIPTION);
-        if (bucketsCommaSeparated != null) {
-            allowedBuckets.addAll(Stream.of(bucketsCommaSeparated.split("\\s*,\\s*"))
-                                        .map(String::trim)
-                                        .collect(Collectors.toSet()));
+        if (groupsCommaSeparated != null) {
+            allowedGroups.addAll(Stream.of(groupsCommaSeparated.split("\\s*,\\s*"))
+                                       .map(String::trim)
+                                       .collect(Collectors.toSet()));
         }
     }
 
     // persmission of a job that needs to be authorised
     public HandleJobsWithGroupNamePermission(Map<String, String> genericInformations) {
         super(DESCRIPTION);
-        if (genericInformations.containsKey(BUCKET_NAME)) {
-            String bucketName = genericInformations.get(BUCKET_NAME);
-            this.allowedBuckets = Collections.singleton(bucketName);
+        if (genericInformations.containsKey(GROUP)) {
+            String bucketName = genericInformations.get(GROUP);
+            this.allowedGroups = Collections.singleton(bucketName);
         } else {
-            this.allowedBuckets = Collections.EMPTY_SET;
+            this.allowedGroups = Collections.EMPTY_SET;
         }
     }
 
@@ -75,9 +75,9 @@ public class HandleJobsWithGroupNamePermission extends ClientPermission {
 
         HandleJobsWithGroupNamePermission incomingPermission = (HandleJobsWithGroupNamePermission) p;
         // check incoming permission and permission given by the security file
-        if (incomingPermission.allowedBuckets.size() == 1) {
-            String incomingBucketName = incomingPermission.allowedBuckets.stream().findFirst().get();
-            return this.allowedBuckets.contains(incomingBucketName);
+        if (incomingPermission.allowedGroups.size() == 1) {
+            String incomingGroupName = incomingPermission.allowedGroups.stream().findFirst().get();
+            return this.allowedGroups.contains(incomingGroupName);
         } else {
             return false;
         }
