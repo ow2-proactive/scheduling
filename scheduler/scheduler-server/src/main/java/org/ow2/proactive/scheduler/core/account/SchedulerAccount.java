@@ -47,20 +47,42 @@ public final class SchedulerAccount implements Account {
 
     private long totalJobDuration;
 
+    private int pendingJobsCount;
+
+    private int currentJobsCount;
+
+    private int pastJobsCount;
+
+    private int pendingTasksCount;
+
+    private int currentTasksCount;
+
+    private int pastTasksCount;
+
+    private int pausedInErrorTasksCount;
+
     public SchedulerAccount() {
     }
 
     public SchedulerAccount(String username, int totalTaskCount, long totalTaskDuration, int totalJobCount,
-            long totalJobDuration) {
+            long totalJobDuration, int pendingJobsCount, int currentJobsCount, int pastJobsCount, int pendingTasksCount,
+            int currentTasksCount, int pastTasksCount, int pausedInErrorTasksCount) {
         this.username = username;
         this.totalTaskCount = totalTaskCount;
+        this.pendingTasksCount = pendingTasksCount;
+        this.currentTasksCount = currentTasksCount;
+        this.pastTasksCount = pastTasksCount;
+        this.pausedInErrorTasksCount = pausedInErrorTasksCount;
         this.totalTaskDuration = totalTaskDuration;
         this.totalJobCount = totalJobCount;
         this.totalJobDuration = totalJobDuration;
+        this.pendingJobsCount = pendingJobsCount;
+        this.currentJobsCount = currentJobsCount;
+        this.pastJobsCount = pastJobsCount;
     }
 
     /**
-     * The total count of tasks completed by the current user. 
+     * The total count of tasks completed by the current user.
      * @return the total task count
      */
     public int getTotalTaskCount() {
@@ -68,7 +90,39 @@ public final class SchedulerAccount implements Account {
     }
 
     /**
-     * The total time duration in milliseconds of tasks completed by the current user. 
+     * The total count of pending tasks submitted by the current user.
+     * @return the total task count
+     */
+    public int getPendingTasksCount() {
+        return this.pendingTasksCount;
+    }
+
+    /**
+     * The total count of current tasks submitted by the current user.
+     * @return the total task count
+     */
+    public int getCurrentTasksCount() {
+        return this.currentTasksCount;
+    }
+
+    /**
+     * The total count of past tasks submitted by the current user.
+     * @return the total task count
+     */
+    public int getPastTasksCount() {
+        return this.pastTasksCount;
+    }
+
+    /**
+     * The total count of past tasks submitted by the current user.
+     * @return the total task count
+     */
+    public int getPausedInErrorTasksCount() {
+        return this.pausedInErrorTasksCount;
+    }
+
+    /**
+     * The total time duration in milliseconds of tasks completed by the current user.
      * @return the total task duration in milliseconds
      */
     public long getTotalTaskDuration() {
@@ -76,7 +130,7 @@ public final class SchedulerAccount implements Account {
     }
 
     /**
-     * The total count of jobs completed by the current user. 
+     * The total count of jobs completed by the current user.
      * @return the total jobs count
      */
     public int getTotalJobCount() {
@@ -84,7 +138,31 @@ public final class SchedulerAccount implements Account {
     }
 
     /**
-     * The total time duration in milliseconds of jobs completed by the current user. 
+     * The total count of pending jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getPendingJobsCount() {
+        return pendingJobsCount;
+    }
+
+    /**
+     * The total count of current jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getCurrentJobsCount() {
+        return currentJobsCount;
+    }
+
+    /**
+     * The total count of past jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getPastJobsCount() {
+        return pastJobsCount;
+    }
+
+    /**
+     * The total time duration in milliseconds of jobs completed by the current user.
      * @return the total job duration in milliseconds
      */
     public long getTotalJobDuration() {
@@ -92,7 +170,7 @@ public final class SchedulerAccount implements Account {
     }
 
     /**
-     * Returns the username of this account. 
+     * Returns the username of this account.
      * @return the username of this account
      */
     public String getName() {

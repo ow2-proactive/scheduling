@@ -34,25 +34,67 @@ package org.ow2.proactive.scheduler.core.jmx.mbean;
 public interface MyAccountMBean {
 
     /**
-     * The total count of jobs completed by the current user. 
+     * The total count of jobs completed by the current user.
      * @return the total job count
      */
     int getTotalJobCount();
 
     /**
-     * The total time duration in milliseconds of jobs completed by the current user. 
+     * The total count of pending jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    int getPendingJobsCount();
+
+    /**
+     * The total count of current jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    int getCurrentJobsCount();
+
+    /**
+     * The total count of finished jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    int getPastJobsCount();
+
+    /**
+     * The total time duration in milliseconds of jobs completed by the current user.
      * @return the total job duration in milliseconds
      */
     long getTotalJobDuration();
 
     /**
-     * The total count of tasks completed by the current user. 
+     * The total count of tasks completed by the current user.
      * @return the total task count
      */
     int getTotalTaskCount();
 
     /**
-     * The total time duration in milliseconds of tasks completed by the current user. 
+     * The total count of pending tasks submitted by the current user.
+     * @return the total task count
+     */
+    int getPendingTasksCount();
+
+    /**
+     * The total count of current tasks submitted by the current user.
+     * @return the total task count
+     */
+    int getCurrentTasksCount();
+
+    /**
+     * The total count of past tasks submitted by the current user.
+     * @return the total task count
+     */
+    int getPastTasksCount();
+
+    /**
+     * The total count of paused and in-error tasks submitted by the current user.
+     * @return the total task count
+     */
+    int getPausedInErrorTasksCount();
+
+    /**
+     * The total time duration in milliseconds of tasks completed by the current user.
      * @return the total task duration in milliseconds
      */
     long getTotalTaskDuration();
