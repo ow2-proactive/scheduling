@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,9 +64,9 @@ public class ChildFirstClassLoader extends URLClassLoader {
                 logger.debug(name + " loaded from jar " + Arrays.toString(getURLs()));
             } catch (ClassNotFoundException e) {
                 logger.debug(name + " not found in jar " + Arrays.toString(getURLs()));
+                logger.debug(name + " loading from parent " + getParent());
                 // class is not found in the given urls, try it in parent classloader.
                 // If class is still not found, then this method will throw class not found ex.
-                logger.debug(name + " loading from parent " + getParent());
                 loadedClass = super.loadClass(name, resolve);
             }
         }
@@ -80,40 +80,16 @@ public class ChildFirstClassLoader extends URLClassLoader {
     public Enumeration<URL> getResources(String name) throws IOException {
         List<URL> allRes = new LinkedList<>();
         // load resource from this classloader
-        Enumeration<URL> thisRes = findResources(name);
-        if (thisRes != null) {
-            while (thisRes.hasMoreElements()) {
-                allRes.add(thisRes.nextElement());
-            }
-        }
+        allRes.addAll(Collections.list(findResources(name)));
         // then try finding resources from parent classloaders
-        Enumeration<URL> parentRes = super.findResources(name);
-        if (parentRes != null) {
-            while (parentRes.hasMoreElements()) {
-                allRes.add(parentRes.nextElement());
-            }
-        }
-        return new Enumeration<URL>() {
-            Iterator<URL> it = allRes.iterator();
+        allRes.addAll(Collections.list(super.getResources(name)));
 
-            @Override
-            public boolean hasMoreElements() {
-                return it.hasNext();
-            }
-
-            @Override
-            public URL nextElement() {
-                return it.next();
-            }
-        };
+        return Collections.enumeration(allRes);
     }
 
     @Override
     public URL getResource(String name) {
-        URL res = null;
-        if (res == null) {
-            res = findResource(name);
-        }
+        URL res = findResource(name);
         if (res == null) {
             res = super.getResource(name);
         }
