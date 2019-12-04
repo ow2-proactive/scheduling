@@ -27,29 +27,36 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.utils.ChildFirstClassLoader;
+import org.ow2.proactive.resourcemanager.utils.FilePathHelper;
 
 
 /**
- *
  * Provides a generic way to create an infrastructure manager.
  * Loads all supported infrastructure names from a config file. Checks that required
  * infrastructure is supported at creation time.
- *
  */
 public class InfrastructureManagerFactory {
 
-    /** list of supported infrastructures */
-    private static Collection<Class<?>> supportedInfrastructures;
-
     private static final Logger logger = Logger.getLogger(InfrastructureManagerFactory.class);
+
+    // the class loader of this class (usually it is the system class loader)
+    private static ClassLoader originalClassLoader = InfrastructureManagerFactory.class.getClassLoader();
+
+    // store the corresponding class loader for each infrastructure manager (key is the infrastructure class name)
+    private static Map<String, ClassLoader> infraClassLoaderMap = new HashMap<>();
 
     /**
      * Creates new infrastructure manager using reflection mechanism.
@@ -72,24 +79,24 @@ public class InfrastructureManagerFactory {
             if (!supported) {
                 throw new IllegalArgumentException(infrastructureType + " is not supported");
             }
-
-            Class<?> imClass = Class.forName(infrastructureType);
+            Class<?> imClass = loadInfrastructureClass(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
             im.internalConfigure(infrastructureParameters);
             im.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(nodeSourceDescriptor));
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return im;
     }
 
     /**
-      * Creates a new infrastructure manager and recovers its state thanks to
-      * the variables contained in the nodeSourceDescriptor.
-      *
-      * @param nodeSourceDescriptor the persisted information about the node source
-      * @return recovered infrastructure manager
-      */
+     * Creates a new infrastructure manager and recovers its state thanks to
+     * the variables contained in the nodeSourceDescriptor.
+     *
+     * @param nodeSourceDescriptor the persisted information about the node source
+     * @return recovered infrastructure manager
+     */
     public static InfrastructureManager recover(NodeSourceDescriptor nodeSourceDescriptor) {
         InfrastructureManager infrastructure = create(nodeSourceDescriptor);
         infrastructure.recoverPersistedInfraVariables(nodeSourceDescriptor.getLastRecoveredInfrastructureVariables());
@@ -98,6 +105,7 @@ public class InfrastructureManagerFactory {
 
     /**
      * Loads a list of supported infrastructures from a configuration file
+     *
      * @return list of supported infrastructures
      */
     public static Collection<Class<?>> getSupportedInfrastructures() {
@@ -118,17 +126,92 @@ public class InfrastructureManagerFactory {
             logger.error("Error when loading infrastructure definition file : " + propFileName, e);
         }
 
-        supportedInfrastructures = new ArrayList<>(properties.size());
+        Collection<Class<?>> supportedInfrastructures = new ArrayList<>(properties.size());
 
         for (Object className : properties.keySet()) {
             try {
-                Class<?> cls = Class.forName(className.toString());
+                Class<?> cls = loadInfrastructureClass(className.toString());
                 supportedInfrastructures.add(cls);
             } catch (ClassNotFoundException e) {
                 logger.error("Cannot find infrastructure class " + className.toString());
+            } catch (Exception e) {
+                logger.error("Error when getSupportedInfrastructures : ", e);
+                e.printStackTrace();
             }
         }
 
         return supportedInfrastructures;
+    }
+
+    /**
+     * Load the infrastructure class with a child-first delegation mechanims class loader.
+     * This child-first class loader allows the different infrastructures use their specific version of dependent library.
+     * To ensure the infrastructure class always use the correct class loader, both its class loader and thread context class loader are specified.
+     *
+     * @param infraClassName the complete class name of the infrastructure
+     * @return the loaded class of the infrastructure
+     * @throws ClassNotFoundException
+     */
+    private static Class<?> loadInfrastructureClass(String infraClassName) throws ClassNotFoundException {
+        ClassLoader classLoader = getInfrastructureClassLoader(infraClassName);
+        Thread.currentThread().setContextClassLoader(classLoader);
+        logger.debug("thread class loader: " + Thread.currentThread().getContextClassLoader());
+        Class<?> imClass = Class.forName(infraClassName, true, classLoader);
+        logger.debug(imClass.getName() + "--------- class loader: " + imClass.getClassLoader());
+        if (imClass.getClassLoader() instanceof ChildFirstClassLoader) {
+            logger.debug("url:" + Arrays.toString(((ChildFirstClassLoader) imClass.getClassLoader()).getURLs()));
+        }
+        return imClass;
+    }
+
+    // try to get the infrastructure class loader from stored map, create if not found.
+    private static ClassLoader getInfrastructureClassLoader(String infraClassName) {
+        ClassLoader infraClassLoader = infraClassLoaderMap.get(infraClassName);
+        if (infraClassLoader == null) {
+            infraClassLoader = createInfrastructureClassLoader(infraClassName);
+            infraClassLoaderMap.put(infraClassName, infraClassLoader);
+        }
+        return infraClassLoader;
+    }
+
+    /**
+     * Create ClassLoader for an infrastructure manager,
+     * in case of addons infrastructure, a child-first class loader will be created and returned.
+     * otherwise, originalClassLoader will be returned.
+     * 
+      * @param infraClassName
+     * @return
+     */
+    private static ClassLoader createInfrastructureClassLoader(String infraClassName) {
+        if (isAddonsInfrastructure(infraClassName)) {
+            URL[] infraJarUrl = FilePathHelper.findJarsInPath(getInfrastructureJarDirPath(infraClassName));
+            return new ChildFirstClassLoader(infraJarUrl, originalClassLoader);
+        } else {
+            return originalClassLoader;
+        }
+    }
+
+    /**
+     * Check whether the infrastructure should be loaded from addons jar.
+     * The infrastructure is considered to be loaded from addons jar, iff server addons directory contains a directory named as infrastructure name in minuscule.
+     *
+     * @param infrasClassName The complete class name of the infrastructure
+     * @return whether the infrastructure should be loaded from addons jar
+     */
+    private static boolean isAddonsInfrastructure(String infrasClassName) {
+        File infraAddonDir = new File(getInfrastructureJarDirPath(infrasClassName));
+        return infraAddonDir.exists() && infraAddonDir.isDirectory();
+    }
+
+    private static String getInfrastructureJarDirPath(String infrasClassName) {
+        return FilePathHelper.getAddonsPath() + File.separator + getClassSimpleName(infrasClassName).toLowerCase();
+    }
+
+    private static String getClassSimpleName(String classFullName) {
+        int infraNameBeginIndex = classFullName.lastIndexOf(".") + 1;
+        if (infraNameBeginIndex >= classFullName.length()) {
+            throw new IllegalArgumentException(classFullName + " is not a valid class name.");
+        }
+        return classFullName.substring(infraNameBeginIndex);
     }
 }
