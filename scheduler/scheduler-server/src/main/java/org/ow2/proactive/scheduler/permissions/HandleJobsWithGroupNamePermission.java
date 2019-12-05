@@ -37,7 +37,7 @@ import org.ow2.proactive.permissions.ClientPermission;
 
 
 public class HandleJobsWithGroupNamePermission extends ClientPermission {
-    private final static String DESCRIPTION = "Handle Jobs that contains specific 'group' in Generic Information";
+    private final static String DESCRIPTION = "Handle Jobs that contain specific 'group' in Generic Information";
 
     public final static String GROUP = "group";
 
@@ -57,8 +57,8 @@ public class HandleJobsWithGroupNamePermission extends ClientPermission {
     public HandleJobsWithGroupNamePermission(Map<String, String> genericInformations) {
         super(DESCRIPTION);
         if (genericInformations.containsKey(GROUP)) {
-            String bucketName = genericInformations.get(GROUP);
-            this.allowedGroups = Collections.singleton(bucketName);
+            String groupName = genericInformations.get(GROUP);
+            this.allowedGroups = Collections.singleton(groupName);
         } else {
             this.allowedGroups = Collections.EMPTY_SET;
         }

@@ -49,6 +49,30 @@ public class HandleJobsWithGroupNamePermissionTest {
     }
 
     @Test
+    public void testThatJobAllowed2dGroup() {
+        HandleJobsWithGroupNamePermission fromSecutiryFile = new HandleJobsWithGroupNamePermission("uno,dos,trez");
+
+        Map<String, String> genericInfo = new HashMap<>();
+        genericInfo.put(HandleJobsWithGroupNamePermission.GROUP, "dos");
+
+        HandleJobsWithGroupNamePermission persmissionFromJob = new HandleJobsWithGroupNamePermission(genericInfo);
+
+        assertTrue(fromSecutiryFile.implies(persmissionFromJob));
+    }
+
+    @Test
+    public void testThatJobAllowed3rdGroup() {
+        HandleJobsWithGroupNamePermission fromSecutiryFile = new HandleJobsWithGroupNamePermission("uno,dos,trez");
+
+        Map<String, String> genericInfo = new HashMap<>();
+        genericInfo.put(HandleJobsWithGroupNamePermission.GROUP, "trez");
+
+        HandleJobsWithGroupNamePermission persmissionFromJob = new HandleJobsWithGroupNamePermission(genericInfo);
+
+        assertTrue(fromSecutiryFile.implies(persmissionFromJob));
+    }
+
+    @Test
     public void testThatJobForbiden() {
         HandleJobsWithGroupNamePermission fromSecutiryFile = new HandleJobsWithGroupNamePermission("uno,dos,trez");
 
@@ -61,7 +85,7 @@ public class HandleJobsWithGroupNamePermissionTest {
     }
 
     @Test
-    public void testThatJobForbiden2Buckets() {
+    public void testThatJobForbiden2Groups() {
         HandleJobsWithGroupNamePermission fromSecutiryFile = new HandleJobsWithGroupNamePermission("uno,dos,trez");
 
         Map<String, String> genericInfo = new HashMap<>();

@@ -49,6 +49,30 @@ public class HandleJobsWithBucketNamePermissionTest {
     }
 
     @Test
+    public void testThatJobAllowed2dBucket() {
+        HandleJobsWithBucketNamePermission fromSecutiryFile = new HandleJobsWithBucketNamePermission("uno,dos,trez");
+
+        Map<String, String> genericInfo = new HashMap<>();
+        genericInfo.put(HandleJobsWithBucketNamePermission.BUCKET_NAME, "doz");
+
+        HandleJobsWithBucketNamePermission persmissionFromJob = new HandleJobsWithBucketNamePermission(genericInfo);
+
+        assertTrue(fromSecutiryFile.implies(persmissionFromJob));
+    }
+
+    @Test
+    public void testThatJobAllowed3rdBucket() {
+        HandleJobsWithBucketNamePermission fromSecutiryFile = new HandleJobsWithBucketNamePermission("uno,dos,trez");
+
+        Map<String, String> genericInfo = new HashMap<>();
+        genericInfo.put(HandleJobsWithBucketNamePermission.BUCKET_NAME, "trez");
+
+        HandleJobsWithBucketNamePermission persmissionFromJob = new HandleJobsWithBucketNamePermission(genericInfo);
+
+        assertTrue(fromSecutiryFile.implies(persmissionFromJob));
+    }
+
+    @Test
     public void testThatJobForbiden() {
         HandleJobsWithBucketNamePermission fromSecutiryFile = new HandleJobsWithBucketNamePermission("uno,dos,trez");
 
