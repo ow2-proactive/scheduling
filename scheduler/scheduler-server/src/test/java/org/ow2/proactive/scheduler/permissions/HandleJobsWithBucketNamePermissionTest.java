@@ -53,7 +53,7 @@ public class HandleJobsWithBucketNamePermissionTest {
         HandleJobsWithBucketNamePermission fromSecutiryFile = new HandleJobsWithBucketNamePermission("uno,dos,trez");
 
         Map<String, String> genericInfo = new HashMap<>();
-        genericInfo.put(HandleJobsWithBucketNamePermission.BUCKET_NAME, "doz");
+        genericInfo.put(HandleJobsWithBucketNamePermission.BUCKET_NAME, "dos");
 
         HandleJobsWithBucketNamePermission persmissionFromJob = new HandleJobsWithBucketNamePermission(genericInfo);
 
