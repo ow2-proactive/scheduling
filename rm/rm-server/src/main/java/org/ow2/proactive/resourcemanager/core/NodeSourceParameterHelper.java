@@ -37,10 +37,12 @@ import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
+import org.ow2.proactive.resourcemanager.utils.AddonClassUtils;
 import org.ow2.proactive.utils.Lambda;
 
 
 public class NodeSourceParameterHelper {
+    private static ClassLoader originalClassLoader = NodeSourceParameterHelper.class.getClassLoader();
 
     public Collection<ConfigurableField> getPluginConfigurableFields(String pluginClassName)
             throws PluginNotFoundException {
@@ -117,7 +119,13 @@ public class NodeSourceParameterHelper {
         Class<NodeSourcePlugin> pluginClass;
 
         try {
-            pluginClass = (Class<NodeSourcePlugin>) Class.forName(pluginClassName);
+            // The plugin should use its proper class loader if its jar is in the addons/<plugin simple class name(in minuscule)> directory
+            if (AddonClassUtils.isAddon(pluginClassName)) {
+                ClassLoader classLoader = AddonClassUtils.getAddonClassLoader(pluginClassName, originalClassLoader);
+                pluginClass = (Class<NodeSourcePlugin>) Class.forName(pluginClassName, true, classLoader);
+            } else {
+                pluginClass = (Class<NodeSourcePlugin>) Class.forName(pluginClassName);
+            }
         } catch (ClassNotFoundException e) {
             throw new PluginNotFoundException(pluginClassName, e);
         }

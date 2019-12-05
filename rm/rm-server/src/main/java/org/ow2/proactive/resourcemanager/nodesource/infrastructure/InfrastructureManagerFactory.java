@@ -27,20 +27,17 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.utils.AddonClassUtils;
 import org.ow2.proactive.resourcemanager.utils.ChildFirstClassLoader;
-import org.ow2.proactive.resourcemanager.utils.FilePathHelper;
 
 
 /**
@@ -54,9 +51,6 @@ public class InfrastructureManagerFactory {
 
     // the class loader of this class (usually it is the system class loader)
     private static ClassLoader originalClassLoader = InfrastructureManagerFactory.class.getClassLoader();
-
-    // store the corresponding class loader for each infrastructure manager (key is the infrastructure class name)
-    private static Map<String, ClassLoader> infraClassLoaderMap = new HashMap<>();
 
     /**
      * Creates new infrastructure manager using reflection mechanism.
@@ -153,7 +147,7 @@ public class InfrastructureManagerFactory {
      * @throws ClassNotFoundException
      */
     private static Class<?> loadInfrastructureClass(String infraClassName) throws ClassNotFoundException {
-        ClassLoader classLoader = getInfrastructureClassLoader(infraClassName);
+        ClassLoader classLoader = AddonClassUtils.getAddonClassLoader(infraClassName, originalClassLoader);
         Thread.currentThread().setContextClassLoader(classLoader);
         logger.debug("thread class loader: " + Thread.currentThread().getContextClassLoader());
         Class<?> imClass = Class.forName(infraClassName, true, classLoader);
@@ -162,56 +156,5 @@ public class InfrastructureManagerFactory {
             logger.debug("url:" + Arrays.toString(((ChildFirstClassLoader) imClass.getClassLoader()).getURLs()));
         }
         return imClass;
-    }
-
-    // try to get the infrastructure class loader from stored map, create if not found.
-    private static ClassLoader getInfrastructureClassLoader(String infraClassName) {
-        ClassLoader infraClassLoader = infraClassLoaderMap.get(infraClassName);
-        if (infraClassLoader == null) {
-            infraClassLoader = createInfrastructureClassLoader(infraClassName);
-            infraClassLoaderMap.put(infraClassName, infraClassLoader);
-        }
-        return infraClassLoader;
-    }
-
-    /**
-     * Create ClassLoader for an infrastructure manager,
-     * in case of addons infrastructure, a child-first class loader will be created and returned.
-     * otherwise, originalClassLoader will be returned.
-     * 
-      * @param infraClassName
-     * @return
-     */
-    private static ClassLoader createInfrastructureClassLoader(String infraClassName) {
-        if (isAddonsInfrastructure(infraClassName)) {
-            URL[] infraJarUrl = FilePathHelper.findJarsInPath(getInfrastructureJarDirPath(infraClassName));
-            return new ChildFirstClassLoader(infraJarUrl, originalClassLoader);
-        } else {
-            return originalClassLoader;
-        }
-    }
-
-    /**
-     * Check whether the infrastructure should be loaded from addons jar.
-     * The infrastructure is considered to be loaded from addons jar, iff server addons directory contains a directory named as infrastructure name in minuscule.
-     *
-     * @param infrasClassName The complete class name of the infrastructure
-     * @return whether the infrastructure should be loaded from addons jar
-     */
-    private static boolean isAddonsInfrastructure(String infrasClassName) {
-        File infraAddonDir = new File(getInfrastructureJarDirPath(infrasClassName));
-        return infraAddonDir.exists() && infraAddonDir.isDirectory();
-    }
-
-    private static String getInfrastructureJarDirPath(String infrasClassName) {
-        return FilePathHelper.getAddonsPath() + File.separator + getClassSimpleName(infrasClassName).toLowerCase();
-    }
-
-    private static String getClassSimpleName(String classFullName) {
-        int infraNameBeginIndex = classFullName.lastIndexOf(".") + 1;
-        if (infraNameBeginIndex >= classFullName.length()) {
-            throw new IllegalArgumentException(classFullName + " is not a valid class name.");
-        }
-        return classFullName.substring(infraNameBeginIndex);
     }
 }
