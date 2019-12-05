@@ -50,7 +50,6 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
 
         int taskCount;
 
-        // TODO complete the singleJobScenario with task the following statistics
         int pendingTasksCount;
 
         int currentTasksCount;
