@@ -132,6 +132,8 @@ public enum TaskStatus implements java.io.Serializable {
                                                                         WAITING_ON_ERROR,
                                                                         WAITING_ON_FAILURE);
 
+    public static final Set<TaskStatus> PAUSED_AND_IN_ERROR_TASKS = ImmutableSet.of(PAUSED, IN_ERROR);
+
     public static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(SUBMITTED, PENDING);
 
     /** The name of the current status. */
