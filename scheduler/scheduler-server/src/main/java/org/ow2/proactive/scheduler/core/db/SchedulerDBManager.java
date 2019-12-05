@@ -56,6 +56,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -358,7 +359,7 @@ public class SchedulerDBManager {
 
             Criteria criteria = session.createCriteria(JobData.class);
             criteria.setFetchMode("tasks", FetchMode.JOIN);
-            criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+            criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
             criteria.add(Restrictions.eq("owner", userName));
             // exclude killed but not started jobs
             criteria.add(Restrictions.gt("startTime", -1L));
@@ -398,6 +399,42 @@ public class SchedulerDBManager {
         return getJobsNumberWithStatus(Collections.singletonList(JobStatus.RUNNING));
     }
 
+    public int getPendingJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.PENDING), username);
+    }
+
+    public int getStalledJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.STALLED), username);
+    }
+
+    public int getRunningJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.RUNNING), username);
+    }
+
+    public int getPausedJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.PAUSED), username);
+    }
+
+    public int getInErrorJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.IN_ERROR), username);
+    }
+
+    public int getFailedJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.FAILED), username);
+    }
+
+    public int getKilledJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.KILLED), username);
+    }
+
+    public int getFinishedJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.FINISHED), username);
+    }
+
+    public int getCanceledJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.CANCELED), username);
+    }
+
     public long getTotalJobsCount() {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getTotalJobsCount");
@@ -410,6 +447,16 @@ public class SchedulerDBManager {
             Query query = session.getNamedQuery("getJobsNumberWithStatus").setParameterList("status", status);
 
             return (Long) query.uniqueResult();
+        });
+    }
+
+    private int getJobsNumberWithStatusForUser(final Collection<JobStatus> status, String username) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsNumberWithStatusUsername")
+                                 .setParameter("username", username)
+                                 .setParameterList("status", status);
+
+            return Math.toIntExact((Long) query.uniqueResult());
         });
     }
 
@@ -449,6 +496,15 @@ public class SchedulerDBManager {
         });
     }
 
+    public int getTaskCountForUser(Collection<TaskStatus> filter, String username) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTasksCountForUsername")
+                                 .setParameter("username", username)
+                                 .setParameterList("taskStatus", filter);
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
     public long getRunningTasksCount() {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getRunningTasksCount")
@@ -460,9 +516,7 @@ public class SchedulerDBManager {
     }
 
     public long getTotalTasksCount() {
-        return executeReadOnlyTransaction(session -> {
-            return (Long) session.getNamedQuery("getTotalTasksCount").uniqueResult();
-        });
+        return executeReadOnlyTransaction(session -> (Long) session.getNamedQuery("getTotalTasksCount").uniqueResult());
     }
 
     public double getMeanJobPendingTime() {
@@ -594,24 +648,6 @@ public class SchedulerDBManager {
     public SchedulerAccount readAccount(final String username) {
         return executeReadOnlyTransaction(session -> {
             Query tasksQuery = session.getNamedQuery("readAccountTasks").setParameter("username", username);
-            Query pendingTasksQuery = session.getNamedQuery("getTasksCountForUsername")
-                                             .setParameter("username", username)
-                                             .setParameterList("taskStatus", TaskStatus.PENDING_TASKS);
-            Query currentTasksQuery = session.getNamedQuery("getTasksCountForUsername")
-                                             .setParameter("username", username)
-                                             .setParameterList("taskStatus", TaskStatus.RUNNING_TASKS);
-            Query pastTasksQuery = session.getNamedQuery("getTasksCountForUsername")
-                                          .setParameter("username", username)
-                                          .setParameterList("taskStatus", TaskStatus.FINISHED_TASKS);
-            Query pausedInErrorTasksQuery = session.getNamedQuery("getTasksCountForUsername")
-                                                   .setParameter("username", username)
-                                                   .setParameterList("taskStatus",
-                                                                     TaskStatus.PAUSED_AND_IN_ERROR_TASKS);
-
-            int pendingTasksCount = ((Number) pendingTasksQuery.uniqueResult()).intValue();
-            int currentTasksCount = ((Number) currentTasksQuery.uniqueResult()).intValue();
-            int pastTasksCount = ((Number) pastTasksQuery.uniqueResult()).intValue();
-            int pausedInErrorTasksCount = ((Number) pausedInErrorTasksQuery.uniqueResult()).intValue();
 
             int taskCount;
             long taskDuration;
@@ -624,20 +660,12 @@ public class SchedulerDBManager {
                 taskDuration = 0L;
             }
 
-            Query jobQuery = session.getNamedQuery("readAccountJobs").setParameter("username", username);
-            Query pastJobsQuery = session.getNamedQuery("getJobsNumberWithStatusAndUser")
-                                         .setParameter("username", username)
-                                         .setParameterList("status", FINISHED_JOB_STATUSES);
-            Query currentJobsQuery = session.getNamedQuery("getJobsNumberWithStatusAndUser")
-                                            .setParameter("username", username)
-                                            .setParameterList("status", RUNNING_JOB_STATUSES);
-            Query pendingJobsQuery = session.getNamedQuery("getJobsNumberWithStatusAndUser")
-                                            .setParameter("username", username)
-                                            .setParameterList("status", PENDING_JOB_STATUSES);
+            int pendingTasksCount = getTaskCountForUser(TaskStatus.PENDING_TASKS, username);
+            int currentTasksCount = getTaskCountForUser(TaskStatus.RUNNING_TASKS, username);
+            int pastTasksCount = getTaskCountForUser(TaskStatus.FINISHED_TASKS, username);
+            int pausedInErrorTasksCount = getTaskCountForUser(TaskStatus.PAUSED_AND_IN_ERROR_TASKS, username);
 
-            int pendingJobsCount = ((Number) pendingJobsQuery.uniqueResult()).intValue();
-            int currentJobsCount = ((Number) currentJobsQuery.uniqueResult()).intValue();
-            int pastJobsCount = ((Number) pastJobsQuery.uniqueResult()).intValue();
+            Query jobQuery = session.getNamedQuery("readAccountJobs").setParameter("username", username);
 
             int jobCount;
             long jobDuration;
@@ -650,18 +678,26 @@ public class SchedulerDBManager {
                 jobDuration = 0L;
             }
 
-            return new SchedulerAccount(username,
-                                        taskCount,
-                                        taskDuration,
-                                        jobCount,
-                                        jobDuration,
-                                        pendingJobsCount,
-                                        currentJobsCount,
-                                        pastJobsCount,
-                                        pendingTasksCount,
-                                        currentTasksCount,
-                                        pastTasksCount,
-                                        pausedInErrorTasksCount);
+            return SchedulerAccount.builder()
+                                   .username(username)
+                                   .totalTaskCount(taskCount)
+                                   .totalTaskDuration(taskDuration)
+                                   .totalJobCount(jobCount)
+                                   .totalJobDuration(jobDuration)
+                                   .pendingTasksCount(pendingTasksCount)
+                                   .currentTasksCount(currentTasksCount)
+                                   .pastTasksCount(pastTasksCount)
+                                   .pausedInErrorTasksCount(pausedInErrorTasksCount)
+                                   .pendingJobsCount(getPendingJobsCount(username))
+                                   .stalledJobsCount(getStalledJobsCount(username))
+                                   .runningJobsCount(getRunningJobsCount(username))
+                                   .pausedJobsCount(getPausedJobsCount(username))
+                                   .inErrorJobsCount(getInErrorJobsCount(username))
+                                   .failedJobsCount(getFailedJobsCount(username))
+                                   .canceledJobsCount(getCanceledJobsCount(username))
+                                   .killedJobsCount(getKilledJobsCount(username))
+                                   .finishedJobsCount(getFinishedJobsCount(username))
+                                   .build();
         });
     }
 

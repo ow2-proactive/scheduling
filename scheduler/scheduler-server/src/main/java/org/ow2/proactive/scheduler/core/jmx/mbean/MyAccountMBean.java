@@ -40,24 +40,6 @@ public interface MyAccountMBean {
     int getTotalJobCount();
 
     /**
-     * The total count of pending jobs submitted by the current user.
-     * @return the total jobs count
-     */
-    int getPendingJobsCount();
-
-    /**
-     * The total count of current jobs submitted by the current user.
-     * @return the total jobs count
-     */
-    int getCurrentJobsCount();
-
-    /**
-     * The total count of finished jobs submitted by the current user.
-     * @return the total jobs count
-     */
-    int getPastJobsCount();
-
-    /**
      * The total time duration in milliseconds of jobs completed by the current user.
      * @return the total job duration in milliseconds
      */
@@ -98,4 +80,58 @@ public interface MyAccountMBean {
      * @return the total task duration in milliseconds
      */
     long getTotalTaskDuration();
+
+    /**
+     * The total count of pending jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    int getPendingJobsCount();
+
+    /**
+     * The total count of stalled jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getStalledJobsCount();
+
+    /**
+     * The total count of running jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getRunningJobsCount();
+
+    /**
+     * The total count of paused jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getPausedJobsCount();
+
+    /**
+     * The total count of in-error jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getInErrorJobsCount();
+
+    /**
+     * The total count of canceled jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getCanceledJobsCount();
+
+    /**
+     * The total count of failed jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getFailedJobsCount();
+
+    /**
+     * The total count of killed jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getKilledJobsCount();
+
+    /**
+     * The total count of finished jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getFinishedJobsCount();
 }

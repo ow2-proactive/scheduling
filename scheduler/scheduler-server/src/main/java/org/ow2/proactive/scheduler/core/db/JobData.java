@@ -85,7 +85,7 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "countJobData", query = "select count (*) from JobData"),
                 @NamedQuery(name = "findUsersWithJobs", query = "select owner, count(owner), max(submittedTime) from JobData group by owner"),
                 @NamedQuery(name = "getJobsNumberWithStatus", query = "select count(*) from JobData where status in (:status) and removedTime = -1"),
-                @NamedQuery(name = "getJobsNumberWithStatusAndUser", query = "select count(*) from JobData where owner = :username and status in (:status) and removedTime = -1"),
+                @NamedQuery(name = "getJobsNumberWithStatusUsername", query = "select count(*) from JobData where owner = :username and status in (:status) and removedTime = -1"),
                 @NamedQuery(name = "getJobSubmittedTime", query = "select submittedTime from JobData where id = :id"),
                 @NamedQuery(name = "getMeanJobExecutionTime", query = "select avg(finishedTime - startTime) from JobData where startTime > 0 and finishedTime > 0"),
                 @NamedQuery(name = "getMeanJobPendingTime", query = "select avg(startTime - submittedTime) from JobData where startTime > 0 and submittedTime > 0"),
@@ -249,8 +249,7 @@ public class JobData implements Serializable {
 
     JobInfo toJobInfo() {
         JobId jobIdInstance = new JobIdImpl(getId(), getJobName());
-        JobInfoImpl jobInfo = createJobInfo(jobIdInstance);
-        return jobInfo;
+        return createJobInfo(jobIdInstance);
     }
 
     InternalJob toInternalJob() {

@@ -105,12 +105,36 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
         return this.perThreadAccount.get().getPendingJobsCount();
     }
 
-    public int getCurrentJobsCount() {
-        return this.perThreadAccount.get().getCurrentJobsCount();
+    public int getStalledJobsCount() {
+        return this.perThreadAccount.get().getStalledJobsCount();
     }
 
-    public int getPastJobsCount() {
-        return this.perThreadAccount.get().getPastJobsCount();
+    public int getRunningJobsCount() {
+        return this.perThreadAccount.get().getRunningJobsCount();
+    }
+
+    public int getPausedJobsCount() {
+        return this.perThreadAccount.get().getPausedJobsCount();
+    }
+
+    public int getInErrorJobsCount() {
+        return this.perThreadAccount.get().getInErrorJobsCount();
+    }
+
+    public int getCanceledJobsCount() {
+        return this.perThreadAccount.get().getCanceledJobsCount();
+    }
+
+    public int getFailedJobsCount() {
+        return this.perThreadAccount.get().getFailedJobsCount();
+    }
+
+    public int getKilledJobsCount() {
+        return this.perThreadAccount.get().getKilledJobsCount();
+    }
+
+    public int getFinishedJobsCount() {
+        return this.perThreadAccount.get().getFinishedJobsCount();
     }
 
     public long getTotalJobDuration() {
@@ -146,7 +170,7 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
         final String username = subject.getPrincipals().iterator().next().getName();
         SchedulerAccount acc = this.accountsManager.getAccount(username);
         if (acc == null) {
-            acc = new SchedulerAccount();
+            acc = SchedulerAccount.builder().build();
         }
         return acc; // never null
     }

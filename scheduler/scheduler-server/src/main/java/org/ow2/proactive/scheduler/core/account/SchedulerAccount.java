@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.core.account;
 
 import org.ow2.proactive.account.Account;
 
+import lombok.Builder;
+
 
 /**
  * This class represents an account, it contains information about the
@@ -35,6 +37,7 @@ import org.ow2.proactive.account.Account;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.1
  */
+@Builder
 public final class SchedulerAccount implements Account {
 
     private String username;
@@ -47,12 +50,6 @@ public final class SchedulerAccount implements Account {
 
     private long totalJobDuration;
 
-    private int pendingJobsCount;
-
-    private int currentJobsCount;
-
-    private int pastJobsCount;
-
     private int pendingTasksCount;
 
     private int currentTasksCount;
@@ -61,25 +58,23 @@ public final class SchedulerAccount implements Account {
 
     private int pausedInErrorTasksCount;
 
-    public SchedulerAccount() {
-    }
+    private int pendingJobsCount;
 
-    public SchedulerAccount(String username, int totalTaskCount, long totalTaskDuration, int totalJobCount,
-            long totalJobDuration, int pendingJobsCount, int currentJobsCount, int pastJobsCount, int pendingTasksCount,
-            int currentTasksCount, int pastTasksCount, int pausedInErrorTasksCount) {
-        this.username = username;
-        this.totalTaskCount = totalTaskCount;
-        this.pendingTasksCount = pendingTasksCount;
-        this.currentTasksCount = currentTasksCount;
-        this.pastTasksCount = pastTasksCount;
-        this.pausedInErrorTasksCount = pausedInErrorTasksCount;
-        this.totalTaskDuration = totalTaskDuration;
-        this.totalJobCount = totalJobCount;
-        this.totalJobDuration = totalJobDuration;
-        this.pendingJobsCount = pendingJobsCount;
-        this.currentJobsCount = currentJobsCount;
-        this.pastJobsCount = pastJobsCount;
-    }
+    private int stalledJobsCount;
+
+    private int runningJobsCount;
+
+    private int pausedJobsCount;
+
+    private int inErrorJobsCount;
+
+    private int canceledJobsCount;
+
+    private int failedJobsCount;
+
+    private int killedJobsCount;
+
+    private int finishedJobsCount;
 
     /**
      * The total count of tasks completed by the current user.
@@ -138,30 +133,6 @@ public final class SchedulerAccount implements Account {
     }
 
     /**
-     * The total count of pending jobs submitted by the current user.
-     * @return the total jobs count
-     */
-    public int getPendingJobsCount() {
-        return pendingJobsCount;
-    }
-
-    /**
-     * The total count of current jobs submitted by the current user.
-     * @return the total jobs count
-     */
-    public int getCurrentJobsCount() {
-        return currentJobsCount;
-    }
-
-    /**
-     * The total count of past jobs submitted by the current user.
-     * @return the total jobs count
-     */
-    public int getPastJobsCount() {
-        return pastJobsCount;
-    }
-
-    /**
      * The total time duration in milliseconds of jobs completed by the current user.
      * @return the total job duration in milliseconds
      */
@@ -175,5 +146,77 @@ public final class SchedulerAccount implements Account {
      */
     public String getName() {
         return this.username;
+    }
+
+    /**
+     * The total count of pending jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getPendingJobsCount() {
+        return pendingJobsCount;
+    }
+
+    /**
+     * The total count of stalled jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getStalledJobsCount() {
+        return stalledJobsCount;
+    }
+
+    /**
+     * The total count of running jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getRunningJobsCount() {
+        return runningJobsCount;
+    }
+
+    /**
+     * The total count of paused jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getPausedJobsCount() {
+        return pausedJobsCount;
+    }
+
+    /**
+     * The total count of in-error jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getInErrorJobsCount() {
+        return inErrorJobsCount;
+    }
+
+    /**
+     * The total count of canceled jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getCanceledJobsCount() {
+        return canceledJobsCount;
+    }
+
+    /**
+     * The total count of failed jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getFailedJobsCount() {
+        return failedJobsCount;
+    }
+
+    /**
+     * The total count of killed jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getKilledJobsCount() {
+        return killedJobsCount;
+    }
+
+    /**
+     * The total count of finished jobs submitted by the current user.
+     * @return the total jobs count
+     */
+    public int getFinishedJobsCount() {
+        return finishedJobsCount;
     }
 }
