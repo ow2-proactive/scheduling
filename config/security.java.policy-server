@@ -68,8 +68,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Members of "user" group can get/free nodes and monitor the state, submit jobs and see jobs of other people
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "user" {
-    //permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "automation-dashboard,workflow-automation,cloud-watch,job-gantt,job-planner-gantt-chart";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNeededNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
