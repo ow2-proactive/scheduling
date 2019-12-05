@@ -38,15 +38,30 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  * @author ActiveEon Team
  * @since 03/12/19
  */
-public class FilePathHelper {
-    public static final String ADDONS_DIRNAME = "addons";
+public class AddonPathUtils {
+    public static final String ADDONS_BASE_DIRNAME = "addons";
 
-    public static String getAddonsPath() {
-        return getRmHome() + File.separator + ADDONS_DIRNAME;
+    public static String getAddonsBasePath() {
+        return getRmHome() + File.separator + ADDONS_BASE_DIRNAME;
     }
 
     public static String getRmHome() {
         return PAResourceManagerProperties.RM_HOME.getValueAsString();
+    }
+
+    public static String getPathInAddons(String addonName) {
+        return getAddonsBasePath() + File.separator + addonName;
+    }
+
+    /**
+     * Check whether exist a directory named dirName inside the addons directory
+     *
+     * @param dirName
+     * @return
+     */
+    public static boolean existDirectoryInAddons(String dirName) {
+        File infraAddonDir = new File(getPathInAddons(dirName));
+        return infraAddonDir.exists() && infraAddonDir.isDirectory();
     }
 
     /**
