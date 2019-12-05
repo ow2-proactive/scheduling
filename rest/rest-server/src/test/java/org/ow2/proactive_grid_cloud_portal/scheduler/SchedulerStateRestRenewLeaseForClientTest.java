@@ -53,7 +53,7 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * The purpose of the test is to check that each method from {@link
- * SchedulerRestInterface} invokes {@link SchedulerStateRest#renewLeaseForClient(Scheduler)}
+ * SchedulerRestInterface} invokes {@link SchedulerStateRest#renewSession(String)}
  * if it tries to perform an action once logged.
  * <p/>
  * To this aim, the scheduler is mocked and the {@link SchedulerStateRest}
@@ -85,7 +85,8 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
         Set<String> methodsToIgnore = ImmutableSet.of("getCreateCredential",
                                                       "login",
                                                       "loginWithCredential",
-                                                      "validate");
+                                                      "validate",
+                                                      "getUrl");
 
         Method[] methodsToTest = SchedulerRestInterface.class.getMethods();
         Object[][] data = new Object[methodsToTest.length][2];

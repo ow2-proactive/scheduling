@@ -89,6 +89,16 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestEx
 public interface SchedulerRestInterface {
 
     /**
+     * Returns the url of the scheduler server.
+     *
+     * @return ProActive url of the scheduler server
+     */
+    @GET
+    @Path("url")
+    @Produces("text/plain")
+    String getUrl();
+
+    /**
      * Returns the ids of the current jobs under a list of string.
      * 
      * @param sessionId

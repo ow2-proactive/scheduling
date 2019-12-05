@@ -162,6 +162,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private final WorkflowVariablesTransformer workflowVariablesTransformer = new WorkflowVariablesTransformer();
 
     @Override
+    public String getUrl() {
+        return PortalConfiguration.SCHEDULER_URL.getValueAsString();
+    }
+
+    @Override
     public RestPage<String> jobs(String sessionId, int index, int limit) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs");
