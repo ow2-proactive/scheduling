@@ -48,16 +48,25 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
     static class AccountData {
 
         long taskTime;
+
         int taskCount;
+
         int pendingTasksCount;
+
         int currentTasksCount;
+
         int pastTasksCount;
 
         long jobTime;
+
         int jobCount;
+
         int pendingJobsCount;
+
         int runningJobsCount;
+
         int finishedJobsCount;
+
         int stalledJobsCount;
 
         final String userName;
