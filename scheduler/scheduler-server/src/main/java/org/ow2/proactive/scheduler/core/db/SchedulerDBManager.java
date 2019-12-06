@@ -661,7 +661,7 @@ public class SchedulerDBManager {
             }
 
             int pendingTasksCount = getTaskCountForUser(TaskStatus.PENDING_TASKS, username);
-            int currentTasksCount = getTaskCountForUser(TaskStatus.RUNNING_TASKS, username);
+            int currentTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.RUNNING), username);
             int pastTasksCount = getTaskCountForUser(TaskStatus.FINISHED_TASKS, username);
             int pausedInErrorTasksCount = getTaskCountForUser(TaskStatus.PAUSED_AND_IN_ERROR_TASKS, username);
 
