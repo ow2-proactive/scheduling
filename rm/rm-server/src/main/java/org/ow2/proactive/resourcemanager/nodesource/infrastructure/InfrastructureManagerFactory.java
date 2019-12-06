@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,6 +75,7 @@ public class InfrastructureManagerFactory {
                 throw new IllegalArgumentException(infrastructureType + " is not supported");
             }
             Class<?> imClass = loadInfrastructureClass(infrastructureType);
+            Thread.currentThread().setContextClassLoader(imClass.getClassLoader());
             im = (InfrastructureManager) imClass.newInstance();
             im.internalConfigure(infrastructureParameters);
             im.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(nodeSourceDescriptor));
@@ -148,12 +150,10 @@ public class InfrastructureManagerFactory {
      */
     private static Class<?> loadInfrastructureClass(String infraClassName) throws ClassNotFoundException {
         ClassLoader classLoader = AddonClassUtils.getAddonClassLoader(infraClassName, originalClassLoader);
-        Thread.currentThread().setContextClassLoader(classLoader);
-        logger.debug("thread class loader: " + Thread.currentThread().getContextClassLoader());
         Class<?> imClass = Class.forName(infraClassName, true, classLoader);
-        logger.debug(imClass.getName() + "--------- class loader: " + imClass.getClassLoader());
-        if (imClass.getClassLoader() instanceof ChildFirstClassLoader) {
-            logger.debug("url:" + Arrays.toString(((ChildFirstClassLoader) imClass.getClassLoader()).getURLs()));
+        logger.debug(imClass.getName() + " use class loader: " + imClass.getClassLoader());
+        if (imClass.getClassLoader() instanceof URLClassLoader) {
+            logger.debug("class loader url:" + Arrays.toString(((URLClassLoader) imClass.getClassLoader()).getURLs()));
         }
         return imClass;
     }
