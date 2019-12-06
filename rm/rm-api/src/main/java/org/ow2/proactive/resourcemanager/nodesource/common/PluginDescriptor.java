@@ -81,6 +81,8 @@ public class PluginDescriptor implements Serializable {
 
     public PluginDescriptor(Class<?> cls, Map<String, String> defaultValues) {
         try {
+            // The context class loader of the thread for instantiating plugin object should always be the same as plugin class loader
+            Thread.currentThread().setContextClassLoader(cls.getClassLoader());
             Object instance = cls.newInstance();
             pluginName = cls.getName();
             this.defaultValues = defaultValues;
