@@ -28,6 +28,8 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.client.utils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.*;
@@ -230,12 +232,15 @@ public class Zipper {
             }
         }
 
-        private static ZipEntry zipEntry(String basepath, File file) {
-            String name = (Strings.isNullOrEmpty(basepath) ||
-                           basepath.equals(file.getAbsolutePath())) ? file.getPath()
-                                                                    : file.getAbsolutePath()
-                                                                          .substring(basepath.length() + 1);
-            name = file.isDirectory() ? name.concat("/") : name;
+        private static ZipEntry zipEntry(String basepath, File file) throws IOException {
+            String realAbsolutePath = Paths.get(file.getAbsolutePath()).toRealPath().toString();
+            String realBasePath = Paths.get(basepath).toRealPath().toString();
+
+            String name = (Strings.isNullOrEmpty(realBasePath) ||
+                           realBasePath.equals(realAbsolutePath)) ? file.getPath()
+                                                                  : realAbsolutePath.substring(realBasePath.length() +
+                                                                                               1);
+            name = file.isDirectory() ? new File(name, "/").toString() : name;
             return new ZipEntry(name);
         }
     }
