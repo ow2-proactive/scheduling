@@ -81,6 +81,16 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 public interface RMRestInterface {
 
     /**
+     * Returns the url of the rm server.
+     *
+     * @return ProActive url of the rm server
+     */
+    @GET
+    @Path("url")
+    @Produces("text/plain")
+    String getUrl();
+
+    /**
      * Log into the resource manager using an form containing 2 fields
      * @return the sessionid of the user if succeed
      */

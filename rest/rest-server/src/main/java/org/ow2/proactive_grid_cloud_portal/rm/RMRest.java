@@ -100,6 +100,7 @@ import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
 
 
@@ -129,6 +130,11 @@ public class RMRest implements RMRestInterface {
         }
 
         return session.getRM();
+    }
+
+    @Override
+    public String getUrl() {
+        return PortalConfiguration.RM_URL.getValueAsString();
     }
 
     @Override

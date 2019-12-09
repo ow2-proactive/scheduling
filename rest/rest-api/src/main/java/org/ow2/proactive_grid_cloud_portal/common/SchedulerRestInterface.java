@@ -91,6 +91,16 @@ public interface SchedulerRestInterface {
     String defaultStatusFilter = "running;pending;finished";
 
     /**
+     * Returns the url of the scheduler server.
+     *
+     * @return ProActive url of the scheduler server
+     */
+    @GET
+    @Path("url")
+    @Produces("text/plain")
+    String getUrl();
+
+    /**
      * Returns the ids of the current jobs under a list of string.
      * 
      * @param sessionId
