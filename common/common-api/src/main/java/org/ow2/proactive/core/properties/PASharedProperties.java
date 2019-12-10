@@ -75,7 +75,6 @@ public enum PASharedProperties implements PACommonProperties {
     /** comma-separated list of folder and/or files which need to be backup */
     SCHEDULER_BACKUP_TARGETS("pa.scheduler.backup.targets", PropertyType.STRING, "data,logs");
 
-
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     public static final String PA_SHARED_PROPERTIES_FILEPATH = "pa.shared.properties.filepath";
