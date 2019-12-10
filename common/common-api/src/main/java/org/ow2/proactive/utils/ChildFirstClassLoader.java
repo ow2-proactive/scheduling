@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.utils;
+package org.ow2.proactive.utils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -39,7 +39,11 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * ChildFirstClassLoader first trys to load the class from the specified jars then the parent class loader.
+ * ChildFirstClassLoader provides a child-first delegation mechanims for class loading.
+ * That is, it first trys to load the class from the specified jars, then delegates to the parent class loader.
+ * This child-first class loader allows the different addons use their specific version of dependent library.
+ *
+ * Note, the class loader should be used both as the class loader and as the thread context class loader.
  *
  * @author ActiveEon Team
  * @since 28/11/19
@@ -57,7 +61,6 @@ public class ChildFirstClassLoader extends URLClassLoader {
         // check whether the class already loaded
         Class<?> loadedClass = findLoadedClass(name);
         if (loadedClass == null) {
-            logger.debug("loading ..." + name);
             try {
                 // find the class from given jar urls as in first constructor parameter.
                 loadedClass = findClass(name);
