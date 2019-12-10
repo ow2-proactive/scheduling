@@ -235,7 +235,7 @@ public class Zipper {
         private static String getRealRelativeFilePath(String basepath, String absolutePath) throws IOException {
             String realAbsolutePath = Paths.get(absolutePath).toRealPath().toString();
             String realBasePath = Paths.get(basepath).toRealPath().toString();
-            return basepath.endsWith("/") ? realAbsolutePath.substring(realBasePath.length())
+            return basepath.endsWith(File.separator) ? realAbsolutePath.substring(realBasePath.length())
                                           : realAbsolutePath.substring(realBasePath.length() + 1);
         }
 
@@ -244,7 +244,7 @@ public class Zipper {
                            basepath.equals(file.getAbsolutePath())) ? file.getPath()
                                                                     : getRealRelativeFilePath(basepath,
                                                                                               file.getAbsolutePath());
-            name = file.isDirectory() ? new File(name, "/").toString() : name;
+            name = file.isDirectory() ? new File(name, File.separator).toString() : name;
             return new ZipEntry(name);
         }
     }
