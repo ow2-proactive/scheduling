@@ -38,17 +38,19 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.AddonClassUtils;
+import org.ow2.proactive.resourcemanager.utils.ContextClassLoaderInjector;
 import org.ow2.proactive.utils.Lambda;
 
 
 public class NodeSourceParameterHelper {
-    private static ClassLoader originalClassLoader = NodeSourceParameterHelper.class.getClassLoader();
 
     public Collection<ConfigurableField> getPluginConfigurableFields(String pluginClassName)
             throws PluginNotFoundException {
 
         Class<NodeSourcePlugin> pluginClass = this.getPluginClassOrFail(pluginClassName);
-        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(pluginClass, new HashMap<>());
+        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(pluginClass,
+                                                                       instantiatePlugin(pluginClass),
+                                                                       new HashMap<>());
 
         return policyPluginDescriptor.getConfigurableFields();
     }
@@ -74,11 +76,12 @@ public class NodeSourceParameterHelper {
     }
 
     public Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
-        return plugins.stream().map(cls -> new PluginDescriptor(cls, new HashMap<>())).collect(Collectors.toList());
+        return plugins.stream()
+                      .map(cls -> new PluginDescriptor(cls, instantiatePlugin(cls), new HashMap<>()))
+                      .collect(Collectors.toList());
     }
 
     public PluginDescriptor getPluginDescriptor(String pluginClassName, Object[] parameters, String nodeSourceName) {
-
         Class<NodeSourcePlugin> pluginClass;
 
         try {
@@ -87,7 +90,7 @@ public class NodeSourceParameterHelper {
             throw new IllegalStateException(e.getMessageWithContext(nodeSourceName), e);
         }
 
-        return new PluginDescriptor(pluginClass, parameters);
+        return new PluginDescriptor(pluginClass, instantiatePlugin(pluginClass), parameters);
     }
 
     private String getStringValue(Object[] newParameters, int index, Configurable meta) {
@@ -114,18 +117,14 @@ public class NodeSourceParameterHelper {
         }
     }
 
-    private Class<NodeSourcePlugin> getPluginClassOrFail(String pluginClassName) throws PluginNotFoundException {
+    public Class<NodeSourcePlugin> getPluginClassOrFail(String pluginClassName) throws PluginNotFoundException {
 
         Class<NodeSourcePlugin> pluginClass;
 
         try {
-            // The plugin should use its proper class loader if its jar is in the addons/<plugin simple class name(in minuscule)> directory
-            if (AddonClassUtils.isAddon(pluginClassName)) {
-                ClassLoader classLoader = AddonClassUtils.getAddonClassLoader(pluginClassName, originalClassLoader);
-                pluginClass = (Class<NodeSourcePlugin>) Class.forName(pluginClassName, true, classLoader);
-            } else {
-                pluginClass = (Class<NodeSourcePlugin>) Class.forName(pluginClassName);
-            }
+            ClassLoader classLoader = AddonClassUtils.getAddonClassLoader(pluginClassName,
+                                                                          this.getClass().getClassLoader());
+            pluginClass = (Class<NodeSourcePlugin>) classLoader.loadClass(pluginClassName);
         } catch (ClassNotFoundException e) {
             throw new PluginNotFoundException(pluginClassName, e);
         }
@@ -133,4 +132,16 @@ public class NodeSourceParameterHelper {
         return pluginClass;
     }
 
+    public Object instantiatePlugin(Class<?> pluginClass) {
+        try {
+            // when the plugin is an addon (which is loaded by a specific class loader), its methods need to inject setting of thread context class loader.
+            if (AddonClassUtils.isAddon(pluginClass.getName())) {
+                return ContextClassLoaderInjector.createInjectedObject(pluginClass, pluginClass.getClassLoader());
+            } else {
+                return pluginClass.newInstance();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error when instantiating the plugin " + pluginClass, e);
+        }
+    }
 }

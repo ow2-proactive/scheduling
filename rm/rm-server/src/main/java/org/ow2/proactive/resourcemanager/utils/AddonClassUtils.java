@@ -29,8 +29,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.utils.ChildFirstClassLoader;
+
 
 /**
+ * This class helps the addon classes to use a child-first class loading mechanism.
+ * Loading the addon class with a child-first delegation mechanims allows addons to use their specific version of dependent library.
+ *
  * @author ActiveEon Team
  * @since 03/12/19
  */
@@ -40,7 +45,7 @@ public class AddonClassUtils {
 
     /**
      * Check whether the addon class should be loaded from addons jars.
-     * The class is considered to be loaded from addons jar, iff server addons directory contains a directory named as addonName.
+     * The class is considered to be loaded from addons jar, iff server addons directory contains a directory named as addonName (plugin simple class name in minuscule).
      *
      * @param addonFullClassName The complete class name of the addon
      * @return whether the addon class should be loaded from addons jar
@@ -50,35 +55,28 @@ public class AddonClassUtils {
     }
 
     /**
-     * try to get the addon class loader from stored map, create one if not found.
+     * Get the proper class loader for the class which could be an addon.
+     * If the class is an addon, it should use its proper child-first class loader.
+     * Otherwise, the originalClassLoader is used.
+     *
+     * The created classloaders are stored and reused when asked for the same class next time.
+     *
      * @param addonClassName The complete class name of the addon
      * @param originalClassLoader The parent class loader of the addon class loader
-     * @return
+     * @return the proper class loader for the class
      */
     public static ClassLoader getAddonClassLoader(String addonClassName, ClassLoader originalClassLoader) {
         ClassLoader addonClassLoader = addonClassLoaderMap.get(addonClassName);
         if (addonClassLoader == null) {
-            addonClassLoader = createClassLoader(addonClassName, originalClassLoader);
-            addonClassLoaderMap.put(addonClassName, addonClassLoader);
+            if (isAddon(addonClassName)) {
+                URL[] addonJarsUrl = findAddonJars(addonClassName);
+                addonClassLoader = new ChildFirstClassLoader(addonJarsUrl, originalClassLoader);
+                addonClassLoaderMap.put(addonClassName, addonClassLoader);
+            } else {
+                addonClassLoader = originalClassLoader;
+            }
         }
         return addonClassLoader;
-    }
-
-    /**
-     * Create ClassLoader for the classes which could be an addon,
-     * in case of existing addons jar for the class, a child-first class loader will be created and returned.
-     * otherwise, originalClassLoader will be returned.
-     *
-     * @param addonClassName the complete class name of the addon
-     * @return
-     */
-    private static ClassLoader createClassLoader(String addonClassName, ClassLoader originalClassLoader) {
-        if (isAddon(addonClassName)) {
-            URL[] addonJarsUrl = findAddonJars(addonClassName);
-            return new ChildFirstClassLoader(addonJarsUrl, originalClassLoader);
-        } else {
-            return originalClassLoader;
-        }
     }
 
     /**

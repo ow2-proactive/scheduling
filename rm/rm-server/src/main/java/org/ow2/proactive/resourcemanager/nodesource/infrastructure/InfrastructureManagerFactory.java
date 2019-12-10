@@ -27,18 +27,17 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.resourcemanager.core.NodeSourceParameterHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
-import org.ow2.proactive.resourcemanager.utils.AddonClassUtils;
-import org.ow2.proactive.resourcemanager.utils.ChildFirstClassLoader;
+import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
 
 
 /**
@@ -65,8 +64,8 @@ public class InfrastructureManagerFactory {
         try {
 
             boolean supported = false;
-            for (Class<?> cls : getSupportedInfrastructures()) {
-                if (cls.getName().equals(infrastructureType)) {
+            for (String supportedInfra : getSupportedInfrastructuresName()) {
+                if (supportedInfra.equals(infrastructureType)) {
                     supported = true;
                     break;
                 }
@@ -74,9 +73,9 @@ public class InfrastructureManagerFactory {
             if (!supported) {
                 throw new IllegalArgumentException(infrastructureType + " is not supported");
             }
-            Class<?> imClass = loadInfrastructureClass(infrastructureType);
-            Thread.currentThread().setContextClassLoader(imClass.getClassLoader());
-            im = (InfrastructureManager) imClass.newInstance();
+
+            NodeSourceParameterHelper nsHelper = new NodeSourceParameterHelper();
+            im = (InfrastructureManager) nsHelper.instantiatePlugin(nsHelper.getPluginClassOrFail(infrastructureType));
             im.internalConfigure(infrastructureParameters);
             im.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(nodeSourceDescriptor));
         } catch (Exception e) {
@@ -104,7 +103,7 @@ public class InfrastructureManagerFactory {
      *
      * @return list of supported infrastructures
      */
-    public static Collection<Class<?>> getSupportedInfrastructures() {
+    public static Collection<String> getSupportedInfrastructuresName() {
         // reload file each time as it can be updated while the rm is running
         Properties properties = new Properties();
         String propFileName = null;
@@ -121,40 +120,18 @@ public class InfrastructureManagerFactory {
         } catch (Exception e) {
             logger.error("Error when loading infrastructure definition file : " + propFileName, e);
         }
-
-        Collection<Class<?>> supportedInfrastructures = new ArrayList<>(properties.size());
-
-        for (Object className : properties.keySet()) {
-            try {
-                Class<?> cls = loadInfrastructureClass(className.toString());
-                supportedInfrastructures.add(cls);
-            } catch (ClassNotFoundException e) {
-                logger.error("Cannot find infrastructure class " + className.toString());
-            } catch (Exception e) {
-                logger.error("Error when getSupportedInfrastructures : ", e);
-                e.printStackTrace();
-            }
-        }
-
-        return supportedInfrastructures;
+        return properties.keySet().stream().map(Object::toString).collect(Collectors.toList());
     }
 
-    /**
-     * Load the infrastructure class with a child-first delegation mechanims class loader.
-     * This child-first class loader allows the different infrastructures use their specific version of dependent library.
-     * To ensure the infrastructure class always use the correct class loader, both its class loader and thread context class loader are specified.
-     *
-     * @param infraClassName the complete class name of the infrastructure
-     * @return the loaded class of the infrastructure
-     * @throws ClassNotFoundException
-     */
-    private static Class<?> loadInfrastructureClass(String infraClassName) throws ClassNotFoundException {
-        ClassLoader classLoader = AddonClassUtils.getAddonClassLoader(infraClassName, originalClassLoader);
-        Class<?> imClass = Class.forName(infraClassName, true, classLoader);
-        logger.debug(imClass.getName() + " use class loader: " + imClass.getClassLoader());
-        if (imClass.getClassLoader() instanceof URLClassLoader) {
-            logger.debug("class loader url:" + Arrays.toString(((URLClassLoader) imClass.getClassLoader()).getURLs()));
+    public static Collection<Class<?>> getSupportedInfrastructures() {
+        Collection<Class<?>> supportedInfastructures = new ArrayList<>();
+        try {
+            for (String infraClassName : getSupportedInfrastructuresName()) {
+                supportedInfastructures.add(new NodeSourceParameterHelper().getPluginClassOrFail(infraClassName));
+            }
+        } catch (PluginNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        return imClass;
+        return supportedInfastructures;
     }
 }
