@@ -39,10 +39,8 @@ import java.util.stream.Stream;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.ow2.proactive.core.properties.PASharedProperties;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
+import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.utils.ClasspathUtils;
 
 
@@ -58,13 +56,13 @@ public class SchedulerBackupRunner implements Runnable {
 
     private final int windowSize;
 
-    private final Scheduler scheduler;
+    private final SchedulingService scheduler;
 
-    public SchedulerBackupRunner(Scheduler scheduler) {
+    public SchedulerBackupRunner(SchedulingService scheduler) {
         this.scheduler = scheduler;
         targets = Arrays.asList(PASharedProperties.SCHEDULER_BACKUP_TARGETS.getValueAsString().split(","));
         destination = PASharedProperties.SCHEDULER_BACKUP_DESTINATION.getValueAsString();
-        windowSize = PASharedProperties.SCHEDULER_BACKUP_PERIOD.getValueAsInt();
+        windowSize = PASharedProperties.SCHEDULER_BACKUP_WINDOWS.getValueAsInt();
     }
 
     @Override
@@ -73,19 +71,15 @@ public class SchedulerBackupRunner implements Runnable {
             scheduler.freeze();
             removeOldBackups();
             performBackup();
-        } catch (NotConnectedException | PermissionException | IOException e) {
+        } catch (IOException e) {
             LOGGER.error(e);
         } finally {
-            try {
-                scheduler.resume();
-            } catch (NotConnectedException | PermissionException e) {
-                LOGGER.error(e);
-            }
+            scheduler.resume();
         }
     }
 
     private void performBackup() throws IOException {
-        String backupFileName = PREFIX + DateTime.now().toString("yyyy-MM-dd") + ".zip";
+        String backupFileName = PREFIX + DateTime.now().toString("yyyy-MM-dd'T'HH:mm") + ".zip";
         File backupFile = new File(destination, backupFileName);
         LOGGER.info("Performing backup to " + backupFile);
         String schedulerHome = ClasspathUtils.findSchedulerHome();
@@ -113,6 +107,10 @@ public class SchedulerBackupRunner implements Runnable {
                   }
               }).reversed())
               .skip(windowSize - 1)
-              .peek(File::delete);
+              .forEach(file -> {
+                  LOGGER.info("Removing old backup: " + file.getName());
+                  file.delete();
+              });
+
     }
 }
