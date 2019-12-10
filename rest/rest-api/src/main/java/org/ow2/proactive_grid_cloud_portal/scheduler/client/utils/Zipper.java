@@ -236,7 +236,7 @@ public class Zipper {
             String realAbsolutePath = Paths.get(absolutePath).toRealPath().toString();
             String realBasePath = Paths.get(basepath).toRealPath().toString();
             return basepath.endsWith(File.separator) ? realAbsolutePath.substring(realBasePath.length())
-                                          : realAbsolutePath.substring(realBasePath.length() + 1);
+                                                     : realAbsolutePath.substring(realBasePath.length() + 1);
         }
 
         private static ZipEntry zipEntry(String basepath, File file) throws IOException {
