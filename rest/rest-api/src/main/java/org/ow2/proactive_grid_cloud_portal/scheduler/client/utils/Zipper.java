@@ -232,14 +232,18 @@ public class Zipper {
             }
         }
 
-        private static ZipEntry zipEntry(String basepath, File file) throws IOException {
-            String realAbsolutePath = Paths.get(file.getAbsolutePath()).toRealPath().toString();
+        private static String getRealRelativeFilePath(String basepath, String absolutePath) throws IOException {
+            String realAbsolutePath = Paths.get(absolutePath).toRealPath().toString();
             String realBasePath = Paths.get(basepath).toRealPath().toString();
+            return basepath.endsWith("/") ? realAbsolutePath.substring(realBasePath.length())
+                                          : realAbsolutePath.substring(realBasePath.length() + 1);
+        }
 
-            String name = (Strings.isNullOrEmpty(realBasePath) ||
-                           realBasePath.equals(realAbsolutePath)) ? file.getPath()
-                                                                  : realAbsolutePath.substring(realBasePath.length() +
-                                                                                               1);
+        private static ZipEntry zipEntry(String basepath, File file) throws IOException {
+            String name = (Strings.isNullOrEmpty(basepath) ||
+                           basepath.equals(file.getAbsolutePath())) ? file.getPath()
+                                                                    : getRealRelativeFilePath(basepath,
+                                                                                              file.getAbsolutePath());
             name = file.isDirectory() ? new File(name, "/").toString() : name;
             return new ZipEntry(name);
         }
