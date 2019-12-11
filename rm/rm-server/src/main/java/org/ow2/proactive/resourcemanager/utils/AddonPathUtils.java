@@ -30,6 +30,7 @@ import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
