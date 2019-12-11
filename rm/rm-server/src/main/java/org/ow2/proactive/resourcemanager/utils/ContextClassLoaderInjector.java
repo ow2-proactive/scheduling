@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.lang.reflect.Method;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
@@ -53,16 +52,14 @@ public class ContextClassLoaderInjector {
         proxyFactory.setSuperclass(superClass);
         // The thread context class loader also needs to be sepecified during the object instantiation.
         Object object = switchContextClassLoader(contextClassLoader, () -> {
-            Class proxyClass = proxyFactory.createClass();
+            Class<?> proxyClass = proxyFactory.createClass();
             return proxyClass.newInstance();
         });
 
-        MethodHandler injectClassLoaderHandler = new MethodHandler() {
-            public Object invoke(Object self, Method method, Method proceed, Object[] args) throws Throwable {
-                logger.debug("Delegating method: " + self.getClass().getSimpleName() + "." + method.getName());
-                // inject setting of thread context classloader during execution of all the object original methods
-                return switchContextClassLoader(contextClassLoader, () -> proceed.invoke(self, args));
-            }
+        MethodHandler injectClassLoaderHandler = (self, method, proceed, args) -> {
+            logger.debug("Delegating method: " + self.getClass().getSimpleName() + "." + method.getName());
+            // inject setting of thread context classloader during execution of all the object original methods
+            return switchContextClassLoader(contextClassLoader, () -> proceed.invoke(self, args));
         };
         ((Proxy) object).setHandler(injectClassLoaderHandler);
 
@@ -77,7 +74,7 @@ public class ContextClassLoaderInjector {
      * @return the function return value
      * @throws Exception the exception thrown during function execution
      */
-    private static <T> T switchContextClassLoader(ClassLoader contextClassLoader, SupplierWithException<T> func)
+    public static <T> T switchContextClassLoader(ClassLoader contextClassLoader, SupplierWithException<T> func)
             throws Exception {
         // Remember original thread context classloader
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();

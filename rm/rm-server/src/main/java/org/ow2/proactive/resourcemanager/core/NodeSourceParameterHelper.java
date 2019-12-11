@@ -38,7 +38,6 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.AddonClassUtils;
-import org.ow2.proactive.resourcemanager.utils.ContextClassLoaderInjector;
 import org.ow2.proactive.utils.Lambda;
 
 
@@ -49,7 +48,7 @@ public class NodeSourceParameterHelper {
 
         Class<NodeSourcePlugin> pluginClass = this.getPluginClassOrFail(pluginClassName);
         PluginDescriptor policyPluginDescriptor = new PluginDescriptor(pluginClass,
-                                                                       instantiatePlugin(pluginClass),
+                                                                       AddonClassUtils.instantiateAddon(pluginClass),
                                                                        new HashMap<>());
 
         return policyPluginDescriptor.getConfigurableFields();
@@ -77,11 +76,12 @@ public class NodeSourceParameterHelper {
 
     public Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
         return plugins.stream()
-                      .map(cls -> new PluginDescriptor(cls, instantiatePlugin(cls), new HashMap<>()))
+                      .map(cls -> new PluginDescriptor(cls, AddonClassUtils.instantiateAddon(cls), new HashMap<>()))
                       .collect(Collectors.toList());
     }
 
     public PluginDescriptor getPluginDescriptor(String pluginClassName, Object[] parameters, String nodeSourceName) {
+
         Class<NodeSourcePlugin> pluginClass;
 
         try {
@@ -90,7 +90,7 @@ public class NodeSourceParameterHelper {
             throw new IllegalStateException(e.getMessageWithContext(nodeSourceName), e);
         }
 
-        return new PluginDescriptor(pluginClass, instantiatePlugin(pluginClass), parameters);
+        return new PluginDescriptor(pluginClass, AddonClassUtils.instantiateAddon(pluginClass), parameters);
     }
 
     private String getStringValue(Object[] newParameters, int index, Configurable meta) {
@@ -117,14 +117,13 @@ public class NodeSourceParameterHelper {
         }
     }
 
-    public Class<NodeSourcePlugin> getPluginClassOrFail(String pluginClassName) throws PluginNotFoundException {
+    private Class<NodeSourcePlugin> getPluginClassOrFail(String pluginClassName) throws PluginNotFoundException {
 
         Class<NodeSourcePlugin> pluginClass;
 
         try {
-            ClassLoader classLoader = AddonClassUtils.getAddonClassLoader(pluginClassName,
-                                                                          this.getClass().getClassLoader());
-            pluginClass = (Class<NodeSourcePlugin>) classLoader.loadClass(pluginClassName);
+            ClassLoader currentClassLoader = this.getClass().getClassLoader();
+            pluginClass = (Class<NodeSourcePlugin>) AddonClassUtils.loadClass(pluginClassName, currentClassLoader);
         } catch (ClassNotFoundException e) {
             throw new PluginNotFoundException(pluginClassName, e);
         }
@@ -132,16 +131,4 @@ public class NodeSourceParameterHelper {
         return pluginClass;
     }
 
-    public Object instantiatePlugin(Class<?> pluginClass) {
-        try {
-            // when the plugin is an addon (which is loaded by a specific class loader), its methods need to inject setting of thread context class loader.
-            if (AddonClassUtils.isAddon(pluginClass.getName())) {
-                return ContextClassLoaderInjector.createInjectedObject(pluginClass, pluginClass.getClassLoader());
-            } else {
-                return pluginClass.newInstance();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error when instantiating the plugin " + pluginClass, e);
-        }
-    }
 }
