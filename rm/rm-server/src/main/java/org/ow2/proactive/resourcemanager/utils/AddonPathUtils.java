@@ -76,7 +76,7 @@ public class AddonPathUtils {
                 return name.endsWith(".jar");
             }
         });
-        HashSet<URL> jarNames = new HashSet<>();
+        Set<URL> jarNames = new HashSet<>();
         for (File jarFile : jarArray) {
             try {
                 jarNames.add(jarFile.toURI().toURL());
