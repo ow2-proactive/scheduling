@@ -33,17 +33,18 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.ow2.proactive.resourcemanager.core.NodeSourceParameterHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
-import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
+import org.ow2.proactive.resourcemanager.utils.AddonClassUtils;
 
 
 /**
+ *
  * Provides a generic way to create an infrastructure manager.
  * Loads all supported infrastructure names from a config file. Checks that required
  * infrastructure is supported at creation time.
+ *
  */
 public class InfrastructureManagerFactory {
 
@@ -62,7 +63,6 @@ public class InfrastructureManagerFactory {
         String infrastructureType = nodeSourceDescriptor.getInfrastructureType();
         Object[] infrastructureParameters = nodeSourceDescriptor.getInfrastructureParameters();
         try {
-
             boolean supported = false;
             for (String supportedInfra : getSupportedInfrastructuresName()) {
                 if (supportedInfra.equals(infrastructureType)) {
@@ -74,12 +74,11 @@ public class InfrastructureManagerFactory {
                 throw new IllegalArgumentException(infrastructureType + " is not supported");
             }
 
-            NodeSourceParameterHelper nsHelper = new NodeSourceParameterHelper();
-            im = (InfrastructureManager) nsHelper.instantiatePlugin(nsHelper.getPluginClassOrFail(infrastructureType));
+            Class<?> imClass = AddonClassUtils.loadClass(infrastructureType, originalClassLoader);
+            im = (InfrastructureManager) AddonClassUtils.instantiateAddon(imClass);
             im.internalConfigure(infrastructureParameters);
             im.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(nodeSourceDescriptor));
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return im;
@@ -99,9 +98,9 @@ public class InfrastructureManagerFactory {
     }
 
     /**
-     * Loads a list of supported infrastructures from a configuration file
+     * Get a list of supported infrastructures name from a configuration file
      *
-     * @return list of supported infrastructures
+     * @return list of supported infrastructures name
      */
     public static Collection<String> getSupportedInfrastructuresName() {
         // reload file each time as it can be updated while the rm is running
@@ -123,15 +122,22 @@ public class InfrastructureManagerFactory {
         return properties.keySet().stream().map(Object::toString).collect(Collectors.toList());
     }
 
+    /**
+     * Load the list of supported infrastructures
+     *
+     * @return list of supported infrastructures class
+     */
     public static Collection<Class<?>> getSupportedInfrastructures() {
         Collection<Class<?>> supportedInfastructures = new ArrayList<>();
-        try {
-            for (String infraClassName : getSupportedInfrastructuresName()) {
-                supportedInfastructures.add(new NodeSourceParameterHelper().getPluginClassOrFail(infraClassName));
+
+        for (String infraClassName : getSupportedInfrastructuresName()) {
+            try {
+                supportedInfastructures.add(AddonClassUtils.loadClass(infraClassName, originalClassLoader));
+            } catch (ClassNotFoundException e) {
+                logger.error("Cannot find infrastructure class " + infraClassName);
             }
-        } catch (PluginNotFoundException e) {
-            throw new RuntimeException(e);
         }
+
         return supportedInfastructures;
     }
 }

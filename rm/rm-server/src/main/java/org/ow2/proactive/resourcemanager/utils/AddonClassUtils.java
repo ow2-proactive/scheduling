@@ -33,7 +33,7 @@ import org.ow2.proactive.utils.ChildFirstClassLoader;
 
 
 /**
- * This class helps the addon classes to use a child-first class loading mechanism.
+ * This class helps the addon classes to use a child-first class loading mechanism for class loading and creating instances.
  * Loading the addon class with a child-first delegation mechanims allows addons to use their specific version of dependent library.
  *
  * @author ActiveEon Team
@@ -45,7 +45,7 @@ public class AddonClassUtils {
 
     /**
      * Check whether the addon class should be loaded from addons jars.
-     * The class is considered to be loaded from addons jar, iff server addons directory contains a directory named as addonName (plugin simple class name in minuscule).
+     * The class is considered to be loaded from addons jar, iff server addons directory contains a directory named as addonName (addon simple class name in minuscule).
      *
      * @param addonFullClassName The complete class name of the addon
      * @return whether the addon class should be loaded from addons jar
@@ -80,10 +80,60 @@ public class AddonClassUtils {
     }
 
     /**
+     * Load the class which could be an addon with the proper class loader.
+     * If the class is an addon, the class loader is set as thread context class loader during class initialization.
+     *
+     * @param addonClassName the name of class to be loaded.
+     * @param originalClassLoader the original class loader used when the class is not an addon.
+     * @return the class object of given class name
+     * @throws ClassNotFoundException if the class can't be located
+     */
+    public static Class<?> loadClass(String addonClassName, ClassLoader originalClassLoader)
+            throws ClassNotFoundException {
+        // when the class is an addon, load it with a specific class loader, and inject thread context class loader during initializing class.
+        if (AddonClassUtils.isAddon(addonClassName)) {
+            ClassLoader classLoader = getAddonClassLoader(addonClassName, originalClassLoader);
+            try {
+                return ContextClassLoaderInjector.switchContextClassLoader(classLoader,
+                                                                           () -> Class.forName(addonClassName,
+                                                                                               true,
+                                                                                               classLoader));
+            } catch (ClassNotFoundException e) {
+                throw e;
+            } catch (Exception ex) {
+                throw new RuntimeException("Error when loading addon class " + addonClassName, ex);
+            }
+        } else {
+            return Class.forName(addonClassName);
+        }
+
+    }
+
+    /**
+     * Create a new instance of the given class which could be an addon.
+     * If the class is an addon, the class loader of addon class are injected as thread context class loader to the instance methods.
+     *
+     * @param addonClass the class object which could be an addon class
+     * @return a newly allocated instance of the given class
+     */
+    public static Object instantiateAddon(Class<?> addonClass) {
+        try {
+            // when the class is an addon (which is loaded by a specific class loader), its methods need to inject setting of thread context class loader.
+            if (AddonClassUtils.isAddon(addonClass.getName())) {
+                return ContextClassLoaderInjector.createInjectedObject(addonClass, addonClass.getClassLoader());
+            } else {
+                return addonClass.newInstance();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error when instantiating the addon " + addonClass, e);
+        }
+    }
+
+    /**
      * Get the addon jars URL which should located in the sub-directory (named as addon simple class name in minuscule) of dir addons.
      *
      * @param addonClassName the complete class name of the addon
-     * @return
+     * @return URL array where locate the addon jars
      */
     private static URL[] findAddonJars(String addonClassName) {
         String addonDirName = getAddonsDirectoryName(addonClassName);
@@ -93,8 +143,8 @@ public class AddonClassUtils {
     /**
      * Get the addon directory name from its complete class name, which is its simple class name in minuscule.
      *
-     * @param fullClassName
-     * @return
+     * @param fullClassName complete class name of addon
+     * @return the directory name of the addon jar
      */
     private static String getAddonsDirectoryName(String fullClassName) {
         return getSimpleClassName(fullClassName).toLowerCase();
