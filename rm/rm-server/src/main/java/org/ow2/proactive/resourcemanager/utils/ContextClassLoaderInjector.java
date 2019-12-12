@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
+import java.lang.reflect.InvocationTargetException;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
@@ -83,7 +84,9 @@ public class ContextClassLoaderInjector {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
 
             return func.get();
-
+        } catch (InvocationTargetException e) {
+            // unwrap InvocationTargetException to get func exception cause
+            throw new Exception(e.getCause());
         } finally {
             // Replace the original classloader on the way out
             Thread.currentThread().setContextClassLoader(originalClassLoader);
