@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.core.helpers;
+package org.ow2.proactive.scheduler.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
-import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.utils.ClasspathUtils;
 
 
@@ -69,13 +68,21 @@ public class SchedulerBackupRunner implements Runnable {
     public void run() {
         try {
             scheduler.freeze();
+
+            while (!noOtherTaskIsRunning()) {
+                Thread.sleep(10000);
+            }
             removeOldBackups();
             performBackup();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             LOGGER.error(e);
         } finally {
             scheduler.resume();
         }
+    }
+
+    private boolean noOtherTaskIsRunning() {
+        return scheduler.getJobs().getRunningTasks().isEmpty();
     }
 
     private void performBackup() throws IOException {

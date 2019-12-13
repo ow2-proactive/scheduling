@@ -142,7 +142,6 @@ import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.helpers.JobsMemoryMonitorRunner;
-import org.ow2.proactive.scheduler.core.helpers.SchedulerBackupRunner;
 import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -220,8 +219,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
 
     private it.sauronsoftware.cron4j.Scheduler metricsMonitorScheduler;
-
-    private it.sauronsoftware.cron4j.Scheduler backupScheduler;
 
     /*
      * ######################################################################### ##################
@@ -383,14 +380,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 metricsMonitorScheduler.start();
             }
 
-            if (PASharedProperties.SHARED_BACKUP.isSet()) {
-                logger.debug("Starting the scheduler backup process...");
-                backupScheduler = new it.sauronsoftware.cron4j.Scheduler();
-                String cronExpr = PASharedProperties.SHARED_BACKUP_PERIOD.getValueAsString();
-                backupScheduler.schedule(cronExpr, new SchedulerBackupRunner(this.schedulingService));
-                backupScheduler.start();
-
-            }
         } catch (Exception e) {
             logger.fatal("Failed to start Scheduler", e);
             e.printStackTrace();
