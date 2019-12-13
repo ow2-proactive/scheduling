@@ -87,13 +87,23 @@ public class SchedulerBackupRunner implements Runnable {
 
     private void performBackup() throws IOException {
         String backupFileName = PREFIX + DateTime.now().toString("yyyy-MM-dd'T'HH:mm") + ".zip";
-        File backupFile = new File(destination, backupFileName);
-        LOGGER.info("Performing backup to " + backupFile);
-        String schedulerHome = ClasspathUtils.findSchedulerHome();
-        String[] foldersToZip = targets.stream()
-                                       .map(target -> (new File(schedulerHome, target)).getAbsolutePath())
-                                       .toArray(String[]::new);
-        ZipUtils.zip(foldersToZip, backupFile, null);
+        File destinationFile = new File(destination);
+        if (destinationFile.exists()) {
+            File backupFile;
+            if (destinationFile.isAbsolute()) {
+                backupFile = new File(destination, backupFileName);
+            } else {
+                backupFile = new File(new File(ClasspathUtils.findSchedulerHome(), destination), backupFileName);
+            }
+            LOGGER.info("Performing backup to " + backupFile);
+            String schedulerHome = ClasspathUtils.findSchedulerHome();
+            String[] foldersToZip = targets.stream()
+                                           .map(target -> (new File(schedulerHome, target)).getAbsolutePath())
+                                           .toArray(String[]::new);
+            ZipUtils.zip(foldersToZip, backupFile, null);
+        } else {
+            LOGGER.error("Cannot save a backup because backup destination folder does not exist: " + destination);
+        }
     }
 
     private void removeOldBackups() {
@@ -101,23 +111,25 @@ public class SchedulerBackupRunner implements Runnable {
         Stream.of(Objects.requireNonNull(fodlerWhereBackups.listFiles()))
               .filter(File::isFile)
               .filter(file -> file.getName().startsWith(PREFIX))
-              .sorted(Comparator.comparingLong(file -> {
-                  try {
-                      File f = (File) file;
-                      BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
-                      FileTime fileTime = attr.creationTime();
-                      return fileTime.toMillis();
-                  } catch (IOException e) {
-                      LOGGER.error(e);
-                      // handle exception
-                      return 0l;
-                  }
-              }).reversed())
+              .sorted(Comparator.comparingLong(file -> getCreationTime((File) file)).reversed())
               .skip(windowSize - 1)
               .forEach(file -> {
                   LOGGER.info("Removing old backup: " + file.getName());
                   file.delete();
               });
 
+    }
+
+    private long getCreationTime(File file) {
+        try {
+            File f = file;
+            BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
+            FileTime fileTime = attr.creationTime();
+            return fileTime.toMillis();
+        } catch (IOException e) {
+            LOGGER.error(e);
+            // handle exception
+            return 0l;
+        }
     }
 }
