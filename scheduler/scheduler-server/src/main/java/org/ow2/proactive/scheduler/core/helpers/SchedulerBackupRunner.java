@@ -60,9 +60,9 @@ public class SchedulerBackupRunner implements Runnable {
 
     public SchedulerBackupRunner(SchedulingService scheduler) {
         this.scheduler = scheduler;
-        targets = Arrays.asList(PASharedProperties.SCHEDULER_BACKUP_TARGETS.getValueAsString().split(","));
-        destination = PASharedProperties.SCHEDULER_BACKUP_DESTINATION.getValueAsString();
-        windowSize = PASharedProperties.SCHEDULER_BACKUP_WINDOWS.getValueAsInt();
+        targets = Arrays.asList(PASharedProperties.SHARED_BACKUP_TARGETS.getValueAsString().split(","));
+        destination = PASharedProperties.SHARED_BACKUP_DESTINATION.getValueAsString();
+        windowSize = PASharedProperties.SHARED_BACKUP_WINDOWS.getValueAsInt();
     }
 
     @Override

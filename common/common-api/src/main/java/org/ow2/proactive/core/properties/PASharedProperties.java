@@ -61,19 +61,19 @@ public enum PASharedProperties implements PACommonProperties {
     /* ***************************************************************** */
 
     /** if backup is enabled */
-    SCHEDULER_BACKUP("pa.scheduler.backup", PropertyType.BOOLEAN, "false"),
+    SHARED_BACKUP("pa.shared.backup", PropertyType.BOOLEAN, "false"),
 
     /** cron expression which defines when backuop should be performed */
-    SCHEDULER_BACKUP_PERIOD("pa.scheduler.backup.period", PropertyType.STRING, "0 * * * *"),
+    SHARED_BACKUP_PERIOD("pa.shared.backup.period", PropertyType.STRING, "0 * * * *"),
 
     /** determines how many backups should be kept */
-    SCHEDULER_BACKUP_WINDOWS("pa.scheduler.backup.windows", PropertyType.INTEGER, "10"),
+    SHARED_BACKUP_WINDOWS("pa.shared.backup.windows", PropertyType.INTEGER, "10"),
 
     /** a relative or absolute path to a folder (where the backup files should be stored) */
-    SCHEDULER_BACKUP_DESTINATION("pa.scheduler.backup.destination", PropertyType.STRING, "./backup"),
+    SHARED_BACKUP_DESTINATION("pa.shared.backup.destination", PropertyType.STRING, "./backup"),
 
     /** comma-separated list of folder and/or files which need to be backup */
-    SCHEDULER_BACKUP_TARGETS("pa.scheduler.backup.targets", PropertyType.STRING, "data,logs");
+    SHARED_BACKUP_TARGETS("pa.shared.backup.targets", PropertyType.STRING, "data,logs");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

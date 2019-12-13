@@ -383,10 +383,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 metricsMonitorScheduler.start();
             }
 
-            if (PASharedProperties.SCHEDULER_BACKUP.isSet()) {
+            if (PASharedProperties.SHARED_BACKUP.isSet()) {
                 logger.debug("Starting the scheduler backup process...");
                 backupScheduler = new it.sauronsoftware.cron4j.Scheduler();
-                String cronExpr = PASharedProperties.SCHEDULER_BACKUP_PERIOD.getValueAsString();
+                String cronExpr = PASharedProperties.SHARED_BACKUP_PERIOD.getValueAsString();
                 backupScheduler.schedule(cronExpr, new SchedulerBackupRunner(this.schedulingService));
                 backupScheduler.start();
 
