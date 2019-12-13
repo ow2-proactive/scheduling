@@ -26,9 +26,11 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +42,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  * @since 03/12/19
  */
 public class AddonPathUtils {
+
     public static final String ADDONS_BASE_DIRNAME = "addons";
 
     public static String getAddonsBasePath() {
@@ -66,25 +69,21 @@ public class AddonPathUtils {
     }
 
     /**
-     * Find all the jar files in the path
-     * @param path
-     * @return
+     * Find all the jar files in the directory
+     * @param jarDirPath the path of the directory where located the jar files
+     * @return the URL array of jar files under the directory
      */
-    public static URL[] findJarsInPath(String path) {
-        File[] jarArray = new File(path).listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".jar");
+    public static URL[] findJarsInPath(String jarDirPath) {
+        Set<URL> jarSet = new HashSet<>();
+
+        try (DirectoryStream<Path> jars = Files.newDirectoryStream(new File(jarDirPath).toPath(), "*.jar")) {
+            for (Path jar : jars) {
+                jarSet.add(jar.toUri().toURL());
             }
-        });
-        Set<URL> jarNames = new HashSet<>();
-        for (File jarFile : jarArray) {
-            try {
-                jarNames.add(jarFile.toURI().toURL());
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("Malformed URL: " + jarFile);
-            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Error during getting the jar file from the path: " + jarDirPath, e);
         }
-        return jarNames.toArray(new URL[0]);
+
+        return jarSet.toArray(new URL[0]);
     }
 }
