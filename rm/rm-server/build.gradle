@@ -16,7 +16,6 @@ dependencies {
     )
 
     compile 'com.google.guava:guava:19.0'
-    compile group: 'org.javassist', name: 'javassist', version: '3.15.0-GA'
 
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     testCompile "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
