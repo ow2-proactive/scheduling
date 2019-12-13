@@ -158,7 +158,7 @@ public class SchedulingService {
             startHouseKeeping();
         }
 
-        if (PASharedProperties.SHARED_BACKUP.isSet()) {
+        if (PASharedProperties.SERVER_BACKUP.isSet()) {
             startBackuping();
         }
     }
@@ -166,7 +166,7 @@ public class SchedulingService {
     private void startBackuping() {
         logger.debug("Starting the scheduler backup process...");
         backupScheduler = new it.sauronsoftware.cron4j.Scheduler();
-        String cronExpr = PASharedProperties.SHARED_BACKUP_PERIOD.getValueAsString();
+        String cronExpr = PASharedProperties.SERVER_BACKUP_PERIOD.getValueAsString();
         backupScheduler.schedule(cronExpr, new SchedulerBackupRunner(this));
         backupScheduler.start();
     }
