@@ -90,6 +90,7 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
@@ -378,6 +379,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                                                              recoveredState.getSchedulerState()));
                 metricsMonitorScheduler.start();
             }
+
         } catch (Exception e) {
             logger.fatal("Failed to start Scheduler", e);
             e.printStackTrace();
