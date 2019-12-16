@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
-import org.ow2.proactive.utils.ClasspathUtils;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class SchedulerBackupRunner implements Runnable {
@@ -86,19 +86,19 @@ public class SchedulerBackupRunner implements Runnable {
     }
 
     private void performBackup() throws IOException {
-        String backupFileName = PREFIX + DateTime.now().toString("yyyy-MM-dd'T'HH:mm") + ".zip";
-        File destinationFile = new File(destination);
-        if (destinationFile.exists()) {
-            File backupFile;
-            if (destinationFile.isAbsolute()) {
-                backupFile = new File(destination, backupFileName);
-            } else {
-                backupFile = new File(new File(ClasspathUtils.findSchedulerHome(), destination), backupFileName);
-            }
+        String backupFileName = PREFIX + DateTime.now().toString("yyyy-MM-dd'T'HH-mm") + ".zip";
+        File destinationFolder = new File(destination);
+
+        if (!destinationFolder.isAbsolute()) {
+            destinationFolder = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(), destination);
+        }
+
+        if (destinationFolder.exists() && destinationFolder.isDirectory() && destinationFolder.canWrite()) {
+            File backupFile = new File(destination, backupFileName);
             LOGGER.info("Performing backup to " + backupFile);
-            String schedulerHome = ClasspathUtils.findSchedulerHome();
             String[] foldersToZip = targets.stream()
-                                           .map(target -> (new File(schedulerHome, target)).getAbsolutePath())
+                                           .map(target -> (new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
+                                                                    target)).getAbsolutePath())
                                            .toArray(String[]::new);
             ZipUtils.zip(foldersToZip, backupFile, null);
         } else {
