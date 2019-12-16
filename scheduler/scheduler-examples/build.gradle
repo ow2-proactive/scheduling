@@ -2,26 +2,7 @@ repositories {
     mavenCentral()
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
-    }
-}
-
-apply plugin: "io.spring.dependency-management"
-
-dependencyManagement {
-    imports {
-        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.228'
-    }
-}
-
 dependencies {
-    compile 'com.amazonaws:aws-java-sdk-s3'
-    compile group: 'com.microsoft.azure', name: 'azure-storage-blob', version: '10.0.3-Preview'
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.3.9'
     compile group: 'commons-dbutils', name: 'commons-dbutils', version: '1.7'
     // used in rest client tasks for convenience
