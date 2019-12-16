@@ -122,8 +122,7 @@ public class SchedulerBackupRunner implements Runnable {
 
     private long getCreationTime(File file) {
         try {
-            File f = file;
-            BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
+            BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
             FileTime fileTime = attr.creationTime();
             return fileTime.toMillis();
         } catch (IOException e) {
