@@ -75,7 +75,7 @@ public class SchedulerBackupRunner implements Runnable {
             removeOldBackups();
             performBackup();
         } catch (IOException | InterruptedException e) {
-            LOGGER.error(e);
+            LOGGER.error("", e);
         } finally {
             scheduler.resume();
         }
@@ -126,7 +126,7 @@ public class SchedulerBackupRunner implements Runnable {
             FileTime fileTime = attr.creationTime();
             return fileTime.toMillis();
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOGGER.error("", e);
             // handle exception
             return 0l;
         }
