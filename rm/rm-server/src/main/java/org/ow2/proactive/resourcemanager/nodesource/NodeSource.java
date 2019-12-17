@@ -914,7 +914,11 @@ public class NodeSource implements InitActive, RunActive {
                 }
             } catch (Throwable t) {
                 logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
-                stub.detectedPingedDownNode(nodeName, nodeUrl);
+                try {
+                    stub.detectedPingedDownNode(nodeName, nodeUrl);
+                } catch (Exception e) {
+                    logger.warn("Could not send detectedPingedDownNode message", e);
+                }
             }
         });
     }
