@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.rest;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static org.ow2.proactive.scheduler.common.task.TaskStatus.statusesToString;
+import static org.ow2.proactive.scheduler.common.task.TaskStatus.wrapIntoAggregatedStatuses;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
@@ -107,6 +109,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -1184,11 +1187,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit) throws SchedulerException {
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
+            int offset, int limit) throws SchedulerException {
         RestPage<TaskStateData> page = null;
         try {
-            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset, limit, null);
+            page = restApi().getTaskStates(sid, from, to, mytasks, statusesToString(taskStatuses), offset, limit, null);
         } catch (RestException e) {
             throw RestException.unwrapRestException(e);
         }
@@ -1204,8 +1207,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
+            Set<TaskStatus> statusFilter, int offset, int limit, SortSpecifierContainer sortParams)
             throws SchedulerException {
         RestPage<TaskStateData> page = null;
         SortSpecifierContainer sortContainer = new SortSpecifierContainer(sortParams.toString());
@@ -1214,9 +1217,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                            from,
                                            to,
                                            mytasks,
-                                           running,
-                                           pending,
-                                           finished,
+                                           TaskStatus.statusFilterString(statusFilter),
                                            offset,
                                            limit,
                                            sortContainer);

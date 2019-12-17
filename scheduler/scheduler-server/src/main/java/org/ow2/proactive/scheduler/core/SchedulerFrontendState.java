@@ -76,11 +76,14 @@ import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
+import org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission;
 import org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission;
+import org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission;
 import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Lambda;
+import org.ow2.proactive.utils.Lambda.RunnableThatThrows3Exceptions;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
@@ -428,9 +431,21 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @throws PermissionException
      *             if permission is denied
      */
-    void handleJobsWithGenericInformationPermission(Map<String, String> genericInformation, UserIdentificationImpl ui,
-            String errorMessage) throws PermissionException {
+    private void handleJobsWithGenericInformationPermission(Map<String, String> genericInformation,
+            UserIdentificationImpl ui, String errorMessage) throws PermissionException {
         ui.checkPermission(new HandleJobsWithGenericInformationPermission(genericInformation),
+                           ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
+    }
+
+    private void handleJobBucketNameGenericInformationPermission(Map<String, String> genericInformation,
+            UserIdentificationImpl ui, String errorMessage) throws PermissionException {
+        ui.checkPermission(new HandleJobsWithBucketNamePermission(genericInformation),
+                           ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
+    }
+
+    private void handleJobGroupNameGenericInformationPermission(Map<String, String> genericInformation,
+            UserIdentificationImpl ui, String errorMessage) throws PermissionException {
+        ui.checkPermission(new HandleJobsWithGroupNamePermission(genericInformation),
                            ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
     }
 
@@ -737,20 +752,49 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     void checkPermissions(String methodName, IdentifiedJob identifiedJob, String errorMessage)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        try {
-            checkJobOwner(methodName, identifiedJob, errorMessage);
-        } catch (PermissionException jobOwnerException) {
-            UserIdentificationImpl ident = checkPermission(methodName, errorMessage);
-            try {
-                boolean iAmTheJobOwner = false;
-                handleOnlyMyJobsPermission(iAmTheJobOwner, ident, errorMessage);
-            } catch (PermissionException onlyMyJobException) {
-                logger.debug("No permission to handle other user job(" + onlyMyJobException.getMessage() +
-                             ") checking generic information permission");
-                handleJobsWithGenericInformationPermission(identifiedJob.getGenericInformation(), ident, errorMessage);
-            }
+        checkPermissionChain(
+                             // if we are job owner
+                             () -> checkJobOwner(methodName, identifiedJob, errorMessage),
+                             // if it is 'only my jobs' permission
+                             () -> handleOnlyMyJobsPermission(false,
+                                                              checkPermission(methodName, errorMessage),
+                                                              errorMessage),
+                             // if generic info matches
+                             () -> handleJobsWithGenericInformationPermission(identifiedJob.getGenericInformation(),
+                                                                              checkPermission(methodName, errorMessage),
+                                                                              errorMessage),
+                             // if bucket name is allowed
+                             () -> handleJobBucketNameGenericInformationPermission(identifiedJob.getGenericInformation(),
+                                                                                   checkPermission(methodName,
+                                                                                                   errorMessage),
+                                                                                   errorMessage),
+                             // if group name is allows
+                             () -> handleJobGroupNameGenericInformationPermission(identifiedJob.getGenericInformation(),
+                                                                                  checkPermission(methodName,
+                                                                                                  errorMessage),
+                                                                                  errorMessage));
+    }
 
+    void checkPermissionChain(
+            RunnableThatThrows3Exceptions<PermissionException, NotConnectedException, UnknownJobException>... checks)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        for (int i = 0; i < checks.length; ++i) {
+            RunnableThatThrows3Exceptions<PermissionException, NotConnectedException, UnknownJobException> check = checks[i];
+            try {
+                check.run();
+            } catch (PermissionException pe) {
+                if (i == checks.length - 1) {
+                    throw pe; // all checks failed, no more hope
+                } else {
+                    continue; // we will try another one check
+                }
+            } catch (NotConnectedException | UnknownJobException se) {
+                // we failed and we cannot continue
+                throw se;
+            }
+            break; // all good
         }
+
     }
 
     void checkJobOwner(String methodName, IdentifiedJob IdentifiedJob, String permissionMsg)

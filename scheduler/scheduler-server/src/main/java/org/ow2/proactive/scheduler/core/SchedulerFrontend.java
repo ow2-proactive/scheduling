@@ -90,6 +90,7 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
@@ -378,6 +379,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                                                              recoveredState.getSchedulerState()));
                 metricsMonitorScheduler.start();
             }
+
         } catch (Exception e) {
             logger.fatal("Failed to start Scheduler", e);
             e.printStackTrace();
@@ -1451,11 +1453,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
         boolean myJobsOnly = filterCriteria.isMyJobsOnly();
 
-        String user;
+        String user = null;
         if (myJobsOnly) {
             user = ident.getUsername();
-        } else {
-            user = null;
         }
         return dbManager.getJobs(offset,
                                  limit,
@@ -1571,31 +1571,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     @Override
     @ImmediateService
-    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit)
-            throws NotConnectedException, PermissionException {
-        RestPageParameters params = new RestPageParameters(frontendState,
-                                                           "getTaskIds",
-                                                           from,
-                                                           to,
-                                                           mytasks,
-                                                           running,
-                                                           pending,
-                                                           finished,
-                                                           offset,
-                                                           limit,
-                                                           taskTag,
-                                                           SortSpecifierContainer.EMPTY_CONTAINER);
-        Page<TaskInfo> pTaskInfo;
-        pTaskInfo = dbManager.getTasks(params.getFrom(),
-                                       params.getTo(),
-                                       params.getTag(),
-                                       params.getOffset(),
-                                       params.getLimit(),
-                                       params.getUserName(),
-                                       params.isPending(),
-                                       params.isRunning(),
-                                       params.isFinished());
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
+            int offset, int limit) throws NotConnectedException, PermissionException {
+        String userName = null;
+        if (mytasks) {
+            userName = frontendState.checkPermission("getTaskIds", "You do not have permission to use frontendState")
+                                    .getUsername();
+        }
+        Page<TaskInfo> pTaskInfo = dbManager.getTasks(from, to, taskTag, offset, limit, userName, taskStatuses);
         List<TaskId> lTaskId = new ArrayList<>(pTaskInfo.getList().size());
         for (TaskInfo taskInfo : pTaskInfo.getList()) {
             lTaskId.add(taskInfo.getTaskId());
@@ -1605,33 +1588,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     @Override
     @ImmediateService
-    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
+            Set<TaskStatus> statusFilter, int offset, int limit, SortSpecifierContainer sortParams)
             throws NotConnectedException, PermissionException {
-        RestPageParameters params = new RestPageParameters(frontendState,
-                                                           "getTaskStates",
-                                                           from,
-                                                           to,
-                                                           mytasks,
-                                                           running,
-                                                           pending,
-                                                           finished,
-                                                           offset,
-                                                           limit,
-                                                           taskTag,
-                                                           sortParams);
-        Page<TaskState> pTasks;
-        pTasks = dbManager.getTaskStates(params.getFrom(),
-                                         params.getTo(),
-                                         params.getTag(),
-                                         params.getOffset(),
-                                         params.getLimit(),
-                                         params.getUserName(),
-                                         params.isPending(),
-                                         params.isRunning(),
-                                         params.isFinished(),
-                                         params.getSortParams());
-        return pTasks;
+
+        String userName = null;
+        if (mytasks) {
+            userName = frontendState.checkPermission("getTaskStates", "You do not have permission to use frontendState")
+                                    .getUsername();
+        }
+        return dbManager.getTaskStates(from, to, taskTag, offset, limit, userName, statusFilter, sortParams);
 
     }
 

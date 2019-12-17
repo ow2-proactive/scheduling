@@ -88,6 +88,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestEx
 @Path("/scheduler/")
 public interface SchedulerRestInterface {
 
+    String defaultStatusFilter = "running;pending;finished";
+
     /**
      * Returns the url of the scheduler server.
      *
@@ -463,12 +465,9 @@ public interface SchedulerRestInterface {
      * @param mytasks
      *            <code>True</code> if you want to fetch only the user's tasks.
      *            Default value is <code>False</code>.
-     * @param running
-     *            fetch running tasks. Default value is <code>True</code>.
-     * @param pending
-     *            fetch pending tasks. Default value is <code>True</code>.
-     * @param finished
-     *            fetch finished tasks. Default value is <code>True</code>.
+     * @param statusFilter
+     *            String contains list of aggregated task statuses, like "Current", "Past", etc.
+     *            These values joined by semi colon.
      * @param offset
      *            the index of the first task to fetch (for pagination).
      * @param limit
@@ -483,9 +482,7 @@ public interface SchedulerRestInterface {
     RestPage<String> getTaskIds(@HeaderParam("sessionid") String sessionId,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
-            @QueryParam("running") @DefaultValue("true") boolean running,
-            @QueryParam("pending") @DefaultValue("true") boolean pending,
-            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("statusFilter") @DefaultValue(value = defaultStatusFilter) String statusFilter,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit)
             throws RestException;
 
@@ -511,12 +508,9 @@ public interface SchedulerRestInterface {
      * @param mytasks
      *            <code>True</code> if you want to fetch only the user's tasks.
      *            Default value is <code>False</code>.
-     * @param running
-     *            fetch running tasks. Default value is <code>True</code>.
-     * @param pending
-     *            fetch pending tasks. Default value is <code>True</code>.
-     * @param finished
-     *            fetch finished tasks. Default value is <code>True</code>.
+     * @param statusFilter
+     *            String contains list of aggregated task statuses, like "Current", "Past", etc.
+     *            These values joined by semi colon.
      * @param offset
      *            the index of the first task to fetch (for pagination).
      * @param limit
@@ -531,9 +525,7 @@ public interface SchedulerRestInterface {
     RestPage<String> getTaskIdsByTag(@HeaderParam("sessionid") String sessionId, @PathParam("tasktag") String taskTag,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
-            @QueryParam("running") @DefaultValue("true") boolean running,
-            @QueryParam("pending") @DefaultValue("true") boolean pending,
-            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("statusFilter") @DefaultValue(value = defaultStatusFilter) String statusFilter,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit)
             throws RestException;
 
@@ -727,12 +719,9 @@ public interface SchedulerRestInterface {
      * @param mytasks
      *            <code>True</code> if you want to fetch only the user's tasks.
      *            Default value is <code>False</code>.
-     * @param running
-     *            fetch running tasks. Default value is <code>True</code>.
-     * @param pending
-     *            fetch pending tasks. Default value is <code>True</code>.
-     * @param finished
-     *            fetch finished tasks. Default value is <code>True</code>.
+     * @param statusFilter
+     *            String contains list of aggregated task statuses, like "Current", "Past", etc.
+     *            These values joined by semi colon.
      * @param offset
      *            the index of the first task to fetch (for pagination).
      * @param limit
@@ -748,9 +737,7 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getTaskStates(@HeaderParam("sessionid") String sessionId,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
-            @QueryParam("running") @DefaultValue("true") boolean running,
-            @QueryParam("pending") @DefaultValue("true") boolean pending,
-            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("statusFilter") @DefaultValue(value = defaultStatusFilter) String statusFilter,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("sortparameters") SortSpecifierContainer sortParams) throws RestException;
 
@@ -777,12 +764,9 @@ public interface SchedulerRestInterface {
      * @param mytasks
      *            <code>True</code> if you want to fetch only the user's tasks.
      *            <code>False</code> will fetch everything.
-     * @param running
-     *            fetch running tasks. Default value is <code>True</code>.
-     * @param pending
-     *            fetch pending tasks. Default value is <code>True</code>.
-     * @param finished
-     *            fetch finished tasks. Default value is <code>True</code>.
+     * @param statusFilter
+     *            String contains list of aggregated task statuses, like "Current", "Past", etc.
+     *            These values joined by semi colon.
      * @param offset
      *            the index of the first task to fetch (for pagination).
      * @param limit
@@ -798,9 +782,7 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("tasktag") String taskTag, @QueryParam("from") @DefaultValue("0") long from,
             @QueryParam("to") @DefaultValue("0") long to, @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
-            @QueryParam("running") @DefaultValue("true") boolean running,
-            @QueryParam("pending") @DefaultValue("true") boolean pending,
-            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("statusFilter") @DefaultValue(value = defaultStatusFilter) String statusFilter,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("sortparameters") SortSpecifierContainer sortParams) throws RestException;
 

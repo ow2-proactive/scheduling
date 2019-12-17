@@ -28,6 +28,8 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.client.utils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.*;
@@ -159,9 +161,15 @@ public class Zipper {
                 ZipOutputStream zos = new ZipOutputStream(os);
                 closer.register(zos);
                 for (File file : files) {
-                    FileInputStream inputStream = new FileInputStream(file);
-                    closer.register(inputStream);
-                    writeZipEntry(zipEntry(basepath, file), inputStream, zos);
+                    if (file.isFile()) {
+                        FileInputStream inputStream = new FileInputStream(file);
+                        closer.register(inputStream);
+                        writeZipEntry(zipEntry(basepath, file), inputStream, zos);
+                    } else {
+                        ZipEntry ze = zipEntry(basepath, file);
+                        logger.trace("Adding directory zip entry: " + ze.toString());
+                        zos.putNextEntry(ze);
+                    }
                 }
             } catch (IOException ioe) {
                 throw closer.rethrow(ioe);
@@ -174,7 +182,7 @@ public class Zipper {
             Closer closer = Closer.create();
             closer.register(is);
             try {
-                logger.trace("Adding zip entry: " + zipEntry.toString());
+                logger.trace("Adding file zip entry: " + zipEntry.toString());
                 zos.putNextEntry(zipEntry);
                 ByteStreams.copy(is, zos);
                 zos.flush();
@@ -224,11 +232,19 @@ public class Zipper {
             }
         }
 
-        private static ZipEntry zipEntry(String basepath, File file) {
+        private static String getRealRelativeFilePath(String basepath, String absolutePath) throws IOException {
+            String realAbsolutePath = Paths.get(absolutePath).toRealPath().toString();
+            String realBasePath = Paths.get(basepath).toRealPath().toString();
+            return basepath.endsWith(File.separator) ? realAbsolutePath.substring(realBasePath.length())
+                                                     : realAbsolutePath.substring(realBasePath.length() + 1);
+        }
+
+        private static ZipEntry zipEntry(String basepath, File file) throws IOException {
             String name = (Strings.isNullOrEmpty(basepath) ||
                            basepath.equals(file.getAbsolutePath())) ? file.getPath()
-                                                                    : file.getAbsolutePath()
-                                                                          .substring(basepath.length() + 1);
+                                                                    : getRealRelativeFilePath(basepath,
+                                                                                              file.getAbsolutePath());
+            name = file.isDirectory() ? new File(name, File.separator).toString() : name;
             return new ZipEntry(name);
         }
     }

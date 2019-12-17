@@ -25,8 +25,10 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -130,6 +132,8 @@ public enum TaskStatus implements java.io.Serializable {
                                                                         WAITING_ON_ERROR,
                                                                         WAITING_ON_FAILURE);
 
+    public static final Set<TaskStatus> PAUSED_AND_IN_ERROR_TASKS = ImmutableSet.of(PAUSED, IN_ERROR);
+
     public static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(SUBMITTED, PENDING);
 
     /** The name of the current status. */
@@ -173,13 +177,13 @@ public enum TaskStatus implements java.io.Serializable {
                     return Stream.of(TaskStatus.SUBMITTED);
                 case "pending":
                     return Stream.of(TaskStatus.PENDING);
+                case "current":
                 case "running":
                 case "active":
-                case "current":
                     return TaskStatus.RUNNING_TASKS.stream();
+                case "past":
                 case "finished":
                 case "terminated":
-                case "past":
                     return TaskStatus.FINISHED_TASKS.stream();
                 case "error":
                     return TaskStatus.ERROR_TASKS.stream();
@@ -188,4 +192,54 @@ public enum TaskStatus implements java.io.Serializable {
             }
         }).collect(Collectors.toSet());
     }
+
+    public static List<String> wrapIntoAggregatedStatuses(Set<TaskStatus> actualStatuses) {
+        return actualStatuses.stream().map(x -> {
+            if (x.equals(TaskStatus.SUBMITTED)) {
+                return TaskStatus.SUBMITTED.name;
+            } else if (x.equals(TaskStatus.PENDING)) {
+                return TaskStatus.PENDING.name;
+            } else if (TaskStatus.RUNNING_TASKS.contains(x)) {
+                return TaskStatus.RUNNING.name;
+            } else if (TaskStatus.FINISHED_TASKS.contains(x)) {
+                return TaskStatus.FINISHED.name;
+            } else if (TaskStatus.ERROR_TASKS.contains(x)) {
+                return "error";
+            } else {
+                return "";
+            }
+        }).distinct().collect(Collectors.toList());
+    }
+
+    public static String aggregatedStatusesToFilterString(List<String> statuses) {
+        return String.join(";", statuses);
+    }
+
+    public static String statusesToString(Set<TaskStatus> actualStatuses) {
+        return aggregatedStatusesToFilterString(wrapIntoAggregatedStatuses(actualStatuses));
+    }
+
+    public static Set<TaskStatus> taskStatuses(boolean pending, boolean running, boolean finished) {
+        List<String> aggregatedStatuses = new LinkedList<>();
+
+        if (pending) {
+            aggregatedStatuses.add(TaskStatus.SUBMITTED.name);
+            aggregatedStatuses.add(TaskStatus.PENDING.name);
+        }
+
+        if (running) {
+            aggregatedStatuses.add(TaskStatus.RUNNING.name);
+        }
+
+        if (finished) {
+            aggregatedStatuses.add(TaskStatus.FINISHED.name);
+        }
+
+        return TaskStatus.expandAggregatedStatusesToRealStatuses(aggregatedStatuses);
+    }
+
+    public static String statusFilterString(Set<TaskStatus> statuses) {
+        return statuses.stream().map(TaskStatus::toString).collect(Collectors.joining(";"));
+    }
+
 }

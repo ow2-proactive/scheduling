@@ -15,7 +15,7 @@
 //
 // Members of "guest" group can get/free nodes and monitor the state submit jobs
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "guests" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "automation_dashboard,workflow_automation";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "automation-dashboard,workflow-automation";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodesList";
@@ -120,7 +120,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 	//"false" means user can get full state and listen for any events.
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
-    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";    
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.submit";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getJobResult";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getTaskResult";

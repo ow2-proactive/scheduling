@@ -54,7 +54,26 @@ public enum PASharedProperties implements PACommonProperties {
     FAILED_LOGIN_RENEW_MINUTES("pa.shared.failed.renew.minutes", PropertyType.INTEGER, "10"),
 
     /** Key used when decrypting properties */
-    PROPERTIES_CRYPT_KEY("pa.shared.properties.crypt.key", PropertyType.STRING, "activeeon");
+    PROPERTIES_CRYPT_KEY("pa.shared.properties.crypt.key", PropertyType.STRING, "activeeon"),
+
+    /* ***************************************************************** */
+    /* ******************* SCHEDULER BACKUP PROPERTIES ******************* */
+    /* ***************************************************************** */
+
+    /** if backup is enabled */
+    SERVER_BACKUP("pa.server.backup", PropertyType.BOOLEAN, "false"),
+
+    /** cron expression which defines when backuop should be performed */
+    SERVER_BACKUP_PERIOD("pa.server.backup.period", PropertyType.STRING, "0 0 * * *"),
+
+    /** determines how many backups should be kept */
+    SERVER_BACKUP_WINDOWS("pa.server.backup.windows", PropertyType.INTEGER, "10"),
+
+    /** a relative or absolute path to a folder (where the backup files should be stored) */
+    SERVER_BACKUP_DESTINATION("pa.server.backup.destination", PropertyType.STRING, "backup"),
+
+    /** comma-separated list of folder and/or files which need to be backup */
+    SERVER_BACKUP_TARGETS("pa.server.backup.targets", PropertyType.STRING, "data,logs");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

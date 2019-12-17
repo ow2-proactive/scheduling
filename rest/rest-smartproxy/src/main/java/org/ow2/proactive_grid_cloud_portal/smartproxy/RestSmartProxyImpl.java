@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import javax.security.auth.Subject;
@@ -66,6 +67,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.rest.DisconnectionAwareSchedulerEventListener;
@@ -681,25 +683,16 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit) throws SchedulerException {
-        return _getScheduler().getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
+            int offset, int limit) throws SchedulerException {
+        return _getScheduler().getTaskIds(taskTag, from, to, mytasks, taskStatuses, offset, limit);
     }
 
     @Override
-    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
+            Set<TaskStatus> statusFilter, int offset, int limit, SortSpecifierContainer sortParams)
             throws SchedulerException {
-        return _getScheduler().getTaskStates(taskTag,
-                                             from,
-                                             to,
-                                             mytasks,
-                                             running,
-                                             pending,
-                                             finished,
-                                             offset,
-                                             limit,
-                                             sortParams);
+        return _getScheduler().getTaskStates(taskTag, from, to, mytasks, statusFilter, offset, limit, sortParams);
     }
 
     @Override

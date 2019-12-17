@@ -30,11 +30,13 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.utils.AddonClassUtils;
 
 
 /**
@@ -46,10 +48,10 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
  */
 public class InfrastructureManagerFactory {
 
-    /** list of supported infrastructures */
-    private static Collection<Class<?>> supportedInfrastructures;
-
     private static final Logger logger = Logger.getLogger(InfrastructureManagerFactory.class);
+
+    // the class loader of this class (usually it is the system class loader)
+    private static ClassLoader originalClassLoader = InfrastructureManagerFactory.class.getClassLoader();
 
     /**
      * Creates new infrastructure manager using reflection mechanism.
@@ -61,10 +63,9 @@ public class InfrastructureManagerFactory {
         String infrastructureType = nodeSourceDescriptor.getInfrastructureType();
         Object[] infrastructureParameters = nodeSourceDescriptor.getInfrastructureParameters();
         try {
-
             boolean supported = false;
-            for (Class<?> cls : getSupportedInfrastructures()) {
-                if (cls.getName().equals(infrastructureType)) {
+            for (String supportedInfra : getSupportedInfrastructuresName()) {
+                if (supportedInfra.equals(infrastructureType)) {
                     supported = true;
                     break;
                 }
@@ -73,8 +74,8 @@ public class InfrastructureManagerFactory {
                 throw new IllegalArgumentException(infrastructureType + " is not supported");
             }
 
-            Class<?> imClass = Class.forName(infrastructureType);
-            im = (InfrastructureManager) imClass.newInstance();
+            Class<?> imClass = AddonClassUtils.loadClass(infrastructureType, originalClassLoader);
+            im = (InfrastructureManager) AddonClassUtils.instantiateAddon(imClass);
             im.internalConfigure(infrastructureParameters);
             im.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(nodeSourceDescriptor));
         } catch (Exception e) {
@@ -84,12 +85,12 @@ public class InfrastructureManagerFactory {
     }
 
     /**
-      * Creates a new infrastructure manager and recovers its state thanks to
-      * the variables contained in the nodeSourceDescriptor.
-      *
-      * @param nodeSourceDescriptor the persisted information about the node source
-      * @return recovered infrastructure manager
-      */
+     * Creates a new infrastructure manager and recovers its state thanks to
+     * the variables contained in the nodeSourceDescriptor.
+     *
+     * @param nodeSourceDescriptor the persisted information about the node source
+     * @return recovered infrastructure manager
+     */
     public static InfrastructureManager recover(NodeSourceDescriptor nodeSourceDescriptor) {
         InfrastructureManager infrastructure = create(nodeSourceDescriptor);
         infrastructure.recoverPersistedInfraVariables(nodeSourceDescriptor.getLastRecoveredInfrastructureVariables());
@@ -97,10 +98,11 @@ public class InfrastructureManagerFactory {
     }
 
     /**
-     * Loads a list of supported infrastructures from a configuration file
-     * @return list of supported infrastructures
+     * Get a list of supported infrastructures name from a configuration file
+     *
+     * @return list of supported infrastructures name
      */
-    public static Collection<Class<?>> getSupportedInfrastructures() {
+    public static Collection<String> getSupportedInfrastructuresName() {
         // reload file each time as it can be updated while the rm is running
         Properties properties = new Properties();
         String propFileName = null;
@@ -117,18 +119,25 @@ public class InfrastructureManagerFactory {
         } catch (Exception e) {
             logger.error("Error when loading infrastructure definition file : " + propFileName, e);
         }
+        return properties.keySet().stream().map(Object::toString).collect(Collectors.toList());
+    }
 
-        supportedInfrastructures = new ArrayList<>(properties.size());
+    /**
+     * Load the list of supported infrastructures
+     *
+     * @return list of supported infrastructures class
+     */
+    public static Collection<Class<?>> getSupportedInfrastructures() {
+        Collection<Class<?>> supportedInfastructures = new ArrayList<>();
 
-        for (Object className : properties.keySet()) {
+        for (String infraClassName : getSupportedInfrastructuresName()) {
             try {
-                Class<?> cls = Class.forName(className.toString());
-                supportedInfrastructures.add(cls);
+                supportedInfastructures.add(AddonClassUtils.loadClass(infraClassName, originalClassLoader));
             } catch (ClassNotFoundException e) {
-                logger.error("Cannot find infrastructure class " + className.toString());
+                logger.error("Cannot find infrastructure class " + infraClassName);
             }
         }
 
-        return supportedInfrastructures;
+        return supportedInfastructures;
     }
 }
