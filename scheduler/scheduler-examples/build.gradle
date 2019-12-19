@@ -5,18 +5,6 @@ repositories {
 dependencies {
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.3.9'
     compile group: 'commons-dbutils', name: 'commons-dbutils', version: '1.7'
-    // used in rest client tasks for convenience
-    compile ('io.rest-assured:rest-assured:3.3.0') {
-        exclude group: 'org.codehaus.groovy'
-    }
-    compile ('io.rest-assured:json-path:3.3.0') {
-        exclude group: 'org.codehaus.groovy'
-    }
-    compile ('io.rest-assured:xml-path:3.3.0') {
-        exclude group: 'org.codehaus.groovy'
-        exclude group: 'com.sun.xml.bind'
-        exclude group: 'javax.xml.bind'
-    }
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile(
             project(':scheduler:scheduler-api'),
