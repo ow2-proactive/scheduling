@@ -158,7 +158,7 @@ public class SchedulingService {
             startHouseKeeping();
         }
 
-        if (PASharedProperties.SERVER_BACKUP.isSet()) {
+        if (PASharedProperties.SERVER_BACKUP.getValueAsBoolean()) {
             startBackuping();
         }
     }

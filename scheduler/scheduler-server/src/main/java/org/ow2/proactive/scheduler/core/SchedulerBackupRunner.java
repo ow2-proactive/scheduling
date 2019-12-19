@@ -33,7 +33,6 @@ import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -93,6 +92,10 @@ public class SchedulerBackupRunner implements Runnable {
             destinationFolder = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(), destination);
         }
 
+        if (!destinationFolder.exists()) {
+            destinationFolder.mkdirs();
+        }
+
         if (destinationFolder.exists() && destinationFolder.isDirectory() && destinationFolder.canWrite()) {
             File backupFile = new File(destination, backupFileName);
             LOGGER.info("Performing backup to " + backupFile);
@@ -108,16 +111,18 @@ public class SchedulerBackupRunner implements Runnable {
 
     private void removeOldBackups() {
         File fodlerWhereBackups = new File(destination);
-        Stream.of(Objects.requireNonNull(fodlerWhereBackups.listFiles()))
-              .filter(File::isFile)
-              .filter(file -> file.getName().startsWith(PREFIX))
-              .sorted(Comparator.comparingLong(file -> getCreationTime((File) file)).reversed())
-              .skip(windowSize - 1)
-              .forEach(file -> {
-                  LOGGER.info("Removing old backup: " + file.getName());
-                  file.delete();
-              });
-
+        File[] files = fodlerWhereBackups.listFiles();
+        if (files != null) {
+            Stream.of(files)
+                  .filter(File::isFile)
+                  .filter(file -> file.getName().startsWith(PREFIX))
+                  .sorted(Comparator.comparingLong(file -> getCreationTime((File) file)).reversed())
+                  .skip(windowSize - 1)
+                  .forEach(file -> {
+                      LOGGER.info("Removing old backup: " + file.getName());
+                      file.delete();
+                  });
+        }
     }
 
     private long getCreationTime(File file) {
