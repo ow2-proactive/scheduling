@@ -124,8 +124,6 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     private boolean isStarted = false;
 
-    private boolean frozen = false;
-
     @java.lang.SuppressWarnings("unused")
     public AOSynchronization() {
         // ProActive empty no arg constructor
@@ -824,22 +822,22 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         Service service = new Service(body);
         while (body.isActive()) {
             try {
-                waitIfNeeded();
                 NewRequestWithWaitTime requestWithWaitTime = waitForNewRequest(service);
                 Request request = requestWithWaitTime.getNewRequest();
-
-                if (request != null && request.getMethodName().startsWith("wait") &&
-                    !testWaitFunction(service, request)) {
+                if (request != null && request.getMethodName().equals("freeze")) {
+                    service.serve(request);
+                    service.blockingServeOldest("resume");
+                } else if (request != null && request.getMethodName().startsWith("wait") &&
+                        !testWaitFunction(service, request)) {
                     // If the predicate is not met, delay the wait method execution
                     TimedOutRequest timedOutRequest = new TimedOutRequest(request,
-                                                                          extractWaitRequestTimeoutParameter(request));
+                            extractWaitRequestTimeoutParameter(request));
                     logger.trace("New pending wait request : " + timedOutRequest);
                     waitUntilQueue.add(new TimedOutRequest(request, extractWaitRequestTimeoutParameter(request)));
                 } else if (request != null) {
                     service.serve(request);
                 }
                 unblockWaitMethods(service, requestWithWaitTime.getWaitTime());
-
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -849,24 +847,10 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     public void freeze() throws IOException {
         recordManager.close();
         recordManager = null;
-        frozen = true;
     }
 
-    @ImmediateService
     public synchronized void resume() throws IOException {
         recordManager = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
-        frozen = false;
-        this.notifyAll();
-    }
-
-    private synchronized void waitIfNeeded() {
-        try {
-            while (frozen) {
-                this.wait();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 
     /**
