@@ -40,6 +40,7 @@ import org.joda.time.DateTime;
 import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 
 
 public class SchedulerBackupRunner implements Runnable {
@@ -54,25 +55,41 @@ public class SchedulerBackupRunner implements Runnable {
 
     private final int windowSize;
 
+    private final int possibleDealyInSeconds;
+
     private final SchedulingService scheduler;
 
-    public SchedulerBackupRunner(SchedulingService scheduler) {
+    private AOSynchronization synchronizationAPI;
+
+    public SchedulerBackupRunner(SchedulingService scheduler, AOSynchronization synchronizationAPI) {
         this.scheduler = scheduler;
-        targets = Arrays.asList(PASharedProperties.SERVER_BACKUP_TARGETS.getValueAsString().split(","));
+        this.synchronizationAPI = synchronizationAPI;
+        targets = Arrays.asList(PASharedProperties.SERVER_BACKUP_TARGETS.getValueAsString().split("\\s*,\\s*"));
         destination = PASharedProperties.SERVER_BACKUP_DESTINATION.getValueAsString();
         windowSize = PASharedProperties.SERVER_BACKUP_WINDOWS.getValueAsInt();
+        possibleDealyInSeconds = PASharedProperties.SERVER_BACKUP_POSSIBLE_DELAY.getValueAsInt();
     }
 
     @Override
     public void run() {
+        scheduler.freeze();
         try {
-            scheduler.freeze();
-
-            while (!noOtherTaskIsRunning()) {
-                Thread.sleep(10000);
+            DateTime deadLine = DateTime.now().plusSeconds(possibleDealyInSeconds);
+            while (DateTime.now().isBefore(deadLine) && otherTaskIsRunning()) {
+                Thread.sleep(10000); // sleep 10s
             }
-            removeOldBackups();
-            performBackup();
+            if (!otherTaskIsRunning()) {
+                synchronizationAPI.freeze();
+                try {
+                    removeOldBackups();
+                    performBackup();
+                } finally {
+                    synchronizationAPI.resume();
+                }
+            } else {
+                LOGGER.info("Backup will not be performed because there is still some jobs running");
+                // we will not perform backup
+            }
         } catch (IOException | InterruptedException e) {
             LOGGER.error("", e);
         } finally {
@@ -80,8 +97,8 @@ public class SchedulerBackupRunner implements Runnable {
         }
     }
 
-    private boolean noOtherTaskIsRunning() {
-        return scheduler.getJobs().getRunningTasks().isEmpty();
+    private boolean otherTaskIsRunning() {
+        return !scheduler.getJobs().getRunningTasks().isEmpty();
     }
 
     private void performBackup() throws IOException {

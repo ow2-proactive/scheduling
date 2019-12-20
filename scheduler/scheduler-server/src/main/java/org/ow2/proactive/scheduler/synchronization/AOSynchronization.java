@@ -128,6 +128,15 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         // ProActive empty no arg constructor
     }
 
+    public void freeze() throws IOException {
+        recordManager.close();
+        recordManager = null;
+    }
+
+    public void resume() throws IOException {
+        recordManager = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
+    }
+
     @java.lang.SuppressWarnings("unused")
     public AOSynchronization(String statusFileDirectoryPath) {
         initializeGroovyCompiler();

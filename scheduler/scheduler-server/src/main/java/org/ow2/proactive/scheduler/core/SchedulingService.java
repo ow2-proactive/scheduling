@@ -63,6 +63,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -167,7 +168,7 @@ public class SchedulingService {
         logger.debug("Starting the scheduler backup process...");
         backupScheduler = new it.sauronsoftware.cron4j.Scheduler();
         String cronExpr = PASharedProperties.SERVER_BACKUP_PERIOD.getValueAsString();
-        backupScheduler.schedule(cronExpr, new SchedulerBackupRunner(this));
+        backupScheduler.schedule(cronExpr, new SchedulerBackupRunner(this, (AOSynchronization) synchronizationAPI));
         backupScheduler.start();
     }
 
