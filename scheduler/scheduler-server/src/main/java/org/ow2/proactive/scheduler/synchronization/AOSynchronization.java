@@ -51,6 +51,7 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -123,18 +124,11 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     private boolean isStarted = false;
 
+    private boolean frozen = false;
+
     @java.lang.SuppressWarnings("unused")
     public AOSynchronization() {
         // ProActive empty no arg constructor
-    }
-
-    public void freeze() throws IOException {
-        recordManager.close();
-        recordManager = null;
-    }
-
-    public void resume() throws IOException {
-        recordManager = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
     }
 
     @java.lang.SuppressWarnings("unused")
@@ -830,7 +824,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         Service service = new Service(body);
         while (body.isActive()) {
             try {
-
+                waitIfNeeded();
                 NewRequestWithWaitTime requestWithWaitTime = waitForNewRequest(service);
                 Request request = requestWithWaitTime.getNewRequest();
 
@@ -849,6 +843,29 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+        }
+    }
+
+    public void freeze() throws IOException {
+        recordManager.close();
+        recordManager = null;
+        frozen = true;
+    }
+
+    @ImmediateService
+    public synchronized void resume() throws IOException {
+        recordManager = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
+        frozen = false;
+        this.notifyAll();
+    }
+
+    private synchronized void waitIfNeeded() {
+        try {
+            while (frozen) {
+                this.wait();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

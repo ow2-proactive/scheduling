@@ -55,7 +55,7 @@ public class SchedulerBackupRunner implements Runnable {
 
     private final int windowSize;
 
-    private final int possibleDealyInSeconds;
+    private final int possibleDelayInSeconds;
 
     private final SchedulingService scheduler;
 
@@ -67,18 +67,18 @@ public class SchedulerBackupRunner implements Runnable {
         targets = Arrays.asList(PASharedProperties.SERVER_BACKUP_TARGETS.getValueAsString().split("\\s*,\\s*"));
         destination = PASharedProperties.SERVER_BACKUP_DESTINATION.getValueAsString();
         windowSize = PASharedProperties.SERVER_BACKUP_WINDOWS.getValueAsInt();
-        possibleDealyInSeconds = PASharedProperties.SERVER_BACKUP_POSSIBLE_DELAY.getValueAsInt();
+        possibleDelayInSeconds = PASharedProperties.SERVER_BACKUP_POSSIBLE_DELAY.getValueAsInt();
     }
 
     @Override
     public void run() {
         scheduler.freeze();
         try {
-            DateTime deadLine = DateTime.now().plusSeconds(possibleDealyInSeconds);
-            while (DateTime.now().isBefore(deadLine) && otherTaskIsRunning()) {
+            DateTime deadLine = DateTime.now().plusSeconds(possibleDelayInSeconds);
+            while (DateTime.now().isBefore(deadLine) && someTaskIsRunning()) {
                 Thread.sleep(10000); // sleep 10s
             }
-            if (!otherTaskIsRunning()) {
+            if (noTaskIsRunning()) {
                 synchronizationAPI.freeze();
                 try {
                     removeOldBackups();
@@ -87,7 +87,8 @@ public class SchedulerBackupRunner implements Runnable {
                     synchronizationAPI.resume();
                 }
             } else {
-                LOGGER.info("Backup will not be performed because there is still some jobs running");
+                LOGGER.warn("Backup will not be performed because there is still some jobs running. " +
+                            "Waititng time can be changed by using the property 'pa.server.backup.possile.delay'.");
                 // we will not perform backup
             }
         } catch (IOException | InterruptedException e) {
@@ -97,8 +98,12 @@ public class SchedulerBackupRunner implements Runnable {
         }
     }
 
-    private boolean otherTaskIsRunning() {
-        return !scheduler.getJobs().getRunningTasks().isEmpty();
+    private boolean noTaskIsRunning() {
+        return scheduler.getJobs().getRunningTasks().isEmpty();
+    }
+
+    private boolean someTaskIsRunning() {
+        return !noTaskIsRunning();
     }
 
     private void performBackup() throws IOException {
