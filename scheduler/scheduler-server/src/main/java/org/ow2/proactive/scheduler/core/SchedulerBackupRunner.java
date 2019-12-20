@@ -97,7 +97,7 @@ public class SchedulerBackupRunner implements Runnable {
         }
 
         if (destinationFolder.exists() && destinationFolder.isDirectory() && destinationFolder.canWrite()) {
-            File backupFile = new File(destination, backupFileName);
+            File backupFile = new File(destinationFolder, backupFileName);
             LOGGER.info("Performing backup to " + backupFile);
             String[] foldersToZip = targets.stream()
                                            .map(target -> (new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
