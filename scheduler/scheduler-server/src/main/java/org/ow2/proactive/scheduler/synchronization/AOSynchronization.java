@@ -828,10 +828,10 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
                     service.serve(request);
                     service.blockingServeOldest("resume");
                 } else if (request != null && request.getMethodName().startsWith("wait") &&
-                        !testWaitFunction(service, request)) {
+                           !testWaitFunction(service, request)) {
                     // If the predicate is not met, delay the wait method execution
                     TimedOutRequest timedOutRequest = new TimedOutRequest(request,
-                            extractWaitRequestTimeoutParameter(request));
+                                                                          extractWaitRequestTimeoutParameter(request));
                     logger.trace("New pending wait request : " + timedOutRequest);
                     waitUntilQueue.add(new TimedOutRequest(request, extractWaitRequestTimeoutParameter(request)));
                 } else if (request != null) {
