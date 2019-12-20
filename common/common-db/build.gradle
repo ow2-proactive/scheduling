@@ -20,7 +20,7 @@ dependencies {
     compile 'com.sun.xml.bind:jaxb-core:2.2.11'
     compile 'com.sun.xml.bind:jaxb-osgi:2.2.11'
     compile 'javax.xml.bind:jaxb-api:2.2.12'
-    runtime('org.hibernate:hibernate-hikaricp:5.1.12.Final') {
+    runtime('org.hibernate:hibernate-hikaricp:5.1.0.Final') {
         exclude group: 'org.javassist', module: 'javassist'
     }
 
