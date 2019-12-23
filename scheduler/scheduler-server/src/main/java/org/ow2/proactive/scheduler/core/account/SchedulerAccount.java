@@ -56,7 +56,13 @@ public final class SchedulerAccount implements Account {
 
     private int pastTasksCount;
 
-    private int pausedInErrorTasksCount;
+    private int pausedTasksCount;
+
+    private int faultyTasksCount;
+
+    private int failedTasksCount;
+
+    private int inErrorTasksCount;
 
     private int pendingJobsCount;
 
@@ -112,8 +118,32 @@ public final class SchedulerAccount implements Account {
      * The total count of past tasks submitted by the current user.
      * @return the total task count
      */
-    public int getPausedInErrorTasksCount() {
-        return this.pausedInErrorTasksCount;
+    public int getPausedTasksCount() {
+        return this.pausedTasksCount;
+    }
+
+    /**
+     * The total count of past tasks submitted by the current user.
+     * @return the total task count
+     */
+    public int getFailedTasksCount() {
+        return this.failedTasksCount;
+    }
+
+    /**
+     * The total count of past tasks submitted by the current user.
+     * @return the total task count
+     */
+    public int getFaultyTasksCount() {
+        return this.faultyTasksCount;
+    }
+
+    /**
+     * The total count of past tasks submitted by the current user.
+     * @return the total task count
+     */
+    public int getInErrorTasksCount() {
+        return this.inErrorTasksCount;
     }
 
     /**
