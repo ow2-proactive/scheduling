@@ -162,6 +162,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
     @Test
     public void testChannelCreationDeletion() throws IOException, InvalidChannelException {
+        freezeAndSleepInParallel();
         synchronization.createChannel(CHANNEL1, false);
         Assert.assertEquals(0, synchronization.size(CHANNEL1));
         synchronization.deleteChannel(CHANNEL1);
@@ -171,6 +172,19 @@ public class AOSynchronizationTest extends ProActiveTestClean {
         } catch (InvalidChannelException e) {
             // ok
         }
+    }
+
+    private void freezeAndSleepInParallel() {
+        Thread thread = new Thread(() -> {
+            try {
+                synchronization.freeze();
+                Thread.sleep(5000);
+                synchronization.resume();
+            } catch (IOException e) {
+            } catch (InterruptedException e) {
+            }
+        });
+        thread.start();
     }
 
     @Test
@@ -313,6 +327,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
     @Test
     public void testConditionalCompute() throws IOException, InvalidChannelException, CompilationException {
+        freezeAndSleepInParallel();
         initChannel();
         try {
             synchronization.conditionalCompute(CHANNEL1,
@@ -455,6 +470,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
     @Test
     public void testWaitUntilThen() throws IOException, InvalidChannelException, CompilationException {
+        freezeAndSleepInParallel();
         initChannel();
         try {
             synchronization.waitUntilThen(CHANNEL1,

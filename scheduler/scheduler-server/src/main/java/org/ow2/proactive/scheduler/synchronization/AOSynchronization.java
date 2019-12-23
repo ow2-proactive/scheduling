@@ -844,11 +844,13 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         }
     }
 
+    @Override
     public void freeze() throws IOException {
         recordManager.close();
         recordManager = null;
     }
 
+    @Override
     public synchronized void resume() throws IOException {
         recordManager = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
     }
