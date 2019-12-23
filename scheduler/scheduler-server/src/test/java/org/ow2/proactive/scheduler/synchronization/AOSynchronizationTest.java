@@ -180,8 +180,8 @@ public class AOSynchronizationTest extends ProActiveTestClean {
                 synchronization.freeze();
                 Thread.sleep(5000);
                 synchronization.resume();
-            } catch (IOException e) {
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
         });
         thread.start();
