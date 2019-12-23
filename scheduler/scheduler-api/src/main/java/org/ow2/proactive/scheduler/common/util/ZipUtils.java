@@ -42,6 +42,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.utils.FileUtils;
 
@@ -54,6 +55,8 @@ import org.ow2.proactive.utils.FileUtils;
  */
 @PublicAPI
 public class ZipUtils extends FileUtils {
+
+    private static final Logger logger = Logger.getLogger(ZipUtils.class);
 
     /**
      * Compression level of the file.
@@ -181,8 +184,10 @@ public class ZipUtils extends FileUtils {
             }
             jos.closeEntry();
         } catch (ZipException e) {
-            // TODO Other exceptions ?
             // Duplicate entry : ignore it.
+        } catch (IOException e) {
+            logger.error("Error occurred while trying to zip file " + filePath, e);
+            throw e;
         }
     }
 
