@@ -663,7 +663,10 @@ public class SchedulerDBManager {
             int pendingTasksCount = getTaskCountForUser(TaskStatus.PENDING_TASKS, username);
             int currentTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.RUNNING), username);
             int pastTasksCount = getTaskCountForUser(TaskStatus.FINISHED_TASKS, username);
-            int pausedInErrorTasksCount = getTaskCountForUser(TaskStatus.PAUSED_AND_IN_ERROR_TASKS, username);
+            int pausedTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.PAUSED), username);
+            int faultyTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.FAULTY), username);
+            int failedTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.FAILED), username);
+            int inErrorTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.IN_ERROR), username);
 
             Query jobQuery = session.getNamedQuery("readAccountJobs").setParameter("username", username);
 
@@ -687,7 +690,10 @@ public class SchedulerDBManager {
                                    .pendingTasksCount(pendingTasksCount)
                                    .currentTasksCount(currentTasksCount)
                                    .pastTasksCount(pastTasksCount)
-                                   .pausedInErrorTasksCount(pausedInErrorTasksCount)
+                                   .pausedTasksCount(pausedTasksCount)
+                                   .faultyTasksCount(faultyTasksCount)
+                                   .failedJobsCount(failedTasksCount)
+                                   .inErrorTasksCount(inErrorTasksCount)
                                    .pendingJobsCount(getPendingJobsCount(username))
                                    .stalledJobsCount(getStalledJobsCount(username))
                                    .runningJobsCount(getRunningJobsCount(username))

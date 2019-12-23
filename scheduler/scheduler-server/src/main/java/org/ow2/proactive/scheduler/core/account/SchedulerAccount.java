@@ -56,7 +56,13 @@ public final class SchedulerAccount implements Account {
 
     private int pastTasksCount;
 
-    private int pausedInErrorTasksCount;
+    private int pausedTasksCount;
+
+    private int faultyTasksCount;
+
+    private int failedTasksCount;
+
+    private int inErrorTasksCount;
 
     private int pendingJobsCount;
 
@@ -86,7 +92,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of pending tasks submitted by the current user.
-     * @return the total task count
+     * @return the pending task count
      */
     public int getPendingTasksCount() {
         return this.pendingTasksCount;
@@ -94,7 +100,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of current tasks submitted by the current user.
-     * @return the total task count
+     * @return the current task count
      */
     public int getCurrentTasksCount() {
         return this.currentTasksCount;
@@ -102,18 +108,42 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of past tasks submitted by the current user.
-     * @return the total task count
+     * @return the past task count
      */
     public int getPastTasksCount() {
         return this.pastTasksCount;
     }
 
     /**
-     * The total count of past tasks submitted by the current user.
-     * @return the total task count
+     * The total count of paused tasks submitted by the current user.
+     * @return the paused task count
      */
-    public int getPausedInErrorTasksCount() {
-        return this.pausedInErrorTasksCount;
+    public int getPausedTasksCount() {
+        return this.pausedTasksCount;
+    }
+
+    /**
+     * The total count of failed tasks submitted by the current user.
+     * @return the failed task count
+     */
+    public int getFailedTasksCount() {
+        return this.failedTasksCount;
+    }
+
+    /**
+     * The total count of faulty tasks submitted by the current user.
+     * @return the faulty task count
+     */
+    public int getFaultyTasksCount() {
+        return this.faultyTasksCount;
+    }
+
+    /**
+     * The total count of in-error tasks submitted by the current user.
+     * @return the  in-error task count
+     */
+    public int getInErrorTasksCount() {
+        return this.inErrorTasksCount;
     }
 
     /**
@@ -150,7 +180,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of pending jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the pending jobs count
      */
     public int getPendingJobsCount() {
         return pendingJobsCount;
@@ -158,7 +188,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of stalled jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the stalled jobs count
      */
     public int getStalledJobsCount() {
         return stalledJobsCount;
@@ -166,7 +196,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of running jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the running jobs count
      */
     public int getRunningJobsCount() {
         return runningJobsCount;
@@ -174,7 +204,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of paused jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the paused jobs count
      */
     public int getPausedJobsCount() {
         return pausedJobsCount;
@@ -182,7 +212,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of in-error jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the in-error jobs count
      */
     public int getInErrorJobsCount() {
         return inErrorJobsCount;
@@ -190,7 +220,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of canceled jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the canceled jobs count
      */
     public int getCanceledJobsCount() {
         return canceledJobsCount;
@@ -198,7 +228,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of failed jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the failed jobs count
      */
     public int getFailedJobsCount() {
         return failedJobsCount;
@@ -206,7 +236,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of killed jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the killed jobs count
      */
     public int getKilledJobsCount() {
         return killedJobsCount;
@@ -214,7 +244,7 @@ public final class SchedulerAccount implements Account {
 
     /**
      * The total count of finished jobs submitted by the current user.
-     * @return the total jobs count
+     * @return the finished jobs count
      */
     public int getFinishedJobsCount() {
         return finishedJobsCount;

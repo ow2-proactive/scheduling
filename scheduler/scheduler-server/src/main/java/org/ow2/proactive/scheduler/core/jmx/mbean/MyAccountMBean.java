@@ -70,10 +70,28 @@ public interface MyAccountMBean {
     int getPastTasksCount();
 
     /**
-     * The total count of paused and in-error tasks submitted by the current user.
+     * The total count of paused tasks submitted by the current user.
      * @return the total task count
      */
-    int getPausedInErrorTasksCount();
+    int getPausedTasksCount();
+
+    /**
+     * The total count of faulty tasks submitted by the current user.
+     * @return the total task count
+     */
+    int getFaultyTasksCount();
+
+    /**
+     * The total count of failed tasks submitted by the current user.
+     * @return the total task count
+     */
+    int getFailedTasksCount();
+
+    /**
+     * The total count of in-error tasks submitted by the current user.
+     * @return the total task count
+     */
+    int getInErrorTasksCount();
 
     /**
      * The total time duration in milliseconds of tasks completed by the current user.
