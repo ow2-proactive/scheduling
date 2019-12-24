@@ -105,6 +105,8 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
     public static final String FUNCTION_RETURN_SEVEN = "{k -> 7}";
 
+    private static final int FREEZE_RESUME_SLEEP_TIME = 2000;
+
     private AOSynchronization synchronizationInternal;
 
     private Synchronization synchronization;
@@ -178,7 +180,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
         Thread thread = new Thread(() -> {
             try {
                 synchronization.freeze();
-                Thread.sleep(5000);
+                Thread.sleep(FREEZE_RESUME_SLEEP_TIME);
                 synchronization.resume();
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
@@ -444,7 +446,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
         Runnable decrementRunnable = () -> {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(FREEZE_RESUME_SLEEP_TIME + 600);
                 synchronization.compute(CHANNEL1, "a", BIFUNCTION_DECREMENT_ONE);
             } catch (Exception e) {
                 e.printStackTrace();
