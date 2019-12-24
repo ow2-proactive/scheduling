@@ -145,4 +145,8 @@ public interface SynchronizationInternal extends Serializable {
     PredicateActionResult waitUntilThen(String originator, TaskId taskid, String channel, String key, String predicate,
             long timeout, String thenRemappingFunction)
             throws InvalidChannelException, CompilationException, IOException, TimeoutException;
+
+    void freeze() throws IOException;
+
+    void resume() throws IOException;
 }
