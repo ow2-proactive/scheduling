@@ -845,13 +845,19 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     @Override
     public void freeze() throws IOException {
+        logger.info("Closing Record Manager");
         recordManager.close();
         recordManager = null;
+        isStarted = false;
     }
 
     @Override
-    public synchronized void resume() throws IOException {
+    public void resume() throws IOException {
+        logger.info("Loading Record Manager from file : " + statusFile);
         recordManager = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
+        persistedChannels = recordManager.hashMap(STATUS_RECORD_NAME);
+        recordManager.commit();
+        isStarted = true;
     }
 
     /**

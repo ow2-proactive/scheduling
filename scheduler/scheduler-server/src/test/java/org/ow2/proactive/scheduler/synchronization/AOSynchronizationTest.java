@@ -134,6 +134,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
         initSynchronizationAPI(tempFolder);
 
         executor = Executors.newFixedThreadPool(2);
+        freezeAndSleepInParallel();
     }
 
     private void initSynchronizationAPI(File tempFolder) throws ActiveObjectCreationException, NodeException {
@@ -162,7 +163,6 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
     @Test
     public void testChannelCreationDeletion() throws IOException, InvalidChannelException {
-        freezeAndSleepInParallel();
         synchronization.createChannel(CHANNEL1, false);
         Assert.assertEquals(0, synchronization.size(CHANNEL1));
         synchronization.deleteChannel(CHANNEL1);
@@ -327,7 +327,6 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
     @Test
     public void testConditionalCompute() throws IOException, InvalidChannelException, CompilationException {
-        freezeAndSleepInParallel();
         initChannel();
         try {
             synchronization.conditionalCompute(CHANNEL1,
@@ -443,17 +442,14 @@ public class AOSynchronizationTest extends ProActiveTestClean {
     public void testWaitUntilWithTimeout() throws IOException, InvalidChannelException, CompilationException {
         initChannel();
 
-        Runnable decrementRunnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    synchronization.compute(CHANNEL1, "a", BIFUNCTION_DECREMENT_ONE);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+        Runnable decrementRunnable = () -> {
+            try {
+                Thread.sleep(1000);
+                synchronization.compute(CHANNEL1, "a", BIFUNCTION_DECREMENT_ONE);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         };
 
         // this is a producer/consumer pattern
@@ -470,7 +466,6 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
     @Test
     public void testWaitUntilThen() throws IOException, InvalidChannelException, CompilationException {
-        freezeAndSleepInParallel();
         initChannel();
         try {
             synchronization.waitUntilThen(CHANNEL1,
