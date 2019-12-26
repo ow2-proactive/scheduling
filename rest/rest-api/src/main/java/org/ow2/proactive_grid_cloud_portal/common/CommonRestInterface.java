@@ -83,4 +83,14 @@ public interface CommonRestInterface {
     boolean portalAccess(@HeaderParam("sessionid") String sessionId, @PathParam("portal") String portal)
             throws RestException;
 
+    /**
+     *
+     * Check if the user has admin privilege in notification service
+     *
+     * @return true if the user has the correct rights
+     */
+    @GET
+    @Path("permissions/notification-service/admin")
+    boolean checkSubscriptionAdmin(@HeaderParam("sessionid") String sessionId) throws RestException;
+
 }
