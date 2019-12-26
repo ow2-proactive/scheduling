@@ -79,9 +79,9 @@ public class PluginDescriptor implements Serializable {
     public PluginDescriptor() {
     }
 
-    public PluginDescriptor(Class<?> cls, Map<String, String> defaultValues) {
+    public PluginDescriptor(Class<?> cls, Object instance, Map<String, String> defaultValues) {
+
         try {
-            Object instance = cls.newInstance();
             pluginName = cls.getName();
             this.defaultValues = defaultValues;
 
@@ -102,8 +102,8 @@ public class PluginDescriptor implements Serializable {
     /**
      * Create a plugin descriptor populated with the given parameters
      */
-    public PluginDescriptor(Class<?> cls, Object[] parameters) {
-        this(cls, new HashMap<>());
+    public PluginDescriptor(Class<?> cls, Object instance, Object[] parameters) {
+        this(cls, instance, new HashMap<>());
 
         this.validateParametersOrFail(cls, parameters);
 

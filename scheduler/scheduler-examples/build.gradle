@@ -2,40 +2,9 @@ repositories {
     mavenCentral()
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
-    }
-}
-
-apply plugin: "io.spring.dependency-management"
-
-dependencyManagement {
-    imports {
-        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.228'
-    }
-}
-
 dependencies {
-    compile 'com.amazonaws:aws-java-sdk-s3'
-    compile group: 'com.microsoft.azure', name: 'azure-storage-blob', version: '10.0.3-Preview'
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.3.9'
     compile group: 'commons-dbutils', name: 'commons-dbutils', version: '1.7'
-    // used in rest client tasks for convenience
-    compile ('io.rest-assured:rest-assured:3.3.0') {
-        exclude group: 'org.codehaus.groovy'
-    }
-    compile ('io.rest-assured:json-path:3.3.0') {
-        exclude group: 'org.codehaus.groovy'
-    }
-    compile ('io.rest-assured:xml-path:3.3.0') {
-        exclude group: 'org.codehaus.groovy'
-        exclude group: 'com.sun.xml.bind'
-        exclude group: 'javax.xml.bind'
-    }
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile(
             project(':scheduler:scheduler-api'),

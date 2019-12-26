@@ -16,8 +16,6 @@ dependencies {
 
     compile 'org.fusesource.jdbm:jdbm:2.0.1'
 
-    compile "org.ow2.proactive:emailnotification-addons:${schedulingVersion}"
-
     compile 'org.eclipse.jetty:jetty-webapp:9.2.29.v20191105'
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 

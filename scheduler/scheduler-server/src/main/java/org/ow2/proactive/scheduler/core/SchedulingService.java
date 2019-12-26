@@ -42,6 +42,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -62,6 +63,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -111,6 +113,8 @@ public class SchedulingService {
 
     private Scheduler houseKeepingScheduler;
 
+    private Scheduler backupScheduler;
+
     private SynchronizationInternal synchronizationAPI;
 
     /**
@@ -154,6 +158,18 @@ public class SchedulingService {
         if (PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY.getValueAsInt() > 0) {
             startHouseKeeping();
         }
+
+        if (PASharedProperties.SERVER_BACKUP.getValueAsBoolean()) {
+            startBackuping();
+        }
+    }
+
+    private void startBackuping() {
+        logger.debug("Starting the scheduler backup process...");
+        backupScheduler = new it.sauronsoftware.cron4j.Scheduler();
+        String cronExpr = PASharedProperties.SERVER_BACKUP_PERIOD.getValueAsString();
+        backupScheduler.schedule(cronExpr, new SchedulerBackupRunner(this, (AOSynchronization) synchronizationAPI));
+        backupScheduler.start();
     }
 
     public void startHouseKeeping() {

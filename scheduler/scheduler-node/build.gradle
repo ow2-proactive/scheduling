@@ -19,6 +19,7 @@ dependencies {
     compile(
             "org.objectweb.proactive:programming-extension-processbuilder:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}",
+            "org.ow2.proactive:emailnotification-addons:${schedulingVersion}",
 
             project(':scheduler:scheduler-client'),
             project(':rest:rest-client'),
