@@ -86,11 +86,14 @@ public class JobEmailNotification {
 
     private SchedulerDBManager dbManager = null;
 
+    private JobInfo jobInfo;
+
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification, SendMail sender) {
         this.asyncMailSender = Executors.newCachedThreadPool();
         this.jobState = js;
         this.eventType = notification.getEventType();
         this.sender = sender;
+        this.jobInfo = notification.getData();
     }
 
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification) {
@@ -144,7 +147,7 @@ public class JobEmailNotification {
                 if ((jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString()
                                                                                               .toLowerCase()) ||
                      jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.name().toLowerCase()))) {
-                    if (hasFaultyTasks())
+                    if (hasTasksWithIssues())
                         sendEmail(withAttachment, true);
                 } else {
                     sendEmail(withAttachment, false);
@@ -194,13 +197,9 @@ public class JobEmailNotification {
         }
     }
 
-    private boolean hasFaultyTasks() {
-        List<TaskState> tasks = jobState.getTasks();
-        boolean withErrors = tasks.stream()
-                                  .map(task -> task.getStatus().name().toLowerCase())
-                                  .anyMatch(t -> t.equals("Faulty".toLowerCase()));
-
-        return withErrors;
+    private boolean hasTasksWithIssues() {
+        return jobInfo.getNumberOfFaultyTasks() + jobInfo.getNumberOfInErrorTasks() +
+               jobInfo.getNumberOfFailedTasks() > 0;
     }
 
     public void checkAndSendAsync(boolean withAttachment) {
