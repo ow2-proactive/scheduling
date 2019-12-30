@@ -168,7 +168,7 @@ public class SchedulingService {
         logger.debug("Starting the scheduler backup process...");
         backupScheduler = new it.sauronsoftware.cron4j.Scheduler();
         String cronExpr = PASharedProperties.SERVER_BACKUP_PERIOD.getValueAsString();
-        backupScheduler.schedule(cronExpr, new SchedulerBackupRunner(this, (AOSynchronization) synchronizationAPI));
+        backupScheduler.schedule(cronExpr, new SchedulerBackupRunner(this, synchronizationAPI));
         backupScheduler.start();
     }
 

@@ -41,6 +41,7 @@ import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 
 
 public class SchedulerBackupRunner implements Runnable {
@@ -59,9 +60,9 @@ public class SchedulerBackupRunner implements Runnable {
 
     private final SchedulingService scheduler;
 
-    private AOSynchronization synchronizationAPI;
+    private SynchronizationInternal synchronizationAPI;
 
-    public SchedulerBackupRunner(SchedulingService scheduler, AOSynchronization synchronizationAPI) {
+    public SchedulerBackupRunner(SchedulingService scheduler, SynchronizationInternal synchronizationAPI) {
         this.scheduler = scheduler;
         this.synchronizationAPI = synchronizationAPI;
         targets = Arrays.asList(PASharedProperties.SERVER_BACKUP_TARGETS.getValueAsString().split("\\s*,\\s*"));
