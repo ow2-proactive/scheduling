@@ -147,8 +147,11 @@ public class JobEmailNotification {
                 if ((jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString()
                                                                                               .toLowerCase()) ||
                      jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.name().toLowerCase()))) {
-                    if (hasTasksWithIssues())
+                    if (hasTasksWithIssues()) {
                         sendEmail(withAttachment, true);
+                    } else {
+                        return false;
+                    }
                 } else {
                     sendEmail(withAttachment, false);
                 }
