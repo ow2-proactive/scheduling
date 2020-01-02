@@ -89,8 +89,20 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
         return this.perThreadAccount.get().getPastTasksCount();
     }
 
-    public int getPausedInErrorTasksCount() {
-        return this.perThreadAccount.get().getPausedInErrorTasksCount();
+    public int getPausedTasksCount() {
+        return this.perThreadAccount.get().getPausedTasksCount();
+    }
+
+    public int getFaultyTasksCount() {
+        return this.perThreadAccount.get().getFaultyTasksCount();
+    }
+
+    public int getFailedTasksCount() {
+        return this.perThreadAccount.get().getFailedTasksCount();
+    }
+
+    public int getInErrorTasksCount() {
+        return this.perThreadAccount.get().getInErrorTasksCount();
     }
 
     public long getTotalTaskDuration() {

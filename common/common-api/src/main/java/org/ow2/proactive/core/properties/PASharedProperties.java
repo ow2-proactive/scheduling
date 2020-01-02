@@ -73,7 +73,11 @@ public enum PASharedProperties implements PACommonProperties {
     SERVER_BACKUP_DESTINATION("pa.server.backup.destination", PropertyType.STRING, "backup"),
 
     /** comma-separated list of folder and/or files which need to be backup */
-    SERVER_BACKUP_TARGETS("pa.server.backup.targets", PropertyType.STRING, "data,logs");
+    SERVER_BACKUP_TARGETS("pa.server.backup.targets", PropertyType.STRING, "data,logs"),
+
+    /** backup mechanism may wait possible.delay (in seconds) untill all tasks are finished,
+     * if some task will still run then backup will not be performed */
+    SERVER_BACKUP_POSSIBLE_DELAY("pa.server.backup.possile.delay", PropertyType.INTEGER, "600");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

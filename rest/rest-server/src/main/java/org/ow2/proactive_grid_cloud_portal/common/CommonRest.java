@@ -36,6 +36,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.permissions.NotificationAdminPermission;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -126,7 +127,7 @@ public class CommonRest implements CommonRestInterface {
             } catch (PermissionException e) {
                 // access to portal is disabled, thus the answer will not contain it.
             } catch (NotConnectedException e) {
-                throw new NotConnectedRestException("you are not connected to the scheduler, you should log on first");
+                throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
             }
         }
         return answer;
@@ -143,7 +144,22 @@ public class CommonRest implements CommonRestInterface {
         } catch (PermissionException e) {
             return false;
         } catch (NotConnectedException e) {
-            throw new NotConnectedRestException("you are not connected to the scheduler, you should log on first");
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
+
+    @Override
+    public boolean checkSubscriptionAdmin(String sessionId) throws NotConnectedRestException {
+        Scheduler scheduler = checkAccess(sessionId);
+
+        try {
+            return checkPermission(scheduler.getSubject(),
+                                   new NotificationAdminPermission(),
+                                   "User does not have notification service administrator privilege");
+        } catch (PermissionException e) {
+            return false;
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
         }
     }
 

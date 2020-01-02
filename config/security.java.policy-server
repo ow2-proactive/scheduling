@@ -312,6 +312,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
 
+    // Notification service administrator permission
+    permission org.ow2.proactive.permissions.NotificationAdminPermission;
+
     //use the following line to allow a user to download full scheduler state and get events from any user
     //"true" means that this user can get only its job in the state and listen for its events
     //"false" means user can get full state and listen for any events.

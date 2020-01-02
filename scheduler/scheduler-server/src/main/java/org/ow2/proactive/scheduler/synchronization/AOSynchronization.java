@@ -821,12 +821,13 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         Service service = new Service(body);
         while (body.isActive()) {
             try {
-
                 NewRequestWithWaitTime requestWithWaitTime = waitForNewRequest(service);
                 Request request = requestWithWaitTime.getNewRequest();
-
-                if (request != null && request.getMethodName().startsWith("wait") &&
-                    !testWaitFunction(service, request)) {
+                if (request != null && request.getMethodName().equals("freeze")) {
+                    service.serve(request);
+                    service.blockingServeOldest("resume");
+                } else if (request != null && request.getMethodName().startsWith("wait") &&
+                           !testWaitFunction(service, request)) {
                     // If the predicate is not met, delay the wait method execution
                     TimedOutRequest timedOutRequest = new TimedOutRequest(request,
                                                                           extractWaitRequestTimeoutParameter(request));
@@ -836,11 +837,27 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
                     service.serve(request);
                 }
                 unblockWaitMethods(service, requestWithWaitTime.getWaitTime());
-
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    @Override
+    public void freeze() throws IOException {
+        logger.info("Closing Record Manager");
+        recordManager.close();
+        recordManager = null;
+        isStarted = false;
+    }
+
+    @Override
+    public void resume() throws IOException {
+        logger.info("Loading Record Manager from file : " + statusFile);
+        recordManager = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
+        persistedChannels = recordManager.hashMap(STATUS_RECORD_NAME);
+        recordManager.commit();
+        isStarted = true;
     }
 
     /**
