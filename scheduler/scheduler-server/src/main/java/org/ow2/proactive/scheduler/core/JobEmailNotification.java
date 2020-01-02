@@ -152,7 +152,6 @@ public class JobEmailNotification {
                 } else {
                     sendEmail(withAttachment, false);
                 }
-                break;
             case JOB_CHANGE_PRIORITY:
             case JOB_IN_ERROR:
             case JOB_PAUSED:
@@ -164,11 +163,11 @@ public class JobEmailNotification {
                     jobStatusList.contains(eventType.toString().toLowerCase())) {
                     sendEmail(withAttachment, false);
                 }
+                break;
             default:
                 logger.trace("Event not in the list of email notification, doing nothing");
                 return false;
         }
-
         return true;
 
     }
