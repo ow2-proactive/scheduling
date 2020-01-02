@@ -155,6 +155,7 @@ public class JobEmailNotification {
                 } else {
                     sendEmail(withAttachment, false);
                 }
+                break;
             case JOB_CHANGE_PRIORITY:
             case JOB_IN_ERROR:
             case JOB_PAUSED:

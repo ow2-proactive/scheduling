@@ -123,21 +123,6 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         return internalJob;
     }
 
-    private InternalJob createJobWithFailedTask(String userEmail) throws Exception {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName(JOB_NAME);
-        if (userEmail != null) {
-            job.addGenericInformation(JobEmailNotification.GENERIC_INFORMATION_KEY_EMAIL, userEmail);
-        }
-        JavaTask javaTask = new JavaTask();
-        javaTask.setExecutableClassName(null);
-        javaTask.setName(TASK_NAME);
-        job.addTask(javaTask);
-        InternalJob internalJob = InternalJobFactory.createJob(job, null);
-        internalJob.setOwner(DEFAULT_USER_NAME);
-        return internalJob;
-    }
-
     private static boolean sendNotification(JobState jobState, SchedulerEvent event, SendMail sender)
             throws JobEmailNotificationException, UnknownJobException, IOException, PermissionException {
         NotificationData<JobInfo> notification = getNotification(jobState, event);
@@ -319,12 +304,13 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
 
     @Test
     public void testFinishedWithErrors() throws Exception {
-        InternalJob job = createJobWithFailedTask(USER_EMAIL);
+        InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.FINISHED);
         Map<String, String> genericInfo = job.getGenericInformation();
         genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished with errors");
         job.setGenericInformation(genericInfo);
+        job.setNumberOfFaultyTasks(1);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
