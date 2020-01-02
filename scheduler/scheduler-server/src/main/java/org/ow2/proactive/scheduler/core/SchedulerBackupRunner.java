@@ -40,7 +40,6 @@ import org.joda.time.DateTime;
 import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 
 
@@ -52,7 +51,7 @@ public class SchedulerBackupRunner implements Runnable {
 
     private final List<String> targets;
 
-    private final String destination;
+    private final String configuredDestination;
 
     private final int windowSize;
 
@@ -62,13 +61,21 @@ public class SchedulerBackupRunner implements Runnable {
 
     private SynchronizationInternal synchronizationAPI;
 
+    private File resolvedDestination;
+
     public SchedulerBackupRunner(SchedulingService scheduler, SynchronizationInternal synchronizationAPI) {
         this.scheduler = scheduler;
         this.synchronizationAPI = synchronizationAPI;
         targets = Arrays.asList(PASharedProperties.SERVER_BACKUP_TARGETS.getValueAsString().split("\\s*,\\s*"));
-        destination = PASharedProperties.SERVER_BACKUP_DESTINATION.getValueAsString();
+        configuredDestination = PASharedProperties.SERVER_BACKUP_DESTINATION.getValueAsString();
         windowSize = PASharedProperties.SERVER_BACKUP_WINDOWS.getValueAsInt();
         possibleDelayInSeconds = PASharedProperties.SERVER_BACKUP_POSSIBLE_DELAY.getValueAsInt();
+        resolvedDestination = new File(configuredDestination);
+
+        if (!resolvedDestination.isAbsolute()) {
+            resolvedDestination = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
+                                           configuredDestination);
+        }
     }
 
     @Override
@@ -109,18 +116,13 @@ public class SchedulerBackupRunner implements Runnable {
 
     private void performBackup() throws IOException {
         String backupFileName = PREFIX + DateTime.now().toString("yyyy-MM-dd'T'HH-mm") + ".zip";
-        File destinationFolder = new File(destination);
 
-        if (!destinationFolder.isAbsolute()) {
-            destinationFolder = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(), destination);
+        if (!resolvedDestination.exists()) {
+            resolvedDestination.mkdirs();
         }
 
-        if (!destinationFolder.exists()) {
-            destinationFolder.mkdirs();
-        }
-
-        if (destinationFolder.exists() && destinationFolder.isDirectory() && destinationFolder.canWrite()) {
-            File backupFile = new File(destinationFolder, backupFileName);
+        if (resolvedDestination.exists() && resolvedDestination.isDirectory() && resolvedDestination.canWrite()) {
+            File backupFile = new File(resolvedDestination, backupFileName);
             LOGGER.info("Performing backup to " + backupFile);
             String[] foldersToZip = targets.stream()
                                            .map(target -> (new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
@@ -128,13 +130,13 @@ public class SchedulerBackupRunner implements Runnable {
                                            .toArray(String[]::new);
             ZipUtils.zip(foldersToZip, backupFile, null);
         } else {
-            LOGGER.error("Cannot save a backup because backup destination folder does not exist: " + destination);
+            LOGGER.error("Cannot save a backup because backup configuredDestination folder does not exist: " +
+                         configuredDestination);
         }
     }
 
     private void removeOldBackups() {
-        File fodlerWhereBackups = new File(destination);
-        File[] files = fodlerWhereBackups.listFiles();
+        File[] files = resolvedDestination.listFiles();
         if (files != null) {
             Stream.of(files)
                   .filter(File::isFile)
