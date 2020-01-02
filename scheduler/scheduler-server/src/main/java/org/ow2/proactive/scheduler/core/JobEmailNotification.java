@@ -237,7 +237,7 @@ public class JobEmailNotification {
     }
 
     private String getSubject(boolean withErrors) {
-        String event = withErrors ? SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString().toLowerCase()
+        String event = withErrors ? SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString()
                                   : eventType.toString();
         String jobID = jobState.getId().value();
         return String.format(SUBJECT_TEMPLATE, jobID, event);
