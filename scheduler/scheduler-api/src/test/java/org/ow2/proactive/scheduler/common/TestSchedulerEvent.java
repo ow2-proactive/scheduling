@@ -32,7 +32,7 @@ import org.junit.Test;
 /**
  * TestSchedulerEvent tests that the scheduler event ordinal have not been changed.<br>
  * The ordinal of the SchedulerEvent class must not changed as it is used by user.
- * Changing this ordinal may imply many bugs in client implementation that already use the API. 
+ * Changing this ordinal may imply many bugs in client implementation that already use the API.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
@@ -73,8 +73,9 @@ public class TestSchedulerEvent {
         Assert.assertEquals(SchedulerEvent.JOB_RESTARTED_FROM_ERROR.ordinal(), 29);
         Assert.assertEquals(SchedulerEvent.JOB_UPDATED.ordinal(), 30);
         Assert.assertEquals(SchedulerEvent.TASK_IN_ERROR_TO_FINISHED.ordinal(), 31);
+        Assert.assertEquals(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.ordinal(), 32);
 
-        Assert.assertEquals(32, SchedulerEvent.values().length);
+        Assert.assertEquals(33, SchedulerEvent.values().length);
     }
 
 }

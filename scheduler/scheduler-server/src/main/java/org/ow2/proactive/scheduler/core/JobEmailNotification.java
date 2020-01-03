@@ -86,11 +86,14 @@ public class JobEmailNotification {
 
     private SchedulerDBManager dbManager = null;
 
+    private JobInfo jobInfo;
+
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification, SendMail sender) {
         this.asyncMailSender = Executors.newCachedThreadPool();
         this.jobState = js;
         this.eventType = notification.getEventType();
         this.sender = sender;
+        this.jobInfo = notification.getData();
     }
 
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification) {
@@ -116,7 +119,8 @@ public class JobEmailNotification {
                                           "JOB_RESTARTED_FROM_ERROR",
                                           "JOB_RESUMED",
                                           "JOB_RUNNING_TO_FINISHED",
-                                          "JOB_SUBMITTED")
+                                          "JOB_SUBMITTED",
+                                          "JOB_RUNNING_TO_FINISHED_WITH_ERRORS")
                                       .map(status -> status.toLowerCase())
                                       .collect(Collectors.toList());
             } else {
@@ -125,48 +129,80 @@ public class JobEmailNotification {
             }
         }
 
+        if (!PASchedulerProperties.EMAIL_NOTIFICATIONS_ENABLED.getValueAsBoolean()) {
+            logger.debug("Notification emails disabled, doing nothing");
+            return false;
+        }
+
+        if ((!jobStatusList.contains(eventType.toString().toLowerCase()) &&
+             !jobStatusList.contains(eventType.name().toLowerCase())) &&
+            (!jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.name().toLowerCase())) &&
+            (!jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString().toLowerCase()))) {
+            return false;
+        }
+
         switch (eventType) {
+            case JOB_PENDING_TO_FINISHED:
+            case JOB_RUNNING_TO_FINISHED:
+                if ((jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString()
+                                                                                              .toLowerCase()) ||
+                     jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.name().toLowerCase()))) {
+                    if (hasTasksWithIssues()) {
+                        sendEmail(withAttachment, true);
+                    } else {
+                        return false;
+                    }
+                } else {
+                    sendEmail(withAttachment, false);
+                }
+                break;
             case JOB_CHANGE_PRIORITY:
             case JOB_IN_ERROR:
             case JOB_PAUSED:
-            case JOB_PENDING_TO_FINISHED:
-            case JOB_PENDING_TO_RUNNING:
             case JOB_RESTARTED_FROM_ERROR:
+            case JOB_PENDING_TO_RUNNING:
             case JOB_RESUMED:
-            case JOB_RUNNING_TO_FINISHED:
             case JOB_SUBMITTED:
+                if (jobStatusList.contains(eventType.name().toLowerCase()) ||
+                    jobStatusList.contains(eventType.toString().toLowerCase())) {
+                    sendEmail(withAttachment, false);
+                }
                 break;
             default:
                 logger.trace("Event not in the list of email notification, doing nothing");
                 return false;
         }
-        if (!PASchedulerProperties.EMAIL_NOTIFICATIONS_ENABLED.getValueAsBoolean()) {
-            logger.debug("Notification emails disabled, doing nothing");
-            return false;
-        }
-        if (!jobStatusList.contains(eventType.toString().toLowerCase()) &&
-            !jobStatusList.contains(eventType.name().toLowerCase())) {
-            return false;
-        }
+        return true;
 
+    }
+
+    private void sendEmail(boolean withAttachment, boolean withErrors)
+            throws JobEmailNotificationException, IOException, UnknownJobException, PermissionException {
         try {
             if (withAttachment) {
                 String attachment = getAttachment();
                 if (attachment != null) {
-                    sender.sender(getTo(), getSubject(), getBody(), attachment, getAttachmentName());
+                    sender.sender(getTo(), getSubject(withErrors), getBody(), attachment, getAttachmentName());
                     FileUtils.deleteQuietly(new File(attachment));
                 } else {
-                    sender.sender(getTo(), getSubject(), getBody());
+                    sender.sender(getTo(), getSubject(withErrors), getBody());
                 }
             } else {
-                sender.sender(getTo(), getSubject(), getBody());
+                sender.sender(getTo(), getSubject(withErrors), getBody());
             }
-            return true;
-        } catch (EmailException e) {
+
+        } catch (EmailException e)
+
+        {
             throw new JobEmailNotificationException(String.join(",", getTo()),
                                                     "Error sending email: " + e.getMessage(),
                                                     e);
         }
+    }
+
+    private boolean hasTasksWithIssues() {
+        return jobInfo.getNumberOfFaultyTasks() + jobInfo.getNumberOfInErrorTasks() +
+               jobInfo.getNumberOfFailedTasks() > 0;
     }
 
     public void checkAndSendAsync(boolean withAttachment) {
@@ -204,9 +240,10 @@ public class JobEmailNotification {
         return Arrays.asList(toList);
     }
 
-    private String getSubject() {
+    private String getSubject(boolean withErrors) {
+        String event = withErrors ? SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString()
+                                  : eventType.toString();
         String jobID = jobState.getId().value();
-        String event = eventType.toString();
         return String.format(SUBJECT_TEMPLATE, jobID, event);
     }
 
