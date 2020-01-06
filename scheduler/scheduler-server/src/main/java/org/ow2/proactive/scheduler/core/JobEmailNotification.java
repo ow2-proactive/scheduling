@@ -164,8 +164,7 @@ public class JobEmailNotification {
 
                     // second case: check if JOB_RUNNING_TO_FINISHED is provided along with JOB_RUNNING_TO_FINISHED_WITH_ERRORS (e.g., the case of 'All' event)
                 } else if ((jobStatusList.contains(eventFinishedWithErrorsName) ||
-                            jobStatusList.contains(eventFinishedWithErrorsMethod)) &&
-                           (jobStatusList.contains(eventFinishedName) || jobStatusList.contains(eventFinishedMethod))) {
+                            jobStatusList.contains(eventFinishedWithErrorsMethod))) {
                     // check if any tasks have issues
                     if (hasTasksWithIssues()) {
                         sendEmail(withAttachment, true);
