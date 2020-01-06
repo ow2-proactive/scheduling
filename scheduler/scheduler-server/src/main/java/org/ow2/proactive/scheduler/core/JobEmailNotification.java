@@ -107,6 +107,12 @@ public class JobEmailNotification {
 
     public boolean doCheckAndSend(boolean withAttachment)
             throws JobEmailNotificationException, IOException, UnknownJobException, PermissionException {
+        String eventFinishedWithErrorsName = SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.name().toLowerCase();
+        String eventFinishedWithErrorsMethod = SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString()
+                                                                                                 .toLowerCase();
+        String eventFinishedName = SchedulerEvent.JOB_RUNNING_TO_FINISHED.name().toLowerCase();
+        String eventFinishedMethod = SchedulerEvent.JOB_RUNNING_TO_FINISHED.toString().toLowerCase();
+
         String jobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
         List<String> jobStatusList = new ArrayList<>();
         if (jobStatus != null) {
@@ -136,22 +142,39 @@ public class JobEmailNotification {
 
         if ((!jobStatusList.contains(eventType.toString().toLowerCase()) &&
              !jobStatusList.contains(eventType.name().toLowerCase())) &&
-            (!jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.name().toLowerCase())) &&
-            (!jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString().toLowerCase()))) {
+            (!jobStatusList.contains(eventFinishedWithErrorsName)) &&
+            (!jobStatusList.contains(eventFinishedWithErrorsMethod))) {
             return false;
         }
 
         switch (eventType) {
             case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
-                if ((jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString()
-                                                                                              .toLowerCase()) ||
-                     jobStatusList.contains(SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.name().toLowerCase()))) {
+                // first case: check if JOB_RUNNING_TO_FINISHED is not provided along with JOB_RUNNING_TO_FINISHED_WITH_ERRORS
+                if ((jobStatusList.contains(eventFinishedWithErrorsName) ||
+                     jobStatusList.contains(eventFinishedWithErrorsMethod)) &&
+                    (!jobStatusList.contains(eventFinishedName) && !jobStatusList.contains(eventFinishedMethod))) {
+                    // check if any tasks have issues
                     if (hasTasksWithIssues()) {
                         sendEmail(withAttachment, true);
+                        //if not we do not send any notification as JOB_RUNNING_TO_FINISHED is not included
                     } else {
                         return false;
                     }
+
+                    // second case: check if JOB_RUNNING_TO_FINISHED is provided along with JOB_RUNNING_TO_FINISHED_WITH_ERRORS (e.g., the case of 'All' event)
+                } else if ((jobStatusList.contains(eventFinishedWithErrorsName) ||
+                            jobStatusList.contains(eventFinishedWithErrorsMethod)) &&
+                           (jobStatusList.contains(eventFinishedName) || jobStatusList.contains(eventFinishedMethod))) {
+                    // check if any tasks have issues
+                    if (hasTasksWithIssues()) {
+                        sendEmail(withAttachment, true);
+                        //if not we send a notification about finished job as JOB_RUNNING_TO_FINISHED is included
+                    } else {
+                        sendEmail(withAttachment, false);
+                    }
+
+                    // third case: JOB_RUNNING_TO_FINISHED_WITH_ERRORS is not provided, then the notification should be sent for events having no errors
                 } else {
                     sendEmail(withAttachment, false);
                 }
