@@ -44,9 +44,9 @@ public class JobEmailStatus {
 
     private JobInfo jobInfo;
 
-    public JobEmailStatus(JobInfo jobInfo, boolean withErrors, boolean aborted) {
-        this.aborted = aborted;
-        this.withErrors = withErrors;
+    public JobEmailStatus(JobInfo jobInfo) {
+        this.aborted = false;
+        this.withErrors = false;
         this.jobInfo = jobInfo;
     }
 
@@ -55,9 +55,9 @@ public class JobEmailStatus {
      *
      * @return true if the job has tasks with issues
      */
-    public boolean hasTasksWithErrors() {
-        return jobInfo.getNumberOfFaultyTasks() + jobInfo.getNumberOfInErrorTasks() +
-               jobInfo.getNumberOfFailedTasks() > 0;
+    public void checkTasksWithErrors() {
+        this.withErrors = jobInfo.getNumberOfFaultyTasks() + jobInfo.getNumberOfInErrorTasks() +
+                          jobInfo.getNumberOfFailedTasks() > 0;
     }
 
     /**
@@ -65,8 +65,8 @@ public class JobEmailStatus {
      *
      * @return true if the job has been aborted
      */
-    public boolean hasBeenAborted() {
-        return jobInfo.getStatus().toString().matches("Canceled|Failed|Killed");
+    public void checkJobAborted() {
+        this.aborted = jobInfo.getStatus().toString().matches("Canceled|Failed|Killed");
     }
 
     public boolean isAborted() {
