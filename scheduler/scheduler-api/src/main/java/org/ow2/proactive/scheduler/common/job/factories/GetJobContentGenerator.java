@@ -244,8 +244,8 @@ public class GetJobContentGenerator {
                                  XMLAttributes.VARIABLE_NAME,
                                  jobVariable.getName(),
                                  XMLAttributes.VARIABLE_VALUE,
-                                 encryptionNeeded ? PropertyDecrypter.encryptData(jobVariable.getValue())
-                                                  : jobVariable.getValue(),
+                                 xmlEscaping(encryptionNeeded ? PropertyDecrypter.encryptData(jobVariable.getValue())
+                                                              : jobVariable.getValue()),
                                  XMLAttributes.VARIABLE_MODEL,
                                  jobVariable.getModel());
         } else {
@@ -255,8 +255,27 @@ public class GetJobContentGenerator {
                                  XMLAttributes.VARIABLE_NAME,
                                  jobVariable.getName(),
                                  XMLAttributes.VARIABLE_VALUE,
-                                 jobVariable.getValue());
+                                 xmlEscaping(jobVariable.getValue()));
         }
+    }
+
+    /**
+    
+     &   &amp;
+     "   &quot;
+     '   &apos;
+     <   &lt;
+     >   &gt;
+    
+     */
+    private String xmlEscaping(String raw) {
+        return raw
+                  // ampersand replacement MUST be the first
+                  .replaceAll("&", "&amp;")
+                  .replaceAll("\"", "&quot;")
+                  .replaceAll("'", "&apos;")
+                  .replaceAll("<", "&lt;")
+                  .replaceAll(">", "&gt;");
     }
 
 }
