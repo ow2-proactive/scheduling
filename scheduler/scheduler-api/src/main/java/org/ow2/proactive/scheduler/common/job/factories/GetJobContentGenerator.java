@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelType;
@@ -88,7 +89,7 @@ public class GetJobContentGenerator {
                              XMLAttributes.COMMON_NAME,
                              pair.getKey(),
                              XMLAttributes.COMMON_VALUE,
-                             pair.getValue());
+                             StringEscapeUtils.escapeXml11(pair.getValue()));
     }
 
     private String replaceGenericInfoContent(String jobContent, String newContent, int end) {
@@ -244,8 +245,8 @@ public class GetJobContentGenerator {
                                  XMLAttributes.VARIABLE_NAME,
                                  jobVariable.getName(),
                                  XMLAttributes.VARIABLE_VALUE,
-                                 xmlEscaping(encryptionNeeded ? PropertyDecrypter.encryptData(jobVariable.getValue())
-                                                              : jobVariable.getValue()),
+                                 StringEscapeUtils.escapeXml11(encryptionNeeded ? PropertyDecrypter.encryptData(jobVariable.getValue())
+                                                                                : jobVariable.getValue()),
                                  XMLAttributes.VARIABLE_MODEL,
                                  jobVariable.getModel());
         } else {
@@ -255,27 +256,8 @@ public class GetJobContentGenerator {
                                  XMLAttributes.VARIABLE_NAME,
                                  jobVariable.getName(),
                                  XMLAttributes.VARIABLE_VALUE,
-                                 xmlEscaping(jobVariable.getValue()));
+                                 StringEscapeUtils.escapeXml11(jobVariable.getValue()));
         }
-    }
-
-    /**
-    
-     &   &amp;
-     "   &quot;
-     '   &apos;
-     <   &lt;
-     >   &gt;
-    
-     */
-    private String xmlEscaping(String raw) {
-        return raw
-                  // ampersand replacement MUST be the first
-                  .replaceAll("&", "&amp;")
-                  .replaceAll("\"", "&quot;")
-                  .replaceAll("'", "&apos;")
-                  .replaceAll("<", "&lt;")
-                  .replaceAll(">", "&gt;");
     }
 
 }
