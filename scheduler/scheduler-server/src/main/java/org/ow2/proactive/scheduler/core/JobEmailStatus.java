@@ -30,9 +30,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 
 /**
  * The JobEmailStatus defines the status of the job for email notification.
- * The status of the job could be either aborted (due to an error policy, manual kill but the user,
+ * The status of the job could be either aborted (due to an error policy, manual kill by the user,
  * or due to resource failure). or it could finish with errors (when at least one task fails),
- * or finally it could finish without issues when the two previous tasks are false.
+ * or finally it could finish without issues in case of normal behavior.
  *
  * @author ActiveEon Team
  * @since 2020-01-07
@@ -51,9 +51,7 @@ public class JobEmailStatus {
     }
 
     /**
-     * Verifies if the job has any tasks Failed, In-Error, or Faulty
-     *
-     * @return true if the job has tasks with issues
+     * Verifies if the job has any Failed, In-Error, or Faulty tasks. 'withErrors' attribute is turned to true
      */
     public void checkTasksWithErrors() {
         this.withErrors = jobInfo.getNumberOfFaultyTasks() + jobInfo.getNumberOfInErrorTasks() +
@@ -61,9 +59,7 @@ public class JobEmailStatus {
     }
 
     /**
-     * Verifies if the job has been aborted. A job is aborted when it is Cancelled, Failed, or Killed
-     *
-     * @return true if the job has been aborted
+     * Verifies if the job has been aborted with status Cancelled, Failed, or Killed. 'aborted' attribute is turned to true
      */
     public void checkJobAborted() {
         this.aborted = jobInfo.getStatus().toString().matches("Canceled|Failed|Killed");
@@ -83,5 +79,13 @@ public class JobEmailStatus {
 
     public void setWithErrors(boolean withErrors) {
         this.withErrors = withErrors;
+    }
+
+    public JobInfo getJobInfo() {
+        return jobInfo;
+    }
+
+    public void setJobInfo(JobInfo jobInfo) {
+        this.jobInfo = jobInfo;
     }
 }
