@@ -115,7 +115,11 @@ public enum SchedulerEvent {
     /** A job has been terminated with at least one faulty task
      * This event is only used in the JobEmailNotification to filter finishied jobs with errors from all finished jobs
      * */
-    JOB_RUNNING_TO_FINISHED_WITH_ERRORS("Job running to finished with errors");
+    JOB_RUNNING_TO_FINISHED_WITH_ERRORS("Job running to finished with errors"),
+    /** A job has been aborted due to a node failure, manuel kill by the user, or error policy
+     * This event is only used in the JobEmailNotification to filter aborted jobs from finished jobs
+     * */
+    JOB_ABORTED("Job aborted");
     /** Name of the method */
     private String methodName;
 

@@ -337,6 +337,39 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
     }
 
     @Test
+    public void testJobAborted() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.CANCELED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job aborted");
+        job.setGenericInformation(genericInfo);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
+
+        assertTrue(sent);
+        ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
+        verify(stubbedSender).sender(varArgs.capture(),
+                                     contains("ProActive Job 123890 : Job aborted"),
+                                     contains("Status: Canceled"));
+        assertTrue(varArgs.getValue().contains(USER_EMAIL));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testJobNotAborted() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.FINISHED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job aborted");
+        job.setGenericInformation(genericInfo);
+
+        assertFalse(sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender));
+
+    }
+
+    @Test
     public void testKilled() throws Exception {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
