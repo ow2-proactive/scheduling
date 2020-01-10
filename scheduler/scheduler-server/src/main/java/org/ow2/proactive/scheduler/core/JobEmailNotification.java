@@ -86,11 +86,14 @@ public class JobEmailNotification {
 
     private SchedulerDBManager dbManager = null;
 
+    private JobInfo jobInfo;
+
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification, SendMail sender) {
         this.asyncMailSender = Executors.newCachedThreadPool();
         this.jobState = js;
         this.eventType = notification.getEventType();
         this.sender = sender;
+        this.jobInfo = notification.getData();
     }
 
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification) {
@@ -104,6 +107,14 @@ public class JobEmailNotification {
 
     public boolean doCheckAndSend(boolean withAttachment)
             throws JobEmailNotificationException, IOException, UnknownJobException, PermissionException {
+        String eventFinishedWithErrorsName = SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.name().toLowerCase();
+        String eventFinishedWithErrorsMethod = SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString()
+                                                                                                 .toLowerCase();
+        String eventFinishedName = SchedulerEvent.JOB_RUNNING_TO_FINISHED.name().toLowerCase();
+        String eventFinishedMethod = SchedulerEvent.JOB_RUNNING_TO_FINISHED.toString().toLowerCase();
+        String eventAbortedName = SchedulerEvent.JOB_ABORTED.name().toLowerCase();
+        String eventAbortedMethod = SchedulerEvent.JOB_ABORTED.toString().toLowerCase();
+
         String jobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
         List<String> jobStatusList = new ArrayList<>();
         if (jobStatus != null) {
@@ -116,7 +127,9 @@ public class JobEmailNotification {
                                           "JOB_RESTARTED_FROM_ERROR",
                                           "JOB_RESUMED",
                                           "JOB_RUNNING_TO_FINISHED",
-                                          "JOB_SUBMITTED")
+                                          "JOB_SUBMITTED",
+                                          "JOB_RUNNING_TO_FINISHED_WITH_ERRORS",
+                                          "JOB_ABORTED")
                                       .map(status -> status.toLowerCase())
                                       .collect(Collectors.toList());
             } else {
@@ -125,44 +138,104 @@ public class JobEmailNotification {
             }
         }
 
+        if (!PASchedulerProperties.EMAIL_NOTIFICATIONS_ENABLED.getValueAsBoolean()) {
+            logger.debug("Notification emails disabled, doing nothing");
+            return false;
+        }
+
+        if ((!jobStatusList.contains(eventType.toString().toLowerCase()) &&
+             !jobStatusList.contains(eventType.name().toLowerCase())) &&
+            (!jobStatusList.contains(eventFinishedWithErrorsName)) &&
+            (!jobStatusList.contains(eventFinishedWithErrorsMethod)) && (!jobStatusList.contains(eventAbortedName)) &&
+            (!jobStatusList.contains(eventAbortedMethod))) {
+            return false;
+        }
+
+        JobEmailStatus jobEmailStatus = new JobEmailStatus(jobInfo);
         switch (eventType) {
+            case JOB_PENDING_TO_FINISHED:
+            case JOB_RUNNING_TO_FINISHED:
+                // first case: JOB_RUNNING_TO_FINISHED_WITH_ERRORS is provided and JOB_RUNNING_TO_FINISHED is not provided along with it
+                if ((jobStatusList.contains(eventFinishedWithErrorsName) ||
+                     jobStatusList.contains(eventFinishedWithErrorsMethod)) &&
+                    (!jobStatusList.contains(eventFinishedName) && !jobStatusList.contains(eventFinishedMethod))) {
+                    // check if any tasks have issues
+                    jobEmailStatus.checkTasksWithErrors();
+                    if (!jobEmailStatus.isWithErrors())
+                        // don't send a notification if there are no errors
+                        return false;
+                    else {
+                        // send a notification about a finished job with errors
+                        sendEmail(withAttachment, jobEmailStatus);
+                    }
+
+                    // second case: JOB_RUNNING_TO_FINISHED_WITH_ERRORS is provided along with JOB_RUNNING_TO_FINISHED (e.g., the case of 'All' event)
+                } else if ((jobStatusList.contains(eventFinishedWithErrorsName) ||
+                            jobStatusList.contains(eventFinishedWithErrorsMethod))) {
+                    // check if any tasks have issues
+                    jobEmailStatus.checkTasksWithErrors();
+                    // send notification according to the job finished status, with errors or not
+                    sendEmail(withAttachment, jobEmailStatus);
+
+                    // third case: check if JOB_ABORTED is activated while JOB_RUNNING_TO_FINISHED with ERRORS or not is not activated
+                } else if ((jobStatusList.contains(eventAbortedName) || jobStatusList.contains(eventAbortedMethod)) &&
+                           (!jobStatusList.contains(eventFinishedName) &&
+                            !jobStatusList.contains(eventFinishedMethod) &&
+                            !jobStatusList.contains(eventFinishedWithErrorsName) &&
+                            !jobStatusList.contains(eventFinishedWithErrorsMethod))) {
+                    // check job if the job is aborted according to its status Canceled, Failed or Killed
+                    jobEmailStatus.checkJobAborted();
+                    if (!jobEmailStatus.isAborted())
+                        // don't send a notification if not aborted
+                        return false;
+                    else {
+                        // send a notification about an aborted job
+                        sendEmail(withAttachment, jobEmailStatus);
+                    }
+
+                    // last case: JOB_RUNNING_TO_FINISHED_WITH_ERRORS and JOB_ABORTED are not provided, then the notification should be sent for events having no errors or issues
+                } else {
+                    sendEmail(withAttachment, jobEmailStatus);
+                }
+                break;
             case JOB_CHANGE_PRIORITY:
             case JOB_IN_ERROR:
             case JOB_PAUSED:
-            case JOB_PENDING_TO_FINISHED:
-            case JOB_PENDING_TO_RUNNING:
             case JOB_RESTARTED_FROM_ERROR:
+            case JOB_PENDING_TO_RUNNING:
             case JOB_RESUMED:
-            case JOB_RUNNING_TO_FINISHED:
             case JOB_SUBMITTED:
+                if (jobStatusList.contains(eventType.name().toLowerCase()) ||
+                    jobStatusList.contains(eventType.toString().toLowerCase())) {
+                    sendEmail(withAttachment, jobEmailStatus);
+                }
                 break;
             default:
                 logger.trace("Event not in the list of email notification, doing nothing");
                 return false;
         }
-        if (!PASchedulerProperties.EMAIL_NOTIFICATIONS_ENABLED.getValueAsBoolean()) {
-            logger.debug("Notification emails disabled, doing nothing");
-            return false;
-        }
-        if (!jobStatusList.contains(eventType.toString().toLowerCase()) &&
-            !jobStatusList.contains(eventType.name().toLowerCase())) {
-            return false;
-        }
+        return true;
 
+    }
+
+    private void sendEmail(boolean withAttachment, JobEmailStatus jobEmailStatus)
+            throws JobEmailNotificationException, IOException, UnknownJobException, PermissionException {
         try {
             if (withAttachment) {
                 String attachment = getAttachment();
                 if (attachment != null) {
-                    sender.sender(getTo(), getSubject(), getBody(), attachment, getAttachmentName());
+                    sender.sender(getTo(), getSubject(jobEmailStatus), getBody(), attachment, getAttachmentName());
                     FileUtils.deleteQuietly(new File(attachment));
                 } else {
-                    sender.sender(getTo(), getSubject(), getBody());
+                    sender.sender(getTo(), getSubject(jobEmailStatus), getBody());
                 }
             } else {
-                sender.sender(getTo(), getSubject(), getBody());
+                sender.sender(getTo(), getSubject(jobEmailStatus), getBody());
             }
-            return true;
-        } catch (EmailException e) {
+
+        } catch (EmailException e)
+
+        {
             throw new JobEmailNotificationException(String.join(",", getTo()),
                                                     "Error sending email: " + e.getMessage(),
                                                     e);
@@ -204,9 +277,14 @@ public class JobEmailNotification {
         return Arrays.asList(toList);
     }
 
-    private String getSubject() {
-        String jobID = jobState.getId().value();
+    private String getSubject(JobEmailStatus jobEmailStatus) {
         String event = eventType.toString();
+        if (jobEmailStatus.isAborted()) {
+            event = SchedulerEvent.JOB_ABORTED.toString();
+        } else if (jobEmailStatus.isWithErrors()) {
+            event = SchedulerEvent.JOB_RUNNING_TO_FINISHED_WITH_ERRORS.toString();
+        }
+        String jobID = jobState.getId().value();
         return String.format(SUBJECT_TEMPLATE, jobID, event);
     }
 

@@ -63,7 +63,10 @@ public enum PASharedProperties implements PACommonProperties {
     /** if backup is enabled */
     SERVER_BACKUP("pa.server.backup", PropertyType.BOOLEAN, "false"),
 
-    /** cron expression which defines when backuop should be performed */
+    /** cron expression which defines when backup should be performed (every day by default).
+        A UNIX crontab-like expression in the following format:
+        (minutes) (hours) (days of month) (month) (days of week)
+     * */
     SERVER_BACKUP_PERIOD("pa.server.backup.period", PropertyType.STRING, "0 0 * * *"),
 
     /** determines how many backups should be kept */

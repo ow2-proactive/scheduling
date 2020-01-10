@@ -73,7 +73,11 @@ task standaloneJar(type: OneJar) {
     mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
     binLib = files({ rootProject.configurations.nativeBundle.collect { zipTree(it) } })
     additionalDir = file('src/main/resources')
-    manifest = oneJarManifest
+    manifest {
+        attributes 'Timestamp': String.valueOf(System.currentTimeMillis())
+        attributes 'One-Jar-Expand': 'lib,binlib,main,dist'
+        attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
+    }
 }
 build.dependsOn standaloneJar
 artifacts {
