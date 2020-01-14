@@ -27,14 +27,19 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.extensions.pamr.client.Agent;
+import org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.utils.NodeSet;
+
+import com.google.common.util.concurrent.Uninterruptibles;
 
 
 /**
@@ -47,8 +52,12 @@ public class ExecuterInformationData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ExecuterInformationData.class);
 
+    private static transient volatile boolean pamrReconnectionTimeoutSpent = false;
+
     private long taskId;
 
+    // This naming is misleading as the field contains the task launcher and not the node url
+    // changing the name will introduce a serialization incompatible change
     private String taskLauncherNodeUrl;
 
     private NodeSet nodes;
@@ -98,17 +107,45 @@ public class ExecuterInformationData implements Serializable {
     }
 
     private TaskLauncher getReboundTaskLauncherIfStillExist() {
-        try {
-            logger.debug("List AOs on " + taskLauncherNodeUrl + " (expect only one): " +
-                         Arrays.toString(NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects()));
-            Object[] aos = NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects();
-            return (TaskLauncher) aos[0];
-        } catch (Throwable t) {
-            logger.warn("Failed to rebind TaskLauncher of task " + taskId + ". TaskLauncher with node URL: " +
-                        taskLauncherNodeUrl +
-                        " could not be looked up. Running task cannot be recovered, it will be restarted if possible.");
-            return new TaskLauncher();
-        }
-    }
+        TaskLauncher answer = null;
+        boolean nodeConnected = false;
+        boolean isPAMR = taskLauncherNodeUrl.startsWith(PAMRRemoteObjectFactory.PROTOCOL_ID + "://");
+        // When using the pamr protocol, nodes (pamr agents) will reconnect by re-registering with the router using the same agent id.
+        // Each reconnection attempt is using a maximum interval of Agent.MAXIMUM_RETRY_DELAY_MS milliseconds, the router will not know of these agents until the reconnection occurs.
+        long initialTime = System.currentTimeMillis();
+        String nodeUrl = nodes.get(0).getNodeInformation().getURL();
+        boolean taskLauncherFound = false;
+        do {
+            try {
+                logger.debug("List AOs on " + nodeUrl + " (expect only one): ");
+                Object[] aos = NodeFactory.getNode(nodeUrl).getActiveObjects();
+                nodeConnected = true;
+                logger.debug(Arrays.toString(aos));
+                taskLauncherFound = aos.length > 0;
+                if (!taskLauncherFound) {
+                    // node was found but task launcher is absent, exit the loop
+                    break;
+                }
+                answer = (TaskLauncher) aos[0];
+            } catch (NodeException t) {
+                if (isPAMR) {
+                    logger.debug("Failed to access node " + nodeUrl);
+                    Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+                }
+            } catch (Throwable t) {
+                logger.warn("Error while retrieving task launcher", t);
+            }
+            // Once the maximum pamr reconnection interval has been reached, no agent id re-attribution should occur,
+            // which means the nodes are definitely not reachable
+            pamrReconnectionTimeoutSpent = pamrReconnectionTimeoutSpent ||
+                                           (System.currentTimeMillis() - initialTime > Agent.MAXIMUM_RETRY_DELAY_MS);
+        } while (!nodeConnected && isPAMR && !pamrReconnectionTimeoutSpent);
 
+        if (!nodeConnected || answer == null) {
+            logger.warn("Failed to rebind TaskLauncher of task " + taskId + ". TaskLauncher with node URL: " + nodeUrl +
+                        " could not be looked up. Running task cannot be recovered, it will be restarted if possible.");
+            answer = new TaskLauncher();
+        }
+        return answer;
+    }
 }

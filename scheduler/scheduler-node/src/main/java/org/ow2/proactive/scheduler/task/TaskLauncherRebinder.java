@@ -95,11 +95,10 @@ public class TaskLauncherRebinder {
     TaskTerminateNotification getReboundTaskTerminateNotificationHandler(Throwable error) {
         if (taskRecoverable) {
             try {
-                logger.debug("List AOs on " + terminateNotificationNodeURL + " (expect only one): " +
-                             Arrays.toString(NodeFactory.getNode(terminateNotificationNodeURL)
-                                                        .getActiveObjects(TaskTerminateNotification.class.getName())));
+                logger.debug("List AOs on " + terminateNotificationNodeURL + " (expect only one):");
                 Node node = NodeFactory.getNode(terminateNotificationNodeURL);
                 Object[] aos = node.getActiveObjects(TaskTerminateNotification.class.getName());
+                logger.debug(Arrays.toString(aos));
                 logger.info("On node " + node.getNodeInformation().getName() + " number of active objects found is " +
                             aos.length + " and the first one " + aos[0] + " will be used to send back the task result");
                 return (TaskTerminateNotification) aos[0];
