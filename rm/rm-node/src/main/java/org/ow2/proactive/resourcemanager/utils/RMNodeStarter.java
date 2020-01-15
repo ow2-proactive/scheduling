@@ -92,6 +92,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
+import org.ow2.proactive.utils.OneJar;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.Version;
 

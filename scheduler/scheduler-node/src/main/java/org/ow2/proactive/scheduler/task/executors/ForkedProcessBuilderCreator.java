@@ -36,9 +36,9 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedJvmTaskExecutionCommandCreator;
-import org.ow2.proactive.scheduler.task.utils.ClasspathUtils;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.ClasspathUtils;
 
 import com.google.common.base.StandardSystemProperty;
 
