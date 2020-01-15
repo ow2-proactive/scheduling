@@ -131,9 +131,9 @@ public class ForkedProcessBuilderCreator implements Serializable {
     }
 
     private void addExecutionPermissionToScripts() throws IOException {
-        String schedulerHome = ClasspathUtils.findSchedulerHome();
         //Add execution permissions to scripts except for windows OS
         if (!StandardSystemProperty.OS_NAME.value().toLowerCase().contains("windows")) {
+            String schedulerHome = ClasspathUtils.findSchedulerHome();
             File scriptsDirectory = new File(schedulerHome, "dist/scripts/processbuilder/linux");
             if (scriptsDirectory != null) {
                 for (File script : scriptsDirectory.listFiles()) {
