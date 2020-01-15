@@ -3,6 +3,7 @@
 # Kills the entire process tree of each process which matches the specified
 # pattern. Any process which does not belong the current user will be ingored.
 
+set +H
 LOGIN=$(whoami)
 
 ######## SEND SIGTERM

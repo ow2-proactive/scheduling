@@ -21,6 +21,7 @@ OSLP_PACKAGE="org.objectweb.proactive.extensions.processbuilder.exception."
 
 trap "echo trapped signal" SIGTERM
 
+set +H
 token=$1
 
 # temp file
