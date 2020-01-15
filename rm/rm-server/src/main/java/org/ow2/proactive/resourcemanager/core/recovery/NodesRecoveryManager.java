@@ -32,10 +32,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extensions.pamr.client.Agent;
+import org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
@@ -50,6 +56,9 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManagerFactory;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.utils.PAExecutors;
+
+import com.google.common.util.concurrent.Uninterruptibles;
 
 
 /**
@@ -137,12 +146,30 @@ public class NodesRecoveryManager {
         Collection<RMNodeData> nodesData = this.rmCore.getDbManager().getNodesByNodeSource(nodeSourceName);
         logger.info("Number of nodes found in database for node source " + nodeSourceName + ": " + nodesData.size());
 
-        List<RMNode> recoveredEligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
+        List<RMNode> recoveredEligibleNodes = Collections.synchronizedList(new ArrayList<>());
         Map<NodeState, Integer> recoveredNodeStatesCounter = new HashMap<>();
         // for each node found in database, try to lookup node or recover it
         // as down node
+        ExecutorService nodeRecoveryThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                                        PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt(),
+                                                                                        120L,
+                                                                                        TimeUnit.SECONDS,
+                                                                                        new NamedThreadFactory("NodeRecoveryThreadPool"));
+        List<Future<RMNode>> nodesFutures = new ArrayList<>(nodesData.size());
         for (RMNodeData rmNodeData : nodesData) {
-            RMNode node = this.recoverNode(rmNodeData, nodeSource, recoveredNodeStatesCounter);
+            nodesFutures.add(nodeRecoveryThreadPool.submit(() -> this.recoverNode(rmNodeData,
+                                                                                  nodeSource,
+                                                                                  recoveredNodeStatesCounter)));
+        }
+        for (Future<RMNode> rmNodeFuture : nodesFutures) {
+            RMNode node = null;
+            try {
+                node = rmNodeFuture.get();
+            } catch (Exception e) {
+                logger.error("Unexpected error occurred while recovering node source " + nodeSource.getName(), e);
+                nodeRecoveryThreadPool.shutdownNow();
+                return;
+            }
             if (this.isEligible(node)) {
                 recoveredEligibleNodes.add(node);
             }
@@ -153,6 +180,7 @@ public class NodesRecoveryManager {
                 this.rmCore.registerAndEmitNodeEvent(event);
             }
         }
+        nodeRecoveryThreadPool.shutdownNow();
         this.rmCore.setEligibleNodesToRecover(recoveredEligibleNodes);
         this.logNodeRecoverySummary(nodeSourceName, recoveredNodeStatesCounter, recoveredEligibleNodes.size());
     }
@@ -196,7 +224,7 @@ public class NodesRecoveryManager {
         }
     }
 
-    private RMNode addRMNodeToCoreAndSource(NodeSource nodeSource, Map<NodeState, Integer> nodeStates,
+    private synchronized RMNode addRMNodeToCoreAndSource(NodeSource nodeSource, Map<NodeState, Integer> nodeStates,
             RMNodeData rmNodeData, String nodeUrl, Node node, NodeState previousState) {
         RMNode rmNode = nodeSource.internalAddNodeAfterRecovery(node, rmNodeData);
         this.rmCore.registerAvailableNode(rmNode);
@@ -243,14 +271,35 @@ public class NodesRecoveryManager {
         Node node = null;
         String nodeUrl = rmNodeData.getNodeUrl();
         NodeState previousState = rmNodeData.getState();
-        try {
-            node = nodeSource.lookupNode(nodeUrl, PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt());
-            logger.info("Node " + nodeUrl + " was looked up successfully");
-        } catch (Exception e) {
-            logger.info("Node " + nodeUrl + " could not be looked up");
+        boolean isPAMR = nodeUrl.startsWith(PAMRRemoteObjectFactory.PROTOCOL_ID + "://");
+        boolean connected = false;
+        long initialTime = System.currentTimeMillis();
+        do {
+            try {
+                node = nodeSource.lookupNode(nodeUrl,
+                                             PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt());
+                logger.info("Node " + nodeUrl + " was looked up successfully");
+                connected = true;
+            } catch (Exception e) {
+                if (isPAMR) {
+                    logger.debug("Node " + nodeUrl +
+                                 " could not be looked up. Wait for PAMR agent reconnection delay.");
+                    Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+                } else {
+                    logger.error("Node " + nodeUrl + " could not be looked up.");
+                }
+
+            }
+        } while (!connected && isPAMR && (System.currentTimeMillis() - initialTime) < Agent.MAXIMUM_RETRY_DELAY_MS);
+
+        if (!connected) {
             node = new FakeDownNodeForRecovery(rmNodeData.getName(), rmNodeData.getNodeUrl());
             rmNodeData.setState(NodeState.DOWN);
+            if (isPAMR) {
+                logger.error("Node " + nodeUrl + " could not be looked up.");
+            }
         }
+
         return this.addRMNodeToCoreAndSource(nodeSource,
                                              recoveredNodeStatesCounter,
                                              rmNodeData,
