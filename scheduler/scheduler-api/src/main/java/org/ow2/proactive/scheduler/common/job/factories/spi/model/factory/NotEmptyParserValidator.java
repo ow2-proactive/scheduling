@@ -39,7 +39,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Vali
 public class NotEmptyParserValidator extends BaseParserValidator<String> {
 
     public NotEmptyParserValidator(String model) throws ModelSyntaxException {
-        super(model, ModelType.NOT_EMPTY);
+        super(model, ModelType.NOT_EMPTY_STRING);
     }
 
     @Override
