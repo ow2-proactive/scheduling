@@ -141,7 +141,7 @@ public class ModelValidatorTest {
 
     @Test
     public void testModelValidatorNotEmpty() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + ModelType.NOT_EMPTY, NotEmptyParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.NOT_EMPTY_STRING, NotEmptyParserValidator.class);
     }
 
     public void createAndCheckValidator(String model, Class expectedClass) throws ModelSyntaxException {
