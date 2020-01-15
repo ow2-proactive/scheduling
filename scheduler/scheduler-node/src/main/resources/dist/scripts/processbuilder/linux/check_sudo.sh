@@ -5,6 +5,7 @@
 # arguments:
 #	$1 - username
 #	$2 - scripts home folder (needed only if we also have a password)
+set +H
 username=$1
 passw=$PA_OSPB_USER_PASSWORD
 keycont=$PA_OSPB_USER_KEY_CONTENT

@@ -57,8 +57,10 @@ public class ClasspathUtils {
         }
     }
 
-    public static String findSchedulerHome() {
-        if (SCHEDULER_HOME == null) {
+    public static synchronized String findSchedulerHome() {
+        if (SCHEDULER_HOME == null && OneJar.isRunningWithOneJar()) {
+            SCHEDULER_HOME = findBaseDirectoryFromJarLocation("lib");
+        } else if (SCHEDULER_HOME == null) {
             SCHEDULER_HOME = findBaseDirectoryFromJarLocation("dist");
         }
         return SCHEDULER_HOME;

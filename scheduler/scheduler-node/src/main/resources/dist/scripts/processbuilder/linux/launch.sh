@@ -20,6 +20,7 @@ OSPL_E_CAUSE="CAUSE";
 OSLP_PACKAGE="org.objectweb.proactive.extensions.processbuilder.exception."
 #---------------
 
+set +H
 token=$1
 
 workdir=$3
