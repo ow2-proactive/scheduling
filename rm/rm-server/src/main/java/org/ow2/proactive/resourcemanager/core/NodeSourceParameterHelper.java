@@ -112,8 +112,16 @@ public class NodeSourceParameterHelper {
         String cleanNewValue = newValue.trim();
         String cleanOldValue = oldValue.trim();
 
-        if (configurableField.getMeta().dynamic() && !cleanNewValue.equals(cleanOldValue)) {
-            mergedParameters.set(valueIndex, cleanNewValue);
+        // if new value is empty string and configurable field is checkbox
+        // then we keep old value.
+        // we do it, because I cannot figure out why GWT DynamicForm
+        // sends empty value for non-changed checkbox
+        if (cleanNewValue.isEmpty() && configurableField.getMeta().checkbox()) {
+            mergedParameters.set(valueIndex, cleanOldValue);
+        } else {
+            if (configurableField.getMeta().dynamic() && !cleanNewValue.equals(cleanOldValue)) {
+                mergedParameters.set(valueIndex, cleanNewValue);
+            }
         }
     }
 
