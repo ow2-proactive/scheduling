@@ -1204,7 +1204,7 @@ public class TaskData {
                              getFinishedTime(),
                              getExecutionDuration(),
                              getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber(),
-                             getDescription(),
+                             getDescription() == null ? null : getDescription().trim(),
                              getExecutionHostName(),
                              getNumberOfExecutionLeft(),
                              getNumberOfExecutionOnFailureLeft(),

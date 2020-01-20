@@ -159,7 +159,7 @@ public class DataUtility {
                              d.getTaskFinishedTime(),
                              d.getTaskExecutionDuration(),
                              d.getTaskNodeNumber(),
-                             d.getTaskDescription(),
+                             d.getTaskDescription() == null ? null : d.getTaskDescription().trim(),
                              d.getExecutionHostName(),
                              d.getNumberOfExecutionLeft(),
                              d.getNumberOfExecutionOnFailureLeft(),
