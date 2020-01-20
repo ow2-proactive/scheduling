@@ -701,7 +701,10 @@ public class JobData implements Serializable {
                                          getProjectName(),
                                          jobId.value(),
                                          getJobName(),
-                                         getFinishedTime() - getStartTime());
+                                         getFinishedTime() - getStartTime(),
+                                         getStatus().toString(),
+                                         getSubmittedTime(),
+                                         getParentId());
         for (TaskData taskData : getTasks()) {
             TaskUsage taskUsage = taskData.toTaskUsage(jobId);
             jobUsage.add(taskUsage);

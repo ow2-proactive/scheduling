@@ -51,23 +51,53 @@ public class TaskUsage implements Serializable {
 
     private final int taskNodeNumber;
 
-    public TaskUsage(String taskId, String taskName, long taskStartTime, long taskFinishedTime,
-            long taskExecutionDuration, int taskNodeNumber) {
+    private final String taskStatus;
 
+    private final String taskTag;
+
+    private final String taskDescription;
+
+    private final String executionHostName;
+
+    private final int numberOfExecutionLeft;
+
+    private final int numberOfExecutionOnFailureLeft;
+
+    private final int maxNumberOfExecution;
+
+    public TaskUsage(String taskId, String taskStatus, String taskName, String taskTag, long taskStartTime,
+            long taskFinishedTime, long taskExecutionDuration, int taskNodeNumber, String taskDescription,
+            String executionHostName, int numberOfExecutionLeft, int numberOfExecutionOnFailureLeft,
+            int maxNumberOfExecution) {
         this.taskId = taskId;
+        this.taskStatus = taskStatus;
         this.taskName = taskName;
+        this.taskTag = taskTag;
         this.taskStartTime = taskStartTime;
         this.taskFinishedTime = taskFinishedTime;
         this.taskExecutionDuration = taskExecutionDuration;
         this.taskNodeNumber = taskNodeNumber;
+        this.taskDescription = taskDescription;
+        this.executionHostName = executionHostName;
+        this.numberOfExecutionLeft = numberOfExecutionLeft;
+        this.numberOfExecutionOnFailureLeft = numberOfExecutionOnFailureLeft;
+        this.maxNumberOfExecution = maxNumberOfExecution;
     }
 
     public String getTaskId() {
         return taskId;
     }
 
+    public String getTaskStatus() {
+        return taskStatus;
+    }
+
     public String getTaskName() {
         return taskName;
+    }
+
+    public String getTaskTag() {
+        return taskTag;
     }
 
     public long getTaskStartTime() {
@@ -84,5 +114,25 @@ public class TaskUsage implements Serializable {
 
     public int getTaskNodeNumber() {
         return taskNodeNumber;
+    }
+
+    public String getTaskDescription() {
+        return taskDescription;
+    }
+
+    public String getExecutionHostName() {
+        return executionHostName;
+    }
+
+    public int getNumberOfExecutionLeft() {
+        return numberOfExecutionLeft;
+    }
+
+    public int getNumberOfExecutionOnFailureLeft() {
+        return numberOfExecutionOnFailureLeft;
+    }
+
+    public int getMaxNumberOfExecution() {
+        return maxNumberOfExecution;
     }
 }

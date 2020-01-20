@@ -135,7 +135,14 @@ public class DataUtility {
     }
 
     public static JobUsage jobUsage(JobUsageData d) {
-        JobUsage impl = new JobUsage(d.getOwner(), d.getProject(), d.getJobId(), d.getJobName(), d.getJobDuration());
+        JobUsage impl = new JobUsage(d.getOwner(),
+                                     d.getProject(),
+                                     d.getJobId(),
+                                     d.getJobName(),
+                                     d.getJobDuration(),
+                                     d.getStatus(),
+                                     d.getSubmittedTime(),
+                                     d.getParentId());
         List<TaskUsageData> taskUsageDataList = d.getTaskUsages();
         for (TaskUsageData taskUsageData : taskUsageDataList) {
             impl.add(taskUsage(taskUsageData));
@@ -145,11 +152,18 @@ public class DataUtility {
 
     public static TaskUsage taskUsage(TaskUsageData d) {
         return new TaskUsage(d.getTaskId(),
+                             d.getTaskStatus(),
                              d.getTaskName(),
+                             d.getTaskTag(),
                              d.getTaskStartTime(),
                              d.getTaskFinishedTime(),
                              d.getTaskExecutionDuration(),
-                             d.getTaskNodeNumber());
+                             d.getTaskNodeNumber(),
+                             d.getTaskDescription(),
+                             d.getExecutionHostName(),
+                             d.getNumberOfExecutionLeft(),
+                             d.getNumberOfExecutionOnFailureLeft(),
+                             d.getMaxNumberOfExecution());
     }
 
     public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {
