@@ -360,7 +360,9 @@ public class SchedulerDBManager {
             Criteria criteria = session.createCriteria(JobData.class);
             criteria.setFetchMode("tasks", FetchMode.JOIN);
             criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-            criteria.add(Restrictions.eq("owner", userName));
+            if (userName != null) {
+                criteria.add(Restrictions.eq("owner", userName));
+            }
             // exclude killed but not started jobs
             criteria.add(Restrictions.gt("startTime", -1L));
             criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startDate.getTime()),
