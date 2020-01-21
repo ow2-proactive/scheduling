@@ -125,6 +125,15 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
     }
 
+    public EligibleTaskDescriptorImpl findInternalTaskByName(String taskName) {
+        return allTasksWithTheirChildren.values()
+                                        .stream()
+                                        .map(x -> (EligibleTaskDescriptorImpl) x)
+                                        .filter(x -> x.getInternal().getName().equals(taskName))
+                                        .findFirst()
+                                        .get();
+    }
+
     /**
      * Make a dependences tree of the job's tasks according to the dependence list
      * stored in taskDescriptor.
@@ -164,6 +173,30 @@ public class JobDescriptorImpl implements JobDescriptor {
             }
 
             allTasksWithTheirChildren.put(td, lt);
+        }
+
+        for (InternalTask internalTask : job.getITasks()) {
+            if (internalTask.getFlowScript() != null &&
+                FlowActionType.parse(internalTask.getFlowScript().getActionType()).equals(FlowActionType.IF)) {
+
+                TaskDescriptor taskDescriptor = allTasksWithTheirChildren.get(internalTask);
+
+                EligibleTaskDescriptorImpl actionIf = findInternalTaskByName(internalTask.getFlowScript()
+                                                                                         .getActionTarget());
+                ((EligibleTaskDescriptorImpl) taskDescriptor).addChild(actionIf);
+                actionIf.addParent(taskDescriptor);
+
+                EligibleTaskDescriptorImpl actionElse = findInternalTaskByName(internalTask.getFlowScript()
+                                                                                           .getActionTargetElse());
+                ((EligibleTaskDescriptorImpl) taskDescriptor).addChild(actionElse);
+                actionElse.addParent(taskDescriptor);
+
+                EligibleTaskDescriptorImpl actionContinue = findInternalTaskByName(internalTask.getFlowScript()
+                                                                                               .getActionContinuation());
+                ((EligibleTaskDescriptorImpl) taskDescriptor).addChild(actionContinue);
+                actionContinue.addParent(taskDescriptor);
+
+            }
         }
 
         //now for each taskDescriptor, set the parents and children list
