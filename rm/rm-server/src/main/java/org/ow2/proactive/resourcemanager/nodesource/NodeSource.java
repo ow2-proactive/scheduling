@@ -27,15 +27,11 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
 import java.security.Permission;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -56,6 +52,7 @@ import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -93,6 +90,35 @@ import com.google.common.annotations.VisibleForTesting;
  */
 @ActiveObject
 public class NodeSource implements InitActive, RunActive {
+
+    public enum AdditionalInformation {
+
+        ACTUAL_COST,
+        COST_LIMIT
+    }
+
+    private Map<AdditionalInformation, String> additionalInformations = null;
+
+    public void putAdditionalInfo(AdditionalInformation key, String value) {
+        String valueToUpdate = this.additionalInformations.get(key);
+        if (valueToUpdate == null || (valueToUpdate != null && !valueToUpdate.equals(value))) {
+            this.additionalInformations.put(key, value);
+            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_UPDATED,
+                                                                  this.administrator.getName(),
+                                                                  this.name,
+                                                                  this.getDescription(),
+                                                                  this.getAdditionalInformationsAsString(),
+                                                                  this.administrator.getName(),
+                                                                  this.getStatus().toString()));
+        }
+    }
+
+    public String getAdditionalInformationsAsString() {
+        return this.additionalInformations.keySet()
+                                          .stream()
+                                          .map(key -> key + ":" + additionalInformations.get(key))
+                                          .collect(Collectors.joining(", ", "{", "}"));
+    }
 
     private static Logger logger = Logger.getLogger(NodeSource.class);
 
@@ -198,6 +224,7 @@ public class NodeSource implements InitActive, RunActive {
         providerPermission = null;
         monitoring = null;
         descriptor = null;
+        additionalInformations = new HashMap<AdditionalInformation, String>();
     }
 
     /**
@@ -236,6 +263,8 @@ public class NodeSource implements InitActive, RunActive {
         this.nodeUserAccessType = this.policy.getUserAccessType();
 
         this.descriptor = nodeSourceDescriptor;
+
+        this.additionalInformations = new HashMap<AdditionalInformation, String>();
     }
 
     /**
@@ -973,6 +1002,7 @@ public class NodeSource implements InitActive, RunActive {
     public RMNodeSourceEvent createNodeSourceEvent() {
         return new RMNodeSourceEvent(this.name,
                                      getDescription(),
+                                     getAdditionalInformationsAsString(),
                                      this.administrator.getName(),
                                      this.getStatus().toString());
     }
