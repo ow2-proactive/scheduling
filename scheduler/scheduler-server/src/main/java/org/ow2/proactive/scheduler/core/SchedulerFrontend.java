@@ -456,7 +456,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
-        this.frontendState.connect(sourceBodyID, identification, cred);
+        Credentials enrichedCreds = cred;
+        try {
+            enrichedCreds = schedulingService.addThirdPartyCredentials(cred);
+        } catch (Exception e) {
+            logger.warn("Could not add third party credentials to connection of user " + identification.getUsername() +
+                        " from " + identification.getHostName());
+        }
+        this.frontendState.connect(sourceBodyID, identification, enrichedCreds);
         this.spacesSupport.registerUserSpace(identification.getUsername());
     }
 
