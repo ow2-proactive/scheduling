@@ -44,6 +44,12 @@ public class JobUsageData {
 
     private List<TaskUsageData> taskUsages;
 
+    private String status;
+
+    private long submittedTime;
+
+    private Long parentId;
+
     public JobUsageData() {
     }
 
@@ -93,5 +99,29 @@ public class JobUsageData {
 
     public List<TaskUsageData> getTaskUsages() {
         return taskUsages;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public long getSubmittedTime() {
+        return submittedTime;
+    }
+
+    public void setSubmittedTime(long submittedTime) {
+        this.submittedTime = submittedTime;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 }
