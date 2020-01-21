@@ -1208,7 +1208,8 @@ public class TaskData {
                              getExecutionHostName(),
                              getNumberOfExecutionLeft(),
                              getNumberOfExecutionOnFailureLeft(),
-                             getMaxNumberOfExecution());
+                             getMaxNumberOfExecution(),
+                             PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
     }
 
     TaskInfoImpl createTaskInfo(JobIdImpl jobId) {

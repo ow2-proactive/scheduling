@@ -65,10 +65,12 @@ public class TaskUsage implements Serializable {
 
     private final int maxNumberOfExecution;
 
+    private final int maxNumberOfExecutionOnFailure;
+
     public TaskUsage(String taskId, String taskStatus, String taskName, String taskTag, long taskStartTime,
             long taskFinishedTime, long taskExecutionDuration, int taskNodeNumber, String taskDescription,
             String executionHostName, int numberOfExecutionLeft, int numberOfExecutionOnFailureLeft,
-            int maxNumberOfExecution) {
+            int maxNumberOfExecution, int maxNumberOfExecutionOnFailure) {
         this.taskId = taskId;
         this.taskStatus = taskStatus;
         this.taskName = taskName;
@@ -82,6 +84,7 @@ public class TaskUsage implements Serializable {
         this.numberOfExecutionLeft = numberOfExecutionLeft;
         this.numberOfExecutionOnFailureLeft = numberOfExecutionOnFailureLeft;
         this.maxNumberOfExecution = maxNumberOfExecution;
+        this.maxNumberOfExecutionOnFailure = maxNumberOfExecutionOnFailure;
     }
 
     public String getTaskId() {
@@ -134,5 +137,9 @@ public class TaskUsage implements Serializable {
 
     public int getMaxNumberOfExecution() {
         return maxNumberOfExecution;
+    }
+
+    public int getMaxNumberOfExecutionOnFailure() {
+        return maxNumberOfExecutionOnFailure;
     }
 }

@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
@@ -163,7 +164,8 @@ public class DataUtility {
                              d.getExecutionHostName(),
                              d.getNumberOfExecutionLeft(),
                              d.getNumberOfExecutionOnFailureLeft(),
-                             d.getMaxNumberOfExecution());
+                             d.getMaxNumberOfExecution(),
+                             PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
     }
 
     public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {

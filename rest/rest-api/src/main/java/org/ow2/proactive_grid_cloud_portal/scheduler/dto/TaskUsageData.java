@@ -52,6 +52,8 @@ public class TaskUsageData {
 
     private int maxNumberOfExecution;
 
+    private int maxNumberOfExecutionOnFailure;
+
     public String getTaskName() {
         return taskName;
     }
@@ -154,5 +156,13 @@ public class TaskUsageData {
 
     public void setTaskStatus(String taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public int getMaxNumberOfExecutionOnFailure() {
+        return maxNumberOfExecutionOnFailure;
+    }
+
+    public void setMaxNumberOfExecutionOnFailure(int maxNumberOfExecutionOnFailure) {
+        this.maxNumberOfExecutionOnFailure = maxNumberOfExecutionOnFailure;
     }
 }
