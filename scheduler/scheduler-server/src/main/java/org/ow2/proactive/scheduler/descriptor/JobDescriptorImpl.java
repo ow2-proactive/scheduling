@@ -548,23 +548,41 @@ public class JobDescriptorImpl implements JobDescriptor {
             TaskDescriptor taskToTerminate = currentTasks.get(taskId);
 
             if (taskToTerminate != null) {
-                for (TaskDescriptor childTask : taskToTerminate.getChildren()) {
-                    decreaseParentCount(childTask);
 
-                    if (((EligibleTaskDescriptorImpl) childTask).getCount() == 0) {
-                        if (internalJob.getStatus() == JobStatus.PAUSED) {
-                            pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
-                        } else if (internalJob.getStatus() == JobStatus.IN_ERROR &&
-                                   ((EligibleTaskDescriptorImpl) childTask).getInternal()
-                                                                           .getStatus() == TaskStatus.PAUSED) {
-                            pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
-                        } else if (((EligibleTaskDescriptorImpl) childTask).getInternal()
-                                                                           .getStatus() == TaskStatus.SKIPPED) {
-                            runningTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
-                            taskIdsToSkip.add(childTask.getTaskId());
-                        } else {
-                            eligibleTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
+                // if it is IF condition, and it is skipped, then we just skip all branches
+                InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskToTerminate).getInternal();
+                if (internalTask.getFlowScript() != null &&
+                    FlowActionType.parse(internalTask.getFlowScript().getActionType()).equals(FlowActionType.IF) &&
+                    internalTask.getStatus().equals(TaskStatus.SKIPPED)) {
+                    Set<EligibleTaskDescriptor> branches = new HashSet<>(3);
+                    branches.add(getTaskByName(internalTask.getFlowScript().getActionTarget()));
+                    branches.add(getTaskByName(internalTask.getFlowScript().getActionTargetElse()));
+                    branches.add(getTaskByName(internalTask.getFlowScript().getActionContinuation()));
+                    for (EligibleTaskDescriptor childTask : branches) {
+                        runningTasks.put(childTask.getTaskId(), childTask);
+                        taskIdsToSkip.add(childTask.getTaskId());
+                    }
+
+                } else if (!taskToTerminate.getChildren().isEmpty()) {
+                    for (TaskDescriptor childTask : taskToTerminate.getChildren()) {
+                        decreaseParentCount(childTask);
+
+                        if (((EligibleTaskDescriptorImpl) childTask).getCount() == 0) {
+                            if (internalJob.getStatus() == JobStatus.PAUSED) {
+                                pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
+                            } else if (internalJob.getStatus() == JobStatus.IN_ERROR &&
+                                       ((EligibleTaskDescriptorImpl) childTask).getInternal()
+                                                                               .getStatus() == TaskStatus.PAUSED) {
+                                pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
+                            } else if (((EligibleTaskDescriptorImpl) childTask).getInternal()
+                                                                               .getStatus() == TaskStatus.SKIPPED) {
+                                runningTasks.put(childTask.getTaskId(), childTask);
+                                taskIdsToSkip.add(childTask.getTaskId());
+                            } else {
+                                eligibleTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
+                            }
                         }
+
                     }
                 }
 
@@ -578,6 +596,20 @@ public class JobDescriptorImpl implements JobDescriptor {
             terminate(taskIdToSkip);
         }
 
+    }
+
+    public EligibleTaskDescriptor getTaskByName(String taskName) {
+        return (EligibleTaskDescriptor) allTasksWithTheirChildren.values()
+                                                                 .stream()
+                                                                 .filter(x -> x.getTaskId()
+                                                                               .getReadableName()
+                                                                               .equals(taskName))
+                                                                 .findFirst()
+                                                                 .get();
+    }
+
+    public InternalTask getInternalTaskByName(String taskName) {
+        return allTasksWithTheirChildren.keySet().stream().filter(x -> x.getName().equals(taskName)).findFirst().get();
     }
 
     private void decreaseParentCount(TaskDescriptor childTask) {
@@ -753,13 +785,26 @@ public class JobDescriptorImpl implements JobDescriptor {
         return pausedTasks;
     }
 
-    public List<InternalTask> getTaskChildren(InternalTask internalTask) {
+    /**
+     * This method is used to find all task that should be skiped when REPS is 0
+     * We do BFS to mark all task in the block which has to be skipped.
+     * We return children and branches if it IF confition
+     */
+    public List<InternalTask> getTaskChildrenWithIfBranches(InternalTask internalTask) {
         List<InternalTask> children = new ArrayList<>();
         if (allTasksWithTheirChildren.containsKey(internalTask)) {
             for (TaskDescriptor taskDescriptor : allTasksWithTheirChildren.get(internalTask).getChildren()) {
                 children.add(((EligibleTaskDescriptorImpl) taskDescriptor).getInternal());
             }
         }
+
+        if (internalTask.getFlowScript() != null &&
+            FlowActionType.parse(internalTask.getFlowScript().getActionType()).equals(FlowActionType.IF)) {
+            children.add(getInternalTaskByName(internalTask.getFlowScript().getActionTarget()));
+            children.add(getInternalTaskByName(internalTask.getFlowScript().getActionTargetElse()));
+            children.add(getInternalTaskByName(internalTask.getFlowScript().getActionContinuation()));
+        }
+
         return children;
     }
 

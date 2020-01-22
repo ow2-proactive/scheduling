@@ -170,13 +170,14 @@ public class TerminateReplicateTaskHandlerTest extends ProActiveTestClean {
         InternalTask internalTask3 = generateInternalTask(888L);
         tempTasks.put(internalTask3.getId(), internalTask3);
         internalTask3.addDependence(startTask);
-        when(jobDescriptorImpl.getTaskChildren(startTask)).thenReturn(Lists.newArrayList(internalTask2, internalTask3));
+        when(jobDescriptorImpl.getTaskChildrenWithIfBranches(startTask)).thenReturn(Lists.newArrayList(internalTask2,
+                                                                                                       internalTask3));
 
         InternalTask endTask = generateInternalTask(999L);
         tempTasks.put(endTask.getId(), endTask);
         endTask.setFlowBlock(FlowBlock.END);
-        when(jobDescriptorImpl.getTaskChildren(internalTask2)).thenReturn(Lists.newArrayList(endTask));
-        when(jobDescriptorImpl.getTaskChildren(internalTask3)).thenReturn(Lists.newArrayList(endTask));
+        when(jobDescriptorImpl.getTaskChildrenWithIfBranches(internalTask2)).thenReturn(Lists.newArrayList(endTask));
+        when(jobDescriptorImpl.getTaskChildrenWithIfBranches(internalTask3)).thenReturn(Lists.newArrayList(endTask));
 
         endTask.addDependence(internalTask2);
         endTask.addDependence(internalTask3);
