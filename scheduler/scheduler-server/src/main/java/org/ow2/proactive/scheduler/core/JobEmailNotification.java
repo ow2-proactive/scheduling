@@ -31,11 +31,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.addons.email.exception.EmailException;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
@@ -61,6 +63,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.EmailConfiguration;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SendMail;
+
+import com.google.common.io.Files;
 
 
 public class JobEmailNotification {
@@ -306,8 +310,19 @@ public class JobEmailNotification {
 
         final Properties properties = EmailConfiguration.getConfiguration().getProperties();
         String templatePath = properties.getProperty(EmailConfiguration.TEMPLATE_PATH);
-        String bodyTemplate = new String(Files.readAllBytes(Paths.get(PASchedulerProperties.getAbsolutePath(templatePath))));
-        return String.format(bodyTemplate, jobID, status, allTaskStatusesString, hostname);
+        String bodyTemplate = Files.toString(new File(PASchedulerProperties.getAbsolutePath(templatePath)),
+                                             Charset.defaultCharset());
+
+        Map<String, String> values = new HashMap<>();
+        values.put("JOB_ID", jobID);
+        values.put("JOB_STATUS", status);
+        values.put("JOB_TASKS", allTaskStatusesString);
+        values.put("HOST_NAME", hostname);
+
+        // use of StrSubstitutor to replace email template parameters by job details
+        String emailBody = StrSubstitutor.replace(bodyTemplate, values, "%", "%");
+
+        return emailBody;
     }
 
     private String getAttachment() throws NotConnectedException, UnknownJobException, PermissionException, IOException {
