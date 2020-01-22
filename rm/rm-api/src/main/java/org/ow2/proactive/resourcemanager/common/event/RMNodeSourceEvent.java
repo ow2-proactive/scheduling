@@ -57,6 +57,8 @@ public class RMNodeSourceEvent extends RMEvent {
     /** description of the source concerned by the event. */
     private String nodeSourceDescription = null;
 
+    private String additionalInformations = null;
+
     private String nodeSourceAdmin = null;
 
     /** string representation of the status of node source */
@@ -72,10 +74,11 @@ public class RMNodeSourceEvent extends RMEvent {
      * Creates an RMNodesourceEvent object.
      * Used to represent the resource manager state @see RMInitialState.
      */
-    public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription, String nodeSourceAdmin,
-            String nodeSourceStatus) {
+    public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription, String additionalInformations,
+            String nodeSourceAdmin, String nodeSourceStatus) {
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
+        this.additionalInformations = additionalInformations;
         this.nodeSourceAdmin = nodeSourceAdmin;
         this.nodeSourceStatus = nodeSourceStatus;
     }
@@ -84,11 +87,12 @@ public class RMNodeSourceEvent extends RMEvent {
      * Creates an RMNodesourceEvent object.
      */
     public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName, String nodeSourceDescription,
-            String nodeSourceAdmin, String nodeSourceStatus) {
+            String additionalInformations, String nodeSourceAdmin, String nodeSourceStatus) {
         super(type);
         this.initiator = initiator;
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
+        this.additionalInformations = additionalInformations;
         this.nodeSourceAdmin = nodeSourceAdmin;
         this.nodeSourceStatus = nodeSourceStatus;
     }
@@ -148,6 +152,10 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     public String getSourceDescription() {
         return this.nodeSourceDescription;
+    }
+
+    public String getAdditionalInformations() {
+        return additionalInformations;
     }
 
     /**
