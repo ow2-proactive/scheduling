@@ -1197,11 +1197,19 @@ public class TaskData {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
 
         return new TaskUsage(taskId.value(),
+                             getTaskStatus().toString(),
                              getTaskName(),
+                             getTag(),
                              getStartTime(),
                              getFinishedTime(),
                              getExecutionDuration(),
-                             getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
+                             getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber(),
+                             getDescription() == null ? null : getDescription().trim(),
+                             getExecutionHostName(),
+                             getNumberOfExecutionLeft(),
+                             getNumberOfExecutionOnFailureLeft(),
+                             getMaxNumberOfExecution(),
+                             PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
     }
 
     TaskInfoImpl createTaskInfo(JobIdImpl jobId) {

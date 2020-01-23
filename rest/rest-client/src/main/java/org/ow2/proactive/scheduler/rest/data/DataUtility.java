@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
@@ -135,7 +136,14 @@ public class DataUtility {
     }
 
     public static JobUsage jobUsage(JobUsageData d) {
-        JobUsage impl = new JobUsage(d.getOwner(), d.getProject(), d.getJobId(), d.getJobName(), d.getJobDuration());
+        JobUsage impl = new JobUsage(d.getOwner(),
+                                     d.getProject(),
+                                     d.getJobId(),
+                                     d.getJobName(),
+                                     d.getJobDuration(),
+                                     d.getStatus(),
+                                     d.getSubmittedTime(),
+                                     d.getParentId());
         List<TaskUsageData> taskUsageDataList = d.getTaskUsages();
         for (TaskUsageData taskUsageData : taskUsageDataList) {
             impl.add(taskUsage(taskUsageData));
@@ -145,11 +153,19 @@ public class DataUtility {
 
     public static TaskUsage taskUsage(TaskUsageData d) {
         return new TaskUsage(d.getTaskId(),
+                             d.getTaskStatus(),
                              d.getTaskName(),
+                             d.getTaskTag(),
                              d.getTaskStartTime(),
                              d.getTaskFinishedTime(),
                              d.getTaskExecutionDuration(),
-                             d.getTaskNodeNumber());
+                             d.getTaskNodeNumber(),
+                             d.getTaskDescription() == null ? null : d.getTaskDescription().trim(),
+                             d.getExecutionHostName(),
+                             d.getNumberOfExecutionLeft(),
+                             d.getNumberOfExecutionOnFailureLeft(),
+                             d.getMaxNumberOfExecution(),
+                             PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
     }
 
     public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {

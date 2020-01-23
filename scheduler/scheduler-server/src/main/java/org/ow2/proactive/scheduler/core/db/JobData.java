@@ -188,6 +188,8 @@ public class JobData implements Serializable {
 
     private String onTaskErrorString;
 
+    private Long taskRetryDelay;
+
     private JobPriority priority;
 
     private JobStatus status;
@@ -271,6 +273,9 @@ public class JobData implements Serializable {
         internalJob.setUserSpace(getGlobalSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
+        if (getTaskRetryDelay() != null) {
+            internalJob.setTaskRetryDelay(getTaskRetryDelay());
+        }
         internalJob.setScheduledTimeForRemoval(getScheduledTimeForRemoval());
         try {
             internalJob.setResultMap(SerializationUtil.deserializeVariableMap(getResultMap()));
@@ -285,6 +290,7 @@ public class JobData implements Serializable {
         JobData jobRuntimeData = new JobData();
         jobRuntimeData.setMaxNumberOfExecution(job.getMaxNumberOfExecution());
         jobRuntimeData.setOnTaskErrorString(job.getOnTaskErrorProperty().getValue());
+        jobRuntimeData.setTaskRetryDelay(job.getTaskRetryDelay());
         jobRuntimeData.setSubmittedTime(job.getSubmittedTime());
         jobRuntimeData.setStartTime(job.getStartTime());
         jobRuntimeData.setInErrorTime(job.getInErrorTime());
@@ -395,6 +401,15 @@ public class JobData implements Serializable {
 
     public void setOnTaskErrorString(String onTaskError) {
         this.onTaskErrorString = onTaskError;
+    }
+
+    @Column(name = "TASK_RETRY_DELAY")
+    public Long getTaskRetryDelay() {
+        return taskRetryDelay;
+    }
+
+    public void setTaskRetryDelay(Long taskRetryDelay) {
+        this.taskRetryDelay = taskRetryDelay;
     }
 
     @Column(name = "JOB_NAME", nullable = false, updatable = false)
@@ -686,7 +701,10 @@ public class JobData implements Serializable {
                                          getProjectName(),
                                          jobId.value(),
                                          getJobName(),
-                                         getFinishedTime() - getStartTime());
+                                         getFinishedTime() - getStartTime(),
+                                         getStatus().toString(),
+                                         getSubmittedTime(),
+                                         getParentId());
         for (TaskData taskData : getTasks()) {
             TaskUsage taskUsage = taskData.toTaskUsage(jobId);
             jobUsage.add(taskUsage);
