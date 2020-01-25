@@ -31,7 +31,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -91,15 +90,13 @@ import com.google.common.annotations.VisibleForTesting;
 @ActiveObject
 public class NodeSource implements InitActive, RunActive {
 
-    public enum AdditionalInformation {
+    private HashMap<String, String> additionalInformations = null;
 
-        ACTUAL_COST,
-        COST_LIMIT
+    public HashMap<String, String> getAdditionalInformations() {
+        return additionalInformations;
     }
 
-    private Map<AdditionalInformation, String> additionalInformations = null;
-
-    public void putAdditionalInfo(AdditionalInformation key, String value) {
+    public void putAdditionalInfo(String key, String value) {
         String valueToUpdate = this.additionalInformations.get(key);
         if (valueToUpdate == null || (valueToUpdate != null && !valueToUpdate.equals(value))) {
             this.additionalInformations.put(key, value);
@@ -107,17 +104,10 @@ public class NodeSource implements InitActive, RunActive {
                                                                   this.administrator.getName(),
                                                                   this.name,
                                                                   this.getDescription(),
-                                                                  this.getAdditionalInformationsAsString(),
+                                                                  this.additionalInformations,
                                                                   this.administrator.getName(),
                                                                   this.getStatus().toString()));
         }
-    }
-
-    public String getAdditionalInformationsAsString() {
-        return this.additionalInformations.keySet()
-                                          .stream()
-                                          .map(key -> key + ":" + additionalInformations.get(key))
-                                          .collect(Collectors.joining(", ", "{", "}"));
     }
 
     private static Logger logger = Logger.getLogger(NodeSource.class);
@@ -224,7 +214,7 @@ public class NodeSource implements InitActive, RunActive {
         providerPermission = null;
         monitoring = null;
         descriptor = null;
-        additionalInformations = new HashMap<AdditionalInformation, String>();
+        additionalInformations = new HashMap<String, String>();
     }
 
     /**
@@ -264,7 +254,7 @@ public class NodeSource implements InitActive, RunActive {
 
         this.descriptor = nodeSourceDescriptor;
 
-        this.additionalInformations = new HashMap<AdditionalInformation, String>();
+        this.additionalInformations = new HashMap<String, String>();
     }
 
     /**
@@ -1002,7 +992,7 @@ public class NodeSource implements InitActive, RunActive {
     public RMNodeSourceEvent createNodeSourceEvent() {
         return new RMNodeSourceEvent(this.name,
                                      getDescription(),
-                                     getAdditionalInformationsAsString(),
+                                     this.additionalInformations,
                                      this.administrator.getName(),
                                      this.getStatus().toString());
     }

@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
+import java.util.HashMap;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -57,7 +59,7 @@ public class RMNodeSourceEvent extends RMEvent {
     /** description of the source concerned by the event. */
     private String nodeSourceDescription = null;
 
-    private String additionalInformations = null;
+    private HashMap<String, String> additionalInformations = null;
 
     private String nodeSourceAdmin = null;
 
@@ -74,11 +76,11 @@ public class RMNodeSourceEvent extends RMEvent {
      * Creates an RMNodesourceEvent object.
      * Used to represent the resource manager state @see RMInitialState.
      */
-    public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription, String additionalInformations,
-            String nodeSourceAdmin, String nodeSourceStatus) {
+    public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription,
+            HashMap<String, String> additionalInformations, String nodeSourceAdmin, String nodeSourceStatus) {
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
-        this.additionalInformations = additionalInformations;
+        this.additionalInformations = new HashMap<String, String>(additionalInformations);
         this.nodeSourceAdmin = nodeSourceAdmin;
         this.nodeSourceStatus = nodeSourceStatus;
     }
@@ -87,12 +89,12 @@ public class RMNodeSourceEvent extends RMEvent {
      * Creates an RMNodesourceEvent object.
      */
     public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName, String nodeSourceDescription,
-            String additionalInformations, String nodeSourceAdmin, String nodeSourceStatus) {
+            HashMap<String, String> additionalInformations, String nodeSourceAdmin, String nodeSourceStatus) {
         super(type);
         this.initiator = initiator;
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
-        this.additionalInformations = additionalInformations;
+        this.additionalInformations = new HashMap<String, String>(additionalInformations);
         this.nodeSourceAdmin = nodeSourceAdmin;
         this.nodeSourceStatus = nodeSourceStatus;
     }
@@ -154,7 +156,7 @@ public class RMNodeSourceEvent extends RMEvent {
         return this.nodeSourceDescription;
     }
 
-    public String getAdditionalInformations() {
+    public HashMap<String, String> getAdditionalInformations() {
         return additionalInformations;
     }
 

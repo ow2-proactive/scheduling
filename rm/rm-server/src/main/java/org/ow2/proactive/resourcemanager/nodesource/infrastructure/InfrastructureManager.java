@@ -960,7 +960,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         nsStub.internalEmitDeployingNodeEvent(event);
     }
 
-    public void putAdditionalInfo(NodeSource.AdditionalInformation key, String value) {
+    public void putAdditionalInfo(String key, String value) {
         this.nodeSource.putAdditionalInfo(key, value);
     }
 
