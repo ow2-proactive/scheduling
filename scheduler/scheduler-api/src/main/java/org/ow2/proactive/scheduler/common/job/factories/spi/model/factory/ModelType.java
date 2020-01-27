@@ -46,7 +46,7 @@ public enum ModelType {
     LIST(ListParserValidator.class, String.class),
     LONG(LongParserValidator.class, Long.class),
     MODEL_FROM_URL(ModelFromURLParserValidator.class, String.class),
-    NOT_EMPTY(NotEmptyParserValidator.class, String.class),
+    NOT_EMPTY_STRING(NotEmptyParserValidator.class, String.class),
     REGEXP(RegexpParserValidator.class, String.class),
     SHORT(ShortParserValidator.class, Short.class),
     SPEL(SPELParserValidator.class, String.class),

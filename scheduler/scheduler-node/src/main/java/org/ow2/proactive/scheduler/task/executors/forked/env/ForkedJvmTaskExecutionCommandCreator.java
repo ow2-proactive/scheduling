@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperty;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
-import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -49,6 +48,7 @@ import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.command.JavaPrefixCommandExtractor;
 import org.ow2.proactive.scripting.ForkEnvironmentScriptResult;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.OneJar;
 
 import com.google.common.base.Strings;
 

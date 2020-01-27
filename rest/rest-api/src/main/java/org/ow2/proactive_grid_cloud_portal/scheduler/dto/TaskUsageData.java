@@ -38,6 +38,22 @@ public class TaskUsageData {
 
     private int taskNodeNumber;
 
+    private String taskStatus;
+
+    private String taskTag;
+
+    private String taskDescription;
+
+    private String executionHostName;
+
+    private int numberOfExecutionLeft;
+
+    private int numberOfExecutionOnFailureLeft;
+
+    private int maxNumberOfExecution;
+
+    private int maxNumberOfExecutionOnFailure;
+
     public String getTaskName() {
         return taskName;
     }
@@ -84,5 +100,69 @@ public class TaskUsageData {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public String getTaskTag() {
+        return taskTag;
+    }
+
+    public void setTaskTag(String taskTag) {
+        this.taskTag = taskTag;
+    }
+
+    public String getTaskDescription() {
+        return taskDescription;
+    }
+
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
+    }
+
+    public String getExecutionHostName() {
+        return executionHostName;
+    }
+
+    public void setExecutionHostName(String executionHostName) {
+        this.executionHostName = executionHostName;
+    }
+
+    public int getNumberOfExecutionLeft() {
+        return numberOfExecutionLeft;
+    }
+
+    public void setNumberOfExecutionLeft(int numberOfExecutionLeft) {
+        this.numberOfExecutionLeft = numberOfExecutionLeft;
+    }
+
+    public int getNumberOfExecutionOnFailureLeft() {
+        return numberOfExecutionOnFailureLeft;
+    }
+
+    public void setNumberOfExecutionOnFailureLeft(int numberOfExecutionOnFailureLeft) {
+        this.numberOfExecutionOnFailureLeft = numberOfExecutionOnFailureLeft;
+    }
+
+    public int getMaxNumberOfExecution() {
+        return maxNumberOfExecution;
+    }
+
+    public void setMaxNumberOfExecution(int maxNumberOfExecution) {
+        this.maxNumberOfExecution = maxNumberOfExecution;
+    }
+
+    public String getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(String taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
+    public int getMaxNumberOfExecutionOnFailure() {
+        return maxNumberOfExecutionOnFailure;
+    }
+
+    public void setMaxNumberOfExecutionOnFailure(int maxNumberOfExecutionOnFailure) {
+        this.maxNumberOfExecutionOnFailure = maxNumberOfExecutionOnFailure;
     }
 }

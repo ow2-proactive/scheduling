@@ -41,34 +41,35 @@ public class NotEmptyParserValidatorTest {
     @Test
     public void testNotEmptyParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "my string foo";
-        Assert.assertEquals(value, new NotEmptyParserValidator(ModelType.NOT_EMPTY.name()).parseAndValidate(value));
+        Assert.assertEquals(value,
+                            new NotEmptyParserValidator(ModelType.NOT_EMPTY_STRING.name()).parseAndValidate(value));
     }
 
     @Test(expected = ValidationException.class)
     public void testNotEmptyParserValidatorDisallowEmptyString()
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
-        new NotEmptyParserValidator(ModelType.NOT_EMPTY.name()).parseAndValidate(value);
+        new NotEmptyParserValidator(ModelType.NOT_EMPTY_STRING.name()).parseAndValidate(value);
     }
 
     @Test(expected = ValidationException.class)
     public void testNotEmptyParserValidatorDisallowBlankString()
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = " ";
-        new NotEmptyParserValidator(ModelType.NOT_EMPTY.name()).parseAndValidate(value);
+        new NotEmptyParserValidator(ModelType.NOT_EMPTY_STRING.name()).parseAndValidate(value);
     }
 
     @Test
     public void testNotEmptyModelCaseInsensitive()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        String testModel = "NoT_EmPtY";
+        String testModel = "NoT_EmPtY_StRiNg";
         String value = "my string foo";
         Assert.assertEquals(value, new NotEmptyParserValidator(testModel).parseAndValidate(value));
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testNotEmptyInvalidModel() throws ModelSyntaxException, ValidationException, ConversionException {
-        String testModel = "NOT-EMPTY";
+        String testModel = "NOT-EMPTY-STRING";
         String value = "my string foo";
         new NotEmptyParserValidator(testModel).parseAndValidate(value);
     }

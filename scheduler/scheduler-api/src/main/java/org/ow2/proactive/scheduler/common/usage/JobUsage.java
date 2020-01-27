@@ -53,14 +53,24 @@ public class JobUsage implements Serializable {
 
     private final long jobDuration;
 
-    private List<TaskUsage> taskUsages = new ArrayList<TaskUsage>();
+    private final List<TaskUsage> taskUsages = new ArrayList<>();
 
-    public JobUsage(String owner, String project, String jobId, String jobName, long jobDuration) {
+    private final String status;
+
+    private final long submittedTime;
+
+    private final Long parentId;
+
+    public JobUsage(String owner, String project, String jobId, String jobName, long jobDuration, String status,
+            long submittedTime, Long parentId) {
         this.owner = owner;
         this.project = project;
         this.jobId = jobId;
         this.jobName = jobName;
         this.jobDuration = jobDuration;
+        this.status = status;
+        this.submittedTime = submittedTime;
+        this.parentId = parentId;
     }
 
     public void add(TaskUsage taskUsage) {
@@ -89,5 +99,17 @@ public class JobUsage implements Serializable {
 
     public List<TaskUsage> getTaskUsages() {
         return taskUsages;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public long getSubmittedTime() {
+        return submittedTime;
+    }
+
+    public Long getParentId() {
+        return parentId;
     }
 }
