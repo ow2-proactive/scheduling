@@ -960,10 +960,6 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         nsStub.internalEmitDeployingNodeEvent(event);
     }
 
-    public void putAdditionalInfo(String key, String value) {
-        this.nodeSource.putAdditionalInfo(key, value);
-    }
-
     private void timeout(String pnURL, long timeout) {
         if (this.declareDeployingNodeLost(pnURL, "Timeout occurred after " + timeout + " ms.")) {
             this.notifyDeployingNodeLost(pnURL);

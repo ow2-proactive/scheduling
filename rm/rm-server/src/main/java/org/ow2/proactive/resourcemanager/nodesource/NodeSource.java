@@ -57,6 +57,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -89,26 +90,6 @@ import com.google.common.annotations.VisibleForTesting;
  */
 @ActiveObject
 public class NodeSource implements InitActive, RunActive {
-
-    private HashMap<String, String> additionalInformations = null;
-
-    public HashMap<String, String> getAdditionalInformations() {
-        return additionalInformations;
-    }
-
-    public void putAdditionalInfo(String key, String value) {
-        String valueToUpdate = this.additionalInformations.get(key);
-        if (valueToUpdate == null || (valueToUpdate != null && !valueToUpdate.equals(value))) {
-            this.additionalInformations.put(key, value);
-            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_UPDATED,
-                                                                  this.administrator.getName(),
-                                                                  this.name,
-                                                                  this.getDescription(),
-                                                                  this.additionalInformations,
-                                                                  this.administrator.getName(),
-                                                                  this.getStatus().toString()));
-        }
-    }
 
     private static Logger logger = Logger.getLogger(NodeSource.class);
 
@@ -183,6 +164,18 @@ public class NodeSource implements InitActive, RunActive {
 
     private NodeSourceDescriptor descriptor;
 
+    private HashMap<String, String> additionalInformation;
+
+    /**
+     * Database manager, used to persist the runtime variables.
+     */
+    private RMDBManager dbManager;
+
+    /**
+     * Information related to node source that are persisted in database
+     */
+    private NodeSourceData nodeSourceData;
+
     static {
         try {
             int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
@@ -214,7 +207,7 @@ public class NodeSource implements InitActive, RunActive {
         providerPermission = null;
         monitoring = null;
         descriptor = null;
-        additionalInformations = new HashMap<String, String>();
+        additionalInformation = new HashMap<>();
     }
 
     /**
@@ -254,7 +247,8 @@ public class NodeSource implements InitActive, RunActive {
 
         this.descriptor = nodeSourceDescriptor;
 
-        this.additionalInformations = new HashMap<String, String>();
+        this.additionalInformation = Optional.ofNullable(nodeSourceDescriptor.getAdditionalInformation())
+                                             .orElse(new HashMap<>());
     }
 
     /**
@@ -575,6 +569,63 @@ public class NodeSource implements InitActive, RunActive {
     public void setStatus(NodeSourceStatus status) {
         this.getDescriptor().setStatus(status);
         this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
+    }
+
+    public HashMap<String, String> getAdditionalInformation() {
+        return additionalInformation;
+    }
+
+    public void putAndPersistAdditionalInformation(String key, String value) {
+        String valueToUpdate = this.additionalInformation.get(key);
+        if (valueToUpdate == null || (valueToUpdate != null && !valueToUpdate.equals(value))) {
+
+            // Put additional information and make it visible from the rm portal by triggering an event
+            this.additionalInformation.put(key, value);
+            this.descriptor.getAdditionalInformation().put(key, value);
+            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_UPDATED,
+                                                                  this.administrator.getName(),
+                                                                  this.name,
+                                                                  this.getDescription(),
+                                                                  this.additionalInformation,
+                                                                  this.administrator.getName(),
+                                                                  this.getStatus().toString()));
+            // Persist additional information
+            persistAdditionalInformation();
+        }
+    }
+
+    private void setRmDbManager(RMDBManager dbManager) {
+        this.dbManager = dbManager;
+    }
+
+    private void updateNodeSourceDataFromDB() {
+        if (this.dbManager == null) {
+            setRmDbManager(RMDBManager.getInstance());
+        }
+        if (this.nodeSourceData == null) {
+            this.nodeSourceData = this.dbManager.getNodeSource(this.name);
+        }
+        if (this.nodeSourceData == null) {
+            logger.warn("Node source " + this.name + " is unknown. Cannot persist infrastructure variables");
+        }
+    }
+
+    private void persistAdditionalInformation() {
+        updateNodeSourceDataFromDB();
+        this.nodeSourceData.setAdditionalInformation(this.additionalInformation);
+        this.dbManager.updateNodeSource(this.nodeSourceData);
+    }
+
+    public void recoverAdditionalInformation() {
+        updateNodeSourceDataFromDB();
+        this.additionalInformation = new HashMap<>(this.nodeSourceData.getAdditionalInformation());
+    }
+
+    public void removeAndPersistAdditionalInformation(String... keys) {
+        for (String key : keys) {
+            this.additionalInformation.remove(key);
+        }
+        persistAdditionalInformation();
     }
 
     public NodeSourceDescriptor updateDynamicParameters(List<Serializable> infrastructureParamsWithDynamicUpdated,
@@ -992,7 +1043,7 @@ public class NodeSource implements InitActive, RunActive {
     public RMNodeSourceEvent createNodeSourceEvent() {
         return new RMNodeSourceEvent(this.name,
                                      getDescription(),
-                                     this.additionalInformations,
+                                     this.additionalInformation,
                                      this.administrator.getName(),
                                      this.getStatus().toString());
     }
