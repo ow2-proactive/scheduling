@@ -26,10 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.ow2.proactive.resourcemanager.authentication.Client;
 
@@ -57,13 +54,13 @@ public class NodeSourceDescriptor implements Serializable {
 
     private NodeSourceStatus status;
 
-    private HashMap<String, String> additionalInformation;
+    private LinkedHashMap<String, String> additionalInformation;
 
     private Map<String, Serializable> lastRecoveredInfrastructureVariables;
 
     private NodeSourceDescriptor(String name, String infrastructureType, List<Serializable> infrastructureParameters,
             String policyType, List<Serializable> policyParameters, Client provider, boolean nodesRecoverable,
-            NodeSourceStatus status, HashMap<String, String> additionalInformation) {
+            NodeSourceStatus status, LinkedHashMap<String, String> additionalInformation) {
         this.name = name;
         this.infrastructureType = infrastructureType;
         this.infrastructureParameters = infrastructureParameters;
@@ -72,7 +69,7 @@ public class NodeSourceDescriptor implements Serializable {
         this.provider = provider;
         this.nodesRecoverable = nodesRecoverable;
         this.status = status;
-        this.additionalInformation = Optional.ofNullable(additionalInformation).orElse(new HashMap<>());
+        this.additionalInformation = Optional.ofNullable(additionalInformation).orElse(new LinkedHashMap<>());
     }
 
     public String getName() {
@@ -123,7 +120,7 @@ public class NodeSourceDescriptor implements Serializable {
         return this.status;
     }
 
-    public HashMap<String, String> getAdditionalInformation() {
+    public LinkedHashMap<String, String> getAdditionalInformation() {
         return this.additionalInformation;
     }
 
@@ -161,7 +158,7 @@ public class NodeSourceDescriptor implements Serializable {
 
         private NodeSourceStatus status;
 
-        private HashMap<String, String> additionalInformation;
+        private LinkedHashMap<String, String> additionalInformation;
 
         private Map<String, Serializable> lastRecoveredInfrastructureVariables;
 
@@ -205,7 +202,7 @@ public class NodeSourceDescriptor implements Serializable {
             return this;
         }
 
-        public Builder additionalInformation(HashMap<String, String> additionalInformation) {
+        public Builder additionalInformation(LinkedHashMap<String, String> additionalInformation) {
             this.additionalInformation = additionalInformation;
             return this;
         }

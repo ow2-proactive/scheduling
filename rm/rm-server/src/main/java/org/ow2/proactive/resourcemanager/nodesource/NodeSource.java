@@ -164,7 +164,7 @@ public class NodeSource implements InitActive, RunActive {
 
     private NodeSourceDescriptor descriptor;
 
-    private HashMap<String, String> additionalInformation;
+    private LinkedHashMap<String, String> additionalInformation;
 
     /**
      * Database manager, used to persist the runtime variables.
@@ -207,7 +207,7 @@ public class NodeSource implements InitActive, RunActive {
         providerPermission = null;
         monitoring = null;
         descriptor = null;
-        additionalInformation = new HashMap<>();
+        additionalInformation = new LinkedHashMap<>();
     }
 
     /**
@@ -248,7 +248,7 @@ public class NodeSource implements InitActive, RunActive {
         this.descriptor = nodeSourceDescriptor;
 
         this.additionalInformation = Optional.ofNullable(nodeSourceDescriptor.getAdditionalInformation())
-                                             .orElse(new HashMap<>());
+                                             .orElse(new LinkedHashMap<>());
     }
 
     /**
@@ -571,7 +571,7 @@ public class NodeSource implements InitActive, RunActive {
         this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
     }
 
-    public HashMap<String, String> getAdditionalInformation() {
+    public LinkedHashMap<String, String> getAdditionalInformation() {
         return additionalInformation;
     }
 
@@ -594,38 +594,32 @@ public class NodeSource implements InitActive, RunActive {
         }
     }
 
+    public void removeAndPersistAdditionalInformation(String... keys) {
+        for (String key : keys) {
+            this.additionalInformation.remove(key);
+        }
+        persistAdditionalInformation();
+    }
+
     private void setRmDbManager(RMDBManager dbManager) {
         this.dbManager = dbManager;
     }
 
-    private void updateNodeSourceDataFromDB() {
+    private void persistAdditionalInformation() {
+        // Update nodeSourceData data from DB
         if (this.dbManager == null) {
             setRmDbManager(RMDBManager.getInstance());
         }
         if (this.nodeSourceData == null) {
             this.nodeSourceData = this.dbManager.getNodeSource(this.name);
         }
-        if (this.nodeSourceData == null) {
+
+        if (nodeSourceData != null) {
+            this.nodeSourceData.setAdditionalInformation(this.additionalInformation);
+            this.dbManager.updateNodeSource(this.nodeSourceData);
+        } else {
             logger.warn("Node source " + this.name + " is unknown. Cannot persist infrastructure variables");
         }
-    }
-
-    private void persistAdditionalInformation() {
-        updateNodeSourceDataFromDB();
-        this.nodeSourceData.setAdditionalInformation(this.additionalInformation);
-        this.dbManager.updateNodeSource(this.nodeSourceData);
-    }
-
-    public void recoverAdditionalInformation() {
-        updateNodeSourceDataFromDB();
-        this.additionalInformation = new HashMap<>(this.nodeSourceData.getAdditionalInformation());
-    }
-
-    public void removeAndPersistAdditionalInformation(String... keys) {
-        for (String key : keys) {
-            this.additionalInformation.remove(key);
-        }
-        persistAdditionalInformation();
     }
 
     public NodeSourceDescriptor updateDynamicParameters(List<Serializable> infrastructureParamsWithDynamicUpdated,
