@@ -579,9 +579,14 @@ public class NodeSource implements InitActive, RunActive {
         String valueToUpdate = this.additionalInformation.get(key);
         if (valueToUpdate == null || (valueToUpdate != null && !valueToUpdate.equals(value))) {
 
-            // Put additional information and make it visible from the rm portal by triggering an event
+            // Put additional information
             this.additionalInformation.put(key, value);
             this.descriptor.getAdditionalInformation().put(key, value);
+
+            // Persist additional information
+            persistAdditionalInformation();
+
+            // Notify the rm portal that the node source changed
             this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_UPDATED,
                                                                   this.administrator.getName(),
                                                                   this.name,
@@ -589,8 +594,6 @@ public class NodeSource implements InitActive, RunActive {
                                                                   this.additionalInformation,
                                                                   this.administrator.getName(),
                                                                   this.getStatus().toString()));
-            // Persist additional information
-            persistAdditionalInformation();
         }
     }
 
@@ -601,14 +604,10 @@ public class NodeSource implements InitActive, RunActive {
         persistAdditionalInformation();
     }
 
-    private void setRmDbManager(RMDBManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
     private void persistAdditionalInformation() {
         // Update nodeSourceData data from DB
         if (this.dbManager == null) {
-            setRmDbManager(RMDBManager.getInstance());
+            this.dbManager = RMDBManager.getInstance();
         }
         if (this.nodeSourceData == null) {
             this.nodeSourceData = this.dbManager.getNodeSource(this.name);
