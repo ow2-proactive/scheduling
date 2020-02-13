@@ -67,6 +67,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.PAProperties;
 
 import com.google.common.base.Stopwatch;
@@ -328,6 +329,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
                                                                thirdPartyCredentials,
                                                                variables,
                                                                error);
+            try {
+                scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, scriptResult.getResult());
+            } catch (Throwable throwable) {
+                scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, throwable);
+            }
             ScriptResult postScriptResult = scriptHandler.handle(taskContext.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute post script: " +
@@ -341,9 +347,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
             PrintStream error, TaskResultImpl taskResult) {
         if (flowScript != null) {
             try {
-                scriptHandler.addBinding(FlowScript.resultVariable, taskResult.value());
+                scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, taskResult.value());
             } catch (Throwable throwable) {
-                scriptHandler.addBinding(FlowScript.resultVariable, throwable);
+                scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, throwable);
             }
 
             ScriptResult<FlowAction> flowScriptResult = scriptHandler.handle(flowScript, output, error);

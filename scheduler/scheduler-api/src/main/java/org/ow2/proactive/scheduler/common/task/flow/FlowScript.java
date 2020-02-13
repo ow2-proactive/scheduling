@@ -89,10 +89,6 @@ public class FlowScript extends Script<FlowAction> {
     /** Name of the 'Continuation' target task if this action is an 'If' */
     private String targetContinuation = null;
 
-    /** Name of the variable that will be set in the script's environment
-     * to contain the result of the Task executed along this script */
-    public static final String resultVariable = "result";
-
     /** Name of the boolean variable to set in the script to determine 
      * if a LOOP action is enabled or if the execution should continue */
     public static final String loopVariable = "loop";
