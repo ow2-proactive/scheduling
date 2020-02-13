@@ -27,12 +27,7 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
 import java.security.Permission;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -56,11 +51,13 @@ import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -167,6 +164,18 @@ public class NodeSource implements InitActive, RunActive {
 
     private NodeSourceDescriptor descriptor;
 
+    private LinkedHashMap<String, String> additionalInformation;
+
+    /**
+     * Database manager, used to persist the runtime variables.
+     */
+    private RMDBManager dbManager;
+
+    /**
+     * Information related to node source that are persisted in database
+     */
+    private NodeSourceData nodeSourceData;
+
     static {
         try {
             int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
@@ -198,6 +207,7 @@ public class NodeSource implements InitActive, RunActive {
         providerPermission = null;
         monitoring = null;
         descriptor = null;
+        additionalInformation = new LinkedHashMap<>();
     }
 
     /**
@@ -236,6 +246,9 @@ public class NodeSource implements InitActive, RunActive {
         this.nodeUserAccessType = this.policy.getUserAccessType();
 
         this.descriptor = nodeSourceDescriptor;
+
+        this.additionalInformation = Optional.ofNullable(nodeSourceDescriptor.getAdditionalInformation())
+                                             .orElse(new LinkedHashMap<>());
     }
 
     /**
@@ -556,6 +569,56 @@ public class NodeSource implements InitActive, RunActive {
     public void setStatus(NodeSourceStatus status) {
         this.getDescriptor().setStatus(status);
         this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
+    }
+
+    public LinkedHashMap<String, String> getAdditionalInformation() {
+        return additionalInformation;
+    }
+
+    public void putAndPersistAdditionalInformation(String key, String value) {
+        String valueToUpdate = this.additionalInformation.get(key);
+        if (valueToUpdate == null || (valueToUpdate != null && !valueToUpdate.equals(value))) {
+
+            // Put additional information
+            this.additionalInformation.put(key, value);
+            this.descriptor.getAdditionalInformation().put(key, value);
+
+            // Persist additional information
+            persistAdditionalInformation();
+
+            // Notify the rm portal that the node source changed
+            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_UPDATED,
+                                                                  this.administrator.getName(),
+                                                                  this.name,
+                                                                  this.getDescription(),
+                                                                  this.additionalInformation,
+                                                                  this.administrator.getName(),
+                                                                  this.getStatus().toString()));
+        }
+    }
+
+    public void removeAndPersistAdditionalInformation(String... keys) {
+        for (String key : keys) {
+            this.additionalInformation.remove(key);
+        }
+        persistAdditionalInformation();
+    }
+
+    private void persistAdditionalInformation() {
+        // Update nodeSourceData data from DB
+        if (this.dbManager == null) {
+            this.dbManager = RMDBManager.getInstance();
+        }
+        if (this.nodeSourceData == null) {
+            this.nodeSourceData = this.dbManager.getNodeSource(this.name);
+        }
+
+        if (nodeSourceData != null) {
+            this.nodeSourceData.setAdditionalInformation(this.additionalInformation);
+            this.dbManager.updateNodeSource(this.nodeSourceData);
+        } else {
+            logger.warn("Node source " + this.name + " is unknown. Cannot persist infrastructure variables");
+        }
     }
 
     public NodeSourceDescriptor updateDynamicParameters(List<Serializable> infrastructureParamsWithDynamicUpdated,
@@ -973,6 +1036,7 @@ public class NodeSource implements InitActive, RunActive {
     public RMNodeSourceEvent createNodeSourceEvent() {
         return new RMNodeSourceEvent(this.name,
                                      getDescription(),
+                                     this.additionalInformation,
                                      this.administrator.getName(),
                                      this.getStatus().toString());
     }

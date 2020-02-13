@@ -1388,7 +1388,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                   serializablePolicyParams,
                                   this.caller,
                                   nodesRecoverable,
-                                  NodeSourceStatus.NODES_UNDEPLOYED);
+                                  NodeSourceStatus.NODES_UNDEPLOYED,
+                                  null);
     }
 
     private List<Serializable> getSerializableParamsOrFail(Object[] parameters) {
@@ -1674,6 +1675,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                             this.caller.getName(),
                                                             nodeSourceName,
                                                             nodeSourceToRemove.getDescription(),
+                                                            nodeSourceToRemove.getAdditionalInformation(),
                                                             nodeSourceToRemove.getAdministrator().getName(),
                                                             NodeSourceStatus.NODES_UNDEPLOYED.toString()));
 
@@ -1746,6 +1748,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               this.caller.getName(),
                                                               descriptor.getName(),
                                                               nodeSource.getDescription(),
+                                                              nodeSource.getAdditionalInformation(),
                                                               descriptor.getProvider().getName(),
                                                               nodeSource.getStatus().toString()));
     }
@@ -2128,6 +2131,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                        nodeSourceAdministratorName,
                                                                        nodeSourceName,
                                                                        nodeSource.getDescription(),
+                                                                       nodeSource.getAdditionalInformation(),
                                                                        nodeSourceAdministratorName,
                                                                        nodeSourceStatus.toString());
 
@@ -2364,6 +2368,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                   this.caller.getName(),
                                                                   nodeSourceToRemove.getName(),
                                                                   nodeSourceToRemove.getDescription(),
+                                                                  nodeSourceToRemove.getAdditionalInformation(),
                                                                   nodeSourceToRemove.getAdministrator().getName(),
                                                                   nodeSourceToRemove.getStatus().toString()));
         }
@@ -2385,6 +2390,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                             this.caller.getName(),
                                                             nodeSourceName,
                                                             nodeSourceToRemove.getDescription(),
+                                                            nodeSourceToRemove.getAdditionalInformation(),
                                                             nodeSourceToRemove.getAdministrator().getName(),
                                                             status.toString()));
 
