@@ -135,6 +135,15 @@ public class SchedulerConstants {
     public static final String RESULT_METADATA_VARIABLE = "resultMetadata";
 
     /**
+     * Specific metadata values
+     */
+    public static final String METADATA_CONTENT_TYPE = "content.type";
+
+    public static final String METADATA_FILE_NAME = "file.name";
+
+    public static final String METADATA_FILE_EXTENSION = "file.extension";
+
+    /**
      * The variable name to access the user's third party credentials.
      */
     public static final String CREDENTIALS_VARIABLE = "credentials";

@@ -49,6 +49,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 
@@ -87,10 +88,20 @@ public class ForkedTaskVariablesManager implements Serializable {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
         scriptHandler.addBinding(SchedulerConstants.RESULT_MAP_BINDING_NAME, resultMap);
-        scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME,
-                                 taskContext.getInitializer().getGenericInformation());
+        ImmutableMap<String, String> genericInformation = taskContext.getInitializer().getGenericInformation();
+        scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, genericInformation);
 
         scriptHandler.addBinding(SchedulerConstants.RESULTS_VARIABLE, tasksResults(taskContext));
+
+        addResultMetadataFromGenericInformation(genericInformation,
+                                                resultMetadata,
+                                                SchedulerConstants.METADATA_CONTENT_TYPE);
+        addResultMetadataFromGenericInformation(genericInformation,
+                                                resultMetadata,
+                                                SchedulerConstants.METADATA_FILE_EXTENSION);
+        addResultMetadataFromGenericInformation(genericInformation,
+                                                resultMetadata,
+                                                SchedulerConstants.METADATA_FILE_NAME);
 
         scriptHandler.addBinding(SchedulerConstants.RESULT_METADATA_VARIABLE, resultMetadata);
 
@@ -135,6 +146,13 @@ public class ForkedTaskVariablesManager implements Serializable {
                                                                              taskContext.getProgressFilePath()),
                                                       outputSink,
                                                       errorSink));
+    }
+
+    private void addResultMetadataFromGenericInformation(ImmutableMap<String, String> genericInformation,
+            Map<String, String> resultMetadata, String key) {
+        if (genericInformation != null && resultMetadata != null && genericInformation.containsKey(key)) {
+            resultMetadata.put(key, genericInformation.get(key));
+        }
     }
 
     private String convertToLinuxIfNeeded(boolean isDockerWindows2Linux, String uri) {
