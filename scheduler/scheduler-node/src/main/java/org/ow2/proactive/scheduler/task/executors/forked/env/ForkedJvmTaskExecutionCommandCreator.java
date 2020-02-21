@@ -181,7 +181,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     }
 
     private PAPropertyString createNodeSourceProperty() {
-        PAPropertyString nodeSourceNameProperty = new PAPropertyString("proactive.node.nodesource", false, "local");
+        PAPropertyString nodeSourceNameProperty = new PAPropertyString("proactive.node.nodesource", false, "Default");
         nodeSourceNameProperty.setValue(System.getProperty("proactive.node.nodesource"));
         return nodeSourceNameProperty;
     }
