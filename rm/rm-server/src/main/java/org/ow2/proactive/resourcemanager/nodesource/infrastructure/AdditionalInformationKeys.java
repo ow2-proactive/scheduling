@@ -27,11 +27,13 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 public final class AdditionalInformationKeys {
 
-    public static final String AZURE_BILLING_RESOURCE_USAGE_REPORTED_START_DATE_TIME_KEY = "Azure Billing|Resource Usage reported start time";
+    public static final String CLOUD_COST_RESOURCE_USAGE_REPORTED_AT_KEY = "Cloud Cost|Resource Usage reported at";
 
-    public static final String AZURE_BILLING_RESOURCE_USAGE_REPORTED_END_DATE_TIME_KEY = "Azure Billing|Resource Usage reported end time";
+    public static final String CLOUD_COST_RESOURCE_USAGE_REPORTED_UNTIL_KEY = "Cloud Cost|Resource Usage reported until";
 
-    public static final String AZURE_BILLING_VM_GLOBAL_COST = "Azure Billing|VM global cost";
+    public static final String CLOUD_COST_GLOBAL_COST = "Cloud Cost|Global Cost (vms, other resources)";
 
-    public static final String AZURE_BILLING_CURRENCY = "Azure Billing|Currency";
+    public static final String CLOUD_COST_CURRENCY = "Cloud Cost|Currency";
+
+    public static final String CLOUD_COST_BUDGET_PERCENTAGE = "Cloud Cost|Budget %";
 }
