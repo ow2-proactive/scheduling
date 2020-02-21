@@ -207,6 +207,12 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         }
     }
 
+    /**
+     * The following method adds the received PA properties to JVM arguments.
+     * @param jvmArguments Source JVM arguments.
+     * @param propertiesToForward PA properties that has to be forwarded to the forked JVM.
+     * @return
+     */
     private void forwardOtherProperties(List<String> jvmArguments, PAProperty... propertiesToForward) {
         for (PAProperty property : propertiesToForward) {
             if (property.isSet() && !propertyDefinedByScript(jvmArguments, property)) {
