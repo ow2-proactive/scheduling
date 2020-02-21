@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperty;
+import org.objectweb.proactive.core.config.PAPropertyString;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
@@ -152,6 +153,8 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                                    CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP,
                                    CentralPAPropertyRepository.PA_NET_USE_IP_ADDRESS);
 
+        forwardOtherProperties(jvmArguments, createNodeSourceProperty());
+
         List<String> prefixes = javaPrefixCommandExtractor.extractJavaPrefixCommandToCommandListFromScriptResult(forkEnvironmentScriptResult);
         if (prefixes.isEmpty() && forkEnvironment != null) {
             prefixes.addAll(forkEnvironment.getPreJavaCommand());
@@ -177,6 +180,12 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         return javaCommand;
     }
 
+    private PAPropertyString createNodeSourceProperty() {
+        PAPropertyString nodeSourceNameProperty = new PAPropertyString("proactive.node.nodesource", false, "local");
+        nodeSourceNameProperty.setValue(System.getProperty("proactive.node.nodesource"));
+        return nodeSourceNameProperty;
+    }
+
     private String convertToLinuxPathIfNeeded(boolean isDockerWindowsToLinux, String serializedContextAbsolutePath) {
         return isDockerWindowsToLinux ? ForkEnvironment.convertToLinuxPath(serializedContextAbsolutePath)
                                       : serializedContextAbsolutePath;
@@ -191,6 +200,14 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     }
 
     private void forwardProActiveProperties(List<String> jvmArguments, PAProperty... propertiesToForward) {
+        for (PAProperty property : propertiesToForward) {
+            if (property.isSet() && !propertyDefinedByScript(jvmArguments, property)) {
+                jvmArguments.add(property.getCmdLine() + property.getValueAsString());
+            }
+        }
+    }
+
+    private void forwardOtherProperties(List<String> jvmArguments, PAProperty... propertiesToForward) {
         for (PAProperty property : propertiesToForward) {
             if (property.isSet() && !propertyDefinedByScript(jvmArguments, property)) {
                 jvmArguments.add(property.getCmdLine() + property.getValueAsString());
