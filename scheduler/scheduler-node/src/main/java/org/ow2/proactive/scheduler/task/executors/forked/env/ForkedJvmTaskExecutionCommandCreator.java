@@ -182,7 +182,12 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
 
     private PAPropertyString createNodeSourceProperty() {
         PAPropertyString nodeSourceNameProperty = new PAPropertyString("proactive.node.nodesource", false, "Default");
-        nodeSourceNameProperty.setValue(System.getProperty("proactive.node.nodesource"));
+        try {
+            nodeSourceNameProperty.setValue(System.getProperty("proactive.node.nodesource"));
+        } catch (NullPointerException npe) {
+            // Ignore malformed lines.
+            logger.warn("System property proactive.node.nodesource can't be found.");
+        }
         return nodeSourceNameProperty;
     }
 
