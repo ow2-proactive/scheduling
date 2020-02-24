@@ -35,5 +35,7 @@ public final class AdditionalInformationKeys {
 
     public static final String CLOUD_COST_CURRENCY = "Cloud Cost|Currency";
 
-    public static final String CLOUD_COST_BUDGET_PERCENTAGE = "Cloud Cost|Budget %";
+    public static final String CLOUD_COST_MAX_BUDGET = "Cloud Cost|Max Budget";
+
+    public static final String CLOUD_COST_COST_IN_MAX_BUDGET_PERCENTAGE = "Cloud Cost|Global Cost in Max Budget %";
 }
