@@ -131,7 +131,7 @@ public class TaskLauncher implements InitActive {
     @Override
     public void initActivity(Body body) {
         this.taskId = initializer.getTaskId();
-        this.taskLogger = new TaskLogger(taskId, getHostname());
+        this.taskLogger = new TaskLogger(taskId, getHostName());
         if (Boolean.valueOf(System.getProperty(PROGRESS_FILE_READER_OLD))) {
             this.progressFileReader = new ProgressFileReader();
         } else {
@@ -204,7 +204,7 @@ public class TaskLauncher implements InitActive {
                                                              dataspaces.getUserURI(),
                                                              dataspaces.getGlobalURI()),
                                       progressFileReader.getProgressFile().toString(),
-                                      new NodeInfo(getHostname(), getNodeUrl(), getNodeName()),
+                                      new NodeInfo(getHostName(), getNodeUrl(), getNodeName(), getNodeSourceName()),
                                       decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
@@ -502,7 +502,7 @@ public class TaskLauncher implements InitActive {
         return progressFileReader.getProgress();
     }
 
-    private static String getHostname() {
+    private static String getHostName() {
         return ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
@@ -520,6 +520,15 @@ public class TaskLauncher implements InitActive {
             return PAActiveObject.getNode().getNodeInformation().getName();
         } catch (Exception e) {
             logger.debug("Failed to acquire task launcher node information", e);
+            return null;
+        }
+    }
+
+    private String getNodeSourceName() {
+        try {
+            return System.getProperty("proactive.node.nodesource");
+        } catch (Exception e) {
+            logger.debug("Failed to acquire task launcher node source information", e);
             return null;
         }
     }

@@ -253,7 +253,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null),
+                                                  new NodeInfo(null, null, null, null),
                                                   decrypter);
 
         // variable should belong to the expected class
@@ -283,7 +283,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null),
+                                                  new NodeInfo(null, null, null, null),
                                                   decrypter);
 
         // variable should belong to the expected class
@@ -319,7 +319,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(testSetString, null, null, null, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
@@ -344,7 +344,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, testSetString, null, null, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
@@ -369,7 +369,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, testSetString, null, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
@@ -394,7 +394,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, testSetString, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
@@ -419,7 +419,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, testSetString, null),
                                                   null,
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
@@ -444,7 +444,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, testSetString),
                                                   null,
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
@@ -470,7 +470,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null),
+                                                  new NodeInfo(null, null, null, null),
                                                   decrypter);
 
         ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
@@ -531,7 +531,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
 
         ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
         forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
@@ -615,7 +615,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   previousTasksResults,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   "dummy",
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
         return taskContext;
     }
 

@@ -100,7 +100,7 @@ public class TaskContext implements Serializable {
             otherNodesURLs = new ArrayList<>(nbNodes);
             nodesHosts = new ArrayList<>(nbNodes + 1);
 
-            nodesHosts.add(nodeInfo.getCurrentNodeHostname());
+            nodesHosts.add(nodeInfo.getCurrentNodeHostName());
             for (Node node : executableContainer.getNodes()) {
                 otherNodesURLs.add(node.getNodeInformation().getURL());
                 nodesHosts.add(node.getNodeInformation().getVMInformation().getHostName());
@@ -184,7 +184,11 @@ public class TaskContext implements Serializable {
         return nodeInfo.getCurrentNodeName();
     }
 
-    public String getNodeHostname() {
-        return nodeInfo.getCurrentNodeHostname();
+    public String getNodeHostName() {
+        return nodeInfo.getCurrentNodeHostName();
+    }
+
+    public String getNodeSourceName() {
+        return nodeInfo.getCurrentNodeSourceName();
     }
 }

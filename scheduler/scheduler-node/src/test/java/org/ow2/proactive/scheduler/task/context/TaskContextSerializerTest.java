@@ -79,7 +79,7 @@ public class TaskContextSerializerTest extends ProActiveTestClean {
                                null,
                                new NodeDataSpacesURIs(null, null, null, null, null, null),
                                null,
-                               new NodeInfo(null, null, null));
+                               new NodeInfo(null, null, null, null));
     }
 
 }
