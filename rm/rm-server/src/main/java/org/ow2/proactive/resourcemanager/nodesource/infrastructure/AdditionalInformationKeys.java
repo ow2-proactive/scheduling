@@ -23,41 +23,19 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.task.context;
+package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.Serializable;
+public final class AdditionalInformationKeys {
 
+    public static final String CLOUD_COST_RESOURCE_USAGE_REPORTED_AT_KEY = "Cloud Cost|Resource Usage reported at";
 
-public class NodeInfo implements Serializable {
-    private final String currentNodeHostName;
+    public static final String CLOUD_COST_RESOURCE_USAGE_REPORTED_UNTIL_KEY = "Cloud Cost|Resource Usage reported until";
 
-    private final String currentNodeUrl;
+    public static final String CLOUD_COST_GLOBAL_COST = "Cloud Cost|Global Cost (vms, other resources)";
 
-    private final String currentNodeName;
+    public static final String CLOUD_COST_CURRENCY = "Cloud Cost|Currency";
 
-    private final String currentNodeSourceName;
+    public static final String CLOUD_COST_MAX_BUDGET = "Cloud Cost|Max Budget";
 
-    public NodeInfo(String currentNodeHostName, String currentNodeUrl, String currentNodeName,
-            String currentNodeSourceName) {
-        this.currentNodeHostName = currentNodeHostName;
-        this.currentNodeUrl = currentNodeUrl;
-        this.currentNodeName = currentNodeName;
-        this.currentNodeSourceName = currentNodeSourceName;
-    }
-
-    public String getCurrentNodeHostName() {
-        return currentNodeHostName;
-    }
-
-    public String getCurrentNodeUrl() {
-        return currentNodeUrl;
-    }
-
-    public String getCurrentNodeName() {
-        return currentNodeName;
-    }
-
-    public String getCurrentNodeSourceName() {
-        return currentNodeSourceName;
-    }
+    public static final String CLOUD_COST_COST_IN_MAX_BUDGET_PERCENTAGE = "Cloud Cost|Global Cost in Max Budget %";
 }

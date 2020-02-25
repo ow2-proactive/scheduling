@@ -30,15 +30,7 @@ import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManage
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -312,7 +304,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         if (pn != null) {
             String url = pn.getNodeURL();
             RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_REMOVED, pn.getState(), pn.getProvider().getName());
-            emitEvent(event);
+            emitNodeEvent(event);
             logger.trace("DeployingNode " + url + " removed from IM");
             // one notifies listeners about the deploying node removal
             // if the node is not lost
@@ -426,7 +418,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_REMOVED,
                                                        pn.getState(),
                                                        pn.getProvider().getName());
-                emitEvent(event);
+                emitNodeEvent(event);
                 this.notifyAcquiredNode(node);
                 // if everything went well with the new node, caching it
                 addAcquiredNodeNameWithLockAndPersist(node.getNodeInformation().getName());
@@ -802,7 +794,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_ADDED,
                                                           null,
                                                           deployingNode.getProvider().getName());
-        emitEvent(event);
+        emitNodeEvent(event);
         this.sched(new TimerTask() {
             @Override
             public void run() {
@@ -831,7 +823,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                    previousState,
                                                    pn.getProvider().getName());
-            emitEvent(event);
+            emitNodeEvent(event);
             logger.trace("Deploying node " + toUpdateURL + " updated in IM");
             return true;
         } else {
@@ -878,7 +870,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                               previousState,
                                                               deployingNode.getProvider().getName());
-            emitEvent(event);
+            emitNodeEvent(event);
 
             if (logger.isTraceEnabled()) {
                 logger.trace(RMDeployingNode.class.getSimpleName() + " " + toUpdateURL + " declared lost in IM");
@@ -961,9 +953,9 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     // **********************************************************************************************//
 
     /**
-     * To emit an event and register it in the database
+     * To emit a node event and register it in the database
      */
-    private void emitEvent(final RMNodeEvent event) {
+    private void emitNodeEvent(final RMNodeEvent event) {
         NodeSource nsStub = this.nodeSource.getStub();
         nsStub.internalEmitDeployingNodeEvent(event);
     }

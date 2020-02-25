@@ -26,9 +26,7 @@
 package org.ow2.proactive.resourcemanager.db;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -69,6 +67,8 @@ public class NodeSourceData implements Serializable {
 
     private NodeSourceStatus status;
 
+    private LinkedHashMap<String, String> additionalInformation = null;
+
     /**
      * Map of infrastructure variables
      * key:name of the variable, value:value of the variable
@@ -84,8 +84,7 @@ public class NodeSourceData implements Serializable {
 
     public NodeSourceData(String nodeSourceName, String infrastructureType, List<Serializable> infrastructureParameters,
             String policyType, List<Serializable> policyParameters, Client provider, boolean nodesRecoverable,
-            NodeSourceStatus status) {
-
+            NodeSourceStatus status, LinkedHashMap<String, String> additionalInformation) {
         this.name = nodeSourceName;
         this.infrastructureType = infrastructureType;
         this.infrastructureParameters = infrastructureParameters;
@@ -94,6 +93,7 @@ public class NodeSourceData implements Serializable {
         this.provider = provider;
         this.nodesRecoverable = nodesRecoverable;
         this.status = status;
+        this.additionalInformation = Optional.ofNullable(additionalInformation).orElse(new LinkedHashMap<>());
         this.infrastructureVariables = new HashMap<>();
     }
 
@@ -105,7 +105,8 @@ public class NodeSourceData implements Serializable {
                                                            descriptor.getSerializablePolicyParameters(),
                                                            descriptor.getProvider(),
                                                            descriptor.nodesRecoverable(),
-                                                           descriptor.getStatus());
+                                                           descriptor.getStatus(),
+                                                           descriptor.getAdditionalInformation());
         nodeSourceData.setInfrastructureVariables(descriptor.getLastRecoveredInfrastructureVariables());
         return nodeSourceData;
     }
@@ -189,6 +190,16 @@ public class NodeSourceData implements Serializable {
 
     @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public LinkedHashMap<String, String> getAdditionalInformation() {
+        return additionalInformation;
+    }
+
+    public void setAdditionalInformation(LinkedHashMap<String, String> additionalInformation) {
+        this.additionalInformation = new LinkedHashMap<>(additionalInformation);
+    }
+
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, Serializable> getInfrastructureVariables() {
         return infrastructureVariables;
     }
@@ -206,6 +217,7 @@ public class NodeSourceData implements Serializable {
                                                  .provider(this.provider)
                                                  .nodesRecoverable(this.nodesRecoverable)
                                                  .status(this.status)
+                                                 .additionalInformation(this.additionalInformation)
                                                  .lastRecoveredInfrastructureVariables(this.infrastructureVariables)
                                                  .build();
     }

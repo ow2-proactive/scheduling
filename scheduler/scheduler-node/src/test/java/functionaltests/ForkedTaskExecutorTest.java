@@ -101,7 +101,7 @@ public class ForkedTaskExecutorTest {
                                                                                                   "",
                                                                                                   ""),
                                                                            "",
-                                                                           new NodeInfo("", "", "")),
+                                                                           new NodeInfo("", "", "", "")),
                                                            taskOutput.outputStream,
                                                            taskOutput.error);
 
@@ -123,7 +123,7 @@ public class ForkedTaskExecutorTest {
                                                                      null,
                                                                      new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                                      "",
-                                                                     new NodeInfo("", "", "")),
+                                                                     new NodeInfo("", "", "", "")),
                                                      taskOutput.outputStream,
                                                      taskOutput.error);
 
@@ -148,7 +148,7 @@ public class ForkedTaskExecutorTest {
                                                                      null,
                                                                      new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                                      "",
-                                                                     new NodeInfo("", "", "")),
+                                                                     new NodeInfo("", "", "", "")),
                                                      taskOutput.outputStream,
                                                      taskOutput.error);
 
@@ -176,7 +176,7 @@ public class ForkedTaskExecutorTest {
                                                   null,
                                                   new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                   "",
-                                                  new NodeInfo("", "", ""),
+                                                  new NodeInfo("", "", "", ""),
                                                   decrypter);
 
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
@@ -210,7 +210,7 @@ public class ForkedTaskExecutorTest {
                                                                      null,
                                                                      new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                                      "",
-                                                                     new NodeInfo("", "", "")),
+                                                                     new NodeInfo("", "", "", "")),
                                                      taskOutput.outputStream,
                                                      taskOutput.error);
 
@@ -241,7 +241,7 @@ public class ForkedTaskExecutorTest {
                                              null,
                                              new NodeDataSpacesURIs("", "", "", "", "", ""),
                                              "",
-                                             new NodeInfo("", "", "")),
+                                             new NodeInfo("", "", "", "")),
                              taskOutput.outputStream,
                              taskOutput.error);
 
@@ -274,7 +274,7 @@ public class ForkedTaskExecutorTest {
                                              null,
                                              new NodeDataSpacesURIs("", "", "", "", "", ""),
                                              "",
-                                             new NodeInfo("", "", "")),
+                                             new NodeInfo("", "", "", "")),
                              taskOutput.outputStream,
                              taskOutput.error);
 
@@ -303,7 +303,7 @@ public class ForkedTaskExecutorTest {
                                                                          null,
                                                                          new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                                          "",
-                                                                         new NodeInfo("", "", "")),
+                                                                         new NodeInfo("", "", "", "")),
                                                          taskOutput.outputStream,
                                                          taskOutput.error);
 
