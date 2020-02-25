@@ -526,7 +526,7 @@ public class TaskLauncher implements InitActive {
 
     private String getNodeSourceName() {
         try {
-            return System.getProperty("proactive.node.nodesource");
+            return System.getProperty("proactive.node.nodesource", "Default");
         } catch (Exception e) {
             logger.debug("Failed to acquire task launcher node source information", e);
             return null;
