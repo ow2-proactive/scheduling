@@ -59,6 +59,12 @@ public interface JobInfo extends Serializable {
     String getJobOwner();
 
     /**
+     * Returns the project name associated with this job
+     * @return project name
+     */
+    String getProjectName();
+
+    /**
      * Returns the time at which the Job has finished.
      *
      * @return the time at which the Job has finished

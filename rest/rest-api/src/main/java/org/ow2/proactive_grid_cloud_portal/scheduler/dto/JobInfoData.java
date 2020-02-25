@@ -62,6 +62,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private String jobOwner;
 
+    private String projectName;
+
     private boolean toBeRemoved = false;
 
     private Map<String, String> genericInformation;
@@ -148,6 +150,14 @@ public class JobInfoData implements java.io.Serializable {
         this.jobOwner = jobOwner;
     }
 
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
     public JobIdData getJobId() {
         return jobId;
     }
@@ -228,8 +238,8 @@ public class JobInfoData implements java.io.Serializable {
                ", numberOfRunningTasks=" + numberOfRunningTasks + ", numberOfFinishedTasks=" + numberOfFinishedTasks +
                ", numberOfFailedTasks=" + numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks +
                ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
-               '\'' + ", toBeRemoved=" + toBeRemoved + ", genericInformation=" + genericInformation + ", variables=" +
-               variables + '}';
+               "', projectName='" + projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" +
+               genericInformation + ", variables=" + variables + '}';
     }
 
 }

@@ -1243,6 +1243,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         JobId newJobId = JobIdImpl.makeJobId(jobId);
         jobInfoImpl.setJobId(newJobId);
         jobInfoImpl.setJobOwner(jobInfoData.getJobOwner());
+        jobInfoImpl.setProjectName(jobInfoData.getProjectName());
         jobInfoImpl.setFinishedTime(jobInfoData.getFinishedTime());
         jobInfoImpl.setRemovedTime(jobInfoData.getRemovedTime());
         jobInfoImpl.setStartTime(jobInfoData.getStartTime());
