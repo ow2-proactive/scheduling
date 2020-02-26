@@ -62,6 +62,8 @@ public class SchedulerHsqldbStarterTest extends ProActiveTestClean {
         verify(hsqldbServerMock, times(3)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
 
         schedulerHsqldbStarter.configureCatalogs(hsqldbServerMock, "/scheduler/home/");
+
+        verify(hsqldbServerMock, times(6)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
     }
 
     @Test
