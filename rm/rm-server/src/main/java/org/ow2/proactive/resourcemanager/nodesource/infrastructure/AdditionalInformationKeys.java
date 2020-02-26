@@ -31,11 +31,11 @@ public final class AdditionalInformationKeys {
 
     public static final String CLOUD_COST_RESOURCE_USAGE_REPORTED_UNTIL_KEY = "Cloud Cost|Resource Usage reported until";
 
-    public static final String CLOUD_COST_GLOBAL_COST = "Cloud Cost|Global Cost (vms, other resources)";
+    public static final String CLOUD_COST_GLOBAL_COST_KEY = "Cloud Cost|Global Cost (vms, other resources)";
 
-    public static final String CLOUD_COST_CURRENCY = "Cloud Cost|Currency";
+    public static final String CLOUD_COST_CURRENCY_KEY = "Cloud Cost|Currency";
 
-    public static final String CLOUD_COST_MAX_BUDGET = "Cloud Cost|Max Budget";
+    public static final String CLOUD_COST_MAX_BUDGET_KEY = "Cloud Cost|Max Budget";
 
-    public static final String CLOUD_COST_COST_IN_MAX_BUDGET_PERCENTAGE = "Cloud Cost|Global Cost in Max Budget %";
+    public static final String CLOUD_COST_GLOBAL_COST_IN_MAX_BUDGET_PERCENTAGE_KEY = "Cloud Cost|Global Cost in Max Budget %";
 }
