@@ -25,6 +25,8 @@
  */
 package functionaltests.api;
 
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -46,15 +48,18 @@ import functionaltests.utils.SchedulerFunctionalTestNoRestart;
  */
 public class TestJobInstantGetTaskResult extends SchedulerFunctionalTestNoRestart {
 
+    private SubmitJob client;
+
     @Test
     public void testJobInstantGetTaskResult() throws Throwable {
         //create Scheduler client as an active object
-        SubmitJob client = (SubmitJob) PAActiveObject.newActive(SubmitJob.class.getName(), new Object[] {});
+        client = (SubmitJob) PAActiveObject.newActive(SubmitJob.class.getName(), new Object[] {});
         //begin to use the client : must be a futur result in order to start the scheduler at next step
         client.begin();
 
         //create job
         TaskFlowJob job = new TaskFlowJob();
+        job.setProjectName("My project");
 
         for (int i = 0; i < 50; i++) {
             JavaTask t = new JavaTask();
@@ -67,7 +72,15 @@ public class TestJobInstantGetTaskResult extends SchedulerFunctionalTestNoRestar
         client.setJobId(id);
 
         schedulerHelper.waitForEventJobRemoved(id);
-        PAActiveObject.terminateActiveObject(client, true);
+        String projectName = client.getProjectName();
+        Assert.assertEquals("My project", projectName);
+    }
+
+    @After
+    public void cleanup() {
+        if (client != null) {
+            PAActiveObject.terminateActiveObject(client, true);
+        }
     }
 
 }
