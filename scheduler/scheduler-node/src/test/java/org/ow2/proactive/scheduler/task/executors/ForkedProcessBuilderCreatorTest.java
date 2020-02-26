@@ -192,7 +192,7 @@ public class ForkedProcessBuilderCreatorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  new NodeInfo(null, null, null));
+                                                  new NodeInfo(null, null, null, null));
         return taskContext;
     }
 

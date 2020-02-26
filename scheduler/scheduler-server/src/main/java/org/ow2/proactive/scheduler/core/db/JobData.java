@@ -216,6 +216,7 @@ public class JobData implements Serializable {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
         jobInfo.setJobOwner(getOwner());
+        jobInfo.setProjectName(getProjectName());
         jobInfo.setStatus(getStatus());
         jobInfo.setTotalNumberOfTasks(getTotalNumberOfTasks());
         jobInfo.setNumberOfPendingTasks(getNumberOfPendingTasks());

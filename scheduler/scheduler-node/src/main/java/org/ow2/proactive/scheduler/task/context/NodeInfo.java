@@ -29,20 +29,24 @@ import java.io.Serializable;
 
 
 public class NodeInfo implements Serializable {
-    private final String currentNodeHostname;
+    private final String currentNodeHostName;
 
     private final String currentNodeUrl;
 
     private final String currentNodeName;
 
-    public NodeInfo(String currentNodeHostname, String currentNodeUrl, String currentNodeName) {
-        this.currentNodeHostname = currentNodeHostname;
+    private final String currentNodeSourceName;
+
+    public NodeInfo(String currentNodeHostName, String currentNodeUrl, String currentNodeName,
+            String currentNodeSourceName) {
+        this.currentNodeHostName = currentNodeHostName;
         this.currentNodeUrl = currentNodeUrl;
         this.currentNodeName = currentNodeName;
+        this.currentNodeSourceName = currentNodeSourceName;
     }
 
-    public String getCurrentNodeHostname() {
-        return currentNodeHostname;
+    public String getCurrentNodeHostName() {
+        return currentNodeHostName;
     }
 
     public String getCurrentNodeUrl() {
@@ -51,5 +55,9 @@ public class NodeInfo implements Serializable {
 
     public String getCurrentNodeName() {
         return currentNodeName;
+    }
+
+    public String getCurrentNodeSourceName() {
+        return currentNodeSourceName;
     }
 }

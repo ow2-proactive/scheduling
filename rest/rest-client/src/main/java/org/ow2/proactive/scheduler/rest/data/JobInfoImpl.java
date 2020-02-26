@@ -51,6 +51,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String jobOwner;
 
+    private String projectName;
+
     private int totalNumberOfTasks = 0;
 
     private int numberOfPendingTasks = 0;
@@ -102,6 +104,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public String getJobOwner() {
         return jobOwner;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
+    public String getProjectName() {
+        return projectName;
     }
 
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {
