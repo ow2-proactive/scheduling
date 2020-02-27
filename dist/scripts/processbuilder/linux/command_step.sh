@@ -58,6 +58,8 @@ shift;shift;shift;shift;
 # change umask settings to prevent file permission issues in RunAsMe mode
 umask 0000
 
+export XDG_RUNTIME_DIR=/run/user/$UID
+
 # check if the workdir is OK
 if [ -d "${workdir}" ]; then
   cd "$workdir"
