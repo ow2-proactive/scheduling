@@ -136,8 +136,8 @@ public interface RestDataspace {
             @QueryParam("excludes") List<String> excludes) throws NotConnectedRestException, PermissionRestException;
 
     /**
-     * Delete file(s) from the specified location in the <i>dataspace</i>. The
-     * format of the DELETE URI is:
+     * Delete file(s) from the specified location in the <i>dataspace</i>.
+     * The format of the DELETE URI is:
      * <p>
      * {@code http://<rest-server-path>/data/<dataspace>/<path-name>}
      * <p>
