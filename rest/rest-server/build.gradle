@@ -1,7 +1,7 @@
 apply plugin: 'miredot'
 
 miredot {
-    source = sourceSets.main.allJava
+    source = sourceSets.main.allJava.srcDirs(project(':rest:rest-api').sourceSets.main.allJava.srcDirs)
     destination = sourceSets.main.output
     output {
         formats {
