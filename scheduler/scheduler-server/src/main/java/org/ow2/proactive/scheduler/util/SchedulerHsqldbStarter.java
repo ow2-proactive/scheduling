@@ -50,6 +50,8 @@ public class SchedulerHsqldbStarter {
 
     private Path hibernateSchedulerConfiguration;
 
+    private Path hibernateNotificationServiceConfiguration;
+
     public SchedulerHsqldbStarter() throws IOException {
         this.hsqldbServer = createHsqldbServer();
         configureCatalogs(hsqldbServer, schedulerHome);
@@ -88,8 +90,14 @@ public class SchedulerHsqldbStarter {
                                                     "scheduler",
                                                     databaseFileName);
 
+        hibernateNotificationServiceConfiguration = Paths.get(schedulerHome,
+                                                              schedulerConfigurationFolderName,
+                                                              "notification-service",
+                                                              databaseFileName);
+
         server.addCatalog(schedulerDbPath, hibernateRmConfiguration);
         server.addCatalog(schedulerDbPath, hibernateSchedulerConfiguration);
+        server.addCatalog(schedulerDbPath, hibernateNotificationServiceConfiguration);
     }
 
     public boolean isServerModeRequired() throws IOException {
