@@ -45,49 +45,129 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestExce
 @Path("/common")
 @Produces(APPLICATION_JSON)
 public interface CommonRestInterface {
+
+    /**
+     * login to the server with username and password form.
+     *
+     * @param username
+     *            username
+     * @param password
+     *            password
+     * @return the session id associated to this new connection
+     * @throws LoginException if the authentication fails
+     * @throws SchedulerRestException if any other error occurs
+     */
     @POST
     @Path("login")
     String login(@FormParam("username") String username, @FormParam("password") String password)
-            throws KeyException, LoginException, SchedulerRestException;
+            throws LoginException, SchedulerRestException;
 
+    /**
+     * Login to the server using a multipart form.
+     *
+     * It can be used either by submitting:<ul>
+     *     <li>2 fields: 'username' and 'password'</li>
+     *     <li>a credential file with field name 'credential'</li>'
+     * </ul>
+     *
+     * @param multipart multipart form
+     * @return the session id associated to this new connection
+     * @throws LoginException if the authentication fails
+     * @throws KeyException if the credentials file cannot be decrypted
+     * @throws SchedulerRestException if any other error occurs
+     */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
     String loginWithCredential(@MultipartForm LoginForm multipart)
-            throws IOException, KeyException, LoginException, SchedulerRestException;
+            throws KeyException, LoginException, SchedulerRestException;
 
+    /**
+     * Terminates a session.
+     *
+     * @param sessionId id of the session to terminate
+     * @throws RestException if the server cannot be contacted
+     */
     @PUT
     @Path("logout")
     void logout(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
+    /**
+     * Tests whether the session is connected to the ProActive server.
+     *
+     * @param sessionId
+     *            the session to test
+     * @return true if the session is connected to the ProActive server, false otherwise.
+     */
     @GET
     @Path("connected")
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
 
+    /**
+     * Get the login string associated to a session.
+     *
+     * <br/> NOTE: <br/>
+     * In case the given sessionId doesn't have an associated login (session id expired, or invalid),
+     * this endpoint will return null
+     *
+     * @param sessionId id of a session
+     * @return the associated login value or an empty string
+     */
     @GET
     @Path("currentuser")
     String currentUser(@HeaderParam("sessionid") String sessionId);
 
+    /**
+     * Get a UserData object associated to a session.
+     *
+     * <br/> NOTE: <br/>
+     * In case the given sessionId doesn't have an associated login (session id expired, or invalid),
+     * this endpoint will return null
+     *
+     * @param sessionId id of a session
+     * @return a UserData object or null
+     */
     @GET
     @Path("currentuserdata")
     UserData currentUserData(@HeaderParam("sessionid") String sessionId);
 
+    /**
+     * Check multiple portals accesses.
+     *
+     * Test if a user has access to the portals specified.
+     *
+     * @param sessionId id of a session
+     * @param portals a list of portals access to test
+     * @throws RestException if an error occurs or the session is invalid
+     * @return a sublist of accessible portals
+     */
     @GET
     @Path("permissions/portals")
     List<String> portalsAccesses(@HeaderParam("sessionid") String sessionId,
             @QueryParam("portals") List<String> portals) throws RestException;
 
+    /**
+     * Check single portal access.
+     *
+     * Test if a user has access to the specified portal.
+     *
+     * @param sessionId id of a session
+     * @param portal string value identifying the portal
+     * @throws RestException if an error occurs or the session is invalid
+     * @return true if the user can access the portal, false otherwise
+     */
     @GET
     @Path("permissions/portals/{portal}")
     boolean portalAccess(@HeaderParam("sessionid") String sessionId, @PathParam("portal") String portal)
             throws RestException;
 
     /**
+     * Check if a user has admin privilege in notification service.
      *
-     * Check if the user has admin privilege in notification service
-     *
+     * @param sessionId id of a session
      * @return true if the user has the correct rights
+     * @throws RestException if an error occurs or the session is invalid
      */
     @GET
     @Path("permissions/notification-service/admin")
