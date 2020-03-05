@@ -597,13 +597,6 @@ public class NodeSource implements InitActive, RunActive {
         }
     }
 
-    public void removeAndPersistAdditionalInformation(String... keys) {
-        for (String key : keys) {
-            this.additionalInformation.remove(key);
-        }
-        persistAdditionalInformation();
-    }
-
     private void persistAdditionalInformation() {
         // Update nodeSourceData data from DB
         if (this.dbManager == null) {
