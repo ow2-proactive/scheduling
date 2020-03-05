@@ -26,7 +26,7 @@ dependencies {
     runtime 'org.apache.ivy:ivy:2.1.0'
     runtime 'org.codehaus.groovy:groovy-all:2.4.12'
     runtime 'jsr223:jsr223-nativeshell:0.6.0'
-    runtime 'jsr223:jsr223-docker-compose:0.3.2'
+    runtime 'jsr223:jsr223-docker-compose:0.3.3'
     runtime 'jsr223:jsr223-perl:0.1.1'
     runtime 'jsr223:jsr223-powershell:0.2.1'
     runtime 'jsr223:jsr223-cpython:0.1.7'
