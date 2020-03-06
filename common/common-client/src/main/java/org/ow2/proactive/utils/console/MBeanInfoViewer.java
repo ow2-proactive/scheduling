@@ -111,7 +111,8 @@ public final class MBeanInfoViewer {
         return rangeBuilder.toString();
     }
 
-    public static String rrdContent(byte[] rrd4j, String newRange, String[] dataSources) throws IOException {
+    public static String rrdContent(byte[] rrd4j, String newRange, String[] dataSources, String function)
+            throws IOException {
 
         File rrd4jDb = File.createTempFile("database", "rr4dj");
         // construct the JSON response directly in a String
@@ -138,7 +139,10 @@ public final class MBeanInfoViewer {
                 char zone = newRange.charAt(i);
                 long timeStart = timeEnd - secondsInZone(zone);
 
-                FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
+                FetchRequest req = db.createFetchRequest(function != null ? ConsolFun.valueOf(function)
+                                                                          : ConsolFun.AVERAGE,
+                                                         timeStart,
+                                                         timeEnd);
                 req.setFilter(dataSource);
                 FetchData fetchData = req.fetchData();
                 result.append("\"").append(dataSource).append("\":[");
@@ -242,7 +246,7 @@ public final class MBeanInfoViewer {
         }
     }
 
-    public String retrieveStats(String mbeanName, String range, String[] dataSources) {
+    public String retrieveStats(String mbeanName, String range, String[] dataSources, String function) {
         lazyConnect();
 
         try {
@@ -254,7 +258,8 @@ public final class MBeanInfoViewer {
 
             return MBeanInfoViewer.rrdContent(rrd4j,
                                               MBeanInfoViewer.possibleModifyRange(range, dataSources, 'd'),
-                                              dataSources);
+                                              dataSources,
+                                              function);
         } catch (Exception e) {
             LOGGER.error("Could not retrieve statistics history, " + e.getMessage());
             throw new RuntimeException(e);

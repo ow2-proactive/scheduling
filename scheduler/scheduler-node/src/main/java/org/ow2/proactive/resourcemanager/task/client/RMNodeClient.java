@@ -54,6 +54,7 @@ import org.ow2.proactive_grid_cloud_portal.common.RMRestInterface;
 import org.ow2.proactive_grid_cloud_portal.rm.client.RMRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
+import org.rrd4j.ConsolFun;
 
 
 @PublicAPI
@@ -605,24 +606,24 @@ public class RMNodeClient implements IRMClient, Serializable {
      *
      * @param range a String of 9 chars, one for each stat history source, indicating the time range to fetch
      *      for each source. Each char can be:<ul>
-     *            <li>'a' 1 minute
-     *            <li>'m' 10 minutes
-     *            <li>'n' 5 minutes
-     *            <li>'t' 30 minutes
-     *            <li>'h' 1 hour
-     *            <li>'j' 2 hours
-     *            <li>'k' 4 hours
-     *            <li>'H' 8 hours
-     *            <li>'d' 1 day
-     *            <li>'w' 1 week
-     *            <li>'M' 1 month
-     *            <li>'y' 1 year</ul>
+     *            <li>'a' 1 minute</li>
+     *            <li>'m' 10 minutes</li>
+     *            <li>'n' 5 minutes</li>
+     *            <li>'t' 30 minutes</li>
+     *            <li>'h' 1 hour</li>
+     *            <li>'j' 2 hours</li>
+     *            <li>'k' 4 hours</li>
+     *            <li>'H' 8 hours</li>
+     *            <li>'d' 1 day</li>
+     *            <li>'w' 1 week</li>
+     *            <li>'M' 1 month</li>
+     *            <li>'y' 1 year</li></ul>
      * @return a JSON object containing a key for each source
      */
     public String getStatHistory(String range) throws ReflectionException, InterruptedException, IntrospectionException,
             NotConnectedException, InstanceNotFoundException, MalformedObjectNameException, IOException {
         checkNonEmptySession();
-        return rm.getStatHistory(sessionId, range);
+        return rm.getStatHistory(sessionId, range, ConsolFun.AVERAGE.name());
     }
 
     /**

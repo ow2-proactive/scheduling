@@ -1829,12 +1829,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public String getStatHistory(String sessionId) throws NotConnectedRestException {
+    public String getStatHistory(String sessionId, String function) throws NotConnectedRestException {
         SchedulerProxyUserInterface s = checkAccess(sessionId, "stats");
         return s.getStatHistory("ProActiveScheduler:name=RuntimeData",
                                 "dddd", // all for ranges for the days
                                 new String[] { "PendingJobsCount", "PausedJobsCount", "RunningJobsCount",
-                                               "StalledJobsCount", "InErrorJobsCount" });
+                                               "StalledJobsCount", "InErrorJobsCount" },
+                                function);
     }
 
     @Override
