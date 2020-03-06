@@ -1778,7 +1778,7 @@ public interface SchedulerRestInterface {
     @Path("stathistory")
     @Produces("application/json")
     public String getStatHistory(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException;
+    final String sessionId, @QueryParam("function") String function) throws NotConnectedRestException;
 
     /**
      * returns a string containing some data regarding the user's account

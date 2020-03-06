@@ -101,7 +101,7 @@ public class RMRestTest extends RestTestServer {
         when(rmMock.getMBeanAttributes(Matchers.<ObjectName> any(), Matchers.<String[]> any())).thenReturn(value);
         RMRestInterface client = ProxyFactory.create(RMRestInterface.class, "http://localhost:" + port + "/");
 
-        String statHistory = client.getStatHistory(sessionId, "hhhhh");
+        String statHistory = client.getStatHistory(sessionId, "hhhhh", ConsolFun.AVERAGE.name());
         return (JSONObject) new JSONParser().parse(statHistory);
     }
 

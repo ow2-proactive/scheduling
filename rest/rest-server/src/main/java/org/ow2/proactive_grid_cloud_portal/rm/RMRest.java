@@ -681,7 +681,7 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public String getStatHistory(String sessionId, String range1)
+    public String getStatHistory(String sessionId, String range1, String function)
             throws ReflectionException, InterruptedException, IntrospectionException, NotConnectedException,
             InstanceNotFoundException, MalformedObjectNameException, IOException {
 
@@ -698,7 +698,7 @@ public class RMRest implements RMRestInterface {
             // content of the RRD4J database backing file
             byte[] rrd4j = (byte[]) attr.getValue();
 
-            return MBeanInfoViewer.rrdContent(rrd4j, newRange, dataSources);
+            return MBeanInfoViewer.rrdContent(rrd4j, newRange, dataSources, function);
         });
 
         return entry.getValue();
