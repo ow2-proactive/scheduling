@@ -125,10 +125,12 @@ public class ForkedTaskExecutor implements TaskExecutor {
             FileUtils.deleteQuietly(serializedContext);
 
             if (process != null) {
+                logger.info("killing forked JVM process");
                 process.destroy();
                 try {
                     //wait for twice the time of the cleanup process
                     process.waitFor((new CleanupTimeoutGetter()).getCleanupTimeSeconds(), TimeUnit.SECONDS);
+                    logger.info("JVM process killed");
                 } catch (Exception e) {
                     logger.info("Exception while waiting task to finish " + e);
                 }

@@ -169,6 +169,7 @@ public class TaskLauncher implements InitActive {
         TaskContext context = null;
         Stopwatch taskStopwatchForFailures = null;
         TaskDataspaces dataspaces = null;
+        File taskLogFile = null;
 
         try {
             taskStarted.set(true);
@@ -190,7 +191,7 @@ public class TaskLauncher implements InitActive {
 
             copyTaskLogsFromUserSpace(taskLogger.createLogFilePath(dataspaces.getScratchFolder()), dataspaces);
 
-            File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
+            taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
@@ -240,10 +241,12 @@ public class TaskLauncher implements InitActive {
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
                     taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
+                    copyTaskLogsToUserSpace(taskLogFile, dataspaces);
                     sendResultToScheduler(rebindedTerminateNotification, taskResult);
                     return;
                 case KILLED_MANUALLY:
                     // killed by Scheduler, no need to send results back
+                    copyTaskLogsToUserSpace(taskLogFile, dataspaces);
                     return;
             }
 
@@ -263,10 +266,12 @@ public class TaskLauncher implements InitActive {
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
                     taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
+                    copyTaskLogsToUserSpace(taskLogFile, dataspaces);
                     sendResultToScheduler(terminateNotification, taskResult);
                     break;
                 case KILLED_MANUALLY:
                     // killed by Scheduler, no need to send results back
+                    copyTaskLogsToUserSpace(taskLogFile, dataspaces);
                     return;
                 default:
                     logger.info("Failed to execute task", taskFailure);
@@ -372,7 +377,7 @@ public class TaskLauncher implements InitActive {
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
-        if (initializer.isPreciousLogs()) {
+        if (initializer.isPreciousLogs() && taskLogFile != null) {
             try {
                 FileSelector taskLogFileSelector = new FileSelector(taskLogFile.getName());
                 taskLogFileSelector.setIncludes(new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
