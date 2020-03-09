@@ -854,10 +854,6 @@ public interface RMRestInterface {
      *            <li>LAST: The last data point is used.</li>
      *            <li>FIRST: The fist data point is used.</li>
      *            <li>TOTAL: The total of the data points is stored.</li>
-     *            <li>STDEV: The standard deviation.</li>
-     *            <li>LSLSLOPE: The least squares line, slope.</li>
-     *            <li>LSLINT: The least squares line, y-intercept.</li>
-     *            <li>LSLCORREL: The least squares line, correlation coefficient.</li>
      *            </ul>
      *            Default value is AVERAGE.
      * @return a JSON object containing a key for each source

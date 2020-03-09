@@ -86,22 +86,26 @@ public class RMRestTest extends RestTestServer {
     public void testStatsHistory_Locale_Fr() throws Exception {
         Locale.setDefault(Locale.FRANCE);
 
-        JSONObject jsonObject = callGetStatHistory();
-
+        byte[] rrdb = createRrdDb().getBytes();
+        JSONObject jsonObject = callGetStatHistory(rrdb, ConsolFun.AVERAGE);
         assertEquals(EXPECTED_RRD_VALUE, (Double) ((JSONArray) jsonObject.get("AverageActivity")).get(0), 0.001);
 
+        jsonObject = callGetStatHistory(rrdb, ConsolFun.MIN);
+        assertEquals(EXPECTED_RRD_VALUE, (Double) ((JSONArray) jsonObject.get("AverageActivity")).get(0), 0.001);
+
+        jsonObject = callGetStatHistory(rrdb, ConsolFun.MAX);
+        assertEquals(EXPECTED_RRD_VALUE, (Double) ((JSONArray) jsonObject.get("AverageActivity")).get(0), 0.001);
     }
 
-    private JSONObject callGetStatHistory() throws Exception {
+    private JSONObject callGetStatHistory(byte[] rrdb, ConsolFun function) throws Exception {
         RMProxyUserInterface rmMock = mock(RMProxyUserInterface.class);
         String sessionId = SharedSessionStoreTestUtils.createValidSession(rmMock);
 
-        AttributeList value = new AttributeList(Collections.singletonList(new Attribute("test",
-                                                                                        createRrdDb().getBytes())));
+        AttributeList value = new AttributeList(Collections.singletonList(new Attribute("test", rrdb)));
         when(rmMock.getMBeanAttributes(Matchers.<ObjectName> any(), Matchers.<String[]> any())).thenReturn(value);
         RMRestInterface client = ProxyFactory.create(RMRestInterface.class, "http://localhost:" + port + "/");
 
-        String statHistory = client.getStatHistory(sessionId, "hhhhh", ConsolFun.AVERAGE.name());
+        String statHistory = client.getStatHistory(sessionId, "hhhhh", function.name());
         return (JSONObject) new JSONParser().parse(statHistory);
     }
 
@@ -114,6 +118,9 @@ public class RMRestTest extends RestTestServer {
             rrdDef.addDatasource(dataSource, DsType.GAUGE, 600, 0, Double.NaN);
         }
         rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 1, 150);
+        rrdDef.addArchive(ConsolFun.MAX, 0.5, 1, 150);
+        rrdDef.addArchive(ConsolFun.MIN, 0.5, 1, 150);
+
         RrdDb rrdDb = new RrdDb(rrdDef, org.rrd4j.core.RrdBackendFactory.getFactory("MEMORY"));
         Sample sample = rrdDb.createSample();
 
@@ -121,7 +128,7 @@ public class RMRestTest extends RestTestServer {
         while (time <= end + 172800L) {
             sample.setTime(time);
             for (String dataSource : RMRest.dataSources) {
-                sample.setValue(dataSource, 1.042);
+                sample.setValue(dataSource, EXPECTED_RRD_VALUE);
             }
             sample.update();
             time += new Random().nextDouble() * 300 + 1;
