@@ -1769,9 +1769,17 @@ public interface SchedulerRestInterface {
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
-     *
-     * @param sessionId
-     *              the session id associated to this new connection
+     * Get the statistics history for the last 24 hours.
+     * @param sessionId current session
+     * @param function function applying to statistics, one of: <ul>
+     *            <li>AVERAGE: The average of the data points is stored.</li>
+     *            <li>MIN: The smallest of the data points is stored.</li>
+     *            <li>MAX: The largest of the data points is stored.</li>
+     *            <li>LAST: The last data point is used.</li>
+     *            <li>FIRST: The fist data point is used.</li>
+     *            <li>TOTAL: The total of the data points is stored.</li>
+     *            </ul>
+     *            Default value is AVERAGE.
      * @return a string containing the history of the statistics for 1 day
      */
     @GET
