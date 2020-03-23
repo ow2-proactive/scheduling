@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import java.net.URI;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -52,7 +53,10 @@ public class GlobalFileValidator implements Validator<URI> {
             return parameterValue;
         }
 
-        // if parameterValue not exists in 3rd-party credentials, throw ValidationException
+        // if parameterValue is not a file existing in data space, we throw ValidationException
+        if (StringUtils.isBlank(parameterValue.toString())) {
+            throw new ValidationException("Please provide a valid file path in the user space as the variable value.");
+        }
         try {
             if (!context.getScheduler().checkFileExistsInGlobalSpace(parameterValue.toString())) {
                 throw new ValidationException(String.format("Could not find the file path [%s] in the global data space. Please add the file into the global data space or change the variable value to a valid path.",
