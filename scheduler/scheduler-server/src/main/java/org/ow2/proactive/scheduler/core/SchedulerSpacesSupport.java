@@ -113,6 +113,20 @@ public class SchedulerSpacesSupport {
     }
 
     /**
+     * Check whether a file path exist in user space
+     * @param username the user's name
+     * @param pathname the file path to check
+     * @return whether the file exist in user space
+     */
+    public boolean checkFileExistsInUserSpace(String username, String pathname) {
+        try {
+            return this.getUserSpace(username).resolveFile(pathname).exists();
+        } catch (FileSystemException e) {
+            return false;
+        }
+    }
+
+    /**
      * This method creates a dedicated USER space for the user which successfully connected
      * This USER space is a subspace of the scheduler default USER space,
      * A sub-folder named with the username is created to contain the USER space

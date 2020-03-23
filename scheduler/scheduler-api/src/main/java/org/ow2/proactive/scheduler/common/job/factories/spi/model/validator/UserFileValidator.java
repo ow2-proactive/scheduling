@@ -39,15 +39,15 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
  * @author ActiveEon Team
  * @since 27/08/19
  */
-public class GlobalFileValidator implements Validator<URI> {
-    private static final Logger logger = Logger.getLogger(GlobalFileValidator.class);
+public class UserFileValidator implements Validator<URI> {
+    private static final Logger logger = Logger.getLogger(UserFileValidator.class);
 
     @Override
     public URI validate(URI parameterValue, ModelValidatorContext context) throws ValidationException {
         if (context == null || context.getScheduler() == null) {
             // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog).
-            // In this case, we don't have the access of the scheduler global dataspace, so the validity check is passed.
-            logger.debug(String.format("Can't check the validity of the variable value [%s], because missing the access to the scheduler global data space",
+            // In this case, we don't have the access of the scheduler user dataspace, so the validity check is passed.
+            logger.debug(String.format("Can't check the validity of the variable value [%s], because missing the access to the scheduler user data space",
                                        parameterValue));
             return parameterValue;
         }
@@ -57,12 +57,12 @@ public class GlobalFileValidator implements Validator<URI> {
             throw new ValidationException("Please provide a valid file path in the user space as the variable value.");
         }
         try {
-            if (!context.getScheduler().checkFileExistsInGlobalSpace(parameterValue.toString())) {
-                throw new ValidationException(String.format("Could not find the file path [%s] in the global data space. Please add the file into the global data space or change the variable value to a valid path.",
+            if (!context.getScheduler().checkFileExistsInUserSpace(parameterValue.toString())) {
+                throw new ValidationException(String.format("Could not find the file path [%s] in the user data space. Please add the file into the user data space or change the variable value to a valid path.",
                                                             parameterValue));
             }
         } catch (NotConnectedException | PermissionException e) {
-            throw new ValidationException("Could not read global data space files from the scheduler, make sure you are connected and you have permission rights to read global data space files.",
+            throw new ValidationException("Could not read user data space files from the scheduler, make sure you are connected and you have permission rights to read user data space files.",
                                           e);
         }
         return parameterValue;

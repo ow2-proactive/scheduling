@@ -114,9 +114,19 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param pathname the file path to check
      * @return whether the specified file exists in the GLOBAL DataSpace
      * @throws NotConnectedException if you are not authenticated.
-     * @throws PermissionException if you can't access to the global dataspace.
+     * @throws PermissionException if you can't access to the global data space.
      */
     boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException;
+
+    /**
+     * Check if the USER DataSpace contains the specified file
+     *
+     * @param pathname the file path to check
+     * @return whether the specified file exists in the USER DataSpace
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to the user data space.
+     */
+    boolean checkFileExistsInUserSpace(String pathname) throws NotConnectedException, PermissionException;
 
     /**
      * Get the result for the given jobId. A user can only get HIS result back

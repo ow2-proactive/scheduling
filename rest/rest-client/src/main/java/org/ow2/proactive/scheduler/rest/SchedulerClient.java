@@ -1083,6 +1083,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public boolean checkFileExistsInUserSpace(String pathname) throws NotConnectedException, PermissionException {
+        try {
+            return restApi().existsFileInUserSpace(sid, pathname);
+        } catch (Exception error) {
+            throw throwNCEOrPE(error);
+        }
+    }
+
+    @Override
     public void renewSession() throws NotConnectedException {
         Closer closer = Closer.create();
         try {

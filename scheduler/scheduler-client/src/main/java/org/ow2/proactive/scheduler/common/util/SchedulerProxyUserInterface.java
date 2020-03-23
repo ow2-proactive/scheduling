@@ -311,6 +311,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public boolean checkFileExistsInUserSpace(String pathname) throws NotConnectedException, PermissionException {
+        return uischeduler.checkFileExistsInUserSpace(pathname);
+    }
+
+    @Override
     @ImmediateService
     public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();

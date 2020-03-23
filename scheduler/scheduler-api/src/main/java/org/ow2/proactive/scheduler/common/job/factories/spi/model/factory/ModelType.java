@@ -54,6 +54,7 @@ public enum ModelType {
     URL(URLParserValidator.class, URL.class),
     HIDDEN(HiddenParserValidator.class, String.class),
     CREDENTIAL(CredentialParserValidator.class, String.class),
+    USER_FILE(UserFileParserValidator.class, URI.class),
     GLOBAL_FILE(GlobalFileParserValidator.class, URI.class);
 
     // The parser validator of the model type

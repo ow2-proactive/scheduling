@@ -30,7 +30,7 @@ import java.net.URI;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.URIConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.GlobalFileValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.UserFileValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
 
@@ -38,10 +38,10 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Vali
  * @author ActiveEon Team
  * @since 27/08/19
  */
-public class GlobalFileParserValidator extends BaseParserValidator<URI> {
+public class UserFileParserValidator extends BaseParserValidator<URI> {
 
-    public GlobalFileParserValidator(String model) throws ModelSyntaxException {
-        super(model, ModelType.GLOBAL_FILE);
+    public UserFileParserValidator(String model) throws ModelSyntaxException {
+        super(model, ModelType.USER_FILE);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class GlobalFileParserValidator extends BaseParserValidator<URI> {
 
     @Override
     protected Validator<URI> createValidator(String model, Converter<URI> converter) {
-        return new GlobalFileValidator();
+        return new UserFileValidator();
     }
 
 }

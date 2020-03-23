@@ -90,8 +90,6 @@ import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 
 /**
  * Smart proxy implementation that relies on active objects for communicating
@@ -623,6 +621,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     @Override
     public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
         return schedulerProxy.checkFileExistsInGlobalSpace(pathname);
+    }
+
+    @Override
+    public boolean checkFileExistsInUserSpace(String pathname) throws NotConnectedException, PermissionException {
+        return schedulerProxy.checkFileExistsInUserSpace(pathname);
     }
 
     @Override

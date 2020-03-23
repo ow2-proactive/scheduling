@@ -1742,9 +1742,15 @@ public interface SchedulerRestInterface {
     List<String> globalspaceURIs(@HeaderParam("sessionid") String sessionId) throws RestException;
 
     @GET
-    @Path("globalspace/")
+    @Path("globalspace/{pathname}/exist")
     @Produces("application/json")
     boolean existsFileInGlobalSpace(@HeaderParam("sessionid") String sessionId, @PathParam("pathname") String pathname)
+            throws RestException;
+
+    @GET
+    @Path("userspace/{pathname}/exist")
+    @Produces("application/json")
+    boolean existsFileInUserSpace(@HeaderParam("sessionid") String sessionId, @PathParam("pathname") String pathname)
             throws RestException;
 
     /**
