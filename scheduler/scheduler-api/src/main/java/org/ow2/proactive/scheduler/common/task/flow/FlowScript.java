@@ -499,7 +499,6 @@ public class FlowScript extends Script<FlowAction> {
 
     @Override
     protected Reader getReader() {
-        logger.info("this.script: " + this.script);
         return new StringReader(script);
     }
 
