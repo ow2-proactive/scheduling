@@ -33,7 +33,6 @@ import javax.script.Bindings;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scripting.InvalidScriptException;
