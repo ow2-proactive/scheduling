@@ -124,32 +124,29 @@ public class ScriptData {
     }
 
     FlowScript createFlowScriptByURL() throws InvalidScriptException {
+        URL inputUrl;
         try {
-            URL inputUrl = new URL(url);
-
-            if (flowScriptActionType.equals(FlowActionType.CONTINUE.toString())) {
-                return FlowScript.createContinueFlowScript();
-            } else if (flowScriptActionType.equals(FlowActionType.IF.toString())) {
-                return FlowScript.createIfFlowScript(inputUrl,
-                                                     getScriptEngine(),
-                                                     getFlowScriptTarget(),
-                                                     getFlowScriptTargetElse(),
-                                                     getFlowScriptTargetContinuation(),
-                                                     parameters());
-            } else if (flowScriptActionType.equals(FlowActionType.LOOP.toString())) {
-                return FlowScript.createLoopFlowScript(inputUrl,
-                                                       getScriptEngine(),
-                                                       getFlowScriptTarget(),
-                                                       parameters());
-            }
-            if (flowScriptActionType.equals(FlowActionType.REPLICATE.toString())) {
-                return FlowScript.createReplicateFlowScript(inputUrl, getScriptEngine(), parameters());
-            } else {
-                throw new DatabaseManagerException("Invalid flow script action: " + flowScriptActionType);
-            }
-
+            inputUrl = new URL(url);
         } catch (MalformedURLException e) {
             throw new InvalidScriptException(e);
+        }
+
+        if (flowScriptActionType.equals(FlowActionType.CONTINUE.toString())) {
+            return FlowScript.createContinueFlowScript();
+        } else if (flowScriptActionType.equals(FlowActionType.IF.toString())) {
+            return FlowScript.createIfFlowScript(inputUrl,
+                                                 getScriptEngine(),
+                                                 getFlowScriptTarget(),
+                                                 getFlowScriptTargetElse(),
+                                                 getFlowScriptTargetContinuation(),
+                                                 parameters());
+        } else if (flowScriptActionType.equals(FlowActionType.LOOP.toString())) {
+            return FlowScript.createLoopFlowScript(inputUrl, getScriptEngine(), getFlowScriptTarget(), parameters());
+        }
+        if (flowScriptActionType.equals(FlowActionType.REPLICATE.toString())) {
+            return FlowScript.createReplicateFlowScript(inputUrl, getScriptEngine(), parameters());
+        } else {
+            throw new DatabaseManagerException("Invalid flow script action: " + flowScriptActionType);
         }
     }
 
