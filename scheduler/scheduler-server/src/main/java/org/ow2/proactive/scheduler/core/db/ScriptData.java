@@ -30,9 +30,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import javassist.NotFoundException;
 
 import javax.persistence.*;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -74,6 +76,8 @@ public class ScriptData {
 
     private TaskData taskData;
 
+    private static final Logger logger = Logger.getLogger(ScriptData.class);
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
                            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
@@ -103,11 +107,7 @@ public class ScriptData {
         return scriptData;
     }
 
-    FlowScript createFlowScript() throws InvalidScriptException {
-        if (flowScriptActionType == null) {
-            throw new DatabaseManagerException("Flow script action type is null");
-        }
-
+    FlowScript createFlowScriptByScript() throws InvalidScriptException {
         if (flowScriptActionType.equals(FlowActionType.CONTINUE.toString())) {
             return FlowScript.createContinueFlowScript();
         } else if (flowScriptActionType.equals(FlowActionType.IF.toString())) {
@@ -123,6 +123,44 @@ public class ScriptData {
             return FlowScript.createReplicateFlowScript(getScript(), getScriptEngine());
         } else {
             throw new DatabaseManagerException("Invalid flow script action: " + flowScriptActionType);
+        }
+    }
+
+    FlowScript createFlowScriptByURL() throws InvalidScriptException {
+        try {
+            URL inputUrl = new URL(url);
+
+            if (flowScriptActionType.equals(FlowActionType.CONTINUE.toString())) {
+                return FlowScript.createContinueFlowScript();
+            } else if (flowScriptActionType.equals(FlowActionType.IF.toString())) {
+                return FlowScript.createIfFlowScript(inputUrl,
+                                                     getScriptEngine(),
+                                                     getFlowScriptTarget(),
+                                                     getFlowScriptTargetElse(),
+                                                     getFlowScriptTargetContinuation());
+            } else if (flowScriptActionType.equals(FlowActionType.LOOP.toString())) {
+                return FlowScript.createLoopFlowScript(inputUrl, getScriptEngine(), getFlowScriptTarget());
+            }
+            if (flowScriptActionType.equals(FlowActionType.REPLICATE.toString())) {
+                return FlowScript.createReplicateFlowScript(inputUrl, getScriptEngine());
+            } else {
+                throw new DatabaseManagerException("Invalid flow script action: " + flowScriptActionType);
+            }
+
+        } catch (MalformedURLException e) {
+            throw new InvalidScriptException(e);
+        }
+    }
+
+    FlowScript createFlowScript() throws InvalidScriptException {
+        if (flowScriptActionType == null) {
+            throw new DatabaseManagerException("Flow script action type is null");
+        }
+
+        if (script == null && url != null) {
+            return createFlowScriptByURL();
+        } else {
+            return createFlowScriptByScript();
         }
     }
 
