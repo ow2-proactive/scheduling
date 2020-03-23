@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 
 
@@ -86,6 +87,7 @@ public class EnvironmentModifierData {
 
     @Column(name = "VALUE", nullable = false, length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getValue() {
         return value;
     }

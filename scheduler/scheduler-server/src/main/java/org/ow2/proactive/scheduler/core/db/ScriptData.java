@@ -180,6 +180,7 @@ public class ScriptData {
 
     @Column(name = "SCRIPT", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getScript() {
         return script;
     }
@@ -190,6 +191,7 @@ public class ScriptData {
 
     @Column(name = "URL", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getURL() {
         return url;
     }
