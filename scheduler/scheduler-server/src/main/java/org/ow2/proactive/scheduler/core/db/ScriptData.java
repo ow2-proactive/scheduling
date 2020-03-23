@@ -30,11 +30,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import javassist.NotFoundException;
 
 import javax.persistence.*;
 
-import org.apache.log4j.Logger;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -75,8 +73,6 @@ public class ScriptData {
     private String flowScriptTargetContinuation;
 
     private TaskData taskData;
-
-    private static final Logger logger = Logger.getLogger(ScriptData.class);
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
