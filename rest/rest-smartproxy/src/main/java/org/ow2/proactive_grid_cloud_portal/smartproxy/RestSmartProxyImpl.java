@@ -349,6 +349,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
+        return _getScheduler().checkFileExistsInGlobalSpace(pathname);
+    }
+
+    @Override
     public void addEventListener(SchedulerEventListenerExtended listener, boolean myEventsOnly,
             SchedulerEvent... events) throws NotConnectedException, PermissionException {
         _getScheduler().addEventListener(listener, myEventsOnly, events);

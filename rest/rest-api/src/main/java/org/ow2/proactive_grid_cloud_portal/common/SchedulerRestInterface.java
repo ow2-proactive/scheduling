@@ -1741,6 +1741,12 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     List<String> globalspaceURIs(@HeaderParam("sessionid") String sessionId) throws RestException;
 
+    @GET
+    @Path("globalspace/")
+    @Produces("application/json")
+    boolean existsFileInGlobalSpace(@HeaderParam("sessionid") String sessionId, @PathParam("pathname") String pathname)
+            throws RestException;
+
     /**
      * Users having jobs in the scheduler
      * 

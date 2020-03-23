@@ -621,6 +621,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
+        return schedulerProxy.checkFileExistsInGlobalSpace(pathname);
+    }
+
+    @Override
     public void addEventListener(SchedulerEventListenerExtended listener, boolean myEventsOnly, SchedulerEvent[] events)
             throws NotConnectedException, PermissionException {
         eventListeners.add(listener);

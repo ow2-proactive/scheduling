@@ -546,6 +546,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return this.spacesSupport.getGlobalSpaceURIs();
     }
 
+    @Override
+    @ImmediateService
+    public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
+        frontendState.checkPermission("checkFileExistsInGlobalSpace",
+                                      "You don't have permissions to check the file existence in the GLOBAL Space");
+        return this.spacesSupport.checkFileExistsInGlobalSpace(pathname);
+    }
+
     /**
      * {@inheritDoc}
      */

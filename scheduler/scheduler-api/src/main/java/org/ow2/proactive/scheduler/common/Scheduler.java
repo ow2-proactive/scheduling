@@ -109,6 +109,16 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException;
 
     /**
+     * Check if the GLOBAL DataSpace contains the specified file
+     *
+     * @param pathname the file path to check
+     * @return whether the specified file exists in the GLOBAL DataSpace
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to the global dataspace.
+     */
+    boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException;
+
+    /**
      * Get the result for the given jobId. A user can only get HIS result back
      * except if he is admin.<br>
      * If the job does not exist, a schedulerException is sent with the proper

@@ -53,7 +53,8 @@ public enum ModelType {
     URI(URIParserValidator.class, URI.class),
     URL(URLParserValidator.class, URL.class),
     HIDDEN(HiddenParserValidator.class, String.class),
-    CREDENTIAL(CredentialParserValidator.class, String.class);
+    CREDENTIAL(CredentialParserValidator.class, String.class),
+    GLOBAL_FILE(GlobalFileParserValidator.class, URI.class);
 
     // The parser validator of the model type
     private Class typeParserValidator;

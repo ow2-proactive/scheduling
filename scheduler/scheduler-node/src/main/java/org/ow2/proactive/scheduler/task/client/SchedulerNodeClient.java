@@ -143,6 +143,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.checkFileExistsInGlobalSpace(pathname);
+    }
+
+    @Override
     public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         renewSession();
         return client.getJobResult(jobId);

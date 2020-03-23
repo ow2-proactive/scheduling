@@ -306,6 +306,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
+        return uischeduler.checkFileExistsInGlobalSpace(pathname);
+    }
+
+    @Override
     @ImmediateService
     public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();

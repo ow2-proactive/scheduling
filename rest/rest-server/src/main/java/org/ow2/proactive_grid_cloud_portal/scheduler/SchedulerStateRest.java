@@ -1955,6 +1955,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public boolean existsFileInGlobalSpace(String sessionId, String pathname) throws RestException {
+        SchedulerProxyUserInterface proxy = checkAccess(sessionId);
+        try {
+            return proxy.checkFileExistsInGlobalSpace(pathname);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
     public JobValidationData validate(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart)
             throws NotConnectedRestException {
         File tmpFile = null;
