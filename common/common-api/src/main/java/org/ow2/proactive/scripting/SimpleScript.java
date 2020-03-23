@@ -65,6 +65,7 @@ public class SimpleScript extends Script<Object> {
     public SimpleScript(URL url, String engineName) throws InvalidScriptException {
         super(url, engineName, false);
     }
+
     /** Create a script from a file.
      * @param file a file containing script code.
      * @param parameters execution parameters
