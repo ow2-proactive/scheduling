@@ -482,6 +482,8 @@ if [[ "$OLD_PADIR" == "" ]]; then
          sed "s/pa\.scheduler\.job\.removeFromDataBase=.*/pa.scheduler.job.removeFromDataBase=true/g"  -i "$PA_ROOT/default/config/scheduler/settings.ini"
          sed "s/^#pa\.rm\.history\.maxperiod=.*/pa.rm.history.maxperiod=$JOB_CLEANUP_SECONDS/g"  -i "$PA_ROOT/default/config/rm/settings.ini"
          sed "s/^notifications\.housekeeping\.removedelay=.*/notifications.housekeeping.removedelay=$JOB_CLEANUP_SECONDS/g"  -i "$PA_ROOT/default/dist/war/notification-service/WEB-INF/classes/application.properties"
+         sed "s/^pa\.job\.execution\.history\.maxperiod=.*/pa.job.execution.history.maxperiod=$JOB_CLEANUP_SECONDS/g"  -i "$PA_ROOT/default/dist/war/job-planner/WEB-INF/classes/application.properties"
+
 
          # Cleanup extra log files older than the given period
          if [[ $(grep -c "$PA_ROOT/default/logs" /etc/crontab) == 0 ]]; then
