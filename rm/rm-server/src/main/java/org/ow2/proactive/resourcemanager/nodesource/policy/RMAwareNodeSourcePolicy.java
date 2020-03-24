@@ -76,8 +76,8 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
         if (!rmShuttingDown) {
             try {
                 rmMonitoring.removeRMEventListener();
-            } catch (RMException e) {
-                logger.error("Error when removing event listener", e);
+            } catch (Exception e) {
+                logger.warn("Error when removing event listener", e);
             }
         }
         super.shutdown(initiator);

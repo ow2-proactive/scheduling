@@ -127,7 +127,7 @@ public class RMListenerProxy extends RMGroupEventListener {
     public BooleanWrapper disconnect() {
         try {
             target.getMonitoring().removeRMEventListener();
-        } catch (RMException ignored) {
+        } catch (Exception ignored) {
         }
         BooleanWrapper r = target.disconnect();
         return r;
@@ -145,8 +145,8 @@ public class RMListenerProxy extends RMGroupEventListener {
             logger.warn("Local event counter is " + counter + " vs. rm event counter " + event.getCounter());
             try {
                 this.target.getMonitoring().removeRMEventListener();
-            } catch (RMException e) {
-                logger.error(e.getMessage(), e);
+            } catch (Exception e) {
+                logger.warn(e.getMessage(), e);
             }
             rebindListener();
             counter.set(0);

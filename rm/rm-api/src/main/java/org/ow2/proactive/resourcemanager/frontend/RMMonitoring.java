@@ -65,7 +65,7 @@ public interface RMMonitoring {
     /**
      * Removes a listener from RMMonitoring. Only listener itself must call this method
      */
-    void removeRMEventListener() throws RMException;
+    void removeRMEventListener();
 
     /**
      * Gets the current snapshot of the resource manager state providing
