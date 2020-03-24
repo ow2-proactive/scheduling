@@ -64,6 +64,12 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getMyAccountUsage";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getGlobalSpaceURIs";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getUserSpaceURIs";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
 };
 
 // Members of "user" group can get/free nodes and monitor the state, submit jobs and see jobs of other people
@@ -157,6 +163,11 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.thirdPartyCredentialsKeySet";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.removeThirdPartyCredential";
 
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
 };
 
 
@@ -214,6 +225,12 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
 };
 
 // Members of "nsadmins" can create/remove node sources (according to their policies)
@@ -280,6 +297,12 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
 };
 
 // Members of "rmcoreadmins" can call any method of rmcore
@@ -305,6 +328,12 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
 };
 
 // Members of "scheduleradmins" can call any method of the scheduler
@@ -369,11 +398,23 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
 };
 
 // Members of "admin" group possess permissions to perform any actions
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "admin" {
     permission org.ow2.proactive.permissions.AllPermission;
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
 };
 
 // Members of "watchers" group have only a read access to the scheduler and RM state
@@ -386,6 +427,12 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getStatus";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getTopology";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
 };
 //
 // OTHER PERMISSIONS
