@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 
 
@@ -88,6 +89,7 @@ public class JobDataVariable {
 
     @Column(name = "VARIABLE_VALUE", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getValue() {
         return value;
     }
@@ -98,6 +100,7 @@ public class JobDataVariable {
 
     @Column(name = "VARIABLE_MODEL", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getModel() {
         return model;
     }

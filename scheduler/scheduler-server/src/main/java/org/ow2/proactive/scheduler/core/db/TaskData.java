@@ -299,6 +299,7 @@ public class TaskData {
 
     @Column(name = "JAVA_HOME", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getJavaHome() {
         return javaHome;
     }
@@ -364,6 +365,7 @@ public class TaskData {
 
     @Column(name = "WORKING_DIR", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getWorkingDir() {
         return workingDir;
     }
