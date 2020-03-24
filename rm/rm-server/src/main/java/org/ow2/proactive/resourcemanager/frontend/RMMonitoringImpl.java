@@ -370,18 +370,18 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     /**
      * Removes a listener from RMMonitoring. Only listener itself must call this method
      */
-    public void removeRMEventListener() throws RMException {
+    public void removeRMEventListener() {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         String shortId = id.shortString();
         if (removeRMEventListener(id)) {
             logger.debug("Removing the RM listener for " + shortId);
         } else {
-            throw new RMException("Unknown listener found: " + shortId);
+            logger.warn("Unknown listener found: " + shortId);
         }
     }
 
-    public boolean removeRMEventListener(UniqueID id) throws RMException {
+    public boolean removeRMEventListener(UniqueID id) {
         if (dispatchers == null || dispatchers.isEmpty()) {
             return false;
         }
