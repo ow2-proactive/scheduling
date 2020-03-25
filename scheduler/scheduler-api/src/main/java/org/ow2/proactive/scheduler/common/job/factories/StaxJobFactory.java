@@ -56,6 +56,7 @@ import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -66,6 +67,7 @@ import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorRegistry;
 import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorService;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -148,7 +150,7 @@ public class StaxJobFactory extends JobFactory {
     public Job createJob(String filePath, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
         try {
-            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, null);
+            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, null, null);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -158,9 +160,10 @@ public class StaxJobFactory extends JobFactory {
 
     @Override
     public Job createJob(String filePath, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos, Scheduler scheduler) throws JobCreationException {
+            Map<String, String> replacementGenericInfos, Scheduler scheduler, SchedulerSpaceInterface space)
+            throws JobCreationException {
         try {
-            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, scheduler);
+            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, scheduler, space);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -177,7 +180,7 @@ public class StaxJobFactory extends JobFactory {
     public Job createJob(URI filePath, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
         try {
-            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, null);
+            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, null, null);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -193,14 +196,19 @@ public class StaxJobFactory extends JobFactory {
     @Override
     public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
-        return createJob(workflowStream, replacementVariables, replacementGenericInfos, null);
+        return createJob(workflowStream, replacementVariables, replacementGenericInfos, null, null);
     }
 
     @Override
     public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos, Scheduler scheduler) throws JobCreationException {
+            Map<String, String> replacementGenericInfos, Scheduler scheduler, SchedulerSpaceInterface space)
+            throws JobCreationException {
         try {
-            return createJobFromInputStream(workflowStream, replacementVariables, replacementGenericInfos, scheduler);
+            return createJobFromInputStream(workflowStream,
+                                            replacementVariables,
+                                            replacementGenericInfos,
+                                            scheduler,
+                                            space);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -209,14 +217,19 @@ public class StaxJobFactory extends JobFactory {
     }
 
     private Job createJob(File file, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos, Scheduler scheduler) throws JobCreationException {
+            Map<String, String> replacementGenericInfos, Scheduler scheduler, SchedulerSpaceInterface space)
+            throws JobCreationException {
         try {
             if (!file.exists()) {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
             relativePathRoot = file.getParentFile().getAbsolutePath();
             try (InputStream inputStream = new FileInputStream(file)) {
-                return createJobFromInputStream(inputStream, replacementVariables, replacementGenericInfos, scheduler);
+                return createJobFromInputStream(inputStream,
+                                                replacementVariables,
+                                                replacementGenericInfos,
+                                                scheduler,
+                                                space);
             }
         } catch (JobCreationException jce) {
             jce.pushTag(XMLTags.JOB.getXMLName());
@@ -227,7 +240,7 @@ public class StaxJobFactory extends JobFactory {
     }
 
     private Job createJobFromInputStream(InputStream jobInputStream, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos, Scheduler scheduler)
+            Map<String, String> replacementGenericInfos, Scheduler scheduler, SchedulerSpaceInterface space)
             throws JobCreationException, VerifierConfigurationException, IOException, XMLStreamException {
         long t0 = System.currentTimeMillis();
         byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
@@ -247,7 +260,7 @@ public class StaxJobFactory extends JobFactory {
 
         makeDependences(job, dependencies);
         long t4 = System.currentTimeMillis();
-        validate((TaskFlowJob) job, scheduler);
+        validate((TaskFlowJob) job, scheduler, space);
         long t5 = System.currentTimeMillis();
         long d1 = t1 - t0;
         long d2 = t2 - t1;
@@ -288,7 +301,7 @@ public class StaxJobFactory extends JobFactory {
     /*
      * Validate the given job descriptor
      */
-    private TaskFlowJob validate(TaskFlowJob job, Scheduler scheduler)
+    private TaskFlowJob validate(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space)
             throws VerifierConfigurationException, JobCreationException {
         Map<String, JobValidatorService> factories;
         try {
@@ -302,7 +315,7 @@ public class StaxJobFactory extends JobFactory {
         try {
 
             for (JobValidatorService factory : factories.values()) {
-                updatedJob = factory.validateJob(updatedJob, scheduler);
+                updatedJob = factory.validateJob(updatedJob, scheduler, space);
             }
         } catch (JobValidationException e) {
             throw e;

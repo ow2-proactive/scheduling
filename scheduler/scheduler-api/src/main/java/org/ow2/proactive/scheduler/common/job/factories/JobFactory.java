@@ -32,6 +32,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 
@@ -143,12 +144,13 @@ public abstract class JobFactory {
      * @param filePath the path to an XML job descriptor
      * @param variables map of job submission variables
      * @param genericInfos map of job submission generic infos
-     * @param scheduler the scheduler instance with access of third-party credentials for validating jobs
+     * @param scheduler the Scheduler instance for validating jobs to access third-party credentials
+     * @param space the SchedulerSpaceInterface instance for validating jobs to access data spaces files
      * @return a Job instance created with the given XML file
      * @throws JobCreationException if an exception occurred during job creation
      */
     public abstract Job createJob(String filePath, Map<String, String> variables, Map<String, String> genericInfos,
-            Scheduler scheduler) throws JobCreationException;
+            Scheduler scheduler, SchedulerSpaceInterface space) throws JobCreationException;
 
     /**
      * Creates a job using the given job descriptor.
@@ -180,6 +182,7 @@ public abstract class JobFactory {
             Map<String, String> genericInfos) throws JobCreationException;
 
     public abstract Job createJob(InputStream workflowStream, Map<String, String> variables,
-            Map<String, String> genericInfos, Scheduler scheduler) throws JobCreationException;
+            Map<String, String> genericInfos, Scheduler scheduler, SchedulerSpaceInterface space)
+            throws JobCreationException;
 
 }

@@ -47,6 +47,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
@@ -368,6 +369,24 @@ public class RestDataspaceImpl implements RestDataspace {
             Throwables.propagateIfInstanceOf(error, FileSystemException.class);
             Throwables.propagateIfInstanceOf(error, IOException.class);
             Throwables.propagate(error);
+        }
+    }
+
+    public boolean checkFileExistsInGlobalSpace(Session session, String pathname)
+            throws NotConnectedException, PermissionException {
+        try {
+            return fileSystem(session).resolveFileInGlobalspace(pathname).exists();
+        } catch (FileSystemException e) {
+            return false;
+        }
+    }
+
+    public boolean checkFileExistsInUserSpace(Session session, String pathname)
+            throws NotConnectedException, PermissionException {
+        try {
+            return fileSystem(session).resolveFileInUserspace(pathname).exists();
+        } catch (FileSystemException e) {
+            return false;
         }
     }
 

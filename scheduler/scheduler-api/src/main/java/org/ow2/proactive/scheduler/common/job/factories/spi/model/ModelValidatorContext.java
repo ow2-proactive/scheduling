@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedMethodResolver;
@@ -50,38 +51,46 @@ public class ModelValidatorContext {
 
     private final Scheduler scheduler;
 
+    private final SchedulerSpaceInterface space;
+
     private String variableName;
 
     // container for job and task variables
     private SpELVariables spELVariables;
 
-    public ModelValidatorContext(StandardEvaluationContext context, Scheduler scheduler) {
+    public ModelValidatorContext(StandardEvaluationContext context, Scheduler scheduler,
+            SchedulerSpaceInterface space) {
         this.spelContext = context;
         this.scheduler = scheduler;
+        this.space = space;
     }
 
-    public ModelValidatorContext(Map<String, Serializable> variablesValues, Scheduler scheduler) {
+    public ModelValidatorContext(Map<String, Serializable> variablesValues, Scheduler scheduler,
+            SchedulerSpaceInterface space) {
         spELVariables = new SpELVariables(variablesValues);
         spelContext = new StandardEvaluationContext(spELVariables);
         spelContext.setTypeLocator(new RestrictedTypeLocator());
         spelContext.setMethodResolvers(Collections.singletonList(new RestrictedMethodResolver()));
         spelContext.addPropertyAccessor(new RestrictedPropertyAccessor());
         this.scheduler = scheduler;
+        this.space = space;
     }
 
-    public ModelValidatorContext(Task task, Scheduler scheduler) {
+    public ModelValidatorContext(Task task, Scheduler scheduler, SchedulerSpaceInterface space) {
         this(task.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
                                                            (m, v) -> m.put(v.getName(), v.getValue()),
                                                            HashMap<String, Serializable>::putAll),
-             scheduler);
+             scheduler,
+             space);
 
     }
 
-    public ModelValidatorContext(TaskFlowJob job, Scheduler scheduler) {
+    public ModelValidatorContext(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space) {
         this(job.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
                                                           (m, v) -> m.put(v.getName(), v.getValue()),
                                                           HashMap<String, Serializable>::putAll),
-             scheduler);
+             scheduler,
+             space);
 
     }
 
@@ -95,6 +104,10 @@ public class ModelValidatorContext {
 
     public Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public SchedulerSpaceInterface getSpace() {
+        return space;
     }
 
     public String getVariableName() {
