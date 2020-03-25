@@ -156,6 +156,13 @@ public class SchedulerStarter {
         configureLogging();
         configureDerby();
 
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                LOGGER.warn("Exception in thread \"" + t.getName() + "\" " + e.getMessage(), e);
+            }
+        });
+
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
         Options options = getOptions();

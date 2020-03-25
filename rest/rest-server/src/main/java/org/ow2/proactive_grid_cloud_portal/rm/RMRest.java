@@ -77,6 +77,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
+import org.ow2.proactive.resourcemanager.common.util.RMListenerProxy;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
@@ -156,7 +157,7 @@ public class RMRest implements RMRestInterface {
     @Override
     public void rmDisconnect(String sessionId) throws NotConnectedException {
         RMProxyUserInterface rm = checkAccess(sessionId);
-        rm.disconnect();
+        PAFuture.getFutureValue(rm.disconnect(), RMListenerProxy.MONITORING_INTERFACE_TIMEOUT);
         sessionStore.terminate(sessionId);
     }
 
