@@ -49,6 +49,8 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -68,6 +70,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
+import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
@@ -81,6 +84,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 public class RMListenerProxy extends RMGroupEventListener {
 
     protected Logger logger = ProActiveLogger.getLogger(RMListenerProxy.class);
+
+    public static final long MONITORING_INTERFACE_TIMEOUT = 30000L;
 
     protected RMAuthentication rmAuth;
 
@@ -126,16 +131,20 @@ public class RMListenerProxy extends RMGroupEventListener {
      */
     public BooleanWrapper disconnect() {
         try {
-            target.getMonitoring().removeRMEventListener();
+            getMonitoringOrFail().removeRMEventListener();
         } catch (Exception ignored) {
+            logger.debug("", ignored);
         }
         BooleanWrapper r = target.disconnect();
         return r;
     }
 
     private void rebindListener() {
-        rmInitialState = this.target.getMonitoring()
-                                    .addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
+        try {
+            rmInitialState = getMonitoringOrFail().addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private void checkCounter(RMEvent event) {
@@ -144,7 +153,7 @@ public class RMListenerProxy extends RMGroupEventListener {
             logger.warn("Missing events detected - resetting the rm state");
             logger.warn("Local event counter is " + counter + " vs. rm event counter " + event.getCounter());
             try {
-                this.target.getMonitoring().removeRMEventListener();
+                this.getMonitoringOrFail().removeRMEventListener();
             } catch (Exception e) {
                 logger.warn(e.getMessage(), e);
             }
@@ -154,6 +163,12 @@ public class RMListenerProxy extends RMGroupEventListener {
             counter.set(event.getCounter());
         }
 
+    }
+
+    private RMMonitoring getMonitoringOrFail() throws ProActiveTimeoutException {
+        RMMonitoring monitoring = this.target.getMonitoring();
+        monitoring = PAFuture.getFutureValue(monitoring, MONITORING_INTERFACE_TIMEOUT);
+        return monitoring;
     }
 
     /**
