@@ -2008,6 +2008,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Gets RM monitoring stub
      */
+    @ImmediateService
     public RMMonitoring getMonitoring() {
         try {
             // return the stub on RMMonitoring interface to keep avoid using server class on client side
