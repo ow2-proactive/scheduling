@@ -45,7 +45,7 @@ public class EncryptionValidatorTest {
     public void before() {
         Map<String, Serializable> variables = new HashMap<>();
         variables.put("foo", "value");
-        context = new ModelValidatorContext(variables, null);
+        context = new ModelValidatorContext(variables, null, null);
         context.setVariableName("foo");
     }
 

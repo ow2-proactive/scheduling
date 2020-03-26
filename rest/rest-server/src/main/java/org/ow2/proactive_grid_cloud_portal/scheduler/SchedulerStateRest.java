@@ -1163,13 +1163,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     private SchedulerSpaceInterface getSpaceInterface(String sessionId) throws NotConnectedRestException {
-        Session session = sessionStore.get(sessionId);
-
-        SchedulerSpaceInterface space = session.getSpace();
 
         renewSession(sessionId);
 
-        return space;
+        return sessionStore.get(sessionId).getSpace();
     }
 
     /**
