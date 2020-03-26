@@ -38,7 +38,9 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -53,6 +55,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.WorkflowSubmitter;
 public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
 
     private static Scheduler scheduler;
+
+    @Mock
+    private static SchedulerSpaceInterface space;
 
     private static JobId submittedJobId = null;
 
@@ -91,7 +96,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
 
     private JobId submitJob(String filename) throws Exception {
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
-        WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler);
+        WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler, space);
         JobId id = submitter.submit(jobFile, new HashMap<String, String>(), null);
         waitJobState(id, JobStatus.FINISHED, 500000);
         return id;

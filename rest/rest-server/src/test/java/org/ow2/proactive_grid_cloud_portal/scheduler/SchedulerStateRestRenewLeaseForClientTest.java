@@ -25,10 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -143,7 +140,7 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
             // However, renewLeaseForClient should have been invoked.
         }
 
-        methodThatMustBeInvoked.invoke(verify(schedulerStateRest, times(1)), sessionId);
+        methodThatMustBeInvoked.invoke(verify(schedulerStateRest, atLeast(1)), sessionId);
     }
 
     private Object[] createMethodParameters(Method method) throws IllegalAccessException {

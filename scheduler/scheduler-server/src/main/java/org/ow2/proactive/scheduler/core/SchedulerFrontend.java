@@ -105,6 +105,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
@@ -175,7 +176,7 @@ import org.ow2.proactive.utils.Tools;
  * @since ProActive Scheduling 0.9
  */
 @ActiveObject
-public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
+public class SchedulerFrontend implements InitActive, Scheduler, RunActive, SchedulerSpaceInterface {
 
     /**
      * Delay to wait for between getting a job result and removing the job
@@ -479,6 +480,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         final Job job = JobFactory.getFactory().createJob(IOUtils.toInputStream(jobContent, Charset.forName("UTF-8")),
                                                           jobVariables,
                                                           jobGenericInfos,
+                                                          this,
                                                           this);
         return submit(job);
     }
@@ -1677,4 +1679,19 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return true;
     }
 
+    @Override
+    @ImmediateService
+    public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
+        frontendState.checkPermission("checkFileExistsInGlobalSpace",
+                                      "You don't have permissions to check the file existence in the GLOBAL Space");
+        return this.spacesSupport.checkFileExistsInGlobalSpace(pathname);
+    }
+
+    @Override
+    @ImmediateService
+    public boolean checkFileExistsInUserSpace(String pathname) throws NotConnectedException, PermissionException {
+        UserIdentificationImpl userId = frontendState.checkPermission("checkFileExistsInUserSpace",
+                                                                      "You don't have permissions to check the file existence in the USER Space");
+        return this.spacesSupport.checkFileExistsInUserSpace(userId.getUsername(), pathname);
+    }
 }

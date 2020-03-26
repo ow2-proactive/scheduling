@@ -96,6 +96,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl;
+import org.ow2.proactive_grid_cloud_portal.dataspace.SchedulerDataspaceImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
@@ -1161,6 +1162,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return schedulerProxy;
     }
 
+    private SchedulerSpaceInterface getSpaceInterface(String sessionId) throws NotConnectedRestException {
+
+        renewSession(sessionId);
+
+        return sessionStore.get(sessionId).getSpace();
+    }
+
     /**
      * Call a method on the scheduler's frontend in order to renew the lease the
      * user has on this frontend. see PORTAL-70
@@ -1268,7 +1276,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public JobIdData submitFromUrl(String sessionId, String url, PathSegment pathSegment, UriInfo contextInfos)
             throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
             SubmissionClosedRestException, IOException {
-        Scheduler s = checkAccess(sessionId, "jobs");
+        Scheduler scheduler = checkAccess(sessionId, "jobs");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
         File tmpWorkflowFile = null;
         try {
@@ -1286,7 +1295,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 if (contextInfos != null)
                     genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
-                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
+                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
                 jobId = workflowSubmitter.submit(tmpWorkflowFile, jobVariables, genericInfos);
             }
 
@@ -1304,6 +1313,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             SubmissionClosedRestException, IOException {
         try {
             Scheduler scheduler = checkAccess(sessionId, "submit");
+            SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
 
@@ -1338,7 +1348,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     if (contextInfos != null)
                         genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
-                    WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
+                    WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
                     jobId = workflowSubmitter.submit(tmpJobFile, jobVariables, genericInfos);
                 }
 
@@ -1418,6 +1428,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public JobIdData reSubmit(String sessionId, String jobId, PathSegment pathSegment, UriInfo contextInfos)
             throws IOException, RestException {
         Scheduler scheduler = checkAccess(sessionId, "reSubmit");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
         File tmpJobFile = File.createTempFile("job", "d");
 
@@ -1438,7 +1449,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
         }
 
-        WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
+        WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
         newJobId = workflowSubmitter.submit(tmpJobFile, jobVariables, genericInfos);
         return mapper.map(newJobId, JobIdData.class);
     }
@@ -1960,8 +1971,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         File tmpFile = null;
         try {
             Scheduler scheduler = null;
+            SchedulerSpaceInterface space = null;
             if (sessionId != null) {
                 scheduler = checkAccess(sessionId);
+                space = getSpaceInterface(sessionId);
             }
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
             String name = formDataMap.keySet().iterator().next();
@@ -1978,7 +1991,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
             }
 
-            return ValidationUtil.validateJobDescriptor(tmpFile, jobVariables, scheduler);
+            return ValidationUtil.validateJobDescriptor(tmpFile, jobVariables, scheduler, space);
         } catch (IOException e) {
             JobValidationData validation = new JobValidationData();
             validation.setErrorMessage("Cannot read from the job validation request.");
@@ -2003,6 +2016,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         File tmpWorkflowFile = null;
         try {
             Scheduler scheduler = checkAccess(sessionId);
+            SchedulerSpaceInterface space = getSpaceInterface(sessionId);
             String jobXml = downloadWorkflowContent(sessionId, url);
             tmpWorkflowFile = File.createTempFile("job", "d");
             Map<String, String> jobVariables;
@@ -2012,7 +2026,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
             }
 
-            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler);
+            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler, space);
 
         } catch (JobCreationRestException | IOException e) {
             JobValidationData validation = new JobValidationData();
