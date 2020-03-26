@@ -152,6 +152,7 @@ public class SchedulerSpacesSupport {
         try {
             return this.globalSpace.resolveFile(pathname).exists();
         } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the file name [%s] in the global space.", pathname), e);
             return false;
         }
     }
@@ -166,6 +167,7 @@ public class SchedulerSpacesSupport {
         try {
             return this.getUserSpace(username).resolveFile(pathname).exists();
         } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse file name [%s] in user [%s] dataspace.", pathname, username), e);
             return false;
         }
     }

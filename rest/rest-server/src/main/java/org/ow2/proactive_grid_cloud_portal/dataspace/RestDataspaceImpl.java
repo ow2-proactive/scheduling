@@ -377,6 +377,7 @@ public class RestDataspaceImpl implements RestDataspace {
         try {
             return fileSystem(session).resolveFileInGlobalspace(pathname).exists();
         } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the file name [%s] in the global space.", pathname), e);
             return false;
         }
     }
@@ -386,6 +387,7 @@ public class RestDataspaceImpl implements RestDataspace {
         try {
             return fileSystem(session).resolveFileInUserspace(pathname).exists();
         } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the file name [%s] in the user space.", pathname), e);
             return false;
         }
     }

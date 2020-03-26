@@ -94,6 +94,22 @@ public class ModelValidatorContext {
 
     }
 
+    public ModelValidatorContext(StandardEvaluationContext context) {
+        this(context, null, null);
+    }
+
+    public ModelValidatorContext(Map<String, Serializable> variablesValues) {
+        this(variablesValues, null, null);
+    }
+
+    public ModelValidatorContext(Task task) {
+        this(task, null, null);
+    }
+
+    public ModelValidatorContext(TaskFlowJob job) {
+        this(job, null, null);
+    }
+
     public StandardEvaluationContext getSpELContext() {
         return spelContext;
     }
