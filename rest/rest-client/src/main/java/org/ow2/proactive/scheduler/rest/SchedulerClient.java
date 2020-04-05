@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.rest;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.statusesToString;
-import static org.ow2.proactive.scheduler.common.task.TaskStatus.wrapIntoAggregatedStatuses;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
@@ -52,6 +51,9 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,8 +72,11 @@ import javax.security.auth.Subject;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -1433,13 +1438,22 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
+    private org.apache.http.impl.client.HttpClientBuilder getHttpClientBuilder()
+            throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        SSLContextBuilder builder = new SSLContextBuilder();
+        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(),
+                                                                          SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        return HttpClients.custom().setSSLSocketFactory(sslsf);
+    }
+
     private JobId submitFromCatalog(HttpGet httpGet, Map<String, String> variables, Map<String, String> genericInfos)
             throws SubmissionClosedException, JobCreationException, NotConnectedException, PermissionException {
         JobIdData jobIdData = null;
 
         httpGet.addHeader("sessionid", sid);
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
+        try (CloseableHttpClient httpclient = getHttpClientBuilder().build();
                 CloseableHttpResponse response = httpclient.execute(httpGet)) {
 
             jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables, genericInfos);
