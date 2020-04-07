@@ -163,7 +163,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         try {
             variable = t.handle();
         } catch (RuntimeException e) {
-            logger.error("Exception while getting runtime variable: " + e.getMessage());
+            logger.error("Exception while getting runtime variable: " + e.getMessage(), e);
             throw e;
         } finally {
             readLock.unlock();
@@ -186,7 +186,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         } catch (IllegalArgumentException e) {
             logger.warn("Infrastructure variables not persisted", e);
         } catch (RuntimeException e) {
-            logger.error("Exception while setting runtime variable: " + e.getMessage());
+            logger.error("Exception while setting runtime variable: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -209,7 +209,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         try {
             persistedInfraVariables.put(RM_URL_KEY, nodeSource.getRegistrationURL());
         } catch (RuntimeException e) {
-            logger.error("Exception while putting RM URL in runtime variables: " + e.getMessage());
+            logger.error("Exception while putting RM URL in runtime variables: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -256,7 +256,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             result.addAll(rmDeployingNodes);
             result.addAll(rmLostNodes);
         } catch (RuntimeException e) {
-            logger.error("Exception while getting deploying and lost nodes: " + e.getMessage());
+            logger.error("Exception while getting deploying and lost nodes: " + e.getMessage(), e);
             throw e;
         } finally {
             readLock.unlock();
@@ -294,7 +294,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 isLost = true;
             }
         } catch (RuntimeException e) {
-            logger.error("Exception while removing deploying node: " + e.getMessage());
+            logger.error("Exception while removing deploying node: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -488,7 +488,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             this.configure(parameters);
         } catch (RuntimeException e) {
             logger.error("Exception while initializing runtime variables and configuring infrastructure: " +
-                         e.getMessage());
+                         e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -853,7 +853,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 addLostNodeWithLockAndPersist(toUpdateURL, deployingNode);
             }
         } catch (RuntimeException e) {
-            logger.error("Exception while moving a node from deploying to lost: " + e.getMessage());
+            logger.error("Exception while moving a node from deploying to lost: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -921,7 +921,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 return false;
             }
         } catch (RuntimeException e) {
-            logger.error("Exception while checking acquired node and doing post action: " + e.getMessage());
+            logger.error("Exception while checking acquired node and doing post action: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
