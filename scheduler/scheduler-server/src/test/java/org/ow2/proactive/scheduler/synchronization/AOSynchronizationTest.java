@@ -105,6 +105,8 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
     public static final String FUNCTION_RETURN_SEVEN = "{k -> 7}";
 
+    private static final int FREEZE_RESUME_SLEEP_TIME = 2000;
+
     private AOSynchronization synchronizationInternal;
 
     private Synchronization synchronization;
@@ -134,6 +136,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
         initSynchronizationAPI(tempFolder);
 
         executor = Executors.newFixedThreadPool(2);
+        freezeAndSleepInParallel();
     }
 
     private void initSynchronizationAPI(File tempFolder) throws ActiveObjectCreationException, NodeException {
@@ -171,6 +174,19 @@ public class AOSynchronizationTest extends ProActiveTestClean {
         } catch (InvalidChannelException e) {
             // ok
         }
+    }
+
+    private void freezeAndSleepInParallel() {
+        Thread thread = new Thread(() -> {
+            try {
+                synchronization.freeze();
+                Thread.sleep(FREEZE_RESUME_SLEEP_TIME);
+                synchronization.resume();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        thread.start();
     }
 
     @Test
@@ -428,17 +444,14 @@ public class AOSynchronizationTest extends ProActiveTestClean {
     public void testWaitUntilWithTimeout() throws IOException, InvalidChannelException, CompilationException {
         initChannel();
 
-        Runnable decrementRunnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    synchronization.compute(CHANNEL1, "a", BIFUNCTION_DECREMENT_ONE);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+        Runnable decrementRunnable = () -> {
+            try {
+                Thread.sleep(FREEZE_RESUME_SLEEP_TIME + 600);
+                synchronization.compute(CHANNEL1, "a", BIFUNCTION_DECREMENT_ONE);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         };
 
         // this is a producer/consumer pattern

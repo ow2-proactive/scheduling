@@ -46,6 +46,7 @@ import org.ow2.proactive.resourcemanager.common.RMStateNodeUrls;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.common.CommonRest;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRMProxyFactory;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.rm.RMRest;
@@ -62,6 +63,8 @@ public class SessionSharingTest {
 
     private StudioRest studioRest;
 
+    private CommonRest commonRest;
+
     private RMProxyUserInterface rmMock;
 
     private SchedulerProxyUserInterface schedulerMock;
@@ -71,6 +74,7 @@ public class SessionSharingTest {
         schedulerRest = new SchedulerStateRest();
         rmRest = new RMRest();
         studioRest = new StudioRest();
+        commonRest = new CommonRest();
 
         SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
         rmMock = mock(RMProxyUserInterface.class);

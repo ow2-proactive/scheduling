@@ -248,7 +248,8 @@ public class Client implements Serializable {
      *
      * @return true if it has, throw {@link SecurityException} otherwise with specified error message
      */
-    public boolean checkPermission(final Permission permission, String errorMessage) {
+    public boolean checkPermission(final Permission permission, String errorMessage,
+            final Permission... superUserPermissions) {
         try {
             Subject.doAsPrivileged(subject, (PrivilegedAction<Object>) () -> {
                 SecurityManager sm = System.getSecurityManager();
@@ -258,10 +259,31 @@ public class Client implements Serializable {
                 return null;
             }, null);
         } catch (SecurityException ex) {
-            throw new SecurityException(errorMessage, ex);
+            // if the client is not allowed to perform the operation, we check if it has one of the provided super-user permissions
+            if (!checkSuperUserPermission(superUserPermissions)) {
+                throw new SecurityException(errorMessage, ex);
+            }
         }
 
         return true;
+    }
+
+    private boolean checkSuperUserPermission(final Permission... superUserPermissions) {
+        for (Permission superUserPermission : superUserPermissions) {
+            try {
+                Subject.doAsPrivileged(subject, (PrivilegedAction<Object>) () -> {
+                    SecurityManager sm = System.getSecurityManager();
+                    if (sm != null) {
+                        sm.checkPermission(superUserPermission);
+                    }
+                    return null;
+                }, null);
+                return true;
+            } catch (SecurityException ex1) {
+                // ignore exception
+            }
+        }
+        return false;
     }
 
     /**

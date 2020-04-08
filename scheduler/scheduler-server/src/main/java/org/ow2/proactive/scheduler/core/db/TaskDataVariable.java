@@ -27,12 +27,12 @@ package org.ow2.proactive.scheduler.core.db;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteTaskDataVariable", query = "delete from TaskDataVariable where taskData.id.jobId = :jobId"),
-                @NamedQuery(name = "deleteTaskDataVariableInBulk", query = "delete from TaskDataVariable where taskData.id.jobId in :jobIdList"),
+@NamedQueries({ @NamedQuery(name = "deleteTaskDataVariableInBulk", query = "delete from TaskDataVariable where taskData.id.jobId in :jobIdList"),
                 @NamedQuery(name = "countTaskDataVariable", query = "select count (*) from TaskDataVariable") })
 @Table(name = "TASK_DATA_VARIABLE", indexes = { @Index(name = "TASK_DATA_VARIABLE_JOB_ID", columnList = "JOB_ID"),
                                                 @Index(name = "TASK_DATA_VARIABLE_TASK_ID", columnList = "TASK_ID") })
@@ -93,6 +93,7 @@ public class TaskDataVariable {
 
     @Column(name = "VARIABLE_VALUE", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getValue() {
         return value;
     }
@@ -112,6 +113,7 @@ public class TaskDataVariable {
 
     @Column(name = "VARIABLE_MODEL", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getModel() {
         return model;
     }

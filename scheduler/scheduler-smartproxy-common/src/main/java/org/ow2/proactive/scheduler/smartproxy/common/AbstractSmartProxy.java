@@ -30,7 +30,6 @@ import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
 
 import java.io.File;
-import java.security.KeyException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -464,7 +463,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                                                                          ts.getTaskInfo()));
                         }
                     } catch (NotConnectedException e) {
-                        e.printStackTrace();
+                        log.error("Scheduler connection error", e);
                     } catch (UnknownJobException e) {
                         log.error("Could not retrieve output data for job " + id +
                                   " because this job is not known by the Scheduler. \n ", e);
@@ -1043,6 +1042,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
+    public boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException {
+        return getScheduler().killJobs(jobsId);
+    }
+
+    @Override
     public boolean killTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return getScheduler().killTask(jobId, taskName);
@@ -1124,6 +1128,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     @Override
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().removeJob(jobId);
+    }
+
+    @Override
+    public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        return getScheduler().removeJobs(jobIds);
     }
 
     @Override
@@ -1238,18 +1247,17 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException {
+    public void putThirdPartyCredential(String key, String value) throws SchedulerException {
         getScheduler().putThirdPartyCredential(key, value);
     }
 
     @Override
-    public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
+    public Set<String> thirdPartyCredentialsKeySet() throws SchedulerException {
         return getScheduler().thirdPartyCredentialsKeySet();
     }
 
     @Override
-    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+    public void removeThirdPartyCredential(String key) throws SchedulerException {
         getScheduler().removeThirdPartyCredential(key);
     }
 

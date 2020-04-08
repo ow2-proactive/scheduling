@@ -2,13 +2,14 @@ dependencies {
     compile("org.objectweb.proactive:programming-extension-dataspaces-common:${programmingVersion}")
 
     compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
-    compile 'org.apache.commons:commons-collections4:4.0'
+    compile 'org.apache.commons:commons-collections4:4.4'
     compile 'msv:isorelax:20050913'
     compile 'msv:msv:20050913'
     compile 'commons-io:commons-io:2.5'
     compile group: 'org.springframework', name: 'spring-expression', version: '4.2.5.RELEASE'
-    compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.12'
-    compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.12'
+    compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.13'
+    compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
+    compile 'com.googlecode.json-simple:json-simple:1.1'
 
     compile 'joda-time:joda-time:2.9.1'
 
@@ -21,12 +22,12 @@ dependencies {
     runtime 'msv:xsdlib:20050913'
     runtime 'xerces:xercesImpl:2.11.0'
 
-    testCompile project (':common:common-api').sourceSets.test.output
+    testCompile project(':common:common-api').sourceSets.test.output
 }
 
 apply plugin: 'trang'
 task convertSchemas
-['3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10', '3.11', 'dev'].each { schemaVersion ->
+['3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12', 'dev'].each { schemaVersion ->
     task("convertSchemasXsd-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
         sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
         targetDirectory = sourceDirectory

@@ -47,6 +47,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
@@ -62,7 +63,7 @@ import com.google.common.base.Throwables;
 
 
 @Path("/data/")
-public class RestDataspaceImpl {
+public class RestDataspaceImpl implements RestDataspace {
 
     private static final Logger logger = Logger.getLogger(RestDataspaceImpl.class);
 
@@ -72,30 +73,7 @@ public class RestDataspaceImpl {
 
     private static SessionStore sessions = SharedSessionStore.getInstance();
 
-    /**
-     * Upload a file to the specified location in the <i>dataspace</i>. The
-     * format of the PUT URI is:
-     * <p>
-     * {@code http://<rest-server-path>/data/<dataspace>/<path-name>}
-     * <p>
-     * Example:
-     * <p>
-     * {@code http://localhost:8080/rest/rest/data/user/my-files/my-text-file.txt}
-     * <ul>
-     * <li><b>dataspace:</b> Can have two possible values, 'user' or 'global',
-     * depending on target <i>DATASPACE</i>.</li>
-     * <li><b>path-name:</b> Location in which the file is stored.</li>
-     * </ul>
-     * <b>Notes:</b>
-     * <ul>
-     * <li>If 'gzip' or 'zip' is specified in the 'Content-Encoding' header, the
-     * contents of the request body will be decoded before being stored.</li>
-     * <li>Any file that already exists in the specified location, it will be
-     * replaced.</li>
-     * </ul>
-     */
-    @PUT
-    @Path("/{dataspace}/{path-name:.*}")
+    @Override
     public Response store(@HeaderParam("sessionid") String sessionId, @HeaderParam("Content-Encoding") String encoding,
             @PathParam("dataspace") String dataspace, @PathParam("path-name") String pathname, InputStream is)
             throws NotConnectedRestException, PermissionRestException {
@@ -114,48 +92,7 @@ public class RestDataspaceImpl {
         return Response.status(Response.Status.CREATED).build();
     }
 
-    /**
-     * Retrieves single or multiple files from specified location of the server.
-     * The format of the GET URI is:
-     * <P>
-     * {@code http://<rest-server-path>/data/<dataspace>/<path-name>}
-     * <p>
-     * Example:
-     * <p>
-     * {@code http://localhost:8080/rest/rest/data/user/my-files/my-text-file.txt}
-     * <ul>
-     * <li>dataspace: can have two possible values, 'user' or 'global',
-     * depending on the target <i>DATASPACE</i></li>
-     * <li>path-name: location from which the file will be retrieved.</li>
-     * </ul>
-     * <b>Notes:</b>
-     * <ul>
-     * <li>If 'list' is specified as the 'comp' query parameter, an
-     * {@link ListFile} type object will be return in JSON format. It will contain a list of files and folder contained in the selected
-     * path.
-     * </li>
-     * <li>If 'recursive' is specified as the 'comp' query parameter, an
-     * {@link ListFile} type object will be return in JSON format. It will contain a list of files and folder contained in the selected
-     * path and all subfolders.
-     * </li>
-     * <li>If the pathname represents a file its contents will be returned as:
-     * <ul>
-     * <li>an octet stream, if its a compressed file or the client doesn't
-     * accept encoded content</li>
-     * <li>a 'gzip' encoded stream, if the client accepts 'gzip' encoded content
-     * </li>
-     * <li>a 'zip' encoded stream, if the client accepts 'zip' encoded contents</li>
-     * </ul>
-     * </li>
-     * <li>If the pathname represents a directory, its contents will be returned
-     * as 'zip' encoded stream.</li>
-     * <li>file names or regular expressions can be used as 'includes' and
-     * 'excludes' query parameters, in order to select which files to be
-     * returned can be used to select the files returned.</li>
-     * </ul>
-     */
-    @GET
-    @Path("/{dataspace}/{path-name:.*}")
+    @Override
     public Response retrieve(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("Accept-Encoding") String encoding, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("comp") String component,
@@ -201,30 +138,7 @@ public class RestDataspaceImpl {
         }
     }
 
-    /**
-     * Delete file(s) from the specified location in the <i>dataspace</i>. The
-     * format of the DELETE URI is:
-     * <p>
-     * {@code http://<rest-server-path>/data/<dataspace>/<path-name>}
-     * <p>
-     * Example:
-     * {@code http://localhost:8080/rest/rest/data/user/my-files/my-text-file.txt}
-     * <ul>
-     * <li>dataspace: can have two possible values, 'user' or 'global',
-     * depending on the target <i>DATASPACE</i></li>
-     * <li>path-name: location of the file(s) to be deleted.</li>
-     * </ul>
-     * <b>Notes:</b>
-     * <ul>
-     * <li>Only empty directories can be deleted.</li>
-     * <li>File names or regular expressions can be used as 'includes' and
-     * 'excludes' query parameters, in order to select which files to be deleted
-     * inside the specified directory (path-name).</li>
-     * </ul>
-     *
-     */
-    @DELETE
-    @Path("/{dataspace}/{path-name:.*}")
+    @Override
     public Response delete(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("includes") List<String> includes,
             @QueryParam("excludes") List<String> excludes) throws NotConnectedRestException, PermissionRestException {
@@ -251,18 +165,7 @@ public class RestDataspaceImpl {
         }
     }
 
-    /**
-     * Retrieve metadata of file in the location specified in <i>dataspace</i>.
-     * The format of the HEAD URI is:
-     * <p>
-     * {@code http://<rest-server-path>/data/<dataspace>/<path-name>}
-     * <p>
-     * Example:
-     * {@code http://localhost:8080/rest/rest/data/user/my-files/my-text-file.txt}
-     *
-     */
-    @HEAD
-    @Path("/{dataspace}/{path-name:.*}")
+    @Override
     public Response metadata(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspacePath,
             @PathParam("path-name") String pathname) throws NotConnectedRestException, PermissionRestException {
         Session session = checkSessionValidity(sessionId);
@@ -282,8 +185,7 @@ public class RestDataspaceImpl {
         }
     }
 
-    @POST
-    @Path("/{dataspace}/{path-name:.*}")
+    @Override
     public Response create(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspacePath,
             @PathParam("path-name") String pathname, @FormParam("mimetype") String mimeType)
             throws NotConnectedRestException, PermissionRestException {
@@ -470,6 +372,26 @@ public class RestDataspaceImpl {
         }
     }
 
+    public boolean checkFileExistsInGlobalSpace(Session session, String pathname)
+            throws NotConnectedException, PermissionException {
+        try {
+            return fileSystem(session).resolveFileInGlobalspace(pathname).exists();
+        } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the file name [%s] in the global space.", pathname), e);
+            return false;
+        }
+    }
+
+    public boolean checkFileExistsInUserSpace(Session session, String pathname)
+            throws NotConnectedException, PermissionException {
+        try {
+            return fileSystem(session).resolveFileInUserspace(pathname).exists();
+        } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the file name [%s] in the user space.", pathname), e);
+            return false;
+        }
+    }
+
     private FileSystem fileSystem(Session session)
             throws FileSystemException, NotConnectedException, PermissionException {
         FileSystem fs = session.fileSystem();
@@ -486,8 +408,8 @@ public class RestDataspaceImpl {
     }
 
     public Session checkSessionValidity(String sessionId) throws NotConnectedRestException {
-        Session session = Strings.isNullOrEmpty(sessionId) ? null : sessions.get(sessionId);
-        if (session == null || session.getScheduler() == null) {
+        Session session = sessions.get(sessionId);
+        if (session.getScheduler() == null) {
             throw new NotConnectedRestException("User not authenticated or session timeout.");
         }
         return session;

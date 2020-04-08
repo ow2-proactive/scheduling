@@ -27,6 +27,7 @@ package functionaltests.permissions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.Criteria;
+import org.ow2.proactive.utils.Lambda;
+import org.ow2.proactive.utils.Lambda.RunnableThatThrows;
 import org.ow2.proactive.utils.NodeSet;
 
 import functionaltests.utils.RMFunctionalTest;
@@ -56,7 +59,7 @@ import functionaltests.utils.TestUsers;
 public class TestNSNodesPermissions extends RMFunctionalTest {
 
     private List<Node> createNodes(String name, int number) throws Exception {
-        List<TestNode> nodePool = rmHelper.createNodes("node", 17);
+        List<TestNode> nodePool = rmHelper.createNodes(name, number);
         testNodes.addAll(nodePool);
         ArrayList<Node> answer = new ArrayList<>(nodePool.size());
         for (TestNode tn : nodePool) {
@@ -67,6 +70,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
+
+        List<Node> nodePool;
 
         String nsName = "TestNSNodesPermissions";
         RMTHelper.log("Test1 - node users = ME");
@@ -80,47 +85,30 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                  NODES_NOT_RECOVERABLE)
                .getBooleanValue();
 
-        List<Node> nodePool = createNodes("node", 2);
+        nodePool = createNodes("node", 2);
         Node node = nodePool.remove(0);
         Node node2 = nodePool.remove(0);
 
-        nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, nsadmin);
 
-        NodeSet nodes = nsadmin.getNodes(new Criteria(1));
-        //we eat free -> busy
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        assertEquals(1, nodes.size());
-        nsadmin.releaseNodes(nodes);
-        //busy -> free
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        NodeSet nodes;
+
+        getAndReleaseNodes(nsadmin, "Node source creator should be able to get nodes", new Criteria(1), 1);
 
         ResourceManager user = rmHelper.getResourceManager(TestUsers.RADMIN);
         nodes = user.getNodes(new Criteria(1));
         assertEquals("User cannot get foreign node", 0, nodes.size());
 
-        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2.getNodeInformation().getURL());
+        addOneNodeToNodeSource(nsName, node2, user);
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nodes = nsadmin.getNodes(new Criteria(2));
-        //we eat free -> busy * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        assertEquals("Did not get foreign node", 2, nodes.size());
-        nsadmin.releaseNodes(nodes);
-        //busy -> free * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        nsadmin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        getAndReleaseNodes(nsadmin,
+                           "Node source creator should be able to get nodes created by a different user",
+                           new Criteria(2),
+                           2);
+
+        removeNodeSourceAndNodes(nsName, nsadmin, 2);
 
         RMTHelper.log("Test2 - node users = MY_GROUPS");
         ResourceManager admin = rmHelper.getResourceManager(TestUsers.ADMIN);
@@ -137,37 +125,20 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         node2 = nodePool.remove(0);
 
         System.out.println(System.currentTimeMillis());
-        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, admin);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        nodes = user.getNodes(new Criteria(1));
-        assertEquals("User cannot get foreign node", 0, nodes.size());
 
-        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node2, user);
 
-        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nodes = nsadmin.getNodes(new Criteria(2));
-        assertEquals(2, nodes.size());
-        //we eat free -> busy * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
-        //busy -> free * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(user,
+                           "user from the same group as the owner should be able to get nodes",
+                           new Criteria(2),
+                           2);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, admin, 2);
 
         RMTHelper.log("Test3 - node users = PROVIDER");
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
@@ -183,48 +154,25 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
 
-        user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, user);
 
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node2, admin);
 
-        // admin can get 2 nodes as it has AllPermissions
-        nodes = admin.getNodes(new Criteria(2));
-        assertEquals("Admin did not get foreign node", 2, nodes.size());
-        //we eat free -> busy * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.releaseNodes(nodes);
-        //busy -> free * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        ResourceManager superAdmin = rmHelper.getResourceManager(TestUsers.TEST);
+
+        // super admin can get 2 nodes as it has AllPermissions
+        getAndReleaseNodes(superAdmin, "Super admin should be able to get foreign nodes", new Criteria(2), 2);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        nodes = user.getNodes(new Criteria(2));
-        assertEquals(1, nodes.size());
-        //we eat free -> busy
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.releaseNodes(nodes);
-        //busy -> free
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(user, "node source owner should be able to get his own nodes only", new Criteria(2), 1);
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nodes = nsadmin.getNodes(new Criteria(2));
-        assertEquals("Have got a foreign node", 0, nodes.size());
-        nsadmin.releaseNodes(nodes);
+        getAndReleaseNodes(nsadmin, "other users should not be able to get nodes", new Criteria(2), 0);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, admin, 2);
 
         RMTHelper.log("Test4 - node users = PROVIDER_GROUPS");
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
@@ -240,53 +188,26 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
 
-        user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, user);
 
-        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        superAdmin = rmHelper.getResourceManager(TestUsers.TEST);
+        addOneNodeToNodeSource(nsName, node2, superAdmin);
 
         // admin can get 2 nodes as it has AllPermissions
-        nodes = admin.getNodes(new Criteria(2));
-        assertEquals("Admin did not get foreign node", 2, nodes.size());
-        //we eat free -> busy * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.releaseNodes(nodes);
-        //we eat busy -> free * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(superAdmin, "superAdmin did not get foreign node", new Criteria(2), 2);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        nodes = user.getNodes(new Criteria(2));
-        assertEquals(1, nodes.size());
+        getAndReleaseNodes(user, "node source owner should get nodes he added", new Criteria(2), 1);
 
-        //we eat free -> busy
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.releaseNodes(nodes);
-        //we eat busy -> free
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-
-        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nodes = nsadmin.getNodes(new Criteria(2));
-        assertEquals("Have not get an admin node", 1, nodes.size());
-        //we eat free -> busy
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
-        //we eat busy -> free
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        getAndReleaseNodes(admin,
+                           "user with the same group as the node source owner should get the same nodes",
+                           new Criteria(2),
+                           1);
 
         // removing the node source
-        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        superAdmin = rmHelper.getResourceManager(TestUsers.TEST);
+        removeNodeSourceAndNodes(nsName, superAdmin, 2);
 
         RMTHelper.log("Test5 - node users = ALL");
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
@@ -301,20 +222,11 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodePool = createNodes("node", 1);
         node = nodePool.remove(0);
 
-        user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, user);
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         Criteria criteria = new Criteria(1);
-        nodes = nsadmin.getNodes(criteria);
-        assertEquals("Have got a foreign node", 1, nodes.size());
-        //we eat the free to busy
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
-        //we eat the busy to free
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(nsadmin, "standard user should use a node", criteria, 1);
 
         criteria.setNodeAccessToken("non_existing_token");
         nodes = nsadmin.getNodes(criteria);
@@ -322,9 +234,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, admin, 1);
 
         RMTHelper.log("Test6.1 - specific users");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
@@ -340,39 +250,23 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
 
-        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, admin);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
         nodes = user.getNodes(new Criteria(1));
-        assertEquals("User cannot get foreign node", 0, nodes.size());
+        assertEquals("unspecified user cannot use its own node", 0, nodes.size());
 
-        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node2, user);
+
         nodes = user.getNodes(new Criteria(1));
-        assertEquals("User cannot even your own node", 0, nodes.size());
+        assertEquals("unspecified user cannot use its own node", 0, nodes.size());
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nodes = nsadmin.getNodes(new Criteria(2));
-        assertEquals(2, nodes.size());
-        //we eat free -> busy * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
-        //busy -> free * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(nsadmin, "specified user should use nodes", new Criteria(2), 2);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, admin, 2);
 
         RMTHelper.log("Test6.2 - specific groups");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
@@ -388,49 +282,25 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
 
-        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, admin);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
         nodes = user.getNodes(new Criteria(1));
-        assertEquals("User cannot get foreign node", 0, nodes.size());
+        assertEquals("User not in specified group should not get foreign node", 0, nodes.size());
 
-        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node2, user);
+
         nodes = user.getNodes(new Criteria(1));
-        assertEquals("User cannot even your own node", 0, nodes.size());
+        assertEquals("User not in specified group should not get his own node", 0, nodes.size());
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nodes = nsadmin.getNodes(new Criteria(2));
-        assertEquals(2, nodes.size());
-        //we eat free -> busy * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
-        //busy -> free * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(nsadmin, "user in specified group should get nodes", new Criteria(2), 2);
 
         // removing the node source
-        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        nodes = admin.getNodes(new Criteria(2));
-        assertEquals(2, nodes.size());
-        //we eat free -> busy * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.releaseNodes(nodes);
-        //busy -> free * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        superAdmin = rmHelper.getResourceManager(TestUsers.TEST);
+        getAndReleaseNodes(superAdmin, "superAdmin should get nodes", new Criteria(2), 2);
 
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, superAdmin, 2);
 
         RMTHelper.log("Test6.3 - specific tokens");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
@@ -445,47 +315,32 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodePool = createNodes("node", 1);
         node = nodePool.remove(0);
 
-        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, admin);
 
         criteria = new Criteria(1);
         criteria.setNodeAccessToken("token1");
-        nodes = admin.getNodes(criteria);
-        assertEquals(1, nodes.size());
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.releaseNodes(nodes);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(admin, "token1 should use the node", criteria, 1);
 
         criteria.setNodeAccessToken("token2");
-        nodes = admin.getNodes(criteria);
-        assertEquals(1, nodes.size());
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.releaseNodes(nodes);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(admin, "token2 should use the node", criteria, 1);
 
         // admin also does not have the right to get the node
         criteria.setNodeAccessToken("token3");
-        nodes = admin.getNodes(criteria);
-        assertEquals(0, nodes.size());
+        getAndReleaseNodes(admin, "token3 should not use the node", criteria, 0);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
         criteria = new Criteria(1);
-        nodes = user.getNodes(criteria);
-        assertEquals(0, nodes.size());
+        getAndReleaseNodes(user, "no token should not use the node", criteria, 0);
 
         criteria.setNodeAccessToken("token1");
-        nodes = user.getNodes(criteria);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.releaseNodes(nodes);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(user, "token1 should use the node", criteria, 1);
+
+        superAdmin = rmHelper.getResourceManager(TestUsers.TEST);
+        getAndReleaseNodes(superAdmin, "superAdmin should use the node", new Criteria(1), 1);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, admin, 1);
 
         RMTHelper.log("Test6.4 - specific users and groups");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
@@ -501,47 +356,20 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
 
-        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, admin);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        nodes = user.getNodes(new Criteria(1));
-        assertEquals("User did not get a node but had a right to get it", 1, nodes.size());
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.releaseNodes(nodes);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(user, "specified user should get node", new Criteria(1), 1);
 
-        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nodes = user.getNodes(new Criteria(2));
-        assertEquals("User did not get nodes but had a right to get them", 2, nodes.size());
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.releaseNodes(nodes);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node2, user);
+        getAndReleaseNodes(user, "specified user should get nodes", new Criteria(2), 2);
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nodes = nsadmin.getNodes(new Criteria(2));
-        assertEquals(2, nodes.size());
-        //we eat free -> busy * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
-        //busy -> free * 2
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(nsadmin, "user from specified group should get nodes", new Criteria(2), 2);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, admin, 2);
 
         RMTHelper.log("Test6.5 - specific users and token");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
@@ -556,37 +384,107 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodePool = createNodes("node", 1);
         node = nodePool.remove(0);
 
-        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, admin);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
         criteria = new Criteria(1);
         criteria.setNodeAccessToken("token1");
-        nodes = user.getNodes(criteria);
-        assertEquals("User did not get a node but had a right to get it", 1, nodes.size());
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.releaseNodes(nodes);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 1);
 
         criteria.setNodeAccessToken("token2"); // will not get a node as don't have the token "token2"
-        nodes = user.getNodes(criteria);
-        assertEquals(0, nodes.size());
+        getAndReleaseNodes(user, "token2 should not allow getting nodes", criteria, 0);
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         criteria.setNodeAccessToken("token1");
-        nodes = nsadmin.getNodes(criteria);
-        assertEquals(1, nodes.size());
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        getAndReleaseNodes(nsadmin, "token1 should allow getting nodes", criteria, 1);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, admin, 1);
+
+        RMTHelper.log("Test6.6 - add/remove token dynamically");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "ME" },
+                               NODES_NOT_RECOVERABLE)
+             .getBooleanValue();
+
+        nodePool = createNodes("node", 1);
+        node = nodePool.remove(0);
+        final Node finalNode = node;
+
+        addOneNodeToNodeSource(nsName, node, admin);
+
+        user = rmHelper.getResourceManager(TestUsers.ADMIN);
+        user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
+        user.addNodeToken(node.getNodeInformation().getURL(), "token2");
+        user.removeNodeToken(node.getNodeInformation().getURL(), "token2");
+
+        // in this case nsadmin does not have rights to call add token
+        // because he is not node source provider
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.NSADMIN)
+                                                  .addNodeToken(finalNode.getNodeInformation().getURL(), "token2"));
+
+        // in this case nsadmin does not have rights to call remove token
+        // because he is not node source provider
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.NSADMIN)
+                                                  .removeNodeToken(finalNode.getNodeInformation().getURL(), "token2"));
+
+        user = rmHelper.getResourceManager(TestUsers.TEST);
+
+        criteria = new Criteria(1);
+        getAndReleaseNodes(user, "super-admin does not care about tokens", criteria, 1);
+
+        user = rmHelper.getResourceManager(TestUsers.USER);
+
+        criteria = new Criteria(1);
+        getAndReleaseNodes(user, "user will not get node because it is protected by token", criteria, 0);
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "all good, node and criteria have right token", criteria, 1);
+
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.USER)
+                                                  .addNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
+
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.USER)
+                                                  .removeNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.PROVIDER)
+                                                  .addNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
+
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.PROVIDER)
+                                                  .removeNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
+
+        // removing the node source
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        removeNodeSourceAndNodes(nsName, admin, 1);
+
+        RMTHelper.log("Test6.7 - check that provider can add/remove token to own node");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "ALL" },
+                               NODES_NOT_RECOVERABLE)
+             .getBooleanValue();
+
+        user = rmHelper.getResourceManager(TestUsers.PROVIDER);
+
+        nodePool = createNodes("node", 1);
+        node = nodePool.remove(0);
+        addOneNodeToNodeSource(nsName, node, user);
+
+        user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+        user.removeNodeToken(node.getNodeInformation().getURL(), "token1");
+
+        // removing the node source
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        removeNodeSourceAndNodes(nsName, admin, 1);
 
         RMTHelper.log("Test7.1 - excluding specific user");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
@@ -601,10 +499,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodePool = createNodes("node", 1);
         node = nodePool.remove(0);
 
-        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, admin);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
         boolean canComputeOnIt = user.isNodeUser(node.getNodeInformation().getURL()).getBooleanValue();
@@ -612,9 +507,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceAndNodes(nsName, admin, 1);
 
         RMTHelper.log("Test7.2 - excluding specific group");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
@@ -629,10 +522,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodePool = createNodes("node", 1);
         node = nodePool.remove(0);
 
-        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        //we eat the configuring to free nodeevent
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        addOneNodeToNodeSource(nsName, node, admin);
 
         user = rmHelper.getResourceManager(TestUsers.NSADMIN);
         canComputeOnIt = user.isNodeUser(node.getNodeInformation().getURL()).getBooleanValue();
@@ -640,8 +530,51 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeSourceAndNodes(nsName, admin, 1);
+    }
+
+    private void checkThrowSecurityException(RunnableThatThrows callable) {
+        try {
+            callable.run();
+        } catch (SecurityException e) {
+            return;
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        fail();
+    }
+
+    private void addOneNodeToNodeSource(String nsName, Node node, ResourceManager admin) {
+        String url = node.getNodeInformation().getURL();
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, url);
+        //we eat the configuring to free nodeevent
+        rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, url);
+    }
+
+    private void removeNodeSourceAndNodes(String nsName, ResourceManager nsadmin, int nbNodes) {
+        nsadmin.removeNodeSource(nsName, true).getBooleanValue();
+        for (int i = 0; i < nbNodes; i++) {
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        }
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+    }
+
+    private void getAndReleaseNodes(ResourceManager user, String message, Criteria criteria, int expectedNodes) {
+        NodeSet nodes;
+        nodes = user.getNodes(criteria);
+        assertEquals(message, expectedNodes, nodes.size());
+        //we eat free -> busy * expectedNodes
+        for (int i = 0; i < expectedNodes; i++) {
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
+
+        if (expectedNodes > 0) {
+            user.releaseNodes(nodes);
+        }
+        //we eat busy -> free * expectedNodes
+        for (int i = 0; i < expectedNodes; i++) {
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
     }
 }

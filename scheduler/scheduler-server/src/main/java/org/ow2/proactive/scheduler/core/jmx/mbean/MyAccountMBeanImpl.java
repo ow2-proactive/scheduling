@@ -77,12 +77,76 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
         return this.perThreadAccount.get().getTotalTaskCount();
     }
 
+    public int getPendingTasksCount() {
+        return this.perThreadAccount.get().getPendingTasksCount();
+    }
+
+    public int getCurrentTasksCount() {
+        return this.perThreadAccount.get().getCurrentTasksCount();
+    }
+
+    public int getPastTasksCount() {
+        return this.perThreadAccount.get().getPastTasksCount();
+    }
+
+    public int getPausedTasksCount() {
+        return this.perThreadAccount.get().getPausedTasksCount();
+    }
+
+    public int getFaultyTasksCount() {
+        return this.perThreadAccount.get().getFaultyTasksCount();
+    }
+
+    public int getFailedTasksCount() {
+        return this.perThreadAccount.get().getFailedTasksCount();
+    }
+
+    public int getInErrorTasksCount() {
+        return this.perThreadAccount.get().getInErrorTasksCount();
+    }
+
     public long getTotalTaskDuration() {
         return this.perThreadAccount.get().getTotalTaskDuration();
     }
 
     public int getTotalJobCount() {
         return this.perThreadAccount.get().getTotalJobCount();
+    }
+
+    public int getPendingJobsCount() {
+        return this.perThreadAccount.get().getPendingJobsCount();
+    }
+
+    public int getStalledJobsCount() {
+        return this.perThreadAccount.get().getStalledJobsCount();
+    }
+
+    public int getRunningJobsCount() {
+        return this.perThreadAccount.get().getRunningJobsCount();
+    }
+
+    public int getPausedJobsCount() {
+        return this.perThreadAccount.get().getPausedJobsCount();
+    }
+
+    public int getInErrorJobsCount() {
+        return this.perThreadAccount.get().getInErrorJobsCount();
+    }
+
+    public int getCanceledJobsCount() {
+        return this.perThreadAccount.get().getCanceledJobsCount();
+    }
+
+    public int getFailedJobsCount() {
+        return this.perThreadAccount.get().getFailedJobsCount();
+    }
+
+    public int getKilledJobsCount() {
+        return this.perThreadAccount.get().getKilledJobsCount();
+    }
+
+    public int getFinishedJobsCount() {
+        return this.perThreadAccount.get().getFinishedJobsCount();
     }
 
     public long getTotalJobDuration() {
@@ -118,7 +182,7 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
         final String username = subject.getPrincipals().iterator().next().getName();
         SchedulerAccount acc = this.accountsManager.getAccount(username);
         if (acc == null) {
-            acc = new SchedulerAccount();
+            acc = SchedulerAccount.builder().build();
         }
         return acc; // never null
     }

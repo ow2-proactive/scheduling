@@ -32,27 +32,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 
 public class LongParserValidator extends RangeParserValidator<Long> {
 
-    public static final String LONG_TYPE = "LONG";
-
-    protected static final String LONG_TYPE_REGEXP = "[Ll][Oo][Nn][Gg]";
-
     public LongParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return LONG_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return LONG_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return Long.class;
+        super(model, ModelType.LONG);
     }
 
     @Override

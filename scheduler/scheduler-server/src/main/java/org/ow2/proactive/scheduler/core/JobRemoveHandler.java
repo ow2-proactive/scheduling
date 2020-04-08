@@ -25,8 +25,11 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -45,13 +48,18 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
     private static final Logger logger = Logger.getLogger(SchedulingService.class);
 
-    private final JobId jobId;
+    private final List<JobId> jobIds;
 
     private final SchedulingService service;
 
     public JobRemoveHandler(SchedulingService service, JobId jobId) {
         this.service = service;
-        this.jobId = jobId;
+        this.jobIds = Collections.singletonList(jobId);
+    }
+
+    public JobRemoveHandler(SchedulingService service, List<JobId> jobIds) {
+        this.service = service;
+        this.jobIds = jobIds;
     }
 
     private boolean isInFinishedState(InternalJob job) {
@@ -61,64 +69,69 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
+        boolean allJobsWereRemoved;
         try {
             long start = 0;
 
+            if (jobIds.isEmpty()) {
+                logger.info("No jobs to remove. You should not create JobRemoveHandler with empty list of ids.");
+                return false;
+            }
             if (logger.isInfoEnabled()) {
                 start = System.currentTimeMillis();
-                logger.info("Removing job " + jobId);
+                logger.info("Removing jobs " + jobIds.stream().map(JobId::value).collect(Collectors.joining(", ")));
             }
 
             SchedulerDBManager dbManager = service.getInfrastructure().getDBManager();
 
-            List<InternalJob> jobs = dbManager.loadJobWithTasksIfNotRemoved(jobId);
-            TerminationData terminationData;
+            List<InternalJob> jobs = dbManager.loadJobWithTasksIfNotRemoved(jobIds.toArray(new JobId[0]));
 
             // if the context is not in sync with the database
-            if (jobs.size() != 1) {
-                terminationData = service.getJobs().removeJob(jobId);
-            } else {
-                // if the job was already finished we just remove it from the context
-                if (isInFinishedState(jobs.get(0))) {
-                    terminationData = service.getJobs().removeJob(jobId);
-                } else {
-                    terminationData = service.getJobs().killJob(jobId);
+            if (jobs.size() != jobIds.size()) {
+                for (JobId jobId : jobIds) {
+                    service.submitTerminationDataHandler(service.getJobs().removeJob(jobId));
                 }
+                allJobsWereRemoved = false;
+            } else {
+                long removedTime = System.currentTimeMillis();
+
+                for (InternalJob job : jobs) {
+                    // if the job was already finished we just remove it from the context
+                    if (isInFinishedState(job)) {
+                        service.submitTerminationDataHandler(service.getJobs().removeJob(job.getId()));
+                    } else {
+                        service.submitTerminationDataHandler(service.getJobs().killJob(job.getId()));
+                    }
+                    job.setRemovedTime(removedTime);
+                }
+
+                boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
+                dbManager.removeJob(jobIds, removedTime, removeFromDb);
+
+                for (InternalJob job : jobs) {
+                    ServerJobAndTaskLogs.getInstance().remove(job.getId(), job.getOwner());
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Job " + job.getId() + " removed in " + (System.currentTimeMillis() - start) +
+                                    "ms");
+                    }
+                    // send event to front-end
+                    service.getListener()
+                           .jobStateUpdated(job.getOwner(),
+                                            new NotificationData<>(SchedulerEvent.JOB_REMOVE_FINISHED,
+                                                                   new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+                }
+                allJobsWereRemoved = true;
             }
-            service.submitTerminationDataHandler(terminationData);
-
-            // if the job doesn't exist in the DB anymore we can stop here
-            if (jobs.size() != 1) {
-                return false;
-            }
-
-            InternalJob job = jobs.get(0);
-
-            job.setRemovedTime(System.currentTimeMillis());
-
-            boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
-
-            dbManager.removeJob(jobId, job.getRemovedTime(), removeFromDb);
-
-            ServerJobAndTaskLogs.getInstance().remove(jobId, job.getOwner());
-
-            if (logger.isInfoEnabled()) {
-                logger.info("Job " + jobId + " removed in " + (System.currentTimeMillis() - start) + "ms");
-            }
-
-            // send event to front-end
-            service.getListener()
-                   .jobStateUpdated(job.getOwner(),
-                                    new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
-                                                                  new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
             service.wakeUpSchedulingThread();
         } catch (Exception e) {
-            logger.error("Error while removing job " + jobId, e);
+            logger.error("Error while removing list of jobs (" +
+                         jobIds.stream().map(JobId::value).collect(Collectors.joining(", ")) + ") due to : " +
+                         e.getMessage(), e);
             throw e;
         }
 
-        return true;
+        return allJobsWereRemoved;
     }
 
 }

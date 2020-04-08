@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -76,6 +77,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -187,6 +189,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * Subscribes a listener to the Scheduler
      */
     @Override
+    @ImmediateService
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
             SchedulerEvent... events) throws NotConnectedException, PermissionException {
         checkSchedulerConnection();
@@ -196,6 +199,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public void disconnect() throws NotConnectedException, PermissionException {
         if (uischeduler == null)
             throw new NotConnectedException("Not connected to the scheduler.");
@@ -205,6 +209,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public boolean isConnected() {
         if (uischeduler == null) {
             return false;
@@ -220,30 +225,35 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public String getCurrentPolicy() throws NotConnectedException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.getCurrentPolicy();
     }
 
     @Override
+    @ImmediateService
     public Map getJobsToSchedule() throws NotConnectedException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.getJobsToSchedule();
     }
 
     @Override
+    @ImmediateService
     public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.getTasksToSchedule();
     }
 
     @Override
+    @ImmediateService
     public void renewSession() throws NotConnectedException {
         checkSchedulerConnection();
         uischeduler.renewSession();
     }
 
     @Override
+    @ImmediateService
     public void removeEventListener() throws NotConnectedException, PermissionException {
         checkSchedulerConnection();
         uischeduler.removeEventListener();
@@ -251,6 +261,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public JobId submit(Job job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         checkSchedulerConnection();
@@ -258,6 +269,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
             throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
             SubmissionClosedException {
@@ -266,6 +278,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public void changeJobPriority(JobId jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         checkSchedulerConnection();
@@ -274,28 +287,33 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
         return uischeduler.getJobResult(jobId);
     }
 
     @Override
+    @ImmediateService
     public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
         return uischeduler.getUserSpaceURIs();
     }
 
     @Override
+    @ImmediateService
     public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
         return uischeduler.getGlobalSpaceURIs();
     }
 
     @Override
+    @ImmediateService
     public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
         return uischeduler.getJobResult(jobId);
     }
 
     @Override
+    @ImmediateService
     public TaskResult getTaskResult(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
@@ -303,6 +321,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public TaskResult getTaskResult(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
@@ -310,6 +329,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
@@ -317,6 +337,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
@@ -324,53 +345,67 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return uischeduler.getTaskResultFromIncarnation(jobId, taskName, inc);
     }
 
     @Override
+    @ImmediateService
     public List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return uischeduler.getTaskResultAllIncarnations(jobId, taskName);
     }
 
     @Override
+    @ImmediateService
     public List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return uischeduler.getTaskResultAllIncarnations(jobId, taskName);
     }
 
     @Override
+    @ImmediateService
     public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return uischeduler.getTaskResultFromIncarnation(jobId, taskName, inc);
     }
 
+    @Override
+    @ImmediateService
     public boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.killTask(jobId, taskName);
     }
 
+    @Override
+    @ImmediateService
     public boolean restartTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.restartTask(jobId, taskName, restartDelay);
     }
 
+    @Override
+    @ImmediateService
     public boolean preemptTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.preemptTask(jobId, taskName, restartDelay);
     }
 
+    @Override
+    @ImmediateService
     public boolean killTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.killTask(jobId, taskName);
     }
 
+    @Override
+    @ImmediateService
     public boolean restartTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
@@ -378,6 +413,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public boolean finishInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
@@ -385,12 +421,15 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.restartInErrorTask(jobId, taskName);
     }
 
+    @Override
+    @ImmediateService
     public boolean preemptTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
@@ -398,12 +437,14 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.killJob(jobId);
     }
 
     @Override
+    @ImmediateService
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
@@ -412,6 +453,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.pauseJob(jobId);
@@ -419,13 +461,21 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.removeJob(jobId);
-
     }
 
     @Override
+    @ImmediateService
+    public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.removeJobs(jobIds);
+    }
+
+    @Override
+    @ImmediateService
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.resumeJob(jobId);
@@ -438,6 +488,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public void changeJobPriority(String jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         uischeduler.changeJobPriority(jobId, priority);
@@ -445,98 +496,142 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         return uischeduler.getStatus();
     }
 
     @Override
+    @ImmediateService
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.killJob(jobId);
     }
 
     @Override
+    @ImmediateService
+    public boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException {
+        return uischeduler.killJobs(jobsId);
+    }
+
+    @Override
+    @ImmediateService
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.pauseJob(jobId);
     }
 
     @Override
+    @ImmediateService
     public boolean restartAllInErrorTasks(String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.restartAllInErrorTasks(jobId);
     }
 
     @Override
+    @ImmediateService
     public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.removeJob(jobId);
     }
 
     @Override
+    @ImmediateService
     public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.resumeJob(jobId);
     }
 
+    @Override
+    @ImmediateService
     public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException {
         uischeduler.addEventListener(sel, myEventsOnly, events);
     }
 
+    @Override
+    @ImmediateService
     public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.getJobState(jobId);
     }
 
+    @Override
+    @ImmediateService
     public void listenJobLogs(String jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         uischeduler.listenJobLogs(jobId, appenderProvider);
     }
 
+    @Override
+    @ImmediateService
     public boolean changePolicy(String newPolicyClassName) throws NotConnectedException, PermissionException {
         return uischeduler.changePolicy(newPolicyClassName);
     }
 
+    @Override
+    @ImmediateService
     public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
         return uischeduler.reloadPolicyConfiguration();
     }
 
+    @Override
+    @ImmediateService
     public boolean freeze() throws NotConnectedException, PermissionException {
         return uischeduler.freeze();
     }
 
+    @Override
+    @ImmediateService
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.getJobState(jobId);
     }
 
+    @Override
+    @ImmediateService
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         return uischeduler.getState();
     }
 
+    @Override
+    @ImmediateService
     public boolean kill() throws NotConnectedException, PermissionException {
         return uischeduler.kill();
     }
 
+    @Override
+    @ImmediateService
     public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException {
         return uischeduler.linkResourceManager(rmURL);
     }
 
+    @Override
+    @ImmediateService
     public boolean pause() throws NotConnectedException, PermissionException {
         return uischeduler.pause();
     }
 
+    @Override
+    @ImmediateService
     public boolean resume() throws NotConnectedException, PermissionException {
         return uischeduler.resume();
     }
 
+    @Override
+    @ImmediateService
     public boolean shutdown() throws NotConnectedException, PermissionException {
         return uischeduler.shutdown();
     }
 
+    @Override
+    @ImmediateService
     public boolean start() throws NotConnectedException, PermissionException {
         return uischeduler.start();
     }
 
+    @Override
+    @ImmediateService
     public boolean stop() throws NotConnectedException, PermissionException {
         return uischeduler.stop();
     }
 
+    @Override
+    @ImmediateService
     public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         return uischeduler.getState(myJobsOnly);
     }
@@ -579,157 +674,187 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    @ImmediateService
     public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException, PermissionException {
         return uischeduler.getJobServerLogs(id);
     }
 
     @Override
+    @ImmediateService
     public String getTaskServerLogs(String id, String taskName)
             throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
         return uischeduler.getTaskServerLogs(id, taskName);
     }
 
     @Override
+    @ImmediateService
     public String getTaskServerLogsByTag(String id, String taskTag)
             throws UnknownJobException, NotConnectedException, PermissionException {
         return uischeduler.getTaskServerLogsByTag(id, taskTag);
     }
 
     @Override
+    @ImmediateService
     public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         return uischeduler.getJobs(index, range, filterCriteria, sortParameters);
     }
 
     @Override
+    @ImmediateService
     public List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException {
         return uischeduler.getJobsInfoList(jobsId);
     }
 
     @Override
+    @ImmediateService
     public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
         return uischeduler.getUsers();
     }
 
     @Override
+    @ImmediateService
     public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
         return uischeduler.getUsersWithJobs();
     }
 
     @Override
+    @ImmediateService
     public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
         return uischeduler.getMyAccountUsage(startDate, endDate);
     }
 
     @Override
+    @ImmediateService
     public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
         return uischeduler.getAccountUsage(user, startDate, endDate);
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, KeyException, PermissionException {
+    @ImmediateService
+    public void putThirdPartyCredential(String key, String value) throws SchedulerException {
         uischeduler.putThirdPartyCredential(key, value);
     }
 
     @Override
-    public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
+    @ImmediateService
+    public Set<String> thirdPartyCredentialsKeySet() throws SchedulerException {
         return uischeduler.thirdPartyCredentialsKeySet();
     }
 
     @Override
-    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+    @ImmediateService
+    public void removeThirdPartyCredential(String key) throws SchedulerException {
         uischeduler.removeThirdPartyCredential(key);
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit)
-            throws NotConnectedException, PermissionException {
-        return uischeduler.getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+    @ImmediateService
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
+            int offset, int limit) throws SchedulerException {
+        return uischeduler.getTaskIds(taskTag, from, to, mytasks, taskStatuses, offset, limit);
     }
 
     @Override
-    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-            throws NotConnectedException, PermissionException {
-        return uischeduler.getTaskStates(taskTag,
-                                         from,
-                                         to,
-                                         mytasks,
-                                         running,
-                                         pending,
-                                         finished,
-                                         offset,
-                                         limit,
-                                         sortParams);
+    @ImmediateService
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
+            Set<TaskStatus> statusFilter, int offset, int limit, SortSpecifierContainer sortParams)
+            throws SchedulerException {
+        return uischeduler.getTaskStates(taskTag, from, to, mytasks, statusFilter, offset, limit, sortParams);
     }
 
     @Override
-    public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
+    @ImmediateService
+    public JobInfo getJobInfo(String jobId) throws SchedulerException {
         return uischeduler.getJobInfo(jobId);
     }
 
     @Override
+    @ImmediateService
     public boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.changeStartAt(jobId, startAt);
     }
 
     @Override
-    public String getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException,
-            JobCreationException, NotConnectedException, PermissionException {
+    @ImmediateService
+    public String getJobContent(JobId jobId) throws SchedulerException {
         return uischeduler.getJobContent(jobId);
     }
 
     @Override
-    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+    @ImmediateService
+    public Map<Object, Object> getPortalConfiguration() throws SchedulerException {
         return uischeduler.getPortalConfiguration();
     }
 
     @Override
+    @ImmediateService
     public String getCurrentUser() throws NotConnectedException {
         return uischeduler.getCurrentUser();
     }
 
     @Override
+    @ImmediateService
     public UserData getCurrentUserData() throws NotConnectedException {
         return uischeduler.getCurrentUserData();
     }
 
     @Override
-    public Map getSchedulerProperties() throws NotConnectedException, PermissionException {
+    @ImmediateService
+    public Subject getSubject() throws NotConnectedException {
+        return uischeduler.getSubject();
+    }
+
+    @Override
+    @ImmediateService
+    public Map getSchedulerProperties() throws SchedulerException {
         return uischeduler.getSchedulerProperties();
     }
 
     @Override
+    @ImmediateService
     public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.getTaskPaginated(jobId, offset, limit);
     }
 
     @Override
+    @ImmediateService
     public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.getTaskPaginated(jobId, statusFilter, offset, limit);
     }
 
     @Override
+    @ImmediateService
     public List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
         return uischeduler.getPreciousTaskResults(jobId);
     }
 
     @Override
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
-            throws NotConnectedException, UnknownJobException {
+    @ImmediateService
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException {
+        return uischeduler.getJobResultMaps(jobsId);
+    }
+
+    @Override
+    @ImmediateService
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws SchedulerException {
+        return uischeduler.getPreciousTaskNames(jobsId);
+    }
+
+    @Override
+    @ImmediateService
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException {
         return uischeduler.checkJobPermissionMethod(sessionId, jobId, method);
     }
 
-    public String getStatHistory(String mbeanName, String range, String[] dataSources) {
-        return mbeaninfoviewer.retrieveStats(mbeanName, range, dataSources);
+    public String getStatHistory(String mbeanName, String range, String[] dataSources, String function) {
+        return mbeaninfoviewer.retrieveStats(mbeanName, range, dataSources, function);
     }
 
 }

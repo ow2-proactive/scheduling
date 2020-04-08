@@ -31,7 +31,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelType;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 
 
 /**
@@ -85,7 +89,7 @@ public class GetJobContentGenerator {
                              XMLAttributes.COMMON_NAME,
                              pair.getKey(),
                              XMLAttributes.COMMON_VALUE,
-                             pair.getValue());
+                             StringEscapeUtils.escapeXml11(pair.getValue()));
     }
 
     private String replaceGenericInfoContent(String jobContent, String newContent, int end) {
@@ -233,12 +237,16 @@ public class GetJobContentGenerator {
 
     private String variableContent(JobVariable jobVariable) {
         if (jobVariable.getModel() != null && !jobVariable.getModel().trim().isEmpty()) {
+            boolean encryptionNeeded = jobVariable.getModel()
+                                                  .trim()
+                                                  .equalsIgnoreCase(ModelValidator.PREFIX + ModelType.HIDDEN.name());
             return String.format(FOUR_SPACES_INDENT + TAG_WITH_THREE_ATTRIBUTES,
                                  XMLTags.VARIABLE.getXMLName(),
                                  XMLAttributes.VARIABLE_NAME,
                                  jobVariable.getName(),
                                  XMLAttributes.VARIABLE_VALUE,
-                                 jobVariable.getValue(),
+                                 StringEscapeUtils.escapeXml11(encryptionNeeded ? PropertyDecrypter.encryptData(jobVariable.getValue())
+                                                                                : jobVariable.getValue()),
                                  XMLAttributes.VARIABLE_MODEL,
                                  jobVariable.getModel());
         } else {
@@ -248,7 +256,7 @@ public class GetJobContentGenerator {
                                  XMLAttributes.VARIABLE_NAME,
                                  jobVariable.getName(),
                                  XMLAttributes.VARIABLE_VALUE,
-                                 jobVariable.getValue());
+                                 StringEscapeUtils.escapeXml11(jobVariable.getValue()));
         }
     }
 

@@ -46,13 +46,28 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
     static final String TEST_USER_NAME2 = "TestReadSchedulerAccount2";
 
     static class AccountData {
+
         long taskTime;
 
         int taskCount;
 
+        int pendingTasksCount;
+
+        int currentTasksCount;
+
+        int pastTasksCount;
+
         long jobTime;
 
         int jobCount;
+
+        int pendingJobsCount;
+
+        int runningJobsCount;
+
+        int finishedJobsCount;
+
+        int stalledJobsCount;
 
         final String userName;
 
@@ -110,6 +125,8 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
         InternalJob job1 = defaultSubmitJobAndLoadInternal(true, jobDef1, accountData.userName);
 
         // job is submitted
+        accountData.pendingJobsCount++;
+        accountData.pendingTasksCount = 3;
 
         checkAccount(invalidUser);
         checkAccount(accountData);
@@ -118,13 +135,21 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
         job1.start();
         startTask(job1, job1.getTask("task1"));
         dbManager.jobTaskStarted(job1, job1.getTask("task1"), true);
+        accountData.pendingJobsCount--;
+        accountData.runningJobsCount++;
+        accountData.pendingTasksCount--;
+        accountData.currentTasksCount++;
 
         checkAccount(invalidUser);
         checkAccount(accountData);
 
         // task1 finished
         accountData.taskTime += finishTask(job1, "task1");
+        accountData.currentTasksCount--;
+        accountData.pastTasksCount++;
         accountData.taskCount++;
+        accountData.runningJobsCount--;
+        accountData.stalledJobsCount++;
 
         checkAccount(invalidUser);
         checkAccount(accountData);
@@ -132,14 +157,22 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
         // task2 and task3 started
         startTask(job1, job1.getTask("task2"));
         dbManager.jobTaskStarted(job1, job1.getTask("task2"), true);
+        accountData.pendingTasksCount--;
+        accountData.currentTasksCount++;
         startTask(job1, job1.getTask("task3"));
         dbManager.jobTaskStarted(job1, job1.getTask("task3"), true);
+        accountData.pendingTasksCount--;
+        accountData.currentTasksCount++;
+        accountData.runningJobsCount++;
+        accountData.stalledJobsCount--;
 
         checkAccount(invalidUser);
         checkAccount(accountData);
 
         // task2 finished
         accountData.taskTime += finishTask(job1, "task2");
+        accountData.currentTasksCount--;
+        accountData.pastTasksCount++;
         accountData.taskCount++;
 
         checkAccount(invalidUser);
@@ -147,8 +180,12 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
 
         // task3 and job finished
         accountData.taskTime += finishTask(job1, "task3");
+        accountData.currentTasksCount--;
+        accountData.pastTasksCount++;
         accountData.taskCount++;
         accountData.jobCount++;
+        accountData.finishedJobsCount++;
+        accountData.runningJobsCount--;
         accountData.jobTime += job1.getFinishedTime() - job1.getStartTime();
 
         checkAccount(invalidUser);
@@ -174,9 +211,15 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
         SchedulerAccount account = dbManager.readAccount(accountData.userName);
         Assert.assertEquals(accountData.userName, account.getName());
         Assert.assertEquals("Tasks count", accountData.taskCount, account.getTotalTaskCount());
+        Assert.assertEquals("Pending tasks count", accountData.pendingTasksCount, account.getPendingTasksCount());
+        Assert.assertEquals("Current tasks count", accountData.currentTasksCount, account.getCurrentTasksCount());
+        Assert.assertEquals("Past tasks count", accountData.pastTasksCount, account.getPastTasksCount());
         Assert.assertEquals("Tasks duration", accountData.taskTime, account.getTotalTaskDuration());
         Assert.assertEquals("Jobs count", accountData.jobCount, account.getTotalJobCount());
         Assert.assertEquals("Jobs duration", accountData.jobTime, account.getTotalJobDuration());
-
+        Assert.assertEquals("Pending jobs count", accountData.pendingJobsCount, account.getPendingJobsCount());
+        Assert.assertEquals("Running jobs count", accountData.runningJobsCount, account.getRunningJobsCount());
+        Assert.assertEquals("Finished jobs count", accountData.finishedJobsCount, account.getFinishedJobsCount());
+        Assert.assertEquals("Stalled jobs count", accountData.stalledJobsCount, account.getStalledJobsCount());
     }
 }

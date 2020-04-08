@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.common.util;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.Attribute;
@@ -50,7 +51,9 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -451,6 +454,16 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
+    public Map<String, List<String>> getInfrasToPoliciesMapping() {
+        return this.target.getInfrasToPoliciesMapping();
+    }
+
+    @Override
+    public List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd) {
+        return target.getNodesHistory(windowStart, windowEnd);
+    }
+
+    @Override
     public StringWrapper getRMThreadDump() {
         return target.getRMThreadDump();
     }
@@ -460,4 +473,18 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return target.getNodeThreadDump(nodeUrl);
     }
 
+    @Override
+    public void addNodeToken(String nodeUrl, String token) throws RMException {
+        target.addNodeToken(nodeUrl, token);
+    }
+
+    @Override
+    public void removeNodeToken(String nodeUrl, String token) throws RMException {
+        target.removeNodeToken(nodeUrl, token);
+    }
+
+    @Override
+    public void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException {
+        target.setNodeTokens(nodeUrl, tokens);
+    }
 }

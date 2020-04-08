@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
+import static org.ow2.proactive.scheduler.common.task.ForkEnvironment.DOCKER_FORK_WINDOWS2LINUX;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,6 +48,8 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
 import org.apache.commons.io.FileUtils;
+import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -63,6 +67,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.PAProperties;
 
 import com.google.common.base.Stopwatch;
@@ -85,6 +90,8 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
+    private final static boolean isDockerWindows2Linux = "true".equals(System.getProperty(DOCKER_FORK_WINDOWS2LINUX));
+
     /**
      * Writes a nodes file to disk.
      *
@@ -103,7 +110,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
                 taskContext.getNodeDataSpaceURIs().getScratchURI().isEmpty()) {
                 directory = new File(".");
             } else {
-                directory = new File(taskContext.getNodeDataSpaceURIs().getScratchURI());
+                String scratchUri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+                directory = new File(isDockerWindows2Linux ? ForkEnvironment.convertToLinuxPath(scratchUri)
+                                                           : scratchUri);
             }
             File nodesFile = new File(directory, NODES_FILE_DIRECTORY_NAME + "_" + taskContext.getTaskId());
 
@@ -131,6 +140,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         String nodesFile = null;
         SchedulerNodeClient schedulerNodeClient = null;
+        RMNodeClient rmNodeClient = null;
         RemoteSpace userSpaceClient = null;
         RemoteSpace globalSpaceClient = null;
         try {
@@ -143,6 +153,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             Map<String, Serializable> resultMap = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
+            rmNodeClient = forkedTaskVariablesManager.createRMNodeClient(taskContext);
             userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
                                                                                    schedulerNodeClient,
                                                                                    IDataSpaceClient.Dataspace.USER);
@@ -156,9 +167,12 @@ public class InProcessTaskExecutor implements TaskExecutor {
                                                                   resultMap,
                                                                   thirdPartyCredentials,
                                                                   schedulerNodeClient,
+                                                                  rmNodeClient,
                                                                   userSpaceClient,
                                                                   globalSpaceClient,
-                                                                  resultMetadata);
+                                                                  resultMetadata,
+                                                                  output,
+                                                                  error);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
@@ -197,6 +211,21 @@ public class InProcessTaskExecutor implements TaskExecutor {
         } finally {
             if (nodesFile != null && !nodesFile.isEmpty()) {
                 FileUtils.deleteQuietly(new File(nodesFile));
+            }
+            if (schedulerNodeClient != null && schedulerNodeClient.isConnected()) {
+                try {
+                    schedulerNodeClient.disconnect();
+                } catch (Exception ignored) {
+
+                }
+            }
+
+            if (rmNodeClient != null && rmNodeClient.getSession() != null) {
+                try {
+                    rmNodeClient.disconnect();
+                } catch (Exception ignored) {
+
+                }
             }
         }
     }
@@ -238,6 +267,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
         } else {
             //Needs to be stored in the local space
             String uri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+            if (isDockerWindows2Linux) {
+                uri = ForkEnvironment.convertToLinuxPath(uri);
+            }
             p = Paths.get(uri, path);
             Path hasParent = p.getParent();
             if (!Files.exists(hasParent)) {
@@ -297,6 +329,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
                                                                thirdPartyCredentials,
                                                                variables,
                                                                error);
+            try {
+                scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, scriptResult.getResult());
+            } catch (Throwable throwable) {
+                scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, throwable);
+            }
             ScriptResult postScriptResult = scriptHandler.handle(taskContext.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute post script: " +
@@ -310,9 +347,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
             PrintStream error, TaskResultImpl taskResult) {
         if (flowScript != null) {
             try {
-                scriptHandler.addBinding(FlowScript.resultVariable, taskResult.value());
+                scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, taskResult.value());
             } catch (Throwable throwable) {
-                scriptHandler.addBinding(FlowScript.resultVariable, throwable);
+                scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, throwable);
             }
 
             ScriptResult<FlowAction> flowScriptResult = scriptHandler.handle(flowScript, output, error);

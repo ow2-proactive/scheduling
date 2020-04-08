@@ -66,7 +66,7 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_HTTPS_PORT("web.https.port", PropertyType.INTEGER, "8443"),
 
-    WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER, "100"),
+    WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER, "300"),
 
     WEB_IDLE_TIMEOUT("web.idle_timeout", PropertyType.INTEGER, "60000"),
 

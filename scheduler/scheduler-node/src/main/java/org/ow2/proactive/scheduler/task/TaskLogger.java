@@ -221,6 +221,8 @@ public class TaskLogger {
             if (!loggersFinalized.get()) {
                 logger.debug("Terminate loggers for task " + this.taskId + " (" + taskId.getReadableName() + ")");
                 this.flushStreams();
+                this.outputSink.close();
+                this.errorSink.close();
 
                 this.loggersFinalized.set(true);
                 this.loggersActivated.set(false);

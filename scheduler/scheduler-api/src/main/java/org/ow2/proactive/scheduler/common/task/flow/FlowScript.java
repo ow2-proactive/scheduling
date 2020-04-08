@@ -26,7 +26,9 @@
 package org.ow2.proactive.scheduler.common.task.flow;
 
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
+import java.net.URL;
 
 import javax.script.Bindings;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -88,10 +90,6 @@ public class FlowScript extends Script<FlowAction> {
 
     /** Name of the 'Continuation' target task if this action is an 'If' */
     private String targetContinuation = null;
-
-    /** Name of the variable that will be set in the script's environment
-     * to contain the result of the Task executed along this script */
-    public static final String resultVariable = "result";
 
     /** Name of the boolean variable to set in the script to determine 
      * if a LOOP action is enabled or if the execution should continue */
@@ -191,6 +189,38 @@ public class FlowScript extends Script<FlowAction> {
 
     /**
      * Creates a Control Flow Script configured to perform a LOOP control flow action
+     *
+     * @param script code of the script
+     * @param engine engine running the script
+     * @param target target of the LOOP action
+     * @param parameters execution parameters
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createLoopFlowScript(String script, String engine, String target,
+            Serializable[] parameters) throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(script, engine, parameters);
+        return createLoopFlowScript(scr, target);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a LOOP control flow action
+     *
+     * @param url url of the script
+     * @param engine engine running the script
+     * @param target target of the LOOP action
+     * @param parameters execution parameters
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createLoopFlowScript(URL url, String engine, String target, Serializable[] parameters)
+            throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(url, engine, parameters);
+        return createLoopFlowScript(scr, target);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a LOOP control flow action
      * 
      * @param script the script to execute
      * @param target target of the LOOP action
@@ -239,6 +269,42 @@ public class FlowScript extends Script<FlowAction> {
 
     /**
      * Creates a Control Flow Script configured to perform an IF control flow action
+     *
+     * @param script code of the script
+     * @param engine engine running the script
+     * @param targetIf IF branch
+     * @param targetElse ELSE branch
+     * @param targetCont CONTINUATION branch, can be null
+     * @param parameters execution parameters
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createIfFlowScript(String script, String engine, String targetIf, String targetElse,
+            String targetCont, Serializable[] parameters) throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(script, engine, parameters);
+        return createIfFlowScript(scr, targetIf, targetElse, targetCont);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform an IF control flow action
+     *
+     * @param url url of the script
+     * @param engine engine running the script
+     * @param targetIf IF branch
+     * @param targetElse ELSE branch
+     * @param targetCont CONTINUATION branch, can be null
+     * @param parameters execution parameters
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createIfFlowScript(URL url, String engine, String targetIf, String targetElse,
+            String targetCont, Serializable[] parameters) throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(url, engine, parameters);
+        return createIfFlowScript(scr, targetIf, targetElse, targetCont);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform an IF control flow action
      * 
      * @param script the script to execute
      * @param targetIf IF branch
@@ -279,6 +345,36 @@ public class FlowScript extends Script<FlowAction> {
      */
     public static FlowScript createReplicateFlowScript(String script, String engine) throws InvalidScriptException {
         Script<?> scr = new SimpleScript(script, engine);
+        return createReplicateFlowScript(scr);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a Replicate control flow action
+     *
+     * @param script code of the script
+     * @param engine engine running the script
+     * @param parameters execution parameters
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createReplicateFlowScript(String script, String engine, Serializable[] parameters)
+            throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(script, engine, parameters);
+        return createReplicateFlowScript(scr);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a Replicate control flow action
+     *
+     * @param url url of the script
+     * @param engine engine running the script
+     * @param parameters execution parameters
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createReplicateFlowScript(URL url, String engine, Serializable[] parameters)
+            throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(url, engine, parameters);
         return createReplicateFlowScript(scr);
     }
 

@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -54,19 +56,19 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
     /**
      * Initial time for nodes acquisition, default is that nodes are added/removed every two minutes
      */
-    @Configurable(description = "Time of the nodes acquisition (crontab format)", dynamic = true)
+    @Configurable(description = "Time of the nodes acquisition (crontab format)", dynamic = true, sectionSelector = 2)
     private String nodeAcquision = "0-58/2 * * * *";
 
-    @Configurable(description = "Time of the nodes removal (crontab format)", dynamic = true)
+    @Configurable(description = "Time of the nodes removal (crontab format)", dynamic = true, sectionSelector = 2)
     private String nodeRemoval = "1-59/2 * * * *";
 
     /**
      * The way of nodes removing
      */
-    @Configurable(description = "How nodes are removed", dynamic = true)
+    @Configurable(description = "How nodes are removed", dynamic = true, checkbox = true, sectionSelector = 2)
     private boolean preemptive = false;
 
-    @Configurable(description = "Start deployment immediately", dynamic = true)
+    @Configurable(description = "Start deployment immediately", dynamic = true, checkbox = true, sectionSelector = 2)
     private boolean forceDeployment = false;
 
     private Scheduler cronScheduler;
@@ -174,4 +176,10 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
 
     }
 
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(2, "Cron Configuration");
+        return sectionDescriptions;
+    }
 }

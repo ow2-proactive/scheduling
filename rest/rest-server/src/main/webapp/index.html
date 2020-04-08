@@ -34,7 +34,7 @@
 
         <p class="lead">
             The REST API documentation can be found <a
-                href="doc/">here</a>
+                href="/doc/rest/">here</a>
         </p>
         <hr>
         <p class="lead">Use the command line client via the REST API
@@ -44,7 +44,7 @@
         <hr>
     </div>
     <div class="modal-footer">
-        <small>&copy; 1997-2015 ActiveEon/INRIA/University of Nice-Sophia Antipolis</small>
+        <small>&copy; 2007-<div id="current-year"></div>, Activeeon, All rights reserved</small>
     </div>
 </div>
 <script>
@@ -54,6 +54,8 @@
     url = url.substring(0, url.lastIndexOf("/"));
     var restApiEndpoint = url;
     document.getElementById('restUrlCli').innerHTML = restApiEndpoint;
+    var date = document.getElementById("current-year");
+    date.innerText = (new Date()).getFullYear();
 </script>
 </body>
 </html>

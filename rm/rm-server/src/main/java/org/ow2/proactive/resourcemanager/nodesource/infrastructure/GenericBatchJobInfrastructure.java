@@ -42,10 +42,10 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
 
-    @Configurable(description = "Fully qualified classname\nof the implementation")
+    @Configurable(description = "Fully qualified classname\nof the implementation", sectionSelector = 1, important = true)
     protected String implementationClassname;
 
-    @Configurable(fileBrowser = true, description = "Absolute path to the\nclass file of the implementation")
+    @Configurable(fileBrowser = true, description = "Absolute path to the\nclass file of the implementation", sectionSelector = 1, important = true)
     protected String implementationFile;
 
     // key to retrieve the actual implementation of the infrastructure

@@ -26,11 +26,17 @@
 package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedMethodResolver;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedPropertyAccessor;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedTypeLocator;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -43,35 +49,65 @@ public class ModelValidatorContext {
 
     private final StandardEvaluationContext spelContext;
 
+    private final Scheduler scheduler;
+
+    private final SchedulerSpaceInterface space;
+
+    private String variableName;
+
     // container for job and task variables
     private SpELVariables spELVariables;
 
-    public ModelValidatorContext(StandardEvaluationContext context) {
+    public ModelValidatorContext(StandardEvaluationContext context, Scheduler scheduler,
+            SchedulerSpaceInterface space) {
         this.spelContext = context;
+        this.scheduler = scheduler;
+        this.space = space;
+    }
 
+    public ModelValidatorContext(Map<String, Serializable> variablesValues, Scheduler scheduler,
+            SchedulerSpaceInterface space) {
+        spELVariables = new SpELVariables(variablesValues);
+        spelContext = new StandardEvaluationContext(spELVariables);
+        spelContext.setTypeLocator(new RestrictedTypeLocator());
+        spelContext.setMethodResolvers(Collections.singletonList(new RestrictedMethodResolver()));
+        spelContext.addPropertyAccessor(new RestrictedPropertyAccessor());
+        this.scheduler = scheduler;
+        this.space = space;
+    }
+
+    public ModelValidatorContext(Task task, Scheduler scheduler, SchedulerSpaceInterface space) {
+        this(task.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
+                                                           (m, v) -> m.put(v.getName(), v.getValue()),
+                                                           HashMap<String, Serializable>::putAll),
+             scheduler,
+             space);
+
+    }
+
+    public ModelValidatorContext(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space) {
+        this(job.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
+                                                          (m, v) -> m.put(v.getName(), v.getValue()),
+                                                          HashMap<String, Serializable>::putAll),
+             scheduler,
+             space);
+
+    }
+
+    public ModelValidatorContext(StandardEvaluationContext context) {
+        this(context, null, null);
+    }
+
+    public ModelValidatorContext(Map<String, Serializable> variablesValues) {
+        this(variablesValues, null, null);
     }
 
     public ModelValidatorContext(Task task) {
-        Map<String, Serializable> taskVariablesValues = new LinkedHashMap<>();
-
-        for (TaskVariable taskVariable : task.getVariables().values()) {
-            taskVariablesValues.put(taskVariable.getName(), taskVariable.getValue());
-        }
-
-        spELVariables = new SpELVariables(taskVariablesValues);
-        spelContext = new StandardEvaluationContext(spELVariables);
+        this(task, null, null);
     }
 
     public ModelValidatorContext(TaskFlowJob job) {
-
-        Map<String, Serializable> jobVariablesValues = new LinkedHashMap<>();
-
-        for (JobVariable jobVariable : job.getVariables().values()) {
-            jobVariablesValues.put(jobVariable.getName(), jobVariable.getValue());
-        }
-
-        spELVariables = new SpELVariables(jobVariablesValues);
-        spelContext = new StandardEvaluationContext(spELVariables);
+        this(job, null, null);
     }
 
     public StandardEvaluationContext getSpELContext() {
@@ -80,6 +116,22 @@ public class ModelValidatorContext {
 
     public SpELVariables getSpELVariables() {
         return spELVariables;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    public SchedulerSpaceInterface getSpace() {
+        return space;
+    }
+
+    public String getVariableName() {
+        return variableName;
+    }
+
+    public void setVariableName(String variableName) {
+        this.variableName = variableName;
     }
 
     /**

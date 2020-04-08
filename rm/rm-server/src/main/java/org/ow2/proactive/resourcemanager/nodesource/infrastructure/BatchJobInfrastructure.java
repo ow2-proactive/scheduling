@@ -37,6 +37,7 @@ import java.net.UnknownHostException;
 import java.security.KeyException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -79,7 +80,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * Path to the Java executable on the remote hosts
      */
-    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts")
+    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts", sectionSelector = 1)
     protected String javaPath = System.getProperty("java.home") + "/bin/java";
 
     /**
@@ -98,27 +99,27 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * ShhClient options (@see {@link SSHClient})
      */
-    @Configurable(description = "Options for the ssh command used\nto log in the batch system head node")
+    @Configurable(description = "Options for the ssh command used\nto log in the batch system head node", sectionSelector = 2)
     protected String sshOptions;
 
     /**
      * Path to the Scheduling installation on the remote hosts
      */
-    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts")
+    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts", sectionSelector = 1)
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
 
     /**
      * Additional java options to append to the command executed on the remote
      * host
      */
-    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
+    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
     /**
      * maximum number of nodes this infrastructure can ask simultaneously to the
      * Job Batching system
      */
-    @Configurable(description = "The maximum number of nodes\nto be requested to the batch system")
+    @Configurable(description = "The maximum number of nodes\nto be requested to the batch system", sectionSelector = 1, important = true)
     protected int maxNodes = 1;
 
     /**
@@ -127,26 +128,26 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * "acquireNode" request are discarded. This time out is also used to time
      * out submit job and delete job command's exit status
      */
-    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
+    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost", sectionSelector = 3)
     protected int nodeTimeOut = 1000 * 60 * 5;// 5mn
 
     /**
      * name of the server on which the job batching software is running. will be
      * contacted using ssh
      */
-    @Configurable(description = "The batch system\nhead node name or IP adress")
+    @Configurable(description = "The batch system\nhead node name or IP adress", sectionSelector = 2, important = true)
     protected String serverName;
 
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the credential file")
+    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 3)
     protected File rmCredentialsPath;
 
     /**
      * options for the submit job command executed on {@link #serverName}
      */
-    @Configurable(description = "Options for the\njob submission command")
+    @Configurable(description = "Options for the\njob submission command", sectionSelector = 1)
     protected String submitJobOpt;
 
     /**
@@ -489,12 +490,12 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
                 this.nodeTimeOut = 1000 * 60 * 5;
             }
             this.serverName = parameters[index++].toString();
-            if (parameters[index] == null) {
-                throw new IllegalArgumentException("Credentials must be specified");
-            }
             try {
-                persistedInfraVariables.put(CREDENTIALS_KEY,
-                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                byte[] possibleCredentials = (byte[]) parameters[index++];
+                if (possibleCredentials != null && possibleCredentials.length > 0) {
+                    persistedInfraVariables.put(CREDENTIALS_KEY,
+                                                Credentials.getCredentialsBase64((byte[]) possibleCredentials));
+                }
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
@@ -816,11 +817,9 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     private Credentials getCredentials() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Credentials>() {
-            @Override
-            public Credentials handle() {
-                return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
-            }
+        return getPersistedInfraVariable(() -> {
+            Credentials credentials = (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
+            return Optional.ofNullable(credentials).orElse(nodeSource.getAdministrator().getCredentials());
         });
     }
 
@@ -944,4 +943,12 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         });
     }
 
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(1, "Deployment Configuration");
+        sectionDescriptions.put(2, "SSH Configuration");
+        sectionDescriptions.put(3, "Node Configuration");
+        return sectionDescriptions;
+    }
 }

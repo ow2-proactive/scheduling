@@ -46,7 +46,11 @@ public class AllObjects2BytesConverterHandler {
 
     private final static String TIMEOUT_JAVA_PROPERTY = "pa.max.deserialization.seconds";
 
-    private final static Long secondsToWait = Long.getLong(TIMEOUT_JAVA_PROPERTY, 30L);
+    private final static String DESERIALIZATION_THRESHOLD = "pa.max.deserialization.threshold";
+
+    private final static Long secondsToWait = Long.getLong(TIMEOUT_JAVA_PROPERTY, 120L);
+
+    private final static Long deserializationThreshold = Long.getLong(DESERIALIZATION_THRESHOLD, 1000000L);
 
     private final static String ERROR_MESSAGE = " was stuck for more than " + secondsToWait +
                                                 " seconds. Killing the Java process.(You can control this timeout  with the java property -D" +
@@ -58,22 +62,31 @@ public class AllObjects2BytesConverterHandler {
 
     public static Map<String, Serializable> convertAllBytes2Objects(final Map<String, byte[]> target,
             final ClassLoader cl) {
-        return convert("Deserialization of variables", createDeserializeCollable(target, cl));
+        long totalBytes = target != null ? target.values()
+                                                 .stream()
+                                                 .mapToInt(value -> value != null ? value.length : 0)
+                                                 .sum()
+                                         : 0;
+        return convert("Deserialization of variables", createDeserializeCollable(target, cl), totalBytes);
     }
 
     public static Map<String, byte[]> convertAllObjects2Bytes(final Map<String, Serializable> variableMap) {
-        return convert("Serialization of variables", createSerializableCallable(variableMap));
+        return convert("Serialization of variables", createSerializableCallable(variableMap), Long.MAX_VALUE);
     }
 
     public static byte[] convertObject2Byte(final String key, final Serializable value) {
-        return convertSingle("Serialization of single value", createSerializeSingleValueCollable(key, value));
+        return convertSingle("Serialization of single value",
+                             createSerializeSingleValueCollable(key, value),
+                             Long.MAX_VALUE);
     }
 
     public static Serializable convertByte2Object(final byte[] value) {
-        return convertSingle("Deserialization of single value", createDeserializeSingleValueCollable(value));
+        return convertSingle("Deserialization of single value",
+                             createDeserializeSingleValueCollable(value),
+                             value != null ? value.length : 0);
     }
 
-    private static <K, V> Map<K, V> convert(String action, Callable<Map<K, V>> callable) {
+    private static <K, V> Map<K, V> convert(String action, Callable<Map<K, V>> callable, long totalSize) {
 
         Map<K, V> resultMap = new HashMap<>();
 
@@ -81,7 +94,14 @@ public class AllObjects2BytesConverterHandler {
         Future<Map<K, V>> future = executor.submit(callable);
 
         try {
-            resultMap = future.get(secondsToWait, TimeUnit.SECONDS);
+            if (totalSize < deserializationThreshold) {
+                // If the amount of bytes to deserialize is small, the deserialization should not exceed a timeout,
+                // otherwise it means a deadlock occurs (most likely due to jython types)
+                // timeout is disabled for serialization
+                resultMap = future.get(secondsToWait, TimeUnit.SECONDS);
+            } else {
+                resultMap = future.get();
+            }
         } catch (TimeoutException e) {
             logger.fatal(action + ERROR_MESSAGE);
             System.exit(1);
@@ -98,7 +118,7 @@ public class AllObjects2BytesConverterHandler {
 
     }
 
-    private static <V> V convertSingle(final String action, final Callable<V> callable) {
+    private static <V> V convertSingle(final String action, final Callable<V> callable, long totalSize) {
 
         V result = null;
 
@@ -106,7 +126,14 @@ public class AllObjects2BytesConverterHandler {
         Future<V> future = executor.submit(callable);
 
         try {
-            result = future.get(secondsToWait, TimeUnit.SECONDS);
+            if (totalSize < deserializationThreshold) {
+                // If the amount of bytes to deserialize is small, the deserialization should not exceed a timeout,
+                // otherwise it means a deadlock occurs (most likely due to jython types)
+                // timeout is disabled for serialization
+                result = future.get(secondsToWait, TimeUnit.SECONDS);
+            } else {
+                result = future.get();
+            }
         } catch (TimeoutException e) {
             logger.fatal(action + ERROR_MESSAGE);
             System.exit(1);

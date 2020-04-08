@@ -25,13 +25,9 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.addons.email.EmailSender;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
@@ -40,7 +36,7 @@ public class SendMail {
 
     /**
      * Throws EmailException whenever configuration is wrong
-     * 
+     *
      * @param to recipient
      * @param subject email subject
      * @param body email body
@@ -78,41 +74,5 @@ public class SendMail {
         builder.setAttachmentPath(fileToAttach);
         builder.setAttachmentName(fileName);
         builder.build().sendPlainTextEmailWithAttachment();
-    }
-}
-
-class EmailConfiguration {
-    private String path;
-
-    private static EmailConfiguration configuration;
-
-    private static Logger logger = Logger.getLogger(EmailConfiguration.class);
-
-    private EmailConfiguration() {
-        path = PASchedulerProperties.EMAIL_NOTIFICATIONS_CONFIGURATION.getValueAsString();
-    }
-
-    public static synchronized EmailConfiguration getConfiguration() {
-        if (configuration == null) {
-            configuration = new EmailConfiguration();
-        }
-        return configuration;
-    }
-
-    public String getPath() {
-        if (path != null && path.length() > 0) {
-            path = PASchedulerProperties.getAbsolutePath(path);
-        }
-        return path;
-    }
-
-    public Properties getProperties() {
-        Properties props = new Properties();
-        try (InputStream fis = new FileInputStream(getPath())) {
-            props.load(fis);
-        } catch (IOException e) {
-            logger.warn("Email Configuration file: " + getPath() + " not found!", e);
-        }
-        return props;
     }
 }

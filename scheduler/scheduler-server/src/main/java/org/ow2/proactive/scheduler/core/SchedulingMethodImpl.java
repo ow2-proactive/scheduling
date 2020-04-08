@@ -264,10 +264,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                                            .equals(TaskStatus.PENDING))
                                                                       .collect(Collectors.toList());
 
-        notPendingYet.forEach(task -> task.getInternal().setStatus(TaskStatus.PENDING));
+        notPendingYet.forEach(task -> {
+            if (task.getInternal().getScheduledTime() == -1) {
+                task.getInternal().setScheduledTime(System.currentTimeMillis());
+            }
+            task.getInternal().setStatus(TaskStatus.PENDING);
+        });
 
         notPendingYet.forEach(task -> {
-            getDBManager().updateTaskStatus(task, TaskStatus.PENDING);
+            getDBManager().updateTaskStatusAndScheduledTime(task,
+                                                            TaskStatus.PENDING,
+                                                            task.getInternal().getScheduledTime());
         });
 
     }
@@ -567,13 +574,23 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             TopologyDescriptor descriptor = null;
             boolean bestEffort = true;
 
+            List<Map<String, String>> listUsageInfo = new LinkedList<>();
             if (internalTask0.isParallel()) {
+                listUsageInfo.add(getUsageInfo(internalTask0));
                 descriptor = internalTask0.getParallelEnvironment().getTopologyDescriptor();
                 bestEffort = false;
                 if (descriptor == null) {
                     logger.debug("Topology is not defined for the task " + internalTask0.getName());
                 }
+            } else {
+                for (int i = 0; i < neededResourcesNumber; ++i) {
+                    EligibleTaskDescriptor eligibleTaskDescriptor = tasksToSchedule.get(i);
+                    InternalJob internalJob = ((JobDescriptorImpl) jobMap.get(eligibleTaskDescriptor.getJobId())).getInternal();
+                    InternalTask internalTask = internalJob.getIHMTasks().get(eligibleTaskDescriptor.getTaskId());
+                    listUsageInfo.add(getUsageInfo(internalTask));
+                }
             }
+
             if (descriptor == null) {
                 // descriptor is not defined, use default
                 descriptor = TopologyDescriptor.ARBITRARY;
@@ -582,6 +599,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             try {
                 schedulingMainLoopTimingLogger.start("setCriteria");
                 Criteria criteria = new Criteria(neededResourcesNumber);
+                criteria.setListUsageInfo(listUsageInfo);
                 criteria.setTopology(descriptor);
                 // resolve script variables (if any) in the list of selection
                 // scripts and then set it as the selection criteria.
@@ -642,6 +660,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
     }
 
+    private Map<String, String> getUsageInfo(InternalTask internalTask) {
+        Map<String, String> metaInfoAboutTask = new HashMap<>();
+        if (internalTask != null) {
+            metaInfoAboutTask.put("TASK_ID", internalTask.getId().value());
+            metaInfoAboutTask.put("TASK_NAME", internalTask.getId().getReadableName());
+            metaInfoAboutTask.put("JOB_ID", internalTask.getId().getJobId().value());
+            metaInfoAboutTask.put("JOB_NAME", internalTask.getId().getJobId().getReadableName());
+        }
+        return metaInfoAboutTask;
+    }
+
     /**
      * Update all variables for the given scheduled tasks
      */
@@ -683,16 +712,24 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     public static SelectionScript replaceBindingsInsideScript(SelectionScript script,
             Map<String, Serializable> bindings) {
         String scriptContent = script.fetchScript();
-        if (bindings != null) {
+        if (bindings != null && scriptContent != null) {
             for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
                 scriptContent = scriptContent.replace(entry.getKey(), entry.getValue().toString());
             }
         }
         try {
-            return new SelectionScript(scriptContent,
-                                       script.getEngineName(),
-                                       script.getParameters(),
-                                       script.isDynamic());
+            if (scriptContent != null) {
+                return new SelectionScript(scriptContent,
+                                           script.getEngineName(),
+                                           script.getParameters(),
+                                           script.isDynamic());
+            } else {
+                return new SelectionScript(script.getScriptUrl(),
+                                           script.getEngineName(),
+                                           script.getParameters(),
+                                           script.isDynamic());
+            }
+
         } catch (InvalidScriptException e) {
             logger.warn("Error when replacing bindings of script (revert to use original script):" +
                         System.lineSeparator() + script.toString(), e);
@@ -886,13 +923,16 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      */
     public static List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
             Map<String, Serializable> variables) {
+        List<SelectionScript> output = new LinkedList<>();
         if (selectionScripts == null) {
             return null;
         }
         for (SelectionScript script : selectionScripts) {
-            VariableSubstitutor.filterAndUpdate(script, variables);
+            SelectionScript resolved = SelectionScript.resolvedSelectionScript(script);
+            VariableSubstitutor.filterAndUpdate(resolved, variables);
+            output.add(resolved);
         }
-        return selectionScripts;
+        return output;
     }
 
 }

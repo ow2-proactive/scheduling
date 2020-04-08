@@ -334,4 +334,16 @@ public class SynchronizationWrapper implements Synchronization {
         initInternalAPI();
         return internalAPI.waitUntilThen(originator, taskId, channel, key, predicate, timeout, thenRemappingFunction);
     }
+
+    @Override
+    public void freeze() throws IOException {
+        initInternalAPI();
+        internalAPI.freeze();
+    }
+
+    @Override
+    public void resume() throws IOException {
+        initInternalAPI();
+        internalAPI.resume();
+    }
 }

@@ -47,6 +47,7 @@ public enum OperatingSystem {
     HP_UX("HP-UX", OperatingSystemFamily.UNIX),
     AIX("AIX", OperatingSystemFamily.UNIX),
     OS_390("OS/390", OperatingSystemFamily.UNIX),
+    zOS("z/OS", OperatingSystemFamily.UNIX),
     FREEBSD("FreeBSD", OperatingSystemFamily.UNIX),
     IRIX("Irix", OperatingSystemFamily.UNIX),
     DIGITAL_UNIX("Digital Unix", OperatingSystemFamily.UNIX),

@@ -291,7 +291,7 @@ public class ManageUsers {
         if (action.isCreate() && !userInfo.isGroupSet()) {
             System.out.print("groups for user " + userInfo.getLogin() + ":");
             String groupString = console.readLine();
-            userInfo.setGroups(Arrays.asList(groupString.split(",")));
+            userInfo.setGroups(Arrays.asList(groupString.split("\\s*,\\s*")));
         }
     }
 

@@ -45,6 +45,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 
 
 /**
@@ -74,18 +75,12 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
-        ScriptResult scriptResult;
-        Map<String, Object> schedulerProperties;
-        String packageDirPath;
         try {
-            packageDirPath = retrievePackagePath();
-
-            schedulerProperties = retrieveSchedulerProperties(currentContext, scheduler);
-
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+            String packageDirPath = retrievePackagePath();
+            Map<String, Object> schedulerProperties = retrieveSchedulerProperties(currentContext, scheduler);
             addSessionIdToSchedulerProperties(currentContext, schedulerProperties);
-
-            scriptResult = executeScript(schedulerProperties, packageDirPath);
+            ScriptResult scriptResult = executeScript(schedulerProperties, packageDirPath);
 
             if (scriptResult.errorOccured()) {
                 logger.error("Failed to execute script: " + SCRIPT_PATH);
@@ -177,7 +172,7 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
     }
 
     private Map<String, Object> retrieveSchedulerProperties(ApplicationContext currentContext,
-            SchedulerRestInterface scheduler) throws PermissionRestException, NotConnectedRestException {
+            SchedulerRestInterface scheduler) throws RestException {
         return scheduler.getSchedulerPropertiesFromSessionId(currentContext.getSessionId());
     }
 

@@ -83,9 +83,9 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "checkJobExistence", query = "select id from JobData where id = :id"),
                 @NamedQuery(name = "countJobDataFinished", query = "select count (*) from JobData where status = 3"),
                 @NamedQuery(name = "countJobData", query = "select count (*) from JobData"),
-                @NamedQuery(name = "deleteJobData", query = "delete from JobData where id = :jobId"),
                 @NamedQuery(name = "findUsersWithJobs", query = "select owner, count(owner), max(submittedTime) from JobData group by owner"),
                 @NamedQuery(name = "getJobsNumberWithStatus", query = "select count(*) from JobData where status in (:status) and removedTime = -1"),
+                @NamedQuery(name = "getJobsNumberWithStatusUsername", query = "select count(*) from JobData where owner = :username and status in (:status) and removedTime = -1"),
                 @NamedQuery(name = "getJobSubmittedTime", query = "select submittedTime from JobData where id = :id"),
                 @NamedQuery(name = "getMeanJobExecutionTime", query = "select avg(finishedTime - startTime) from JobData where startTime > 0 and finishedTime > 0"),
                 @NamedQuery(name = "getMeanJobPendingTime", query = "select avg(startTime - submittedTime) from JobData where startTime > 0 and submittedTime > 0"),
@@ -101,7 +101,7 @@ import com.google.common.collect.Lists;
                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
                                                                      "numberOfInErrorTasks = :numberOfInErrorTasks, inErrorTime = :inErrorTime, lastUpdatedTime = :lastUpdatedTime " +
                                                                      "where id = :jobId"),
-                @NamedQuery(name = "updateJobDataRemovedTime", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                @NamedQuery(name = "updateJobDataRemovedTime", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id in :ids"),
                 @NamedQuery(name = "updateJobDataRemovedTimeInBulk", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id in :jobIdList"),
                 @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
@@ -130,12 +130,15 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
                                       @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
                                       @Index(name = "JOB_DATA_START_TIME", columnList = "START_TIME"),
-                                      @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"), })
+                                      @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"),
+                                      @Index(name = "JOB_PARENT_JOB_ID", columnList = "PARENT_JOB_ID") })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
 
     private Long id;
+
+    private Long parentId;
 
     private List<TaskData> tasks;
 
@@ -185,6 +188,8 @@ public class JobData implements Serializable {
 
     private String onTaskErrorString;
 
+    private Long taskRetryDelay;
+
     private JobPriority priority;
 
     private JobStatus status;
@@ -211,6 +216,7 @@ public class JobData implements Serializable {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
         jobInfo.setJobOwner(getOwner());
+        jobInfo.setProjectName(getProjectName());
         jobInfo.setStatus(getStatus());
         jobInfo.setTotalNumberOfTasks(getTotalNumberOfTasks());
         jobInfo.setNumberOfPendingTasks(getNumberOfPendingTasks());
@@ -246,8 +252,7 @@ public class JobData implements Serializable {
 
     JobInfo toJobInfo() {
         JobId jobIdInstance = new JobIdImpl(getId(), getJobName());
-        JobInfoImpl jobInfo = createJobInfo(jobIdInstance);
-        return jobInfo;
+        return createJobInfo(jobIdInstance);
     }
 
     InternalJob toInternalJob() {
@@ -269,6 +274,9 @@ public class JobData implements Serializable {
         internalJob.setUserSpace(getGlobalSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
+        if (getTaskRetryDelay() != null) {
+            internalJob.setTaskRetryDelay(getTaskRetryDelay());
+        }
         internalJob.setScheduledTimeForRemoval(getScheduledTimeForRemoval());
         try {
             internalJob.setResultMap(SerializationUtil.deserializeVariableMap(getResultMap()));
@@ -283,6 +291,7 @@ public class JobData implements Serializable {
         JobData jobRuntimeData = new JobData();
         jobRuntimeData.setMaxNumberOfExecution(job.getMaxNumberOfExecution());
         jobRuntimeData.setOnTaskErrorString(job.getOnTaskErrorProperty().getValue());
+        jobRuntimeData.setTaskRetryDelay(job.getTaskRetryDelay());
         jobRuntimeData.setSubmittedTime(job.getSubmittedTime());
         jobRuntimeData.setStartTime(job.getStartTime());
         jobRuntimeData.setInErrorTime(job.getInErrorTime());
@@ -316,6 +325,7 @@ public class JobData implements Serializable {
         jobRuntimeData.addJobContent(job.getTaskFlowJob());
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
+        jobRuntimeData.setParentId(job.getParentId());
 
         return jobRuntimeData;
     }
@@ -340,6 +350,15 @@ public class JobData implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Column(name = "PARENT_JOB_ID", nullable = true)
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
@@ -383,6 +402,15 @@ public class JobData implements Serializable {
 
     public void setOnTaskErrorString(String onTaskError) {
         this.onTaskErrorString = onTaskError;
+    }
+
+    @Column(name = "TASK_RETRY_DELAY")
+    public Long getTaskRetryDelay() {
+        return taskRetryDelay;
+    }
+
+    public void setTaskRetryDelay(Long taskRetryDelay) {
+        this.taskRetryDelay = taskRetryDelay;
     }
 
     @Column(name = "JOB_NAME", nullable = false, updatable = false)
@@ -674,7 +702,10 @@ public class JobData implements Serializable {
                                          getProjectName(),
                                          jobId.value(),
                                          getJobName(),
-                                         getFinishedTime() - getStartTime());
+                                         getFinishedTime() - getStartTime(),
+                                         getStatus().toString(),
+                                         getSubmittedTime(),
+                                         getParentId());
         for (TaskData taskData : getTasks()) {
             TaskUsage taskUsage = taskData.toTaskUsage(jobId);
             jobUsage.add(taskUsage);

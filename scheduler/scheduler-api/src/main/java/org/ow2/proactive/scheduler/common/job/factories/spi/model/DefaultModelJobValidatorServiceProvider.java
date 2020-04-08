@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.InputStream;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -52,15 +54,21 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
 
     @Override
     public TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException {
+        return validateJob(job, null, null);
+    }
 
-        ModelValidatorContext context = new ModelValidatorContext(job);
+    @Override
+    public TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space)
+            throws JobValidationException {
+
+        ModelValidatorContext context = new ModelValidatorContext(job, scheduler, space);
 
         for (JobVariable jobVariable : job.getVariables().values()) {
             checkVariableFormat(null, jobVariable, context);
             context.updateJobWithContext(job);
         }
         for (Task task : job.getTasks()) {
-            context = new ModelValidatorContext(task);
+            context = new ModelValidatorContext(task, scheduler, space);
             for (TaskVariable taskVariable : task.getVariables().values()) {
                 checkVariableFormat(task, taskVariable, context);
                 context.updateTaskWithContext(task);
@@ -74,6 +82,7 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
             throws JobValidationException {
         if (variable.getModel() != null && !variable.getModel().trim().isEmpty()) {
             String model = variable.getModel().trim();
+            context.setVariableName(variable.getName());
 
             try {
                 new ModelValidator(model).validate(variable.getValue(), context);

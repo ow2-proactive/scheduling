@@ -29,9 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.*;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.VFS;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 
@@ -102,18 +106,48 @@ public class Zipper {
 
     public static class ZIP {
 
+        private static List<File> findFiles(File root, FileSelector selector) {
+            List<File> listFiles = new ArrayList<>();
+            try {
+                FileObject rootObject = VFS.getManager().toFileObject(root);
+                FileObject[] fos = rootObject.findFiles(selector);
+
+                for (FileObject fo : fos) {
+                    listFiles.add(new File(fo.getName().getPath()));
+                }
+            } catch (Exception e) {
+                logger.error("An error occurred while zipping files: ", e);
+            }
+
+            return listFiles;
+        }
+
+        private static ImmutableList<File> filterNotEmpty(File root, List<String> includes, List<String> excludes) {
+            FileSelector fileSelector = new FileSelector();
+            fileSelector.addIncludes(includes);
+            fileSelector.addExcludes(excludes);
+
+            return ImmutableList.copyOf(findFiles(root, fileSelector));
+        }
+
+        private static ImmutableList<File> filterEmpty(File root) {
+            FluentIterable<File> fi = Files.fileTreeTraverser().postOrderTraversal(root);
+            return fi.filter(new FilesOnlyPredicate()).toList();
+        }
+
         public static void zip(File root, List<String> includes, List<String> excludes, OutputStream os)
                 throws IOException {
+            List<String> logIncludes = nullOrEmpty(includes) ? new ArrayList<>() : includes;
+            List<String> logExcludes = nullOrEmpty(excludes) ? new ArrayList<>() : excludes;
+            logger.trace("Includes list : " + logIncludes.toString());
+            logger.trace("Excludes list : " + logExcludes.toString());
             checkNotNull(root);
             checkNotNull(os);
-            FluentIterable<File> fi = Files.fileTreeTraverser().postOrderTraversal(root);
-            ImmutableList<File> fileList = nullOrEmpty(includes) && nullOrEmpty(excludes)
-                                                                                          ? fi.filter(new FilesOnlyPredicate())
-                                                                                              .toList()
-                                                                                          : fi.filter(new FileSelectionPredicate(root,
-                                                                                                                                 includes,
-                                                                                                                                 excludes))
-                                                                                              .toList();
+            ImmutableList<File> fileList = nullOrEmpty(includes) && nullOrEmpty(excludes) ? filterEmpty(root)
+                                                                                          : filterNotEmpty(root,
+                                                                                                           includes,
+                                                                                                           excludes);
+            logger.trace("Zipping files :" + fileList);
             zipFiles(fileList, root.getAbsolutePath(), os);
         }
 
@@ -127,9 +161,15 @@ public class Zipper {
                 ZipOutputStream zos = new ZipOutputStream(os);
                 closer.register(zos);
                 for (File file : files) {
-                    FileInputStream inputStream = new FileInputStream(file);
-                    closer.register(inputStream);
-                    writeZipEntry(zipEntry(basepath, file), inputStream, zos);
+                    if (file.isFile()) {
+                        FileInputStream inputStream = new FileInputStream(file);
+                        closer.register(inputStream);
+                        writeZipEntry(zipEntry(basepath, file), inputStream, zos);
+                    } else {
+                        ZipEntry ze = zipEntry(basepath, file);
+                        logger.trace("Adding directory zip entry: " + ze.toString());
+                        zos.putNextEntry(ze);
+                    }
                 }
             } catch (IOException ioe) {
                 throw closer.rethrow(ioe);
@@ -142,7 +182,7 @@ public class Zipper {
             Closer closer = Closer.create();
             closer.register(is);
             try {
-                logger.trace("Adding zip entry" + zipEntry.toString());
+                logger.trace("Adding file zip entry: " + zipEntry.toString());
                 zos.putNextEntry(zipEntry);
                 ByteStreams.copy(is, zos);
                 zos.flush();
@@ -192,11 +232,19 @@ public class Zipper {
             }
         }
 
-        private static ZipEntry zipEntry(String basepath, File file) {
+        private static String getRealRelativeFilePath(String basepath, String absolutePath) throws IOException {
+            String realAbsolutePath = Paths.get(absolutePath).toRealPath().toString();
+            String realBasePath = Paths.get(basepath).toRealPath().toString();
+            return basepath.endsWith(File.separator) ? realAbsolutePath.substring(realBasePath.length())
+                                                     : realAbsolutePath.substring(realBasePath.length() + 1);
+        }
+
+        private static ZipEntry zipEntry(String basepath, File file) throws IOException {
             String name = (Strings.isNullOrEmpty(basepath) ||
                            basepath.equals(file.getAbsolutePath())) ? file.getPath()
-                                                                    : file.getAbsolutePath()
-                                                                          .substring(basepath.length() + 1);
+                                                                    : getRealRelativeFilePath(basepath,
+                                                                                              file.getAbsolutePath());
+            name = file.isDirectory() ? new File(name, File.separator).toString() : name;
             return new ZipEntry(name);
         }
     }
@@ -232,39 +280,11 @@ public class Zipper {
     private static class FilesOnlyPredicate implements Predicate<File> {
         @Override
         public boolean apply(File file) {
-            return !file.isDirectory();
-        }
-    }
-
-    private static class FileSelectionPredicate implements Predicate<File> {
-
-        private File root;
-
-        private List<String> includes;
-
-        private List<String> excludes;
-
-        public FileSelectionPredicate(File root, List<String> includes, List<String> excludes) {
-            this.root = root;
-            this.includes = includes;
-            this.excludes = excludes;
-        }
-
-        @Override
-        public boolean apply(File file) {
-            Path pathRelativeToRoot = root.toPath().relativize(file.toPath());
-
-            FileSelector selector = new FileSelector(includes, excludes);
-
-            boolean answer = !file.isDirectory() && selector.matches(pathRelativeToRoot);
+            boolean answer = !file.isDirectory();
             if (logger.isTraceEnabled()) {
-                logger.trace("Analysing file " + file + " for selector " + selector + " : " + answer);
-                logger.trace("Path relative to root : " + pathRelativeToRoot);
+                logger.trace("Analysing file " + file + " : " + answer);
             }
-
             return answer;
         }
-
     }
-
 }

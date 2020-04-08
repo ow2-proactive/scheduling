@@ -86,6 +86,7 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -107,6 +108,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                 @NamedQuery(name = "getMeanTaskPendingTime", query = "select avg(startTime - :jobSubmittedTime) from TaskData task where task.jobData.id = :id and task.startTime > 0"),
                 @NamedQuery(name = "getMeanTaskRunningTime", query = "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.jobData.id = :id"),
                 @NamedQuery(name = "getTasksCount", query = "select count(*) from TaskData task where taskStatus = :taskStatus and task.jobData.removedTime = -1"),
+                @NamedQuery(name = "getTasksCountForUsername", query = "select count(*) from TaskData task where task.jobData.owner = :username and taskStatus in (:taskStatus) and task.jobData.removedTime = -1"),
                 @NamedQuery(name = "getPendingTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
                 @NamedQuery(name = "getRunningTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) " +
                                                                    "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
@@ -154,7 +156,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                                      "where task.id.jobId = :jobId " +
                                                                      "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.IN_ERROR "),
                 @NamedQuery(name = "updateTaskDataJobScripts", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
-                                                                       "cleanScript = null  where id.jobId = :jobId"),
+                                                                       "cleanScript = null  where id.jobId in :ids"),
                 @NamedQuery(name = "updateTaskDataJobScriptsInBulk", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
                                                                              "cleanScript = null  where id.jobId in :jobIdList"),
                 @NamedQuery(name = "updateTaskDataStatusToPending", query = "update TaskData task set task.taskStatus = :taskStatus " +
@@ -257,6 +259,8 @@ public class TaskData {
 
     private long wallTime;
 
+    private Long retryDelay;
+
     private int iteration;
 
     private int replication;
@@ -295,6 +299,7 @@ public class TaskData {
 
     @Column(name = "JAVA_HOME", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getJavaHome() {
         return javaHome;
     }
@@ -360,6 +365,7 @@ public class TaskData {
 
     @Column(name = "WORKING_DIR", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getWorkingDir() {
         return workingDir;
     }
@@ -395,7 +401,7 @@ public class TaskData {
             }
         }
         if (envScript != null) {
-            forkEnv.setEnvScript(envScript.createSimpleScript());
+            forkEnv.setEnvScript(new ForkEnvironmentScript(envScript.createSimpleScript()));
         }
         return forkEnv;
     }
@@ -534,6 +540,7 @@ public class TaskData {
         taskData.setRunAsMe(task.isRunAsMe());
         taskData.setWallTime(task.getWallTime());
         taskData.setOnTaskErrorString(task.getOnTaskErrorProperty().getValue());
+        taskData.setRetryDelay(task.getTaskRetryDelay());
         taskData.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         taskData.setJobData(jobRuntimeData);
         taskData.setNumberOfExecutionOnFailureLeft(PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
@@ -668,12 +675,10 @@ public class TaskData {
 
         InternalTask internalTask;
 
-        if (taskType.equals(SCRIPT_TASK)) {
-            internalTask = new InternalScriptTask(internalJob);
-        } else if (taskType.equals(FORKED_SCRIPT_TASK)) {
+        if (isForkTask()) {
             internalTask = new InternalForkedScriptTask(internalJob);
         } else {
-            throw new IllegalStateException("Unexpected stored task type: " + taskType);
+            internalTask = new InternalScriptTask(internalJob);
         }
 
         internalTask.setId(taskId);
@@ -692,11 +697,16 @@ public class TaskData {
         internalTask.setPreciousLogs(isPreciousLogs());
         internalTask.setPreciousResult(isPreciousResult());
         internalTask.setRunAsMe(isRunAsMe());
+        internalTask.setFork(isForkTask());
         internalTask.setWallTime(getWallTime());
+        if (getRetryDelay() != null) {
+            internalTask.setTaskRetryDelay(getRetryDelay());
+        }
         internalTask.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalTask.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
         internalTask.setNumberOfExecutionOnFailureLeft(getNumberOfExecutionOnFailureLeft());
         internalTask.setRestartTaskOnError(getRestartMode());
+
         internalTask.setFlowBlock(getFlowBlock());
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
@@ -1006,6 +1016,15 @@ public class TaskData {
         this.startTime = startTime;
     }
 
+    @Column(name = "RETRY_DELAY")
+    public Long getRetryDelay() {
+        return retryDelay;
+    }
+
+    public void setRetryDelay(Long retryDelay) {
+        this.retryDelay = retryDelay;
+    }
+
     @Column(name = "FINISH_TIME")
     public long getFinishedTime() {
         return finishedTime;
@@ -1180,11 +1199,19 @@ public class TaskData {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
 
         return new TaskUsage(taskId.value(),
+                             getTaskStatus().toString(),
                              getTaskName(),
+                             getTag(),
                              getStartTime(),
                              getFinishedTime(),
                              getExecutionDuration(),
-                             getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
+                             getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber(),
+                             getDescription() == null ? null : getDescription().trim(),
+                             getExecutionHostName(),
+                             getNumberOfExecutionLeft(),
+                             getNumberOfExecutionOnFailureLeft(),
+                             getMaxNumberOfExecution(),
+                             PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
     }
 
     TaskInfoImpl createTaskInfo(JobIdImpl jobId) {
@@ -1221,10 +1248,23 @@ public class TaskData {
         taskState.setIterationIndex(getIteration());
         taskState.setReplicationIndex(getReplication());
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
+        if (getRetryDelay() != null) {
+            taskState.setTaskRetryDelay(getRetryDelay());
+        }
         taskState.setParallelEnvironment(getParallelEnvironment());
         taskState.setGenericInformation(getGenericInformation());
         taskState.setVariables(variablesToTaskVariables());
         return taskState;
     }
 
+    @Transient
+    public boolean isForkTask() {
+        if (SCRIPT_TASK.equals(taskType)) {
+            return false;
+        } else if (FORKED_SCRIPT_TASK.equals(taskType)) {
+            return true;
+        } else {
+            throw new IllegalStateException("Unexpected stored task type: " + taskType);
+        }
+    }
 }

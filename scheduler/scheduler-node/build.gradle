@@ -7,6 +7,7 @@ buildscript {
         if (project.hasProperty('local')) {
             mavenLocal()
         }
+    mavenCentral()
         jcenter()
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
     }
@@ -18,6 +19,7 @@ dependencies {
     compile(
             "org.objectweb.proactive:programming-extension-processbuilder:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}",
+            "org.ow2.proactive:emailnotification-addons:${schedulingVersion}",
 
             project(':scheduler:scheduler-client'),
             project(':rest:rest-client'),
@@ -71,7 +73,11 @@ task standaloneJar(type: OneJar) {
     mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
     binLib = files({ rootProject.configurations.nativeBundle.collect { zipTree(it) } })
     additionalDir = file('src/main/resources')
-    manifest = oneJarManifest
+    manifest {
+        attributes 'Timestamp': String.valueOf(System.currentTimeMillis())
+        attributes 'One-Jar-Expand': 'lib,binlib,main,dist'
+        attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
+    }
 }
 build.dependsOn standaloneJar
 artifacts {

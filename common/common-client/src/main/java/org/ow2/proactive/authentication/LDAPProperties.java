@@ -30,7 +30,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
+import org.jasypt.iv.RandomIvGenerator;
+import org.jasypt.properties.EncryptableProperties;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.core.properties.PASharedProperties;
+import org.ow2.proactive.core.properties.PropertyDecrypter;
 
 
 /**
@@ -114,6 +119,7 @@ public class LDAPProperties {
      * @param propertiesFileName properties file name
      */
     public LDAPProperties(String propertiesFileName) {
+        prop = PropertyDecrypter.getDecryptableProperties();
         try (FileInputStream stream = new FileInputStream(new File(propertiesFileName))) {
             prop.load(stream);
             setUserJavaProperties();

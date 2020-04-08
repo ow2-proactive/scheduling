@@ -39,6 +39,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
+import org.ow2.proactive.permissions.NodeUserAllPermission;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -340,22 +341,51 @@ public abstract class SelectionManager {
         }
 
         // the nodes are selected, now mark them as busy.
+        int counter = 0;
         for (Node node : selectedNodes) {
+
             try {
-                // Synchronous call
-                rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+
+                if (criteria.getListUsageInfo() != null) {
+                    if (criteria.getListUsageInfo().size() == 1) {
+                        // it is mutli node execution, which means we provide the same usage info for every node
+                        // Synchronous call
+                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
+                                           client,
+                                           criteria.getListUsageInfo().get(0));
+                    } else {
+                        // in this case, we have set of nodes, where will be set of compatible tasks
+                        // Synchronous call
+                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
+                                           client,
+                                           criteria.getListUsageInfo().get(counter));
+                    }
+                } else {
+                    // Synchronous call
+                    rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+                }
             } catch (NotConnectedException e) {
                 // client has disconnected during getNodes request
                 logger.warn(e.getMessage(), e);
                 return null;
             }
+            ++counter;
         }
         // marking extra selected nodes as busy
         if (selectedNodes.size() > 0 && selectedNodes.getExtraNodes() != null) {
             for (Node node : new LinkedList<>(selectedNodes.getExtraNodes())) {
                 try {
-                    // synchronous call
-                    rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+
+                    if (criteria.getListUsageInfo() != null) {
+                        // synchronous call
+                        // here, we believe that it will be called only for multi node execution
+                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
+                                           client,
+                                           criteria.getListUsageInfo().get(0));
+                    } else {
+                        // synchronous call
+                        rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+                    }
                 } catch (NotConnectedException e) {
                     // client has disconnected during getNodes request
                     logger.warn(e.getMessage(), e);
@@ -509,7 +539,8 @@ public abstract class SelectionManager {
                 if (!clientPermissions.contains(node.getUserPermission())) {
                     client.checkPermission(node.getUserPermission(),
                                            client + " is not authorized to get the node " + node.getNodeURL() +
-                                                                     " from " + node.getNodeSource().getName());
+                                                                     " from " + node.getNodeSource().getName(),
+                                           new NodeUserAllPermission());
                     // YES
                     clientPermissions.add(node.getUserPermission());
                 }

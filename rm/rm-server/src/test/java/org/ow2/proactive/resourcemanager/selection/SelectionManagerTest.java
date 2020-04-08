@@ -49,6 +49,7 @@ import org.mockito.Mockito;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.permissions.NodeUserAllPermission;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -175,6 +176,14 @@ public class SelectionManagerTest {
                     ((PrincipalPermission) perm).hasPrincipal(new UserNamePrincipal("user"))) {
                     throw new SecurityException();
                 }
+                if (perm instanceof NodeUserAllPermission) {
+                    throw new SecurityException();
+                }
+            }
+
+            @Override
+            public void checkRead(String fd) {
+                // ok
             }
         };
     }
@@ -222,7 +231,7 @@ public class SelectionManagerTest {
         if (nbNodes > 0) {
             ArrayList<RMNode> freeNodes = new ArrayList<RMNode>(nbNodes);
             for (int i = 0; i < nbNodes; i++) {
-                freeNodes.add(createMockeNode("user", "mocked-node-" + (i + 1), "mocked-node-" + (i + 1)));
+                freeNodes.add(createMockedNode("user", "mocked-node-" + (i + 1), "mocked-node-" + (i + 1)));
             }
             when(mockedRMCore.getFreeNodes()).thenReturn(freeNodes);
         }
@@ -231,10 +240,10 @@ public class SelectionManagerTest {
     }
 
     public static RMNode createMockedNode(String nodeUser) {
-        return createMockeNode(nodeUser, "", "");
+        return createMockedNode(nodeUser, "", "");
     }
 
-    public static RMNode createMockeNode(String nodeUser, String nodeName, String nodeUrl) {
+    public static RMNode createMockedNode(String nodeUser, String nodeName, String nodeUrl) {
         RMNode rmNode = mock(RMNode.class);
         NodeInformation mockedNodeInformation = mock(NodeInformation.class);
         Node node = mock(Node.class);

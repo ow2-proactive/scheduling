@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -69,13 +71,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * SshClient options (@see {@link SSHClient})
      */
-    @Configurable(description = "Options for the ssh command\nto log in the remote hosts")
+    @Configurable(description = "Options for the ssh command\nto log in the remote hosts", sectionSelector = 2)
     protected String sshOptions;
 
     /**
      * Path to the Java executable on the remote hosts
      */
-    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts")
+    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts", sectionSelector = 1)
     protected String javaPath = System.getProperty("java.home") + "/bin/java";
 
     /**
@@ -94,26 +96,26 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * Path to the Scheduling installation on the remote hosts
      */
-    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts")
+    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts", sectionSelector = 1)
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
 
     /**
      * The type of the OS on the remote machine, 'Linux', 'Windows' or 'Cygwin'
      */
-    @Configurable(description = "Linux, Cygwin or Windows depending on\nthe operating system of the remote hosts")
+    @Configurable(description = "Linux, Cygwin or Windows depending on\nthe operating system of the remote hosts", sectionSelector = 1)
     protected String targetOs = "Linux";
 
     /**
      * Additional java options to append to the command executed on the remote
      * host
      */
-    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
+    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the credential file")
+    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 1)
     protected File rmCredentialsPath;
 
     private static final String CREDENTIALS_KEY = "credentials";
@@ -304,10 +306,11 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      *
      * @param parameters
      *            parameters[4] : ssh Options, see {@link SSHClient}
-     *            parameters[5] : java path on the remote machines parameters[6]
-     *            : Scheduling path on remote machines parameters[7] : target
-     *            OS' type (Linux, Windows or Cygwin) parameters[8] : extra java
-     *            options parameters[9] : rm cred
+     *            parameters[5] : java path on the remote machines
+     *            parameters[6] : Scheduling path on remote machines
+     *            parameters[7] : target OS' type (Linux, Windows or Cygwin)
+     *            parameters[8] : extra java options
+     *            parameters[9] : rm cred
      * @throws IllegalArgumentException
      *             configuration failed
      */
@@ -336,12 +339,11 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             this.javaOptions = parameters[index++].toString();
 
             // credentials
-            if (parameters[index] == null) {
-                throw new IllegalArgumentException("Credentials must be specified");
-            }
             try {
-                persistedInfraVariables.put(CREDENTIALS_KEY,
-                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                byte[] possibleCredentials = (byte[]) parameters[index++];
+                if (possibleCredentials != null && possibleCredentials.length > 0) {
+                    persistedInfraVariables.put(CREDENTIALS_KEY, Credentials.getCredentialsBase64(possibleCredentials));
+                }
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
@@ -396,11 +398,9 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     // Below are wrapper methods around the runtime variables map
 
     private Credentials getCredentials() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Credentials>() {
-            @Override
-            public Credentials handle() {
-                return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
-            }
+        return getPersistedInfraVariable(() -> {
+            Credentials credentials = (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
+            return Optional.ofNullable(credentials).orElse(nodeSource.getAdministrator().getCredentials());
         });
     }
 
@@ -421,6 +421,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                 return null;
             }
         });
+    }
+
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(2, "SSH Configuration");
+        return sectionDescriptions;
     }
 
 }

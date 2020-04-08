@@ -132,6 +132,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         job = jobs.get(0);
 
         assertEquals(this.getClass().getSimpleName(), job.getJobId().getReadableName());
+        assertEquals(this.getClass().getSimpleName(), job.getProjectName());
         assertEquals(1, job.getTotalNumberOfTasks());
         assertEquals(0, job.getNumberOfFinishedTasks());
         assertEquals(0, job.getNumberOfPendingTasks());
@@ -245,7 +246,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         PAActiveObject.terminateActiveObject(eventReceiver, true);
 
         // connect as a user who can see only its own jobs
-        cred = Credentials.createCredentials(new CredData("guest", "pwd"), auth.getPublicKey());
+        cred = Credentials.createCredentials(new CredData("user", "pwd"), auth.getPublicKey());
         scheduler = auth.login(cred);
 
         monitorsHandler = new SchedulerMonitorsHandler();
@@ -284,6 +285,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
     private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
+        job.setProjectName(this.getClass().getSimpleName());
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());

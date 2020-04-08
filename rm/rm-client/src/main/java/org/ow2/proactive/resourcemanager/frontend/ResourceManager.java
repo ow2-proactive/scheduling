@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -37,7 +38,9 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -558,4 +561,15 @@ public interface ResourceManager {
     boolean areNodesRecoverable(NodeSet nodes);
 
     void setNeededNodes(int neededNodes);
+
+    Map<String, List<String>> getInfrasToPoliciesMapping();
+
+    List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd);
+
+    void addNodeToken(String nodeUrl, String token) throws RMException;
+
+    void removeNodeToken(String nodeUrl, String token) throws RMException;
+
+    void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException;
+
 }

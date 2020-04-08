@@ -32,7 +32,9 @@ public enum TestUsers {
     TEST("test_executor", "pwd"),
     RADMIN("radmin", "pwd"),
     NSADMIN("nsadmin", "pwd"),
-    ADMIN("admin", "admin");
+    NSADMIN2("nsadmin2", "pwd"),
+    ADMIN("admin", "admin"),
+    PROVIDER("provider", "pwd");
 
     public final String username;
 

@@ -114,7 +114,7 @@ public class AccessType implements Serializable {
             // users=name1,name2;groups=group1,group2
             // or
             // users=!name1,!name2;groups=!group1,!group2
-            String[] semicolon = type.split(";");
+            String[] semicolon = type.split("\\s*;\\s*");
             if (semicolon.length == 0) {
                 throw new IllegalArgumentException("Cannot split " + type + " ';'");
             }
@@ -126,14 +126,14 @@ public class AccessType implements Serializable {
             ArrayList<String> tokens = new ArrayList<>();
 
             for (String s : semicolon) {
-                String[] eq = s.split("=");
+                String[] eq = s.split("\\s*=\\s*");
                 if (eq.length == 0) {
                     throw new IllegalArgumentException("Cannot split " + type + " '='");
                 }
 
                 // Separate included and excluded users, groups
                 String key = eq[0];
-                String[] values = eq[1].split(",");
+                String[] values = eq[1].split("\\s*,\\s*");
 
                 for (String value : values) {
 

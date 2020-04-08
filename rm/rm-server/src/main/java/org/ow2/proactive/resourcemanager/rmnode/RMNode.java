@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.node.Node;
@@ -79,7 +80,9 @@ public interface RMNode extends Comparable<RMNode> {
      * Get a map of all selection scripts already tested on this node,
      * and the responses given.
      * @return the map of Script and status
+     * @deprecated it currently returns empty result always. Selection script results are now handled by the {@link org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager}
      */
+    @Deprecated
     HashMap<SelectionScript, Integer> getScriptStatus();
 
     /**
@@ -276,6 +279,8 @@ public interface RMNode extends Comparable<RMNode> {
      */
     void setBusy(Client owner);
 
+    void setBusy(Client owner, Map<String, String> usageInfo);
+
     /**
      *  * change the node's status to 'to release'.
      */
@@ -346,10 +351,22 @@ public interface RMNode extends Comparable<RMNode> {
      */
     boolean isProtectedByToken();
 
+    void addToken(String token);
+
+    void removeToken(String token);
+
     RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator);
 
     RMNodeEvent createNodeEvent();
 
     long millisSinceStateChanged();
+
+    void setUsageInfo(Map<String, String> usageInfo);
+
+    Map<String, String> getUsageInfo();
+
+    List<String> getNodeTokens();
+
+    void setNodeTokens(String nodeUrl, List<String> tokens);
 
 }

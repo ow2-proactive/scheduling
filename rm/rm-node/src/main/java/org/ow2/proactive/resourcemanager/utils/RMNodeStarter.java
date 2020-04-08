@@ -92,6 +92,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
+import org.ow2.proactive.utils.OneJar;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.Version;
 
@@ -126,6 +127,9 @@ public class RMNodeStarter {
 
     /** Prefix for temp files that store nodes URL */
     private static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
+
+    /** Name of the java property which disables monitoring*/
+    public static final String DISABLE_MONITORING = "proactive.node.monitoring.disabled";
 
     /** Name of the java property to set the rank */
     public final static String RANK_PROP_NAME = "proactive.agent.rank";
@@ -695,10 +699,16 @@ public class RMNodeStarter {
 
     private void loadSigarIfRunningWithOneJar() {
         if (OneJar.isRunningWithOneJar()) {
+
             String nativeLibraryName = SigarLoader.getNativeLibraryName();
-            String nativeLibraryNameToLoad = nativeLibraryName.replace(SigarLoader.getLibraryExtension(), "")
-                                                              .replace(SigarLoader.getLibraryPrefix(), "");
-            System.loadLibrary(nativeLibraryNameToLoad);
+
+            if (nativeLibraryName != null) {
+                String nativeLibraryNameToLoad = nativeLibraryName.replace(SigarLoader.getLibraryExtension(), "")
+                                                                  .replace(SigarLoader.getLibraryPrefix(), "");
+                System.loadLibrary(nativeLibraryNameToLoad);
+            } else {
+                logger.warn("Sigar will not be loaded, as it is not supported by the underlying OS.");
+            }
         }
     }
 
@@ -920,7 +930,7 @@ public class RMNodeStarter {
             }
 
             // Optional help option
-            if (cl.hasOption(OPTION_DISABLE_MONITORING)) {
+            if (cl.hasOption(OPTION_DISABLE_MONITORING) || "true".equals(System.getProperty(DISABLE_MONITORING))) {
                 disabledMonitoring = true;
             }
 

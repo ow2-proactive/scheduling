@@ -34,6 +34,7 @@ import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelType;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.SPELParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
@@ -45,8 +46,7 @@ import com.google.common.collect.ImmutableMap;
 
 public class DefaultModelJobValidatorServiceProviderTest {
 
-    public static final String SPEL_LEFT = ModelValidator.PREFIX + SPELParserValidator.SPEL_TYPE +
-                                           SPELParserValidator.LEFT_DELIMITER;
+    public static final String SPEL_LEFT = ModelValidator.PREFIX + ModelType.SPEL + SPELParserValidator.LEFT_DELIMITER;
 
     public static final String SPEL_RIGHT = SPELParserValidator.RIGHT_DELIMITER;
 
@@ -59,14 +59,12 @@ public class DefaultModelJobValidatorServiceProviderTest {
 
     @Test
     public void testValidateJobWithJobModelVariableOK() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("true",
-                                                          ModelValidator.PREFIX + BooleanParserValidator.BOOLEAN_TYPE));
+        factory.validateJob(createJobWithJobModelVariable("true", ModelValidator.PREFIX + ModelType.BOOLEAN));
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithJobModelVariableKO() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("blabla",
-                                                          ModelValidator.PREFIX + BooleanParserValidator.BOOLEAN_TYPE));
+        factory.validateJob(createJobWithJobModelVariable("blabla", ModelValidator.PREFIX + ModelType.BOOLEAN));
     }
 
     @Test
@@ -95,18 +93,19 @@ public class DefaultModelJobValidatorServiceProviderTest {
         factory.validateJob(createJobWithSpelJobModelVariablesKO());
     }
 
+    @Test(expected = JobValidationException.class)
+    public void testValidateJobWithSpelModelVariablesUnauthorizedType() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithSpelJobModelVariablesUnauthorizedType());
+    }
+
     @Test
     public void testValidateJobWithTaskModelVariableOK() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("true",
-                                                           ModelValidator.PREFIX +
-                                                                   BooleanParserValidator.BOOLEAN_TYPE));
+        factory.validateJob(createJobWithTaskModelVariable("true", ModelValidator.PREFIX + ModelType.BOOLEAN));
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithTaskModelVariableKO() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("blabla",
-                                                           ModelValidator.PREFIX +
-                                                                     BooleanParserValidator.BOOLEAN_TYPE));
+        factory.validateJob(createJobWithTaskModelVariable("blabla", ModelValidator.PREFIX + ModelType.BOOLEAN));
     }
 
     @Test
@@ -152,6 +151,17 @@ public class DefaultModelJobValidatorServiceProviderTest {
                                                                    SPEL_RIGHT),
                                          "var2",
                                          new JobVariable("var2", "", SPEL_LEFT + "#value == 'toto1'" + SPEL_RIGHT)));
+        return job;
+    }
+
+    private TaskFlowJob createJobWithSpelJobModelVariablesUnauthorizedType() throws UserException {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setVariables(ImmutableMap.of("var1",
+                                         new JobVariable("var1",
+                                                         "value1",
+                                                         SPEL_LEFT +
+                                                                   "T(java.lang.Runtime).getRuntime().exec('hostname').waitFor() instanceof T(Integer)" +
+                                                                   SPEL_RIGHT)));
         return job;
     }
 

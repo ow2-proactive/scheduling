@@ -25,10 +25,12 @@
  */
 package functionaltests;
 
+import java.nio.charset.Charset;
 import java.security.Policy;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -118,6 +120,14 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected void assertHttpStatusOK(HttpResponse response) {
+        if (getStatusCode(response) != STATUS_OK) {
+            try {
+                System.out.println("Unexpected status response");
+                System.out.println(IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset()));
+            } catch (Exception e) {
+                //ignored
+            }
+        }
         assertEquals(STATUS_OK, getStatusCode(response));
     }
 

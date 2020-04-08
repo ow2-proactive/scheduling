@@ -27,11 +27,12 @@ package org.ow2.proactive.scheduler.core.db;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteJobDataVariable", query = "delete from JobDataVariable where jobData.id = :jobId"),
+@NamedQueries({ @NamedQuery(name = "deleteJobDataVariable", query = "delete from JobDataVariable where jobData.id in :ids"),
                 @NamedQuery(name = "deleteJobDataVariableInBulk", query = "delete from JobDataVariable where jobData.id in :jobIdList"),
                 @NamedQuery(name = "countJobDataVariable", query = "select count (*) from JobDataVariable") })
 @Table(name = "JOB_DATA_VARIABLE", indexes = { @Index(name = "JOB_DATA_VARIABLE_JOB_ID", columnList = "JOB_ID") })
@@ -88,6 +89,7 @@ public class JobDataVariable {
 
     @Column(name = "VARIABLE_VALUE", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getValue() {
         return value;
     }
@@ -98,6 +100,7 @@ public class JobDataVariable {
 
     @Column(name = "VARIABLE_MODEL", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getModel() {
         return model;
     }

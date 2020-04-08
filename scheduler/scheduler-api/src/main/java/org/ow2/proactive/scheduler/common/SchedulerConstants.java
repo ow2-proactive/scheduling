@@ -99,6 +99,8 @@ public class SchedulerConstants {
      */
     public static final String SCHEDULER_CLIENT_BINDING_NAME = "schedulerapi";
 
+    public static final String RM_CLIENT_BINDING_NAME = "rmapi";
+
     /**
      * The variable containing a proxy to the key/value store
      */
@@ -133,9 +135,23 @@ public class SchedulerConstants {
     public static final String RESULT_METADATA_VARIABLE = "resultMetadata";
 
     /**
+     * Specific metadata values
+     */
+    public static final String METADATA_CONTENT_TYPE = "content.type";
+
+    public static final String METADATA_FILE_NAME = "file.name";
+
+    public static final String METADATA_FILE_EXTENSION = "file.extension";
+
+    /**
      * The variable name to access the user's third party credentials.
      */
     public static final String CREDENTIALS_VARIABLE = "credentials";
+
+    /**
+     * The variable used to get or set the task progress
+     */
+    public static final String PROGRESS_BINDING_NAME = "progress";
 
     /**
      * The Application ID used by the scheduler for local Dataspaces

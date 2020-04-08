@@ -58,8 +58,9 @@ public class ListTaskStatesCommand extends AbstractJobTagPaginatedCommand implem
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             List<TaskStateData> tasks = null;
             if (this.tag == null) {
                 if (this.limit == 0) {

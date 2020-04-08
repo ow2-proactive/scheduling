@@ -119,33 +119,41 @@ public class RRDDataStore extends Thread {
 
             // for step equals 4 seconds
             // Archive of 10 minutes = 600 seconds (4 * 1 * 150) of completely detailed data
-            rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 1, 150);
+            ConsolFun[] consolidationFunctions = new ConsolFun[] { ConsolFun.AVERAGE, ConsolFun.MIN, ConsolFun.MAX,
+                                                                   ConsolFun.LAST, ConsolFun.FIRST, ConsolFun.TOTAL };
+            addArchives(rrdDef, consolidationFunctions, 0.5, 1, 150);
 
             // An archive of 1 hour = 3600 seconds (4 * 5 * 180) i.e. 180 averages of 5 steps
-            rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 5, 180);
+            addArchives(rrdDef, consolidationFunctions, 0.5, 5, 180);
 
             // An archive of 4 hours = 14400 seconds (4 * 10 * 360) i.e. 360 averages of 10 steps
-            rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 10, 360);
+            addArchives(rrdDef, consolidationFunctions, 0.5, 10, 360);
 
             // An archive of 8 hours = 28800 seconds (4 * 20 * 360) i.e. 360 averages of 20 steps
-            rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 20, 360);
+            addArchives(rrdDef, consolidationFunctions, 0.5, 20, 360);
 
             // An archive of 24 hours = 86400 seconds (4 * 30 * 720) i.e. 720 averages of 30 steps
-            rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 30, 720);
+            addArchives(rrdDef, consolidationFunctions, 0.5, 30, 720);
 
             // An archive of 1 week = 604800 seconds (4 * 210 * 720) i.e. 720 averages of 210 steps
-            rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 210, 720);
+            addArchives(rrdDef, consolidationFunctions, 0.5, 210, 720);
 
             // An archive of 1 month ~= 28 days = 604800 seconds (4 * 840 * 720) i.e. 720 averages of 840 steps
-            rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 840, 720);
+            addArchives(rrdDef, consolidationFunctions, 0.5, 840, 720);
 
             // An archive of 1 year = 364 days = 31449600 seconds (4 * 10920 * 720) i.e. 720 averages of 10920 steps
-            rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 10920, 720);
+            addArchives(rrdDef, consolidationFunctions, 0.5, 10920, 720);
 
             RrdDb dataBase = new RrdDb(rrdDef);
             dataBase.close();
         } else {
             logger.info("Using existing RRD database: " + new File(dataBaseFile).getAbsolutePath());
+        }
+    }
+
+    private void addArchives(RrdDef rrdDef, ConsolFun[] consolFunctions, double xff, int steps, int rows) {
+        for (ConsolFun consolFun : consolFunctions) {
+            rrdDef.addArchive(consolFun, xff, steps, rows);
         }
     }
 

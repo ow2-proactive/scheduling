@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -105,7 +106,8 @@ public class RMTHelper {
     private String currentTestConfiguration;
 
     public static void log(String s) {
-        System.out.println("------------------------------ " + s);
+        System.out.println("------------------------------" +
+                           String.format("[%1$tH:%1$tM:%1$tS,%1$tL] ", Calendar.getInstance().getTime()) + s);
     }
 
     /**
@@ -264,7 +266,7 @@ public class RMTHelper {
         for (int i = 0; i < nodesNumber; i++) {
             resourceManager.addNode(nodes.get(i).getNode().getNodeInformation().getURL());
         }
-        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT, monitor);
+        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, RMConstants.DEFAULT_STATIC_SOURCE_NAME, monitor);
         for (int i = 0; i < nodesNumber; i++) {
             waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
         }

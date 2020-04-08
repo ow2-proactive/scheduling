@@ -238,7 +238,7 @@ public class TerminateReplicateTaskHandler {
     }
 
     private List<InternalTask> getTaskChildren(InternalTask internalTask) {
-        return internalJob.getJobDescriptor().getTaskChildren(internalTask);
+        return internalJob.getJobDescriptor().getTaskChildrenWithIfBranches(internalTask);
 
     }
 

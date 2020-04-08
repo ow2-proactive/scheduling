@@ -33,6 +33,7 @@ import java.security.Permission;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -299,6 +300,11 @@ public class AbstractRMNodeTest {
         }
 
         @Override
+        public void setBusy(Client owner, Map<String, String> usageInfo) {
+
+        }
+
+        @Override
         public void setToRemove() {
 
         }
@@ -338,6 +344,25 @@ public class AbstractRMNodeTest {
             return 0;
         }
 
+        @Override
+        public void addToken(String token) {
+
+        }
+
+        @Override
+        public void removeToken(String token) {
+
+        }
+
+        @Override
+        public List<String> getNodeTokens() {
+            return null;
+        }
+
+        @Override
+        public void setNodeTokens(String nodeUrl, List<String> tokens) {
+
+        }
     }
 
 }

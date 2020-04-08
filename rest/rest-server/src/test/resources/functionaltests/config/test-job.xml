@@ -5,7 +5,7 @@
 	<description>Test Job</description>
 	<taskFlow>
 		<task name="TestJobTask">
-			<javaExecutable class="functionaltests.jobs.TestJob" />
+			<javaExecutable class="functionaltests.jobs.SimpleJob" />
 		</task>
 	</taskFlow>
 </job>

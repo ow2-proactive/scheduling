@@ -86,7 +86,7 @@ public class ForkedTaskExecutorRunAsMeTest {
                                                   null,
                                                   new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                   "",
-                                                  new NodeInfo("", "", ""),
+                                                  new NodeInfo("", "", "", ""),
                                                   decrypter);
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 

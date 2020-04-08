@@ -42,23 +42,47 @@ public abstract class RangeParserValidator<T extends Comparable<T>> extends Base
 
     public static final String RIGHT_RANGE_DELIMITER = "]";
 
-    protected static final String LEFT_RANGE_DELIMITER_REGEXP = "\\" + LEFT_RANGE_DELIMITER;
+    // regexp which matches the range definition in the model, i.e., [min,max]
+    protected static final String RANGE_REGEXP = "\\" + LEFT_RANGE_DELIMITER + "([^)]+)" + "\\" + RIGHT_RANGE_DELIMITER;
 
-    protected static final String RIGHT_RANGE_DELIMITER_REGEXP = "\\" + RIGHT_RANGE_DELIMITER;
+    /**
+     * Construct a range parser whose model definition should match the parser type or the type followed by range.
+     * @param model the model definition
+     * @param type the parser type
+     * @throws ModelSyntaxException
+     */
+    public RangeParserValidator(String model, ModelType type) throws ModelSyntaxException {
+        super(model, type, typeRegexpWithOrWithoutRange(type.name()));
+    }
 
-    protected static final String RANGE_MAIN_REGEXP = LEFT_RANGE_DELIMITER_REGEXP + "([^)]+)" +
-                                                      RIGHT_RANGE_DELIMITER_REGEXP;
+    /**
+     * Construct a range parser with a customized model definition rule.
+     * @param model the model definition
+     * @param type the parser type
+     * @param typeRegexp the expected pattern of the model expression
+     * @throws ModelSyntaxException
+     */
+    public RangeParserValidator(String model, ModelType type, String typeRegexp) throws ModelSyntaxException {
+        super(model, type, typeRegexp);
+    }
 
-    public RangeParserValidator(String model) throws ModelSyntaxException {
-        super(model);
+    /**
+     * Get the regexp which matches the parser type (case insensitive) or the type followed by range.
+     * @param type the parser type
+     * @return
+     */
+    protected static String typeRegexpWithOrWithoutRange(String type) {
+        String typeWithoutRangeRegexp = ignoreCaseRegexp(type);
+        return String.format("^%s$|^%s$", typeWithoutRangeRegexp, typeWithoutRangeRegexp + RANGE_REGEXP);
     }
 
     @Override
     protected Validator<T> createValidator(String model, Converter<T> converter) throws ModelSyntaxException {
-        if (model.matches(getTypeRegexp())) {
+        String typeWithoutRangeRegexp = ignoreCaseRegexp(type.name());
+        if (model.matches(typeWithoutRangeRegexp)) {
             return new RangeValidator();
         }
-        String mainRangeRegexp = "^" + getTypeRegexp() + RANGE_MAIN_REGEXP + "$";
+        String mainRangeRegexp = "^" + typeWithoutRangeRegexp + RANGE_REGEXP + "$";
         String rangeString = parseAndGetOneGroup(model, mainRangeRegexp);
         try {
             return new RangeValidator<>(extractRange(rangeString, converter));
@@ -79,12 +103,12 @@ public abstract class RangeParserValidator<T extends Comparable<T>> extends Base
                 T maxValue = converter.convert(modelArguments.get(1));
                 return Range.closed(minValue, maxValue);
             } else {
-                throw new ModelSyntaxException("Internal error, regular expression for " + getType() + " '" +
-                                               rangeRegexp + "' is invalid.");
+                throw new ModelSyntaxException("Internal error, regular expression for " + type + " '" + rangeRegexp +
+                                               "' is invalid.");
             }
         } catch (ConversionException | IllegalArgumentException e) {
-            throw new ModelSyntaxException("Illegal " + getType() + " range expression '" + value + "', " +
-                                           e.getMessage(), e);
+            throw new ModelSyntaxException("Illegal " + type + " range expression '" + value + "', " + e.getMessage(),
+                                           e);
         }
     }
 }

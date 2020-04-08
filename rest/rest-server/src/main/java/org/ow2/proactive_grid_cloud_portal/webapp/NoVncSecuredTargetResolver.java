@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 import com.netiq.websockify.IProxyTargetResolver;
 
@@ -91,9 +92,11 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
             return null;
         }
 
-        Session session = SharedSessionStore.getInstance().get(sessionId);
-        if (session == null) {
-            LOGGER.warn("Unknown sessionId.");
+        Session session = null;
+        try {
+            session = SharedSessionStore.getInstance().get(sessionId);
+        } catch (NotConnectedRestException e) {
+            LOGGER.warn("Session not valid.");
             return null;
         }
 

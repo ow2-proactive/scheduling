@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,26 +49,19 @@ public class TaskDBUtils {
 
     public static SessionWork<Integer> getTotalNumberOfTasks(final DBTaskDataParameters params) {
         return session -> {
-            Set<TaskStatus> taskStatuses = params.getStatuses();
-
-            if (taskStatuses.isEmpty()) {
+            if (params.getStatus().isEmpty()) {
                 return 0;
             }
-
-            boolean hasUser = params.hasUser();
-            boolean hasTag = params.hasTag();
-            boolean hasDateFrom = params.hasDateFrom();
-            boolean hasDateTo = params.hasDateTo();
 
             String queryPrefix = "select count(*) from TaskData T where ";
 
             Query query = getQuery(session,
                                    params,
-                                   taskStatuses,
-                                   hasUser,
-                                   hasTag,
-                                   hasDateFrom,
-                                   hasDateTo,
+                                   params.getStatus(),
+                                   params.hasUser(),
+                                   params.hasTag(),
+                                   params.hasDateFrom(),
+                                   params.hasDateTo(),
                                    SortSpecifierContainer.EMPTY_CONTAINER,
                                    queryPrefix);
 
@@ -77,7 +71,7 @@ public class TaskDBUtils {
 
     public static SessionWork<List<TaskState>> taskStateSessionWork(final DBTaskDataParameters params) {
         return session -> {
-            if (params.getStatuses().isEmpty()) {
+            if (params.getStatus().isEmpty()) {
                 return new ArrayList<>(0);
             }
 
@@ -89,7 +83,7 @@ public class TaskDBUtils {
 
     public static SessionWork<List<TaskInfo>> taskInfoSessionWork(final DBTaskDataParameters params) {
         return session -> {
-            if (params.getStatuses().isEmpty()) {
+            if (params.getStatus().isEmpty()) {
                 return new ArrayList<>(0);
             }
 
@@ -101,39 +95,29 @@ public class TaskDBUtils {
     }
 
     private static List<TaskData> fetchTaskData(Session session, DBTaskDataParameters params) {
-        Set<TaskStatus> taskStatuses = params.getStatuses();
-
-        boolean hasUser = params.hasUser();
-        boolean hasTag = params.hasTag();
-        boolean hasDateFrom = params.hasDateFrom();
-        boolean hasDateTo = params.hasDateTo();
-
-        String queryPrefix = "select T from TaskData T where ";
-
-        Query query = getQuery(session,
-                               params,
-                               taskStatuses,
-                               hasUser,
-                               hasTag,
-                               hasDateFrom,
-                               hasDateTo,
-                               params.getSortParams(),
-                               queryPrefix);
-        query.setMaxResults(params.getLimit());
-        query.setFirstResult(params.getOffset());
-
-        return query.list();
+        return getQuery(session,
+                        params,
+                        params.getStatus(),
+                        params.hasUser(),
+                        params.hasTag(),
+                        params.hasDateFrom(),
+                        params.hasDateTo(),
+                        params.getSortParams(),
+                        "select T from TaskData T where ").setMaxResults(params.getLimit())
+                                                          .setFirstResult(params.getOffset())
+                                                          .list();
     }
 
     private static Query getQuery(Session session, DBTaskDataParameters params, Set<TaskStatus> taskStatuses,
             boolean hasUser, boolean hasTag, boolean hasDateFrom, boolean hasDateTo, SortSpecifierContainer sortParams,
             String queryPrefix) {
-        StringBuilder queryString = new StringBuilder(queryPrefix);
-        queryString.append(getQueryFilteringExpression(hasUser, hasTag, hasDateFrom, hasDateTo, sortParams));
-        Query query = session.createQuery(queryString.toString());
-
+        Query query = session.createQuery(queryPrefix +
+                                          getQueryFilteringExpression(hasUser,
+                                                                      hasTag,
+                                                                      hasDateFrom,
+                                                                      hasDateTo,
+                                                                      sortParams));
         setQueryParameters(taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo, query, params);
-
         return query;
     }
 
@@ -173,9 +157,14 @@ public class TaskDBUtils {
             for (int i = 0; i < items.size(); i++) {
                 SortSpecifierContainer.SortSpecifierItem item = items.get(i);
                 String order = "ascending".compareTo(item.getOrder().toString()) == 0 ? "ASC" : "DESC";
-                result.append("T." + item.getField() + " " + order);
-                if (i < items.size() - 1)
+                if (item.getField().equalsIgnoreCase("jobid") || item.getField().equalsIgnoreCase("taskid")) {
+                    result.append("T.id.").append(item.getField()).append(" ").append(order);
+                } else {
+                    result.append("T.").append(item.getField()).append(" ").append(order);
+                }
+                if (i < items.size() - 1) {
                     result.append(",");
+                }
             }
             result.append(" ");
         }

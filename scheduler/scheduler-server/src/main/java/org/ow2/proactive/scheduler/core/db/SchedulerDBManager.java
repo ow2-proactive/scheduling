@@ -25,14 +25,18 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import static org.ow2.proactive.scheduler.util.HsqldbServer.PROP_HIBERNATE_CONNECTION_PASSWORD;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +56,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -60,6 +65,7 @@ import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.hibernate.type.StandardBasicTypes;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
+import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.db.SortParameter;
@@ -265,18 +271,15 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag, final int offset,
-            final int limit, final String user, final boolean pending, final boolean running, final boolean finished,
-            SortSpecifierContainer sortParams) {
+            final int limit, final String user, Set<TaskStatus> statusFilter, SortSpecifierContainer sortParams) {
 
-        DBTaskDataParameters parameters = new DBTaskDataParameters(tag,
+        DBTaskDataParameters parameters = new DBTaskDataParameters(user,
+                                                                   tag,
                                                                    from,
                                                                    to,
                                                                    offset,
                                                                    limit,
-                                                                   user,
-                                                                   pending,
-                                                                   running,
-                                                                   finished,
+                                                                   statusFilter,
                                                                    sortParams);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskState> lTasks = executeReadOnlyTransaction(TaskDBUtils.taskStateSessionWork(parameters));
@@ -285,17 +288,15 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskInfo> getTasks(final long from, final long to, final String tag, final int offset, final int limit,
-            final String user, final boolean pending, final boolean running, final boolean finished) {
+            final String user, Set<TaskStatus> statusFilter) {
 
-        DBTaskDataParameters parameters = new DBTaskDataParameters(tag,
+        DBTaskDataParameters parameters = new DBTaskDataParameters(user,
+                                                                   tag,
                                                                    from,
                                                                    to,
                                                                    offset,
                                                                    limit,
-                                                                   user,
-                                                                   pending,
-                                                                   running,
-                                                                   finished,
+                                                                   statusFilter,
                                                                    SortSpecifierContainer.EMPTY_CONTAINER);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskInfo> lTaskInfo = executeReadOnlyTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
@@ -358,8 +359,10 @@ public class SchedulerDBManager {
 
             Criteria criteria = session.createCriteria(JobData.class);
             criteria.setFetchMode("tasks", FetchMode.JOIN);
-            criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-            criteria.add(Restrictions.eq("owner", userName));
+            criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+            if (userName != null) {
+                criteria.add(Restrictions.eq("owner", userName));
+            }
             // exclude killed but not started jobs
             criteria.add(Restrictions.gt("startTime", -1L));
             criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startDate.getTime()),
@@ -398,6 +401,42 @@ public class SchedulerDBManager {
         return getJobsNumberWithStatus(Collections.singletonList(JobStatus.RUNNING));
     }
 
+    public int getPendingJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.PENDING), username);
+    }
+
+    public int getStalledJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.STALLED), username);
+    }
+
+    public int getRunningJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.RUNNING), username);
+    }
+
+    public int getPausedJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.PAUSED), username);
+    }
+
+    public int getInErrorJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.IN_ERROR), username);
+    }
+
+    public int getFailedJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.FAILED), username);
+    }
+
+    public int getKilledJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.KILLED), username);
+    }
+
+    public int getFinishedJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.FINISHED), username);
+    }
+
+    public int getCanceledJobsCount(String username) {
+        return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.CANCELED), username);
+    }
+
     public long getTotalJobsCount() {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getTotalJobsCount");
@@ -410,6 +449,16 @@ public class SchedulerDBManager {
             Query query = session.getNamedQuery("getJobsNumberWithStatus").setParameterList("status", status);
 
             return (Long) query.uniqueResult();
+        });
+    }
+
+    private int getJobsNumberWithStatusForUser(final Collection<JobStatus> status, String username) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsNumberWithStatusUsername")
+                                 .setParameter("username", username)
+                                 .setParameterList("status", status);
+
+            return Math.toIntExact((Long) query.uniqueResult());
         });
     }
 
@@ -449,6 +498,15 @@ public class SchedulerDBManager {
         });
     }
 
+    public int getTaskCountForUser(Collection<TaskStatus> filter, String username) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTasksCountForUsername")
+                                 .setParameter("username", username)
+                                 .setParameterList("taskStatus", filter);
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
     public long getRunningTasksCount() {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getRunningTasksCount")
@@ -460,9 +518,7 @@ public class SchedulerDBManager {
     }
 
     public long getTotalTasksCount() {
-        return executeReadOnlyTransaction(session -> {
-            return (Long) session.getNamedQuery("getTotalTasksCount").uniqueResult();
-        });
+        return executeReadOnlyTransaction(session -> (Long) session.getNamedQuery("getTotalTasksCount").uniqueResult());
     }
 
     public double getMeanJobPendingTime() {
@@ -606,10 +662,18 @@ public class SchedulerDBManager {
                 taskDuration = 0L;
             }
 
-            int jobCount;
-            long jobDuration;
+            int pendingTasksCount = getTaskCountForUser(TaskStatus.PENDING_TASKS, username);
+            int currentTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.RUNNING), username);
+            int pastTasksCount = getTaskCountForUser(TaskStatus.FINISHED_TASKS, username);
+            int pausedTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.PAUSED), username);
+            int faultyTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.FAULTY), username);
+            int failedTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.FAILED), username);
+            int inErrorTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.IN_ERROR), username);
 
             Query jobQuery = session.getNamedQuery("readAccountJobs").setParameter("username", username);
+
+            int jobCount;
+            long jobDuration;
 
             Object[] jobResult = (Object[]) jobQuery.uniqueResult();
             jobCount = ((Number) jobResult[0]).intValue();
@@ -619,29 +683,61 @@ public class SchedulerDBManager {
                 jobDuration = 0L;
             }
 
-            return new SchedulerAccount(username, taskCount, taskDuration, jobCount, jobDuration);
+            return SchedulerAccount.builder()
+                                   .username(username)
+                                   .totalTaskCount(taskCount)
+                                   .totalTaskDuration(taskDuration)
+                                   .totalJobCount(jobCount)
+                                   .totalJobDuration(jobDuration)
+                                   .pendingTasksCount(pendingTasksCount)
+                                   .currentTasksCount(currentTasksCount)
+                                   .pastTasksCount(pastTasksCount)
+                                   .pausedTasksCount(pausedTasksCount)
+                                   .faultyTasksCount(faultyTasksCount)
+                                   .failedJobsCount(failedTasksCount)
+                                   .inErrorTasksCount(inErrorTasksCount)
+                                   .pendingJobsCount(getPendingJobsCount(username))
+                                   .stalledJobsCount(getStalledJobsCount(username))
+                                   .runningJobsCount(getRunningJobsCount(username))
+                                   .pausedJobsCount(getPausedJobsCount(username))
+                                   .inErrorJobsCount(getInErrorJobsCount(username))
+                                   .failedJobsCount(getFailedJobsCount(username))
+                                   .canceledJobsCount(getCanceledJobsCount(username))
+                                   .killedJobsCount(getKilledJobsCount(username))
+                                   .finishedJobsCount(getFinishedJobsCount(username))
+                                   .build();
         });
     }
 
-    private void removeJobScripts(Session session, long jobId) {
-        // This query competes with "deleteJobData" query.
+    private void removeJobScripts(Session session, List<Long> jobIds) {
+        // This query competes with "deleteJobDataInBulk" query.
         // So Oracle 12c can stuck in deadlock.
         // It is definitely something to improve.
         // For now, we added "additionalDelayRandomized" in TransactionHelper.
-        session.getNamedQuery("updateTaskDataJobScripts").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("updateTaskDataJobScripts").setParameterList("ids", jobIds).executeUpdate();
 
-        session.getNamedQuery("deleteScriptData").setParameter("jobId", jobId).executeUpdate();
-        session.getNamedQuery("deleteSelectionScriptData").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("deleteScriptDataInBulk").setParameterList("jobIdList", jobIds).executeUpdate();
+        session.getNamedQuery("deleteSelectionScriptDataInBulk").setParameterList("jobIdList", jobIds).executeUpdate();
+    }
+
+    private void removeJobScripts(Session session, long jobId) {
+        removeJobScripts(session, Collections.singletonList(jobId));
     }
 
     private void removeJobRuntimeData(Session session, long jobId) {
+        removeJobRuntimeData(session, Collections.singletonList(jobId));
+    }
+
+    private void removeJobRuntimeData(Session session, List<Long> jobId) {
         removeJobScripts(session, jobId);
 
-        session.getNamedQuery("deleteEnvironmentModifierData").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
+               .setParameterList("jobIdList", jobId)
+               .executeUpdate();
 
-        session.getNamedQuery("deleteTaskDataVariable").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("deleteTaskDataVariableInBulk").setParameterList("jobIdList", jobId).executeUpdate();
 
-        session.getNamedQuery("deleteSelectorData").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("deleteSelectorDataInBulk").setParameterList("jobIdList", jobId).executeUpdate();
     }
 
     public void scheduleJobForRemoval(final JobId jobId, final long timeForRemoval, final boolean shouldRemoveFromDb) {
@@ -676,30 +772,34 @@ public class SchedulerDBManager {
     }
 
     public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
+        removeJob(Collections.singletonList(jobId), removedTime, removeData);
+    }
+
+    public void removeJob(final List<JobId> jobIds, final long removedTime, final boolean removeData) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
-            long id = jobId(jobId);
+            List<Long> ids = jobIds.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
 
             if (removeData) {
-                session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID = :jobId")
-                       .setParameter("jobId", id)
+                session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
                        .executeUpdate();
-                session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID = :jobId")
-                       .setParameter("jobId", id)
+                session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
                        .executeUpdate();
-                session.createSQLQuery("delete from JOB_CONTENT where JOB_ID = :jobId")
-                       .setParameter("jobId", id)
+                session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
                        .executeUpdate();
 
-                session.getNamedQuery("deleteJobDataVariable").setParameter("jobId", id).executeUpdate();
+                session.getNamedQuery("deleteJobDataVariable").setParameterList("ids", ids).executeUpdate();
 
-                removeJobScripts(session, id);
+                removeJobScripts(session, ids);
 
-                session.getNamedQuery("deleteJobData").setParameter("jobId", id).executeUpdate();
+                session.getNamedQuery("deleteJobDataInBulk").setParameterList("jobIdList", ids).executeUpdate();
             } else {
                 session.getNamedQuery("updateJobDataRemovedTime")
                        .setParameter("removedTime", removedTime)
                        .setParameter("lastUpdatedTime", new Date().getTime())
-                       .setParameter("jobId", id)
+                       .setParameterList("ids", ids)
                        .executeUpdate();
             }
             return null;
@@ -1127,6 +1227,93 @@ public class SchedulerDBManager {
         });
     }
 
+    public void killJobs(List<InternalJob> jobs) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            List<Long> jobIds = jobs.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
+
+            List<Long> updatedJobsIds = new ArrayList<>(jobs.size());
+            for (InternalJob job : jobs) {
+                long jobId = jobId(job);
+                JobInfo jobInfo = job.getJobInfo();
+                int result = session.getNamedQuery("updateJobDataAfterTaskFinished")
+                                    .setParameter("status", jobInfo.getStatus())
+                                    .setParameter("finishedTime", jobInfo.getFinishedTime())
+                                    .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
+                                    .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
+                                    .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                                    .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                                    .setParameter("lastUpdatedTime", new Date().getTime())
+                                    .setParameter("resultMap",
+                                                  ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                                    .setParameter("jobId", jobId)
+                                    .executeUpdate();
+                if (result != 0) {
+                    updatedJobsIds.add(jobId);
+                }
+
+            }
+
+            final int notReStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
+                                                         " where task.jobData.id in :jobIds and task.taskStatus in :taskStatuses ")
+                                            .setParameterList("jobIds", jobIds)
+                                            .setParameterList("taskStatuses",
+                                                              Arrays.asList(TaskStatus.WAITING_ON_ERROR,
+                                                                            TaskStatus.WAITING_ON_FAILURE))
+                                            .executeUpdate();
+
+            final int notStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
+                                                       " where task.jobData.id in :jobIds and task.taskStatus in :taskStatuses ")
+                                          .setParameterList("jobIds", jobIds)
+                                          .setParameterList("taskStatuses",
+                                                            TaskStatus.allExceptThese(TaskStatus.RUNNING,
+                                                                                      TaskStatus.WAITING_ON_ERROR,
+                                                                                      TaskStatus.WAITING_ON_FAILURE,
+                                                                                      TaskStatus.FAILED,
+                                                                                      TaskStatus.NOT_STARTED,
+                                                                                      TaskStatus.FAULTY,
+                                                                                      TaskStatus.FINISHED,
+                                                                                      TaskStatus.SKIPPED))
+                                          .executeUpdate();
+
+            final int runningToAborted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
+                                                             " task.finishedTime = :finishedTime where task.jobData.id in :jobIds " +
+                                                             " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                             " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
+                                                .setParameter("finishedTime", System.currentTimeMillis())
+                                                .setParameterList("jobIds", jobIds)
+                                                .executeUpdate();
+
+            final int runningToAbortedWithDuration = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
+                                                                         " task.finishedTime = :finishedTime, " +
+                                                                         " task.executionDuration = task.finishedTime - task.startTime " +
+                                                                         " where task.jobData.id in :jobIds " +
+                                                                         " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                                         " and task.startTime > 0 and task.executionDuration < 0 ")
+                                                            .setParameterList("jobIds", jobIds)
+                                                            .setParameter("finishedTime", System.currentTimeMillis())
+                                                            .executeUpdate();
+
+            logger.trace(String.format("Kill jobs (%s) and tasks: %d %d %d %d %d",
+                                       updatedJobsIds.stream().map(Object::toString).collect(Collectors.joining(", ")),
+                                       updatedJobsIds.size(),
+                                       notReStarted,
+                                       notStarted,
+                                       runningToAborted,
+                                       runningToAbortedWithDuration));
+
+            session.flush();
+            session.clear();
+
+            removeJobRuntimeData(session, jobIds);
+            logger.trace("Flush after kill for job " +
+                         jobIds.stream().map(Object::toString).collect(Collectors.joining(", ")));
+
+            return null;
+        });
+    }
+
     public void updateJobAndTasksState(final InternalJob job) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
 
@@ -1218,6 +1405,25 @@ public class SchedulerDBManager {
             for (TaskState task : job.getTasks()) {
                 updateScheduledTime(job.getId().longValue(), task.getId().longValue(), scheduledTime);
             }
+
+            return null;
+        });
+    }
+
+    public void updateTaskStatusAndScheduledTime(final EligibleTaskDescriptorImpl task, final TaskStatus newStatus,
+            final long scheduledTime) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+
+            final DBTaskId dbTaskId = taskId(task.getInternal());
+
+            Query query = session.createQuery("update TaskData task " +
+                                              "set task.taskStatus = :newStatus, task.scheduledTime = :newTime " +
+                                              "where task.id = :taskId")
+                                 .setParameter("newStatus", newStatus)
+                                 .setParameter("newTime", scheduledTime)
+                                 .setParameter("taskId", dbTaskId);
+
+            query.executeUpdate();
 
             return null;
         });
@@ -1769,9 +1975,13 @@ public class SchedulerDBManager {
                     configuration.configure(configFile);
                 } else {
                     try {
-                        Properties properties = new Properties();
+                        Properties properties = PropertyDecrypter.getDecryptableProperties();
                         properties.load(Files.newBufferedReader(configFile.toPath(), Charset.defaultCharset()));
                         configuration.addProperties(properties);
+                        // Unwrap the decrypted property to let the connection pool framework see it
+                        // (as the connection pool framework reads properties using entryset iterators and jasypt EncryptableProperties does not override them)
+                        configuration.setProperty(PROP_HIBERNATE_CONNECTION_PASSWORD,
+                                                  properties.getProperty(PROP_HIBERNATE_CONNECTION_PASSWORD));
                     } catch (IOException e) {
                         throw new IllegalArgumentException(e);
                     }
@@ -1866,4 +2076,48 @@ public class SchedulerDBManager {
         return transactionHelper;
     }
 
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) {
+        if (jobsId.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return executeReadOnlyTransaction(session -> {
+
+            Query query = session.createQuery("SELECT id, resultMap FROM JobData WHERE id in (:jobIdList)");
+            query.setParameterList("jobIdList", jobsId.stream().map(Long::parseLong).collect(Collectors.toList()));
+
+            Map<Long, Map<String, Serializable>> result = new HashMap<>();
+            List<Object[]> list = query.list();
+            for (Object[] row : list) {
+                long id = (long) row[0];
+                Map<String, byte[]> resultMapAsBytes = (Map<String, byte[]>) row[1];
+
+                Map<String, Serializable> stringSerializableMap = ObjectByteConverter.mapOfByteArrayToSerializable(resultMapAsBytes);
+                result.put(id, stringSerializableMap);
+            }
+
+            return result;
+        });
+    }
+
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) {
+        if (jobsId.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.createQuery("SELECT task.id.jobId, task.id.taskId, task.taskName " +
+                                              "FROM TaskData as task " + "WHERE task.id.jobId in :jobIdList " +
+                                              "and task.preciousResult = true");
+            query.setParameterList("jobIdList", jobsId.stream().map(Long::parseLong).collect(Collectors.toList()));
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .collect(Collectors.groupingBy(row -> (Long) row[0])) // group by job id
+                       .entrySet()
+                       .stream()
+                       .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue()
+                                                                                .stream()
+                                                                                .sorted(Comparator.comparing(row -> (long) row[1])) // sort by task id
+                                                                                .map(row -> (String) row[2])
+                                                                                .collect(Collectors.toList())));
+        });
+    }
 }

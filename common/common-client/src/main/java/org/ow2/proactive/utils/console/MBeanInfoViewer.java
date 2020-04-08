@@ -32,10 +32,12 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -109,7 +111,8 @@ public final class MBeanInfoViewer {
         return rangeBuilder.toString();
     }
 
-    public static String rrdContent(byte[] rrd4j, String newRange, String[] dataSources) throws IOException {
+    public static String rrdContent(byte[] rrd4j, String newRange, String[] dataSources, String function)
+            throws IOException {
 
         File rrd4jDb = File.createTempFile("database", "rr4dj");
         // construct the JSON response directly in a String
@@ -136,25 +139,42 @@ public final class MBeanInfoViewer {
                 char zone = newRange.charAt(i);
                 long timeStart = timeEnd - secondsInZone(zone);
 
-                FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
+                FetchRequest req = db.createFetchRequest(function != null ? ConsolFun.valueOf(function)
+                                                                          : ConsolFun.AVERAGE,
+                                                         timeStart,
+                                                         timeEnd);
                 req.setFilter(dataSource);
                 FetchData fetchData = req.fetchData();
                 result.append("\"").append(dataSource).append("\":[");
 
                 double[] values = fetchData.getValues(dataSource);
-                for (int j = 0; j < values.length; j++) {
-                    if (Double.compare(Double.NaN, values[j]) == 0) {
-                        result.append("null");
-                    } else {
-                        result.append(formatter.format(values[j]));
-                    }
-                    if (j < values.length - 1) {
-                        result.append(',');
-                    }
+
+                int nValuesToTake = values.length;
+                // if the last value is NaN then we decide to not send it to the client
+                // why? Because when we retrieve from RDD file, somehow the latest is
+                // always NaN, which is not what we want.
+                if (Double.compare(values[values.length - 1], Double.NaN) == 0) {
+                    --nValuesToTake;
                 }
+
+                String collect = Arrays.stream(values)
+                                       .boxed()
+                                       .collect(Collectors.toList())
+                                       .subList(0, nValuesToTake)
+                                       .stream()
+                                       .map(value -> {
+                                           if (Double.compare(Double.NaN, value) == 0) {
+                                               return "null";
+                                           } else {
+                                               return formatter.format(value);
+                                           }
+                                       })
+                                       .collect(Collectors.joining(","));
+                result.append(collect);
                 result.append(']');
-                if (i < dataSources.length - 1)
+                if (i < dataSources.length - 1) {
                     result.append(',');
+                }
             }
             result.append("}");
 
@@ -226,7 +246,7 @@ public final class MBeanInfoViewer {
         }
     }
 
-    public String retrieveStats(String mbeanName, String range, String[] dataSources) {
+    public String retrieveStats(String mbeanName, String range, String[] dataSources, String function) {
         lazyConnect();
 
         try {
@@ -238,7 +258,8 @@ public final class MBeanInfoViewer {
 
             return MBeanInfoViewer.rrdContent(rrd4j,
                                               MBeanInfoViewer.possibleModifyRange(range, dataSources, 'd'),
-                                              dataSources);
+                                              dataSources,
+                                              function);
         } catch (Exception e) {
             LOGGER.error("Could not retrieve statistics history, " + e.getMessage());
             throw new RuntimeException(e);

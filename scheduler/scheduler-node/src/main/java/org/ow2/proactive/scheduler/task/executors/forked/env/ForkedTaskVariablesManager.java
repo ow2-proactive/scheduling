@@ -25,17 +25,22 @@
  */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
+import static org.ow2.proactive.scheduler.common.task.ForkEnvironment.DOCKER_FORK_WINDOWS2LINUX;
+
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -44,6 +49,8 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 
 public class ForkedTaskVariablesManager implements Serializable {
@@ -66,14 +73,35 @@ public class ForkedTaskVariablesManager implements Serializable {
 
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext, VariablesMap variables,
             Map<String, Serializable> resultMap, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client,
-            RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
+            RMNodeClient rmNodeClient, RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient,
+            Map<String, String> resultMetadata, PrintStream outputSink, PrintStream errorSink) {
+        boolean isDockerWindows2Linux = "true".equals(System.getProperty(DOCKER_FORK_WINDOWS2LINUX));
+
+        if (isDockerWindows2Linux) {
+            variables.getInheritedMap().replaceAll((k,
+                    v) -> ImmutableSet.of(SchedulerVars.PA_NODESFILE.name(),
+                                          SchedulerVars.PA_SCHEDULER_HOME.name(),
+                                          SchedulerVars.PA_TASK_PROGRESS_FILE.name())
+                                      .contains(k) ? convertToLinuxIfNeeded(isDockerWindows2Linux, (String) v) : v);
+        }
+
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
         scriptHandler.addBinding(SchedulerConstants.RESULT_MAP_BINDING_NAME, resultMap);
-        scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME,
-                                 taskContext.getInitializer().getGenericInformation());
+        ImmutableMap<String, String> genericInformation = taskContext.getInitializer().getGenericInformation();
+        scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, genericInformation);
 
         scriptHandler.addBinding(SchedulerConstants.RESULTS_VARIABLE, tasksResults(taskContext));
+
+        addResultMetadataFromGenericInformation(genericInformation,
+                                                resultMetadata,
+                                                SchedulerConstants.METADATA_CONTENT_TYPE);
+        addResultMetadataFromGenericInformation(genericInformation,
+                                                resultMetadata,
+                                                SchedulerConstants.METADATA_FILE_EXTENSION);
+        addResultMetadataFromGenericInformation(genericInformation,
+                                                resultMetadata,
+                                                SchedulerConstants.METADATA_FILE_NAME);
 
         scriptHandler.addBinding(SchedulerConstants.RESULT_METADATA_VARIABLE, resultMetadata);
 
@@ -83,27 +111,52 @@ public class ForkedTaskVariablesManager implements Serializable {
             scriptHandler.addBinding(SchedulerConstants.DS_USER_API_BINDING_NAME, userSpaceClient);
             scriptHandler.addBinding(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME, globalSpaceClient);
         }
+        if (rmNodeClient != null) {
+            scriptHandler.addBinding(SchedulerConstants.RM_CLIENT_BINDING_NAME, rmNodeClient);
+        }
         scriptHandler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME,
                                  taskContext.getSynchronizationAPI());
 
         scriptHandler.addBinding(SchedulerConstants.DS_SCRATCH_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getScratchURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getScratchURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_CACHE_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getCacheURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getCacheURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_INPUT_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getInputURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getInputURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_OUTPUT_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getOutputURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getOutputURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_GLOBAL_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getGlobalURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getGlobalURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_USER_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getUserURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getUserURI()));
 
         scriptHandler.addBinding(SchedulerConstants.MULTI_NODE_TASK_NODESURL_BINDING_NAME,
                                  taskContext.getOtherNodesURLs());
 
         scriptHandler.addBinding(SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
                                  taskContext.getInitializer().getForkEnvironment());
+        scriptHandler.addBinding(SchedulerConstants.PROGRESS_BINDING_NAME,
+                                 new TaskProgressImpl(convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                                             taskContext.getProgressFilePath()),
+                                                      outputSink,
+                                                      errorSink));
+    }
+
+    private void addResultMetadataFromGenericInformation(ImmutableMap<String, String> genericInformation,
+            Map<String, String> resultMetadata, String key) {
+        if (genericInformation != null && resultMetadata != null && genericInformation.containsKey(key)) {
+            resultMetadata.put(key, genericInformation.get(key));
+        }
+    }
+
+    private String convertToLinuxIfNeeded(boolean isDockerWindows2Linux, String uri) {
+        return isDockerWindows2Linux ? ForkEnvironment.convertToLinuxPath(uri) : uri;
     }
 
     public Map<String, String> extractThirdPartyCredentials(TaskContext container) throws Exception {
@@ -121,6 +174,20 @@ public class ForkedTaskVariablesManager implements Serializable {
     public SchedulerNodeClient createSchedulerNodeClient(TaskContext container) {
         if (container.getDecrypter() != null && !Strings.isNullOrEmpty(container.getSchedulerRestUrl())) {
             return new SchedulerNodeClient(container.getDecrypter(), container.getSchedulerRestUrl());
+        }
+        return null;
+    }
+
+    /**
+     * @return craeted RMNodeClient if possible (there should be decrypter and url), otherwise null
+     */
+    public RMNodeClient createRMNodeClient(TaskContext container) {
+        if (container.getDecrypter() != null && !Strings.isNullOrEmpty(container.getSchedulerRestUrl())) {
+            try {
+                return new RMNodeClient(container.getDecrypter().decrypt(), container.getSchedulerRestUrl());
+            } catch (Exception e) {
+                return null;
+            }
         }
         return null;
     }

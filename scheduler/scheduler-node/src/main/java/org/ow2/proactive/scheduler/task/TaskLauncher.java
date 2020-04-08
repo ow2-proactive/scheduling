@@ -131,7 +131,7 @@ public class TaskLauncher implements InitActive {
     @Override
     public void initActivity(Body body) {
         this.taskId = initializer.getTaskId();
-        this.taskLogger = new TaskLogger(taskId, getHostname());
+        this.taskLogger = new TaskLogger(taskId, getHostName());
         if (Boolean.valueOf(System.getProperty(PROGRESS_FILE_READER_OLD))) {
             this.progressFileReader = new ProgressFileReader();
         } else {
@@ -169,6 +169,7 @@ public class TaskLauncher implements InitActive {
         TaskContext context = null;
         Stopwatch taskStopwatchForFailures = null;
         TaskDataspaces dataspaces = null;
+        File taskLogFile = null;
 
         try {
             taskStarted.set(true);
@@ -190,7 +191,7 @@ public class TaskLauncher implements InitActive {
 
             copyTaskLogsFromUserSpace(taskLogger.createLogFilePath(dataspaces.getScratchFolder()), dataspaces);
 
-            File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
+            taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
@@ -204,7 +205,7 @@ public class TaskLauncher implements InitActive {
                                                              dataspaces.getUserURI(),
                                                              dataspaces.getGlobalURI()),
                                       progressFileReader.getProgressFile().toString(),
-                                      new NodeInfo(getHostname(), getNodeUrl(), getNodeName()),
+                                      new NodeInfo(getHostName(), getNodeUrl(), getNodeName(), getNodeSourceName()),
                                       decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
@@ -240,10 +241,12 @@ public class TaskLauncher implements InitActive {
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
                     taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
+                    copyTaskLogsToUserSpace(taskLogFile, dataspaces);
                     sendResultToScheduler(rebindedTerminateNotification, taskResult);
                     return;
                 case KILLED_MANUALLY:
                     // killed by Scheduler, no need to send results back
+                    copyTaskLogsToUserSpace(taskLogFile, dataspaces);
                     return;
             }
 
@@ -253,7 +256,6 @@ public class TaskLauncher implements InitActive {
             wallTimer.stop();
 
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
-            taskResult.setLogs(taskLogger.getLogs());
 
             sendResultToScheduler(rebindedTerminateNotification, taskResult);
         } catch (Throwable taskFailure) {
@@ -264,10 +266,12 @@ public class TaskLauncher implements InitActive {
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
                     taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
+                    copyTaskLogsToUserSpace(taskLogFile, dataspaces);
                     sendResultToScheduler(terminateNotification, taskResult);
                     break;
                 case KILLED_MANUALLY:
                     // killed by Scheduler, no need to send results back
+                    copyTaskLogsToUserSpace(taskLogFile, dataspaces);
                     return;
                 default:
                     logger.info("Failed to execute task", taskFailure);
@@ -373,7 +377,7 @@ public class TaskLauncher implements InitActive {
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
-        if (initializer.isPreciousLogs()) {
+        if (initializer.isPreciousLogs() && taskLogFile != null) {
             try {
                 FileSelector taskLogFileSelector = new FileSelector(taskLogFile.getName());
                 taskLogFileSelector.setIncludes(new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
@@ -404,6 +408,8 @@ public class TaskLauncher implements InitActive {
         }
         int pingAttempts = initializer.getPingAttempts();
         int pingPeriodMs = initializer.getPingPeriod() * 1000;
+        taskLogger.close();
+        taskResult.setLogs(taskLogger.getLogs());
 
         // We are going to contact the recipient of the task result. This
         // recipient is the TaskTerminateNotification, an active object on the
@@ -501,7 +507,7 @@ public class TaskLauncher implements InitActive {
         return progressFileReader.getProgress();
     }
 
-    private static String getHostname() {
+    private static String getHostName() {
         return ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
@@ -519,6 +525,15 @@ public class TaskLauncher implements InitActive {
             return PAActiveObject.getNode().getNodeInformation().getName();
         } catch (Exception e) {
             logger.debug("Failed to acquire task launcher node information", e);
+            return null;
+        }
+    }
+
+    private String getNodeSourceName() {
+        try {
+            return System.getProperty("proactive.node.nodesource", "Default");
+        } catch (Exception e) {
+            logger.debug("Failed to acquire task launcher node source information", e);
             return null;
         }
     }

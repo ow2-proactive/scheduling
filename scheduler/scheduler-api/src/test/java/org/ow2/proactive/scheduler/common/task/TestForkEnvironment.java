@@ -93,6 +93,21 @@ public class TestForkEnvironment {
         Assert.assertFalse(forkEnvironment.getAdditionalClasspath() == forkEnvironment.getAdditionalClasspath());
     }
 
+    @Test
+    public void testPreJavaCommand() {
+        forkEnvironment.addPreJavaCommand("a");
+        Assert.assertEquals(1, forkEnvironment.getPreJavaCommand().size());
+
+        forkEnvironment.addPreJavaCommand("b");
+        Assert.assertEquals(2, forkEnvironment.getPreJavaCommand().size());
+
+        forkEnvironment.addPreJavaCommand("c");
+        Assert.assertEquals(3, forkEnvironment.getPreJavaCommand().size());
+        Assert.assertEquals("a", forkEnvironment.getPreJavaCommand().get(0));
+        Assert.assertEquals("b", forkEnvironment.getPreJavaCommand().get(1));
+        Assert.assertEquals("c", forkEnvironment.getPreJavaCommand().get(2));
+    }
+
     @Test(expected = NullPointerException.class)
     public void testAddNullAdditionalClasspath() {
         forkEnvironment.addJVMArgument(null);

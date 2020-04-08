@@ -25,8 +25,12 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.security.auth.Subject;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.UserData;
@@ -49,6 +53,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.SchedulerUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
@@ -83,8 +88,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      * @throws UnknownJobException
      */
-    boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
-            throws NotConnectedException, UnknownJobException;
+    boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException;
 
     /**
      * Returns the USER DataSpace URIs associated with the current user
@@ -352,6 +356,14 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if you can't access to this particular job.
      */
     boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
+
+    /**
+     * Remove jobs with given ids
+     * @return true if all jobs with jobIds were removed, otherwise false
+     * @throws NotConnectedException if you are not authenticated
+     * @throws PermissionException if you can't access to at least one of the job
+     */
+    boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException;
 
     /**
      * Listen for the tasks user logs.
@@ -860,6 +872,13 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if you can't access to this particular job.
      */
     boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
+
+    /**
+     * @return true if all jobs were killed
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to at least one particular job
+     */
+    boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException;
 
     /**
      * Try to kill the task with the given task name in the given jobId. A user
@@ -1410,12 +1429,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param mytasks
      *            <code>True</code> will only fetch the user tasks,
      *            <code>False</code> will fetch everyones.
-     * @param running
-     *            fetch the running tasks.
-     * @param pending
-     *            fetch the pending tasks.
-     * @param finished
-     *            fetch the finished tasks.
+     * @param taskStatuses
+     *            Set of task statuses which is used as filter
      * @param offset
      *            the starting task to include in the paginated list.
      * @param limit
@@ -1423,11 +1438,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *            the paginated list.
      * @return the paginated list of tasks names satisfying the given criterias.
      *         The total number of tasks (without pagination() is also returned.
-     * @throws NotConnectedException
-     * @throws PermissionException
      */
-    Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending,
-            boolean finished, int offset, int limit) throws NotConnectedException, PermissionException;
+    Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
+            int offset, int limit) throws SchedulerException;
 
     /**
      * Retrieve a taskstates list from the scheduler.
@@ -1443,12 +1456,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param mytasks
      *            <code>True</code> will only fetch the user tasks,
      *            <code>False</code> will fetch everyones.
-     * @param running
-     *            fetch the running tasks.
-     * @param pending
-     *            fetch the pending tasks.
-     * @param finished
-     *            fetch the finished tasks.
      * @param offset
      *            the starting task to include in the paginated list.
      * @param limit
@@ -1456,12 +1463,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *            the paginated list.
      * @return the paginated list of taskstates satisfying the given criterias.
      *         The total number of tasks (without pagination() is also returned.
-     * @throws NotConnectedException
-     * @throws PermissionException
      */
-    Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending,
-            boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-            throws NotConnectedException, PermissionException;
+    Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> statusFilter,
+            int offset, int limit, SortSpecifierContainer sortParams) throws SchedulerException;
 
     /**
      * Retrieve a job info by it id.
@@ -1469,11 +1473,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param jobId
      *            the id of the job we want to fetch info.
      * @return the <code>JobInfo</code> associated to the given id
-     * @throws UnknownJobException
-     * @throws NotConnectedException
-     * @throws PermissionException
      */
-    JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException;
+    JobInfo getJobInfo(String jobId) throws SchedulerException;
 
     /**
      * Change the START_AT generic information at job level and reset the
@@ -1483,9 +1484,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *            id of the job that needs to be updated
      * @param startAt
      *            its value should be ISO 8601 compliant
-     * @throws NotConnectedException
-     * @throws UnknownJobException
-     * @throws PermissionException
      */
     boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException;
@@ -1494,15 +1492,14 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param jobId job id of existing job
      * @return copy of the xml which was submitted to the scheduler
      */
-    String getJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException,
-            SubmissionClosedException, JobCreationException;
+    String getJobContent(JobId jobId) throws SchedulerException;
 
     /**
      * @return
      * @throws PermissionException 
      * @throws NotConnectedException 
      */
-    Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException;
+    Map<Object, Object> getPortalConfiguration() throws SchedulerException;
 
     /**
      * Returns the user currently connected
@@ -1517,10 +1514,17 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     UserData getCurrentUserData() throws NotConnectedException;
 
     /**
+     * Returns the current user JaaS subject
+     * @return jaas subject
+     * @throws NotConnectedException
+     */
+    Subject getSubject() throws NotConnectedException;
+
+    /**
      * Returns the scheduler properties associated with the user currently connected
      * @return scheduler properties
      */
-    Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException;
+    Map<String, Object> getSchedulerProperties() throws SchedulerException;
 
     /**
      * Return the page of tasks of the given job.<br>
@@ -1545,4 +1549,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
+    Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException;
+
+    Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws SchedulerException;
 }

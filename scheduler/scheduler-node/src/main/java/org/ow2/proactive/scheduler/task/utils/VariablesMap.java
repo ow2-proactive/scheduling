@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.ow2.proactive.core.properties.PropertyDecrypter;
+
 
 /**
  * A map managing variables for scripts use
@@ -117,12 +119,21 @@ public class VariablesMap implements Map<String, Serializable>, Serializable {
 
     /**
      * Getter of the merged variables map: scopeMap variables override inheritedMap variables and scriptMap variables override scopeMap variables
+     * Handles encrypted strings conversion
      * @return the merged variables map
      */
     private Map<String, Serializable> getMergedMap() {
         Map<String, Serializable> variables = new HashMap<>(inheritedMap);
         variables.putAll(scopeMap);
         variables.putAll(scriptMap);
+        variables.replaceAll((key, value) -> {
+            if (value != null && value instanceof String && ((String) value).startsWith("ENC(")) {
+                String encryptedValue = ((String) value).substring(4, ((String) value).length() - 1);
+                return PropertyDecrypter.getDefaultEncryptor().decrypt(encryptedValue);
+            } else {
+                return value;
+            }
+        });
         return variables;
     }
 

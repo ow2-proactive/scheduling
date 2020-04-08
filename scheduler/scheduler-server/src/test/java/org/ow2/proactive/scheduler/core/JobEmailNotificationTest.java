@@ -297,9 +297,76 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job running to finished"),
-                                     contains("Status: Finished"));
+                                     contains("is Finished"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testFinishedWithErrors() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.FINISHED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished with errors");
+        job.setGenericInformation(genericInfo);
+        job.setNumberOfFaultyTasks(1);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
+
+        assertTrue(sent);
+        ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
+        verify(stubbedSender).sender(varArgs.capture(),
+                                     contains("ProActive Job 123890 : Job running to finished with errors"),
+                                     contains("is Finished"));
+        assertTrue(varArgs.getValue().contains(USER_EMAIL));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testFinishedWithoutErrors() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.FINISHED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished with errors");
+        job.setGenericInformation(genericInfo);
+
+        assertFalse(sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender));
+
+    }
+
+    @Test
+    public void testJobAborted() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.CANCELED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job aborted");
+        job.setGenericInformation(genericInfo);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
+
+        assertTrue(sent);
+        ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
+        verify(stubbedSender).sender(varArgs.capture(),
+                                     contains("ProActive Job 123890 : Job aborted"),
+                                     contains("is Canceled"));
+        assertTrue(varArgs.getValue().contains(USER_EMAIL));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testJobNotAborted() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.FINISHED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job aborted");
+        job.setGenericInformation(genericInfo);
+
+        assertFalse(sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender));
+
     }
 
     @Test
@@ -317,7 +384,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job running to finished"),
-                                     contains("Status: Killed"));
+                                     contains("is Killed"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -337,7 +404,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job pending to finished"),
-                                     contains("Status: Finished"));
+                                     contains("is Finished"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -357,7 +424,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job paused"),
-                                     contains("Status: Paused"));
+                                     contains("is Paused"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -377,7 +444,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job resumed"),
-                                     contains("Status: Pending"));
+                                     contains("is Pending"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -397,7 +464,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job In-Error"),
-                                     contains("Status: In-Error"));
+                                     contains("is In-Error"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -417,7 +484,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job submitted"),
-                                     contains("Status: Pending"));
+                                     contains("is Pending"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -437,7 +504,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job pending to running"),
-                                     contains("Status: Pending"));
+                                     contains("is Pending"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -457,7 +524,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job change priority"),
-                                     contains("Status: Stalled"));
+                                     contains("is Stalled"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -477,7 +544,7 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
         ArgumentCaptor<List> varArgs = ArgumentCaptor.forClass(List.class);
         verify(stubbedSender).sender(varArgs.capture(),
                                      contains("ProActive Job 123890 : Job restarted from error"),
-                                     contains("Status: Running"));
+                                     contains("is Running"));
         assertTrue(varArgs.getValue().contains(USER_EMAIL));
         verifyNoMoreInteractions(stubbedSender);
     }

@@ -33,9 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -83,32 +81,32 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     public static final int DEFAULT_SSH_PORT = 22;
 
-    @Configurable(description = "The port of the ssh server " + DEFAULT_SSH_PORT + " by default")
+    @Configurable(description = "The port of the ssh server " + DEFAULT_SSH_PORT + " by default", sectionSelector = 2)
     protected int sshPort = DEFAULT_SSH_PORT;
 
-    @Configurable(description = "Specifies the user to log in as on the remote machine")
+    @Configurable(description = "Specifies the user to log in as on the remote machine", sectionSelector = 2, important = true)
     protected String sshUsername;
 
-    @Configurable(description = "The password to use for authentification (less secure than private key)")
+    @Configurable(description = "The password to use for authentification (less secure than private key)", password = true, sectionSelector = 2, important = true)
     protected String sshPassword;
 
-    @Configurable(fileBrowser = true, description = "If no password specify the private key file")
+    @Configurable(fileBrowser = true, description = "If no password specify the private key file", sectionSelector = 2)
     protected byte[] sshPrivateKey;
 
-    @Configurable(fileBrowser = true, description = "Options file for the ssh to log in the remote hosts, use key=value format, if empty StrictHostKeyChecking is disabled")
+    @Configurable(fileBrowser = true, description = "Options file for the ssh to log in the remote hosts, use key=value format, if empty StrictHostKeyChecking is disabled", sectionSelector = 2)
     protected Properties sshOptions;
 
-    @Configurable(description = "Absolute path of the java executable on the remote hosts")
+    @Configurable(description = "Absolute path of the java executable on the remote hosts", sectionSelector = 1)
     protected String javaPath = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "jre" +
                                 File.separator + "bin" + File.separator + "java";
 
-    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)root directory on the remote hosts")
+    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)root directory on the remote hosts", sectionSelector = 1)
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
 
-    @Configurable(description = "Linux, Cygwin or Windows depending on the operating system of the remote hosts")
+    @Configurable(description = "Linux, Cygwin or Windows depending on the operating system of the remote hosts", sectionSelector = 1)
     protected String targetOs = "Linux";
 
-    @Configurable(description = "Options for the java command launching the node on the remote hosts")
+    @Configurable(description = "Options for the java command launching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
     private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
@@ -323,12 +321,15 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * Configures the Infrastructure
      *
      * @param parameters
-     *            parameters[4] : ssh server port parameters[5] : ssh username
-     *            parameters[6] : ssh password parameters[7] : ssh private key
-     *            parameters[8] : optional ssh options file parameters[9] : java
-     *            path on the remote machines parameters[10] : Scheduling path on
-     *            remote machines parameters[11] : target OS' type (Linux,
-     *            Windows or Cygwin) parameters[12] : extra java options
+     *            parameters[4] : ssh server port
+     *            parameters[5] : ssh username
+     *            parameters[6] : ssh password
+     *            parameters[7] : ssh private key
+     *            parameters[8] : optional ssh options file
+     *            parameters[9] : java path on the remote machines
+     *            parameters[10] : Scheduling path on remote machines
+     *            parameters[11] : target OS' type (Linux, Windows or Cygwin)
+     *            parameters[12] : extra java options
      * @throws IllegalArgumentException
      *             configuration failed
      */
@@ -446,4 +447,10 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         });
     }
 
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(2, "SSH Configuration");
+        return sectionDescriptions;
+    }
 }

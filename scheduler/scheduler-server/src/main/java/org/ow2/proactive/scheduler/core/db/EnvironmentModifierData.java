@@ -27,12 +27,12 @@ package org.ow2.proactive.scheduler.core.db;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteEnvironmentModifierData", query = "delete from EnvironmentModifierData where taskData.id.jobId = :jobId"),
-                @NamedQuery(name = "deleteEnvironmentModifierDataInBulk", query = "delete from EnvironmentModifierData where taskData.id.jobId in :jobIdList"),
+@NamedQueries({ @NamedQuery(name = "deleteEnvironmentModifierDataInBulk", query = "delete from EnvironmentModifierData where taskData.id.jobId in :jobIdList"),
                 @NamedQuery(name = "countEnvironmentModifierData", query = "select count (*) from EnvironmentModifierData") })
 @Table(name = "ENVIRONMENT_MODIFIER_DATA", indexes = { @Index(name = "ENV_MODIFIER_DATA_JOB_ID", columnList = "JOB_ID"),
                                                        @Index(name = "ENV_MODIFIER_DATA_TASK_ID", columnList = "TASK_ID") })
@@ -87,6 +87,7 @@ public class EnvironmentModifierData {
 
     @Column(name = "VALUE", nullable = false, length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getValue() {
         return value;
     }

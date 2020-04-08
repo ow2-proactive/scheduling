@@ -66,6 +66,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
 
     ResourceManager nsadmin;
 
+    ResourceManager nsadmin2;
+
     ResourceManager admin;
 
     ResourceManager user;
@@ -93,51 +95,40 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
 
         Node node1 = nodePool.remove(0).getNode();
         Node node2 = nodePool.remove(0).getNode();
-        nsadmin.addNode(node1.getNodeInformation().getURL(), nsName).getBooleanValue();
+        addNodeToNodeSource(nsadmin, node1);
 
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        user = rmHelper.getResourceManager(TestUsers.PROVIDER);
+        failIfNodeCanBeAdded(user, node2, "provider is not node source owner");
 
-        ResourceManager user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        try {
-            // user does not allow to add nodes
-            user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            fail();
-        } catch (Exception expected) {
-        }
-
-        try {
-            // user does not allow to remove nodes
-            user.removeNode(node1.getNodeInformation().getURL(), true).getBooleanValue();
-            fail();
-        } catch (Exception expected) {
-        }
+        failIfNodeCanBeRemoved(user, node1, "provider is not node source owner");
 
         // AllPermission user
-        ResourceManager admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         // admin is allowed to add nodes
-        admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        addNodeToNodeSource(admin, node2);
 
         // admin is allowed to remove nodes
-        admin.removeNode(node1.getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeAndWait(node1, admin);
 
         // admin is allowed to remove the node source
-        admin.removeNodeSource(nsName, true).getBooleanValue();
+        removeNodeSourceWithNodes(admin, 1);
+    }
+
+    private void removeNodeAndWait(Node node, ResourceManager user) {
+        user.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
     }
 
     @Test
     public void testNodeProviderMyGroups() throws Exception {
         RMTHelper.log("Test2 - node providers = MY_GROUPS");
-        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.createNodeSource(nsName,
-                               DefaultInfrastructureManager.class.getName(),
-                               null,
-                               StaticPolicy.class.getName(),
-                               new Object[] { "ALL", "MY_GROUPS" },
-                               NODES_NOT_RECOVERABLE);
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
+        nsadmin.createNodeSource(nsName,
+                                 DefaultInfrastructureManager.class.getName(),
+                                 null,
+                                 StaticPolicy.class.getName(),
+                                 new Object[] { "ALL", "MY_GROUPS" },
+                                 NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         TestNode node1 = rmHelper.createNode("node1");
@@ -146,48 +137,31 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
 
         testNodes.addAll(Arrays.asList(node1, node2, node3));
 
-        admin.addNode(node1.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        addNodeToNodeSource(nsadmin, node1.getNode());
 
-        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        // nsadmin is in the same group as admin
-        nsadmin.addNode(node2.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        nsadmin2 = rmHelper.getResourceManager(TestUsers.NSADMIN2);
+        // nsadmin2 is in the same group as nsadmin
+        addNodeToNodeSource(nsadmin2, node2.getNode());
 
-        user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        try {
-            // user does not allow to add nodes
-            user.addNode(node3.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-            fail();
-        } catch (Exception expected) {
-        }
+        user = rmHelper.getResourceManager(TestUsers.PROVIDER);
+        failIfNodeCanBeAdded(user, node3.getNode(), "provider is not in node source owner group");
 
-        try {
-            // user does not allow to remove nodes
-            user.removeNode(node2.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-            fail();
-        } catch (Exception expected) {
-        }
+        failIfNodeCanBeRemoved(user, node2.getNode(), "provider is not in node source owner group");
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
 
         // nsadmin can remove node in the node source as a node source provider
-        nsadmin.removeNode(node1.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeAndWait(node1.getNode(), nsadmin);
 
         // but it can remove its own
-        nsadmin.removeNode(node2.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        nsadmin.addNode(node3.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        removeNodeAndWait(node2.getNode(), nsadmin);
+        addNodeToNodeSource(nsadmin, node3.getNode());
 
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         // admin can remove foreign node
-        admin.removeNode(node3.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeAndWait(node3.getNode(), admin);
 
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceWithNodes(admin, 0);
     }
 
     @Test
@@ -208,32 +182,25 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
 
         testNodes.addAll(Arrays.asList(node1, node2, node3));
 
-        nsadmin.addNode(node1.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        addNodeToNodeSource(nsadmin, node1.getNode());
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
         // user can add new nodes
-        user.addNode(node2.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        addNodeToNodeSource(user, node2.getNode());
         // the user should have the right to remove the Node, as the provider of the node source is "ALL"
         // so the user should be considered as a node source provider
-        user.removeNode(node1.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeAndWait(node1.getNode(), user);
 
         // user can remove his own node
-        user.removeNode(node2.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeAndWait(node2.getNode(), user);
         // adding node3
-        user.addNode(node3.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        addNodeToNodeSource(user, node3.getNode());
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         // nsadmin can remove node3 as ns admin
-        nsadmin.removeNode(node3.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeAndWait(node3.getNode(), nsadmin);
 
-        nsadmin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceWithNodes(nsadmin, 0);
     }
 
     @Test
@@ -245,7 +212,7 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
                                  DefaultInfrastructureManager.class.getName(),
                                  null,
                                  StaticPolicy.class.getName(),
-                                 new Object[] { "ALL", "ALL" },
+                                 new Object[] { "ALL", "ME" },
                                  NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
@@ -253,17 +220,14 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         testNode = nodePool.get(0);
         Node node1 = nodePool.remove(0).getNode();
 
-        nsadmin.addNode(node1.getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        addNodeToNodeSource(nsadmin, node1);
 
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
 
         // admin can remove anything
-        admin.removeNode(node1.getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeAndWait(node1, admin);
 
-        admin.removeNodeSource(nsName, true);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        removeNodeSourceWithNodes(admin, 0);
     }
 
     @Test
@@ -284,35 +248,100 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
 
         testNodes.addAll(Arrays.asList(node1, node2, node3));
 
-        admin.addNode(node1.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        addNodeToNodeSource(admin, node1.getNode());
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
 
         // nsadmin can remove node as he is a node source provider
-        nsadmin.removeNode(node1.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        removeNodeAndWait(node1.getNode(), nsadmin);
 
-        nsadmin.addNode(node2.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        try {
-            // user cannot add new nodes
-            user.addNode(node3.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-            fail();
-        } catch (Exception expected) {
-        }
-        try {
-            // user cannot remove node as he is not a node owner
-            user.removeNode(node2.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-            fail();
-        } catch (Exception expected) {
-        }
+        addNodeToNodeSource(nsadmin, node2.getNode());
+        user = rmHelper.getResourceManager(TestUsers.PROVIDER);
+        failIfNodeCanBeAdded(user, node3.getNode(), "provider is not a specified user");
+        failIfNodeCanBeRemoved(user, node2.getNode(), "provider is not a specified user");
 
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        removeNodeSourceWithNodes(admin, 1);
+    }
+
+    @Test
+    public void testSpecificGroups() throws Exception {
+
+        RMTHelper.log("Test5.2 - specific groups");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
+        nsadmin.createNodeSource(nsName,
+                                 DefaultInfrastructureManager.class.getName(),
+                                 null,
+                                 StaticPolicy.class.getName(),
+                                 new Object[] { "ALL", "groups=nsadmins" },
+                                 NODES_NOT_RECOVERABLE)
+               .getBooleanValue();
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+
+        TestNode node1 = rmHelper.createNode("node1");
+        TestNode node2 = rmHelper.createNode("node2");
+        TestNode node3 = rmHelper.createNode("node3");
+
+        testNodes.addAll(Arrays.asList(node1, node2, node3));
+
+        addNodeToNodeSource(nsadmin, node1.getNode());
+        nsadmin2 = rmHelper.getResourceManager(TestUsers.NSADMIN2);
+
+        // nsadmin2 can remove the node as he is a node source provider
+        removeNodeAndWait(node1.getNode(), nsadmin2);
+        addNodeToNodeSource(nsadmin2, node2.getNode());
+
+        user = rmHelper.getResourceManager(TestUsers.PROVIDER);
+        failIfNodeCanBeAdded(user, node3.getNode(), "provider is not in the specified group");
+        failIfNodeCanBeRemoved(user, node2.getNode(), "provider is not in the specified group");
+
+        // admin can remove the NS
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        // user does not allow to remove nodes
+        removeNodeSourceWithNodes(admin, 1);
+    }
+
+    @Test
+    public void testSpecificUsersGroups() throws Exception {
+        RMTHelper.log("Test5.3 - specific users/groups");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
+        nsadmin.createNodeSource(nsName,
+                                 DefaultInfrastructureManager.class.getName(),
+                                 null,
+                                 StaticPolicy.class.getName(),
+                                 new Object[] { "ALL", "users=provider;groups=nsadmins" },
+                                 NODES_NOT_RECOVERABLE);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+
+        TestNode node1 = rmHelper.createNode("node1");
+        TestNode node2 = rmHelper.createNode("node2");
+        TestNode node3 = rmHelper.createNode("node3");
+
+        testNodes.addAll(Arrays.asList(node1, node2, node3));
+
+        addNodeToNodeSource(nsadmin, node1.getNode());
+        nsadmin2 = rmHelper.getResourceManager(TestUsers.NSADMIN2);
+
+        // nsadmin2 can remove the node as he is a node source provider
+        removeNodeAndWait(node1.getNode(), nsadmin2);
+        addNodeToNodeSource(nsadmin2, node2.getNode());
+
+        user = rmHelper.getResourceManager(TestUsers.PROVIDER);
+        // user can add new nodes
+        addNodeToNodeSource(user, node3.getNode());
+
+        //user can remove nodes as a node source provider
+        removeNodeAndWait(node2.getNode(), user);
+
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        removeNodeSourceWithNodes(admin, 1);
+    }
+
+    private void removeNodeSourceWithNodes(ResourceManager user, int nbNodes) {
         try {
-            // user does not allow to remove nodes
-            admin.removeNodeSource(nsName, true).getBooleanValue();
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            user.removeNodeSource(nsName, true).getBooleanValue();
+            for (int i = 0; i < nbNodes; i++) {
+                rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            }
             rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
             e.printStackTrace();
@@ -320,98 +349,26 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         }
     }
 
-    @Test
-    public void testSpecificGroups() throws Exception {
+    private void addNodeToNodeSource(ResourceManager user, Node node) {
+        user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
 
-        RMTHelper.log("Test5.2 - specific groups");
-        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.createNodeSource(nsName,
-                               DefaultInfrastructureManager.class.getName(),
-                               null,
-                               StaticPolicy.class.getName(),
-                               new Object[] { "ALL", "groups=nsadmins" },
-                               NODES_NOT_RECOVERABLE)
-             .getBooleanValue();
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
-
-        TestNode node1 = rmHelper.createNode("node1");
-        TestNode node2 = rmHelper.createNode("node2");
-        TestNode node3 = rmHelper.createNode("node3");
-
-        testNodes.addAll(Arrays.asList(node1, node2, node3));
-
-        admin.addNode(node1.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-
-        // nsadmin can remove the node as he is a node source provider
-        nsadmin.removeNode(node1.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-
-        nsadmin.addNode(node2.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        try {
-            // user cannot add new nodes
-            user.addNode(node3.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-            fail();
-        } catch (Exception expected) {
-        }
-        try {
-            // user cannot remove node as he is not a node owner
-            user.removeNode(node2.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-            fail();
-        } catch (Exception expected) {
-        }
-
-        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        // user does not allow to remove nodes
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
     }
 
-    @Test
-    public void testSpecificUsersGroups() throws Exception {
-        RMTHelper.log("Test5.3 - specific users/groups");
-        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.createNodeSource(nsName,
-                               DefaultInfrastructureManager.class.getName(),
-                               null,
-                               StaticPolicy.class.getName(),
-                               new Object[] { "ALL", "users=radmin;groups=nsadmins" },
-                               NODES_NOT_RECOVERABLE);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+    private static void failIfNodeCanBeAdded(ResourceManager user, Node node, String message) {
+        try {
+            // user cannot add new nodes
+            user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+            fail(message);
+        } catch (Exception expected) {
+        }
+    }
 
-        TestNode node1 = rmHelper.createNode("node1");
-        TestNode node2 = rmHelper.createNode("node2");
-        TestNode node3 = rmHelper.createNode("node3");
-
-        testNodes.addAll(Arrays.asList(node1, node2, node3));
-
-        admin.addNode(node1.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-
-        // nsadmin can remove the node as he is a node source provider
-        nsadmin.removeNode(node1.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-
-        nsadmin.addNode(node2.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        // user can add new nodes
-        user.addNode(node3.getNode().getNodeInformation().getURL(), nsName).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-
-        //user can remove nodes as a node source provider
-        user.removeNode(node2.getNode().getNodeInformation().getURL(), true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-
-        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        // user does not allow to remove nodes
-        admin.removeNodeSource(nsName, true).getBooleanValue();
-        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+    private static void failIfNodeCanBeRemoved(ResourceManager user, Node node, String message) {
+        try {
+            user.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
+            fail(message);
+        } catch (Exception expected) {
+        }
     }
 }

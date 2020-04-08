@@ -45,5 +45,6 @@ public enum SchedulerVars {
     PA_CATALOG_REST_URL,
     PA_NODE_URL,
     PA_NODE_NAME,
-    PA_NODE_HOST
+    PA_NODE_HOST,
+    PA_NODE_SOURCE
 }

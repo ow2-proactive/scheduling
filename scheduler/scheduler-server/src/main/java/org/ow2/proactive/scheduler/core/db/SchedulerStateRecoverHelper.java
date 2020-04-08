@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.PAExecutors;
 
 
 public class SchedulerStateRecoverHelper {
@@ -75,7 +76,11 @@ public class SchedulerStateRecoverHelper {
         Vector<InternalJob> pendingJobs = new Vector<>();
         Vector<InternalJob> runningJobs = new Vector<>();
 
-        ExecutorService recoverRunningTasksThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_NBTHREAD.getValueAsInt());
+        ExecutorService recoverRunningTasksThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                                               PASchedulerProperties.SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_NBTHREAD.getValueAsInt(),
+                                                                                               60L,
+                                                                                               TimeUnit.SECONDS,
+                                                                                               new NamedThreadFactory("TaskRecoverThreadPool"));
 
         for (InternalJob job : notFinishedJobs) {
             recoverJob(rmProxy, pendingJobs, runningJobs, job, recoverRunningTasksThreadPool);

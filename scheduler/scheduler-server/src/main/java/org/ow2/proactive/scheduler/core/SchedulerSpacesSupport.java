@@ -33,6 +33,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
@@ -138,6 +139,36 @@ public class SchedulerSpacesSupport {
             }
             // register the user GlobalSpace to the frontend state
             this.userGlobalSpaces.put(username, userSpace);
+        }
+    }
+
+    /**
+     * Check whether a file path exist in global space
+     *
+     * @param pathname the file path to check
+     * @return whether the file exist in global space
+     */
+    public boolean checkFileExistsInGlobalSpace(String pathname) {
+        try {
+            return this.globalSpace.resolveFile(pathname).exists();
+        } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the file name [%s] in the global space.", pathname), e);
+            return false;
+        }
+    }
+
+    /**
+     * Check whether a file path exist in user space
+     * @param username the user's name
+     * @param pathname the file path to check
+     * @return whether the file exist in user space
+     */
+    public boolean checkFileExistsInUserSpace(String username, String pathname) {
+        try {
+            return this.getUserSpace(username).resolveFile(pathname).exists();
+        } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse file name [%s] in user [%s] dataspace.", pathname, username), e);
+            return false;
         }
     }
 }

@@ -219,6 +219,7 @@ public class ListJobCommandTest {
             jobInfoData.setStartTime(System.currentTimeMillis() - 1000);
             jobInfoData.setFinishedTime(System.currentTimeMillis());
             jobInfoData.setJobOwner("test");
+            jobInfoData.setProjectName("my project");
             userJobInfoList.add(new UserJobData(jobInfoData));
         }
 

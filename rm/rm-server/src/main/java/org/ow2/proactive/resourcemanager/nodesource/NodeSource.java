@@ -27,12 +27,7 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
 import java.security.Permission;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -53,13 +48,16 @@ import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
+import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -97,13 +95,8 @@ public class NodeSource implements InitActive, RunActive {
 
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
-    /** Default name for NS with local nodes started with the Scheduler by default */
-    public static final String DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME = "LocalNodes";
-
-    /** Default name for NS with local nodes started with the Scheduler by default */
+    /** Default recovery mode for NS with local nodes started with the RM by default */
     public static final boolean DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE = false;
-
-    public static final String DEFAULT = "Default";
 
     public static final boolean DEFAULT_RECOVERABLE = true;
 
@@ -171,6 +164,18 @@ public class NodeSource implements InitActive, RunActive {
 
     private NodeSourceDescriptor descriptor;
 
+    private LinkedHashMap<String, String> additionalInformation;
+
+    /**
+     * Database manager, used to persist the runtime variables.
+     */
+    private RMDBManager dbManager;
+
+    /**
+     * Information related to node source that are persisted in database
+     */
+    private NodeSourceData nodeSourceData;
+
     static {
         try {
             int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
@@ -202,6 +207,7 @@ public class NodeSource implements InitActive, RunActive {
         providerPermission = null;
         monitoring = null;
         descriptor = null;
+        additionalInformation = new LinkedHashMap<>();
     }
 
     /**
@@ -240,6 +246,9 @@ public class NodeSource implements InitActive, RunActive {
         this.nodeUserAccessType = this.policy.getUserAccessType();
 
         this.descriptor = nodeSourceDescriptor;
+
+        this.additionalInformation = Optional.ofNullable(nodeSourceDescriptor.getAdditionalInformation())
+                                             .orElse(new LinkedHashMap<>());
     }
 
     /**
@@ -362,7 +371,8 @@ public class NodeSource implements InitActive, RunActive {
         // checking that client has a right to change this node source
         // if the provider is the administrator of the node source it always has this permission
         provider.checkPermission(providerPermission,
-                                 provider + " is not authorized to add node " + nodeUrl + " to " + name);
+                                 provider + " is not authorized to add node " + nodeUrl + " to " + name,
+                                 new RMCoreAllPermission());
 
         // lookup for a new Node
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
@@ -510,7 +520,7 @@ public class NodeSource implements InitActive, RunActive {
         if (rmNodeData.getState().equals(NodeState.BUSY)) {
             logger.info("Node " + rmNodeData.getName() + " was found busy after scheduler recovery with owner " +
                         rmNodeData.getOwner());
-            rmNode.setBusy(rmNodeData.getOwner());
+            rmNode.setBusy(rmNodeData.getOwner(), rmNodeData.getUsageInfo());
         }
         return rmNode;
     }
@@ -559,6 +569,49 @@ public class NodeSource implements InitActive, RunActive {
     public void setStatus(NodeSourceStatus status) {
         this.getDescriptor().setStatus(status);
         this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
+    }
+
+    public LinkedHashMap<String, String> getAdditionalInformation() {
+        return additionalInformation;
+    }
+
+    public void putAndPersistAdditionalInformation(String key, String value) {
+        String valueToUpdate = this.additionalInformation.get(key);
+        if (valueToUpdate == null || (valueToUpdate != null && !valueToUpdate.equals(value))) {
+
+            // Put additional information
+            this.additionalInformation.put(key, value);
+            this.descriptor.getAdditionalInformation().put(key, value);
+
+            // Persist additional information
+            persistAdditionalInformation();
+
+            // Notify the rm portal that the node source changed
+            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_UPDATED,
+                                                                  this.administrator.getName(),
+                                                                  this.name,
+                                                                  this.getDescription(),
+                                                                  this.additionalInformation,
+                                                                  this.administrator.getName(),
+                                                                  this.getStatus().toString()));
+        }
+    }
+
+    private void persistAdditionalInformation() {
+        // Update nodeSourceData data from DB
+        if (this.dbManager == null) {
+            this.dbManager = RMDBManager.getInstance();
+        }
+        if (this.nodeSourceData == null) {
+            this.nodeSourceData = this.dbManager.getNodeSource(this.name);
+        }
+
+        if (nodeSourceData != null) {
+            this.nodeSourceData.setAdditionalInformation(this.additionalInformation);
+            this.dbManager.updateNodeSource(this.nodeSourceData);
+        } else {
+            logger.warn("Node source " + this.name + " is unknown. Cannot persist infrastructure variables");
+        }
     }
 
     public NodeSourceDescriptor updateDynamicParameters(List<Serializable> infrastructureParamsWithDynamicUpdated,
@@ -917,7 +970,11 @@ public class NodeSource implements InitActive, RunActive {
                 }
             } catch (Throwable t) {
                 logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
-                stub.detectedPingedDownNode(nodeName, nodeUrl);
+                try {
+                    stub.detectedPingedDownNode(nodeName, nodeUrl);
+                } catch (Exception e) {
+                    logger.warn("Could not send detectedPingedDownNode message", e);
+                }
             }
         });
     }
@@ -972,6 +1029,7 @@ public class NodeSource implements InitActive, RunActive {
     public RMNodeSourceEvent createNodeSourceEvent() {
         return new RMNodeSourceEvent(this.name,
                                      getDescription(),
+                                     this.additionalInformation,
                                      this.administrator.getName(),
                                      this.getStatus().toString());
     }

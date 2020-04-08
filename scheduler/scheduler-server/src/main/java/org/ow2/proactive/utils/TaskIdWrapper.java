@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.utils;
 
+import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.task.TaskId;
 
 
@@ -32,7 +34,9 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
  * TaskId wrapper mainly used to return an implementation that
  * takes into account job id + task id for hashcode ans equals.
  */
-public final class TaskIdWrapper implements Comparable<TaskIdWrapper> {
+public final class TaskIdWrapper implements Comparable<TaskIdWrapper>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // TODO: this class could probably be removed once next issue is fixed
     // https://github.com/ow2-proactive/scheduling/issues/2306
@@ -80,5 +84,10 @@ public final class TaskIdWrapper implements Comparable<TaskIdWrapper> {
             return jobCompareTo;
         }
         return (new Long(taskId.longValue())).compareTo(o.getTaskId().longValue());
+    }
+
+    @Override
+    public String toString() {
+        return taskId.toString();
     }
 }

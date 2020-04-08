@@ -53,6 +53,12 @@ public interface Topology extends Serializable {
     Long getDistance(Node node, Node node2);
 
     /**
+     * Checks if 2 nodes are on the sane host.
+     * @return true if 2 nodes are on the same hosts, false otherwise
+     */
+    boolean onSameHost(Node node, Node node2);
+
+    /**
      * Returns the distance between 2 hosts identified by their inet addresses.
      *
      * @return the distance between 2 nodes
@@ -65,12 +71,6 @@ public interface Topology extends Serializable {
      * @return the distance between 2 nodes
      */
     Long getDistance(String hostName, String hostName2);
-
-    /**
-     * Checks if 2 nodes are on the sane host.
-     * @return true if 2 nodes are on the same hosts, false otherwise
-     */
-    boolean onSameHost(Node node, Node node2);
 
     /**
      * Checks if the information about host is presented in the topology records.
@@ -104,4 +104,5 @@ public interface Topology extends Serializable {
      * @return the list of host clusters
      */
     List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction);
+
 }

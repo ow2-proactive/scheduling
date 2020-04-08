@@ -85,23 +85,23 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Time in milliseconds before sending a kill request to the scheduler. */
     SCHEDULER_KILL_DELAY("pa.scheduler.core.killdelay", PropertyType.INTEGER, "2000"),
 
-    /** Number of threads used to execute client requests  */
-    SCHEDULER_CLIENT_POOL_NBTHREAD("pa.scheduler.core.clientpoolnbthreads", PropertyType.INTEGER, "5"),
+    /** Maximum number of threads used to execute client requests  */
+    SCHEDULER_CLIENT_POOL_NBTHREAD("pa.scheduler.core.clientpoolnbthreads", PropertyType.INTEGER, "100"),
 
-    /** Number of threads used to execute internal scheduling operations */
-    SCHEDULER_INTERNAL_POOL_NBTHREAD("pa.scheduler.core.internalpoolnbthreads", PropertyType.INTEGER, "5"),
+    /** Maximum number of threads used to execute internal scheduling operations */
+    SCHEDULER_INTERNAL_POOL_NBTHREAD("pa.scheduler.core.internalpoolnbthreads", PropertyType.INTEGER, "100"),
 
-    /** Number of threads used to ping tasks */
-    SCHEDULER_TASK_PINGER_POOL_NBTHREAD("pa.scheduler.core.taskpingerpoolnbthreads", PropertyType.INTEGER, "10"),
+    /** Maximum number of threads used to ping tasks */
+    SCHEDULER_TASK_PINGER_POOL_NBTHREAD("pa.scheduler.core.taskpingerpoolnbthreads", PropertyType.INTEGER, "50"),
 
     /** Number of threads used to handle scheduled operations other than housekeeping operations */
-    SCHEDULER_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.scheduledpoolnbthreads", PropertyType.INTEGER, "2"),
+    SCHEDULER_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.scheduledpoolnbthreads", PropertyType.INTEGER, "20"),
 
     /** Number of threads used to handle scheduled operations related to housekeeping */
     SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.housekeeping.scheduledpoolnbthreads", PropertyType.INTEGER, "5"),
 
-    /** The number of threads in the thread pool that serves to recover running tasks in parallel at scheduler start up */
-    SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_NBTHREAD("pa.scheduler.core.parallel.scheduler.state.recover.nbthreads", PropertyType.INTEGER, "16"),
+    /** Maximum number of threads in the thread pool that serves to recover running tasks in parallel at scheduler start up */
+    SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_NBTHREAD("pa.scheduler.core.parallel.scheduler.state.recover.nbthreads", PropertyType.INTEGER, "100"),
 
     /** The timeout - to be used in minutes - for the scheduler state to be fully recovered */
     SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_TIMEOUT("pa.scheduler.core.parallel.scheduler.state.recover.timeout", PropertyType.INTEGER, "60"),
@@ -191,7 +191,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY("pa.scheduler.core.automaticremovejobdelay", PropertyType.INTEGER, "0"),
 
     /** Cron expression to automatically remove finished jobs */
-    SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR("pa.scheduler.core.automaticremovejobexpression", PropertyType.STRING, "*/10 * * * *"),
+    SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR("pa.scheduler.core.automaticremovejobcronexpression", PropertyType.STRING, "*/10 * * * *"),
 
     /** Remove job in dataBase when removing it from scheduler. */
     JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PropertyType.BOOLEAN, "true"),
@@ -212,7 +212,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PropertyType.INTEGER, "2"),
 
     /** If true script tasks are ran in a forked JVM, if false they are ran in the node's JVM */
-    TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN, "true"),
+    TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN),
 
     /**
      * If true tasks are always ran in RunAsMe mode (implies automatically fork), if false, the user can choose whether to run the task in runasme mode or not

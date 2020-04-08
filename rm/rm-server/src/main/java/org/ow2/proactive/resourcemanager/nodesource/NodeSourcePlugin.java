@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 
@@ -37,5 +38,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  * a policy.
  */
 public interface NodeSourcePlugin extends Serializable {
+    Map<Integer, String> getSectionDescriptions();
 
+    Map<String, String> getMeta();
 }

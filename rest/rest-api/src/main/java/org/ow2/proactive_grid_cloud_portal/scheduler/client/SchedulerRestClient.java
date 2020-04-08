@@ -31,11 +31,14 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.net.ssl.*;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
@@ -45,15 +48,24 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContexts;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.plugins.interceptors.encoding.AcceptEncodingGZIPFilter;
+import org.jboss.resteasy.plugins.interceptors.encoding.GZIPDecodingInterceptor;
+import org.jboss.resteasy.plugins.interceptors.encoding.GZIPEncodingInterceptor;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
@@ -72,24 +84,62 @@ public class SchedulerRestClient {
 
     private String restEndpointURL;
 
-    private ClientHttpEngine httpEngine;
-
     private ResteasyProviderFactory providerFactory;
+
+    private static ClientHttpEngine httpEngine;
+
+    private static SSLContext sslContext;
 
     public SchedulerRestClient(String restEndpointURL) {
         this(restEndpointURL, null);
     }
 
     public SchedulerRestClient(String restEndpointURL, ClientHttpEngine httpEngine) {
-        this.restEndpointURL = restEndpointURL;
+
+        if (httpEngine == null) {
+            setBlindTrustSSLContext();
+            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
+                                                                                                   NoopHostnameVerifier.INSTANCE);
+            HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sslConnectionSocketFactory).build();
+            httpEngine = new ApacheHttpClient4Engine(httpClient);
+        }
+
         this.httpEngine = httpEngine;
+        this.restEndpointURL = restEndpointURL;
 
         providerFactory = ResteasyProviderFactory.getInstance();
         if (!providerFactory.isRegistered(JacksonContextResolver.class)) {
             providerFactory.registerProvider(JacksonContextResolver.class);
         }
+        registerGzipEncoding(providerFactory);
 
         scheduler = createRestProxy(providerFactory, restEndpointURL, httpEngine);
+    }
+
+    private void setBlindTrustSSLContext() {
+        try {
+            TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+            sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+
+        } catch (KeyStoreException | KeyManagementException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private static ResteasyClient buildResteasyClient(ResteasyProviderFactory provider) {
+        return new ResteasyClientBuilder().providerFactory(provider).httpEngine(httpEngine).build();
+    }
+
+    public static void registerGzipEncoding(ResteasyProviderFactory providerFactory) {
+        if (!providerFactory.isRegistered(AcceptEncodingGZIPFilter.class)) {
+            providerFactory.registerProvider(AcceptEncodingGZIPFilter.class);
+        }
+        if (!providerFactory.isRegistered(GZIPDecodingInterceptor.class)) {
+            providerFactory.registerProvider(GZIPDecodingInterceptor.class);
+        }
+        if (!providerFactory.isRegistered(GZIPEncodingInterceptor.class)) {
+            providerFactory.registerProvider(GZIPEncodingInterceptor.class);
+        }
     }
 
     public JobIdData submitXmlAs(String sessionId, InputStream jobXml, String user) throws Exception {
@@ -126,9 +176,8 @@ public class SchedulerRestClient {
                                                              .append(URLEncoder.encode(path, "UTF-8"))
                                                              .toString();
 
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl);
 
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
@@ -158,9 +207,9 @@ public class SchedulerRestClient {
                                                              .append(space)
                                                              .append(URLEncoder.encode(path, "UTF-8"))
                                                              .toString();
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl);
         Response response = target.request().header("sessionid", sessionId).get();
         if (response.getStatus() != HttpURLConnection.HTTP_OK) {
@@ -199,9 +248,9 @@ public class SchedulerRestClient {
                                                    .append(dataspacePath)
                                                    .append('/')
                                                    .append(escapeUrlPathSegment(path));
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl.toString());
         Response response = null;
         try {
@@ -233,9 +282,9 @@ public class SchedulerRestClient {
                                                    .append(addSlashIfMissing(restEndpointURL))
                                                    .append("data/")
                                                    .append(dataspace);
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
         Response response = null;
         try {
@@ -274,9 +323,8 @@ public class SchedulerRestClient {
                                                    .append(dataspacePath)
                                                    .append('/');
 
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
 
         if (includes != null && !includes.isEmpty()) {
@@ -331,9 +379,9 @@ public class SchedulerRestClient {
                                                    .append("data/")
                                                    .append(dataspacePath)
                                                    .append('/');
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
         if (includes != null && !includes.isEmpty()) {
             target = target.queryParam("includes", includes.toArray(new Object[includes.size()]));
@@ -366,9 +414,9 @@ public class SchedulerRestClient {
                                                    .append("data/")
                                                    .append(dataspacePath)
                                                    .append('/');
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(pathname).queryParam("comp", "list");
         Response response = null;
         try {
@@ -394,9 +442,9 @@ public class SchedulerRestClient {
                                                    .append("data/")
                                                    .append(dataspacePath)
                                                    .append(escapeUrlPathSegment(pathname));
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl.toString());
         Response response = null;
         try {
@@ -426,9 +474,8 @@ public class SchedulerRestClient {
             Map<String, String> genericInfos) throws NotConnectedRestException {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
 
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl);
 
         // Variables
@@ -468,9 +515,8 @@ public class SchedulerRestClient {
             Map<String, String> genericInfos) throws NotConnectedRestException {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/jobs/" + jobId + "/resubmit";
 
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                                                           .providerFactory(providerFactory)
-                                                           .build();
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
         ResteasyWebTarget target = client.target(uriTmpl);
 
         // Variables
@@ -530,7 +576,7 @@ public class SchedulerRestClient {
 
     private static SchedulerRestInterface createRestProxy(ResteasyProviderFactory provider, String restEndpointURL,
             ClientHttpEngine httpEngine) {
-        ResteasyClient client = new ResteasyClientBuilder().providerFactory(provider).httpEngine(httpEngine).build();
+        ResteasyClient client = buildResteasyClient(provider);
         ResteasyWebTarget target = client.target(restEndpointURL);
         SchedulerRestInterface schedulerRestClient = target.proxy(SchedulerRestInterface.class);
         return createExceptionProxy(schedulerRestClient);

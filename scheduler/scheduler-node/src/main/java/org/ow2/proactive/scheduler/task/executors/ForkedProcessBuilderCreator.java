@@ -31,7 +31,6 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.security.KeyException;
 
-import org.apache.commons.io.FileUtils;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -39,6 +38,9 @@ import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedJvmTaskExecutionCommandCreator;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.ClasspathUtils;
+
+import com.google.common.base.StandardSystemProperty;
 
 
 public class ForkedProcessBuilderCreator implements Serializable {
@@ -118,6 +120,7 @@ public class ForkedProcessBuilderCreator implements Serializable {
             throws IOException, IllegalAccessException, KeyException {
         OSProcessBuilder processBuilder;
         if (context.isRunAsUser()) {
+            addExecutionPermissionToScripts();
             ForkerUtils.setSharedExecutablePermissions(workingDir);
             processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath)
                                         .getBuilder(ForkerUtils.checkConfigAndGetUser(context.getDecrypter()));
@@ -125,5 +128,20 @@ public class ForkedProcessBuilderCreator implements Serializable {
             processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
         }
         return processBuilder;
+    }
+
+    private void addExecutionPermissionToScripts() throws IOException {
+        //Add execution permissions to scripts except for windows OS
+        if (!StandardSystemProperty.OS_NAME.value().toLowerCase().contains("windows")) {
+            String schedulerHome = ClasspathUtils.findSchedulerHome();
+            File scriptsDirectory = new File(schedulerHome, "dist/scripts/processbuilder/linux");
+            if (scriptsDirectory != null) {
+                for (File script : scriptsDirectory.listFiles()) {
+                    script.setExecutable(true, false);
+                }
+            } else {
+                throw new IOException("The directory that contains scripts required for the runAsMe mode does not exist");
+            }
+        }
     }
 }

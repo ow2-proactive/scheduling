@@ -12,7 +12,8 @@ job = ## Definition of a job for the scheduler
         jobName,
         priority?, 
         onTaskError_j?,
-        restartTaskOnError_j?, 
+        restartTaskOnError_j?,
+        taskRetryDelay_j?,
         numberOfExecution_j?, 
         genericInformation?, 
         inputSpace?, 
@@ -42,6 +43,8 @@ onTaskError_j = ## Defines the base task error behavior. Cancel job, suspend tas
     attribute onTaskError {onErrorTaskType | variableRefType}
 restartTaskOnError_j = ## For each task, where does the task restart if an error occurred ? (default=anywhere)
     attribute restartTaskOnError {restartTaskType | variableRefType}
+taskRetryDelay_j = ## For each task, it specifies how long to wait before restarting the task if an error occurred.
+    attribute taskRetryDelay {durationPattern | variableRefType}
 numberOfExecution_j = ## Maximum number of execution for each task (default=1)
     attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
 pathElement = ## Path element (one pathElement for each classpath entry)
@@ -69,7 +72,9 @@ task = ## A task is the smallest computation unit for the scheduler
         nodesNumber_t?,
         onTaskError_t?,
         restartTaskOnError_t?,
+        taskRetryDelay_t?,
         numberOfExecution_t?,
+        fork?,
         runAsMe?,
         walltime?,
         preciousResult?,
@@ -111,11 +116,13 @@ nodesNumber_t = ## number of cores needed for the task (identifier)
 taskDescription = ## Textual description of this task
     element description { text }
 walltime = ## Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')
-	attribute walltime { walltimePattern | variableRefType}
+	attribute walltime { durationPattern | variableRefType}
 onTaskError_t = ## Defines the base task error behavior. Cancel job, suspend task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)
    attribute onTaskError {onErrorTaskType | variableRefType}
 restartTaskOnError_t = ## Where does the task restart if an error occurred ?
     attribute restartTaskOnError {restartTaskType}
+taskRetryDelay_t = ## This parameter specifies how long to wait before restarting the task if an error occurred.
+    attribute taskRetryDelay {durationPattern | variableRefType}
 numberOfExecution_t = ## Maximum number of execution for this task
     attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
 preciousResult = ## Do we keep the result among the job results  
@@ -144,6 +151,8 @@ post = ## A script launched after the task execution in the task node
     element post { simpleScript }
 cleaning = ## A script launched by the Resource Manager after the task or post script
     element cleaning { simpleScript }
+fork = ## Do we run this task in a forked JVM
+    attribute fork { xsd:boolean | variableRefType }
 runAsMe = ## Do we run this task under the job owner user identity
     attribute runAsMe { xsd:boolean | variableRefType }
 
@@ -279,7 +288,7 @@ onErrorTaskType = 'cancelJob' | 'suspendTask' | 'pauseJob' |  'continueJobExecut
 inaccessModeType = 'transferFromInputSpace' | 'transferFromOutputSpace' | 'transferFromGlobalSpace' | 'transferFromUserSpace' | 'cacheFromInputSpace' | 'cacheFromOutputSpace' | 'cacheFromGlobalSpace' | 'cacheFromUserSpace' | 'none' | variableRefType
 outaccessModeType = 'transferToOutputSpace' | 'transferToGlobalSpace' | 'transferToUserSpace' | 'none' | variableRefType
 classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*" }
-walltimePattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}" }
+durationPattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}" }
 variableRefType = xsd:string { pattern="$\{[A-Za-z0-9._]+\}" }
 inexcludePattern = xsd:string { pattern=".+(,.+)*" }
 controlFlowAction = 'goto' | 'replicate' | 'continue'

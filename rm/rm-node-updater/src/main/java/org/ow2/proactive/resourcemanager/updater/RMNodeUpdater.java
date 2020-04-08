@@ -205,7 +205,6 @@ public class RMNodeUpdater extends RMNodeStarter {
                 FileChannel channel = null;
                 try {
                     if (destination.exists()) {
-
                         lockFile = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value(), "lock");
                         if (!lockFile.exists()) {
                             lockFile.createNewFile();
@@ -219,6 +218,8 @@ public class RMNodeUpdater extends RMNodeStarter {
                             logger.warn("Another process downloaded node.jar");
                             return false;
                         }
+                    } else {
+                        FileUtils.forceMkdirParent(destination);
                     }
                     fetchUrl(nodeJarUrl, destination);
                     // Align the local file modification time with the remote url.
@@ -272,20 +273,42 @@ public class RMNodeUpdater extends RMNodeStarter {
 
     /**
      * Clean the directory used by One-Jar to expand libraries. After a node.jar update, we clean this directory to prevent jar conflicts
-     * @param jarFile name of the node jar file
+     * @param jarFilePath path to the node jar file
      */
-    private void cleanExpandDirectory(String jarFile) {
+    private void cleanExpandDirectory(String jarFilePath) {
         File directoryToClean;
+        File jarFile = new File(jarFilePath);
         String oneJarExpandDir = System.getProperty(ONEJAR_EXPAND_DIR_PROPERTY);
         if (oneJarExpandDir == null) {
             // Default scheme used by one-jar
-            String jar = new File(jarFile).getName().replaceFirst(LAST_DOT_AND_AFTER, "");
+            String jar = jarFile.getName().replaceFirst(LAST_DOT_AND_AFTER, "");
             directoryToClean = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value(), jar);
         } else {
             directoryToClean = new File(oneJarExpandDir);
         }
 
-        FileUtils.deleteQuietly(directoryToClean);
+        boolean jarFileInsideExpandDirectory = isJarFileInsideExpandDirectory(jarFile, directoryToClean);
+        try {
+            if (jarFileInsideExpandDirectory) {
+                FileUtils.moveFileToDirectory(jarFile, directoryToClean.getParentFile(), false);
+            }
+
+            FileUtils.deleteQuietly(directoryToClean);
+
+            if (jarFileInsideExpandDirectory) {
+                FileUtils.moveFileToDirectory(new File(directoryToClean.getParentFile(), jarFile.getName()),
+                                              directoryToClean,
+                                              true);
+            }
+        } catch (IOException e) {
+            logger.fatal("Error when moving node jar file to parent directory, check parent folder permissions, aborting...",
+                         e);
+            System.exit(ExitStatus.FAILED_TO_LAUNCH.exitCode);
+        }
+    }
+
+    private boolean isJarFileInsideExpandDirectory(File jarFile, File expandDirectory) {
+        return jarFile.getParentFile().getAbsoluteFile().equals(expandDirectory.getAbsoluteFile());
     }
 
     @Override
@@ -457,6 +480,8 @@ public class RMNodeUpdater extends RMNodeStarter {
         logger.info("Starting Java command: " + command);
         pb = new ProcessBuilder(command);
         pb.inheritIO();
+        File nodeJarParentFolder = (new File(jarFile)).getParentFile();
+        pb.directory(nodeJarParentFolder);
         if (pb.environment().containsKey("CLASSPATH")) {
             pb.environment().remove("CLASSPATH");
         }

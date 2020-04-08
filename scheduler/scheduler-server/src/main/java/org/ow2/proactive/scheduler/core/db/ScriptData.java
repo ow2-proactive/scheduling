@@ -46,8 +46,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteScriptData", query = "delete from ScriptData where taskData.id.jobId = :jobId"),
-                @NamedQuery(name = "deleteScriptDataInBulk", query = "delete from ScriptData where taskData.id.jobId in :jobIdList"),
+@NamedQueries({ @NamedQuery(name = "deleteScriptDataInBulk", query = "delete from ScriptData where taskData.id.jobId in :jobIdList"),
                 @NamedQuery(name = "countScriptData", query = "select count (*) from ScriptData") })
 @BatchSize(size = 100)
 @Table(name = "SCRIPT_DATA", indexes = { @Index(name = "SCRIPT_DATA_JOB_ID", columnList = "JOB_ID"),
@@ -104,11 +103,7 @@ public class ScriptData {
         return scriptData;
     }
 
-    FlowScript createFlowScript() throws InvalidScriptException {
-        if (flowScriptActionType == null) {
-            throw new DatabaseManagerException("Flow script action type is null");
-        }
-
+    FlowScript createFlowScriptByScript() throws InvalidScriptException {
         if (flowScriptActionType.equals(FlowActionType.CONTINUE.toString())) {
             return FlowScript.createContinueFlowScript();
         } else if (flowScriptActionType.equals(FlowActionType.IF.toString())) {
@@ -116,14 +111,54 @@ public class ScriptData {
                                                  getScriptEngine(),
                                                  getFlowScriptTarget(),
                                                  getFlowScriptTargetElse(),
-                                                 getFlowScriptTargetContinuation());
+                                                 getFlowScriptTargetContinuation(),
+                                                 parameters());
         } else if (flowScriptActionType.equals(FlowActionType.LOOP.toString())) {
-            return FlowScript.createLoopFlowScript(getScript(), getScriptEngine(), getFlowScriptTarget());
+            return FlowScript.createLoopFlowScript(getScript(), getScriptEngine(), getFlowScriptTarget(), parameters());
         }
         if (flowScriptActionType.equals(FlowActionType.REPLICATE.toString())) {
-            return FlowScript.createReplicateFlowScript(getScript(), getScriptEngine());
+            return FlowScript.createReplicateFlowScript(getScript(), getScriptEngine(), parameters());
         } else {
             throw new DatabaseManagerException("Invalid flow script action: " + flowScriptActionType);
+        }
+    }
+
+    FlowScript createFlowScriptByURL() throws InvalidScriptException {
+        URL inputUrl;
+        try {
+            inputUrl = new URL(url);
+        } catch (MalformedURLException e) {
+            throw new InvalidScriptException(e);
+        }
+
+        if (flowScriptActionType.equals(FlowActionType.CONTINUE.toString())) {
+            return FlowScript.createContinueFlowScript();
+        } else if (flowScriptActionType.equals(FlowActionType.IF.toString())) {
+            return FlowScript.createIfFlowScript(inputUrl,
+                                                 getScriptEngine(),
+                                                 getFlowScriptTarget(),
+                                                 getFlowScriptTargetElse(),
+                                                 getFlowScriptTargetContinuation(),
+                                                 parameters());
+        } else if (flowScriptActionType.equals(FlowActionType.LOOP.toString())) {
+            return FlowScript.createLoopFlowScript(inputUrl, getScriptEngine(), getFlowScriptTarget(), parameters());
+        }
+        if (flowScriptActionType.equals(FlowActionType.REPLICATE.toString())) {
+            return FlowScript.createReplicateFlowScript(inputUrl, getScriptEngine(), parameters());
+        } else {
+            throw new DatabaseManagerException("Invalid flow script action: " + flowScriptActionType);
+        }
+    }
+
+    FlowScript createFlowScript() throws InvalidScriptException {
+        if (flowScriptActionType == null) {
+            throw new DatabaseManagerException("Flow script action type is null");
+        }
+
+        if (script == null && url != null) {
+            return createFlowScriptByURL();
+        } else {
+            return createFlowScriptByScript();
         }
     }
 
@@ -181,6 +216,7 @@ public class ScriptData {
 
     @Column(name = "SCRIPT", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getScript() {
         return script;
     }
@@ -191,6 +227,7 @@ public class ScriptData {
 
     @Column(name = "URL", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getURL() {
         return url;
     }

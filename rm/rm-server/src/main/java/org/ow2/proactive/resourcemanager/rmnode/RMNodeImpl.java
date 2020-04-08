@@ -28,7 +28,9 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.Permission;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -36,6 +38,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
@@ -197,6 +200,12 @@ public class RMNodeImpl extends AbstractRMNode {
         this.owner = owner;
     }
 
+    @Override
+    public void setBusy(Client owner, Map<String, String> usageInfo) {
+        this.usageInfo = usageInfo;
+        setBusy(owner);
+    }
+
     /**
      * Changes the state of this node to {@link NodeState#FREE}.
      */
@@ -204,6 +213,7 @@ public class RMNodeImpl extends AbstractRMNode {
     public void setFree() {
         changeState(NodeState.FREE);
         this.owner = null;
+        this.usageInfo = null;
     }
 
     /**
@@ -485,4 +495,39 @@ public class RMNodeImpl extends AbstractRMNode {
         return false;
     }
 
+    @Override
+    public void addToken(String token) {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        principalPermission.addPermission(new TokenPrincipal(token));
+        updateProtectedByToken();
+    }
+
+    @Override
+    public void removeToken(String token) {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        principalPermission.removePermission(new TokenPrincipal(token));
+        updateProtectedByToken();
+    }
+
+    protected void updateProtectedByToken() {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        protectedByToken = principalPermission.isAnyToken();
+    }
+
+    @Override
+    public List<String> getNodeTokens() {
+        if (getUserPermission() instanceof PrincipalPermission) {
+            PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+            return principalPermission.getAllTokens();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public void setNodeTokens(String nodeUrl, List<String> tokens) {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        principalPermission.setAllTokens(tokens);
+        updateProtectedByToken();
+    }
 }

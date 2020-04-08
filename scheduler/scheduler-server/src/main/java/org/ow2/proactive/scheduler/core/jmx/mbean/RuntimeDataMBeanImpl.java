@@ -116,6 +116,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         return (int) dbManager.getJobsCount(JobStatus.PAUSED);
     }
 
+    @Chronological
     @Override
     public int getInErrorJobsCount() {
         return (int) dbManager.getJobsCount(JobStatus.IN_ERROR);

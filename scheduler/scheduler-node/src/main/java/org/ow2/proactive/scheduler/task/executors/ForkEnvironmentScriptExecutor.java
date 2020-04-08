@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
+import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
@@ -69,6 +70,7 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
         Script<?> script = context.getInitializer().getForkEnvironment().getEnvScript();
 
         SchedulerNodeClient schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(context);
+        RMNodeClient rmNodeClient = forkedTaskVariablesManager.createRMNodeClient(context);
         RemoteSpace userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(context,
                                                                                            schedulerNodeClient,
                                                                                            IDataSpaceClient.Dataspace.USER);
@@ -82,13 +84,32 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
                                                               Collections.<String, Serializable> emptyMap(),
                                                               thirdPartyCredentials,
                                                               schedulerNodeClient,
+                                                              rmNodeClient,
                                                               userSpaceClient,
                                                               globalSpaceClient,
-                                                              Collections.<String, String> emptyMap());
+                                                              Collections.<String, String> emptyMap(),
+                                                              outputSink,
+                                                              errorSink);
 
         forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, errorSink);
 
         ScriptResult scriptResult = scriptHandler.handle(script, outputSink, errorSink);
+
+        if (schedulerNodeClient != null && schedulerNodeClient.isConnected()) {
+            try {
+                schedulerNodeClient.disconnect();
+            } catch (Exception ignored) {
+
+            }
+        }
+
+        if (rmNodeClient != null && rmNodeClient.getSession() != null) {
+            try {
+                rmNodeClient.disconnect();
+            } catch (Exception ignored) {
+
+            }
+        }
 
         if (scriptResult.errorOccured()) {
             throw new Exception("Failed to execute fork environment script", scriptResult.getException());

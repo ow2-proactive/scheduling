@@ -29,6 +29,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.ow2.proactive.scheduler.common.task.TaskStatus.taskStatuses;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -419,9 +420,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                                         0,
                                                         10,
                                                         null,
-                                                        true,
-                                                        true,
-                                                        true,
+                                                        taskStatuses(true, true, true),
                                                         new SortSpecifierContainer());
 
         assertThat(tasks.getSize()).isEqualTo(1);
@@ -449,9 +448,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                                         0,
                                                         10,
                                                         null,
-                                                        true,
-                                                        true,
-                                                        true,
+                                                        taskStatuses(true, true, true),
                                                         new SortSpecifierContainer());
 
         assertThat(tasks.getSize()).isEqualTo(1);
@@ -526,9 +523,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                   criterias.getOffset(),
                                   criterias.getLimit(),
                                   criterias.getUser(),
-                                  criterias.isPending(),
-                                  criterias.isRunning(),
-                                  criterias.isFinished());
+                                  taskStatuses(criterias.isPending(), criterias.isRunning(), criterias.isFinished()));
     }
 
     private Page<TaskState> getTaskStates(TaskFilterCriteria criterias) {
@@ -538,9 +533,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                        criterias.getOffset(),
                                        criterias.getLimit(),
                                        criterias.getUser(),
-                                       criterias.isPending(),
-                                       criterias.isRunning(),
-                                       criterias.isFinished(),
+                                       taskStatuses(criterias.isPending(),
+                                                    criterias.isRunning(),
+                                                    criterias.isFinished()),
                                        SortSpecifierContainer.EMPTY_CONTAINER);
     }
 

@@ -45,6 +45,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.db.TransactionHelper;
@@ -69,6 +70,8 @@ public class RMDBManager {
     private static final String REQUEST_BUFFER_STRING = "Request " + RMDBManagerBuffer.class.getSimpleName() + " to ";
 
     private static final String IN_DATABASE_STRING = " in database";
+
+    private static final String PROP_HIBERNATE_CONNECTION_PASSWORD = "hibernate.connection.password";
 
     private final SessionFactory sessionFactory;
 
@@ -110,9 +113,13 @@ public class RMDBManager {
                 configuration.configure(configFile);
             } else {
                 try {
-                    Properties properties = new Properties();
+                    Properties properties = PropertyDecrypter.getDecryptableProperties();
                     properties.load(Files.newBufferedReader(configFile.toPath(), Charset.defaultCharset()));
                     configuration.addProperties(properties);
+                    // Unwrap the decrypted property to let the connection pool framework see it
+                    // (as the connection pool framework reads properties using entryset iterators and jasypt EncryptableProperties does not override them)
+                    configuration.setProperty(PROP_HIBERNATE_CONNECTION_PASSWORD,
+                                              properties.getProperty(PROP_HIBERNATE_CONNECTION_PASSWORD));
                 } catch (IOException e) {
                     throw new IllegalArgumentException(e);
                 }
@@ -404,14 +411,11 @@ public class RMDBManager {
         if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNode(rmNodeData)) {
             try {
                 logger.debug("Update node " + rmNodeData.getName() + IN_DATABASE_STRING);
-                executeReadWriteTransaction(new SessionWork<Void>() {
-                    @Override
-                    public Void doInTransaction(Session session) {
-                        NodeSourceData nodeSourceData = session.load(NodeSourceData.class, nodeSourceName);
-                        rmNodeData.setNodeSource(nodeSourceData);
-                        session.update(rmNodeData);
-                        return null;
-                    }
+                executeReadWriteTransaction((SessionWork<Void>) session -> {
+                    NodeSourceData nodeSourceData = session.load(NodeSourceData.class, nodeSourceName);
+                    rmNodeData.setNodeSource(nodeSourceData);
+                    session.update(rmNodeData);
+                    return null;
                 });
             } catch (RuntimeException e) {
                 throw new RuntimeException("Exception occurred while updating node " + rmNodeData.getName(), e);
@@ -814,4 +818,21 @@ public class RMDBManager {
         return rmdbManagerBuffer;
     }
 
+    public List<NodeHistory> getNodesHistory(long windowStart, long windowEnd) {
+        return executeReadTransaction(session -> {
+            //            this expression is built as negation to expression that
+            //            retrieves all items that we do not want to have in the response.
+            //            just to clarify the events we include
+            //            we discard only events :
+            //            - ending before the windows start
+            //            - starting after the window end
+            //            we include everything else
+            //            when an event as no endingtime the  value of the endingtime will be 0
+            Query query = session.createQuery("FROM NodeHistory " + "WHERE (endTime = 0 OR :windowStart <= endTime) " +
+                                              "AND ( startTime <= :windowEnd )");
+            query.setParameter("windowStart", windowStart);
+            query.setParameter("windowEnd", windowEnd);
+            return (List<NodeHistory>) query.list();
+        });
+    }
 }

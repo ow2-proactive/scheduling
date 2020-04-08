@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -141,6 +142,9 @@ public abstract class Task extends CommonAttribute {
 
     protected boolean runAsMe;
 
+    /** If true, task is ran in a forked JVM, this parameter is optional (nullable) .*/
+    protected Boolean fork;
+
     /** List of dependences if necessary. */
     @XmlTransient
     private List<Task> dependences = null;
@@ -152,6 +156,8 @@ public abstract class Task extends CommonAttribute {
 
     /** A map to hold task variables */
     protected Map<String, TaskVariable> variables = Collections.synchronizedMap(new LinkedHashMap());
+
+    private Map<String, TaskVariable> unresolvedVariables = Collections.synchronizedMap(new LinkedHashMap());
 
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
@@ -259,6 +265,23 @@ public abstract class Task extends CommonAttribute {
      */
     public void setRunAsMe(boolean runAsMe) {
         this.runAsMe = runAsMe;
+    }
+
+    /**
+     * To know if the task will be run in a forked JVM
+     * @return fork true if the task will be run in a forked JVM; false if the task will be ran in the node's JVM.
+     */
+    public Boolean isFork() {
+        return fork;
+    }
+
+    /**
+     * Set if the task will be run in a forked JVM
+     * 
+     * @param fork if true, this task will be run in a forked JVM; if false, it will be ran in the node's JVM.
+     */
+    public void setFork(Boolean fork) {
+        this.fork = fork;
     }
 
     /**
@@ -704,6 +727,35 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
+     * Returns the unresolved variable map of this job.
+     *
+     * @return an unresolved variable map
+     */
+    public Map<String, TaskVariable> getUnresolvedVariables() {
+        return this.unresolvedVariables;
+    }
+
+    /**
+     * Sets the unresolved variable map for this job.
+     *
+     * @param unresolvedVariables the unresolved variables map
+     */
+    public void setUnresolvedVariables(Map<String, TaskVariable> unresolvedVariables) {
+        verifyVariableMap(unresolvedVariables);
+        this.unresolvedVariables = Collections.synchronizedMap(new LinkedHashMap(unresolvedVariables));
+    }
+
+    public static void verifyVariableMap(Map<String, ? extends TaskVariable> variables) {
+        for (Map.Entry<String, ? extends TaskVariable> entry : variables.entrySet()) {
+            if (!entry.getKey().equals(entry.getValue().getName())) {
+                throw new IllegalArgumentException("Variables map entry key (" + entry.getKey() +
+                                                   ") is different from variable name (" + entry.getValue().getName() +
+                                                   ")");
+            }
+        }
+    }
+
+    /**
      * Returns the variable map of this task.
      * 
      * @return a variable map
@@ -730,6 +782,7 @@ public abstract class Task extends CommonAttribute {
         return "Task '" + name + "' : " + System.lineSeparator() +
                addIndent(Stream.of(lineWithQuotes("Description", description),
                                    line("restartTaskOnError", restartTaskOnError),
+                                   line("taskRetryDelay", taskRetryDelay),
                                    line("onTaskError", onTaskError),
                                    line("maxNumberOfExecution",
                                         maxNumberOfExecution,
@@ -752,6 +805,7 @@ public abstract class Task extends CommonAttribute {
                                    line("PreciousResult", preciousResult),
                                    line("PreciousLogs", preciousLogs),
                                    line("RunAsMe", runAsMe),
+                                   line("fork", fork),
                                    line("WallTime", wallTime),
                                    line("Dependences", dependences))
                                .filter(s -> !s.isEmpty())

@@ -17,9 +17,19 @@
         <param-value>false</param-value>
     </context-param>
     <context-param>
+        <param-name>resteasy.gzip.max.input</param-name>
+        <param-value>500000000</param-value>
+    </context-param>
+    <context-param>
+        <!-- This context parameter is added because of stricter request matching rules introduced in resteasy 3.0.25
+         The parameter allows backward compatibility-->
+        <param-name>resteasy.loose.step2.request.matching</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
         <param-name>resteasy.resources</param-name>
         <param-value>
-            org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest,org.ow2.proactive_grid_cloud_portal.studio.StudioRest,org.ow2.proactive_grid_cloud_portal.rm.RMRest,org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl
+            org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest,org.ow2.proactive_grid_cloud_portal.studio.StudioRest,org.ow2.proactive_grid_cloud_portal.rm.RMRest,org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl,org.ow2.proactive_grid_cloud_portal.common.CommonRest
         </param-value>
     </context-param>
 
@@ -101,6 +111,11 @@
     <servlet-mapping>
         <servlet-name>resteasy-servlet</servlet-name>
         <url-pattern>/studio/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>resteasy-servlet</servlet-name>
+        <url-pattern>/common/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

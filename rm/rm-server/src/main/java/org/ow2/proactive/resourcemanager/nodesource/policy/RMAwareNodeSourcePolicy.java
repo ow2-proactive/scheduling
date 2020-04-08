@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -47,6 +48,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
  */
 @ActiveObject
 public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implements RMEventListener {
+
+    private Logger logger = Logger.getLogger(RMAwareNodeSourcePolicy.class);
 
     private boolean rmShuttingDown = false;
 
@@ -73,8 +76,8 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
         if (!rmShuttingDown) {
             try {
                 rmMonitoring.removeRMEventListener();
-            } catch (RMException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.warn("Error when removing event listener", e);
             }
         }
         super.shutdown(initiator);

@@ -28,8 +28,10 @@ package org.ow2.proactive.scheduler.common.task;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -53,6 +55,8 @@ import com.google.common.base.Preconditions;
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ForkEnvironment implements Serializable {
+
+    public static final String DOCKER_FORK_WINDOWS2LINUX = "pa.scheduler.task.docker.windows2linux";
 
     /**
      * Path to directory with Java installed, to this path '/bin/java' will be added.
@@ -85,10 +89,21 @@ public class ForkEnvironment implements Serializable {
      */
     private Script<?> script;
 
+    /**
+     * Command and parameters to add before java executable
+     */
+    private List<String> preJavaCommand;
+
+    /**
+     * Does the current fork environment aims at running a linux docker container on a windows host?
+     */
+    private boolean isDockerWindowsToLinux = false;
+
     public ForkEnvironment() {
         additionalClasspath = new ArrayList<>();
         jvmArguments = new ArrayList<>();
         systemEnvironment = new HashMap<>();
+        preJavaCommand = new ArrayList<>();
     }
 
     /**
@@ -124,6 +139,10 @@ public class ForkEnvironment implements Serializable {
             }
         }
 
+        if (forkEnvironment.preJavaCommand != null) {
+            this.setPreJavaCommand(forkEnvironment.preJavaCommand);
+        }
+
         if (forkEnvironment.script != null) {
             try {
                 this.script = new SimpleScript(forkEnvironment.script);
@@ -134,6 +153,7 @@ public class ForkEnvironment implements Serializable {
     }
 
     public ForkEnvironment(String workingDir) {
+        this();
         this.workingDir = workingDir;
     }
 
@@ -254,6 +274,11 @@ public class ForkEnvironment implements Serializable {
         return new ArrayList<>(additionalClasspath);
     }
 
+    /**
+     * Add one or more classpath entries to the forked JVM classpath
+     *
+     * @param values one or more classpath entries
+     */
     public void addAdditionalClasspath(String... values) {
         for (String value : values) {
             addAdditionalClasspath(value);
@@ -269,6 +294,31 @@ public class ForkEnvironment implements Serializable {
     public void addAdditionalClasspath(String value) {
         Preconditions.checkNotNull(value);
         this.additionalClasspath.add(value);
+    }
+
+    /**
+     * Returns the list of (command + argument) which will be prepended to the java command
+     * e.g. ["docker", "run", "--rm"]
+     * @return a list containing the command + arguments
+     */
+    public List<String> getPreJavaCommand() {
+        return preJavaCommand;
+    }
+
+    /**
+     * Sets the list of (command + argument) which will be prepended to the java command
+     * @param preJavaCommand a list containing the command + arguments, e.g. ["docker", "run", "--rm"]
+     */
+    public void setPreJavaCommand(List<String> preJavaCommand) {
+        this.preJavaCommand = preJavaCommand;
+    }
+
+    /**
+     * Add an item to the list of (command + argument) which will be prepended to the java command
+     * @param commandOrParameter the command (e.g. "docker") or an argument (e.g. "run")
+     */
+    public void addPreJavaCommand(String commandOrParameter) {
+        this.preJavaCommand.add(commandOrParameter);
     }
 
     /**
@@ -292,11 +342,58 @@ public class ForkEnvironment implements Serializable {
         this.script = script;
     }
 
+    /**
+     * Returns true if the current fork environment aims at running a linux docker container on a windows host
+     * @return isDockerWindowsToLinux
+     */
+    public boolean isDockerWindowsToLinux() {
+        return isDockerWindowsToLinux;
+    }
+
+    /**
+     * Set true if the current fork environment aims at running a linux docker container on a windows host
+     * @param dockerWindowsToLinux
+     */
+    public void setDockerWindowsToLinux(boolean dockerWindowsToLinux) {
+        isDockerWindowsToLinux = dockerWindowsToLinux;
+    }
+
+    public static String convertToLinuxPath(String windowsPath) {
+        if (windowsPath.matches("[a-zA-Z]:.*")) {
+            return "/" + windowsPath.charAt(0) + windowsPath.substring(2).replace("\\", "/");
+        } else {
+            return windowsPath.replace("\\", "/");
+        }
+    }
+
+    public static String convertToLinuxPathInJVMArgument(String jvmArgument) {
+        if (jvmArgument.startsWith("-D") && jvmArgument.contains("=")) {
+            int equalSignPos = jvmArgument.indexOf("=");
+            return jvmArgument.substring(0, equalSignPos + 1) +
+                   convertToLinuxClassPath(jvmArgument.substring(equalSignPos + 1));
+        } else {
+            return jvmArgument;
+        }
+    }
+
+    public static String convertToLinuxClassPath(String windowsClassPath) {
+        List<String> linuxClassPathEntries = new LinkedList<>();
+        for (String windowsPath : windowsClassPath.split(";")) {
+            if (windowsPath.matches("[a-zA-Z]:.*")) {
+                linuxClassPathEntries.add("/" + windowsPath.charAt(0) + windowsPath.substring(2).replace("\\", "/"));
+            } else {
+                linuxClassPathEntries.add(windowsPath.replace("\\", "/"));
+            }
+        }
+        return linuxClassPathEntries.stream().collect(Collectors.joining(":"));
+    }
+
     @Override
     public String toString() {
         String nl = System.lineSeparator();
-        return "ForkEnvironment {" + nl + "\tjavaHome = '" + javaHome + '\'' + nl + "\tworkingDir = '" + workingDir +
-               '\'' + nl + "\tsystemEnvironment = " + systemEnvironment + nl + "\tjvmArguments = " + jvmArguments + nl +
+        return "ForkEnvironment {" + nl + "\tjavaHome = '" + javaHome + '\'' + nl + "\tisDockerWindowsToLinux = '" +
+               isDockerWindowsToLinux + '\'' + nl + "\tworkingDir = '" + workingDir + '\'' + nl +
+               "\tsystemEnvironment = " + systemEnvironment + nl + "\tjvmArguments = " + jvmArguments + nl +
                "\tadditionalClasspath = " + additionalClasspath + nl + "\tscript = " +
                (script != null ? script.display() : null) + nl + '}';
     }

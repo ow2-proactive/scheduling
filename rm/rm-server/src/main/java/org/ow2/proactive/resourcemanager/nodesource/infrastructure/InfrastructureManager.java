@@ -30,15 +30,7 @@ import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManage
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -49,6 +41,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -93,6 +86,8 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
 
     /** manager's node source */
     protected NodeSource nodeSource;
+
+    protected static final String ELASTIC = "elastic";
 
     /** key to retrieve the deploying nodes URL set (Set<String>) */
     private static final String DEPLOYING_NODES_URL_KEY = "infrastructureManagerDeployingNodes";
@@ -147,6 +142,17 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     public InfrastructureManager() {
     }
 
+    private Map<String, String> meta = new HashMap<>();
+
+    {
+        meta.put(InfrastructureManager.ELASTIC, "false");
+    }
+
+    @Override
+    public Map<String, String> getMeta() {
+        return meta;
+    }
+
     /**
      * Acquire the read lock and call the handle method of the handler given in parameter.
      * @return the value returned by the handle method
@@ -157,7 +163,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         try {
             variable = t.handle();
         } catch (RuntimeException e) {
-            logger.error("Exception while getting runtime variable: " + e.getMessage());
+            logger.error("Exception while getting runtime variable: " + e.getMessage(), e);
             throw e;
         } finally {
             readLock.unlock();
@@ -180,7 +186,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         } catch (IllegalArgumentException e) {
             logger.warn("Infrastructure variables not persisted", e);
         } catch (RuntimeException e) {
-            logger.error("Exception while setting runtime variable: " + e.getMessage());
+            logger.error("Exception while setting runtime variable: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -203,7 +209,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         try {
             persistedInfraVariables.put(RM_URL_KEY, nodeSource.getRegistrationURL());
         } catch (RuntimeException e) {
-            logger.error("Exception while putting RM URL in runtime variables: " + e.getMessage());
+            logger.error("Exception while putting RM URL in runtime variables: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -250,7 +256,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             result.addAll(rmDeployingNodes);
             result.addAll(rmLostNodes);
         } catch (RuntimeException e) {
-            logger.error("Exception while getting deploying and lost nodes: " + e.getMessage());
+            logger.error("Exception while getting deploying and lost nodes: " + e.getMessage(), e);
             throw e;
         } finally {
             readLock.unlock();
@@ -288,7 +294,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 isLost = true;
             }
         } catch (RuntimeException e) {
-            logger.error("Exception while removing deploying node: " + e.getMessage());
+            logger.error("Exception while removing deploying node: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -298,7 +304,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         if (pn != null) {
             String url = pn.getNodeURL();
             RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_REMOVED, pn.getState(), pn.getProvider().getName());
-            emitEvent(event);
+            emitNodeEvent(event);
             logger.trace("DeployingNode " + url + " removed from IM");
             // one notifies listeners about the deploying node removal
             // if the node is not lost
@@ -412,7 +418,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_REMOVED,
                                                        pn.getState(),
                                                        pn.getProvider().getName());
-                emitEvent(event);
+                emitNodeEvent(event);
                 this.notifyAcquiredNode(node);
                 // if everything went well with the new node, caching it
                 addAcquiredNodeNameWithLockAndPersist(node.getNodeInformation().getName());
@@ -482,7 +488,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             this.configure(parameters);
         } catch (RuntimeException e) {
             logger.error("Exception while initializing runtime variables and configuring infrastructure: " +
-                         e.getMessage());
+                         e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -630,7 +636,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      * If the node source data of this infrastructure is not know, it is first
      * fetched in database.
      * The node source data is never persisted if the current infrastructure is
-     * the {@link NodeSource#DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME}.
+     * the {@link RMConstants#DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME}.
      */
     public void persistInfrastructureVariables() {
         if (nodeSource == null) {
@@ -788,7 +794,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_ADDED,
                                                           null,
                                                           deployingNode.getProvider().getName());
-        emitEvent(event);
+        emitNodeEvent(event);
         this.sched(new TimerTask() {
             @Override
             public void run() {
@@ -817,7 +823,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                    previousState,
                                                    pn.getProvider().getName());
-            emitEvent(event);
+            emitNodeEvent(event);
             logger.trace("Deploying node " + toUpdateURL + " updated in IM");
             return true;
         } else {
@@ -847,7 +853,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 addLostNodeWithLockAndPersist(toUpdateURL, deployingNode);
             }
         } catch (RuntimeException e) {
-            logger.error("Exception while moving a node from deploying to lost: " + e.getMessage());
+            logger.error("Exception while moving a node from deploying to lost: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -864,7 +870,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                               previousState,
                                                               deployingNode.getProvider().getName());
-            emitEvent(event);
+            emitNodeEvent(event);
 
             if (logger.isTraceEnabled()) {
                 logger.trace(RMDeployingNode.class.getSimpleName() + " " + toUpdateURL + " declared lost in IM");
@@ -915,7 +921,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 return false;
             }
         } catch (RuntimeException e) {
-            logger.error("Exception while checking acquired node and doing post action: " + e.getMessage());
+            logger.error("Exception while checking acquired node and doing post action: " + e.getMessage(), e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -947,9 +953,9 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     // **********************************************************************************************//
 
     /**
-     * To emit an event and register it in the database
+     * To emit a node event and register it in the database
      */
-    private void emitEvent(final RMNodeEvent event) {
+    private void emitNodeEvent(final RMNodeEvent event) {
         NodeSource nsStub = this.nodeSource.getStub();
         nsStub.internalEmitDeployingNodeEvent(event);
     }
@@ -1087,7 +1093,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             try {
                 Class.forName(RMDeployingNode.class.getName(), true, RMDeployingNode.class.getClassLoader());
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                logger.error("Error when loading RMDeployingNode class", e);
             }
             return RMDeployingNodeAccessor.DEFAULT;
         }
@@ -1254,4 +1260,8 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         return getPersistedInfraVariable(() -> (String) this.persistedInfraVariables.get(RM_URL_KEY));
     }
 
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        return new HashMap<>();
+    }
 }

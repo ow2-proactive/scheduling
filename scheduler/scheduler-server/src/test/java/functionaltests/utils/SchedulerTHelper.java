@@ -31,6 +31,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -282,7 +283,8 @@ public class SchedulerTHelper {
      * Log a String on console.
      */
     public static void log(String s) {
-        System.out.println("------------------------------ " + s);
+        System.out.println("------------------------------" +
+                           String.format("[%1$tH:%1$tM:%1$tS,%1$tL] ", Calendar.getInstance().getTime()) + s);
     }
 
     public static void log(Exception e) {
