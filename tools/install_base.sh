@@ -524,7 +524,7 @@ if [[ "$OLD_PADIR" == "" ]]; then
     for file in $( find $PA_ROOT/default/dist/war -name 'application.properties' ); do
         sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$file"
         # for cloud_automation_service
-        sed -e "s/^server\.port=.*/server.port=$PORT/g" -i "$PA_ROOT/config/web/settings.ini" -i "$file"
+        sed -e "s/^server\.port=.*/server.port=$PORT/g" -i "$file"
         if $SELF_SIGNED; then
             sed -e "s/web\.https\.allow_any_certificate=.*/web.https.allow_any_certificate=true/g" -i "$file"
             sed -e "s/web\.https\.allow_any_hostname=.*/web.https.allow_any_hostname=true/g" -i "$file"
