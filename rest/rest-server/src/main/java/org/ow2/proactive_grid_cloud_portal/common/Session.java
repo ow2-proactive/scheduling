@@ -38,11 +38,14 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.dataspace.FileSystem;
+import org.ow2.proactive_grid_cloud_portal.dataspace.SchedulerDataspaceImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 
 public class Session {
@@ -58,6 +61,8 @@ public class Session {
     private Clock clock;
 
     private SchedulerProxyUserInterface scheduler;
+
+    private SchedulerSpaceInterface space;
 
     private RMProxyUserInterface rm;
 
@@ -149,6 +154,14 @@ public class Session {
             }
         }
         return rm;
+    }
+
+    public SchedulerSpaceInterface getSpace() throws NotConnectedRestException {
+        updateLastAccessedTime();
+        if (space == null) {
+            space = new SchedulerDataspaceImpl(sessionId);
+        }
+        return space;
     }
 
     public String getUserName() {

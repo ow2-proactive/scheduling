@@ -34,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -57,8 +58,11 @@ public class WorkflowSubmitter {
 
     private Scheduler scheduler;
 
-    public WorkflowSubmitter(Scheduler scheduler) {
+    private SchedulerSpaceInterface space;
+
+    public WorkflowSubmitter(Scheduler scheduler, SchedulerSpaceInterface space) {
         this.scheduler = scheduler;
+        this.space = space;
     }
 
     /**
@@ -114,7 +118,11 @@ public class WorkflowSubmitter {
 
     private Job createJobObject(File jobFile, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
             throws JobCreationException {
-        return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(), jobVariables, jobGenericInfos, scheduler);
+        return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(),
+                                                 jobVariables,
+                                                 jobGenericInfos,
+                                                 scheduler,
+                                                 space);
     }
 
 }

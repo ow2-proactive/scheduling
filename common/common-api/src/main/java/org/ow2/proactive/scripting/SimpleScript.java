@@ -57,6 +57,15 @@ public class SimpleScript extends Script<Object> {
         super(script, engineName);
     }
 
+    /** Directly create a script from an URL.
+     * @param url representing a script source code.
+     * @param engineName script's engine execution name.
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public SimpleScript(URL url, String engineName) throws InvalidScriptException {
+        super(url, engineName, false);
+    }
+
     /** Create a script from a file.
      * @param file a file containing script code.
      * @param parameters execution parameters

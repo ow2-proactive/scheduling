@@ -33,7 +33,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.mockito.Mock;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -53,6 +55,9 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase {
 
     protected static Scheduler scheduler;
 
+    @Mock
+    protected static SchedulerSpaceInterface space;
+
     protected StringBuffer userInput;
 
     protected ByteArrayOutputStream capturedOutput;
@@ -67,7 +72,7 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase {
 
     protected JobId submitJob(String filename, JobStatus waitForStatus) throws Exception {
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
-        WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler);
+        WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler, space);
         JobId id = submitter.submit(jobFile, new HashMap<String, String>(), null);
         waitJobState(id, waitForStatus, 500000);
         return id;
