@@ -127,7 +127,7 @@ public interface RMRestInterface {
      *
      * It can be used either by submitting:<ul>
      *     <li>2 fields: 'username' and 'password'</li>
-     *     <li>a credential file with field name 'credential'</li>'
+     *     <li>a credential file with field name 'credential'</li>
      * </ul>
      *
      * @param multipart multipart form

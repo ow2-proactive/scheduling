@@ -67,7 +67,7 @@ public interface CommonRestInterface {
      *
      * It can be used either by submitting:<ul>
      *     <li>2 fields: 'username' and 'password'</li>
-     *     <li>a credential file with field name 'credential'</li>'
+     *     <li>a credential file with field name 'credential'</li>
      * </ul>
      *
      * @param multipart multipart form
@@ -107,7 +107,7 @@ public interface CommonRestInterface {
     /**
      * Get the login string associated to a session.
      *
-     * <br/> NOTE: <br/>
+     * <br> NOTE: <br>
      * In case the given sessionId doesn't have an associated login (session id expired, or invalid),
      * this endpoint will return null
      *
@@ -121,7 +121,7 @@ public interface CommonRestInterface {
     /**
      * Get a UserData object associated to a session.
      *
-     * <br/> NOTE: <br/>
+     * <br> NOTE: <br>
      * In case the given sessionId doesn't have an associated login (session id expired, or invalid),
      * this endpoint will return null
      *

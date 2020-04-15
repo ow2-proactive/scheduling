@@ -502,6 +502,7 @@ def exportedProjects= [
         ":scheduler:scheduler-node",
         ":scheduler:scheduler-smartproxy",
         ":scheduler:scheduler-smartproxy-common",
+        ":rest:rest-api",
         ":rest:rest-client",
         ":rest:rest-smartproxy",
         ":rm:rm-client",
