@@ -26,6 +26,7 @@
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.ow2.proactive.core.properties.PACommonProperties;
@@ -155,7 +156,12 @@ public enum PortalConfiguration implements PACommonProperties {
         if (new File(userPath).isAbsolute()) {
             return userPath;
         } else {
-            return PortalConfiguration.REST_HOME.getValueAsString() + File.separator + userPath;
+            File pathName = new File(PortalConfiguration.REST_HOME.getValueAsString(), userPath);
+            try {
+                return pathName.getCanonicalPath();
+            } catch (IOException e) {
+                return pathName.getAbsolutePath();
+            }
         }
     }
 

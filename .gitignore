@@ -22,9 +22,11 @@ dist/war/*.war
 **/bin
 out
 
-/tools
-!/tools/startup.groovy
+/tools/*
 !/tools/*.sh
+!/tools/*.jar
+!/tools/*.groovy
+!/tools/*.txt
 
 /TEST_SCHEDULER_DB
 /.nb-gradle/private/

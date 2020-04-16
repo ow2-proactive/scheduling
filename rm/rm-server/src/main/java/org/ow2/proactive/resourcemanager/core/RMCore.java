@@ -3033,7 +3033,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             fileName = PAResourceManagerProperties.RM_NODESOURCE_INFRA_POLICY_MAPPING.getValueAsString();
             if (!(new File(fileName).isAbsolute())) {
                 // file path is relative, so we complete the path with the prefix RM_Home constant
-                fileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + fileName;
+                fileName = PAResourceManagerProperties.getAbsolutePath(fileName);
             }
 
             mapping = Files.readAllLines(Paths.get(fileName))
