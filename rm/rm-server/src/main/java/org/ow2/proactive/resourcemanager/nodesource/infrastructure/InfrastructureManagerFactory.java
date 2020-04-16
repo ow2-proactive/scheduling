@@ -110,7 +110,7 @@ public class InfrastructureManagerFactory {
             propFileName = PAResourceManagerProperties.RM_NODESOURCE_INFRASTRUCTURE_FILE.getValueAsString();
             if (!(new File(propFileName).isAbsolute())) {
                 // file path is relative, so we complete the path with the prefix RM_Home constant
-                propFileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + propFileName;
+                propFileName = PAResourceManagerProperties.getAbsolutePath(propFileName);
             }
 
             try (FileInputStream stream = new FileInputStream(propFileName)) {

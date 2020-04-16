@@ -97,8 +97,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     protected Properties sshOptions;
 
     @Configurable(description = "Absolute path of the java executable on the remote hosts", sectionSelector = 1)
-    protected String javaPath = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "jre" +
-                                File.separator + "bin" + File.separator + "java";
+    protected String javaPath = PAResourceManagerProperties.getAbsolutePath("jre/bin/java");
 
     @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)root directory on the remote hosts", sectionSelector = 1)
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();

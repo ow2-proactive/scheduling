@@ -26,6 +26,7 @@
 package org.ow2.proactive.web;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -191,7 +192,12 @@ public enum WebProperties implements PACommonProperties {
         if (new File(userPath).isAbsolute()) {
             return userPath;
         } else {
-            return WebProperties.REST_HOME.getValueAsString() + File.separator + userPath;
+            File pathName = new File(WebProperties.REST_HOME.getValueAsString(), userPath);
+            try {
+                return pathName.getCanonicalPath();
+            } catch (IOException e) {
+                return pathName.getAbsolutePath();
+            }
         }
     }
 

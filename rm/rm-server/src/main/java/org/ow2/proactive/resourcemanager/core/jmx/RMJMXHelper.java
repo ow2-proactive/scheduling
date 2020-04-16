@@ -98,9 +98,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
             final ObjectName name = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME);
             mbs.registerMBean(anonymMBean, name);
 
-            String dataBaseName = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                                  System.getProperty("file.separator") +
-                                  PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString();
+            String dataBaseName = PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
             FileUtils.forceMkdir(new File(dataBaseName).getParentFile());
 
             setDataStore(new RRDDataStore((StandardMBean) anonymMBean,
