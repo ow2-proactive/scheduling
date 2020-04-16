@@ -28,7 +28,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 import java.net.URI;
 
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.URIConverter;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.EscapeSpaceURIConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.UserFileValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
@@ -42,7 +42,7 @@ public class UserFileParserValidator extends BaseParserValidator<URI> {
 
     @Override
     protected Converter<URI> createConverter(String model) throws ModelSyntaxException {
-        return new URIConverter();
+        return new EscapeSpaceURIConverter();
     }
 
     @Override

@@ -23,30 +23,20 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
 
 import java.net.URI;
 
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.EscapeSpaceURIConverter;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.GlobalFileValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 
 
-public class GlobalFileParserValidator extends BaseParserValidator<URI> {
+public class EscapeSpaceURIConverter extends URIConverter {
 
-    public GlobalFileParserValidator(String model) throws ModelSyntaxException {
-        super(model, ModelType.GLOBAL_FILE);
-    }
+    public final String encodedSpace = "%20";
 
     @Override
-    protected Converter<URI> createConverter(String model) throws ModelSyntaxException {
-        return new EscapeSpaceURIConverter();
-    }
-
-    @Override
-    protected Validator<URI> createValidator(String model, Converter<URI> converter) {
-        return new GlobalFileValidator();
+    public URI convert(String parameterValue) throws ConversionException {
+        String escapedValue = parameterValue.replace(" ", encodedSpace);
+        return super.convert(escapedValue);
     }
 }
