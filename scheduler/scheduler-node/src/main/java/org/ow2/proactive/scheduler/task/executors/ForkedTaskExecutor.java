@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextSerializer;
+import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ExecuteForkedTaskInsideNewJvm;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
@@ -50,7 +51,7 @@ import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 /**
  * Executor in charge to fork a new process for running a non forked task in a dedicated JVM.
  *
- * @see ExecuteForkedTaskInsideNewJvm#fromForkedJVM(String)
+ * @see ExecuteForkedTaskInsideNewJvm
  * @see InProcessTaskExecutor
  */
 public class ForkedTaskExecutor implements TaskExecutor {
@@ -145,8 +146,11 @@ public class ForkedTaskExecutor implements TaskExecutor {
     }
 
     private TaskResultImpl createTaskResult(TaskContext context, Throwable throwable) {
-        return new TaskResultImpl(context.getTaskId(),
-                                  new ForkedJvmProcessException("Failed to execute task in a forked JVM", throwable));
+        TaskResultImpl result = new TaskResultImpl(context.getTaskId(),
+                                                   new ForkedJvmProcessException("Failed to execute task in a forked JVM",
+                                                                                 throwable));
+        result.setPropagatedVariables(new TaskContextVariableExtractor().extractPropagatedVariables(context));
+        return result;
     }
 
     // 4 called by forker

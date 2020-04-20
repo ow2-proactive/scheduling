@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.properties;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -630,7 +631,12 @@ public enum PASchedulerProperties implements PACommonProperties {
         if (new File(userPath).isAbsolute()) {
             return userPath;
         } else {
-            return PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + userPath;
+            File pathName = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(), userPath);
+            try {
+                return pathName.getCanonicalPath();
+            } catch (IOException e) {
+                return pathName.getAbsolutePath();
+            }
         }
     }
 

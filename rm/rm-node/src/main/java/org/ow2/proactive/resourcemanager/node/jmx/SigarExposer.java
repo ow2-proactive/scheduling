@@ -64,12 +64,11 @@ public class SigarExposer extends AbstractJMXHelper {
 
             String databaseFolder = System.getProperty(MONITORING_DB_DIR);
             if (databaseFolder == null || databaseFolder.trim().isEmpty()) {
-                String fs = System.getProperty("file.separator");
-                databaseFolder = PAResourceManagerProperties.RM_HOME.getValueAsString() + fs + "data" + fs;
+                databaseFolder = PAResourceManagerProperties.getAbsolutePath("data");
             }
 
             FileUtils.forceMkdir(new File(databaseFolder));
-            String dataBaseName = databaseFolder + nodeName + "_statistics.rrd";
+            String dataBaseName = new File(databaseFolder, nodeName + "_statistics.rrd").getAbsolutePath();
 
             setDataStore(new RRDSigarDataStore(mbs,
                                                dataBaseName,

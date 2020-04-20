@@ -25,6 +25,10 @@
  */
 package org.ow2.proactive.authentication;
 
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -33,9 +37,15 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -43,9 +53,13 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.core.properties.PASharedProperties;
+
+import com.google.common.base.Strings;
 
 
 /**
@@ -105,6 +119,15 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      */
     private final String AUTHENTICATION_METHOD = ldapProperties.getProperty(LDAPProperties.LDAP_AUTHENTICATION_METHOD);
 
+    private final boolean START_TLS = Boolean.parseBoolean(ldapProperties.getProperty(LDAPProperties.LDAP_START_TLS,
+                                                                                      "false"));
+
+    private final boolean ANY_CERTIFICATE = Boolean.parseBoolean(ldapProperties.getProperty(LDAPProperties.LDAP_START_TLS_ANY_CERTIFICATE,
+                                                                                            "false"));
+
+    private final boolean ANY_HOSTNAME = Boolean.parseBoolean(ldapProperties.getProperty(LDAPProperties.LDAP_START_TLS_ANY_HOSTNAME,
+                                                                                         "false"));
+
     /** user name used to bind to LDAP (if authentication method is different from none) */
     private final String BIND_LOGIN = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_LOGIN);
 
@@ -131,24 +154,25 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         if (fallbackUserAuth) {
             checkLoginFile();
             checkGroupFile();
-            logger.info("Using Login file for fall back authentication at: " + loginFile);
-            logger.info("Using Group file for fall back group membership at: " + groupFile);
+            logger.debug("Using Login file for fall back authentication at: " + loginFile);
+            logger.debug("Using Group file for fall back group membership at: " + groupFile);
         } else if (fallbackGroupMembership) {
             checkGroupFile();
-            logger.info("Using Group file for fall back group membership at: " + groupFile);
+            logger.debug("Using Group file for fall back group membership at: " + groupFile);
         }
 
         //initialize system properties for SSL/TLS connection
         String keyStore = ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PATH);
-
-        if ((keyStore != null) && (!alreadyDefined(SSL_KEYSTORE_PATH_PROPERTY, keyStore))) {
+        if ((!Strings.isNullOrEmpty(keyStore)) && (!alreadyDefined(SSL_KEYSTORE_PATH_PROPERTY, keyStore))) {
+            keyStore = PASharedProperties.getAbsolutePath(keyStore);
             System.setProperty(SSL_KEYSTORE_PATH_PROPERTY, keyStore);
             System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY,
                                ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PASSWD));
         }
 
         String trustStore = ldapProperties.getProperty(LDAPProperties.LDAP_TRUSTSTORE_PATH);
-        if ((trustStore != null) && (!alreadyDefined(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore))) {
+        if ((!Strings.isNullOrEmpty(trustStore)) && (!alreadyDefined(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore))) {
+            trustStore = PASharedProperties.getAbsolutePath(trustStore);
             System.setProperty(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore);
             System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY,
                                ldapProperties.getProperty(LDAPProperties.LDAP_TRUSTSTORE_PASSWD));
@@ -168,8 +192,8 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             String definedPropertyValue = System.getProperty(propertyName);
 
             if (System.getProperty(propertyName) != null && !definedPropertyValue.equals(propertyValue)) {
-                logger.warn("Property " + propertyName + " is already defined");
-                logger.warn("Using old value " + propertyValue);
+                logger.debug("Property " + propertyName + " is already defined");
+                logger.debug("Using old value " + propertyValue);
                 return true;
             }
         }
@@ -408,26 +432,85 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             logger.debug("check password for user: " + userDN);
         }
 
+        ContextHandler handler = createLdapContext(userDN, password);
+        closeContext(handler);
+        return handler != null;
+    }
+
+    private void closeContext(ContextHandler handler) {
+        if (handler != null) {
+            // Close the context when we're done
+            if (handler.getTlsResponse() != null) {
+                try {
+                    handler.getTlsResponse().close();
+                } catch (IOException e) {
+                    logger.error("Problem closing tls session: " + e.getMessage(), e);
+
+                }
+            }
+            try {
+                handler.getDirContext().close();
+            } catch (NamingException e) {
+                logger.error("Problem closing connection: " + e.getMessage(), e);
+            }
+        }
+    }
+
+    private ContextHandler createLdapContext(String user, String password) {
+        LdapContext ctx = null;
+        StartTlsResponse tls = null;
+
         Hashtable<String, String> env = createBasicEnvForInitalContext();
-        env.put(Context.SECURITY_PRINCIPAL, userDN);
-        env.put(Context.SECURITY_CREDENTIALS, password);
-
-        DirContext ctx = null;
         try {
+            if (!START_TLS) {
+                if (!AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
+                    env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
+                    env.put(Context.SECURITY_PRINCIPAL, user);
+                    env.put(Context.SECURITY_CREDENTIALS, password);
+                }
+            }
             // Create the initial directory context
-            ctx = new InitialDirContext(env);
-        } catch (NamingException e) {
-            logger.error("Problem checkin user password, user password may be wrong: " + e);
-            return false;
-        }
+            ctx = new InitialLdapContext(env, null);
 
-        // Close the context when we're done
-        try {
-            ctx.close();
+            if (START_TLS) {
+                // Start TLS
+                tls = (StartTlsResponse) ctx.extendedOperation(new StartTlsRequest());
+                if (ANY_HOSTNAME) {
+                    tls.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+                }
+                if (ANY_CERTIFICATE) {
+                    SSLContext context = SSLContext.getInstance("TLS");
+                    context.init(null, new X509TrustManager[] { new X509TrustManager() {
+                        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                                throws CertificateException {
+                        }
+
+                        public void checkServerTrusted(X509Certificate[] chain, String authType)
+                                throws CertificateException {
+                        }
+
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0];
+                        }
+                    } }, new SecureRandom());
+                    tls.negotiate(context.getSocketFactory());
+                } else {
+                    tls.negotiate();
+                }
+                if (!AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
+                    ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
+                    ctx.addToEnvironment(Context.SECURITY_PRINCIPAL, user);
+                    ctx.addToEnvironment(Context.SECURITY_CREDENTIALS, password);
+                }
+            }
+            return new ContextHandler(ctx, tls);
         } catch (NamingException e) {
-            logger.error("Problem closing secure connection: " + e);
+            logger.error("Problem checking user password, user password may be wrong: " + e);
+            return null;
+        } catch (Exception e) {
+            logger.error("Problem when creating the ldap context", e);
+            return null;
         }
-        return true;
     }
 
     /**
@@ -445,59 +528,58 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     private String getLDAPUserDN(String username) throws NamingException {
 
         String userDN = null;
-        DirContext ctx = null;
+        ContextHandler ctx = null;
         try {
 
             // Create the initial directory context
             ctx = this.connectAndGetContext();
-            SearchControls sControl = new SearchControls();
-            sControl.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String filter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_USER_FILTER), username);
-            // looking for the user dn (distinguish name)
-            NamingEnumeration<SearchResult> answer = ctx.search(USERS_DN, filter, sControl);
-            if (answer.hasMoreElements()) {
-                SearchResult result = (SearchResult) answer.next();
-                userDN = result.getNameInNamespace();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("User " + username + " has LDAP entry " + userDN);
-                }
-                subject.getPrincipals().add(new UserNamePrincipal(username));
+            if (ctx != null) {
+                SearchControls sControl = new SearchControls();
+                sControl.setSearchScope(SearchControls.SUBTREE_SCOPE);
+                String filter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_USER_FILTER), username);
+                // looking for the user dn (distinguish name)
+                NamingEnumeration<SearchResult> answer = ctx.getDirContext().search(new LdapName(USERS_DN),
+                                                                                    filter,
+                                                                                    sControl);
+                if (answer.hasMoreElements()) {
+                    SearchResult result = (SearchResult) answer.next();
+                    userDN = result.getNameInNamespace();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("User " + username + " has LDAP entry " + userDN);
+                    }
+                    subject.getPrincipals().add(new UserNamePrincipal(username));
 
-                // looking for the user groups
-                String groupFilter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_GROUP_FILTER),
-                                                   userDN);
+                    // looking for the user groups
+                    String groupFilter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_GROUP_FILTER),
+                                                       userDN);
 
-                NamingEnumeration<SearchResult> groupResults = ctx.search(GROUPS_DN, groupFilter, sControl);
-                while (groupResults.hasMoreElements()) {
-                    SearchResult res = (SearchResult) groupResults.next();
-                    Attribute attr = res.getAttributes()
-                                        .get(ldapProperties.getProperty(LDAPProperties.LDAP_GROUPNAME_ATTR));
-                    if (attr != null) {
-                        String groupName = attr.get().toString();
-                        subject.getPrincipals().add(new GroupNamePrincipal(groupName));
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("User " + username + " is a member of group " + groupName);
+                    NamingEnumeration<SearchResult> groupResults = ctx.getDirContext().search(new LdapName(GROUPS_DN),
+                                                                                              groupFilter,
+                                                                                              sControl);
+                    while (groupResults.hasMoreElements()) {
+                        SearchResult res = (SearchResult) groupResults.next();
+                        Attribute attr = res.getAttributes()
+                                            .get(ldapProperties.getProperty(LDAPProperties.LDAP_GROUPNAME_ATTR));
+                        if (attr != null) {
+                            String groupName = attr.get().toString();
+                            subject.getPrincipals().add(new GroupNamePrincipal(groupName));
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("User " + username + " is a member of group " + groupName);
+                            }
                         }
                     }
-                }
 
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("User DN not found");
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("User DN not found");
+                    }
                 }
             }
         } catch (NamingException e) {
             logger.error("Problem with the search in mode: " + AUTHENTICATION_METHOD + e);
             throw e;
         } finally {
-            try {
-                if (ctx != null) {
-                    ctx.close();
-                }
-            } catch (NamingException e) {
-                logger.error("", e);
-                logger.error("Problem closing LDAP connection: " + e.getMessage());
-            }
+            closeContext(ctx);
         }
 
         return userDN;
@@ -508,15 +590,9 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return directory service interface.
      * @throws NamingException
      */
-    private DirContext connectAndGetContext() throws NamingException {
-        Hashtable<String, String> env = createBasicEnvForInitalContext();
-
-        if (!AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
-            env.put(Context.SECURITY_PRINCIPAL, BIND_LOGIN);
-            env.put(Context.SECURITY_CREDENTIALS, BIND_PASSWD);
-        }
+    private ContextHandler connectAndGetContext() throws NamingException {
         // Create the initial directory context
-        return new InitialDirContext(env);
+        return createLdapContext(BIND_LOGIN, BIND_PASSWD);
     }
 
     /**
@@ -530,10 +606,29 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         Hashtable<String, String> env = new Hashtable<>(6, 1f);
         env.put("com.sun.jndi.ldap.connect.pool", LDAP_CONNECTION_POOLING);
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
         env.put(Context.PROVIDER_URL, LDAP_URL);
 
         return env;
+    }
+
+    private class ContextHandler {
+
+        private DirContext dirContext;
+
+        private StartTlsResponse tlsResponse;
+
+        public ContextHandler(DirContext dirContext, StartTlsResponse tlsResponse) {
+            this.dirContext = dirContext;
+            this.tlsResponse = tlsResponse;
+        }
+
+        public DirContext getDirContext() {
+            return dirContext;
+        }
+
+        public StartTlsResponse getTlsResponse() {
+            return tlsResponse;
+        }
     }
 
 }

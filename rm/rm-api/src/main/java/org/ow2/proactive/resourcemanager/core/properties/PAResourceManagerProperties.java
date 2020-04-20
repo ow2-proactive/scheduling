@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.core.properties;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -440,7 +441,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
         if (new File(userPath).isAbsolute()) {
             return userPath;
         } else {
-            return PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + userPath;
+            File pathName = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(), userPath);
+            try {
+                return pathName.getCanonicalPath();
+            } catch (IOException e) {
+                return pathName.getAbsolutePath();
+            }
         }
     }
 

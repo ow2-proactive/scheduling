@@ -79,6 +79,13 @@ public class LDAPProperties {
     /** authentication method used to connect to LDAP : none, simple or a SASL method */
     public static final String LDAP_AUTHENTICATION_METHOD = "pa.ldap.authentication.method";
 
+    /** enable starttls negociation **/
+    public static final String LDAP_START_TLS = "pa.ldap.starttls";
+
+    public static final String LDAP_START_TLS_ANY_CERTIFICATE = "pa.ldap.starttls.any.certificate";
+
+    public static final String LDAP_START_TLS_ANY_HOSTNAME = "pa.ldap.starttls.any.hostname";
+
     /** login name used to perform ldap's binding */
     public static final String LDAP_BIND_LOGIN = "pa.ldap.bind.login";
 
@@ -149,5 +156,20 @@ public class LDAPProperties {
      */
     public String getProperty(String key) {
         return prop.getProperty(key);
+    }
+
+    /**
+     * Retrieves the value of the property
+     *
+     * @param key property name
+     * @param defaultValue default value
+     * @return property value
+     */
+    public String getProperty(String key, String defaultValue) {
+        if (prop.containsKey(key)) {
+            return prop.getProperty(key);
+        } else {
+            return defaultValue;
+        }
     }
 }

@@ -166,8 +166,7 @@ public class RMDBManager {
                 configuration.setProperty("hibernate.hbm2ddl.auto", "create");
 
                 // dropping RRD database as well
-                File ddrDB = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
-                                      PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
+                File ddrDB = new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString()));
 
                 if (ddrDB.exists() && !ddrDB.delete()) {
                     logger.error("Dropping RRD database has failed: " + ddrDB);

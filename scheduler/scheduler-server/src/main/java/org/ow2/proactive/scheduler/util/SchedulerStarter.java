@@ -597,11 +597,27 @@ public class SchedulerStarter {
 
     private static void configureSchedulerAndRMAndPAHomes() {
         setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), findSchedulerHome());
+        consolidatePathProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
         String schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
         setPropIfNotAlreadySet(PAResourceManagerProperties.RM_HOME.getKey(), schedHome);
+        consolidatePathProperty(PAResourceManagerProperties.RM_HOME.getKey());
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
+        consolidatePathProperty(CentralPAPropertyRepository.PA_HOME.getName());
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
-                               schedHome + "/config/network/server.ini");
+                               new File(schedHome, "config/network/server.ini").getAbsolutePath());
+    }
+
+    public static void consolidatePathProperty(String propertyName) {
+        String value = System.getProperty(propertyName);
+        if (value != null) {
+            File pathName = new File(value);
+            String newPath;
+            try {
+                System.setProperty(propertyName, pathName.getCanonicalPath());
+            } catch (IOException e) {
+                System.setProperty(propertyName, pathName.getAbsolutePath());
+            }
+        }
     }
 
     private static void checkConfigureConflict() throws SchedulerConfigurationException {

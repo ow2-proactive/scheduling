@@ -52,7 +52,7 @@ public class SchedulerPAMLoginModule extends PAMLoginModule {
         //test that login file path is an absolute path or not
         if (!(new File(loginFile).isAbsolute())) {
             //file path is relative, so we complete the path with the prefix RM_Home constant
-            loginFile = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + loginFile;
+            loginFile = PASchedulerProperties.getAbsolutePath(loginFile);
         }
 
         return loginFile;
@@ -69,7 +69,7 @@ public class SchedulerPAMLoginModule extends PAMLoginModule {
         //test that group file path is an absolute path or not
         if (!(new File(groupFile).isAbsolute())) {
             //file path is relative, so we complete the path with the prefix RM_Home constant
-            groupFile = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + groupFile;
+            groupFile = PASchedulerProperties.getAbsolutePath(groupFile);
         }
 
         return groupFile;
