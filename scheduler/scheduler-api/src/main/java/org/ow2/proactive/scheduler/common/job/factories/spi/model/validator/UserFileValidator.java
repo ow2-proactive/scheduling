@@ -25,8 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import java.net.URI;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -35,11 +33,11 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidator
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class UserFileValidator implements Validator<URI> {
+public class UserFileValidator implements Validator<String> {
     private static final Logger logger = Logger.getLogger(UserFileValidator.class);
 
     @Override
-    public URI validate(URI parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         if (context == null || context.getSpace() == null) {
             // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog).
             // In this case, we don't have the access of the scheduler user dataspace, so the validity check is passed.
@@ -49,11 +47,11 @@ public class UserFileValidator implements Validator<URI> {
         }
 
         // if parameterValue is not a file existing in data space, we throw ValidationException
-        if (StringUtils.isBlank(parameterValue.toString())) {
+        if (StringUtils.isBlank(parameterValue)) {
             throw new ValidationException("Please provide a valid file path in the user space as the variable value.");
         }
         try {
-            if (!context.getSpace().checkFileExistsInUserSpace(parameterValue.toString())) {
+            if (!context.getSpace().checkFileExistsInUserSpace(parameterValue)) {
                 throw new ValidationException(String.format("Could not find the file path [%s] in the user data space. Please add the file into the user data space or change the variable value to a valid path.",
                                                             parameterValue));
             }
