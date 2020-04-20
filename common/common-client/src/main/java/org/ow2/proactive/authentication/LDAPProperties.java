@@ -73,6 +73,9 @@ public class LDAPProperties {
      **/
     public static final String LDAP_GROUP_FILTER = "pa.ldap.group.filter";
 
+    /** use member uid in group search */
+    public static final String LDAP_GROUPSEARCH_USE_UID = "pa.ldap.group.search.use.uid";
+
     /** the attribute in the group entry that matches the jaas' group name */
     public static final String LDAP_GROUPNAME_ATTR = "pa.ldap.group.name.attr";
 
