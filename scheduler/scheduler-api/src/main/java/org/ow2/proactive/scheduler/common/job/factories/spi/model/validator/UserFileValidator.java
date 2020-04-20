@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.USERSPACE_NAME;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -51,8 +53,12 @@ public class UserFileValidator implements Validator<String> {
             throw new ValidationException("Please provide a valid file path in the user space as the variable value.");
         }
         try {
-            if (!context.getSpace().checkFileExistsInUserSpace(parameterValue)) {
+            if (!context.getSpace().checkFileExists(USERSPACE_NAME, parameterValue)) {
                 throw new ValidationException(String.format("Could not find the file path [%s] in the user data space. Please add the file into the user data space or change the variable value to a valid path.",
+                                                            parameterValue));
+            }
+            if (context.getSpace().isFolder(USERSPACE_NAME, parameterValue)) {
+                throw new ValidationException(String.format("The file path [%s] in the user data space is a folder instead of a regular file. Please change the variable value to a valid path of a regular file.",
                                                             parameterValue));
             }
         } catch (NotConnectedException | PermissionException e) {
