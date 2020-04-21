@@ -128,6 +128,9 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     private final boolean ANY_HOSTNAME = Boolean.parseBoolean(ldapProperties.getProperty(LDAPProperties.LDAP_START_TLS_ANY_HOSTNAME,
                                                                                          "false"));
 
+    private final boolean USE_UID_IN_GROUP_SEARCH = Boolean.parseBoolean(ldapProperties.getProperty(LDAPProperties.LDAP_GROUPSEARCH_USE_UID,
+                                                                                                    "false"));
+
     /** user name used to bind to LDAP (if authentication method is different from none) */
     private final String BIND_LOGIN = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_LOGIN);
 
@@ -551,7 +554,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
 
                     // looking for the user groups
                     String groupFilter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_GROUP_FILTER),
-                                                       userDN);
+                                                       USE_UID_IN_GROUP_SEARCH ? username : userDN);
 
                     NamingEnumeration<SearchResult> groupResults = ctx.getDirContext().search(new LdapName(GROUPS_DN),
                                                                                               groupFilter,
