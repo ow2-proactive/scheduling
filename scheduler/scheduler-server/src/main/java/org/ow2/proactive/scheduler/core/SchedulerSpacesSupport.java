@@ -143,32 +143,22 @@ public class SchedulerSpacesSupport {
     }
 
     /**
-     * Check whether a file path exist in global space
-     *
-     * @param pathname the file path to check
-     * @return whether the file exist in global space
+     * Get the file object of a file path in the specified dataspace
+     * @param dataspace the target DataSpace name. It has two possible values, 'USERSPACE' or 'GLOBALSPACE'.
+     * @param username the user's name, it can be null when the dataspace is 'GLOBALSPACE'.
+     * @param pathname the relative file path under the specified dataspace
+     * @return the file object
+     * @throws FileSystemException On error parsing the file path.
      */
-    public boolean checkFileExistsInGlobalSpace(String pathname) {
-        try {
-            return this.globalSpace.resolveFile(pathname).exists();
-        } catch (FileSystemException e) {
-            logger.debug(String.format("Can't parse the file name [%s] in the global space.", pathname), e);
-            return false;
-        }
-    }
-
-    /**
-     * Check whether a file path exist in user space
-     * @param username the user's name
-     * @param pathname the file path to check
-     * @return whether the file exist in user space
-     */
-    public boolean checkFileExistsInUserSpace(String username, String pathname) {
-        try {
-            return this.getUserSpace(username).resolveFile(pathname).exists();
-        } catch (FileSystemException e) {
-            logger.debug(String.format("Can't parse file name [%s] in user [%s] dataspace.", pathname, username), e);
-            return false;
+    public DataSpacesFileObject resolveFile(String dataspace, String username, String pathname)
+            throws FileSystemException {
+        switch (dataspace) {
+            case SchedulerConstants.GLOBALSPACE_NAME:
+                return this.getGlobalSpace().resolveFile(pathname);
+            case SchedulerConstants.USERSPACE_NAME:
+                return this.getUserSpace(username).resolveFile(pathname);
+            default:
+                throw new IllegalArgumentException("Invalid dataspace name: " + dataspace);
         }
     }
 }

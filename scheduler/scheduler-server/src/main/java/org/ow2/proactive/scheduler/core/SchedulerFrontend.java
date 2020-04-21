@@ -86,6 +86,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -1681,17 +1683,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, Sche
 
     @Override
     @ImmediateService
-    public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("checkFileExistsInGlobalSpace",
-                                      "You don't have permissions to check the file existence in the GLOBAL Space");
-        return this.spacesSupport.checkFileExistsInGlobalSpace(pathname);
+    public boolean isFolder(String dataspace, String pathname) throws NotConnectedException, PermissionException {
+        try {
+            UserIdentificationImpl userId = frontendState.checkPermission("isFolder",
+                                                                          "You don't have permissions to check the file type in the DataSpace");
+            DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace, userId.getUsername(), pathname);
+            return file.isFolder();
+        } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the directory [%s] in the user space.", pathname), e);
+            return false;
+        }
     }
 
     @Override
     @ImmediateService
-    public boolean checkFileExistsInUserSpace(String pathname) throws NotConnectedException, PermissionException {
-        UserIdentificationImpl userId = frontendState.checkPermission("checkFileExistsInUserSpace",
-                                                                      "You don't have permissions to check the file existence in the USER Space");
-        return this.spacesSupport.checkFileExistsInUserSpace(userId.getUsername(), pathname);
+    public boolean checkFileExists(String dataspace, String pathname)
+            throws NotConnectedException, PermissionException {
+        try {
+            UserIdentificationImpl userId = frontendState.checkPermission("checkFileExists",
+                                                                          "You don't have permissions to check the file existence in the DataSpace");
+            DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace, userId.getUsername(), pathname);
+            return file.exists();
+        } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the directory [%s] in the user space.", pathname), e);
+            return false;
+        }
     }
+
 }

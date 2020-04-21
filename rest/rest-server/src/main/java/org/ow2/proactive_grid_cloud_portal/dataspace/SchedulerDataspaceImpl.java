@@ -25,6 +25,10 @@
  */
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -34,6 +38,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 
 public class SchedulerDataspaceImpl implements SchedulerSpaceInterface {
 
+    private static final Logger logger = Logger.getLogger(SchedulerDataspaceImpl.class);
+
     private static RestDataspaceImpl dataspaceRestApi = new RestDataspaceImpl();
 
     private Session session;
@@ -42,11 +48,37 @@ public class SchedulerDataspaceImpl implements SchedulerSpaceInterface {
         session = dataspaceRestApi.checkSessionValidity(sessionId);
     }
 
-    public boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException {
-        return dataspaceRestApi.checkFileExistsInGlobalSpace(session, pathname);
+    @Override
+    public boolean isFolder(String dataspace, String pathname) throws NotConnectedException, PermissionException {
+        try {
+            return resolveFile(dataspace, pathname).isFolder();
+        } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the file [%s] in the dataspace [%s].", pathname, dataspace), e);
+            return false;
+        }
     }
 
-    public boolean checkFileExistsInUserSpace(String pathname) throws NotConnectedException, PermissionException {
-        return dataspaceRestApi.checkFileExistsInUserSpace(session, pathname);
+    @Override
+    public boolean checkFileExists(String dataspace, String pathname)
+            throws NotConnectedException, PermissionException {
+        try {
+            return resolveFile(dataspace, pathname).exists();
+        } catch (FileSystemException e) {
+            logger.debug(String.format("Can't parse the file [%s] in the dataspace [%s].", pathname, dataspace), e);
+            return false;
+        }
     }
+
+    private FileObject resolveFile(String dataspace, String pathname)
+            throws NotConnectedException, FileSystemException, PermissionException {
+        switch (dataspace) {
+            case SchedulerConstants.GLOBALSPACE_NAME:
+                return dataspaceRestApi.fileSystem(session).resolveFileInGlobalspace(pathname);
+            case SchedulerConstants.USERSPACE_NAME:
+                return dataspaceRestApi.fileSystem(session).resolveFileInUserspace(pathname);
+            default:
+                throw new IllegalArgumentException("Invalid dataspace name: " + dataspace);
+        }
+    }
+
 }

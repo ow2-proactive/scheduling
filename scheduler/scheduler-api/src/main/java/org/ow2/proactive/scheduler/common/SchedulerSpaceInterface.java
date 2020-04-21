@@ -32,22 +32,22 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 public interface SchedulerSpaceInterface {
 
     /**
-     * Check if the GLOBAL DataSpace contains the specified file
-     *
+     * Check if a file in the specified DataSpace is a folder
+     * @param dataspace the target DataSpace name. It has two possible values, 'USERSPACE' or 'GLOBALSPACE'.
      * @param pathname the file path to check
-     * @return whether the specified file exists in the GLOBAL DataSpace
-     * @throws NotConnectedException if you are not authenticated.
-     * @throws PermissionException if you can't access to the global data space.
+     * @return whether the specified file is a folder
+     * @throws NotConnectedException if you are not authenticated
+     * @throws PermissionException if you can't access to the global data space
      */
-    boolean checkFileExistsInGlobalSpace(String pathname) throws NotConnectedException, PermissionException;
+    boolean isFolder(String dataspace, String pathname) throws NotConnectedException, PermissionException;
 
     /**
-     * Check if the USER DataSpace contains the specified file
-     *
+     * Check if a file exists in the specified location in the DataSpace
+     * @param dataspace the target DataSpace name. It has two possible values, 'USERSPACE' or 'GLOBALSPACE'.
      * @param pathname the file path to check
-     * @return whether the specified file exists in the USER DataSpace
-     * @throws NotConnectedException if you are not authenticated.
-     * @throws PermissionException if you can't access to the user data space.
+     * @return whether the specified file exists in the GLOBAL DataSpace
+     * @throws NotConnectedException if you are not authenticated
+     * @throws PermissionException if you can't access to the global data space
      */
-    boolean checkFileExistsInUserSpace(String pathname) throws NotConnectedException, PermissionException;
+    boolean checkFileExists(String dataspace, String pathname) throws NotConnectedException, PermissionException;
 }
