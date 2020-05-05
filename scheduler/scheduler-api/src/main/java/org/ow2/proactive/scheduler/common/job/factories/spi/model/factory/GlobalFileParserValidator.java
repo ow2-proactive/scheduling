@@ -25,28 +25,26 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
-import java.net.URI;
-
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.URIConverter;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.IdentityConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.GlobalFileValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
 
-public class GlobalFileParserValidator extends BaseParserValidator<URI> {
+public class GlobalFileParserValidator extends BaseParserValidator<String> {
 
     public GlobalFileParserValidator(String model) throws ModelSyntaxException {
         super(model, ModelType.GLOBAL_FILE);
     }
 
     @Override
-    protected Converter<URI> createConverter(String model) throws ModelSyntaxException {
-        return new URIConverter();
+    protected Converter<String> createConverter(String model) throws ModelSyntaxException {
+        return new IdentityConverter();
     }
 
     @Override
-    protected Validator<URI> createValidator(String model, Converter<URI> converter) {
+    protected Validator<String> createValidator(String model, Converter<String> converter) {
         return new GlobalFileValidator();
     }
 }
