@@ -47,13 +47,11 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 import org.ow2.proactive_grid_cloud_portal.dataspace.util.VFSZipper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
@@ -372,27 +370,7 @@ public class RestDataspaceImpl implements RestDataspace {
         }
     }
 
-    public boolean checkFileExistsInGlobalSpace(Session session, String pathname)
-            throws NotConnectedException, PermissionException {
-        try {
-            return fileSystem(session).resolveFileInGlobalspace(pathname).exists();
-        } catch (FileSystemException e) {
-            logger.debug(String.format("Can't parse the file name [%s] in the global space.", pathname), e);
-            return false;
-        }
-    }
-
-    public boolean checkFileExistsInUserSpace(Session session, String pathname)
-            throws NotConnectedException, PermissionException {
-        try {
-            return fileSystem(session).resolveFileInUserspace(pathname).exists();
-        } catch (FileSystemException e) {
-            logger.debug(String.format("Can't parse the file name [%s] in the user space.", pathname), e);
-            return false;
-        }
-    }
-
-    private FileSystem fileSystem(Session session)
+    public FileSystem fileSystem(Session session)
             throws FileSystemException, NotConnectedException, PermissionException {
         FileSystem fs = session.fileSystem();
         if (fs == null) {

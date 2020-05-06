@@ -147,6 +147,8 @@ generate_new_accounts()
     sed "s/rm\.cache\.password=.*/rm.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
     sed "s/^.*rm\.cache\.credential=.*$/rm.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
 
+    sed "s/^.*listeners\.pwd=.*$/listeners.pwd=$(escape_rhs_sed $WATCHER_PWD)/g"  -i "$PA_ROOT/default/dist/war/notification-service/WEB-INF/classes/application.properties"
+
     # removing test accounts
 
     $PA_ROOT/default/tools/proactive-users -D -l demo
@@ -600,8 +602,7 @@ if [[ "$OLD_PADIR" == "" ]]; then
 
     # configure infinite timeout and service type for systemd
     mkdir -p /etc/systemd/system/proactive-scheduler.service.d
-    echo '
-[Service]
+    echo '[Service]
 Type=simple
 TimeoutSec=0
 ' > /etc/systemd/system/proactive-scheduler.service.d/timeout.conf

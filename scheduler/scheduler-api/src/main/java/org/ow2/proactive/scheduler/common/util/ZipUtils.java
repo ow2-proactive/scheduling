@@ -145,12 +145,16 @@ public class ZipUtils extends FileUtils {
             if (dirobject.isDirectory()) {
                 File[] fileList = dirobject.listFiles();
                 // Loop through the files
-                for (int i = 0; i < fileList.length; i++) {
-                    if (fileList[i].isDirectory()) {
-                        zipDirectory(fileList[i].getPath(), iBaseFolderLength, zos, crc);
-                    } else if (fileList[i].isFile()) {
-                        zipFile(fileList[i].getPath(), iBaseFolderLength, zos, crc);
+                if (fileList != null) {
+                    for (int i = 0; i < fileList.length; i++) {
+                        if (fileList[i].isDirectory()) {
+                            zipDirectory(fileList[i].getPath(), iBaseFolderLength, zos, crc);
+                        } else if (fileList[i].isFile()) {
+                            zipFile(fileList[i].getPath(), iBaseFolderLength, zos, crc);
+                        }
                     }
+                } else {
+                    logger.warn("Problem accessing folder: " + dirobject);
                 }
             } else {
                 throw new IOException(directoryName + " is not a directory.");

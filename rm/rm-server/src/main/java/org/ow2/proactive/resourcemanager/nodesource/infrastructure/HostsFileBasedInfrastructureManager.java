@@ -558,7 +558,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             String configuredAddress = hostTracker.getConfiguredAddress();
             String compliantAddress = convertToCompliantAddress(configuredAddress);
             return nodeSource.getName() + COMPLIANT_ADDRESS_DELIMITER + compliantAddress + COMPLIANT_ADDRESS_DELIMITER +
-                   ProActiveCounter.getUniqID();
+                   0;
         }
 
         protected String extractHostFromNode(String nodeNameOrUrl) {

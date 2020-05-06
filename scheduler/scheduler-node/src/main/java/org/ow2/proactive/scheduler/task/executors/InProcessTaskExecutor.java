@@ -207,7 +207,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
             return taskResult;
         } catch (Throwable e) {
             e.printStackTrace(error);
-            return new TaskResultImpl(taskContext.getTaskId(), e);
+            TaskResultImpl result = new TaskResultImpl(taskContext.getTaskId(), e);
+            result.setPropagatedVariables(taskContextVariableExtractor.extractPropagatedVariables(taskContext));
+            return result;
         } finally {
             if (nodesFile != null && !nodesFile.isEmpty()) {
                 FileUtils.deleteQuietly(new File(nodesFile));

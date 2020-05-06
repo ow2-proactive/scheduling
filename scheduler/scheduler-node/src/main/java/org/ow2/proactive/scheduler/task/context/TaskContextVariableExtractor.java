@@ -333,6 +333,30 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     /**
+     * Extract variables from the previous task result to be propagated to children tasks in case of internal error.
+     *
+     * @param taskContext contains the information needed to extract.
+     *
+     * @return a map containing extracted variables or an empty hash if there are no variables or previous tasks.
+     *
+     */
+    public Map<String, byte[]> extractPropagatedVariables(TaskContext taskContext) {
+        Map<String, byte[]> propagatedVariables = new HashMap<>();
+        try {
+            if (taskContext.getPreviousTasksResults() != null) {
+                for (TaskResult previousTaskResult : taskContext.getPreviousTasksResults()) {
+                    if (previousTaskResult.getPropagatedVariables() != null) {
+                        propagatedVariables.putAll(previousTaskResult.getPropagatedVariables());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(ERROR_READING_VARIABLES, e);
+        }
+        return propagatedVariables;
+    }
+
+    /**
      * Extract variables from the previous task result to be used now.
      *
      * @param taskContext contains the information needed to extract.

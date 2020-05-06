@@ -26,6 +26,7 @@
 package org.ow2.proactive.core.properties;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -174,7 +175,12 @@ public enum PASharedProperties implements PACommonProperties {
         if (new File(userPath).isAbsolute()) {
             return userPath;
         } else {
-            return PASharedProperties.SHARED_HOME.getValueAsString() + File.separator + userPath;
+            File pathName = new File(PASharedProperties.SHARED_HOME.getValueAsString(), userPath);
+            try {
+                return pathName.getCanonicalPath();
+            } catch (IOException e) {
+                return pathName.getAbsolutePath();
+            }
         }
     }
 
