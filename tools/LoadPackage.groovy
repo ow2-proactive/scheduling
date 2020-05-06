@@ -14,7 +14,7 @@ import java.util.zip.ZipFile
 
 class LoadPackage {
 
-    private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/scheduler.cred"
+    private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/admin_user.cred"
     private final String LOAD_PACKAGE_SCRIPT_NAME = "LoadPackage.groovy"
     private final String BUCKET_OWNER = "GROUP:public-objects"
     private final String TMP_DIR_PREFIX = "package_temp_dir"
@@ -275,7 +275,7 @@ class LoadPackage {
 
         // Does the bucket already exist? -------------
         // GET QUERY
-        def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
+        def list_buckets_rest_query = this.CATALOG_URL + "/buckets"
         def get = new org.apache.http.client.methods.HttpGet(list_buckets_rest_query)
         get.addHeader("sessionid", this.sessionId)
         def response = getHttpClientBuilder().build().execute(get)
