@@ -128,7 +128,12 @@ public class SchedulerBackupRunner implements Runnable {
                                            .map(target -> (new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
                                                                     target)).getAbsolutePath())
                                            .toArray(String[]::new);
-            ZipUtils.zip(foldersToZip, backupFile, null);
+            LOGGER.info("Backup of the following folders : " + Arrays.toString(foldersToZip));
+            try {
+                ZipUtils.zip(foldersToZip, backupFile, null);
+            } catch (Exception e) {
+                LOGGER.error("Error when performing backup", e);
+            }
         } else {
             LOGGER.error("Cannot save a backup because backup configuredDestination folder does not exist: " +
                          configuredDestination);
