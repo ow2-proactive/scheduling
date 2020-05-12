@@ -162,6 +162,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.putThirdPartyCredential";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.thirdPartyCredentialsKeySet";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.removeThirdPartyCredential";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.checkFileExists";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.isFolder";
 
     // API - access to database
     permission java.sql.SQLPermission "setLog";
