@@ -342,7 +342,7 @@ public class JobData implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "JOBID_SEQUENCE")
-    @SequenceGenerator(name = "JOBID_SEQUENCE", sequenceName = "JOBID_SEQUENCE")
+    @SequenceGenerator(name = "JOBID_SEQUENCE", sequenceName = "JOBID_SEQUENCE", allocationSize = 1, initialValue = 1)
     @Column(name = "ID")
     public Long getId() {
         return id;
