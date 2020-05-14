@@ -1,90 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="ProActive">
-    <link rel="shortcut icon" href="assets/image/favicon.ico">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="Activeeon">
+  <link rel="shortcut icon" href="assets/image/favicon.ico">
 
-    <title>Get started with ProActive</title>
+  <title>Get started with ProActive</title>
 
-    <link href="assets/css/bootstrap.css" rel="stylesheet">
-    <link href="assets/css/custom.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/bootstrap4.1.3//bootstrap.min.css">
+  <link href="assets/css/custom.css" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="assets/js/html5shiv.js"></script>
-    <script src="assets/js/respond.min.js"></script>
-    <![endif]-->
+ <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5G82R5Q');</script>
+  <!-- End Google Tag Manager -->
 </head>
 
 <body>
-<div class="container">
-    <div class="container">
-        <div class="text-center">
-            <h1><img src="assets/image/proactive-arrow-150.png"/>&nbsp;<b>ProActive Workflows & Scheduling</b>
+
+ <div class="text-center">
+            <h1><img src="./assets/image/proactive-arrow-150.png">&nbsp;<b>ProActive Workflows &amp; Scheduling</b>
             </h1>
         </div>
-        <hr>
-        <div class="text-center">
-            <p class="lead">Access Web Portals</p>
+
+ <section style="background-color: #FFFFFF;">
+    <div class="container py-5">
+      <h2 class="mb-3">Portals & Main Services</h2>
+
+      <div class="row">
+        <div class="col-12 ">
+          <div class="row ae-portals">
+            <div class="col-12 col-sm-6 col-lg-3 py-1">
+              <a href="/automation-dashboard" class="ae-portals-item">
+                <div class="border shadow p-3" style="height: 100%">
+                  <img class="img-fluid float-right" width="50px" src="assets/image/pps-dashboard.png"
+                    alt="dashboard automation icon">
+                  <h3 class="h4">Automation dashboard</h3>
+                  <p>Job planning, versioning, service automation, etc.</p>
+                </div>
+              </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 py-1">
+              <a href="/studio" class="ae-portals-item">
+                <div class="border shadow p-3" style="height: 100%">
+                  <img class="img-fluid float-right" width="50px" src="assets/image/pps-build.png" alt="workflow icon">
+                  <h3 class="h4">Workflow &nbsp;&nbsp;&nbsp; studio</h3>
+                  <p>Design your workflows and business processes</p>
+                </div>
+              </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 py-1">
+              <a href="/scheduler" class="ae-portals-item">
+                <div class="border shadow p-3" style="height: 100%">
+                  <img class="img-fluid float-right" width="50px" src="assets/image/pps-run.png" alt="scheduler icon">
+                  <h3 class="h4">Scheduling / Orchestration</h3>
+                  <p>Manage execution, priorities, errors, logs</p>
+                </div>
+              </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 py-1">
+              <a href="/rm" class="ae-portals-item">
+                <div class="border shadow p-3" style="height: 100%">
+                  <img class="img-fluid float-right" width="50px" src="assets/image/pps-deploy.png"
+                    alt="resource manager icon">
+                  <h3 class="h4">Resource manager</h3>
+                  <p>Connect to resources and manage state and auto-scaling</p>
+                </div>
+              </a>
+            </div>
+          </div>
         </div>
-        <div class="row text-center">
-            <div class="col-sm-3">
-                <a href="/automation-dashboard"><img style="width:150px" src="assets/image/pps-dashboard.png"></a>
-                <p><b>Automate</b> your workload with <br/><i>ProActive Automation Dashboard</i></p>
+      </div>
+
+      <h2 class="mt-5">Documentation, tutorials and videos ...</h2>
+      <p>
+        Read our documentation, also check our videos and tutorials that will guide you through the portals, features and more.
+      </p>
+
+      <div class="row mt-3">
+       <div class="col-6 col-md-5 col-lg-4 col-xl-3">
+          <a href="https://doc.activeeon.com/allversions.html">
+            <div class="border shadow p-3 pb-1">
+              <div class="row align-items-center">
+                <div class="col-5">
+                  <img src="assets/image/tuto-and-videos/doc-icon-grey.png" class="img-fluid" />
+                </div>
+                <div class="col-5 text-muted">
+                 Read our documentation!
+                </div>
+              </div>
             </div>
-            <div class="col-sm-3">
-                <a href="/studio/"><img style="width:150px" src="assets/image/pps-build.png"></a>
-                <p><b>Build</b> your workflows with <br><i>ProActive Studio</i></p>
-            </div>
-            <div class="col-sm-3">
-                <a href="/scheduler"><img style="width:150px" src="assets/image/pps-run.png"></a>
-                <p><b>Run</b> your jobs with <br><i>ProActive Scheduler</i></p>
-            </div>
-            <div class="col-sm-3">
-                <a href="/rm"><img style="width:150px" src="assets/image/pps-deploy.png"></a>
-                <p><b>Deploy</b> your workload with <br><i>ProActive Resource Manager</i></p>
-            </div>
+          </a>
         </div>
-        <br>
-        <hr>
-        <p class="lead">Use the command line client via the <a id="restUrlLink" href="/doc/rest/"
-                                                               title="ProActive REST API">REST API</a>
-        </p>
-        <pre>$> ./bin/proactive-client -u <span id="restUrlCli"></span> -l $USER</pre>
-        <br>
-        <hr>
-        <p class="lead">Check out online resources to get started</p>
-
-        <div class="row text-center">
-            <div class="col-xs-4 col-md-offset-2">
-                <a href="/doc/"><img src="assets/image/book.png"></a>
-
-                <p>Documentation</p>
+        <div class="col-6 col-md-5 col-lg-4 col-xl-3">
+          <a href="https://try.activeeon.com/tutorials.html">
+            <div class="border shadow p-3 pb-1">
+              <div class="row align-items-center">
+                <div class="col-5">
+                  <img src="assets/image/tuto-and-videos/book-icon-grey.png" class="img-fluid" />
+                </div>
+                <div class="col-5 text-muted">
+                 Follow our tutorials!
+                </div>
+              </div>
             </div>
-            <div class="col-xs-4">
-                <a href="https://try.activeeon.com/tutorials.html"><img src="assets/image/hat.png"></a>
-
-                <p>Online Tutorials</p>
-            </div>
+          </a>
         </div>
-
+        <div class="col-6 col-md-5 col-lg-4 col-xl-3">
+          <a href="https://try.activeeon.com/tutorials.html">
+            <div class="border shadow p-3 pb-1">
+              <div class="row align-items-center">
+                <div class="col-5">
+                  <img src="assets/image/tuto-and-videos/video-icon-grey.png" class="img-fluid" />
+                </div>
+                <div class="col-5 text-muted">
+                  Watch our videos!
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
-    <div class="modal-footer">
-        <small>&copy; 2007-<script>document.write(new Date().getFullYear())</script>, Activeeon, All rights reserved</small>
+  </section>
+
+ <section>
+    <div class="container py-3">
+      <p>Do not hesitate to have a look to our <a href="http://www.activeeon.com/about/resources#brochures"
+          target="_blank">specific brochures</a>
+        if you want to learn more about our products</p>
     </div>
-</div>
-<script>
-    var url = document.location.href;
-    url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
-    url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
-    url = url.substring(0, url.lastIndexOf("/") + 1);
-    var restApiWebPage = url + "rest";
-    var restApiEndpoint = url + "rest";
-    document.getElementById('restUrlCli').innerHTML = restApiEndpoint;
-    document.getElementById('restUrlLink').href = restApiWebPage;
-</script>
+  </section>
+
+  <section style="background-color: #333333; color: white;">
+    <div class="container py-2">
+      <nav class="nav">
+        <a class="nav-link" style="color: #cccccc;" href="https://www.activeeon.com">Website</a>
+        <a class="nav-link" style="color: #cccccc;" href="https://www.activeeon.com/about/contact">Contact us</a>
+        <a class="nav-link" style="color: #cccccc;" href="https://www.activeeon.com/about/demo">Demo</a>
+      </nav>
+    </div>
+  </section>
+
+  <script src="assets/js/bootstrap4.1.3/jquery-3.3.1.slim.min.js"></script>
+  <script src="assets/js/bootstrap4.1.3/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/form-signup.js"></script>
 </body>
+
 </html>
