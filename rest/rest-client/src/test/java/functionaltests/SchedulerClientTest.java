@@ -378,8 +378,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         JobId jobId = submitJob(job, client);
         JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
 
-        String jobContent = client.getJobContent(jobId);
-        String jobContent1 = client.getJobContent(jobId1);
+        String jobContent = client.getJobContent(jobId).replaceAll("\\s+", "");
+        String jobContent1 = client.getJobContent(jobId1).replaceAll("\\s+", "");
 
         assertEquals(jobContent, jobContent1);
     }
@@ -475,7 +475,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test
-    public void testReSubmitJobMargeVar() throws Exception {
+    public void testReSubmitJobMergeVar() throws Exception {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
                                 "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
@@ -501,7 +501,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test
-    public void testReSubmitJobMargeInfo() throws Exception {
+    public void testReSubmitJobMergeInfo() throws Exception {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
                                 "/functionaltests/descriptors/dataspace_client_node_fork.groovy",

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    name="NoJobVariables" onTaskError="continueJobExecution" priority="normal">
+    <variables>
+        <variable name="job_var" value="job_var_value" />
+        <variable name="global_var" value="global_var_overridden_by_xml" />
+        <variable name="job_var_referencing_global_var" value="${referenced_global_var}" />
+    </variables>
+    <description>NoVariablesTestJob</description>
+    <genericInformation>
+        <info name="gen_info" value="gen_info_value"/>
+        <info name="global_gi" value="global_gi_overridden_by_xml"/>
+        <info name="gen_info_referencing_global_var" value="${referenced_global_var}"/>
+    </genericInformation>
+    <taskFlow>
+        <task name="Linux_Bash_Task">
+            <description>
+                <![CDATA[ The simplest task, ran by a bash engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="bash">
+                        <![CDATA[
+ls -la
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
