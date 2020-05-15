@@ -26,15 +26,18 @@
 package org.ow2.proactive.scheduler.common.job.factories;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.BasicConfigurator;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -72,6 +75,8 @@ public class TestStaxJobFactory {
 
     private static URI jobDescriptorWithUnresolvedGenericInfoAndVariables;
 
+    private static URI jobDescriptorWithGlobalVariablesAndGenericInfo;
+
     private static URI jobDescriptorAttrDefGenericInformationXmlElement;
 
     private static URI jobDescriptorAttrDefParameterXmlElement;
@@ -100,6 +105,9 @@ public class TestStaxJobFactory {
         jobDescriptorWithUnresolvedGenericInfoAndVariables = TestStaxJobFactory.class.getResource("job_with_unresolved_generic_info_and_variables.xml")
                                                                                      .toURI();
 
+        jobDescriptorWithGlobalVariablesAndGenericInfo = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_global_variables_and_gi.xml")
+                                                                                 .toURI();
+
         jobDescriptorAttrDefGenericInformationXmlElement = TestStaxJobFactory.class.getResource("job_attr_def_generic_information_xml_element.xml")
                                                                                    .toURI();
 
@@ -118,6 +126,14 @@ public class TestStaxJobFactory {
     @Before
     public void setJobFactory() {
         factory = (StaxJobFactory) JobFactory.getFactory(JOB_FACTORY_IMPL);
+        factory.globalVariables = new LinkedHashMap<>();
+        factory.globalGenericInformation = new LinkedHashMap<>();
+    }
+
+    @After
+    public void cleanGlobals() {
+        factory.globalVariables = new LinkedHashMap<>();
+        factory.globalGenericInformation = new LinkedHashMap<>();
     }
 
     @Test
@@ -134,6 +150,87 @@ public class TestStaxJobFactory {
     @Test
     public void testCreateJobShouldNotFailWhenParsingEmptyMetadata() throws Exception {
         factory.createJob(jobDescriptorWithEmptyMetadata);
+    }
+
+    @Test
+    public void testCreateJobWithNoVariablesShouldReferenceGlobalVariablesAndGenericInfo() throws Exception {
+        factory.globalVariables.put("globalVar", new JobVariable("globalVar", "globalValue"));
+        factory.globalGenericInformation.put("globalGI", "globalGIValue");
+        Job testScriptJob = factory.createJob(jobDescriptorNoVariablesUri);
+        assertNotNull(testScriptJob.getVariables().get("globalVar"));
+        assertEquals("globalValue", testScriptJob.getVariables().get("globalVar").getValue());
+        assertEquals("globalGIValue", testScriptJob.getGenericInformation().get("globalGI"));
+    }
+
+    @Test
+    public void testCreateJobWithVariablesAndGenericInfoShouldReferenceGlobalVariables() throws Exception {
+        factory.globalVariables.put("referenced_global_var",
+                                    new JobVariable("referenced_global_var", "global_var_value"));
+        Job testScriptJob = factory.createJob(jobDescriptorWithGlobalVariablesAndGenericInfo);
+        assertNotNull(testScriptJob.getVariables().get("job_var_referencing_global_var"));
+        assertEquals("global_var_value", testScriptJob.getVariables().get("job_var_referencing_global_var").getValue());
+        assertEquals("global_var_value", testScriptJob.getGenericInformation().get("gen_info_referencing_global_var"));
+        // other vars and gi in the workflow should be present
+        assertNotNull(testScriptJob.getVariables().get("job_var"));
+        assertNotNull(testScriptJob.getGenericInformation().get("gen_info"));
+    }
+
+    @Test
+    public void testCreateJobWithVariablesAndGenericInfoShouldOverrideGlobalVariablesAndGenericInfo() throws Exception {
+        factory.globalVariables.put("global_var", new JobVariable("global_var", "global_var_value"));
+        factory.globalGenericInformation.put("global_gi", "global_gi_value");
+        Job testScriptJob = factory.createJob(jobDescriptorWithGlobalVariablesAndGenericInfo);
+        assertNotNull(testScriptJob.getVariables().get("global_var"));
+        assertEquals("global_var_overridden_by_xml", testScriptJob.getVariables().get("global_var").getValue());
+        assertEquals("global_gi_overridden_by_xml", testScriptJob.getGenericInformation().get("global_gi"));
+        // other vars and gi in the workflow should be present
+        assertNotNull(testScriptJob.getVariables().get("job_var"));
+        assertNotNull(testScriptJob.getGenericInformation().get("gen_info"));
+    }
+
+    @Test
+    public void
+            testCreateJobWithVariablesAndGenericInfoAndGlobalOnesShouldBeOverriddenBySubmittedVariablesAndGenericInfo()
+                    throws Exception {
+        factory.globalVariables.put("global_var", new JobVariable("global_var", "global_var_value"));
+        factory.globalGenericInformation.put("global_gi", "global_gi_value");
+        Job testScriptJob = factory.createJob(jobDescriptorWithGlobalVariablesAndGenericInfo,
+                                              ImmutableMap.of("global_var", "submitted_var_value"),
+                                              ImmutableMap.of("global_gi", "submitted_gi_value"));
+        assertNotNull(testScriptJob.getVariables().get("global_var"));
+        assertEquals("submitted_var_value", testScriptJob.getVariables().get("global_var").getValue());
+        assertEquals("submitted_gi_value", testScriptJob.getGenericInformation().get("global_gi"));
+        // other vars and gi in the workflow should be present
+        assertNotNull(testScriptJob.getVariables().get("job_var"));
+        assertNotNull(testScriptJob.getGenericInformation().get("gen_info"));
+    }
+
+    @Test
+    public void testCreateJobWithSubmittedVariablesAndGenericInfoShouldReferenceGlobalVariables() throws Exception {
+        factory.globalVariables.put("global_var", new JobVariable("global_var", "global_var_value"));
+        factory.globalGenericInformation.put("global_gi", "global_gi_value");
+        Job testScriptJob = factory.createJob(jobDescriptorNoVariablesUri,
+                                              ImmutableMap.of("submitted_var", "${global_var}"),
+                                              ImmutableMap.of("submitted_gi", "${global_var}"));
+        assertNotNull(testScriptJob.getVariables().get("global_var"));
+        assertEquals("global_var_value", testScriptJob.getVariables().get("global_var").getValue());
+        assertNotNull(testScriptJob.getVariables().get("submitted_var"));
+        assertEquals("global_var_value", testScriptJob.getVariables().get("submitted_var").getValue());
+        assertEquals("global_gi_value", testScriptJob.getGenericInformation().get("global_gi"));
+        assertEquals("global_var_value", testScriptJob.getGenericInformation().get("submitted_gi"));
+    }
+
+    @Test
+    public void testCreateJobWithSubmittedVariablesAndGenericInfoShouldOverrideGlobalVariablesAndGenericInfo()
+            throws Exception {
+        factory.globalVariables.put("global_var", new JobVariable("global_var", "global_var_value"));
+        factory.globalGenericInformation.put("global_gi", "global_gi_value");
+        Job testScriptJob = factory.createJob(jobDescriptorNoVariablesUri,
+                                              ImmutableMap.of("global_var", "submitted_var_value"),
+                                              ImmutableMap.of("global_gi", "submitted_gi_value"));
+        assertNotNull(testScriptJob.getVariables().get("global_var"));
+        assertEquals("submitted_var_value", testScriptJob.getVariables().get("global_var").getValue());
+        assertEquals("submitted_gi_value", testScriptJob.getGenericInformation().get("global_gi"));
     }
 
     @Test
