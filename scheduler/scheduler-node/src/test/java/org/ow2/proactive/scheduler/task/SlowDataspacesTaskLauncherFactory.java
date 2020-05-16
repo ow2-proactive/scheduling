@@ -51,7 +51,8 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
     }
 
     @Override
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
+    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+            TaskLogger taskLogger) {
         return new SlowDataspaces(taskRunning);
     }
 

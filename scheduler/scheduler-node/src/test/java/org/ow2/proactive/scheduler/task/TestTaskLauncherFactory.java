@@ -64,7 +64,8 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
     }
 
     @Override
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
+    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+            TaskLogger taskLogger) {
         return dataSpaces;
     }
 
