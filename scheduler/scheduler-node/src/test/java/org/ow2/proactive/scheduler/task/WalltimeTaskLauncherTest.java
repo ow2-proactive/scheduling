@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -105,7 +104,8 @@ public class WalltimeTaskLauncherTest extends TaskLauncherTestAbstract {
 
     private class ForkingTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
         @Override
-        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
+        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+                TaskLogger taskLogger) {
             return new TestTaskLauncherFactory.TaskFileDataspaces();
         }
 

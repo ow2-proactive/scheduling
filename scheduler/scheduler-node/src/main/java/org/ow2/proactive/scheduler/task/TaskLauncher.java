@@ -187,7 +187,8 @@ public class TaskLauncher implements InitActive {
             DataSpaceNodeConfigurationAgent.lockCacheSpaceCleaning();
             dataspaces = factory.createTaskDataspaces(taskId,
                                                       initializer.getNamingService(),
-                                                      executableContainer.isRunAsUser());
+                                                      executableContainer.isRunAsUser(),
+                                                      taskLogger);
 
             copyTaskLogsFromUserSpace(taskLogger.createLogFilePath(dataspaces.getScratchFolder()), dataspaces);
 

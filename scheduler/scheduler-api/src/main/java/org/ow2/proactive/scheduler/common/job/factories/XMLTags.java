@@ -130,9 +130,9 @@ public enum XMLTags {
     /**
      * pattern that matches for open tag for provided tag name.
      * e.g.: <code>String.format(CLOSE_TAG_PATTERN, XMLTags.VARIABLES</code> seeks
-     * for the string like this: &lt;/variables&gt;, &lt;/   variables&gt;, &lt;  /  variables   &gt;, etc.
+     * for the string like this: &lt;/variables&gt;, &lt;variables/&gt; &lt;/   variables&gt;, &lt;  /  variables   &gt;, etc.
      */
-    public static final String CLOSE_TAG_PATTERN = "<[ ]*/[ ]*%s[ ]*>";
+    public static final String CLOSE_TAG_PATTERN = "<[ ]*/[ ]*%s[ ]*>|<[ ]*%s[ ]*/[ ]*>";
 
     private String xmlName;
 
@@ -154,7 +154,7 @@ public enum XMLTags {
     }
 
     public String getCloseTagPattern() {
-        return String.format(CLOSE_TAG_PATTERN, this.xmlName);
+        return String.format(CLOSE_TAG_PATTERN, this.xmlName, this.xmlName);
     }
 
     private static Map<String, XMLTags> namesToEnum = null;

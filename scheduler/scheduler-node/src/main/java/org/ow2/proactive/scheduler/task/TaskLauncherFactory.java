@@ -36,8 +36,8 @@ import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 
 public interface TaskLauncherFactory extends Serializable {
 
-    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser)
-            throws Exception;
+    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+            TaskLogger taskLogger) throws Exception;
 
     TaskExecutor createTaskExecutor(File workingDir);
 
