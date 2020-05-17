@@ -38,9 +38,9 @@ import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 public class ProActiveNonForkedTaskLauncherFactory implements TaskLauncherFactory {
 
     @Override
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser)
-            throws Exception {
-        return new TaskProActiveDataspaces(taskId, namingService, isRunAsUser);
+    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+            TaskLogger taskLogger) throws Exception {
+        return new TaskProActiveDataspaces(taskId, namingService, isRunAsUser, taskLogger);
     }
 
     @Override

@@ -225,8 +225,8 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
         runTaskLauncher(createLauncherWithInjectedMocks(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
-                    boolean isRunAsUser) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+                    TaskLogger taskLogger) {
                 return dataspacesMock;
             }
         }), executableContainer);
@@ -250,8 +250,8 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
         runTaskLauncher(createLauncherWithInjectedMocks(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
-                    boolean isRunAsUser) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+                    TaskLogger taskLogger) {
                 return dataspacesMock;
             }
         }), executableContainer);
@@ -273,8 +273,8 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
         runTaskLauncher(createLauncherWithInjectedMocks(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
-                    boolean isRunAsUser) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+                    TaskLogger taskLogger) {
                 return dataspacesMock;
             }
         }), executableContainer);
