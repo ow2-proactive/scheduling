@@ -334,7 +334,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/log/server")
-    @Produces("application/json")
+    @Produces("text/plain")
     String jobServerLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -801,7 +801,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/log/full")
-    @Produces("application/json")
+    @Produces("text/plain")
     InputStream jobFullLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @QueryParam("sessionid") String session) throws RestException, IOException;
 
@@ -822,7 +822,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/result/log/all")
-    @Produces("application/json")
+    @Produces("text/plain")
     String jobLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) throws RestException;
 
     /**
@@ -1052,7 +1052,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
-    @Produces("application/json")
+    @Produces("text/plain")
     String taskLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1072,7 +1072,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/all")
-    @Produces("application/json")
+    @Produces("text/plain")
     String taskLogByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1093,7 +1093,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
-    @Produces("application/json")
+    @Produces("text/plain")
     String taskLogErr(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1115,7 +1115,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/err")
-    @Produces("application/json")
+    @Produces("text/plain")
     String taskLogErrByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1136,7 +1136,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
-    @Produces("application/json")
+    @Produces("text/plain")
     String taskLogout(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1158,7 +1158,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/out")
-    @Produces("application/json")
+    @Produces("text/plain")
     String taskLogoutByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1181,7 +1181,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/full")
-    @Produces("application/json")
+    @Produces("text/plain")
     InputStream taskFullLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname, @QueryParam("sessionid") String session)
             throws RestException, IOException;
@@ -1200,7 +1200,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/log/server")
-    @Produces("application/json")
+    @Produces("text/plain")
     String taskServerLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1218,7 +1218,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/log/server")
-    @Produces("application/json")
+    @Produces("text/plain")
     String taskServerLogByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
