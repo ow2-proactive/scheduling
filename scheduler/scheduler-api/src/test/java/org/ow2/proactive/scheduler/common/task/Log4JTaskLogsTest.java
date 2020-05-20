@@ -47,9 +47,14 @@ public class Log4JTaskLogsTest {
         assertEquals(String.format("output%n"), taskLogs.getStdoutLogs(false));
         assertEquals(String.format("error%n"), taskLogs.getStderrLogs(false));
         assertEquals(String.format("error%noutput%n"), taskLogs.getAllLogs(false));
-
-        assertTrue(taskLogs.getStdoutLogs(true).matches(String.format("\\[.*\\] output %n")));
-        assertTrue(taskLogs.getStderrLogs(true).matches(String.format("\\[.*\\] error %n")));
-        assertTrue(taskLogs.getAllLogs(true).matches(String.format("\\[.*\\] error %n\\[.*\\] output %n")));
+        String stdoutLogs = taskLogs.getStdoutLogs(true);
+        System.out.println("STDOUT: " + stdoutLogs);
+        String stderrLogs = taskLogs.getStderrLogs(true);
+        System.out.println("STDERR: " + stderrLogs);
+        String stdallLogs = taskLogs.getAllLogs(true);
+        System.out.println("STDALLL: " + stdallLogs);
+        assertTrue(stdoutLogs.matches("\\A\\[.*\\] output\\r?\\n\\z"));
+        assertTrue(stderrLogs.matches("\\A\\[.*\\] error\\r?\\n\\z"));
+        assertTrue(stdallLogs.matches("\\A\\[.*\\] error\\r?\\n\\[.*\\] output\\r?\\n\\z"));
     }
 }

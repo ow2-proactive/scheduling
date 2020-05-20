@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -138,10 +139,10 @@ public class Log4JTaskLogs implements TaskLogs {
 
     private void appendEventToLogs(LoggingEvent logEvent, StringBuffer logs, Layout logFormat, boolean timeStamp) {
         if (timeStamp) {
-            logs.append(logFormat.format(logEvent));
+            logs.append(StringUtils.stripEnd(logFormat.format(logEvent), null) + nl);
         } else {
-            logs.append(logEvent.getMessage());
-            logs.append(nl);
+            Object message = logEvent.getMessage();
+            logs.append(StringUtils.stripEnd(message.toString(), null) + nl);
         }
     }
 
