@@ -966,8 +966,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         List<TaskResult> resultList = scheduler.getTaskResultAllIncarnations(jobId, taskName);
         for (TaskResult result : resultList) {
             if (result.getOutput() != null) {
-                allLogs.append(result.getOutput().getAllLogs(true));
-                allLogs.append(NL);
+                String taskAllLogs = result.getOutput().getAllLogs(true);
+                allLogs.append(taskAllLogs);
+                if (!taskAllLogs.endsWith("\n")) {
+                    allLogs.append(NL);
+                }
             }
         }
         return allLogs.toString();
@@ -1019,8 +1022,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskResult> resultList = s.getTaskResultAllIncarnations(jobId, taskname);
             for (TaskResult result : resultList) {
                 if (result.getOutput() != null) {
-                    errLogs.append(result.getOutput().getStderrLogs(true));
-                    errLogs.append(NL);
+                    String taskErrLogs = result.getOutput().getStderrLogs(true);
+                    errLogs.append(taskErrLogs);
+                    if (!taskErrLogs.endsWith("\n")) {
+                        errLogs.append(NL);
+                    }
                 }
             }
             return errLogs.toString();
@@ -1054,8 +1060,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskResult> resultList = s.getTaskResultAllIncarnations(jobId, taskname);
             for (TaskResult result : resultList) {
                 if (result.getOutput() != null) {
-                    outLogs.append(result.getOutput().getStdoutLogs(true));
-                    outLogs.append(NL);
+                    String taskOutLogs = result.getOutput().getStdoutLogs(true);
+                    outLogs.append(taskOutLogs);
+                    if (!taskOutLogs.endsWith("\n")) {
+                        outLogs.append(NL);
+                    }
                 }
             }
             return outLogs.toString();

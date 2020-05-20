@@ -85,12 +85,12 @@ public class TaskLoggerTest extends ProActiveTestClean {
 
         System.out.println(taskLogger.getLogs().getAllLogs(false));
 
-        assertEquals(String.format("hello%n%n"), taskLogger.getLogs().getAllLogs(false));
-        assertEquals(String.format("hello%n%n"), taskLogger.getLogs().getStdoutLogs(false));
+        assertEquals(String.format("hello%n"), taskLogger.getLogs().getAllLogs(false));
+        assertEquals(String.format("hello%n"), taskLogger.getLogs().getStdoutLogs(false));
 
         taskLogger.getErrorSink().println("error");
-        assertEquals(String.format("hello%n%nerror%n%n"), taskLogger.getLogs().getAllLogs(false));
-        assertEquals(String.format("error%n%n"), taskLogger.getLogs().getStderrLogs(false));
+        assertEquals(String.format("hello%nerror%n"), taskLogger.getLogs().getAllLogs(false));
+        assertEquals(String.format("error%n"), taskLogger.getLogs().getStderrLogs(false));
     }
 
     @Test
@@ -154,13 +154,13 @@ public class TaskLoggerTest extends ProActiveTestClean {
         assertTrue(taskLogger.getLogs()
                              .getAllLogs(true)
                              .matches("\\[" + quotedStringTaskId +
-                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello\r?\n \r?\n"));
+                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello\r?\n"));
 
         taskLogger.getErrorSink().println("error");
         assertTrue(taskLogger.getLogs()
                              .getStderrLogs(true)
                              .matches("\\[" + quotedStringTaskId +
-                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error\r?\n \r?\n"));
+                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error\r?\n"));
 
     }
 
