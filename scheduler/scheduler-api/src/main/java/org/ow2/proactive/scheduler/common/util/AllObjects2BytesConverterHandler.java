@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.utils.StackTraceUtil;
 
 
 public class AllObjects2BytesConverterHandler {
@@ -53,9 +54,9 @@ public class AllObjects2BytesConverterHandler {
     private final static Long deserializationThreshold = Long.getLong(DESERIALIZATION_THRESHOLD, 1000000L);
 
     private final static String ERROR_MESSAGE = " was stuck for more than " + secondsToWait +
-                                                " seconds. Killing the Java process.(You can control this timeout  with the java property -D" +
+                                                " seconds and the thread analysis detected a jython deadlock (see https://bugs.jython.org/issue2624). Killing the Java process as the deadlock cannot be recovered (You can control this timeout with the java property -D" +
                                                 TIMEOUT_JAVA_PROPERTY +
-                                                "= when starting nodes and/or when starting the scheduler )";
+                                                "= when starting nodes and/or when starting the scheduler).";
 
     private AllObjects2BytesConverterHandler() {
     }
@@ -94,17 +95,24 @@ public class AllObjects2BytesConverterHandler {
         Future<Map<K, V>> future = executor.submit(callable);
 
         try {
-            if (totalSize < deserializationThreshold) {
-                // If the amount of bytes to deserialize is small, the deserialization should not exceed a timeout,
-                // otherwise it means a deadlock occurs (most likely due to jython types)
-                // timeout is disabled for serialization
-                resultMap = future.get(secondsToWait, TimeUnit.SECONDS);
-            } else {
+            try {
+                if (totalSize < deserializationThreshold) {
+                    // If the amount of bytes to deserialize is small, the deserialization should not exceed a timeout,
+                    // otherwise it means a deadlock occurs (most likely due to jython types)
+                    // timeout is disabled for serialization
+                    resultMap = future.get(secondsToWait, TimeUnit.SECONDS);
+                } else {
+                    resultMap = future.get();
+                }
+            } catch (TimeoutException e) {
+                if (StackTraceUtil.getAllStackTraces().contains("org.python.core")) {
+                    // We analyse the current thread state to detect jython deadlocks
+                    // see https://bugs.jython.org/issue2624
+                    logger.fatal(action + ERROR_MESSAGE);
+                    System.exit(1);
+                }
                 resultMap = future.get();
             }
-        } catch (TimeoutException e) {
-            logger.fatal(action + ERROR_MESSAGE);
-            System.exit(1);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
