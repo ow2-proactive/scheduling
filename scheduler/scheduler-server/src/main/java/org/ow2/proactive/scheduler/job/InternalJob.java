@@ -635,37 +635,48 @@ public abstract class InternalJob extends JobState {
         return true;
     }
 
-    /**
-     * Walk up <code>down</code>'s dependences until a task <code>name</code> is
-     * met
-     * <p>
-     * also walks weak references created by {@link FlowActionType#IF}
-     *
-     * @return the task names <code>name</code>, or null
-     */
-    public InternalTask findTaskUp(String name, InternalTask down) {
-        InternalTask ret = null;
-        List<InternalTask> ideps = new ArrayList<>();
-        if (down.getIDependences() != null) {
-            ideps.addAll(down.getIDependences());
-        }
-        if (down.getJoinedBranches() != null) {
-            ideps.addAll(down.getJoinedBranches());
-        }
-        if (down.getIfBranch() != null) {
-            ideps.add(down.getIfBranch());
-        }
-        for (InternalTask up : ideps) {
-            if (up.getName().equals(name)) {
-                ret = up;
-            } else {
-                InternalTask r = findTaskUp(name, up);
-                if (r != null) {
-                    ret = r;
-                }
+    //  Recursive algorithm is causing issues on loops with a large number of tasks
+    //    /**
+    //     * Walk up <code>down</code>'s dependences until a task <code>name</code> is
+    //     * met
+    //     * <p>
+    //     * also walks weak references created by {@link FlowActionType#IF}
+    //     *
+    //     * @return the task names <code>name</code>, or null
+    //     */
+    //    public InternalTask findTaskUp(String name, InternalTask down) {
+    //        InternalTask ret = null;
+    //        List<InternalTask> ideps = new ArrayList<>();
+    //        if (down.getIDependences() != null) {
+    //            ideps.addAll(down.getIDependences());
+    //        }
+    //        if (down.getJoinedBranches() != null) {
+    //            ideps.addAll(down.getJoinedBranches());
+    //        }
+    //        if (down.getIfBranch() != null) {
+    //            ideps.add(down.getIfBranch());
+    //        }
+    //        for (InternalTask up : ideps) {
+    //            if (up.getName().equals(name)) {
+    //                ret = up;
+    //            } else {
+    //                InternalTask r = findTaskUp(name, up);
+    //                if (r != null) {
+    //                    ret = r;
+    //                }
+    //            }
+    //        }
+    //        return ret;
+    //    }
+
+    // replaced findTaskUp call due to recursion issues
+    public InternalTask findTask(String name) {
+        for (InternalTask task : tasks.values()) {
+            if (name.equals(task.getName())) {
+                return task;
             }
         }
-        return ret;
+        return null;
     }
 
     /**
