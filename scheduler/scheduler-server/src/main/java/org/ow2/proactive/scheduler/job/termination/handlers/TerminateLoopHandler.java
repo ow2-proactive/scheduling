@@ -57,7 +57,7 @@ public class TerminateLoopHandler {
         if (action.getTarget().equals(initiator.getName())) {
             target = initiator;
         } else {
-            target = internalJob.findTaskUp(action.getTarget(), initiator);
+            target = internalJob.findTask(action.getTarget());
         }
         boolean replicateForNextLoopIteration = internalJob.replicateForNextLoopIteration(initiator,
                                                                                           target,

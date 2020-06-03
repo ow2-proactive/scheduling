@@ -170,7 +170,7 @@ public class TerminateIfTaskHandler {
                     targetElse = it;
                 }
             } else if (action.getTargetContinuation().equals(it.getName())) {
-                InternalTask up = internalJob.findTaskUp(initiator.getName(), it);
+                InternalTask up = internalJob.findTask(initiator.getName());
                 if (up != null && up.equals(initiator)) {
                     targetJoin = it;
                 }
