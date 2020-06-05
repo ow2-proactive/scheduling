@@ -92,10 +92,17 @@ public class RestDataspaceImpl implements RestDataspace {
 
     @Override
     public Response retrieve(@HeaderParam("sessionid") String sessionId,
-            @HeaderParam("Accept-Encoding") String encoding, @PathParam("dataspace") String dataspace,
+            @HeaderParam("Accept-Encoding") String headerAcceptEncoding, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("comp") String component,
-            @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes)
-            throws NotConnectedRestException, PermissionRestException {
+            @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes,
+            @QueryParam("encoding") String encoding) throws NotConnectedRestException, PermissionRestException {
+        if (encoding == null) {
+            encoding = headerAcceptEncoding;
+        }
+        logger.debug(String.format("Retrieving file %s in %s with encoding %s",
+                                   pathname,
+                                   dataspace.toUpperCase(),
+                                   encoding));
         Session session = checkSessionValidity(sessionId);
         try {
             checkPathParams(dataspace, pathname);

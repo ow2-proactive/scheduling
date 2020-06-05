@@ -106,7 +106,7 @@ public interface RestDataspace {
      * <li>If the pathname represents a file, its contents will be returned as:
      * <ul>
      * <li>an octet stream, if its a compressed file already or if the client doesn't
-     * accept encoded content</li>
+     * accept encoded content (encoding specified as "identity")</li>
      * <li>a 'gzip' encoded stream, if the client accepts 'gzip' encoded content
      * </li>
      * <li>a 'zip' encoded stream, if the client accepts 'zip' encoded contents</li>
@@ -119,21 +119,23 @@ public interface RestDataspace {
      * returned from the specified location.</li>
      * </ul>
      * @param sessionId a valid session id
+     * @param headerAcceptEncoding the accepted encoding supported by the client, can be "*", "gzip", "zip", "identity" or empty. When the query parameter {@code encoding} is specified, it is overridden by {@code encoding}.
      * @param dataspace can have two possible values, 'user' or 'global',
      * depending on the target <i>DATASPACE</i>
      * @param pathname location of the file or folder to retrieve
      * @param component can either be 'list' or empty. If 'list' is used, the response will contain in JSON format the list of files and folder presents at specified location, equivalent to a directory listing.
-     * @param encoding accepted encoding supported by the client, can be "*", "gzip", "zip" or empty.
      * @param includes a list of inclusion directives
      * @param excludes a list of exclusion directives
+     * @param encoding the accepted encoding supported by the client, can be "*", "gzip", "zip", "identity" or empty. It overrides the accepted encoding specified in {@code headerAcceptEncoding}.
      * @return a REST response which can have various content-types
      */
     @GET
     @Path("/{dataspace}/{path-name:.*}")
-    Response retrieve(@HeaderParam("sessionid") String sessionId, @HeaderParam("Accept-Encoding") String encoding,
-            @PathParam("dataspace") String dataspace, @PathParam("path-name") String pathname,
-            @QueryParam("comp") String component, @QueryParam("includes") List<String> includes,
-            @QueryParam("excludes") List<String> excludes) throws NotConnectedRestException, PermissionRestException;
+    Response retrieve(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("Accept-Encoding") String headerAcceptEncoding, @PathParam("dataspace") String dataspace,
+            @PathParam("path-name") String pathname, @QueryParam("comp") String component,
+            @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes,
+            @QueryParam("encoding") String encoding) throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Delete file(s) from the specified location in the <i>dataspace</i>.
