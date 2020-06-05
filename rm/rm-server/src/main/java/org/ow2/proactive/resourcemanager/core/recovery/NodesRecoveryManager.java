@@ -181,7 +181,7 @@ public class NodesRecoveryManager {
             }
         }
         nodeRecoveryThreadPool.shutdownNow();
-        this.rmCore.setEligibleNodesToRecover(recoveredEligibleNodes);
+        this.rmCore.addEligibleNodesToRecover(recoveredEligibleNodes);
         this.logNodeRecoverySummary(nodeSourceName, recoveredNodeStatesCounter, recoveredEligibleNodes.size());
     }
 
