@@ -1047,8 +1047,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, preemptive, isTriggeredFromShutdownHook));
     }
 
-    public void setEligibleNodesToRecover(List<RMNode> eligibleNodes) {
-        this.eligibleNodes = eligibleNodes;
+    public void addEligibleNodesToRecover(List<RMNode> eligibleNodes) {
+        this.eligibleNodes.addAll(eligibleNodes);
     }
 
     private final class RemoveAllNodes implements Function<NodeSource, Void> {
