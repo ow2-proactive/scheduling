@@ -25,8 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.Date;
 
 
@@ -50,12 +48,16 @@ public enum ModelType {
     REGEXP(RegexpParserValidator.class, String.class),
     SHORT(ShortParserValidator.class, Short.class),
     SPEL(SPELParserValidator.class, String.class),
-    URI(URIParserValidator.class, URI.class),
-    URL(URLParserValidator.class, URL.class),
+    URI(URIParserValidator.class, String.class),
+    OPTIONAL_URI(OptionalURIParserValidator.class, String.class),
+    URL(URLParserValidator.class, String.class),
+    OPTIONAL_URL(OptionalURLParserValidator.class, String.class),
     HIDDEN(HiddenParserValidator.class, String.class),
     CREDENTIAL(CredentialParserValidator.class, String.class),
-    USER_FILE(UserFileParserValidator.class, URI.class),
-    GLOBAL_FILE(GlobalFileParserValidator.class, URI.class);
+    USER_FILE(UserFileParserValidator.class, String.class),
+    OPTIONAL_USER_FILE(OptionalUserFileParserValidator.class, String.class),
+    GLOBAL_FILE(GlobalFileParserValidator.class, String.class),
+    OPTIONAL_GLOBAL_FILE(OptionalGlobalFileParserValidator.class, String.class);
 
     // The parser validator of the model type
     private Class typeParserValidator;

@@ -25,8 +25,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,25 +35,32 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class URIParserValidatorTest {
+public class OptionalURLParserValidatorTest {
 
     @Test
-    public void testThatValidURIIsOK()
-            throws ModelSyntaxException, ValidationException, ConversionException, URISyntaxException {
-        String value = "/my/file";
-        Assert.assertEquals(new URI(value).toString(),
-                            new URIParserValidator(ModelType.URI.name()).parseAndValidate(value));
+    public void testThatValidURLIsOK()
+            throws ModelSyntaxException, ValidationException, ConversionException, MalformedURLException {
+        String value = "file://mysite";
+        OptionalURLParserValidator parserValidator = new OptionalURLParserValidator(ModelType.OPTIONAL_URL.name());
+        Assert.assertEquals(new URL(value).toExternalForm(), parserValidator.parseAndValidate(value));
     }
 
     @Test(expected = ValidationException.class)
-    public void testThatInvalidURIThrowException()
+    public void testThatInvalidURLThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator(ModelType.URI.name()).parseAndValidate("\\&¨^¨$ù%");
+        new OptionalURLParserValidator(ModelType.OPTIONAL_URL.name()).parseAndValidate("unknown://protocol");
+    }
+
+    @Test
+    public void testThatBlankURLIsOK() throws ModelSyntaxException, ValidationException, ConversionException {
+        String value = "";
+        OptionalURLParserValidator parserValidator = new OptionalURLParserValidator(ModelType.OPTIONAL_URL.name());
+        Assert.assertEquals(value, parserValidator.parseAndValidate(value));
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testThatInvalidModelThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator("URY").parseAndValidate("blabla");
+        new OptionalURLParserValidator("OPTIONAL_URLL").parseAndValidate("blabla");
     }
 }
