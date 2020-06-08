@@ -23,25 +23,27 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class URLConverterTest {
+/**
+ * @author ActiveEon Team
+ * @since 19/08/19s
+ */
+public class URLValidator implements Validator<String> {
 
-    @Test
-    public void testURLConverterOK() throws ConversionException {
-        URLConverter converter = new URLConverter();
-        String value = "http://mysite?myparam=1";
-        Assert.assertEquals(value, converter.convert(value).toString());
-    }
-
-    @Test(expected = ConversionException.class)
-    public void testURLConverterKO() throws ConversionException {
-        URLConverter converter = new URLConverter();
-        converter.convert("unknown://mysite.com");
+    @Override
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+        try {
+            return new URL(parameterValue).toString();
+        } catch (MalformedURLException e) {
+            throw new ValidationException(parameterValue + " is not a valid url", e);
+        }
     }
 }

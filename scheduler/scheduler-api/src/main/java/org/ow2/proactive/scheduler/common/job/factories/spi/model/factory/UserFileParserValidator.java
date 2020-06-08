@@ -38,6 +38,10 @@ public class UserFileParserValidator extends BaseParserValidator<String> {
         super(model, ModelType.USER_FILE);
     }
 
+    public UserFileParserValidator(String model, ModelType type) throws ModelSyntaxException {
+        super(model, type);
+    }
+
     @Override
     protected Converter<String> createConverter(String model) throws ModelSyntaxException {
         return new IdentityConverter();

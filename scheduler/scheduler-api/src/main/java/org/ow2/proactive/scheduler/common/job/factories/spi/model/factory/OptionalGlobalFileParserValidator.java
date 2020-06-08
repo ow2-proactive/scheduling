@@ -25,34 +25,20 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.GlobalFileValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.OptionalValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
 
-public class URIParserValidatorTest {
-
-    @Test
-    public void testURIParserValidatorOK()
-            throws ModelSyntaxException, ValidationException, ConversionException, URISyntaxException {
-        String value = "/my/file";
-        Assert.assertEquals(new URI(value).toString(),
-                            new URIParserValidator(ModelType.URI.name()).parseAndValidate(value));
+public class OptionalGlobalFileParserValidator extends GlobalFileParserValidator {
+    public OptionalGlobalFileParserValidator(String model) throws ModelSyntaxException {
+        super(model, ModelType.OPTIONAL_GLOBAL_FILE);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testURIParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator(ModelType.URI.name()).parseAndValidate("\\&¨^¨$ù%");
-    }
-
-    @Test(expected = ModelSyntaxException.class)
-    public void testURIParserValidatorInvalidModel()
-            throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator("URY").parseAndValidate("blabla");
+    @Override
+    protected Validator<String> createValidator(String model, Converter<String> converter) {
+        return new OptionalValidator<>(new GlobalFileValidator());
     }
 }

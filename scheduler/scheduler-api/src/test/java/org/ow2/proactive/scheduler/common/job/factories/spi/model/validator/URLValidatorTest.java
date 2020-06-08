@@ -23,36 +23,26 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
-
-import java.net.URI;
-import java.net.URISyntaxException;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class URIParserValidatorTest {
+public class URLValidatorTest {
 
     @Test
-    public void testURIParserValidatorOK()
-            throws ModelSyntaxException, ValidationException, ConversionException, URISyntaxException {
-        String value = "/my/file";
-        Assert.assertEquals(new URI(value).toString(),
-                            new URIParserValidator(ModelType.URI.name()).parseAndValidate(value));
+    public void testURLValidatorOK() throws ValidationException {
+        URLValidator validator = new URLValidator();
+        String value = "http://mysite?myparam=1";
+        Assert.assertEquals(value, validator.validate(value, null));
     }
 
     @Test(expected = ValidationException.class)
-    public void testURIParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator(ModelType.URI.name()).parseAndValidate("\\&¨^¨$ù%");
-    }
-
-    @Test(expected = ModelSyntaxException.class)
-    public void testURIParserValidatorInvalidModel()
-            throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator("URY").parseAndValidate("blabla");
+    public void testURLValidatorKO() throws ValidationException {
+        URLValidator validator = new URLValidator();
+        String value = "unknown://mysite.com";
+        validator.validate(value, null);
     }
 }

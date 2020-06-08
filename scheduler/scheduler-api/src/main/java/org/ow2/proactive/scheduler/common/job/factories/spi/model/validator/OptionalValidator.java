@@ -23,21 +23,31 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.apache.commons.lang3.StringUtils;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 
+/**
+ *
+ * @param <T>
+ */
+public class OptionalValidator<T> implements Validator<T> {
+    Validator<T> validator;
 
-public class URLConverter implements Converter<URL> {
+    public OptionalValidator(Validator<T> validator) {
+        this.validator = validator;
+    }
+
     @Override
-    public URL convert(String parameterValue) throws ConversionException {
-        try {
-            return new URL(parameterValue);
-        } catch (MalformedURLException e) {
-            throw new ConversionException(parameterValue, URL.class, e.getMessage(), e);
+    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
+        // When the parameter value is not provided, it's validated. Otherwise, use its proper validator
+        if (StringUtils.isBlank(parameterValue.toString())) {
+            return parameterValue;
+        } else {
+            return validator.validate(parameterValue, context);
         }
     }
 }

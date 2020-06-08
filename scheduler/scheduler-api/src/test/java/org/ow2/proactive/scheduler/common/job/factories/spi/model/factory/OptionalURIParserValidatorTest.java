@@ -35,24 +35,33 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class URIParserValidatorTest {
+public class OptionalURIParserValidatorTest {
 
     @Test
-    public void testURIParserValidatorOK()
+    public void testOptionalURIParserValidatorOK()
             throws ModelSyntaxException, ValidationException, ConversionException, URISyntaxException {
         String value = "/my/file";
-        Assert.assertEquals(new URI(value).toString(),
-                            new URIParserValidator(ModelType.URI.name()).parseAndValidate(value));
+        OptionalURIParserValidator parserValidator = new OptionalURIParserValidator(ModelType.OPTIONAL_URI.name());
+        Assert.assertEquals(new URI(value).toString(), parserValidator.parseAndValidate(value));
     }
 
     @Test(expected = ValidationException.class)
-    public void testURIParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator(ModelType.URI.name()).parseAndValidate("\\&¨^¨$ù%");
+    public void testOptionalURIParserValidatorKO()
+            throws ModelSyntaxException, ValidationException, ConversionException {
+        new OptionalURIParserValidator(ModelType.OPTIONAL_URI.name()).parseAndValidate("\\&¨^¨$ù%");
+    }
+
+    @Test
+    public void testOptionalURIParserValidatorBlankURIOK()
+            throws ModelSyntaxException, ValidationException, ConversionException {
+        String value = " ";
+        OptionalURIParserValidator parserValidator = new OptionalURIParserValidator(ModelType.OPTIONAL_URI.name());
+        Assert.assertEquals(value, parserValidator.parseAndValidate(value));
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testURIParserValidatorInvalidModel()
+    public void testOptionalURIParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator("URY").parseAndValidate("blabla");
+        new OptionalURIParserValidator("OPTIONAL_URY").parseAndValidate("blabla");
     }
 }

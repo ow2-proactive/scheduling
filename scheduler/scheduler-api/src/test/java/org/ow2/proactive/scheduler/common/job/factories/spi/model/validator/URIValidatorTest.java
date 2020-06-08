@@ -23,25 +23,26 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class URIConverterTest {
+public class URIValidatorTest {
 
     @Test
-    public void testURIConverterOK() throws ConversionException {
-        URIConverter converter = new URIConverter();
+    public void testURIValidatorOK() throws ValidationException {
+        URIValidator validator = new URIValidator();
         String value = "c:/toto";
-        Assert.assertEquals(value, converter.convert(value).toString());
+        Assert.assertEquals(value, validator.validate(value, null));
     }
 
-    @Test(expected = ConversionException.class)
-    public void testURIConverterKO() throws ConversionException {
-        URIConverter converter = new URIConverter();
-        converter.convert("\\&¨^¨$ù%");
+    @Test(expected = ValidationException.class)
+    public void testURIValidatorKO() throws ValidationException {
+        URIValidator validator = new URIValidator();
+        String value = "\\&¨^¨$ù%";
+        validator.validate(value, null);
     }
 }

@@ -23,21 +23,23 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.OptionalValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.URIValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 
+public class OptionalURIParserValidator extends URIParserValidator {
 
-public class URIConverter implements Converter<URI> {
+    public OptionalURIParserValidator(String model) throws ModelSyntaxException {
+        super(model, ModelType.OPTIONAL_URI);
+    }
+
     @Override
-    public URI convert(String parameterValue) throws ConversionException {
-        try {
-            return new URI(parameterValue);
-        } catch (URISyntaxException e) {
-            throw new ConversionException(parameterValue, URI.class, e.getMessage(), e);
-        }
+    protected Validator<String> createValidator(String model, Converter<String> converter) {
+        return new OptionalValidator<>(new URIValidator());
     }
 }
