@@ -33,14 +33,14 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class URLValidatorTest {
 
     @Test
-    public void testURLValidatorOK() throws ValidationException {
+    public void testThatValidURLIsOK() throws ValidationException {
         URLValidator validator = new URLValidator();
         String value = "http://mysite?myparam=1";
         Assert.assertEquals(value, validator.validate(value, null));
     }
 
     @Test(expected = ValidationException.class)
-    public void testURLValidatorKO() throws ValidationException {
+    public void testThatInvalidURLThrowException() throws ValidationException {
         URLValidator validator = new URLValidator();
         String value = "unknown://mysite.com";
         validator.validate(value, null);

@@ -62,20 +62,22 @@ public class GlobalFileParserValidatorTest {
     }
 
     @Test
-    public void testValidGlobalFileOK() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatValidGlobalFileIsOk() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = existGlobalFilePath;
         GlobalFileParserValidator parserValidator = new GlobalFileParserValidator(ModelType.GLOBAL_FILE.name());
         Assert.assertEquals(value, parserValidator.parseAndValidate(value, context));
     }
 
     @Test(expected = ValidationException.class)
-    public void testInvalidGlobalFileKO() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatInvalidGlobalFileThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         GlobalFileParserValidator parserValidator = new GlobalFileParserValidator(ModelType.GLOBAL_FILE.name());
         parserValidator.parseAndValidate(notExistGlobalFilePath, context);
     }
 
     @Test(expected = ValidationException.class)
-    public void testEmptyGlobalFileKO() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatEmptyGlobalFileThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         GlobalFileParserValidator parserValidator = new GlobalFileParserValidator(ModelType.GLOBAL_FILE.name());
         parserValidator.parseAndValidate(value, context);
@@ -83,7 +85,7 @@ public class GlobalFileParserValidatorTest {
 
     // when context is not specified, the parserValidator is expected to not check global file existence.
     @Test
-    public void testEmptyGlobalFileWithoutContextOK()
+    public void testThatGivenNoContextEmptyGlobalFileIsOK()
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         GlobalFileParserValidator parserValidator = new GlobalFileParserValidator(ModelType.GLOBAL_FILE.name());
@@ -91,7 +93,8 @@ public class GlobalFileParserValidatorTest {
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testInvalidModel() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatInvalidModelThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         new GlobalFileParserValidator("GLOBAL_FILEE").parseAndValidate("blabla");
     }
 }

@@ -38,7 +38,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class OptionalURLParserValidatorTest {
 
     @Test
-    public void testOptionalURLParserValidatorOK()
+    public void testThatValidURLIsOK()
             throws ModelSyntaxException, ValidationException, ConversionException, MalformedURLException {
         String value = "file://mysite";
         OptionalURLParserValidator parserValidator = new OptionalURLParserValidator(ModelType.OPTIONAL_URL.name());
@@ -46,21 +46,20 @@ public class OptionalURLParserValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testOptionalURIParserValidatorKO()
+    public void testThatInvalidURLThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
         new OptionalURLParserValidator(ModelType.OPTIONAL_URL.name()).parseAndValidate("unknown://protocol");
     }
 
     @Test
-    public void testOptionalURLParserValidatorBlankURLOK()
-            throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatBlankURLIsOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         OptionalURLParserValidator parserValidator = new OptionalURLParserValidator(ModelType.OPTIONAL_URL.name());
         Assert.assertEquals(value, parserValidator.parseAndValidate(value));
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testOptionalURLParserValidatorInvalidModel()
+    public void testThatInvalidModelThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
         new OptionalURLParserValidator("OPTIONAL_URLL").parseAndValidate("blabla");
     }

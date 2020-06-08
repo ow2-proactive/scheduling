@@ -33,14 +33,14 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class URIValidatorTest {
 
     @Test
-    public void testURIValidatorOK() throws ValidationException {
+    public void testThatValidURIIsOK() throws ValidationException {
         URIValidator validator = new URIValidator();
         String value = "c:/toto";
         Assert.assertEquals(value, validator.validate(value, null));
     }
 
     @Test(expected = ValidationException.class)
-    public void testURIValidatorKO() throws ValidationException {
+    public void testThatInvalidURIThrowException() throws ValidationException {
         URIValidator validator = new URIValidator();
         String value = "\\&¨^¨$ù%";
         validator.validate(value, null);

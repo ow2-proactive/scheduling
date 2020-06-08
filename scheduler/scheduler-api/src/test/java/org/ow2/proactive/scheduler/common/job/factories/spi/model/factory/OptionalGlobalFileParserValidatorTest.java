@@ -62,28 +62,29 @@ public class OptionalGlobalFileParserValidatorTest {
     }
 
     @Test
-    public void testValidOptionalGlobalFileOK() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatExistGlobalFileIsOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = existGlobalFilePath;
         OptionalGlobalFileParserValidator parserValidator = new OptionalGlobalFileParserValidator(ModelType.OPTIONAL_GLOBAL_FILE.name());
         Assert.assertEquals(value, parserValidator.parseAndValidate(value, context));
     }
 
     @Test(expected = ValidationException.class)
-    public void testInvalidOptionalGlobalFileKO()
+    public void testThatNotExistGlobalFileThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
         OptionalGlobalFileParserValidator parserValidator = new OptionalGlobalFileParserValidator(ModelType.OPTIONAL_GLOBAL_FILE.name());
         parserValidator.parseAndValidate(notExistGlobalFilePath, context);
     }
 
     @Test
-    public void testEmptyOptionalGlobalFileOK() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatEmptyGlobalFileIsOk() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         OptionalGlobalFileParserValidator parserValidator = new OptionalGlobalFileParserValidator(ModelType.OPTIONAL_GLOBAL_FILE.name());
         Assert.assertEquals(value, parserValidator.parseAndValidate(value, context));
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testInvalidModel() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatInvalidModelThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         new OptionalGlobalFileParserValidator("OPTIONAL_GLOBAL_FILEE").parseAndValidate("blabla");
     }
 }

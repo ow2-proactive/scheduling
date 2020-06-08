@@ -38,7 +38,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class URIParserValidatorTest {
 
     @Test
-    public void testURIParserValidatorOK()
+    public void testThatValidURIIsOK()
             throws ModelSyntaxException, ValidationException, ConversionException, URISyntaxException {
         String value = "/my/file";
         Assert.assertEquals(new URI(value).toString(),
@@ -46,12 +46,13 @@ public class URIParserValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testURIParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatInvalidURIThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         new URIParserValidator(ModelType.URI.name()).parseAndValidate("\\&¨^¨$ù%");
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testURIParserValidatorInvalidModel()
+    public void testThatInvalidModelThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
         new URIParserValidator("URY").parseAndValidate("blabla");
     }

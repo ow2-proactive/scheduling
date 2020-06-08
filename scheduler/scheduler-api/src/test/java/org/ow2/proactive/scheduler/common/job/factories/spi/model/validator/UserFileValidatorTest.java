@@ -60,20 +60,20 @@ public class UserFileValidatorTest {
     }
 
     @Test
-    public void testExistUserFileOK() throws ValidationException {
+    public void testThatExistUserFileIsOk() throws ValidationException {
         UserFileValidator validator = new UserFileValidator();
         String value = existUserFilePath;
         Assert.assertEquals(value, validator.validate(value, context));
     }
 
     @Test(expected = ValidationException.class)
-    public void testNotExistUserFileKO() throws ValidationException {
+    public void testThatNotExistUserFileThrowException() throws ValidationException {
         UserFileValidator validator = new UserFileValidator();
         validator.validate(notExistUserFilePath, context);
     }
 
     @Test(expected = ValidationException.class)
-    public void testEmptyUserFileKO() throws ValidationException {
+    public void testThatEmptyUserFileThrowException() throws ValidationException {
         UserFileValidator validator = new UserFileValidator();
         String value = "";
         validator.validate(value, context);

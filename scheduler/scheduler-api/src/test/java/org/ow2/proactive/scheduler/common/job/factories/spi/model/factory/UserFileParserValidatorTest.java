@@ -62,20 +62,22 @@ public class UserFileParserValidatorTest {
     }
 
     @Test
-    public void testValidUserFileOK() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatValidUserFileIsOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = existUserFilePath;
         UserFileParserValidator parserValidator = new UserFileParserValidator(ModelType.USER_FILE.name());
         Assert.assertEquals(value, parserValidator.parseAndValidate(value, context));
     }
 
     @Test(expected = ValidationException.class)
-    public void testInvalidUserFileKO() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatInvalidUserFileThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         UserFileParserValidator parserValidator = new UserFileParserValidator(ModelType.USER_FILE.name());
         parserValidator.parseAndValidate(notExistUserFilePath, context);
     }
 
     @Test(expected = ValidationException.class)
-    public void testEmptyUserFileKO() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatEmptyUserFileThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         UserFileParserValidator parserValidator = new UserFileParserValidator(ModelType.USER_FILE.name());
         parserValidator.parseAndValidate(value, context);
@@ -83,7 +85,7 @@ public class UserFileParserValidatorTest {
 
     // when context is not specified, the parserValidator is expected to not check user file existence.
     @Test
-    public void testEmptyUserFileWithoutContextOK()
+    public void testThatGivenNoContextEmptyUserFileIsOK()
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         UserFileParserValidator parserValidator = new UserFileParserValidator(ModelType.USER_FILE.name());
@@ -91,7 +93,8 @@ public class UserFileParserValidatorTest {
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testInvalidModel() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatInvalidModelThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         new UserFileParserValidator("USER_FILEE").parseAndValidate("blabla");
     }
 }

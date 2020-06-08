@@ -43,7 +43,7 @@ public class URIValidator implements Validator<String> {
         try {
             return new URI(parameterValue).toString();
         } catch (URISyntaxException e) {
-            throw new ValidationException(parameterValue + " is not a valid uri", e);
+            throw new ValidationException(parameterValue + " is not a valid URI.", e);
         }
     }
 }

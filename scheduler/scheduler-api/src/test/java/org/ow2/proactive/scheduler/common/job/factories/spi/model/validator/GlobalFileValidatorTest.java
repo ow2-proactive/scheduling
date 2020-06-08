@@ -60,20 +60,20 @@ public class GlobalFileValidatorTest {
     }
 
     @Test
-    public void testExistGlobalFileOK() throws ValidationException {
+    public void testThatExistGlobalFileIsOK() throws ValidationException {
         GlobalFileValidator validator = new GlobalFileValidator();
         String value = existGlobalFilePath;
         Assert.assertEquals(value, validator.validate(value, context));
     }
 
     @Test(expected = ValidationException.class)
-    public void testNotExistGlobalFileKO() throws ValidationException {
+    public void testThatNotExistGlobalFileThrowException() throws ValidationException {
         GlobalFileValidator validator = new GlobalFileValidator();
         validator.validate(notExistGlobalFilePath, context);
     }
 
     @Test(expected = ValidationException.class)
-    public void testEmptyGlobalFileKO() throws ValidationException {
+    public void testThatEmptyGlobalFileThrowException() throws ValidationException {
         GlobalFileValidator validator = new GlobalFileValidator();
         String value = "";
         validator.validate(value, context);

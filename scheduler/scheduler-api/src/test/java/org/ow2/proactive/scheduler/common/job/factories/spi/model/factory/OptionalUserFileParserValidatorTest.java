@@ -62,27 +62,29 @@ public class OptionalUserFileParserValidatorTest {
     }
 
     @Test
-    public void testValidOptionalUserFileOK() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatExistUserFileIsOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = existUserFilePath;
         OptionalUserFileParserValidator parserValidator = new OptionalUserFileParserValidator(ModelType.OPTIONAL_USER_FILE.name());
         Assert.assertEquals(value, parserValidator.parseAndValidate(value, context));
     }
 
     @Test(expected = ValidationException.class)
-    public void testInvalidOptionalUserFileKO() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatNotExistUserFileThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         OptionalUserFileParserValidator parserValidator = new OptionalUserFileParserValidator(ModelType.OPTIONAL_USER_FILE.name());
         parserValidator.parseAndValidate(notExistUserFilePath, context);
     }
 
     @Test
-    public void testEmptyOptionalUserFileOK() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatEmptyUserFileIsOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         OptionalUserFileParserValidator parserValidator = new OptionalUserFileParserValidator(ModelType.OPTIONAL_USER_FILE.name());
         Assert.assertEquals(value, parserValidator.parseAndValidate(value, context));
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testInvalidModel() throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testThatInvalidModelThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         new OptionalUserFileParserValidator("OPTIONAL_USER_FILEE").parseAndValidate("blabla");
     }
 }

@@ -43,7 +43,7 @@ public class URLValidator implements Validator<String> {
         try {
             return new URL(parameterValue).toString();
         } catch (MalformedURLException e) {
-            throw new ValidationException(parameterValue + " is not a valid url", e);
+            throw new ValidationException(parameterValue + " is not a valid URL.", e);
         }
     }
 }
