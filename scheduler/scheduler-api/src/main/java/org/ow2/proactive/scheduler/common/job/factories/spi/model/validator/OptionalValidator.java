@@ -31,7 +31,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 
 
 /**
- *
+ * Validate all the blank parameter value. When the value is not blank, use its specific validator to check the value validity.
  * @param <T>
  */
 public class OptionalValidator<T> implements Validator<T> {

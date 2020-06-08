@@ -69,8 +69,7 @@ public class UserFileValidatorTest {
     @Test(expected = ValidationException.class)
     public void testNotExistUserFileKO() throws ValidationException {
         UserFileValidator validator = new UserFileValidator();
-        String value = notExistUserFilePath;
-        validator.validate(value, context);
+        validator.validate(notExistUserFilePath, context);
     }
 
     @Test(expected = ValidationException.class)

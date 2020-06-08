@@ -53,7 +53,7 @@ public class OptionalURLParserValidatorTest {
 
     @Test
     public void testOptionalURLParserValidatorBlankURLOK()
-            throws ModelSyntaxException, ValidationException, ConversionException, MalformedURLException {
+            throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         OptionalURLParserValidator parserValidator = new OptionalURLParserValidator(ModelType.OPTIONAL_URL.name());
         Assert.assertEquals(value, parserValidator.parseAndValidate(value));

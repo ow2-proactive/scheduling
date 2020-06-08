@@ -69,8 +69,7 @@ public class GlobalFileValidatorTest {
     @Test(expected = ValidationException.class)
     public void testNotExistGlobalFileKO() throws ValidationException {
         GlobalFileValidator validator = new GlobalFileValidator();
-        String value = notExistGlobalFilePath;
-        validator.validate(value, context);
+        validator.validate(notExistGlobalFilePath, context);
     }
 
     @Test(expected = ValidationException.class)
