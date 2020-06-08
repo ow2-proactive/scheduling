@@ -26,29 +26,19 @@
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.IdentityConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.UserFileValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.GlobalFileValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.OptionalValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
 
-public class UserFileParserValidator extends BaseParserValidator<String> {
-
-    public UserFileParserValidator(String model) throws ModelSyntaxException {
-        super(model, ModelType.USER_FILE);
-    }
-
-    public UserFileParserValidator(String model, ModelType type) throws ModelSyntaxException {
-        super(model, type);
-    }
-
-    @Override
-    protected Converter<String> createConverter(String model) throws ModelSyntaxException {
-        return new IdentityConverter();
+public class OptionalGlobalFileParserValidator extends GlobalFileParserValidator {
+    public OptionalGlobalFileParserValidator(String model) throws ModelSyntaxException {
+        super(model, ModelType.OPTIONAL_GLOBAL_FILE);
     }
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) {
-        return new UserFileValidator();
+        return new OptionalValidator<>(new GlobalFileValidator());
     }
 }

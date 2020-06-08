@@ -23,25 +23,23 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.OptionalValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.URIValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
 
-public class URIConverterTest {
+public class OptionalURIParserValidator extends URIParserValidator {
 
-    @Test
-    public void testURIConverterOK() throws ConversionException {
-        URIConverter converter = new URIConverter();
-        String value = "c:/toto";
-        Assert.assertEquals(value, converter.convert(value).toString());
+    public OptionalURIParserValidator(String model) throws ModelSyntaxException {
+        super(model, ModelType.OPTIONAL_URI);
     }
 
-    @Test(expected = ConversionException.class)
-    public void testURIConverterKO() throws ConversionException {
-        URIConverter converter = new URIConverter();
-        converter.convert("\\&¨^¨$ù%");
+    @Override
+    protected Validator<String> createValidator(String model, Converter<String> converter) {
+        return new OptionalValidator<>(new URIValidator());
     }
 }

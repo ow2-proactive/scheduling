@@ -38,20 +38,21 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class URLParserValidatorTest {
 
     @Test
-    public void testURLParserValidatorOK()
+    public void testThatValidURLIsOK()
             throws ModelSyntaxException, ValidationException, ConversionException, MalformedURLException {
         String value = "file://mysite";
         Assert.assertEquals(new URL(value).toExternalForm(),
-                            new URLParserValidator(ModelType.URL.name()).parseAndValidate(value).toExternalForm());
+                            new URLParserValidator(ModelType.URL.name()).parseAndValidate(value));
     }
 
-    @Test(expected = ConversionException.class)
-    public void testURIParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
+    @Test(expected = ValidationException.class)
+    public void testThatInvalidURLThrowException()
+            throws ModelSyntaxException, ValidationException, ConversionException {
         new URLParserValidator(ModelType.URL.name()).parseAndValidate("unknown://protocol");
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testURLParserValidatorInvalidModel()
+    public void testThatInvalidModelThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
         new URLParserValidator("URLL").parseAndValidate("blabla");
     }
