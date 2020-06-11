@@ -26,18 +26,15 @@
 package org.ow2.proactive.utils.appenders;
 
 import java.io.File;
-import java.util.Enumeration;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Appender;
-import org.apache.log4j.AsyncAppender;
-import org.apache.log4j.Layout;
+import org.apache.log4j.EnhancedPatternLayout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
 public abstract class FileAppender extends WriterAppender {
@@ -48,9 +45,13 @@ public abstract class FileAppender extends WriterAppender {
 
     private String filesLocation;
 
+    private static EnhancedPatternLayout configuredLayout = null;
+
     public FileAppender() {
-        setLayout(new PatternLayout("[%d{ISO8601} %-5p] %m%n"));
-        fetchLayoutFromRootLogger();
+        if (configuredLayout == null) {
+            configuredLayout = new EnhancedPatternLayout(PAResourceManagerProperties.LO4J_FILE_APPENDER_PATTERN.getValueAsString());
+        }
+        setLayout(configuredLayout);
     }
 
     @Override
@@ -88,34 +89,6 @@ public abstract class FileAppender extends WriterAppender {
             return null;
         }
         return appender;
-    }
-
-    private void fetchLayoutFromRootLogger() {
-        // trying to get a layout from log4j configuration
-        Enumeration<?> en = Logger.getRootLogger().getAllAppenders();
-        if (en != null && en.hasMoreElements()) {
-            Appender app = (Appender) en.nextElement();
-            if (app != null && app.getLayout() != null) {
-                if (app instanceof AsyncAppender) {
-                    Enumeration<?> attachedAppenders = ((AsyncAppender) app).getAllAppenders();
-                    if (attachedAppenders != null && attachedAppenders.hasMoreElements()) {
-                        Appender attachedApp = (Appender) attachedAppenders.nextElement();
-                        setLayoutUsingAppender(attachedApp);
-                    }
-                } else {
-                    setLayoutUsingAppender(app);
-                }
-            }
-        }
-    }
-
-    private void setLayoutUsingAppender(Appender attachedApp) {
-        final Layout layout = attachedApp.getLayout();
-        if (layout instanceof PatternLayout) {
-            Logger.getRootLogger().trace("Retrieved layout from log4j configuration");
-            PatternLayout paternLayout = (PatternLayout) layout;
-            setLayout(new PatternLayout(paternLayout.getConversionPattern()));
-        }
     }
 
     @Override
