@@ -64,6 +64,14 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     /** Finished jobs */
     private Map<JobId, T> finishedJobs = Collections.synchronizedMap(new LinkedHashMap<JobId, T>());
 
+    /**
+     * Used to control the maximum size of finished jobs. This is mostly used for test compatibility,
+     * As tests use a lot the getState() request. Normal usage of the scheduler does not rely on getState()
+     */
+    private static Integer maxFinishedJobsSize;
+
+    public final static int DEFAULT_MAX_FINISHED_JOBS_SIZE = 1000;
+
     /** Scheduler status */
     private SchedulerStatus status = SchedulerStatus.STARTED;
 
@@ -89,6 +97,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      * ProActive Empty constructor.
      */
     public SchedulerStateImpl() {
+        initMaxFinishedJobs();
     }
 
     /**
@@ -364,12 +373,22 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
 
     public synchronized void pendingToFinished(T js) {
         pendingJobs.remove(js);
+        putInFinished(js);
+    }
+
+    private void putInFinished(T js) {
+        if (finishedJobs.size() >= maxFinishedJobsSize) {
+            Iterator<Map.Entry<JobId, T>> iterator = finishedJobs.entrySet().iterator();
+            Map.Entry<JobId, T> entryToRemove = iterator.next();
+            iterator.remove();
+            jobs.remove(entryToRemove.getKey());
+        }
         finishedJobs.put(js.getId(), js);
     }
 
     public synchronized void runningToFinished(T js) {
         runningJobs.remove(js);
-        finishedJobs.put(js.getId(), js);
+        putInFinished(js);
     }
 
     public synchronized void removeFinished(T js) {
@@ -380,6 +399,20 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     public synchronized void removeFinished(JobId jobId) {
         finishedJobs.remove(jobId);
         jobs.remove(jobId);
+    }
+
+    private static void initMaxFinishedJobs() {
+        if (maxFinishedJobsSize == null) {
+            maxFinishedJobsSize = DEFAULT_MAX_FINISHED_JOBS_SIZE;
+            String configuredMaxJobs = System.getProperty("scheduler.state.max.finished.jobs");
+            if (configuredMaxJobs != null) {
+                try {
+                    maxFinishedJobsSize = Integer.parseInt(configuredMaxJobs);
+                } catch (NumberFormatException e) {
+                    logger.warn("Invalid value of scheduler.state.max.finished.jobs property : " + configuredMaxJobs);
+                }
+            }
+        }
     }
 
 }
