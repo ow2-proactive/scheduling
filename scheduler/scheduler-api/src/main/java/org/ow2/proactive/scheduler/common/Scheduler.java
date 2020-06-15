@@ -1147,6 +1147,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * If a PermissionException is thrown, try using {@link #getState(boolean)}
      * method with argument {@code true}.
      *
+     * NOTE: the total list of finished jobs is limited by the Java property 'scheduler.state.max.finished.jobs'
+     * configured on the server. Default is 1000 finished jobs.
+     *
      * @return the list of every jobs in the Scheduler
      * @throws NotConnectedException
      *             if you are not authenticated.
@@ -1160,6 +1163,10 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * SchedulerState contains 3 list of jobs, pending, running, and finished If
      * the given argument is true, only job that you own will be returned,
      * otherwise every jobs will be returned depending on your right.
+     *
+     * NOTE: the total list of finished jobs is limited by the Java property 'scheduler.state.max.finished.jobs'
+     * configured on the server. Default is 1000 finished jobs.
+     * From this list, only jobs belonging to the current user will be returned.
      *
      * @param myJobsOnly
      *            true to get only my jobs, false to get any.
