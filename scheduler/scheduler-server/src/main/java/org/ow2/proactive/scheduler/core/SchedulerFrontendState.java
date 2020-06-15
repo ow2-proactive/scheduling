@@ -1299,12 +1299,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                             schedulerState.pendingToFinished(js);
                             // set this job finished, user can get its result
                             jobs.remove(notification.getData().getJobId()).setFinished(true);
+                            jobsMap.remove(notification.getData().getJobId());
                             withAttachment = true;
                             break;
                         case JOB_RUNNING_TO_FINISHED:
                             schedulerState.runningToFinished(js);
                             // set this job finished, user can get its result
                             jobs.remove(notification.getData().getJobId()).setFinished(true);
+                            jobsMap.remove(notification.getData().getJobId());
                             withAttachment = true;
                             break;
                         default:
