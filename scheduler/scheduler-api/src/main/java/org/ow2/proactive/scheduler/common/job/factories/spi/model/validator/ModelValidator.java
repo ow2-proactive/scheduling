@@ -27,28 +27,14 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CRONParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CatalogObjectParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DateTimeParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DoubleParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.FloatParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.IntegerParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.JSONParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ListParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.LongParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelFromURLParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BaseParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelType;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.NotEmptyParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.OptionalParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.RegexpParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.SPELParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ShortParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.URIParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.URLParserValidator;
 
 import com.google.common.base.Strings;
 
@@ -58,6 +44,8 @@ public class ModelValidator implements Validator<String> {
     private String model;
 
     public static final String PREFIX = "PA:";
+
+    public static final String OPTIONAL_VARIABLE_SUFFIX = "?";
 
     public ModelValidator(String model) {
         if (Strings.isNullOrEmpty(model)) {
@@ -96,9 +84,18 @@ public class ModelValidator implements Validator<String> {
         for (ModelType type : ModelType.values()) {
             if (uppercaseModel.startsWith(type.name())) {
                 try {
-                    return (ParserValidator) type.getTypeParserValidator()
-                                                 .getDeclaredConstructor(String.class)
-                                                 .newInstance(removePrefix(model));
+                    String modelNoPrefixSuffix = removePrefix(model);
+                    if (uppercaseModel.endsWith(OPTIONAL_VARIABLE_SUFFIX)) {
+                        modelNoPrefixSuffix = StringUtils.removeEnd(modelNoPrefixSuffix, OPTIONAL_VARIABLE_SUFFIX);
+                    }
+                    BaseParserValidator parserValidator = (BaseParserValidator) type.getTypeParserValidator()
+                                                                                    .getDeclaredConstructor(String.class)
+                                                                                    .newInstance(modelNoPrefixSuffix);
+                    if (uppercaseModel.endsWith(OPTIONAL_VARIABLE_SUFFIX)) {
+                        return new OptionalParserValidator(modelNoPrefixSuffix, type, parserValidator);
+                    } else {
+                        return parserValidator;
+                    }
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                         | NoSuchMethodException e) {
                     if (e instanceof InvocationTargetException) {
