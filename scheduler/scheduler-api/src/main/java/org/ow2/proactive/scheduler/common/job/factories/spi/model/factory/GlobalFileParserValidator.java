@@ -38,6 +38,10 @@ public class GlobalFileParserValidator extends BaseParserValidator<String> {
         super(model, ModelType.GLOBAL_FILE);
     }
 
+    public GlobalFileParserValidator(String model, ModelType type) throws ModelSyntaxException {
+        super(model, type);
+    }
+
     @Override
     protected Converter<String> createConverter(String model) throws ModelSyntaxException {
         return new IdentityConverter();

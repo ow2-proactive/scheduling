@@ -25,28 +25,30 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
-import java.net.URI;
-
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.URIConverter;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.IdentityConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.AcceptAllValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.URIValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
 
-public class URIParserValidator extends BaseParserValidator<URI> {
+public class URIParserValidator extends BaseParserValidator<String> {
 
     public URIParserValidator(String model) throws ModelSyntaxException {
         super(model, ModelType.URI);
     }
 
-    @Override
-    protected Converter<URI> createConverter(String model) throws ModelSyntaxException {
-        return new URIConverter();
+    public URIParserValidator(String model, ModelType type) throws ModelSyntaxException {
+        super(model, type);
     }
 
     @Override
-    protected Validator<URI> createValidator(String model, Converter<URI> converter) throws ModelSyntaxException {
-        return new AcceptAllValidator<>();
+    protected Converter<String> createConverter(String model) throws ModelSyntaxException {
+        return new IdentityConverter();
+    }
+
+    @Override
+    protected Validator<String> createValidator(String model, Converter<String> converter) {
+        return new URIValidator();
     }
 }

@@ -23,21 +23,27 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class URIConverter implements Converter<URI> {
+/**
+ * @author ActiveEon Team
+ * @since 19/08/19s
+ */
+public class URIValidator implements Validator<String> {
+
     @Override
-    public URI convert(String parameterValue) throws ConversionException {
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         try {
-            return new URI(parameterValue);
+            return new URI(parameterValue).toString();
         } catch (URISyntaxException e) {
-            throw new ConversionException(parameterValue, URI.class, e.getMessage(), e);
+            throw new ValidationException(parameterValue + " is not a valid URI.", e);
         }
     }
 }

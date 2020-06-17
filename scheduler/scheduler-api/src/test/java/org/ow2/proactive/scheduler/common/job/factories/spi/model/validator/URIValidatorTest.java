@@ -23,21 +23,26 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.junit.Assert;
+import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 
+public class URIValidatorTest {
 
-public class URLConverter implements Converter<URL> {
-    @Override
-    public URL convert(String parameterValue) throws ConversionException {
-        try {
-            return new URL(parameterValue);
-        } catch (MalformedURLException e) {
-            throw new ConversionException(parameterValue, URL.class, e.getMessage(), e);
-        }
+    @Test
+    public void testThatValidURIIsOK() throws ValidationException {
+        URIValidator validator = new URIValidator();
+        String value = "c:/toto";
+        Assert.assertEquals(value, validator.validate(value, null));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testThatInvalidURIThrowException() throws ValidationException {
+        URIValidator validator = new URIValidator();
+        String value = "\\&¨^¨$ù%";
+        validator.validate(value, null);
     }
 }
