@@ -104,6 +104,8 @@ public class SchedulerBackupRunner implements Runnable {
         } finally {
             scheduler.resume();
         }
+        LOGGER.info("Backup terminated");
+
     }
 
     private boolean noTaskIsRunning() {
