@@ -73,26 +73,22 @@ public class ZipUtils extends FileUtils {
      * @throws IOException if the zip file cannot be created.
      */
     public static void zip(String[] directoriesAndFiles, File dest, CRC32 crc) throws IOException {
-        byte[] zipped = ZipUtils.zipDirectoriesAndFiles(directoriesAndFiles, crc);
-        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest))) {
-            bos.write(zipped);
+        try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(dest)))) {
+            ZipUtils.zipDirectoriesAndFiles(zos, directoriesAndFiles, crc);
         }
     }
 
     /**
      * Create a zip file that contains all the directory listed in directories parameter.
+     * @param zos output stream destination
      * @param directoriesAndFiles the list of directories and files to be zipped.
      * @param crc the CRC32 of all zipentries. Can be null if no crc is needed.
-     * @throws IOException if the zip file cannot be created.
-     * @return the zip file as a byte[].
+     * @throws IOException if an error occurs during the compression
      */
-    public static byte[] zipDirectoriesAndFiles(String[] directoriesAndFiles, CRC32 crc) throws IOException {
-
-        // Fill in a byte array
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    public static void zipDirectoriesAndFiles(ZipOutputStream zos, String[] directoriesAndFiles, CRC32 crc)
+            throws IOException {
 
         // Create zip stream
-        ZipOutputStream zos = new ZipOutputStream(baos);
         zos.setLevel(COMP_LEVEL);
 
         // zip file is ready
@@ -100,10 +96,6 @@ public class ZipUtils extends FileUtils {
 
         // Close the file output streams
         zos.flush();
-        zos.close();
-        baos.flush();
-        baos.close();
-        return baos.toByteArray();
     }
 
     /**
