@@ -71,6 +71,7 @@ public class SchedulerStateRecoverHelper {
     }
 
     public RecoveredSchedulerState recover(long loadJobPeriod, RMProxy rmProxy) {
+        dbManager.setTaskDataOwnerIfNull();
         List<InternalJob> notFinishedJobs = dbManager.loadNotFinishedJobs(true);
 
         Vector<InternalJob> pendingJobs = new Vector<>();

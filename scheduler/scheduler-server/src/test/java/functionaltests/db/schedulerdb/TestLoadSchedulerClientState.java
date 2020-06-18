@@ -136,7 +136,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         TaskFlowJob jobDef = new TaskFlowJob();
         jobDef.addTask(createDefaultTask("task1"));
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
-        dbManager.removeJob(job.getId(), System.currentTimeMillis(), false);
+        dbManager.removeJob(job.getId(), System.currentTimeMillis(), true);
 
         jobDef = new TaskFlowJob();
         jobDef.addTask(createDefaultTask("task1"));

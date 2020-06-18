@@ -28,6 +28,8 @@ package functionaltests.service;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +45,6 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
-import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
@@ -67,6 +68,7 @@ public class BaseServiceTest extends ProActiveTest {
 
     @Before
     public void init() throws Exception {
+        Logger.getLogger("org.hibernate.SQL").setLevel(Level.DEBUG);
         dbManager = SchedulerDBManager.createInMemorySchedulerDBManager();
         infrastructure = new MockSchedulingInfrastructure(dbManager);
         listener = new MockSchedulingListener();

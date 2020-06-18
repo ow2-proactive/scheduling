@@ -193,6 +193,7 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
         try {
             future.get();
         } catch (Exception e) {
+            e.printStackTrace();
             Assert.fail("Unexpected exception");
         }
     }
@@ -204,6 +205,7 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
         try {
             future.get();
         } catch (Exception e) {
+            e.printStackTrace();
             Assert.fail("Unexpected exception");
         }
     }

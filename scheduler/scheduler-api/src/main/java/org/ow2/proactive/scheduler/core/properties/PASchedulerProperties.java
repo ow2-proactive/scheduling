@@ -195,6 +195,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR("pa.scheduler.core.automaticremovejobcronexpression", PropertyType.STRING, "*/10 * * * *"),
 
     /** Remove job in dataBase when removing it from scheduler. */
+    /** Changing this setting is strongly not recommended as the support for pa.scheduler.job.removeFromDataBase=false has been discontinued */
     JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PropertyType.BOOLEAN, "true"),
 
     /** File encoding used by the scheduler */
