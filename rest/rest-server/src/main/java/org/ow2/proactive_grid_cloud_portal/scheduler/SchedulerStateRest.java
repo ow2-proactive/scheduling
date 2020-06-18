@@ -376,8 +376,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
         return source.entrySet()
                      .stream()
-                     .filter(entry -> entry.getValue() != null)
-                     .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().toString()));
+                     .collect(Collectors.toMap(Entry::getKey,
+                                               entry -> entry.getValue() != null ? entry.getValue().toString() : ""));
 
     }
 
