@@ -125,31 +125,38 @@ public class TaskDBUtils {
             boolean hasDateTo, SortSpecifierContainer sortParams) {
         StringBuilder result = new StringBuilder();
 
-        result.append("T.jobData.removedTime = -1 ");
+        // Support for removedTime in queries has been discontinued
+        //result.append("T.jobData.removedTime = -1 ");
+        boolean oneClause = false;
 
         // if 'from' and 'to' values are set
         if (hasDateFrom && hasDateTo) {
-            result.append("and ( ( startTime >= :dateFrom and startTime <= :dateTo ) " +
+            result.append("( ( startTime >= :dateFrom and startTime <= :dateTo ) " +
                           "or ( scheduledTime >= :dateFrom and scheduledTime <= :dateTo ) " +
                           "or ( finishedTime >= :dateFrom and finishedTime <= :dateTo ) ) ");
+            oneClause = true;
         } else if (hasDateFrom && !hasDateTo) { // if 'from' only is set
-            result.append("and ( startTime >= :dateFrom or finishedTime >= :dateFrom or scheduledTime >= :dateFrom ) ");
+            result.append("( startTime >= :dateFrom or finishedTime >= :dateFrom or scheduledTime >= :dateFrom ) ");
+            oneClause = true;
         } else if (!hasDateFrom && hasDateTo) { // if 'to' only is set
-            result.append("and ( startTime <= :dateTo or finishedTime <= :dateTo or scheduledTime >= :dateTo ) ");
+            result.append("( startTime <= :dateTo or finishedTime <= :dateTo or scheduledTime >= :dateTo ) ");
+            oneClause = true;
         } else {
             // no datetime filtering required
             // nothing to do
         }
 
         if (hasUser) {
-            result.append("and T.jobData.owner = :user ");
+            result.append((oneClause ? "and " : "") + "owner = :user ");
+            oneClause = true;
         }
 
         if (hasTag) {
-            result.append("and tag = :taskTag ");
+            result.append((oneClause ? "and " : "") + "tag = :taskTag ");
+            oneClause = true;
         }
 
-        result.append("and taskStatus in (:taskStatus) ");
+        result.append((oneClause ? "and " : "") + "taskStatus in (:taskStatus) ");
 
         if (!sortParams.getSortParameters().isEmpty()) {
             result.append("order by ");

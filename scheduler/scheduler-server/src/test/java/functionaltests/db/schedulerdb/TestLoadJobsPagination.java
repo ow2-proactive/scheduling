@@ -237,7 +237,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         // job marked as removed, method 'getJobs' shouldn't return it
         job = defaultSubmitJob(createJob());
-        dbManager.removeJob(job.getId(), System.currentTimeMillis(), false);
+        dbManager.removeJob(job.getId(), System.currentTimeMillis(), true);
 
         List<JobInfo> jobs;
 

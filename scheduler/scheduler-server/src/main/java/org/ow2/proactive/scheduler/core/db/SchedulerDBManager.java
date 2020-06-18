@@ -235,8 +235,6 @@ public class SchedulerDBManager {
                 criteria.add(Restrictions.in("status", jobStatuses));
             }
 
-            criteria.add(Restrictions.eq("removedTime", -1L));
-
             if (sortParameters != null) {
                 Order sortOrder;
                 for (SortParameter<JobSortParameter> param : sortParameters) {
@@ -322,16 +320,16 @@ public class SchedulerDBManager {
 
                 boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
 
-                StringBuilder queryString = new StringBuilder("select count(*) from JobData where removedTime = -1 ");
+                StringBuilder queryString = new StringBuilder("select count(*) from JobData where ");
+
+                queryString.append("status in (:jobStatus) ");
 
                 if (hasUser) {
                     queryString.append("and owner = :user ");
                 }
 
-                queryString.append("and status in (:taskStatus) ");
-
                 Query query = session.createQuery(queryString.toString());
-                query.setParameterList("taskStatus", statuses);
+                query.setParameterList("jobStatus", statuses);
                 if (hasUser) {
                     query.setParameter("user", params.getUser());
                 }
@@ -468,8 +466,15 @@ public class SchedulerDBManager {
 
     public long getFinishedTasksCount() {
         return executeReadOnlyTransaction(session -> {
-            Query query = session.getNamedQuery("getFinishedTasksCount")
-                                 .setParameterList("taskStatus", Arrays.asList(TaskStatus.FINISHED, TaskStatus.FAULTY));
+            Query query = session.getNamedQuery("getTasksCountByStatus")
+                                 .setParameterList("taskStatus",
+                                                   Arrays.asList(TaskStatus.FINISHED,
+                                                                 TaskStatus.FAULTY,
+                                                                 TaskStatus.FAILED,
+                                                                 TaskStatus.NOT_RESTARTED,
+                                                                 TaskStatus.NOT_STARTED,
+                                                                 TaskStatus.ABORTED,
+                                                                 TaskStatus.SKIPPED));
 
             return (Long) query.uniqueResult();
         });
@@ -479,12 +484,11 @@ public class SchedulerDBManager {
         return executeReadOnlyTransaction(session -> {
             Collection<TaskStatus> taskStatus = Arrays.asList(TaskStatus.SUBMITTED,
                                                               TaskStatus.PAUSED,
+                                                              TaskStatus.IN_ERROR,
                                                               TaskStatus.PENDING,
                                                               TaskStatus.WAITING_ON_ERROR,
                                                               TaskStatus.WAITING_ON_FAILURE);
-            Query query = session.getNamedQuery("getPendingTasksCount")
-                                 .setParameterList("jobStatus", NOT_FINISHED_JOB_STATUSES)
-                                 .setParameterList("taskStatus", taskStatus);
+            Query query = session.getNamedQuery("getTasksCountByStatus").setParameterList("taskStatus", taskStatus);
 
             return (Long) query.uniqueResult();
         });
@@ -509,8 +513,7 @@ public class SchedulerDBManager {
 
     public long getRunningTasksCount() {
         return executeReadOnlyTransaction(session -> {
-            Query query = session.getNamedQuery("getRunningTasksCount")
-                                 .setParameterList("jobStatus", NOT_FINISHED_JOB_STATUSES)
+            Query query = session.getNamedQuery("getTasksCountByStatus")
                                  .setParameterList("taskStatus", Collections.singletonList(TaskStatus.RUNNING));
 
             return (Long) query.uniqueResult();
@@ -748,6 +751,16 @@ public class SchedulerDBManager {
                    .setParameter("toBeRemoved", shouldRemoveFromDb)
                    .setParameter("jobId", jobId.longValue())
                    .executeUpdate();
+            return null;
+        });
+    }
+
+    public void setTaskDataOwnerIfNull() {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            Long nbOwnerNull = (Long) session.getNamedQuery("countTaskDataOwnerNull").uniqueResult();
+            if (nbOwnerNull != null && nbOwnerNull > 0L) {
+                session.getNamedQuery("setOwnerInTaskDataIfNull").executeUpdate();
+            }
             return null;
         });
     }
@@ -1168,7 +1181,7 @@ public class SchedulerDBManager {
                                .executeUpdate();
 
             final int notReStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
-                                                         " where task.jobData.id = :jobId and task.taskStatus in :taskStatuses ")
+                                                         " where task.id.jobId = :jobId and task.taskStatus in :taskStatuses ")
                                             .setParameter("jobId", jobId)
                                             .setParameterList("taskStatuses",
                                                               Arrays.asList(TaskStatus.WAITING_ON_ERROR,
@@ -1176,7 +1189,7 @@ public class SchedulerDBManager {
                                             .executeUpdate();
 
             final int notStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
-                                                       " where task.jobData.id = :jobId and task.taskStatus in :taskStatuses ")
+                                                       " where task.id.jobId = :jobId and task.taskStatus in :taskStatuses ")
                                           .setParameter("jobId", jobId)
                                           .setParameterList("taskStatuses",
                                                             TaskStatus.allExceptThese(TaskStatus.RUNNING,
@@ -1190,7 +1203,7 @@ public class SchedulerDBManager {
                                           .executeUpdate();
 
             final int runningToAborted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                                             " task.finishedTime = :finishedTime where task.jobData.id = :jobId " +
+                                                             " task.finishedTime = :finishedTime where task.id.jobId = :jobId " +
                                                              " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
                                                              " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
                                                 .setParameter("finishedTime", System.currentTimeMillis())
@@ -1200,7 +1213,7 @@ public class SchedulerDBManager {
             final int runningToAbortedWithDuration = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
                                                                          " task.finishedTime = :finishedTime, " +
                                                                          " task.executionDuration = task.finishedTime - task.startTime " +
-                                                                         " where task.jobData.id = :jobId " +
+                                                                         " where task.id.jobId = :jobId " +
                                                                          " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
                                                                          " and task.startTime > 0 and task.executionDuration < 0 ")
                                                             .setParameter("jobId", jobId)
@@ -1256,7 +1269,7 @@ public class SchedulerDBManager {
             }
 
             final int notReStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
-                                                         " where task.jobData.id in :jobIds and task.taskStatus in :taskStatuses ")
+                                                         " where task.id.jobId in :jobIds and task.taskStatus in :taskStatuses ")
                                             .setParameterList("jobIds", jobIds)
                                             .setParameterList("taskStatuses",
                                                               Arrays.asList(TaskStatus.WAITING_ON_ERROR,
@@ -1264,7 +1277,7 @@ public class SchedulerDBManager {
                                             .executeUpdate();
 
             final int notStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
-                                                       " where task.jobData.id in :jobIds and task.taskStatus in :taskStatuses ")
+                                                       " where task.id.jobId in :jobIds and task.taskStatus in :taskStatuses ")
                                           .setParameterList("jobIds", jobIds)
                                           .setParameterList("taskStatuses",
                                                             TaskStatus.allExceptThese(TaskStatus.RUNNING,
@@ -1278,7 +1291,7 @@ public class SchedulerDBManager {
                                           .executeUpdate();
 
             final int runningToAborted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                                             " task.finishedTime = :finishedTime where task.jobData.id in :jobIds " +
+                                                             " task.finishedTime = :finishedTime where task.id.jobId in :jobIds " +
                                                              " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
                                                              " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
                                                 .setParameter("finishedTime", System.currentTimeMillis())
@@ -1288,7 +1301,7 @@ public class SchedulerDBManager {
             final int runningToAbortedWithDuration = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
                                                                          " task.finishedTime = :finishedTime, " +
                                                                          " task.executionDuration = task.finishedTime - task.startTime " +
-                                                                         " where task.jobData.id in :jobIds " +
+                                                                         " where task.id.jobId in :jobIds " +
                                                                          " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
                                                                          " and task.startTime > 0 and task.executionDuration < 0 ")
                                                             .setParameterList("jobIds", jobIds)
