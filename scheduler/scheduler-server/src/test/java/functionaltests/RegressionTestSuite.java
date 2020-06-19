@@ -35,6 +35,7 @@ import functionaltests.dataspaces.TestDataspaceConcurrentTransfer;
 import functionaltests.db.schedulerdb.SchedulerDbManagerConcurrencyTest;
 import functionaltests.db.schedulerdb.TestJobRemove;
 import functionaltests.db.schedulerdb.TestMultipleTasks;
+import functionaltests.housekeeping.TestHouseKeeping;
 import functionaltests.job.taskkill.TestJobKilled;
 import functionaltests.job.taskkill.TestProcessTreeKiller;
 import functionaltests.job.taskkill.TestProcessTreeKillerNonForked;
@@ -87,7 +88,7 @@ import functionaltests.workflow.complex.TestWorkflowReplicateJobs3;
                       TestDataspaceConcurrentTransfer.class, TestDataspaceConcurrentKilling.class,
                       RunningTaskRecoveryWithDownNodeTest.class, RunningTaskRecoveryWithForkedTaskExecutorTest.class,
                       RunningTaskRecoveryWithInProcessTaskExecutorTest.class,
-                      RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class })
+                      RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class, TestHouseKeeping.class })
 
 /**
  * @author ActiveEon Team

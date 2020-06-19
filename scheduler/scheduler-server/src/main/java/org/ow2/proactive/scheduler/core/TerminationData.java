@@ -116,6 +116,8 @@ final class TerminationData {
 
     private final Set<JobId> jobsToTerminate;
 
+    private final Map<JobId, Map<String, String>> jobsToTerminateGenericInformation;
+
     private final Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate;
 
     private final Map<TaskIdWrapper, TaskRestartData> tasksToRestart;
@@ -124,22 +126,26 @@ final class TerminationData {
 
     static final TerminationData EMPTY = new TerminationData(Collections.emptySet(),
                                                              Collections.emptyMap(),
+                                                             Collections.emptyMap(),
                                                              Collections.emptyMap());
 
     static TerminationData newTerminationData() {
-        return new TerminationData(new HashSet<>(), new HashMap<>(), new HashMap<>());
+        return new TerminationData(new HashSet<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
     }
 
     private TerminationData(Set<JobId> jobsToTerminate, Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate,
-            Map<TaskIdWrapper, TaskRestartData> tasksToRestart) {
+            Map<TaskIdWrapper, TaskRestartData> tasksToRestart,
+            Map<JobId, Map<String, String>> jobsToTerminateGenericInformation) {
         this.jobsToTerminate = jobsToTerminate;
         this.tasksToTerminate = tasksToTerminate;
+        this.jobsToTerminateGenericInformation = jobsToTerminateGenericInformation;
         this.tasksToRestart = tasksToRestart;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
     }
 
-    void addJobToTerminate(JobId jobId) {
+    void addJobToTerminate(JobId jobId, Map<String, String> jobGenericInfo) {
         jobsToTerminate.add(jobId);
+        jobsToTerminateGenericInformation.put(jobId, jobGenericInfo);
     }
 
     void addTaskData(InternalJob jobData, RunningTaskData taskData, TerminationStatus terminationStatus,
@@ -180,7 +186,7 @@ final class TerminationData {
 
     private void terminateJobs(final SchedulingService service) {
         for (JobId jobId : jobsToTerminate) {
-            service.terminateJobHandling(jobId);
+            service.terminateJobHandling(jobId, jobsToTerminateGenericInformation.get(jobId));
         }
     }
 

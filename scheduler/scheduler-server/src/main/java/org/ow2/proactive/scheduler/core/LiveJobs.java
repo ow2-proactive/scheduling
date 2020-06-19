@@ -764,7 +764,7 @@ class LiveJobs {
                 job.terminate();
                 jlogger.debug(job.getId(), "terminated");
                 jobs.remove(job.getId());
-                terminationData.addJobToTerminate(job.getId());
+                terminationData.addJobToTerminate(job.getId(), job.getGenericInformation());
             }
 
             // Update database
@@ -971,7 +971,7 @@ class LiveJobs {
             // terminating job
             job.terminate();
             jlogger.debug(job.getId(), "terminated");
-            terminationData.addJobToTerminate(job.getId());
+            terminationData.addJobToTerminate(job.getId(), job.getGenericInformation());
             jobs.remove(job.getId());
         }
 
@@ -1044,7 +1044,7 @@ class LiveJobs {
                 JobId jobId = jobData.job.getId();
 
                 jobs.remove(jobId);
-                terminationData.addJobToTerminate(jobId);
+                terminationData.addJobToTerminate(jobId, jobData.job.getGenericInformation());
 
                 InternalJob job = jobData.job;
 
@@ -1103,7 +1103,7 @@ class LiveJobs {
         JobId jobId = jobData.job.getId();
 
         jobs.remove(jobId);
-        terminationData.addJobToTerminate(jobId);
+        terminationData.addJobToTerminate(jobId, jobData.job.getGenericInformation());
 
         InternalJob job = jobData.job;
 

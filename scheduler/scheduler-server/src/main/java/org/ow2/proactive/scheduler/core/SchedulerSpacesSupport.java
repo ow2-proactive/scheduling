@@ -107,38 +107,40 @@ public class SchedulerSpacesSupport {
      */
     public void registerUserSpace(String username) {
         if (this.userGlobalSpaces.get(username) == null) {
-            DataSpacesFileObject userSpace;
+            synchronized (this) {
+                DataSpacesFileObject userSpace;
 
-            String userSpaceName = SchedulerConstants.USERSPACE_NAME + "_" + username;
+                String userSpaceName = SchedulerConstants.USERSPACE_NAME + "_" + username;
 
-            if (!PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.isSet()) {
-                logger.warn("URL of the root USER space is not set, cannot create a USER space for " + username);
-                return;
+                if (!PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.isSet()) {
+                    logger.warn("URL of the root USER space is not set, cannot create a USER space for " + username);
+                    return;
+                }
+
+                String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.getValueAsStringOrNull();
+                String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.getValueAsStringOrNull();
+
+                try {
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter()
+                                           .createSpaceWithUserNameSubfolder(username,
+                                                                             SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
+                                                                             userSpaceName,
+                                                                             PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(),
+                                                                             localpath,
+                                                                             hostname,
+                                                                             false,
+                                                                             true);
+
+                    // immediately retrieve the User Space
+                    userSpace = PADataSpaces.resolveOutput(userSpaceName);
+                    logger.info("USER space for user " + username + " is at " + userSpace.getAllRealURIs());
+                    // register the user GlobalSpace to the frontend state
+                    this.userGlobalSpaces.put(username, userSpace);
+                } catch (Exception e) {
+                    logger.error("", e);
+                    return;
+                }
             }
-
-            String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.getValueAsStringOrNull();
-            String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.getValueAsStringOrNull();
-
-            try {
-                DataSpaceServiceStarter.getDataSpaceServiceStarter()
-                                       .createSpaceWithUserNameSubfolder(username,
-                                                                         SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
-                                                                         userSpaceName,
-                                                                         PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(),
-                                                                         localpath,
-                                                                         hostname,
-                                                                         false,
-                                                                         true);
-
-                // immediately retrieve the User Space
-                userSpace = PADataSpaces.resolveOutput(userSpaceName);
-                logger.info("USER space for user " + username + " is at " + userSpace.getAllRealURIs());
-            } catch (Exception e) {
-                logger.warn("", e);
-                return;
-            }
-            // register the user GlobalSpace to the frontend state
-            this.userGlobalSpaces.put(username, userSpace);
         }
     }
 
