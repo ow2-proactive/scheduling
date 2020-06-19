@@ -56,9 +56,6 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
                                                 ConcurrentJobInsertionScenario.class.getSimpleName() },
                                               { new ConcurrentJobDeletionScenario(true),
                                                 ConcurrentJobDeletionScenario.class.getSimpleName() + "DeleteData" },
-                                              { new ConcurrentJobDeletionScenario(false),
-                                                ConcurrentJobDeletionScenario.class.getSimpleName() +
-                                                                                          "DoNotDeleteData" },
                                               { new ConcurrentJobInsertionAndDeletionScenario(),
                                                 ConcurrentJobInsertionAndDeletionScenario.class.getSimpleName() } });
     }
@@ -133,7 +130,7 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
         private AtomicInteger expectedNumberOfJobs;
 
         public ConcurrentJobInsertionAndDeletionScenario() {
-            super(30);
+            super(20);
 
             expectedNumberOfJobs = new AtomicInteger(nbJobs);
         }
@@ -146,7 +143,7 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
                 threadPool.submit(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        int value = iCopy % 3;
+                        int value = iCopy % 2;
 
                         switch (value) {
                             case 0:
@@ -154,10 +151,6 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
                                 expectedNumberOfJobs.getAndIncrement();
                                 break;
                             case 1:
-                                test.deleteJob(jobIds.get(iCopy), false);
-                                expectedNumberOfJobs.getAndDecrement();
-                                break;
-                            case 2:
                                 test.deleteJob(jobIds.get(iCopy), true);
                                 expectedNumberOfJobs.getAndDecrement();
                                 break;

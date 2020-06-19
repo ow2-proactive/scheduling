@@ -101,21 +101,20 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteTaskDataInBulk", query = "delete from TaskData where jobData.id in :jobIdList"),
+@NamedQueries({ @NamedQuery(name = "deleteTaskDataInBulk", query = "delete from TaskData where id.jobId in :jobIdList"),
                 @NamedQuery(name = "countTaskData", query = "select count (*) from TaskData"),
+                @NamedQuery(name = "countTaskDataOwnerNull", query = "select count (*) from TaskData where owner is null"),
+                @NamedQuery(name = "setOwnerInTaskDataIfNull", query = "update TaskData task set task.owner = (select job.owner from JobData job where job.id = task.id.jobId)"),
                 @NamedQuery(name = "countTaskDataNotFinished", query = "select count (*) from TaskData where taskStatus <> org.ow2.proactive.scheduler.common.task.TaskStatus.FINISHED"),
-                @NamedQuery(name = "getFinishedTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1"),
-                @NamedQuery(name = "getMeanTaskPendingTime", query = "select avg(startTime - :jobSubmittedTime) from TaskData task where task.jobData.id = :id and task.startTime > 0"),
-                @NamedQuery(name = "getMeanTaskRunningTime", query = "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.jobData.id = :id"),
-                @NamedQuery(name = "getTasksCount", query = "select count(*) from TaskData task where taskStatus = :taskStatus and task.jobData.removedTime = -1"),
-                @NamedQuery(name = "getTasksCountForUsername", query = "select count(*) from TaskData task where task.jobData.owner = :username and taskStatus in (:taskStatus) and task.jobData.removedTime = -1"),
-                @NamedQuery(name = "getPendingTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
-                @NamedQuery(name = "getRunningTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) " +
-                                                                   "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
+                @NamedQuery(name = "getTasksCountByStatus", query = "select count(*) from TaskData task where taskStatus in (:taskStatus)"),
+                @NamedQuery(name = "getMeanTaskPendingTime", query = "select avg(startTime - :jobSubmittedTime) from TaskData task where task.id.jobId = :id and task.startTime > 0"),
+                @NamedQuery(name = "getMeanTaskRunningTime", query = "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.id.jobId = :id"),
+                @NamedQuery(name = "getTasksCount", query = "select count(*) from TaskData task where taskStatus = :taskStatus"),
+                @NamedQuery(name = "getTasksCountForUsername", query = "select count(*) from TaskData task where task.owner = :username and taskStatus in (:taskStatus)"),
                 @NamedQuery(name = "findTaskData", query = "from TaskData where id in (:ids)"),
                 @NamedQuery(name = "findTaskDataById", query = "from TaskData td where td.id = :taskId"),
-                @NamedQuery(name = "getTotalNumberOfHostsUsed", query = "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id"),
-                @NamedQuery(name = "getTotalTasksCount", query = "select count(*) from TaskData task where task.jobData.removedTime = -1"),
+                @NamedQuery(name = "getTotalNumberOfHostsUsed", query = "select count(distinct executionHostName) from TaskData task where task.id.jobId = :id"),
+                @NamedQuery(name = "getTotalTasksCount", query = "select count(*) from TaskData task"),
                 @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task " +
                                                             "left outer join fetch task.dependentTasks " +
                                                             "left outer join fetch task.variables " +
@@ -124,7 +123,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                             "left outer join fetch task.envModifiers  " +
                                                             "where task.id.jobId in (:ids)"),
                 @NamedQuery(name = "readAccountTasks", query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
-                                                               "where task.finishedTime > 0 and task.jobData.owner = :username"),
+                                                               "where task.finishedTime > 0 and task.owner = :username"),
                 @NamedQuery(name = "updateTaskData", query = "update TaskData task set task.taskStatus = :taskStatus, " +
                                                              "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
                                                              "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
@@ -185,7 +184,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                        @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
                                        @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
                                        @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
-                                       @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME") })
+                                       @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME"),
+                                       @Index(name = "TASK_DATA_OWNER", columnList = "OWNER") })
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
@@ -221,6 +221,8 @@ public class TaskData {
     private ScriptData script;
 
     private String taskName;
+
+    private String owner;
 
     private String tag;
 
@@ -530,6 +532,7 @@ public class TaskData {
         taskId.setTaskId(task.getTaskInfo().getTaskId().longValue());
 
         taskData.setId(taskId);
+        taskData.setOwner(jobRuntimeData.getOwner());
         taskData.setDescription(task.getDescription());
         taskData.setTag(task.getTag());
         taskData.setParallelEnvironment(task.getParallelEnvironment());
@@ -899,6 +902,15 @@ public class TaskData {
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
+    }
+
+    @Column(name = "OWNER")
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     @Column(name = "TYPE", nullable = false, updatable = false)

@@ -145,17 +145,17 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
         checkMeanTaskRunningTime(job2);
         checkJobAndTasksNumbers(0, 0, 2, 2, 0, 0, 6, 6);
 
-        // remove job2
-        dbManager.removeJob(job2.getId(), System.currentTimeMillis(), false);
-
-        checkJobAndTasksNumbers(0, 0, 1, 1, 0, 0, 3, 3);
-
         checkMeanPendingTime(job1, job2);
         checkMeanExecutionTime(job1, job2);
         checkMeanSubmittingPeriod(job1, job2);
 
+        // remove job2
+        dbManager.removeJob(job2.getId(), System.currentTimeMillis(), true);
+
+        checkJobAndTasksNumbers(0, 0, 1, 1, 0, 0, 3, 3);
+
         InternalJob job3 = defaultSubmitJobAndLoadInternal(true, jobDef1);
-        checkMeanSubmittingPeriod(job1, job2, job3);
+        checkMeanSubmittingPeriod(job1, job3);
     }
 
     private void checkNumberOfHosts(InternalJob job, int expected) {

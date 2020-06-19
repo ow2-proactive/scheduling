@@ -84,17 +84,17 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "countJobDataFinished", query = "select count (*) from JobData where status = 3"),
                 @NamedQuery(name = "countJobData", query = "select count (*) from JobData"),
                 @NamedQuery(name = "findUsersWithJobs", query = "select owner, count(owner), max(submittedTime) from JobData group by owner"),
-                @NamedQuery(name = "getJobsNumberWithStatus", query = "select count(*) from JobData where status in (:status) and removedTime = -1"),
-                @NamedQuery(name = "getJobsNumberWithStatusUsername", query = "select count(*) from JobData where owner = :username and status in (:status) and removedTime = -1"),
+                @NamedQuery(name = "getJobsNumberWithStatus", query = "select count(*) from JobData where status in (:status)"),
+                @NamedQuery(name = "getJobsNumberWithStatusUsername", query = "select count(*) from JobData where owner = :username and status in (:status)"),
                 @NamedQuery(name = "getJobSubmittedTime", query = "select submittedTime from JobData where id = :id"),
                 @NamedQuery(name = "getMeanJobExecutionTime", query = "select avg(finishedTime - startTime) from JobData where startTime > 0 and finishedTime > 0"),
                 @NamedQuery(name = "getMeanJobPendingTime", query = "select avg(startTime - submittedTime) from JobData where startTime > 0 and submittedTime > 0"),
                 @NamedQuery(name = "getMeanJobSubmittingPeriod", query = "select count(*), min(submittedTime), max(submittedTime) from JobData"),
-                @NamedQuery(name = "getTotalJobsCount", query = "select count(*) from JobData where removedTime = -1"),
+                @NamedQuery(name = "getTotalJobsCount", query = "select count(*) from JobData"),
                 @NamedQuery(name = "loadInternalJobs", query = "from JobData as job where job.id in (:ids)"),
-                @NamedQuery(name = "loadJobs", query = "select id from JobData where status in (:status) and removedTime = -1"),
-                @NamedQuery(name = "loadJobsWithPeriod", query = "select id from JobData where status in (:status) and removedTime = -1 and submittedTime >= :minSubmittedTime"),
-                @NamedQuery(name = "loadJobDataIfNotRemoved", query = "from JobData as job where job.id in (:ids) and job.removedTime = -1"),
+                @NamedQuery(name = "loadJobs", query = "select id from JobData where status in (:status)"),
+                @NamedQuery(name = "loadJobsWithPeriod", query = "select id from JobData where status in (:status) and submittedTime >= :minSubmittedTime"),
+                @NamedQuery(name = "loadJobDataIfNotRemoved", query = "from JobData as job where job.id in (:ids)"),
                 @NamedQuery(name = "readAccountJobs", query = "select count(*), sum(finishedTime) - sum(startTime) from JobData" +
                                                               " where owner = :username and finishedTime > 0"),
                 @NamedQuery(name = "updateJobAndTasksState", query = "update JobData set status = :status, " +
@@ -130,8 +130,11 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
                                       @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
                                       @Index(name = "JOB_DATA_START_TIME", columnList = "START_TIME"),
+                                      @Index(name = "JOB_DATA_SUBMIT_TIME", columnList = "SUBMIT_TIME"),
+                                      @Index(name = "JOB_DATA_REMOVAL_TIME", columnList = "SCHEDULED_TIME_FOR_REMOVAL"),
                                       @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"),
-                                      @Index(name = "JOB_PARENT_JOB_ID", columnList = "PARENT_JOB_ID") })
+                                      @Index(name = "JOB_PARENT_JOB_ID", columnList = "PARENT_JOB_ID"),
+                                      @Index(name = "JOB_ID_STATUS", columnList = "ID,STATUS") })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
