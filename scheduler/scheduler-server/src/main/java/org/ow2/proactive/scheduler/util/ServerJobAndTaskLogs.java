@@ -40,6 +40,7 @@ import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
@@ -66,8 +67,21 @@ public class ServerJobAndTaskLogs {
 
     private SchedulerSpacesSupport spacesSupport = null;
 
+    private static ServerJobAndTaskLogs activeInstance = null;
+
     public static ServerJobAndTaskLogs getInstance() {
         return LazyHolder.INSTANCE;
+    }
+
+    public static ServerJobAndTaskLogs getActiveInstance() {
+        if (activeInstance == null) {
+            try {
+                activeInstance = PAActiveObject.turnActive(getInstance());
+            } catch (Exception e) {
+                logger.error("Could not create ServerJobAndTaskLogs instance", e);
+            }
+        }
+        return activeInstance;
     }
 
     static final JobLogger jlogger = JobLogger.getInstance();
@@ -87,6 +101,12 @@ public class ServerJobAndTaskLogs {
 
     public void setSpacesSupport(SchedulerSpacesSupport spacesSupport) {
         this.spacesSupport = spacesSupport;
+    }
+
+    public static void terminateActiveInstance() {
+        if (activeInstance != null) {
+            PAActiveObject.terminateActiveObject(activeInstance, true);
+        }
     }
 
     public String getTaskLog(TaskId id) {

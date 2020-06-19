@@ -77,6 +77,7 @@ import javax.security.auth.Subject;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
@@ -178,7 +179,7 @@ import org.ow2.proactive.utils.Tools;
  * @since ProActive Scheduling 0.9
  */
 @ActiveObject
-public class SchedulerFrontend implements InitActive, Scheduler, RunActive, SchedulerSpaceInterface {
+public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndActive, SchedulerSpaceInterface {
 
     /**
      * Delay to wait for between getting a job result and removing the job
@@ -1710,4 +1711,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, Sche
         }
     }
 
+    @Override
+    public void endActivity(Body body) {
+        ServerJobAndTaskLogs.terminateActiveInstance();
+        PAActiveObject.terminateActiveObject(authentication, true);
+    }
 }

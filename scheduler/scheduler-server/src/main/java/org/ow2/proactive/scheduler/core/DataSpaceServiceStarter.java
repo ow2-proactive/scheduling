@@ -41,8 +41,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
@@ -426,7 +424,7 @@ public class DataSpaceServiceStarter implements Serializable {
             throw new IllegalStateException("DataSpace service is not started");
         }
         try {
-            DataSpacesNodes.closeNodeConfig(NodeFactory.getDefaultNode());
+            DataSpacesNodes.closeNodeConfig(schedulerNode);
             namingServiceDeployer.terminate();
         } catch (Throwable t) {
         }
