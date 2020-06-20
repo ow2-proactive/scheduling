@@ -30,6 +30,7 @@ import java.security.KeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -63,7 +64,6 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
-import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -73,6 +73,7 @@ import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.Tools;
 
 import it.sauronsoftware.cron4j.Scheduler;
 
@@ -90,6 +91,8 @@ public class SchedulingService {
 
     static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() *
                                                     1000;
+
+    static final String GENERIC_INFO_REMOVE_DELAY = "REMOVE_DELAY";
 
     public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED = "SchedulingService::recoverTasksState finished";
 
@@ -572,6 +575,7 @@ public class SchedulingService {
         boolean shouldRemoveFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
 
         if (tempJobs.size() == 1) {
+            logger.info("Job " + jobId + " will be removed at " + new Date(at));
             infrastructure.getDBManager().scheduleJobForRemoval(tempJobs.get(0).getJobInfo().getJobId(),
                                                                 at,
                                                                 shouldRemoveFromDb);
@@ -949,14 +953,27 @@ public class SchedulingService {
         }
     }
 
-    void terminateJobHandling(final JobId jobId) {
+    void terminateJobHandling(final JobId jobId, final Map<String, String> jobGenericInfo) {
         try {
             listenJobLogsSupport.cleanLoggers(jobId);
             jlogger.close(jobId);
 
-            // auto remove
+            long removeDelay = Long.MAX_VALUE;
             if (SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
-                long timeToRemove = System.currentTimeMillis() + SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY;
+                removeDelay = SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY;
+            }
+            if (jobGenericInfo != null && jobGenericInfo.containsKey(GENERIC_INFO_REMOVE_DELAY)) {
+                try {
+                    removeDelay = Tools.formatDate(jobGenericInfo.get(GENERIC_INFO_REMOVE_DELAY));
+                } catch (Exception e) {
+                    logger.error("Error when parsing generic information " + GENERIC_INFO_REMOVE_DELAY + " for job " +
+                                 jobId, e);
+                }
+            }
+
+            // auto remove
+            if (removeDelay < Long.MAX_VALUE) {
+                long timeToRemove = System.currentTimeMillis() + removeDelay;
                 scheduleJobRemove(jobId, timeToRemove);
             }
         } catch (Throwable t) {
@@ -981,22 +998,36 @@ public class SchedulingService {
 
         if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
             logger.debug("Removing non-managed jobs");
-
+            // Note : by default, no finished jobs are recovered from the database, the following code
+            // will not be executed
             for (InternalJob job : recoveredState.getFinishedJobs()) {
                 //re-set job removed delay (if job result has been sent to user)
-                long toWait = 0;
+                long toWait = Long.MAX_VALUE;
                 if (job.isToBeRemoved()) {
                     toWait = SCHEDULER_REMOVED_JOB_DELAY *
-                             SCHEDULER_AUTO_REMOVED_JOB_DELAY == 0 ? SCHEDULER_REMOVED_JOB_DELAY +
-                                                                     SCHEDULER_AUTO_REMOVED_JOB_DELAY
+                             SCHEDULER_AUTO_REMOVED_JOB_DELAY == 0 ? Long.MAX_VALUE
                                                                    : Math.min(SCHEDULER_REMOVED_JOB_DELAY,
                                                                               SCHEDULER_AUTO_REMOVED_JOB_DELAY);
                 } else {
-                    toWait = SCHEDULER_AUTO_REMOVED_JOB_DELAY;
+                    if (SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
+                        toWait = SCHEDULER_AUTO_REMOVED_JOB_DELAY;
+                    }
+                    if (job.getGenericInformation() != null &&
+                        job.getGenericInformation().containsKey(GENERIC_INFO_REMOVE_DELAY)) {
+                        try {
+                            toWait = Tools.formatDate(job.getGenericInformation().get(GENERIC_INFO_REMOVE_DELAY));
+                        } catch (Exception e) {
+                            logger.error("Error when parsing generic information " + GENERIC_INFO_REMOVE_DELAY +
+                                         " for job " + job.getId(), e);
+                        }
+                    }
                 }
-                if (toWait > 0) {
-                    scheduleJobRemove(job.getId(), System.currentTimeMillis() + toWait);
-                    jlogger.debug(job.getId(), "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+                if (toWait < Long.MAX_VALUE) {
+                    long removalDate = System.currentTimeMillis() + toWait;
+                    if (removalDate < job.getScheduledTimeForRemoval()) {
+                        scheduleJobRemove(job.getId(), removalDate);
+                        jlogger.debug(job.getId(), "will be removed at " + new Date(removalDate));
+                    }
                 }
             }
         }
@@ -1132,7 +1163,7 @@ public class SchedulingService {
                 getListener().jobStateUpdated(owner,
                                               new NotificationData<>(SchedulerEvent.JOB_REMOVE_FINISHED,
                                                                      new JobInfoImpl(jobId, owner)));
-                ServerJobAndTaskLogs.getInstance().remove(jobId, owner);
+                ServerJobAndTaskLogs.getActiveInstance().remove(jobId, owner);
                 logger.debug("HOUSEKEEPING sent JOB_REMOVE_FINISHED notification for job " + jobId);
 
             }
