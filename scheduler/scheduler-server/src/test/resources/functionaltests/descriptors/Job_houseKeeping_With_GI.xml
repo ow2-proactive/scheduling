@@ -4,7 +4,7 @@
 	name="Job_houseKeeping_with_GI" priority="normal">
 	<description>Simple Job</description>
 	<genericInformation>
-		<info name="REMOVE_DELAY" value="1:00"/>
+		<info name="REMOVE_DELAY" value="1m"/>
 	</genericInformation>
 	<taskFlow>
 		<task name="task1">

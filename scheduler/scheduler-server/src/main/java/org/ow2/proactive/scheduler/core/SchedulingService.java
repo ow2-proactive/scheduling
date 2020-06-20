@@ -575,7 +575,6 @@ public class SchedulingService {
         boolean shouldRemoveFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
 
         if (tempJobs.size() == 1) {
-            logger.info("Job " + jobId + " will be removed at " + new Date(at));
             infrastructure.getDBManager().scheduleJobForRemoval(tempJobs.get(0).getJobInfo().getJobId(),
                                                                 at,
                                                                 shouldRemoveFromDb);
@@ -964,7 +963,7 @@ public class SchedulingService {
             }
             if (jobGenericInfo != null && jobGenericInfo.containsKey(GENERIC_INFO_REMOVE_DELAY)) {
                 try {
-                    removeDelay = Tools.formatDate(jobGenericInfo.get(GENERIC_INFO_REMOVE_DELAY));
+                    removeDelay = Tools.parsePeriod(jobGenericInfo.get(GENERIC_INFO_REMOVE_DELAY));
                 } catch (Exception e) {
                     logger.error("Error when parsing generic information " + GENERIC_INFO_REMOVE_DELAY + " for job " +
                                  jobId, e);
@@ -974,6 +973,7 @@ public class SchedulingService {
             // auto remove
             if (removeDelay < Long.MAX_VALUE) {
                 long timeToRemove = System.currentTimeMillis() + removeDelay;
+                jlogger.info(jobId, "Job " + jobId + " will be removed at " + new Date(timeToRemove));
                 scheduleJobRemove(jobId, timeToRemove);
             }
         } catch (Throwable t) {
@@ -1015,7 +1015,7 @@ public class SchedulingService {
                     if (job.getGenericInformation() != null &&
                         job.getGenericInformation().containsKey(GENERIC_INFO_REMOVE_DELAY)) {
                         try {
-                            toWait = Tools.formatDate(job.getGenericInformation().get(GENERIC_INFO_REMOVE_DELAY));
+                            toWait = Tools.parsePeriod(job.getGenericInformation().get(GENERIC_INFO_REMOVE_DELAY));
                         } catch (Exception e) {
                             logger.error("Error when parsing generic information " + GENERIC_INFO_REMOVE_DELAY +
                                          " for job " + job.getId(), e);
