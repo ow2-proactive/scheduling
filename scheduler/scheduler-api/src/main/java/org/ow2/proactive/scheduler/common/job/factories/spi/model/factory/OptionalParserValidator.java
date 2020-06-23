@@ -25,11 +25,17 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
+import static org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator.OPTIONAL_VARIABLE_SUFFIX;
+
+import org.apache.commons.lang3.StringUtils;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.NullConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.OptionalValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 /**
@@ -37,27 +43,28 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Vali
  * @since 14/08/19
  */
 public class OptionalParserValidator<T> extends BaseParserValidator<T> {
-    Converter<T> converter;
+    @VisibleForTesting
+    BaseParserValidator<T> parentParserValidator;
 
-    Validator<T> validator;
-
-    BaseParserValidator<T> parserValidator;
-
-    public OptionalParserValidator(String model, ModelType type, BaseParserValidator<T> parserValidator)
-            throws ModelSyntaxException {
-        super(model, type);
-        this.parserValidator = parserValidator;
-        this.converter = parserValidator.createConverter(model);
-        this.validator = parserValidator.createValidator(model, converter);
+    public OptionalParserValidator(String model, ModelType type) throws ModelSyntaxException {
+        super(removeSuffix(model), type, ".+");
+        if (!model.endsWith(OPTIONAL_VARIABLE_SUFFIX)) {
+            throw new ModelSyntaxException("Optional Model should end with \"?\"");
+        }
+        this.parentParserValidator = (BaseParserValidator<T>) ModelValidator.newParserValidator(type, this.model);
     }
 
     @Override
-    protected Converter<T> createConverter(String model) {
-        return new NullConverter<>(converter);
+    protected Converter<T> createConverter(String model) throws ModelSyntaxException {
+        return new NullConverter<>(parentParserValidator.createConverter(this.model));
     }
 
     @Override
-    protected Validator<T> createValidator(String model, Converter<T> converter) {
-        return new OptionalValidator<>(validator);
+    protected Validator<T> createValidator(String model, Converter<T> converter) throws ModelSyntaxException {
+        return new OptionalValidator<>(parentParserValidator.createValidator(this.model, converter));
+    }
+
+    private static String removeSuffix(String model) {
+        return StringUtils.removeEnd(model, OPTIONAL_VARIABLE_SUFFIX);
     }
 }
