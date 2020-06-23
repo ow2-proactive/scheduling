@@ -91,7 +91,7 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
      * Returns the class used by this parser to convert string parameter values.
      * @return class
      */
-    protected Class getClassType() {
+    protected Class<?> getClassType() {
         return type.getClassType();
     }
 

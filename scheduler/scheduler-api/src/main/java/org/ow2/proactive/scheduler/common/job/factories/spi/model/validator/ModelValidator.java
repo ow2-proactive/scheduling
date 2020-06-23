@@ -26,12 +26,12 @@
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BaseParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelType;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.OptionalParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ParserValidator;
@@ -47,6 +47,8 @@ public class ModelValidator implements Validator<String> {
 
     public static final String OPTIONAL_VARIABLE_SUFFIX = "?";
 
+    public static final List<ModelType> NEVER_OPTIONAL_MODEL = Arrays.asList(ModelType.NOT_EMPTY_STRING);
+
     public ModelValidator(String model) {
         if (Strings.isNullOrEmpty(model)) {
             throw new IllegalArgumentException("Model cannot be empty");
@@ -57,7 +59,7 @@ public class ModelValidator implements Validator<String> {
     @Override
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         try {
-            ParserValidator validator = createParserValidator();
+            ParserValidator<?> validator = createParserValidator();
             if (validator != null) {
                 validator.parseAndValidate(parameterValue, context);
             }
@@ -75,7 +77,7 @@ public class ModelValidator implements Validator<String> {
      * @return a registered model parser or null if no registered parser could be found.
      * @throws ModelSyntaxException if an error occurred during the parser creation
      */
-    protected ParserValidator createParserValidator() throws ModelSyntaxException {
+    protected ParserValidator<?> createParserValidator() throws ModelSyntaxException {
         String uppercaseModel = model.toUpperCase();
         if (!uppercaseModel.startsWith(PREFIX)) {
             return null;
@@ -83,36 +85,41 @@ public class ModelValidator implements Validator<String> {
         uppercaseModel = removePrefix(uppercaseModel);
         for (ModelType type : ModelType.values()) {
             if (uppercaseModel.startsWith(type.name())) {
-                try {
-                    String modelNoPrefixSuffix = removePrefix(model);
-                    if (uppercaseModel.endsWith(OPTIONAL_VARIABLE_SUFFIX)) {
-                        modelNoPrefixSuffix = StringUtils.removeEnd(modelNoPrefixSuffix, OPTIONAL_VARIABLE_SUFFIX);
+                String modelNoPrefix = removePrefix(model);
+                if (uppercaseModel.endsWith(OPTIONAL_VARIABLE_SUFFIX)) {
+                    if (NEVER_OPTIONAL_MODEL.contains(type)) {
+                        throw new ModelSyntaxException(String.format("Invalid model '%s': The type '%s' is disallowed to be optional",
+                                                                     model,
+                                                                     type));
                     }
-                    BaseParserValidator parserValidator = (BaseParserValidator) type.getTypeParserValidator()
-                                                                                    .getDeclaredConstructor(String.class)
-                                                                                    .newInstance(modelNoPrefixSuffix);
-                    if (uppercaseModel.endsWith(OPTIONAL_VARIABLE_SUFFIX)) {
-                        return new OptionalParserValidator(modelNoPrefixSuffix, type, parserValidator);
-                    } else {
-                        return parserValidator;
-                    }
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException
-                        | NoSuchMethodException e) {
-                    if (e instanceof InvocationTargetException) {
-                        // unwrap InvocationTargetException to get more specific error message
-                        Throwable exceptionCause = e.getCause();
-                        if (exceptionCause instanceof ModelSyntaxException) {
-                            throw (ModelSyntaxException) exceptionCause;
-                        }
-                    }
-                    throw new ModelSyntaxException(String.format("Error during create the parser [%s] for the model [%s].",
-                                                                 type.getTypeParserValidator().getSimpleName(),
-                                                                 model),
-                                                   e);
+                    return new OptionalParserValidator<>(modelNoPrefix, type);
+                } else {
+                    return newParserValidator(type, modelNoPrefix);
                 }
             }
         }
         throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
+    }
+
+    public static ParserValidator<?> newParserValidator(ModelType type, String model) throws ModelSyntaxException {
+        try {
+            return (ParserValidator<?>) type.getTypeParserValidator()
+                                            .getDeclaredConstructor(String.class)
+                                            .newInstance(model);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                | NoSuchMethodException e) {
+            if (e instanceof InvocationTargetException) {
+                // unwrap InvocationTargetException to get more specific error message
+                Throwable exceptionCause = e.getCause();
+                if (exceptionCause instanceof ModelSyntaxException) {
+                    throw (ModelSyntaxException) exceptionCause;
+                }
+            }
+            throw new ModelSyntaxException(String.format("Error during create the parser [%s] for the model [%s].",
+                                                         type.getTypeParserValidator().getSimpleName(),
+                                                         model),
+                                           e);
+        }
     }
 
     private String removePrefix(String model) {

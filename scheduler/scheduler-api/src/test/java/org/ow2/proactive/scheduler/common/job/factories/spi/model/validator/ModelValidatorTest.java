@@ -35,14 +35,14 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.*;
 public class ModelValidatorTest {
 
     @Test
-    public void testModelValidatorNotHandled() throws ModelSyntaxException, ValidationException {
+    public void testModelValidatorNotHandled() throws ValidationException {
         ModelValidator validator = new ModelValidator("Unknown");
         String parameterValue = "Any Value";
         Assert.assertEquals(parameterValue, validator.validate(parameterValue, null));
     }
 
     @Test(expected = ValidationException.class)
-    public void testModelValidatorValidPrefixButUnknownType() throws ModelSyntaxException, ValidationException {
+    public void testModelValidatorValidPrefixButUnknownType() throws ValidationException {
         ModelValidator validator = new ModelValidator(ModelValidator.PREFIX + "Unknown");
         String parameterValue = "Any Value";
         validator.validate(parameterValue, null);
@@ -50,7 +50,7 @@ public class ModelValidatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     @SuppressWarnings("squid:S1848")
-    public void testModelValidatorEmpty() throws ModelSyntaxException, ValidationException {
+    public void testModelValidatorEmpty() {
         new ModelValidator(null);
     }
 
@@ -140,11 +140,170 @@ public class ModelValidatorTest {
     }
 
     @Test
+    public void testModelValidatorCredential() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.CREDENTIAL, CredentialParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorHidden() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.HIDDEN, HiddenParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorUserFile() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.USER_FILE, UserFileParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorGlobalFile() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.GLOBAL_FILE, GlobalFileParserValidator.class);
+    }
+
+    @Test
     public void testModelValidatorNotEmpty() throws ModelSyntaxException {
         createAndCheckValidator(ModelValidator.PREFIX + ModelType.NOT_EMPTY_STRING, NotEmptyParserValidator.class);
     }
 
-    public void createAndCheckValidator(String model, Class expectedClass) throws ModelSyntaxException {
+    @Test(expected = ValidationException.class)
+    public void testModelValidatorValidPrefixButUnknownTypeOptional() throws ValidationException {
+        ModelValidator validator = new ModelValidator(ModelValidator.PREFIX + "Unknown" +
+                                                      ModelValidator.OPTIONAL_VARIABLE_SUFFIX);
+        String parameterValue = "Any Value";
+        validator.validate(parameterValue, null);
+    }
+
+    @Test
+    public void testModelValidatorIntegerOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.INTEGER + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorLongOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.LONG + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorShortOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.SHORT + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorFloatOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.FLOAT + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorDoubleOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.DOUBLE + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorBooleanOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.BOOLEAN + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorURIOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.URI + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorURLOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.URL + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorCRONOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.CRON + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorDatetimeOptional() throws ModelSyntaxException {
+        String exampleDatetimeModel = ModelType.DATETIME + "(yyyy-MM-dd)";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleDatetimeModel + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorListOptional() throws ModelSyntaxException {
+        String exampleListModel = ModelType.LIST + "(a,b,c)";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleListModel + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorRegexpOptional() throws ModelSyntaxException {
+        String exampleRegexpModel = ModelType.REGEXP + "([a-z]+)";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleRegexpModel + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testSpelValidatorRegexpOptional() throws ModelSyntaxException {
+        String exampleSpelModel = ModelType.SPEL + "(#value == 'abc')";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleSpelModel + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorModelFromURLOptional() throws ModelSyntaxException {
+        String exampleSpelModel = ModelType.MODEL_FROM_URL + "(file:///srv/machines_list_model.txt)";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleSpelModel + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorCatalogObjectOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.CATALOG_OBJECT +
+                                ModelValidator.OPTIONAL_VARIABLE_SUFFIX, OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorJSONOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.JSON + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorCredentialOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.CREDENTIAL + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorHiddenOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.HIDDEN + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorUserFileOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.USER_FILE + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorGlobalFileOptional() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.GLOBAL_FILE + ModelValidator.OPTIONAL_VARIABLE_SUFFIX,
+                                OptionalParserValidator.class);
+    }
+
+    @Test(expected = ModelSyntaxException.class)
+    public void testThatNotEmptyOptionalModelThrowException() throws ModelSyntaxException {
+        String model = ModelValidator.PREFIX + ModelType.NOT_EMPTY_STRING + ModelValidator.OPTIONAL_VARIABLE_SUFFIX;
+        new ModelValidator(model).createParserValidator().getClass();
+    }
+
+    public void createAndCheckValidator(String model, Class<?> expectedClass) throws ModelSyntaxException {
         ModelValidator validator = new ModelValidator(model);
         Assert.assertEquals(expectedClass, validator.createParserValidator().getClass());
         // add empty leading spaces and convert to lower case to verify trimming and case insensitive
