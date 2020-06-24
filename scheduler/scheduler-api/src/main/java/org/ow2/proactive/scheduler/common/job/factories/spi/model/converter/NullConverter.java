@@ -23,23 +23,30 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.converter;
 
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.OptionalValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.URIValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
+import org.apache.commons.lang3.StringUtils;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 
 
-public class OptionalURIParserValidator extends URIParserValidator {
+/**
+ * Accept the blank string by converting it to null. When the value is not blank, use its specific converter to convert its value.
+ * @param <T>
+ */
+public class NullConverter<T> implements Converter<T> {
+    Converter<T> converter;
 
-    public OptionalURIParserValidator(String model) throws ModelSyntaxException {
-        super(model, ModelType.OPTIONAL_URI);
+    public NullConverter(Converter<T> converter) {
+        this.converter = converter;
     }
 
     @Override
-    protected Validator<String> createValidator(String model, Converter<String> converter) {
-        return new OptionalValidator<>(new URIValidator());
+    public T convert(String parameterValue) throws ConversionException {
+        // When the parameter value is not provided, it's null. Otherwise, use its proper converter
+        if (StringUtils.isBlank(parameterValue)) {
+            return null;
+        } else {
+            return converter.convert(parameterValue);
+        }
     }
 }

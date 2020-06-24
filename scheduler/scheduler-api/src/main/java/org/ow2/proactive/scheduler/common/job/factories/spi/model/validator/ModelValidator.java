@@ -26,29 +26,15 @@
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CRONParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CatalogObjectParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DateTimeParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DoubleParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.FloatParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.IntegerParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.JSONParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ListParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.LongParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelFromURLParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelType;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.NotEmptyParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.OptionalParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.RegexpParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.SPELParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ShortParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.URIParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.URLParserValidator;
 
 import com.google.common.base.Strings;
 
@@ -58,6 +44,10 @@ public class ModelValidator implements Validator<String> {
     private String model;
 
     public static final String PREFIX = "PA:";
+
+    public static final String OPTIONAL_VARIABLE_SUFFIX = "?";
+
+    public static final List<ModelType> NEVER_OPTIONAL_MODEL = Arrays.asList(ModelType.NOT_EMPTY_STRING);
 
     public ModelValidator(String model) {
         if (Strings.isNullOrEmpty(model)) {
@@ -69,7 +59,7 @@ public class ModelValidator implements Validator<String> {
     @Override
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         try {
-            ParserValidator validator = createParserValidator();
+            ParserValidator<?> validator = createParserValidator();
             if (validator != null) {
                 validator.parseAndValidate(parameterValue, context);
             }
@@ -87,7 +77,7 @@ public class ModelValidator implements Validator<String> {
      * @return a registered model parser or null if no registered parser could be found.
      * @throws ModelSyntaxException if an error occurred during the parser creation
      */
-    protected ParserValidator createParserValidator() throws ModelSyntaxException {
+    protected ParserValidator<?> createParserValidator() throws ModelSyntaxException {
         String uppercaseModel = model.toUpperCase();
         if (!uppercaseModel.startsWith(PREFIX)) {
             return null;
@@ -95,27 +85,41 @@ public class ModelValidator implements Validator<String> {
         uppercaseModel = removePrefix(uppercaseModel);
         for (ModelType type : ModelType.values()) {
             if (uppercaseModel.startsWith(type.name())) {
-                try {
-                    return (ParserValidator) type.getTypeParserValidator()
-                                                 .getDeclaredConstructor(String.class)
-                                                 .newInstance(removePrefix(model));
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException
-                        | NoSuchMethodException e) {
-                    if (e instanceof InvocationTargetException) {
-                        // unwrap InvocationTargetException to get more specific error message
-                        Throwable exceptionCause = e.getCause();
-                        if (exceptionCause instanceof ModelSyntaxException) {
-                            throw (ModelSyntaxException) exceptionCause;
-                        }
+                String modelNoPrefix = removePrefix(model);
+                if (uppercaseModel.endsWith(OPTIONAL_VARIABLE_SUFFIX)) {
+                    if (NEVER_OPTIONAL_MODEL.contains(type)) {
+                        throw new ModelSyntaxException(String.format("Invalid model '%s': The type '%s' is disallowed to be optional",
+                                                                     model,
+                                                                     type));
                     }
-                    throw new ModelSyntaxException(String.format("Error during create the parser [%s] for the model [%s].",
-                                                                 type.getTypeParserValidator().getSimpleName(),
-                                                                 model),
-                                                   e);
+                    return new OptionalParserValidator<>(modelNoPrefix, type);
+                } else {
+                    return newParserValidator(type, modelNoPrefix);
                 }
             }
         }
         throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
+    }
+
+    public static ParserValidator<?> newParserValidator(ModelType type, String model) throws ModelSyntaxException {
+        try {
+            return (ParserValidator<?>) type.getTypeParserValidator()
+                                            .getDeclaredConstructor(String.class)
+                                            .newInstance(model);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                | NoSuchMethodException e) {
+            if (e instanceof InvocationTargetException) {
+                // unwrap InvocationTargetException to get more specific error message
+                Throwable exceptionCause = e.getCause();
+                if (exceptionCause instanceof ModelSyntaxException) {
+                    throw (ModelSyntaxException) exceptionCause;
+                }
+            }
+            throw new ModelSyntaxException(String.format("Error during create the parser [%s] for the model [%s].",
+                                                         type.getTypeParserValidator().getSimpleName(),
+                                                         model),
+                                           e);
+        }
     }
 
     private String removePrefix(String model) {
