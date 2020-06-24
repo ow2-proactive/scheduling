@@ -91,7 +91,7 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
      * Returns the class used by this parser to convert string parameter values.
      * @return class
      */
-    protected Class getClassType() {
+    protected Class<?> getClassType() {
         return type.getClassType();
     }
 
@@ -159,9 +159,6 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
     @Override
     public T parseAndValidate(String parameterValue, ModelValidatorContext context)
             throws ConversionException, ValidationException, ModelSyntaxException {
-        if (parameterValue == null) {
-            throw new ConversionException(parameterValue, getClassType());
-        }
         Converter<T> converter = createConverter(model);
         return createValidator(model, converter).validate(converter.convert(parameterValue), context);
     }

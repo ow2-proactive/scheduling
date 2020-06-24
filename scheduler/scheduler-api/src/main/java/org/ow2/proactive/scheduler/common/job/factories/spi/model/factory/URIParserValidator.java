@@ -38,10 +38,6 @@ public class URIParserValidator extends BaseParserValidator<String> {
         super(model, ModelType.URI);
     }
 
-    public URIParserValidator(String model, ModelType type) throws ModelSyntaxException {
-        super(model, type);
-    }
-
     @Override
     protected Converter<String> createConverter(String model) throws ModelSyntaxException {
         return new IdentityConverter();
