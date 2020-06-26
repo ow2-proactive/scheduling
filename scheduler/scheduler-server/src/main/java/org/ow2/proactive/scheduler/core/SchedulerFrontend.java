@@ -172,7 +172,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * Delay to wait for between getting a job result and removing the job
      * concerned
      */
-    private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() *
+    private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsLong() *
                                                             1000;
 
     private static final Logger logger = Logger.getLogger(SchedulerFrontend.class);
