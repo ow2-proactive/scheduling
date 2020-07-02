@@ -41,7 +41,7 @@ import org.ow2.tests.ProActiveTestClean;
 
 /**
  * @author ActiveEon Team
- * 
+ *
  * @see SchedulerHsqldbStarter
  */
 public class SchedulerHsqldbStarterTest extends ProActiveTestClean {
@@ -59,11 +59,11 @@ public class SchedulerHsqldbStarterTest extends ProActiveTestClean {
 
     @Test
     public void testConfigureCatalogs() throws Exception {
-        verify(hsqldbServerMock, times(3)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
+        verify(hsqldbServerMock, times(4)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
 
         schedulerHsqldbStarter.configureCatalogs(hsqldbServerMock, "/scheduler/home/");
 
-        verify(hsqldbServerMock, times(6)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
+        verify(hsqldbServerMock, times(8)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
     }
 
     @Test
