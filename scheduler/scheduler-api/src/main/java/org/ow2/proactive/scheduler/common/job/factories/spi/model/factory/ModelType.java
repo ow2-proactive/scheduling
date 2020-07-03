@@ -53,7 +53,9 @@ public enum ModelType {
     HIDDEN(HiddenParserValidator.class, String.class),
     CREDENTIAL(CredentialParserValidator.class, String.class),
     USER_FILE(UserFileParserValidator.class, String.class),
-    GLOBAL_FILE(GlobalFileParserValidator.class, String.class);
+    GLOBAL_FILE(GlobalFileParserValidator.class, String.class),
+    USER_FOLDER(UserFolderParserValidator.class, String.class),
+    GLOBAL_FOLDER(GlobalFolderParserValidator.class, String.class);
 
     // The parser validator of the model type
     private Class<?> typeParserValidator;
