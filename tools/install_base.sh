@@ -547,8 +547,7 @@ if [[ "$OLD_PADIR" == "" ]]; then
 
     if [[ "$OS" == "Debian" ]]; then
         tail -n +5 "$PA_ROOT/default/tools/proactive-scheduler" > "$PA_ROOT/default/tools/proactive-scheduler.tmp"
-        echo '
-#!/bin/bash
+        echo '#!/bin/bash
 ### BEGIN INIT INFO
 # Provides:          proactive-scheduler
 # Required-Start:    $all
