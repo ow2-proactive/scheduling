@@ -49,32 +49,30 @@ public enum ModelType {
     SHORT(ShortParserValidator.class, Short.class),
     SPEL(SPELParserValidator.class, String.class),
     URI(URIParserValidator.class, String.class),
-    OPTIONAL_URI(OptionalURIParserValidator.class, String.class),
     URL(URLParserValidator.class, String.class),
-    OPTIONAL_URL(OptionalURLParserValidator.class, String.class),
     HIDDEN(HiddenParserValidator.class, String.class),
     CREDENTIAL(CredentialParserValidator.class, String.class),
     USER_FILE(UserFileParserValidator.class, String.class),
-    OPTIONAL_USER_FILE(OptionalUserFileParserValidator.class, String.class),
     GLOBAL_FILE(GlobalFileParserValidator.class, String.class),
-    OPTIONAL_GLOBAL_FILE(OptionalGlobalFileParserValidator.class, String.class);
+    USER_FOLDER(UserFolderParserValidator.class, String.class),
+    GLOBAL_FOLDER(GlobalFolderParserValidator.class, String.class);
 
     // The parser validator of the model type
-    private Class typeParserValidator;
+    private Class<?> typeParserValidator;
 
     // The parameter string value is expected to be converted to which class by its parser
-    private Class classType;
+    private Class<?> classType;
 
-    ModelType(Class typeParserValidator, Class classType) {
+    ModelType(Class<?> typeParserValidator, Class<?> classType) {
         this.typeParserValidator = typeParserValidator;
         this.classType = classType;
     }
 
-    public Class getTypeParserValidator() {
+    public Class<?> getTypeParserValidator() {
         return typeParserValidator;
     }
 
-    public Class getClassType() {
+    public Class<?> getClassType() {
         return classType;
     }
 }

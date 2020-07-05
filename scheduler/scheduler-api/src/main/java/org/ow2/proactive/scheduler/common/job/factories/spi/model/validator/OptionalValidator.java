@@ -44,7 +44,7 @@ public class OptionalValidator<T> implements Validator<T> {
     @Override
     public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
         // When the parameter value is not provided, it's validated. Otherwise, use its proper validator
-        if (StringUtils.isBlank(parameterValue.toString())) {
+        if (parameterValue == null || StringUtils.isBlank(parameterValue.toString())) {
             return parameterValue;
         } else {
             return validator.validate(parameterValue, context);
