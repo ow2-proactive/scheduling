@@ -1,0 +1,7 @@
+urlid scheduler
+
+url jdbc:hsqldb:hsql://localhost:9001/scheduler
+
+username scheduler
+
+password
