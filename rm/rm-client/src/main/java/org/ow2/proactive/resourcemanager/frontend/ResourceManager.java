@@ -572,4 +572,6 @@ public interface ResourceManager {
 
     void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException;
 
+    List<String> getNodeTokens(String nodeUrl) throws RMException;
+
 }
