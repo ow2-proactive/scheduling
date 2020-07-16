@@ -59,11 +59,11 @@ public class SchedulerHsqldbStarterTest extends ProActiveTestClean {
 
     @Test
     public void testConfigureCatalogs() throws Exception {
-        verify(hsqldbServerMock, times(4)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
+        verify(hsqldbServerMock, times(5)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
 
         schedulerHsqldbStarter.configureCatalogs(hsqldbServerMock, "/scheduler/home/");
 
-        verify(hsqldbServerMock, times(8)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
+        verify(hsqldbServerMock, times(10)).addCatalog(Mockito.<Path> any(), Mockito.<Path> any());
     }
 
     @Test
