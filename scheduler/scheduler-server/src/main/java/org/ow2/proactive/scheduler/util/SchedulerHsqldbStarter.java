@@ -54,6 +54,8 @@ public class SchedulerHsqldbStarter {
 
     private Path hibernateCatalogConfiguration;
 
+    private Path hibernatePcaConfiguration;
+
     public SchedulerHsqldbStarter() throws IOException {
         this.hsqldbServer = createHsqldbServer();
         configureCatalogs(hsqldbServer, schedulerHome);
@@ -102,10 +104,13 @@ public class SchedulerHsqldbStarter {
                                                   "catalog",
                                                   databaseFileName);
 
+        hibernatePcaConfiguration = Paths.get(schedulerHome, schedulerConfigurationFolderName, "pca", databaseFileName);
+
         server.addCatalog(schedulerDbPath, hibernateRmConfiguration);
         server.addCatalog(schedulerDbPath, hibernateSchedulerConfiguration);
         server.addCatalog(schedulerDbPath, hibernateNotificationServiceConfiguration);
         server.addCatalog(schedulerDbPath, hibernateCatalogConfiguration);
+        server.addCatalog(schedulerDbPath, hibernatePcaConfiguration);
     }
 
     public boolean isServerModeRequired() throws IOException {
