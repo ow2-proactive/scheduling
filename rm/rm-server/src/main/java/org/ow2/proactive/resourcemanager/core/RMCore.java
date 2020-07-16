@@ -3109,6 +3109,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     public void addNodeToken(String nodeUrl, String token) throws RMException {
+        if (token == null || token.isEmpty()) {
+            throw new RMException("Invalid empty token");
+        }
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
             if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(caller)) {
@@ -3129,8 +3132,20 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    public List<String> getNodeTokens(String nodeUrl) throws RMException {
+        if (allNodes.containsKey(nodeUrl)) {
+            RMNode rmNode = allNodes.get(nodeUrl);
+            return rmNode.getNodeTokens();
+        } else {
+            throw new RMException("Unknown node " + nodeUrl);
+        }
+    }
+
     @Override
     public void removeNodeToken(String nodeUrl, String token) throws RMException {
+        if (token == null || token.isEmpty()) {
+            throw new RMException("Invalid empty token");
+        }
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
             if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(caller)) {
@@ -3153,6 +3168,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     public void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException {
+        if (tokens.stream().anyMatch(token -> token == null || token.isEmpty())) {
+            throw new RMException("Invalid empty token in list " + tokens);
+        }
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
             rmNode.setNodeTokens(nodeUrl, tokens);
