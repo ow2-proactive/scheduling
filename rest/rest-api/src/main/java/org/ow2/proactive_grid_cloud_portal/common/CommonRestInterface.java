@@ -173,4 +173,15 @@ public interface CommonRestInterface {
     @Path("permissions/notification-service/admin")
     boolean checkSubscriptionAdmin(@HeaderParam("sessionid") String sessionId) throws RestException;
 
+    /**
+     * Check if a user has admin privilege in cloud automation service.
+     *
+     * @param sessionId id of a session
+     * @return true if the user has the correct rights
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("permissions/cloud-automation-service/admin")
+    boolean checkPcaAdmin(@HeaderParam("sessionid") String sessionId) throws RestException;
+
 }
