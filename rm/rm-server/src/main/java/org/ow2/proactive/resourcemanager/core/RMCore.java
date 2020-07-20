@@ -3114,7 +3114,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
-            checkNodeAdminPermission(rmNode, caller);
+            if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(getCurrentUser())) {
+                // current user has the right to add a token to reserve it for further usage
+            } else {
+                // if not, check that the request initiator is a node administrator
+                checkNodeAdminPermission(rmNode, caller);
+            }
             rmNode.addToken(token);
 
             persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
@@ -3143,7 +3148,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
-            checkNodeAdminPermission(rmNode, caller);
+            if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(getCurrentUser())) {
+                // current user has the right to add a token to reserve it for further usage
+            } else {
+                checkNodeAdminPermission(rmNode, caller);
+            }
             rmNode.removeToken(token);
 
             persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
