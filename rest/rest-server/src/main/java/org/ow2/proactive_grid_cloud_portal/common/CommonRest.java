@@ -37,6 +37,7 @@ import javax.security.auth.login.LoginException;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.permissions.NotificationAdminPermission;
+import org.ow2.proactive.permissions.PcaAdminPermission;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -156,6 +157,21 @@ public class CommonRest implements CommonRestInterface {
             return checkPermission(scheduler.getSubject(),
                                    new NotificationAdminPermission(),
                                    "User does not have notification service administrator privilege");
+        } catch (PermissionException e) {
+            return false;
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
+
+    @Override
+    public boolean checkPcaAdmin(String sessionId) throws NotConnectedRestException {
+        Scheduler scheduler = checkAccess(sessionId);
+
+        try {
+            return checkPermission(scheduler.getSubject(),
+                                   new PcaAdminPermission(),
+                                   "User does not have cloud automation service administrator privilege");
         } catch (PermissionException e) {
             return false;
         } catch (NotConnectedException e) {
