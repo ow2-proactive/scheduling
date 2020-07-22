@@ -3114,7 +3114,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
-            if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(getCurrentUser())) {
+            if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(caller)) {
                 // current user has the right to add a token to reserve it for further usage
             } else {
                 // if not, check that the request initiator is a node administrator
@@ -3148,7 +3148,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
-            if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(getCurrentUser())) {
+            if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(caller)) {
                 // current user has the right to add a token to reserve it for further usage
             } else {
                 checkNodeAdminPermission(rmNode, caller);
