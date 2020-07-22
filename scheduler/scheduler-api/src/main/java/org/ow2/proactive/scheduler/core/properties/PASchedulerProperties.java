@@ -379,6 +379,8 @@ public enum PASchedulerProperties implements PACommonProperties {
             PropertyType.INTEGER,
             "100"),
 
+    SCHEDULER_DB_ITEMS_MAX_SIZE("pa.scheduler.db.items.max.size", PropertyType.INTEGER, "1000"),
+
     SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE("pa.scheduler.db.fetch.batch_size", PropertyType.INTEGER, "50"),
 
     /* ***************************************************************** */
