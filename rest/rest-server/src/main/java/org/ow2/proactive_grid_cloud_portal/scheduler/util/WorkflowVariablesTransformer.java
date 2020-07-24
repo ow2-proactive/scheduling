@@ -25,17 +25,20 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.util;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 
 
 public class WorkflowVariablesTransformer {
 
-    public Map<String, String> getWorkflowVariablesFromPathSegment(PathSegment pathSegment) {
+    public Map<String, String> getWorkflowVariablesFromPathSegment(PathSegment pathSegment)
+            throws UnsupportedEncodingException {
         Map<String, String> variables = null;
         MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
         if (matrixParams != null && !matrixParams.isEmpty()) {
@@ -44,7 +47,8 @@ public class WorkflowVariablesTransformer {
             variables = Maps.newHashMap();
             for (String key : matrixParams.keySet()) {
                 String value = matrixParams.getFirst(key) == null ? "" : matrixParams.getFirst(key);
-                variables.put(key, value);
+                //decode value
+                variables.put(key, java.net.URLDecoder.decode(value, Charsets.UTF_8.displayName()));
             }
         }
         return variables;

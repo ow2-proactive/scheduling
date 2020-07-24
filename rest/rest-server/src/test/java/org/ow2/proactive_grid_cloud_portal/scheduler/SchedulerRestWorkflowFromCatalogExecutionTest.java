@@ -32,6 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +57,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+
+import com.google.common.base.Charsets;
 
 
 public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServer {
@@ -174,6 +177,28 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     }
 
     @Test
+    public void testWhenSubmittingAValidTemplateWithVariablesHavingSpecialCharacters() throws Exception {
+        when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(99L, "job"));
+        ArgumentCaptor<Job> argumentCaptor = ArgumentCaptor.forClass(Job.class);
+
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
+
+        JobIdData response = schedulerRest.submitFromUrl(sessionId,
+                                                         workflowUrl,
+                                                         getOneVariablePathSegment("var1", "value1/slash"),
+                                                         null);
+
+        verify(scheduler).submit(argumentCaptor.capture());
+        Job interceptedJob = argumentCaptor.getValue();
+
+        Assert.assertEquals(1, interceptedJob.getVariables().size());
+        Assert.assertEquals("value1/slash", interceptedJob.getVariables().get("var1").getValue());
+
+        Assert.assertEquals(99L, response.getId());
+        Assert.assertEquals("job", response.getReadableName());
+    }
+
+    @Test
     public void testWhenValidatingAValidTemplateWithVariablesThenTheProvidedJobVariableIsUsed() throws Exception {
 
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
@@ -247,15 +272,15 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         return "http://localhost:" + port + "/wsh";
     }
 
-    private PathSegment getEmptyPathSegment() {
+    private PathSegment getEmptyPathSegment() throws UnsupportedEncodingException {
         return getOneVariablePathSegment(null, null);
     }
 
-    private PathSegment getOneVariablePathSegment(String key, String value) {
+    private PathSegment getOneVariablePathSegment(String key, String value) throws UnsupportedEncodingException {
         PathSegment pathSegment = mock(PathSegment.class);
         MultivaluedMap<String, String> matrix = new MultivaluedHashMap<>();
         if (key != null) {
-            matrix.put(key, Arrays.asList(value));
+            matrix.put(key, Arrays.asList(java.net.URLEncoder.encode(value, Charsets.UTF_8.displayName())));
         }
         when(pathSegment.getMatrixParameters()).thenReturn(matrix);
         return pathSegment;

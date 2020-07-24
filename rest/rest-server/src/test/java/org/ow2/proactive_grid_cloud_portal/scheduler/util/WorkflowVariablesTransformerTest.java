@@ -31,6 +31,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -54,7 +55,7 @@ public class WorkflowVariablesTransformerTest {
     }
 
     @Test
-    public void testEmptyMap() {
+    public void testEmptyMap() throws UnsupportedEncodingException {
 
         PathSegment pathSegment = mock(PathSegment.class);
 
@@ -68,7 +69,7 @@ public class WorkflowVariablesTransformerTest {
     }
 
     @Test
-    public void testTwoVariablesMap() {
+    public void testTwoVariablesMap() throws UnsupportedEncodingException {
 
         Map<String, String> expectedVariables = Maps.newHashMap();
 
@@ -92,7 +93,7 @@ public class WorkflowVariablesTransformerTest {
     }
 
     @Test
-    public void testTwoVariablesEmptyMap() {
+    public void testTwoVariablesEmptyMap() throws UnsupportedEncodingException {
 
         Map<String, String> expectedVariables = Maps.newHashMap();
 
@@ -116,7 +117,7 @@ public class WorkflowVariablesTransformerTest {
     }
 
     @Test
-    public void testTwoVariablesNullMap() {
+    public void testTwoVariablesNullMap() throws UnsupportedEncodingException {
 
         Map<String, String> expectedVariables = Maps.newHashMap();
 
@@ -131,6 +132,30 @@ public class WorkflowVariablesTransformerTest {
         multivalueMap.put("KEY1", null);
 
         multivalueMap.put("KEY2", null);
+
+        when(pathSegment.getMatrixParameters()).thenReturn(multivalueMap);
+
+        Map<String, String> variables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+        assertThat(variables, is(expectedVariables));
+    }
+
+    @Test
+    public void testTwoVariablesWithSpecialCharacterMap() throws UnsupportedEncodingException {
+
+        Map<String, String> expectedVariables = Maps.newHashMap();
+
+        expectedVariables.put("KEY1", "VALUE1/slash");
+
+        expectedVariables.put("KEY2", "VALUE2$dollar");
+
+        PathSegment pathSegment = mock(PathSegment.class);
+
+        MultivaluedMap<String, String> multivalueMap = new MultivaluedHashMap();
+
+        multivalueMap.put("KEY1", Lists.newArrayList("VALUE1/slash"));
+
+        multivalueMap.put("KEY2", Lists.newArrayList("VALUE2$dollar"));
 
         when(pathSegment.getMatrixParameters()).thenReturn(multivalueMap);
 
