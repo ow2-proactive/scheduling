@@ -73,6 +73,10 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_REDIRECT_HTTP_TO_HTTPS("web.redirect_http_to_https", PropertyType.BOOLEAN, "false"),
 
+    WEB_PCA_PROXY_REWRITE_ENABLED("web.pca.proxy.rewrite.enabled", PropertyType.BOOLEAN, "true"),
+
+    WEB_PCA_PROXY_REWRITE_REFERER_CACHE_SIZE("web.pca.proxy.rewrite.referer.cache.size", PropertyType.INTEGER, "10000"),
+
     METADATA_CONTENT_TYPE("content.type", PropertyType.STRING),
 
     METADATA_FILE_NAME("file.name", PropertyType.STRING),

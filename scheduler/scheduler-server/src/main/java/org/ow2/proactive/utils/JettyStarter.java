@@ -31,10 +31,13 @@ import java.net.BindException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.DispatcherType;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -116,7 +119,15 @@ public class JettyStarter {
 
             server.setStopAtShutdown(true);
 
-            HandlerList handlerList = new HandlerList();
+            HandlerList topLevelHandlerList = new HandlerList();
+
+            if (httpsEnabled && redirectHttpToHttps) {
+                ContextHandler redirectHandler = new ContextHandler();
+                redirectHandler.setContextPath("/");
+                redirectHandler.setHandler(new SecuredRedirectHandler());
+                redirectHandler.setVirtualHosts(httpVirtualHost);
+                topLevelHandlerList.addHandler(redirectHandler);
+            }
 
             if (WebProperties.JETTY_LOG_FILE.isSet()) {
                 String pathToJettyLogFile = FileStorageSupportFactory.relativeToHomeIfNotAbsolute(WebProperties.JETTY_LOG_FILE.getValueAsString());
@@ -134,20 +145,34 @@ public class JettyStarter {
 
                     RequestLogHandler requestLogHandler = new RequestLogHandler();
                     requestLogHandler.setRequestLog(requestLog);
-                    handlerList.addHandler(requestLogHandler);
+                    topLevelHandlerList.addHandler(requestLogHandler);
                 }
             }
 
-            if (httpsEnabled && redirectHttpToHttps) {
-                ContextHandler redirectHandler = new ContextHandler();
-                redirectHandler.setContextPath("/");
-                redirectHandler.setHandler(new SecuredRedirectHandler());
-                redirectHandler.setVirtualHosts(httpVirtualHost);
-                handlerList.addHandler(redirectHandler);
+            RewriteHandler rewriteHandler = null;
+            HandlerList contextHandlerList = null;
+
+            if (WebProperties.WEB_PCA_PROXY_REWRITE_ENABLED.getValueAsBoolean()) {
+                rewriteHandler = new RewriteHandler();
+                PCAProxyRule proxyRule = new PCAProxyRule();
+                rewriteHandler.addRule(proxyRule);
+                rewriteHandler.setRewriteRequestURI(true);
+                rewriteHandler.setRewritePathInfo(false);
+                rewriteHandler.setOriginalPathAttribute(PCAProxyRule.originalPathAttribute);
+                rewriteHandler.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ASYNC);
+                contextHandlerList = new HandlerList();
+            } else {
+                contextHandlerList = topLevelHandlerList;
             }
 
-            addWarsToHandlerList(handlerList, defaultVirtualHost);
-            server.setHandler(handlerList);
+            addWarsToHandlerList(contextHandlerList, defaultVirtualHost);
+
+            if (WebProperties.WEB_PCA_PROXY_REWRITE_ENABLED.getValueAsBoolean()) {
+                rewriteHandler.setHandler(contextHandlerList);
+                topLevelHandlerList.addHandler(rewriteHandler);
+            }
+
+            server.setHandler(topLevelHandlerList);
 
             String schedulerHost = ProActiveInet.getInstance().getHostname();
             return startServer(server, schedulerHost, restPort, httpProtocol);
@@ -283,7 +308,18 @@ public class JettyStarter {
 
     private List<String> printDeployedApplications(Server server, String schedulerHost, int restPort,
             String httpProtocol) {
-        HandlerList handlerList = (HandlerList) server.getHandler();
+        HandlerList handlerList = null;
+        if (WebProperties.WEB_PCA_PROXY_REWRITE_ENABLED.getValueAsBoolean()) {
+            HandlerList topLevelHandlerList = (HandlerList) server.getHandler();
+            for (Handler handler : topLevelHandlerList.getHandlers()) {
+                if (handler instanceof RewriteHandler) {
+                    handlerList = (HandlerList) ((RewriteHandler) handler).getHandler();
+                }
+            }
+        } else {
+            handlerList = (HandlerList) server.getHandler();
+        }
+
         ArrayList<String> applicationsUrls = new ArrayList<>();
         if (handlerList.getHandlers() != null) {
             for (Handler handler : handlerList.getHandlers()) {
