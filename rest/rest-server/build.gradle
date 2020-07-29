@@ -61,6 +61,7 @@ dependencies {
 
     runtime 'org.eclipse.jetty.websocket:websocket-server:9.2.29.v20191105'
     runtime 'org.eclipse.jetty:jetty-webapp:9.2.29.v20191105'
+    runtime 'org.eclipse.jetty:jetty-rewrite:9.2.29.v20191105'
 
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 }
