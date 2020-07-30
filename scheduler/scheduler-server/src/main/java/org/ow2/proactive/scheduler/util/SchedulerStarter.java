@@ -36,6 +36,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
@@ -242,12 +243,29 @@ public class SchedulerStarter {
         if (applicationUrls != null) {
             for (String applicationUrl : applicationUrls) {
                 if (applicationUrl.endsWith("/rest") && !PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-                    PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
+                    PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(getPublicUrl(applicationUrl));
                 }
                 if (applicationUrl.endsWith("/catalog") && !PASchedulerProperties.CATALOG_REST_URL.isSet()) {
-                    PASchedulerProperties.CATALOG_REST_URL.updateProperty(applicationUrl);
+                    PASchedulerProperties.CATALOG_REST_URL.updateProperty(getPublicUrl(applicationUrl));
                 }
             }
+        }
+    }
+
+    private static String getPublicUrl(String url) {
+        if (PASchedulerProperties.SERVER_PUBLIC_URL.isSet()) {
+            try {
+                URL publicUrl = new URL(PASchedulerProperties.SERVER_PUBLIC_URL.getValueAsString());
+                URL applicationUrl = new URL(url);
+                URL resolvedUrl = new URL(publicUrl, applicationUrl.getPath().substring(1));
+                return resolvedUrl.toExternalForm();
+
+            } catch (Exception e) {
+                LOGGER.warn("Error when resolving public url for " + url, e);
+                return url;
+            }
+        } else {
+            return url;
         }
     }
 
