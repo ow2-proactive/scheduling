@@ -328,6 +328,12 @@ public enum PASchedulerProperties implements PACommonProperties {
      */
     CATALOG_REST_URL("pa.catalog.rest.url", PropertyType.STRING),
 
+    /**
+     * Set this property to define the public url of the server (e.g. if behind a reverse proxy or accessed through a domain)
+     * the SCHEDULER_REST_URL and CATALOG_REST_URL properties will be updated accordingly
+     */
+    SERVER_PUBLIC_URL("pa.server.public.url", PropertyType.STRING),
+
     /* ***************************************************************** */
     /* ************************** RM PROPERTIES ************************ */
     /* ***************************************************************** */
