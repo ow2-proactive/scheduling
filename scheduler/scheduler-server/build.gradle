@@ -18,6 +18,7 @@ dependencies {
 
     compile 'org.eclipse.jetty:jetty-webapp:9.2.29.v20191105'
     compile 'org.eclipse.jetty:jetty-rewrite:9.2.29.v20191105'
+    compile 'org.eclipse.jetty:jetty-util:9.2.29.v20191105'
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
     compile project(':common:common-api')

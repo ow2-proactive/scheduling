@@ -409,6 +409,14 @@ public class JettyStarter {
         // The following setting allows to avoid conflicts between server jackson jars and individual war jackson versions.
         webApp.addServerClass("com.fasterxml.jackson.");
         webApp.addServerClass("com.google.gson.");
+        if (contextPath.contains("cloud-automation-service")) {
+            // Make jetty.util not overridable and not hidden for cloud-automation
+            // as jetty websocket is loaded from the system class loader and uses jetty.util
+            // Otherwise, cloud-automation-service will not be able to use SslContextFactory
+            // see https://www.eclipse.org/lists/jetty-dev/msg03096.html for the same issue report
+            webApp.prependServerClass("-org.eclipse.jetty.util.");
+            webApp.prependSystemClass("org.eclipse.jetty.util.");
+        }
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);
         return webApp;

@@ -140,12 +140,22 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
                 logger.debug(String.format("Rewrote %s to %s", target, newTarget));
             }
             referrerCache.put(target, endpointPath);
-            if (request.getMethod().equals(HttpMethod.GET.asString())) {
+            if (HttpMethod.GET.is(request.getMethod())) {
                 redirectGetRequest(target, endpointPath, request, response, newTarget);
             }
             return newTarget;
         } else {
             logger.trace("Target already contains endpoint");
+            if (!target.startsWith(endpointPath)) {
+                // endpoint is in the middle of the path (who did this?), let's bring it on top
+                // NOTE: we don't store this in the referer cache
+                target = target.replace(endpointPath, "");
+                String newTarget = endpointPath.substring(0, endpointPath.length() - 1) + target;
+                if (HttpMethod.GET.is(request.getMethod())) {
+                    redirectGetRequest(target, endpointPath, request, response, newTarget);
+                }
+                return newTarget;
+            }
         }
         return target;
     }
