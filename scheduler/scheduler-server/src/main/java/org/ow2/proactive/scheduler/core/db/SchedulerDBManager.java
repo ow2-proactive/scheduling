@@ -40,7 +40,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -108,7 +107,6 @@ import org.ow2.proactive.utils.ObjectByteConverter;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 
 @SuppressWarnings("JpaQueryApiInspection")
@@ -136,8 +134,6 @@ public class SchedulerDBManager {
                                                                                                         PENDING_JOB_STATUSES));
 
     public static final String ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED = "All required Jobs have been fetched"; // important for JobRecoveryTest
-
-    public static final int MAX_ITEMS_IN_LIST = PASchedulerProperties.SCHEDULER_DB_ITEMS_MAX_SIZE.getValueAsInt();
 
     private final SessionFactory sessionFactory;
 
@@ -735,23 +731,16 @@ public class SchedulerDBManager {
         removeJobRuntimeData(session, Collections.singletonList(jobId));
     }
 
-    private void removeJobRuntimeData(Session session, List<Long> jobIds) {
-        List<List<Long>> jobIdSubSets = Lists.partition(jobIds, MAX_ITEMS_IN_LIST);
-        for (List<Long> jobIdSubList : jobIdSubSets) {
-            removeJobScripts(session, jobIdSubList);
+    private void removeJobRuntimeData(Session session, List<Long> jobId) {
+        removeJobScripts(session, jobId);
 
-            session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
-                   .setParameterList("jobIdList", jobIdSubList)
-                   .executeUpdate();
+        session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
+               .setParameterList("jobIdList", jobId)
+               .executeUpdate();
 
-            session.getNamedQuery("deleteTaskDataVariableInBulk")
-                   .setParameterList("jobIdList", jobIdSubList)
-                   .executeUpdate();
+        session.getNamedQuery("deleteTaskDataVariableInBulk").setParameterList("jobIdList", jobId).executeUpdate();
 
-            session.getNamedQuery("deleteSelectorDataInBulk")
-                   .setParameterList("jobIdList", jobIdSubList)
-                   .executeUpdate();
-        }
+        session.getNamedQuery("deleteSelectorDataInBulk").setParameterList("jobIdList", jobId).executeUpdate();
     }
 
     public void scheduleJobForRemoval(final JobId jobId, final long timeForRemoval, final boolean shouldRemoveFromDb) {
@@ -792,10 +781,7 @@ public class SchedulerDBManager {
     }
 
     public void executeHousekeepingInDB(final List<Long> jobIdList, final boolean shouldRemoveFromDb) {
-        List<List<Long>> jobIdSubSets = Lists.partition(jobIdList, MAX_ITEMS_IN_LIST);
-        for (List<Long> jobIdSubList : jobIdSubSets) {
-            executeReadWriteTransaction(new HousekeepingSessionWork(jobIdSubList, shouldRemoveFromDb));
-        }
+        executeReadWriteTransaction(new HousekeepingSessionWork(jobIdList, shouldRemoveFromDb));
     }
 
     public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
@@ -803,37 +789,34 @@ public class SchedulerDBManager {
     }
 
     public void removeJob(final List<JobId> jobIds, final long removedTime, final boolean removeData) {
-        List<List<JobId>> jobIdSubSets = Lists.partition(jobIds, MAX_ITEMS_IN_LIST);
-        for (List<JobId> jobIdSubList : jobIdSubSets) {
-            executeReadWriteTransaction((SessionWork<Void>) session -> {
-                List<Long> ids = jobIdSubList.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            List<Long> ids = jobIds.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
 
-                if (removeData) {
-                    session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in (:ids)")
-                           .setParameterList("ids", ids)
-                           .executeUpdate();
-                    session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in (:ids)")
-                           .setParameterList("ids", ids)
-                           .executeUpdate();
-                    session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in (:ids)")
-                           .setParameterList("ids", ids)
-                           .executeUpdate();
+            if (removeData) {
+                session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
+                       .executeUpdate();
+                session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
+                       .executeUpdate();
+                session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
+                       .executeUpdate();
 
-                    session.getNamedQuery("deleteJobDataVariable").setParameterList("ids", ids).executeUpdate();
+                session.getNamedQuery("deleteJobDataVariable").setParameterList("ids", ids).executeUpdate();
 
-                    removeJobScripts(session, ids);
+                removeJobScripts(session, ids);
 
-                    session.getNamedQuery("deleteJobDataInBulk").setParameterList("jobIdList", ids).executeUpdate();
-                } else {
-                    session.getNamedQuery("updateJobDataRemovedTime")
-                           .setParameter("removedTime", removedTime)
-                           .setParameter("lastUpdatedTime", new Date().getTime())
-                           .setParameterList("ids", ids)
-                           .executeUpdate();
-                }
-                return null;
-            });
-        }
+                session.getNamedQuery("deleteJobDataInBulk").setParameterList("jobIdList", ids).executeUpdate();
+            } else {
+                session.getNamedQuery("updateJobDataRemovedTime")
+                       .setParameter("removedTime", removedTime)
+                       .setParameter("lastUpdatedTime", new Date().getTime())
+                       .setParameterList("ids", ids)
+                       .executeUpdate();
+            }
+            return null;
+        });
     }
 
     public List<InternalJob> loadNotFinishedJobs(boolean fullState) {
@@ -867,34 +850,22 @@ public class SchedulerDBManager {
     }
 
     public List<InternalJob> loadJobWithTasksIfNotRemoved(final JobId... jobIds) {
-        ArrayList<InternalJob> answer = new ArrayList(jobIds.length);
-        List<List<JobId>> jobIdSubSets = Lists.partition(Arrays.asList(jobIds), MAX_ITEMS_IN_LIST);
-        for (List<JobId> jobIdSubList : jobIdSubSets) {
-            answer.addAll(executeReadOnlyTransaction(session -> {
-                Query jobQuery = session.getNamedQuery("loadJobDataIfNotRemoved").setReadOnly(true);
+        return executeReadOnlyTransaction(session -> {
+            Query jobQuery = session.getNamedQuery("loadJobDataIfNotRemoved").setReadOnly(true);
 
-                List<Long> ids = jobIdSubList.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
+            List<Long> ids = Arrays.stream(jobIds).map(SchedulerDBManager::jobId).collect(Collectors.toList());
 
-                List<InternalJob> result = new ArrayList<>(jobIdSubList.size());
-                batchLoadJobs(session, false, jobQuery, ids, result);
-                return result;
-            }));
-        }
-        return answer;
+            List<InternalJob> result = new ArrayList<>(jobIds.length);
+            batchLoadJobs(session, false, jobQuery, ids, result);
+            return result;
+        });
     }
 
     public List<InternalJob> loadJobs(final boolean fullState, final JobId... jobIds) {
-        ArrayList<InternalJob> answer = new ArrayList(jobIds.length);
-        List<List<JobId>> jobIdSubSets = Lists.partition(Arrays.asList(jobIds), MAX_ITEMS_IN_LIST);
-        for (List<JobId> jobIdSubList : jobIdSubSets) {
-            answer.addAll(executeReadOnlyTransaction(session -> {
-                final List<Long> ids = jobIdSubList.stream()
-                                                   .map(SchedulerDBManager::jobId)
-                                                   .collect(Collectors.toList());
-                return loadInternalJobs(fullState, session, ids);
-            }));
-        }
-        return answer;
+        return executeReadOnlyTransaction(session -> {
+            final List<Long> ids = Stream.of(jobIds).map(SchedulerDBManager::jobId).collect(Collectors.toList());
+            return loadInternalJobs(fullState, session, ids);
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -1138,12 +1109,8 @@ public class SchedulerDBManager {
                 taskIds.add(taskId(id));
             }
 
-            List<TaskData> tasksToUpdate = new ArrayList<>(taskIds.size());
-            List<List<DBTaskId>> dbTaskIdsSubSets = Lists.partition(taskIds, MAX_ITEMS_IN_LIST);
-            for (List<DBTaskId> dbTaskIdsSubList : dbTaskIdsSubSets) {
-                Query tasksQuery = session.getNamedQuery("findTaskData").setParameterList("ids", dbTaskIdsSubList);
-                tasksToUpdate.addAll(tasksQuery.list());
-            }
+            Query tasksQuery = session.getNamedQuery("findTaskData").setParameterList("ids", taskIds);
+            List<TaskData> tasksToUpdate = tasksQuery.list();
             Set<TaskId> newTasks = changesInfo.getNewTasks();
 
             for (TaskData taskData : tasksToUpdate) {
@@ -1274,96 +1241,90 @@ public class SchedulerDBManager {
     }
 
     public void killJobs(List<InternalJob> jobs) {
-        List<List<InternalJob>> jobsSubSets = Lists.partition(jobs, MAX_ITEMS_IN_LIST);
-        for (List<InternalJob> jobsSubList : jobsSubSets) {
-            executeReadWriteTransaction((SessionWork<Void>) session -> {
-                List<Long> jobIds = jobsSubList.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            List<Long> jobIds = jobs.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
 
-                List<Long> updatedJobsIds = new ArrayList<>(jobsSubList.size());
-                for (InternalJob job : jobsSubList) {
-                    long jobId = jobId(job);
-                    JobInfo jobInfo = job.getJobInfo();
-                    int result = session.getNamedQuery("updateJobDataAfterTaskFinished")
-                                        .setParameter("status", jobInfo.getStatus())
-                                        .setParameter("finishedTime", jobInfo.getFinishedTime())
-                                        .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
-                                        .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
-                                        .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
-                                        .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
-                                        .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
-                                        .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
-                                        .setParameter("lastUpdatedTime", new Date().getTime())
-                                        .setParameter("resultMap",
-                                                      ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                                        .setParameter("jobId", jobId)
-                                        .executeUpdate();
-                    if (result != 0) {
-                        updatedJobsIds.add(jobId);
-                    }
-
+            List<Long> updatedJobsIds = new ArrayList<>(jobs.size());
+            for (InternalJob job : jobs) {
+                long jobId = jobId(job);
+                JobInfo jobInfo = job.getJobInfo();
+                int result = session.getNamedQuery("updateJobDataAfterTaskFinished")
+                                    .setParameter("status", jobInfo.getStatus())
+                                    .setParameter("finishedTime", jobInfo.getFinishedTime())
+                                    .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
+                                    .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
+                                    .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                                    .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                                    .setParameter("lastUpdatedTime", new Date().getTime())
+                                    .setParameter("resultMap",
+                                                  ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                                    .setParameter("jobId", jobId)
+                                    .executeUpdate();
+                if (result != 0) {
+                    updatedJobsIds.add(jobId);
                 }
 
-                final int notReStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
-                                                             " where task.id.jobId in :jobIds and task.taskStatus in :taskStatuses ")
+            }
+
+            final int notReStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
+                                                         " where task.id.jobId in :jobIds and task.taskStatus in :taskStatuses ")
+                                            .setParameterList("jobIds", jobIds)
+                                            .setParameterList("taskStatuses",
+                                                              Arrays.asList(TaskStatus.WAITING_ON_ERROR,
+                                                                            TaskStatus.WAITING_ON_FAILURE))
+                                            .executeUpdate();
+
+            final int notStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
+                                                       " where task.id.jobId in :jobIds and task.taskStatus in :taskStatuses ")
+                                          .setParameterList("jobIds", jobIds)
+                                          .setParameterList("taskStatuses",
+                                                            TaskStatus.allExceptThese(TaskStatus.RUNNING,
+                                                                                      TaskStatus.WAITING_ON_ERROR,
+                                                                                      TaskStatus.WAITING_ON_FAILURE,
+                                                                                      TaskStatus.FAILED,
+                                                                                      TaskStatus.NOT_STARTED,
+                                                                                      TaskStatus.FAULTY,
+                                                                                      TaskStatus.FINISHED,
+                                                                                      TaskStatus.SKIPPED))
+                                          .executeUpdate();
+
+            final int runningToAborted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
+                                                             " task.finishedTime = :finishedTime where task.id.jobId in :jobIds " +
+                                                             " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                             " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
+                                                .setParameter("finishedTime", System.currentTimeMillis())
                                                 .setParameterList("jobIds", jobIds)
-                                                .setParameterList("taskStatuses",
-                                                                  Arrays.asList(TaskStatus.WAITING_ON_ERROR,
-                                                                                TaskStatus.WAITING_ON_FAILURE))
                                                 .executeUpdate();
 
-                final int notStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
-                                                           " where task.id.jobId in :jobIds and task.taskStatus in :taskStatuses ")
-                                              .setParameterList("jobIds", jobIds)
-                                              .setParameterList("taskStatuses",
-                                                                TaskStatus.allExceptThese(TaskStatus.RUNNING,
-                                                                                          TaskStatus.WAITING_ON_ERROR,
-                                                                                          TaskStatus.WAITING_ON_FAILURE,
-                                                                                          TaskStatus.FAILED,
-                                                                                          TaskStatus.NOT_STARTED,
-                                                                                          TaskStatus.FAULTY,
-                                                                                          TaskStatus.FINISHED,
-                                                                                          TaskStatus.SKIPPED))
-                                              .executeUpdate();
+            final int runningToAbortedWithDuration = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
+                                                                         " task.finishedTime = :finishedTime, " +
+                                                                         " task.executionDuration = task.finishedTime - task.startTime " +
+                                                                         " where task.id.jobId in :jobIds " +
+                                                                         " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                                         " and task.startTime > 0 and task.executionDuration < 0 ")
+                                                            .setParameterList("jobIds", jobIds)
+                                                            .setParameter("finishedTime", System.currentTimeMillis())
+                                                            .executeUpdate();
 
-                final int runningToAborted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                                                 " task.finishedTime = :finishedTime where task.id.jobId in :jobIds " +
-                                                                 " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                                                                 " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
-                                                    .setParameter("finishedTime", System.currentTimeMillis())
-                                                    .setParameterList("jobIds", jobIds)
-                                                    .executeUpdate();
+            logger.trace(String.format("Kill jobs (%s) and tasks: %d %d %d %d %d",
+                                       updatedJobsIds.stream().map(Object::toString).collect(Collectors.joining(", ")),
+                                       updatedJobsIds.size(),
+                                       notReStarted,
+                                       notStarted,
+                                       runningToAborted,
+                                       runningToAbortedWithDuration));
 
-                final int runningToAbortedWithDuration = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                                                             " task.finishedTime = :finishedTime, " +
-                                                                             " task.executionDuration = task.finishedTime - task.startTime " +
-                                                                             " where task.id.jobId in :jobIds " +
-                                                                             " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                                                                             " and task.startTime > 0 and task.executionDuration < 0 ")
-                                                                .setParameterList("jobIds", jobIds)
-                                                                .setParameter("finishedTime",
-                                                                              System.currentTimeMillis())
-                                                                .executeUpdate();
+            session.flush();
+            session.clear();
 
-                logger.trace(String.format("Kill jobs (%s) and tasks: %d %d %d %d %d",
-                                           updatedJobsIds.stream()
-                                                         .map(Object::toString)
-                                                         .collect(Collectors.joining(", ")),
-                                           updatedJobsIds.size(),
-                                           notReStarted,
-                                           notStarted,
-                                           runningToAborted,
-                                           runningToAbortedWithDuration));
+            removeJobRuntimeData(session, jobIds);
+            logger.trace("Flush after kill for job " +
+                         jobIds.stream().map(Object::toString).collect(Collectors.joining(", ")));
 
-                session.flush();
-                session.clear();
-
-                removeJobRuntimeData(session, jobIds);
-                logger.trace("Flush after kill for job " +
-                             jobIds.stream().map(Object::toString).collect(Collectors.joining(", ")));
-
-                return null;
-            });
-        }
+            return null;
+        });
     }
 
     public void updateJobAndTasksState(final InternalJob job) {
@@ -1635,7 +1596,6 @@ public class SchedulerDBManager {
         });
     }
 
-    @SuppressWarnings("unchecked")
     public Map<TaskId, TaskResult> loadTasksResults(final JobId jobId, final List<TaskId> taskIds) {
         if (taskIds.isEmpty()) {
             throw new IllegalArgumentException("TaskIds list is empty");
@@ -1650,19 +1610,12 @@ public class SchedulerDBManager {
 
             List<DBTaskId> dbTaskIds = taskIds.stream().map(SchedulerDBManager::taskId).collect(Collectors.toList());
 
-            JobResultImpl jobResult = new JobResultImpl();
-            jobResult.setJobInfo(job.createJobInfo(jobId));
+            Query query = session.getNamedQuery("loadTasksResults").setParameterList("tasksIds", dbTaskIds);
 
-            try {
-                jobResult.getResultMap().putAll(ObjectByteConverter.mapOfByteArrayToSerializable(job.getResultMap()));
-            } catch (Exception e) {
-                logger.error("error ", e);
-            }
-
-            List<List<DBTaskId>> dbTaskIdsSubSets = Lists.partition(dbTaskIds, MAX_ITEMS_IN_LIST);
-            for (List<DBTaskId> dbTaskIdsSubList : dbTaskIdsSubSets) {
-                Query query = session.getNamedQuery("loadTasksResults").setParameterList("tasksIds", dbTaskIdsSubList);
-                loadAndAddTaskResultsToJobResult(session, query, jobId, jobResult);
+            JobResultImpl jobResult = loadJobResult(session, query, job, jobId);
+            if (jobResult == null) {
+                throw new DatabaseManagerException("Failed to load result for tasks " + taskIds + " (job: " + jobId +
+                                                   ")");
             }
 
             Map<TaskId, TaskResult> resultsMap = new HashMap<>(taskIds.size());
@@ -1692,7 +1645,6 @@ public class SchedulerDBManager {
 
     }
 
-    @SuppressWarnings("unchecked")
     public JobResult loadJobResult(final JobId jobId) {
         return executeReadOnlyTransaction((SessionWork<JobResult>) session -> {
             long id = jobId(jobId);
@@ -1703,29 +1655,29 @@ public class SchedulerDBManager {
                 return null;
             }
 
-            JobResultImpl jobResult = new JobResultImpl();
-            jobResult.setJobInfo(job.createJobInfo(jobId));
-
-            try {
-                jobResult.getResultMap().putAll(ObjectByteConverter.mapOfByteArrayToSerializable(job.getResultMap()));
-            } catch (Exception e) {
-                logger.error("error ", e);
-            }
-
             Query query = session.getNamedQuery("loadJobResult").setParameter("job", job);
 
-            loadAndAddTaskResultsToJobResult(session, query, jobId, jobResult);
-
-            return jobResult;
+            return loadJobResult(session, query, job, jobId);
         });
     }
 
-    private void loadAndAddTaskResultsToJobResult(Session session, Query query, JobId jobId, JobResultImpl jobResult) {
+    @SuppressWarnings("unchecked")
+    private JobResultImpl loadJobResult(Session session, Query query, JobData job, JobId jobId) {
+        JobResultImpl jobResult = new JobResultImpl();
+        jobResult.setJobInfo(job.createJobInfo(jobId));
+
+        try {
+            jobResult.getResultMap().putAll(ObjectByteConverter.mapOfByteArrayToSerializable(job.getResultMap()));
+        } catch (Exception e) {
+            logger.error("error ", e);
+        }
+
+        DBTaskId currentTaskId = null;
+
         List<Object[]> resultList = (List<Object[]>) query.list();
         if (resultList.isEmpty()) {
-            return;
+            return jobResult;
         }
-        DBTaskId currentTaskId = null;
 
         int counter = 0;
 
@@ -1746,6 +1698,8 @@ public class SchedulerDBManager {
                 session.clear();
             }
         }
+
+        return jobResult;
     }
 
     public TaskResult loadLastTaskResult(final TaskId taskId) {
@@ -2135,60 +2089,48 @@ public class SchedulerDBManager {
         return transactionHelper;
     }
 
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsIds) {
-        Map<Long, Map<String, Serializable>> answer = new LinkedHashMap<>(jobsIds.size());
-        if (jobsIds.isEmpty()) {
-            return answer;
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) {
+        if (jobsId.isEmpty()) {
+            return Collections.emptyMap();
         }
-        List<List<String>> jobIdSubSets = Lists.partition(jobsIds, MAX_ITEMS_IN_LIST);
-        for (List<String> jobIdSubList : jobIdSubSets) {
-            answer.putAll(executeReadOnlyTransaction(session -> {
+        return executeReadOnlyTransaction(session -> {
 
-                Query query = session.createQuery("SELECT id, resultMap FROM JobData WHERE id in (:jobIdList)");
-                query.setParameterList("jobIdList",
-                                       jobIdSubList.stream().map(Long::parseLong).collect(Collectors.toList()));
+            Query query = session.createQuery("SELECT id, resultMap FROM JobData WHERE id in (:jobIdList)");
+            query.setParameterList("jobIdList", jobsId.stream().map(Long::parseLong).collect(Collectors.toList()));
 
-                Map<Long, Map<String, Serializable>> result = new HashMap<>();
-                List<Object[]> list = query.list();
-                for (Object[] row : list) {
-                    long id = (long) row[0];
-                    Map<String, byte[]> resultMapAsBytes = (Map<String, byte[]>) row[1];
+            Map<Long, Map<String, Serializable>> result = new HashMap<>();
+            List<Object[]> list = query.list();
+            for (Object[] row : list) {
+                long id = (long) row[0];
+                Map<String, byte[]> resultMapAsBytes = (Map<String, byte[]>) row[1];
 
-                    Map<String, Serializable> stringSerializableMap = ObjectByteConverter.mapOfByteArrayToSerializable(resultMapAsBytes);
-                    result.put(id, stringSerializableMap);
-                }
+                Map<String, Serializable> stringSerializableMap = ObjectByteConverter.mapOfByteArrayToSerializable(resultMapAsBytes);
+                result.put(id, stringSerializableMap);
+            }
 
-                return result;
-            }));
-        }
-        return answer;
+            return result;
+        });
     }
 
-    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsIds) {
-        Map<Long, List<String>> answer = new LinkedHashMap<>(jobsIds.size());
-        if (jobsIds.isEmpty()) {
-            return answer;
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) {
+        if (jobsId.isEmpty()) {
+            return Collections.emptyMap();
         }
-        List<List<String>> jobIdSubSets = Lists.partition(jobsIds, MAX_ITEMS_IN_LIST);
-        for (List<String> jobIdSubList : jobIdSubSets) {
-            answer.putAll(executeReadOnlyTransaction(session -> {
-                Query query = session.createQuery("SELECT task.id.jobId, task.id.taskId, task.taskName " +
-                                                  "FROM TaskData as task " + "WHERE task.id.jobId in :jobIdList " +
-                                                  "and task.preciousResult = true");
-                query.setParameterList("jobIdList",
-                                       jobIdSubList.stream().map(Long::parseLong).collect(Collectors.toList()));
-                List<Object[]> list = query.list();
-                return list.stream()
-                           .collect(Collectors.groupingBy(row -> (Long) row[0])) // group by job id
-                           .entrySet()
-                           .stream()
-                           .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue()
-                                                                                    .stream()
-                                                                                    .sorted(Comparator.comparing(row -> (long) row[1])) // sort by task id
-                                                                                    .map(row -> (String) row[2])
-                                                                                    .collect(Collectors.toList())));
-            }));
-        }
-        return answer;
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.createQuery("SELECT task.id.jobId, task.id.taskId, task.taskName " +
+                                              "FROM TaskData as task " + "WHERE task.id.jobId in :jobIdList " +
+                                              "and task.preciousResult = true");
+            query.setParameterList("jobIdList", jobsId.stream().map(Long::parseLong).collect(Collectors.toList()));
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .collect(Collectors.groupingBy(row -> (Long) row[0])) // group by job id
+                       .entrySet()
+                       .stream()
+                       .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue()
+                                                                                .stream()
+                                                                                .sorted(Comparator.comparing(row -> (long) row[1])) // sort by task id
+                                                                                .map(row -> (String) row[2])
+                                                                                .collect(Collectors.toList())));
+        });
     }
 }
