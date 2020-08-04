@@ -487,9 +487,4 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException {
         target.setNodeTokens(nodeUrl, tokens);
     }
-
-    @Override
-    public List<String> getNodeTokens(String nodeUrl) throws RMException {
-        return target.getNodeTokens(nodeUrl);
-    }
 }
