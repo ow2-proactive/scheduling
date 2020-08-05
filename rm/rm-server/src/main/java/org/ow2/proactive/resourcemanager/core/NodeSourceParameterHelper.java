@@ -97,7 +97,7 @@ public class NodeSourceParameterHelper {
 
         String newValue;
 
-        if (meta.credential() || meta.fileBrowser() || meta.password()) {
+        if (meta.credential() || meta.fileBrowser()) {
             newValue = new String((byte[]) newParameters[index]);
         } else {
             newValue = String.valueOf(newParameters[index]);
