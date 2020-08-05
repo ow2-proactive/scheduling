@@ -114,7 +114,8 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
             Matcher matcherReferer = pattern.matcher(refererPath);
 
             if (matcherReferer.find()) {
-                String endpointPath = refererPath.substring(matcherReferer.start(), matcherReferer.end());
+                // get the endpoint path, without trailing slash
+                String endpointPath = refererPath.substring(matcherReferer.start(), matcherReferer.end() - 1);
                 return rewriteTarget(target, endpointPath, request, response);
             } else if (referrerCache.containsKey(refererPath)) {
                 // the referer is a direct url which has already been handled and stored in our cache
@@ -134,40 +135,39 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
             logger.debug("Endpoint found in referer: " + endpointPath);
         }
         if (!matcherRequest.find()) {
-            // request target does not point to the pca endpoint, we need to add it and remove the trailing slash
-            String newTarget = endpointPath.substring(0, endpointPath.length() - 1) + target;
+            // request target does not contain a pca endpoint, we need to add it
+            String newTarget = endpointPath + target;
             if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Rewrote %s to %s", target, newTarget));
             }
             referrerCache.put(target, endpointPath);
             if (HttpMethod.GET.is(request.getMethod())) {
-                redirectGetRequest(target, endpointPath, request, response, newTarget);
+                redirectGetRequest(target, endpointPath, request, response);
             }
             return newTarget;
         } else {
             logger.trace("Target already contains endpoint");
             if (!target.startsWith(endpointPath)) {
                 // endpoint is in the middle of the path (who did this?), let's bring it on top
-                // NOTE: we don't store this in the referer cache
-                target = target.replace(endpointPath, "");
-                String newTarget = endpointPath.substring(0, endpointPath.length() - 1) + target;
-                if (HttpMethod.GET.is(request.getMethod())) {
-                    redirectGetRequest(target, endpointPath, request, response, newTarget);
-                }
+                // NOTE: we don't store this in the referer cache, and we don't use redirect
+                String targetWithoutEndpoint = target.replace(endpointPath, "");
+                String newTarget = endpointPath + targetWithoutEndpoint;
                 return newTarget;
             }
         }
         return target;
     }
 
-    private void redirectGetRequest(String target, String endpointPath, HttpServletRequest request,
-            HttpServletResponse response, String newTarget) {
+    private void redirectGetRequest(String targetWithoutEndpoint, String endpointPath, HttpServletRequest request,
+            HttpServletResponse response) {
         // GET requests should be redirected while preserving all original parameters
         // this allows the application to provide a correct Referer in most cases (thus not relying on the cache mechanism)
         // Other type of requests redirection behaves erratically
+        String newUri = null;
         try {
-            String newUri = endpointPath.substring(0, endpointPath.length() - 1) +
-                            ((Request) request).getUri().getCompletePath();
+            String oldUri = ((Request) request).getUri().getCompletePath();
+            String uriWithoutEndpoint = oldUri.replace(endpointPath, "");
+            newUri = endpointPath + uriWithoutEndpoint;
 
             if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Relocation URI %s", newUri));
@@ -177,7 +177,7 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
             (request instanceof Request ? (Request) request
                                         : HttpChannel.getCurrentHttpChannel().getRequest()).setHandled(true);
         } catch (IOException e) {
-            logger.error(String.format("Error while redirecting %s to %s", target, newTarget), e);
+            logger.error(String.format("Error while redirecting %s to %s", targetWithoutEndpoint, newUri), e);
         }
     }
 
