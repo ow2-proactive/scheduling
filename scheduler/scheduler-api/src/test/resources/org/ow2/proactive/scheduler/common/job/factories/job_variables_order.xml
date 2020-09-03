@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    name="VariablesOrder" onTaskError="continueJobExecution" priority="normal">
+    <variables>
+        <variable name="var_1" value="value_1" />
+        <variable name="var_2" value="value_2" />
+        <variable name="var_3" value="value_3" />
+        <variable name="var_4" value="value_4" />
+        <variable name="var_5" value="value_5" />
+        <variable name="var_6" value="value_6" />
+    </variables>
+    <description>NoVariablesTestJob</description>
+    <taskFlow>
+        <task name="Linux_Bash_Task">
+            <description>
+                <![CDATA[ The simplest task, ran by a bash engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="bash">
+                        <![CDATA[
+ls -la
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
