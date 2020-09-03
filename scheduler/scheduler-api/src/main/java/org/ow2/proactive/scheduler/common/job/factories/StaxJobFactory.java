@@ -257,7 +257,7 @@ public class StaxJobFactory extends JobFactory {
             validate(jobInputStreamForValidation);
         }
         long t2 = System.currentTimeMillis();
-        Map<String, ArrayList<String>> dependencies = new HashMap<>();
+        Map<String, ArrayList<String>> dependencies = new LinkedHashMap<>();
         Job job;
         try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
             XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
@@ -417,7 +417,7 @@ public class StaxJobFactory extends JobFactory {
         };
 
         // To allow variable replacements on the job attributes, store them until job variables are parsed
-        Map<String, String> delayedJobAttributes = new HashMap<>();
+        Map<String, String> delayedJobAttributes = new LinkedHashMap<>();
         int attrLen = cursorJob.getAttributeCount();
         int i = 0;
         for (; i < attrLen; i++) {
@@ -710,8 +710,8 @@ public class StaxJobFactory extends JobFactory {
     protected Map<String, JobVariable> replaceVariablesInJobVariablesMap(Map<String, JobVariable> variablesMap,
             Map<String, String> replacementVariables) throws JobCreationException {
 
-        HashMap<String, String> updatedReplacementVariables = new HashMap<>();
-        HashMap<String, JobVariable> updatedVariablesMap = new HashMap<>(variablesMap);
+        LinkedHashMap<String, String> updatedReplacementVariables = new LinkedHashMap<>();
+        LinkedHashMap<String, JobVariable> updatedVariablesMap = new LinkedHashMap<>(variablesMap);
 
         // replacements will include at first variables defined in the job
         for (JobVariable variable : updatedVariablesMap.values()) {
@@ -759,7 +759,7 @@ public class StaxJobFactory extends JobFactory {
      */
     private Map<String, TaskVariable> createUnresolvedTaskVariables(XMLStreamReader cursorVariables)
             throws JobCreationException {
-        HashMap<String, TaskVariable> unresolvedVariablesMap = new LinkedHashMap<>();
+        LinkedHashMap<String, TaskVariable> unresolvedVariablesMap = new LinkedHashMap<>();
         try {
             int eventType;
             while (cursorVariables.hasNext()) {
@@ -806,8 +806,8 @@ public class StaxJobFactory extends JobFactory {
     protected Map<String, TaskVariable> replaceVariablesInTaskVariablesMap(Map<String, TaskVariable> variablesMap,
             Map<String, String> replacementVariables) throws JobCreationException {
 
-        HashMap<String, String> updatedReplacementVariables = new HashMap<>();
-        HashMap<String, TaskVariable> updatedVariablesMap = new HashMap<>(variablesMap);
+        LinkedHashMap<String, String> updatedReplacementVariables = new LinkedHashMap<>();
+        LinkedHashMap<String, TaskVariable> updatedVariablesMap = new LinkedHashMap<>(variablesMap);
 
         // replacements will include at first variables defined in the job
         for (TaskVariable variable : updatedVariablesMap.values()) {
@@ -924,9 +924,10 @@ public class StaxJobFactory extends JobFactory {
      *
      * @return the list of generic information as a hashMap.
      */
-    private HashMap<String, String> getResolvedGenericInformations(Map<String, String> unresolvedGenericInformations,
-            Map<String, String> variables) throws JobCreationException {
-        HashMap<String, String> infos = new HashMap<>();
+    private LinkedHashMap<String, String> getResolvedGenericInformations(
+            Map<String, String> unresolvedGenericInformations, Map<String, String> variables)
+            throws JobCreationException {
+        LinkedHashMap<String, String> infos = new LinkedHashMap<>();
         for (Map.Entry<String, String> unresolvedGenericInformationValue : unresolvedGenericInformations.entrySet()) {
             infos.put(unresolvedGenericInformationValue.getKey(),
                       replace(unresolvedGenericInformationValue.getValue(), variables));
@@ -1087,7 +1088,7 @@ public class StaxJobFactory extends JobFactory {
             };
 
             // To allow variable replacements on the task attributes, store them until task variables are parsed
-            Map<String, String> delayedTaskAttributes = new HashMap<>();
+            Map<String, String> delayedTaskAttributes = new LinkedHashMap<>();
             int attrLen = cursorTask.getAttributeCount();
 
             for (; i < attrLen; i++) {
@@ -1371,7 +1372,7 @@ public class StaxJobFactory extends JobFactory {
     private Map<String, ArrayList<String>> createDependences(XMLStreamReader cursorDepends, Task t)
             throws JobCreationException {
         try {
-            Map<String, ArrayList<String>> dependencies = new HashMap<>();
+            Map<String, ArrayList<String>> dependencies = new LinkedHashMap<>();
 
             ArrayList<String> depends = new ArrayList<>(0);
             int eventType;
@@ -2057,7 +2058,7 @@ public class StaxJobFactory extends JobFactory {
     private static String replace(String str, Map<String, String> variables) throws JobCreationException {
 
         // Include System Variables
-        Map<String, String> replacements = new HashMap<>();
+        Map<String, String> replacements = new LinkedHashMap<>();
         for (Map.Entry<Object, Object> o : System.getProperties().entrySet()) {
             replacements.put(o.getKey().toString(), o.getValue().toString());
         }

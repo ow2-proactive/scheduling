@@ -85,6 +85,8 @@ public class TestStaxJobFactory {
 
     private static URI jobDescriptorTaskVariable;
 
+    private static URI jobDescriptorVariableOrder;
+
     private StaxJobFactory factory;
 
     @BeforeClass
@@ -119,6 +121,8 @@ public class TestStaxJobFactory {
 
         jobDescriptorTaskVariable = TestStaxJobFactory.class.getResource("task_variables.xml").toURI();
 
+        jobDescriptorVariableOrder = TestStaxJobFactory.class.getResource("job_variables_order.xml").toURI();
+
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
     }
@@ -150,6 +154,16 @@ public class TestStaxJobFactory {
     @Test
     public void testCreateJobShouldNotFailWhenParsingEmptyMetadata() throws Exception {
         factory.createJob(jobDescriptorWithEmptyMetadata);
+    }
+
+    @Test
+    public void testCreateJobShouldPreserveVariablesOrder() throws Exception {
+        Job job = factory.createJob(jobDescriptorVariableOrder);
+        int index = 1;
+        for (String variable : job.getVariables().keySet()) {
+            assertEquals("var_" + index, variable);
+            index++;
+        }
     }
 
     @Test
