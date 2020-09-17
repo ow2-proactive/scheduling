@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -97,7 +98,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     protected Properties sshOptions;
 
     @Configurable(description = "Absolute path of the java executable on the remote hosts", sectionSelector = 1)
-    protected String javaPath = PAResourceManagerProperties.getAbsolutePath("jre/bin/java");
+    protected String javaPath = Utils.getDefaultJavaPath();
 
     @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)root directory on the remote hosts", sectionSelector = 1)
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
@@ -373,13 +374,13 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         }
 
         this.javaPath = parameters[index++].toString();
-        if (this.javaPath == null || this.javaPath.equals("")) {
-            throw new IllegalArgumentException("A valid Java path must be supplied");
+        if (this.javaPath == null || StringUtils.isBlank(this.javaPath)) {
+            this.javaPath = Utils.getDefaultJavaPath();
         }
 
         this.schedulingPath = parameters[index++].toString();
-        if (this.schedulingPath == null || this.schedulingPath.equals("")) {
-            throw new IllegalArgumentException("A valid path of the scheduling dir must be supplied");
+        if (this.schedulingPath == null || StringUtils.isBlank(this.schedulingPath)) {
+            this.schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
         }
 
         // target OS

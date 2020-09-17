@@ -206,4 +206,18 @@ public class Utils {
             }
         }
     }
+
+    /**
+     * Get default javaPath: use Java from JAVA_HOME if defined, otherwise use Java from system property java.home
+     */
+    public static String getDefaultJavaPath() {
+        String jhome = System.getenv("JAVA_HOME");
+        if (jhome != null) {
+            File f = new File(jhome);
+            if (f.exists() && f.isDirectory()) {
+                return jhome + ((jhome.endsWith("/")) ? "" : "/") + "bin/java";
+            }
+        }
+        return System.getProperty("java.home") + "/bin/java";
+    }
 }

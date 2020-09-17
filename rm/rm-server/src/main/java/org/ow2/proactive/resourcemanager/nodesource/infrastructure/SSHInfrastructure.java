@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -78,20 +79,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * Path to the Java executable on the remote hosts
      */
     @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts", sectionSelector = 1)
-    protected String javaPath = System.getProperty("java.home") + "/bin/java";
-
-    /**
-     * Use the Java from JAVA_HOME if defined
-     */
-    {
-        String jhome = System.getenv("JAVA_HOME");
-        if (jhome != null) {
-            File f = new File(jhome);
-            if (f.exists() && f.isDirectory()) {
-                javaPath = jhome + ((jhome.endsWith("/")) ? "" : "/") + "bin/java";
-            }
-        }
-    }
+    protected String javaPath = Utils.getDefaultJavaPath();
 
     /**
      * Path to the Scheduling installation on the remote hosts
@@ -321,10 +309,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         if (parameters != null && parameters.length >= 10) {
             this.sshOptions = parameters[index++].toString();
             this.javaPath = parameters[index++].toString();
-            if (this.javaPath == null || this.javaPath.equals("")) {
-                throw new IllegalArgumentException("A valid Java path must be supplied.");
+            if (this.javaPath == null || StringUtils.isBlank(this.javaPath)) {
+                this.javaPath = Utils.getDefaultJavaPath();
             }
             this.schedulingPath = parameters[index++].toString();
+            if (this.schedulingPath == null || StringUtils.isBlank(this.schedulingPath)) {
+                this.schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
+            }
             // target OS
             if (parameters[index] != null) {
                 OperatingSystem configuredTargetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
