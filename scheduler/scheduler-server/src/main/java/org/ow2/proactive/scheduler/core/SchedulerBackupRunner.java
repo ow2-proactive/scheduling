@@ -127,8 +127,7 @@ public class SchedulerBackupRunner implements Runnable {
             File backupFile = new File(resolvedDestination, backupFileName);
             LOGGER.info("Performing backup to " + backupFile);
             String[] foldersToZip = targets.stream()
-                                           .map(target -> (new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
-                                                                    target)).getAbsolutePath())
+                                           .map(target -> PASchedulerProperties.getAbsolutePath(target))
                                            .toArray(String[]::new);
             LOGGER.info("Backup of the following folders : " + Arrays.toString(foldersToZip));
             try {

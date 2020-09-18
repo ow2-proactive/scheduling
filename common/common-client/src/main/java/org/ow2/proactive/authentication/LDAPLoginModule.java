@@ -435,7 +435,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             logger.debug("check password for user: " + userDN);
         }
 
-        ContextHandler handler = createLdapContext(userDN, password);
+        ContextHandler handler = createLdapContext(userDN, password, true);
         closeContext(handler);
         return handler != null;
     }
@@ -459,15 +459,19 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         }
     }
 
-    private ContextHandler createLdapContext(String user, String password) {
+    private ContextHandler createLdapContext(String user, String password, boolean requireAuthentication) {
         LdapContext ctx = null;
         StartTlsResponse tls = null;
 
         Hashtable<String, String> env = createBasicEnvForInitalContext();
         try {
             if (!START_TLS) {
-                if (!AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
-                    env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
+                if (requireAuthentication || !AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
+                    if (requireAuthentication) {
+                        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+                    } else {
+                        env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
+                    }
                     env.put(Context.SECURITY_PRINCIPAL, user);
                     env.put(Context.SECURITY_CREDENTIALS, password);
                 }
@@ -500,8 +504,12 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 } else {
                     tls.negotiate();
                 }
-                if (!AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
-                    ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
+                if (requireAuthentication || !AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
+                    if (requireAuthentication) {
+                        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+                    } else {
+                        ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
+                    }
                     ctx.addToEnvironment(Context.SECURITY_PRINCIPAL, user);
                     ctx.addToEnvironment(Context.SECURITY_CREDENTIALS, password);
                 }
@@ -595,7 +603,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      */
     private ContextHandler connectAndGetContext() throws NamingException {
         // Create the initial directory context
-        return createLdapContext(BIND_LOGIN, BIND_PASSWD);
+        return createLdapContext(BIND_LOGIN, BIND_PASSWD, false);
     }
 
     /**
