@@ -114,15 +114,19 @@ public class ValidationUtil {
 
     private static void fillUpdatedVariables(TaskFlowJob job, JobValidationData data) {
         HashMap<String, String> updatedVariables = new HashMap<>();
+        HashMap<String, String> updatedModels = new HashMap<>();
         for (JobVariable jobVariable : job.getVariables().values()) {
             updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
+            updatedModels.put(jobVariable.getName(), jobVariable.getModel());
         }
         for (Task task : job.getTasks()) {
             for (TaskVariable taskVariable : task.getVariables().values()) {
                 updatedVariables.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getValue());
+                updatedModels.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getModel());
             }
         }
         data.setUpdatedVariables(updatedVariables);
+        data.setUpdatedModels(updatedModels);
     }
 
     private static void validateJob(TaskFlowJob job, JobValidationData data) {

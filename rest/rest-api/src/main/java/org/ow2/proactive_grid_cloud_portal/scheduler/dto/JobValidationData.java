@@ -42,6 +42,8 @@ public class JobValidationData {
 
     private Map<String, String> updatedVariables;
 
+    private Map<String, String> updatedModels;
+
     public JobValidationData() {
     }
 
@@ -83,5 +85,13 @@ public class JobValidationData {
 
     public void setUpdatedVariables(Map<String, String> updatedVariables) {
         this.updatedVariables = updatedVariables;
+    }
+
+    public void setUpdatedModels(Map<String, String> updatedModels) {
+        this.updatedModels = updatedModels;
+    }
+
+    public Map<String, String> getUpdatedModels() {
+        return updatedModels;
     }
 }
