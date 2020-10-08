@@ -93,13 +93,13 @@ public class ValidationUtil {
     public static JobValidationData validateJob(String jobFilePath, Map<String, String> jobVariables,
             Scheduler scheduler, SchedulerSpaceInterface space) {
         JobValidationData data = new JobValidationData();
+        Job job = null;
         try {
             JobFactory factory = JobFactory.getFactory();
-            Job job = factory.createJob(jobFilePath, jobVariables, null, scheduler, space);
+            job = factory.createJob(jobFilePath, jobVariables, null, scheduler, space);
 
             if (job instanceof TaskFlowJob) {
                 validateJob((TaskFlowJob) job, data);
-                fillUpdatedVariables((TaskFlowJob) job, data);
             } else {
                 data.setValid(true);
             }
@@ -107,6 +107,11 @@ public class ValidationUtil {
             data.setTaskName(e.getTaskName());
             data.setErrorMessage(e.getMessage());
             data.setStackTrace(getStackTrace(e));
+
+        } finally {
+            if (job != null && job instanceof TaskFlowJob) {
+                fillUpdatedVariables((TaskFlowJob) job, data);
+            }
         }
         return data;
 
