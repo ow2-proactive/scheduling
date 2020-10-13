@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.core.properties.PASharedProperties;
 
 
 /**
@@ -82,7 +83,7 @@ public class SimpleScript extends Script<Object> {
      */
     public SimpleScript(URL url, Serializable[] parameters) throws InvalidScriptException {
         // standard scripts (i.e. other than Selection scripts) use url late binding by default
-        super(url, parameters, false);
+        super(url, parameters, !isLazyFetch());
     }
 
     /** Create a script from an URL.
@@ -92,7 +93,7 @@ public class SimpleScript extends Script<Object> {
      * @throws InvalidScriptException if the creation fails.
      */
     public SimpleScript(URL url, String engineName, Serializable[] parameters) throws InvalidScriptException {
-        super(url, engineName, parameters, false);
+        super(url, engineName, parameters, !isLazyFetch());
     }
 
     /** Directly create a script with a string.
