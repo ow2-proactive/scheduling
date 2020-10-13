@@ -79,9 +79,14 @@ public enum PASharedProperties implements PACommonProperties {
     /** comma-separated list of folder and/or files which need to be backup */
     SERVER_BACKUP_TARGETS("pa.server.backup.targets", PropertyType.STRING, "data,logs"),
 
-    /** backup mechanism may wait possible.delay (in seconds) untill all tasks are finished,
-     * if some task will still run then backup will not be performed */
-    SERVER_BACKUP_POSSIBLE_DELAY("pa.server.backup.possile.delay", PropertyType.INTEGER, "600");
+    /** backup mechanism may wait possible.delay (in seconds) until all currently running tasks are finished.
+     * if some tasks are still running after this delay, the backup will not be performed */
+    SERVER_BACKUP_POSSIBLE_DELAY("pa.server.backup.possible.delay", PropertyType.INTEGER, "600"),
+
+    /** Controls the fetch mode of scripts defined by URL.
+    If true (default), it means that the script is fetched at task execution time
+    If false, it means that the script is fetch when the job is submitted to the scheduler */
+    LAZY_FETCH_SCRIPT("pa.lazy.fetch.script", PropertyType.BOOLEAN, "true");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

@@ -38,6 +38,7 @@ import javax.script.Bindings;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.core.properties.PASharedProperties;
 
 
 /**
@@ -211,8 +212,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     public SelectionScript(URL url, String engineName, Serializable[] parameters, boolean dynamic)
             throws InvalidScriptException {
-        // Selection scripts cannot use url late binding, i.e. fetchImmediately must be false.
-        super(url, engineName, parameters, false);
+        super(url, engineName, parameters, !isLazyFetch());
         this.dynamic = dynamic;
     }
 
