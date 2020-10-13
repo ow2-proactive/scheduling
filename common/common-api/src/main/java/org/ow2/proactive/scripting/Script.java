@@ -52,6 +52,7 @@ import javax.script.ScriptEngineManager;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.http.CommonHttpResourceDownloader;
 import org.ow2.proactive.utils.BoundedStringWriter;
 import org.ow2.proactive.utils.FileUtils;
@@ -99,6 +100,8 @@ public abstract class Script<E> implements Serializable {
 
     /** Name of the script **/
     private String scriptName;
+
+    private static Boolean lazyFetch = null;
 
     /** ProActive needed constructor */
     public Script() {
@@ -253,6 +256,19 @@ public abstract class Script<E> implements Serializable {
         this(script2.script, script2.scriptEngineLookupName, script2.parameters, scriptName);
         this.url = script2.url;
         this.id = script2.id;
+    }
+
+    protected static boolean isLazyFetch() {
+        if (lazyFetch == null) {
+            try {
+                lazyFetch = PASharedProperties.LAZY_FETCH_SCRIPT.getValueAsBoolean();
+            } catch (Exception e) {
+                logger.warn("Incorrect value of " + PASharedProperties.LAZY_FETCH_SCRIPT.getKey() +
+                            ", default value will be used.", e);
+                lazyFetch = true;
+            }
+        }
+        return lazyFetch;
     }
 
     /**
