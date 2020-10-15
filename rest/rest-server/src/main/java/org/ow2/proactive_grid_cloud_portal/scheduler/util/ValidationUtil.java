@@ -99,6 +99,7 @@ public class ValidationUtil {
             job = factory.createJob(jobFilePath, jobVariables, null, scheduler, space);
 
             if (job instanceof TaskFlowJob) {
+                fillUpdatedVariables((TaskFlowJob) job, data);
                 validateJob((TaskFlowJob) job, data);
             } else {
                 data.setValid(true);
@@ -107,10 +108,11 @@ public class ValidationUtil {
             data.setTaskName(e.getTaskName());
             data.setErrorMessage(e.getMessage());
             data.setStackTrace(getStackTrace(e));
-
-        } finally {
-            if (job != null && job instanceof TaskFlowJob) {
-                fillUpdatedVariables((TaskFlowJob) job, data);
+            if (e.getUpdatedVariables() != null) {
+                data.setUpdatedVariables(e.getUpdatedVariables());
+            }
+            if (e.getUpdatedModels() != null) {
+                data.setUpdatedModels(e.getUpdatedModels());
             }
         }
         return data;

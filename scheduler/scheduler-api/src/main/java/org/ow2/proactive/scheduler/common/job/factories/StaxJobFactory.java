@@ -326,12 +326,32 @@ public class StaxJobFactory extends JobFactory {
                 updatedJob = factory.validateJob(updatedJob, scheduler, space);
             }
         } catch (JobValidationException e) {
+            fillUpdatedVariables(e, job);
             throw e;
         } catch (Exception e) {
-            throw new JobValidationException(e);
+            JobValidationException validationException = new JobValidationException(e);
+            fillUpdatedVariables(validationException, job);
+            throw validationException;
         }
 
         return updatedJob;
+    }
+
+    private void fillUpdatedVariables(JobValidationException e, TaskFlowJob job) {
+        HashMap<String, String> updatedVariables = new HashMap<>();
+        HashMap<String, String> updatedModels = new HashMap<>();
+        for (JobVariable jobVariable : job.getVariables().values()) {
+            updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
+            updatedModels.put(jobVariable.getName(), jobVariable.getModel());
+        }
+        for (Task task : job.getTasks()) {
+            for (TaskVariable taskVariable : task.getVariables().values()) {
+                updatedVariables.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getValue());
+                updatedModels.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getModel());
+            }
+        }
+        e.setUpdatedVariables(updatedVariables);
+        e.setUpdatedModels(updatedModels);
     }
 
     /**
