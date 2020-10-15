@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.exception;
 
+import java.util.Map;
 import java.util.Stack;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -48,6 +49,10 @@ public class JobCreationException extends SchedulerException {
     private XMLAttributes attribute = null;
 
     private boolean isSchemaException = false;
+
+    private Map<String, String> updatedVariables = null;
+
+    private Map<String, String> updatedModels = null;
 
     /**
      * Create a new instance of JobCreationException using the given message string
@@ -221,5 +226,21 @@ public class JobCreationException extends SchedulerException {
      */
     public XMLAttributes getAttribute() {
         return attribute;
+    }
+
+    public Map<String, String> getUpdatedVariables() {
+        return updatedVariables;
+    }
+
+    public void setUpdatedVariables(Map<String, String> updatedVariables) {
+        this.updatedVariables = updatedVariables;
+    }
+
+    public Map<String, String> getUpdatedModels() {
+        return updatedModels;
+    }
+
+    public void setUpdatedModels(Map<String, String> updatedModels) {
+        this.updatedModels = updatedModels;
     }
 }
