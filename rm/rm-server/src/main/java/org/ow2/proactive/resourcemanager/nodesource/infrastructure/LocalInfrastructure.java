@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -48,7 +49,11 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 
 
 public class LocalInfrastructure extends InfrastructureManager {
@@ -90,7 +95,7 @@ public class LocalInfrastructure extends InfrastructureManager {
      * Index of deployment, if startNodes is called multiple times, each time a new process will be created.
      * The index is used to prevent conflicts in nodes urls
      */
-    private static final String LAST_NODE_STARTED_INDEX_KEY = "lastNodeStartedIndex";
+    private static final String LAST_NODE_STARTED_INDEXES_KEY = "lastNodeStartedIndexes";
 
     /**
      * Maps containing process executors, associated with their corresponding deployment node urls.
@@ -323,11 +328,12 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
         incrementNumberOfLostNodesWithLockAndPersist();
-        removeNodeAndMaybeKillProcessIfEmpty(deployingToProcessExecutors, processExecutorsToDeploying, pnURL, true);
+        removeNodeAndMaybeKillProcessIfEmpty(deployingToProcessExecutors, processExecutorsToDeploying, pnURL, true, -1);
     }
 
     private ProcessExecutor removeNodeAndMaybeKillProcessIfEmpty(Map<String, ProcessExecutor> urlToProcess,
-            Map<ProcessExecutor, List<String>> processToUrl, String url, boolean killProcessIfEmpty) {
+            Map<ProcessExecutor, List<String>> processToUrl, String url, boolean killProcessIfEmpty,
+            int deploymentIndex) {
         ProcessExecutor executor = urlToProcess.remove(url);
         if (executor != null) {
             List<String> urlsAssociatedWithTheProcess = processToUrl.get(executor);
@@ -335,6 +341,9 @@ public class LocalInfrastructure extends InfrastructureManager {
             if (killProcessIfEmpty && urlsAssociatedWithTheProcess.isEmpty()) {
                 processToUrl.remove(executor);
                 executor.killProcess();
+                if (deploymentIndex >= 0) {
+                    removeIndexWithLockAndPersist(deploymentIndex);
+                }
             } else if (urlsAssociatedWithTheProcess.isEmpty()) {
                 processToUrl.remove(executor);
             }
@@ -349,7 +358,8 @@ public class LocalInfrastructure extends InfrastructureManager {
         ProcessExecutor associatedProcess = removeNodeAndMaybeKillProcessIfEmpty(deployingToProcessExecutors,
                                                                                  processExecutorsToDeploying,
                                                                                  deployingNodeURL,
-                                                                                 false);
+                                                                                 false,
+                                                                                 -1);
         acquiredToProcessExecutors.put(node.getNodeInformation().getURL(), associatedProcess);
         List<String> nodesUrls = processExecutorsToAcquired.putIfAbsent(associatedProcess,
                                                                         Lists.newArrayList(node.getNodeInformation()
@@ -363,7 +373,22 @@ public class LocalInfrastructure extends InfrastructureManager {
     public void removeNode(Node node) throws RMException {
         logger.info("The node " + node.getNodeInformation().getURL() + " is removed from " +
                     this.getClass().getSimpleName());
-        removeNodeAndShutdownProcessIfNeeded(node.getNodeInformation().getURL());
+        removeNodeAndShutdownProcessIfNeeded(node.getNodeInformation().getURL(), extractDeploymentIndex(node));
+    }
+
+    private int extractDeploymentIndex(Node node) {
+        try {
+            String name = node.getNodeInformation().getName();
+            String prefix = "local-" + this.nodeSource.getName() + "-";
+            name = name.replace(prefix, "");
+            if (name.contains("_")) {
+                name = name.substring(0, name.indexOf('_'));
+            }
+            return Integer.parseInt(name);
+        } catch (Exception e) {
+            logger.warn("Could node extract index from node " + node, e);
+            return -1;
+        }
     }
 
     @Override
@@ -399,10 +424,10 @@ public class LocalInfrastructure extends InfrastructureManager {
         this.persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, 0);
         this.persistedInfraVariables.put(NB_LOST_NODES_KEY, 0);
         this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, 0);
-        this.persistedInfraVariables.put(LAST_NODE_STARTED_INDEX_KEY, 0);
+        this.persistedInfraVariables.put(LAST_NODE_STARTED_INDEXES_KEY, new TreeSet<>());
     }
 
-    private void removeNodeAndShutdownProcessIfNeeded(String nodeUrlToRemove) {
+    private void removeNodeAndShutdownProcessIfNeeded(String nodeUrlToRemove, int deploymentIndex) {
 
         // Update handle & acquire/lost nodes persistent counters
         decrementNumberOfHandledNodesWithLockAndPersist();
@@ -416,12 +441,14 @@ public class LocalInfrastructure extends InfrastructureManager {
             removeNodeAndMaybeKillProcessIfEmpty(acquiredToProcessExecutors,
                                                  processExecutorsToAcquired,
                                                  nodeUrlToRemove,
-                                                 true);
+                                                 true,
+                                                 deploymentIndex);
         } else if (deployingToProcessExecutors.containsKey(nodeUrlToRemove)) {
             removeNodeAndMaybeKillProcessIfEmpty(deployingToProcessExecutors,
                                                  processExecutorsToDeploying,
                                                  nodeUrlToRemove,
-                                                 true);
+                                                 true,
+                                                 deploymentIndex);
         }
 
     }
@@ -486,9 +513,35 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     private int getIndexAndIncrementWithLockAndPersist() {
         return setPersistedInfraVariable(() -> {
-            int deployedNodeIndex = (int) this.persistedInfraVariables.get(LAST_NODE_STARTED_INDEX_KEY);
-            this.persistedInfraVariables.put(LAST_NODE_STARTED_INDEX_KEY, deployedNodeIndex + 1);
-            return deployedNodeIndex;
+            // This method aims at finding the first integer index not already used by a current deployment
+            // The algorithm is the following:
+            // set deployedNodeIndexes = [all currently used indexes]
+            // set allIndexes = [0..max(deployedNodeIndexes)+1]
+            // set availableIndexes = allIndexes - deployedNodeIndexes
+            // newIndex = min(availableIntegers)
+            TreeSet<Integer> deployedNodeIndexes = (TreeSet<Integer>) this.persistedInfraVariables.get(LAST_NODE_STARTED_INDEXES_KEY);
+            int maxIndex;
+            if (deployedNodeIndexes.isEmpty()) {
+                maxIndex = -1;
+            } else {
+                maxIndex = deployedNodeIndexes.last();
+            }
+            ContiguousSet<Integer> allIndexes = ContiguousSet.create(Range.closed(0, maxIndex + 1),
+                                                                     DiscreteDomain.integers());
+            TreeSet<Integer> availableIndexes = new TreeSet(Sets.difference(allIndexes, deployedNodeIndexes));
+            int newIndex = availableIndexes.first();
+            deployedNodeIndexes.add(newIndex);
+            this.persistedInfraVariables.put(LAST_NODE_STARTED_INDEXES_KEY, deployedNodeIndexes);
+            return newIndex;
+        });
+    }
+
+    private void removeIndexWithLockAndPersist(int indexToRemove) {
+        setPersistedInfraVariable(() -> {
+            TreeSet<Integer> deployedNodeIndexes = (TreeSet<Integer>) this.persistedInfraVariables.get(LAST_NODE_STARTED_INDEXES_KEY);
+            deployedNodeIndexes.remove(indexToRemove);
+            this.persistedInfraVariables.put(LAST_NODE_STARTED_INDEXES_KEY, deployedNodeIndexes);
+            return deployedNodeIndexes;
         });
     }
 
