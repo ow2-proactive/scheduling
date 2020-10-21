@@ -158,7 +158,7 @@ public class SelectorData {
         this.type = type;
     }
 
-    @Column(name = "INCLUDES")
+    @Column(name = "INCLUDES", length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.types.PatternType", parameters = @Parameter(name = PatternType.CLASS_NAME, value = "java.lang.Object"))
     public Set<String> getIncludes() {
         return includes;
@@ -168,7 +168,7 @@ public class SelectorData {
         this.includes = includes;
     }
 
-    @Column(name = "EXCLUDES")
+    @Column(name = "EXCLUDES", length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.types.PatternType", parameters = @Parameter(name = PatternType.CLASS_NAME, value = "java.lang.Object"))
     public Set<String> getExcludes() {
         return excludes;

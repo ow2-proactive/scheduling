@@ -47,4 +47,4 @@ Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
 fi
 
-exec "$JAVACMD" -jar sqltool-2.4.1.jar --rcFile=sqltool.rc scheduler
+exec "$JAVACMD" -jar sqltool-2.5.1.jar --rcFile=sqltool.rc scheduler
