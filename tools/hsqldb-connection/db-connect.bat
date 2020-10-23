@@ -41,4 +41,4 @@ echo location of your Java installation.
 
 :execute
 @rem Execute DB connection script
-"%JAVA_EXE%" -jar sqltool-2.4.1.jar --rcFile=sqltool.rc scheduler
+"%JAVA_EXE%" -jar sqltool-2.5.1.jar --rcFile=sqltool.rc scheduler

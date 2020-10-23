@@ -310,7 +310,7 @@ public class TaskData {
         this.javaHome = javaHome;
     }
 
-    @Column(name = "JVM_ARGUMENTS")
+    @Column(name = "JVM_ARGUMENTS", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public List<String> getJvmArguments() {
         return jvmArguments;
@@ -320,7 +320,7 @@ public class TaskData {
         this.jvmArguments = jvmArguments;
     }
 
-    @Column(name = "CLASSPATH")
+    @Column(name = "CLASSPATH", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public List<String> getAdditionalClasspath() {
         return additionalClasspath;
@@ -742,7 +742,7 @@ public class TaskData {
         this.id = taskId;
     }
 
-    @Column(name = "GENERIC_INFO", updatable = false)
+    @Column(name = "GENERIC_INFO", updatable = false, length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, String> getGenericInformation() {
         return genericInformation;
