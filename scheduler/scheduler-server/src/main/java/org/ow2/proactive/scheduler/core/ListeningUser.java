@@ -31,7 +31,7 @@ import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 public class ListeningUser {
 
     /** Associated listener to client */
-    private ClientRequestHandler listener;
+    private volatile ClientRequestHandler listener;
 
     private UserIdentificationImpl user;
 

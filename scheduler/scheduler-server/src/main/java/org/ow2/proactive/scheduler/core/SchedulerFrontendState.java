@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
 
@@ -187,16 +188,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /** Stores methods that will be called on clients */
     private static final Map<String, Method> eventMethods;
 
-    /** lock protecting user session changes, when inside a users write lock, state write lock can be acquired,
-     * but when inside a state read or write lock, a users write lock should never be acquired in order to prevent deadlocks.
-     * Similarly when using a users read lock, state write lock should never be acquired */
-    private ReentrantReadWriteLock usersLock = new ReentrantReadWriteLock();
-
-    private ReentrantReadWriteLock.ReadLock usersReadLock = usersLock.readLock();
-
-    private ReentrantReadWriteLock.WriteLock usersWriteLock = usersLock.writeLock();
-
-    /** lock protecting scheduler state changes, see above for lock hierarchy */
+    /** lock protecting scheduler state changes */
     private ReentrantReadWriteLock stateLock = new ReentrantReadWriteLock();
 
     private ReentrantReadWriteLock.ReadLock stateReadLock = stateLock.readLock();
@@ -213,10 +205,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Mapping on the UniqueId of the sender and the user/admin identifications
      */
-    private final Map<UniqueID, ListeningUser> identifications;
-
-    /** Map that link uniqueID to user credentials */
-    private final Map<UniqueID, Credentials> credentials;
+    private final Map<UniqueID, UserAndCredentials> identifications;
 
     /** List used to mark the user that does not respond anymore */
     private final Set<UniqueID> dirtyList;
@@ -244,7 +233,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     SchedulerFrontendState(SchedulerStateImpl schedulerState, SchedulerJMXHelper jmxHelper) {
         this.identifications = new ConcurrentHashMap<>();
-        this.credentials = new HashMap<>();
         this.dirtyList = new HashSet<>();
         this.jmxHelper = jmxHelper;
         this.jobsMap = new HashMap<>();
@@ -325,18 +313,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
-        Lambda.withLockInterruptible(usersWriteLock, () -> {
-            if (identifications.containsKey(sourceBodyID)) {
-                logger.warn("Active object already connected for this user :" + identification.getUsername());
-                throw new AlreadyConnectedException("This active object is already connected to the scheduler !");
-            }
-            logger.info(identification.getUsername() + " successfully connected !");
-            identifications.put(sourceBodyID, new ListeningUser(identification));
-            credentials.put(sourceBodyID, cred);
-            renewUserSession(sourceBodyID, identification);
-            // add this new user in the list of connected user
-            return true;
-        }, new RuntimeException("Session was interrupted"));
+        if (identifications.containsKey(sourceBodyID)) {
+            logger.warn("Active object already connected for this user :" + identification.getUsername());
+            throw new AlreadyConnectedException("This active object is already connected to the scheduler !");
+        }
+        // add this new user in the list of connected user
+        logger.info(identification.getUsername() + " successfully connected !");
+        identifications.put(sourceBodyID, new UserAndCredentials(new ListeningUser(identification), cred));
+        renewUserSession(sourceBodyID, identification);
+        // add this new user in the list of connected user
         Lambda.withLock(stateWriteLock, () -> schedulerState.getUsers().update(identification));
         // send events
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, identification));
@@ -353,24 +338,22 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      *            the user on which to renew the session
      */
     private void renewUserSession(final UniqueID id, UserIdentificationImpl identification) {
-        if (identifications.get(id).isListening()) {
+        if (identifications.get(id).getListeningUser().isListening()) {
             // if this id has a listener, do not renew user session
             return;
         }
         final String userName = identification.getUsername();
-        TimerTask session = identification.getSession();
-        if (session != null) {
-            session.cancel();
+        synchronized (sessionTimer) {
+            identification.setSession(new TimerTask() {
+                @Override
+                public void run() {
+                    logger.info("End of session for user " + userName + ", id=" + id);
+                    disconnect(id);
+                }
+            });
+            sessionTimer.purge();
+            sessionTimer.schedule(identification.getSession(), USER_SESSION_DURATION);
         }
-        identification.setSession(new TimerTask() {
-            @Override
-            public void run() {
-                logger.info("End of session for user " + userName + ", id=" + id);
-                disconnect(id);
-            }
-        });
-        sessionTimer.purge();
-        sessionTimer.schedule(identification.getSession(), USER_SESSION_DURATION);
     }
 
     SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
@@ -482,17 +465,16 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             // check get state permission
             handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
         }
-        Lambda.withLock(usersWriteLock, () -> {
-            // prepare user for receiving events
-            uIdent.getUser().setUserEvents(events);
-            // set if the user wants to get its events only or every events
-            uIdent.getUser().setMyEventsOnly(myEventsOnly);
-            // add the listener to the list of listener for this user.
-            UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-            uIdent.setListener(new ClientRequestHandler(this, id, sel));
-            // cancel timer for this user : session is now managed by events
-            uIdent.getUser().getSession().cancel();
-        });
+        // prepare user for receiving events
+        uIdent.getUser().setUserEvents(events);
+        // set if the user wants to get its events only or every events
+        uIdent.getUser().setMyEventsOnly(myEventsOnly);
+        // add the listener to the list of listener for this user.
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        uIdent.setListener(new ClientRequestHandler(this, id, sel));
+        // cancel timer for this user : session is now managed by events
+        uIdent.getUser().cancelSession();
+
         // return to the user
         return currentState;
     }
@@ -516,7 +498,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         UniqueID id = checkAccess();
 
-        Credentials userCreds = Lambda.withLock(usersReadLock, () -> this.credentials.get(id));
+        Credentials userCreds = identifications.get(id).getCredentials();
 
         // get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob, userCreds);
@@ -567,7 +549,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         () -> jobs.put(job.getId(),
                                        new IdentifiedJob(job.getId(), ident, job.getGenericInformation())));
         // increase number of submit for this user
-        Lambda.withLock(usersWriteLock, () -> ident.addSubmit());
+        ident.addSubmit();
         // send update user event
         usersUpdated(new NotificationData<>(SchedulerEvent.USERS_UPDATE, ident));
         jlogger.info(job.getId(),
@@ -657,27 +639,25 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      *            the uniqueID of the user
      */
     private void disconnect(UniqueID id) {
-        Lambda.withLockInterruptible(usersWriteLock, () -> {
-            credentials.remove(id);
-            ListeningUser ident = identifications.remove(id);
-            if (ident != null) {
-                // remove listeners if needed
-                ident.clearListener();
-                // remove this user to the list of connected user if it has not
-                // already been removed
-                ident.getUser().setToRemove();
-                Lambda.withLock(stateWriteLock, () -> schedulerState.getUsers().update(ident.getUser()));
-                // cancel the timer
-                ident.getUser().getSession().cancel();
-                // log and send events
-                String user = ident.getUser().getUsername();
-                logger.info("User '" + user + "' has disconnected from the scheduler.");
-                dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE,
-                                                                              ident.getUser()),
-                                     false);
-            }
-            return true;
-        }, new RuntimeException("session interrupted"));
+        UserAndCredentials userAndCredentials = identifications.remove(id);
+        if (userAndCredentials != null) {
+            // remove listeners if needed
+            userAndCredentials.getListeningUser().clearListener();
+            // remove this user to the list of connected user if it has not
+            // already been removed
+            userAndCredentials.getListeningUser().getUser().setToRemove();
+            Lambda.withLock(stateWriteLock,
+                            () -> schedulerState.getUsers().update(userAndCredentials.getListeningUser().getUser()));
+            // cancel the timer
+            userAndCredentials.getListeningUser().getUser().cancelSession();
+            // log and send events
+            String user = userAndCredentials.getListeningUser().getUser().getUsername();
+            logger.info("User '" + user + "' has disconnected from the scheduler.");
+            dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE,
+                                                                          userAndCredentials.getListeningUser()
+                                                                                            .getUser()),
+                                 false);
+        }
 
     }
 
@@ -692,16 +672,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     Pair<ListeningUser, UserIdentificationImpl> renewSession(boolean clearListener) throws NotConnectedException {
         UniqueID id = checkAccess();
-        return Lambda.withLockInterruptible(usersWriteLock, () -> {
-            ListeningUser user = identifications.get(id);
-            UserIdentificationImpl ident = identifications.get(id).getUser();
-            if (clearListener) {
-                user.clearListener();
-            }
-            // renew session for this user
-            renewUserSession(id, ident);
-            return Pair.of(user, ident);
-        }, new NotConnectedException("Session was interrupted"));
+        ListeningUser listeningUser = identifications.get(id).getListeningUser();
+        UserIdentificationImpl ident = listeningUser.getUser();
+        if (clearListener) {
+            listeningUser.clearListener();
+        }
+        // renew session for this user
+        renewUserSession(id, ident);
+        return Pair.of(listeningUser, ident);
+
     }
 
     IdentifiedJob getIdentifiedJob(JobId jobId) throws UnknownJobException {
@@ -735,6 +714,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext()
                                                                       .getCurrentRequest()
                                                                       .getSourceBodyID())
+                                                   .getListeningUser()
                                                    .getUser();
 
         try {
@@ -810,16 +790,19 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     Set<TaskId> getJobTasks(JobId jobId) {
         return Lambda.withLock(stateReadLock, () -> {
-            JobState jobState = getClientJobState(jobId);
-            synchronized (jobState) {
-                if (jobState == null) {
-                    return (Set<TaskId>) new HashSet<TaskId>();
-                } else {
+            ClientJobState jobState = getClientJobState(jobId);
+            if (jobState == null) {
+                return new HashSet<>();
+            } else {
+                jobState.readLock();
+                try {
                     Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
                     for (TaskState task : jobState.getTasks()) {
                         tasks.add(task.getId());
                     }
                     return tasks;
+                } finally {
+                    jobState.readUnlock();
                 }
             }
         });
@@ -832,13 +815,19 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return Lambda.withLock(stateReadLock, () -> {
             ClientJobState jobState = getClientJobState(jobId);
             ClientJobState jobStateCopy;
-            synchronized (jobState) {
+            if (jobState == null) {
+                throw new UnknownJobException(jobId);
+            }
+            try {
+                jobState.readLock();
                 try {
                     jobStateCopy = (ClientJobState) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(jobState);
                 } catch (Exception e) {
                     logger.error("Error when copying job state", e);
                     throw new IllegalStateException(e);
                 }
+            } finally {
+                jobState.readUnlock();
             }
             return jobStateCopy;
         });
@@ -850,16 +839,19 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
         return Lambda.withLockException2(stateReadLock, () -> {
-            JobState jobState = getClientJobState(jobId);
+            ClientJobState jobState = getClientJobState(jobId);
             if (jobState == null) {
                 throw new UnknownJobException(jobId);
             }
-            synchronized (jobState) {
+            try {
+                jobState.readLock();
                 TaskState ts = jobState.getHMTasks().get(taskId);
                 if (ts == null) {
                     throw new UnknownTaskException(taskId, jobId);
                 }
                 return ts;
+            } finally {
+                jobState.readUnlock();
             }
         }, UnknownJobException.class, UnknownTaskException.class);
     }
@@ -872,7 +864,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
 
         return Lambda.withLockException2(stateReadLock, () -> {
-            JobState jobState = getClientJobState(jobId);
+            ClientJobState jobState = getClientJobState(jobId);
             if (jobState == null) {
                 throw new UnknownJobException(jobId);
             }
@@ -885,12 +877,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             if (taskId == null) {
                 throw new UnknownTaskException(taskName, jobId);
             }
-            synchronized (jobState) {
+            try {
+                jobState.readLock();
                 TaskState ts = jobState.getHMTasks().get(taskId);
                 if (ts == null) {
                     throw new UnknownTaskException(taskId, jobId);
                 }
                 return ts;
+            } finally {
+                jobState.readUnlock();
             }
         }, UnknownJobException.class, UnknownTaskException.class);
     }
@@ -993,7 +988,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             if (logger.isDebugEnabled()) {
                 logger.debug("event [" + eventType.toString() + "]");
             }
-            for (ListeningUser userId : identifications.values()) {
+            for (UserAndCredentials userAndCredentials : identifications.values()) {
+                ListeningUser userId = userAndCredentials.getListeningUser();
                 // if this user has a listener
                 if (userId.isListening()) {
                     // if there is no specified event OR if the specified event
@@ -1022,7 +1018,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             if (logger.isDebugEnabled()) {
                 jlogger.debug(job.getJobInfo().getJobId(), " event [" + SchedulerEvent.JOB_SUBMITTED + "]");
             }
-            for (ListeningUser listeningUserId : identifications.values()) {
+            for (UserAndCredentials userAndCredentials : identifications.values()) {
+                ListeningUser listeningUserId = userAndCredentials.getListeningUser();
                 // if this user has a listener
                 if (listeningUserId.isListening()) {
                     UserIdentificationImpl userId = listeningUserId.getUser();
@@ -1067,7 +1064,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     jlogger.debug(notification.getData().getJobId(), " event [" + notification.getEventType() + "]");
                 }
             }
-            for (ListeningUser listeningUserId : identifications.values()) {
+            for (UserAndCredentials userAndCredentials : identifications.values()) {
+                ListeningUser listeningUserId = userAndCredentials.getListeningUser();
                 // if this user has a listener
                 if (listeningUserId.isListening()) {
                     UserIdentificationImpl userId = listeningUserId.getUser();
@@ -1102,7 +1100,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             if (logger.isDebugEnabled()) {
                 jlogger.debug(job.getJobInfo().getJobId(), " event [" + SchedulerEvent.JOB_UPDATED + "]");
             }
-            for (ListeningUser listeningUserId : identifications.values()) {
+            for (UserAndCredentials userAndCredentials : identifications.values()) {
+                ListeningUser listeningUserId = userAndCredentials.getListeningUser();
                 // if this user has a listener
                 if (listeningUserId.isListening()) {
                     UserIdentificationImpl userId = listeningUserId.getUser();
@@ -1140,7 +1139,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             if (logger.isDebugEnabled()) {
                 tlogger.debug(notification.getData().getTaskId(), "event [" + notification.getEventType() + "]");
             }
-            for (ListeningUser listeningUserId : identifications.values()) {
+            for (UserAndCredentials userAndCredentials : identifications.values()) {
+                ListeningUser listeningUserId = userAndCredentials.getListeningUser();
                 // if this user has a listener
                 if (listeningUserId.isListening()) {
                     UserIdentificationImpl userId = listeningUserId.getUser();
@@ -1175,7 +1175,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             if (logger.isDebugEnabled()) {
                 logger.debug("event [" + notification.getEventType() + "]");
             }
-            for (ListeningUser listeningUserId : identifications.values()) {
+            for (UserAndCredentials userAndCredentials : identifications.values()) {
+                ListeningUser listeningUserId = userAndCredentials.getListeningUser();
                 // if this user has a listener
                 if (listeningUserId.isListening()) {
                     UserIdentificationImpl userId = listeningUserId.getUser();
@@ -1250,7 +1251,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             }
         });
         // send the event for all case, except default
-        Lambda.withLock(usersWriteLock, () -> dispatchSchedulerStateUpdated(eventType));
+        dispatchSchedulerStateUpdated(eventType);
         this.jmxHelper.getSchedulerRuntimeMBean().schedulerStateUpdatedEvent(eventType);
     }
 
@@ -1261,7 +1262,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             jobsMap.put(job.getId(), storedJobState);
             schedulerState.update(storedJobState);
         });
-        Lambda.withLock(usersWriteLock, () -> dispatchJobSubmitted(job));
+        dispatchJobSubmitted(job);
     }
 
     @Override
@@ -1281,7 +1282,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
             boolean withAttachment = false;
             if (js != null) {
-                synchronized (js) {
+                try {
+                    js.writeLock();
                     js.update(notification.getData());
                     switch (notification.getEventType()) {
                         case JOB_PENDING_TO_RUNNING:
@@ -1315,45 +1317,52 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                             return;
                     }
                     new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
+                } finally {
+                    js.writeUnlock();
                 }
             }
         });
-        Lambda.withLock(usersWriteLock, () -> dispatchJobStateUpdated(owner, notification));
+        dispatchJobStateUpdated(owner, notification);
     }
 
     @Override
     public void jobUpdatedFullData(JobState jobstate) {
         ClientJobState storedJobState = new ClientJobState(jobstate);
-        Lambda.withLock(usersWriteLock, () -> dispatchJobUpdatedFullData(storedJobState));
+        dispatchJobUpdatedFullData(storedJobState);
     }
 
     @Override
     public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
-        JobState jobState = getClientJobState(notification.getData().getJobId());
-        synchronized (jobState) {
-            jobState.update(notification.getData());
-            switch (notification.getEventType()) {
-                case TASK_PENDING_TO_RUNNING:
-                case TASK_RUNNING_TO_FINISHED:
-                case TASK_WAITING_FOR_RESTART:
-                case TASK_IN_ERROR:
-                case TASK_SKIPPED:
-                case TASK_REPLICATED:
-                case TASK_IN_ERROR_TO_FINISHED:
-                    Lambda.withLock(usersWriteLock, () -> dispatchTaskStateUpdated(owner, notification));
-                    break;
-                case TASK_PROGRESS:
-                    // this event can be sent while task is already finished,
-                    // as it is not a correct behavior, event is dropped if task is
-                    // already finished.
-                    // so if task is not finished, send event
-                    if (notification.getData().getFinishedTime() <= 0) {
-                        Lambda.withLock(usersWriteLock, () -> dispatchTaskStateUpdated(owner, notification));
-                    }
-                    break;
-                default:
-                    logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                                notification.getEventType());
+        ClientJobState jobState = getClientJobState(notification.getData().getJobId());
+        if (jobState != null) {
+            try {
+                jobState.writeLock();
+                jobState.update(notification.getData());
+                switch (notification.getEventType()) {
+                    case TASK_PENDING_TO_RUNNING:
+                    case TASK_RUNNING_TO_FINISHED:
+                    case TASK_WAITING_FOR_RESTART:
+                    case TASK_IN_ERROR:
+                    case TASK_SKIPPED:
+                    case TASK_REPLICATED:
+                    case TASK_IN_ERROR_TO_FINISHED:
+                        dispatchTaskStateUpdated(owner, notification);
+                        break;
+                    case TASK_PROGRESS:
+                        // this event can be sent while task is already finished,
+                        // as it is not a correct behavior, event is dropped if task is
+                        // already finished.
+                        // so if task is not finished, send event
+                        if (notification.getData().getFinishedTime() <= 0) {
+                            dispatchTaskStateUpdated(owner, notification);
+                        }
+                        break;
+                    default:
+                        logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                                    notification.getEventType());
+                }
+            } finally {
+                jobState.writeUnlock();
             }
         }
     }
@@ -1362,7 +1371,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     public void usersUpdated(NotificationData<UserIdentification> notification) {
         switch (notification.getEventType()) {
             case USERS_UPDATE:
-                Lambda.withLock(usersWriteLock, () -> dispatchUsersUpdated(notification, true));
+                dispatchUsersUpdated(notification, true);
                 break;
             default:
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
@@ -1389,18 +1398,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     List<SchedulerUserInfo> getUsers() {
-        return Lambda.withLock(usersReadLock, () -> {
-            List<SchedulerUserInfo> users = new ArrayList<>(identifications.size());
-            for (ListeningUser listeningUser : identifications.values()) {
-                UserIdentificationImpl user = listeningUser.getUser();
-                users.add(new SchedulerUserInfo(user.getHostName(),
-                                                user.getUsername(),
-                                                user.getConnectionTime(),
-                                                user.getLastSubmitTime(),
-                                                user.getSubmitNumber()));
-            }
-            return users;
-        });
+        return identifications.values().stream().map(userAndCredentials -> {
+            ListeningUser listeningUser = userAndCredentials.getListeningUser();
+            UserIdentificationImpl user = listeningUser.getUser();
+            return new SchedulerUserInfo(user.getHostName(),
+                                         user.getUsername(),
+                                         user.getConnectionTime(),
+                                         user.getLastSubmitTime(),
+                                         user.getSubmitNumber());
+        }).collect(Collectors.toList());
     }
 
     public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
@@ -1437,7 +1443,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         ClientJobState jobState = getClientJobState(jobId);
-        synchronized (jobState) {
+        if (jobState == null) {
+            throw new UnknownJobException(jobId);
+        }
+        try {
+            jobState.readLock();
             try {
                 final TaskStatesPage tasksPaginated = jobState.getTasksPaginated(offset, limit);
                 final List<TaskState> taskStatesCopy = (List<TaskState>) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(new ArrayList<>(tasksPaginated.getTaskStates()));
@@ -1446,6 +1456,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 logger.error("Error when copying tasks page", e);
                 throw new IllegalStateException(e);
             }
+        } finally {
+            jobState.readUnlock();
         }
     }
 
@@ -1455,7 +1467,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         ClientJobState jobState = getClientJobState(jobId);
-        synchronized (jobState) {
+        if (jobState == null) {
+            throw new UnknownJobException(jobId);
+        }
+        try {
+            jobState.readLock();
             try {
                 final TaskStatesPage tasksPaginated = jobState.getTasksPaginated(statusFilter, offset, limit);
                 final List<TaskState> taskStatesCopy = (List<TaskState>) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(new ArrayList<>(tasksPaginated.getTaskStates()));
@@ -1464,6 +1480,28 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 logger.error("Error when copying tasks page", e);
                 throw new IllegalStateException(e);
             }
+        } finally {
+            jobState.readUnlock();
+        }
+    }
+
+    public static class UserAndCredentials {
+
+        private ListeningUser listeningUser;
+
+        public UserAndCredentials(ListeningUser listeningUser, Credentials credentials) {
+            this.listeningUser = listeningUser;
+            this.credentials = credentials;
+        }
+
+        private Credentials credentials;
+
+        public ListeningUser getListeningUser() {
+            return listeningUser;
+        }
+
+        public Credentials getCredentials() {
+            return credentials;
         }
     }
 }
