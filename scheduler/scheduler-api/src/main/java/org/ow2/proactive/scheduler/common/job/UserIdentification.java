@@ -69,7 +69,7 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
 
     private static int currentOrder = ASC_ORDER;
 
-    protected boolean toRemove = false;
+    protected volatile boolean toRemove = false;
 
     /**
      * To get the user name

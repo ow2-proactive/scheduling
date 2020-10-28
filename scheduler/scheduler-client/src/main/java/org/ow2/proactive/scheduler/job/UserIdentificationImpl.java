@@ -57,26 +57,26 @@ public class UserIdentificationImpl extends UserIdentification {
     private Subject subject;
 
     /** Number of submit for this user */
-    private int submitNumber = 0;
+    private volatile int submitNumber = 0;
 
     /** Connection time of this user */
     private long connectionTime;
 
     /** last submit time */
-    private long lastSubmitTime = -1;
+    private volatile long lastSubmitTime = -1;
 
     /** Host name of this user. */
-    private String hostName;
+    private volatile String hostName;
 
     /** Tell if this user want to receive all events or only his events */
-    private boolean myEventsOnly = false;
+    private volatile boolean myEventsOnly = false;
 
     /** List of events that the user want to receive. */
-    private transient HashSet<SchedulerEvent> userEvents = null;
+    private transient volatile HashSet<SchedulerEvent> userEvents = null;
 
     /** Associated timerTask for user session management */
     //must be transient because useless on user side and TimerTask is not serializable
-    private transient TimerTask session;
+    private transient volatile TimerTask session;
 
     /**
      * Constructor of user identification using user name.
@@ -229,11 +229,23 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     /**
+     * Cancel the current session of the user
+     */
+    public synchronized void cancelSession() {
+        if (this.session != null) {
+            this.session.cancel();
+            this.session = null;
+        }
+    }
+
+    /**
      * Set the session value to the given session value
+     * If the user has already a session active, it will be cancelled and replaced by the new one.
      * 
      * @param session the session to set
      */
-    public void setSession(TimerTask session) {
+    public synchronized void setSession(TimerTask session) {
+        cancelSession();
         this.session = session;
     }
 
