@@ -509,6 +509,17 @@ public abstract class SelectionManager {
         return matched;
     }
 
+    private boolean isClientNodeUserAllPermission(Client client) {
+        try {
+            client.checkPermission(new NodeUserAllPermission(), client.getName() + " is not super-admin");
+            return true;
+        } catch (SecurityException e) {
+            // NO
+            logger.trace(e.getMessage());
+            return false;
+        }
+    }
+
     /**
      * Removes exclusion nodes and nodes not accessible for the client
      */
@@ -536,6 +547,10 @@ public abstract class SelectionManager {
         HashSet<Permission> clientPermissions = new HashSet<>();
         for (RMNode node : freeNodes) {
             try {
+                if (node.isProtectedByToken() && !nodeWithTokenRequested && !isClientNodeUserAllPermission(client)) {
+                    logger.debug("Node " + node.getNodeURL() + " is protected by token");
+                    continue;
+                }
                 if (!clientPermissions.contains(node.getUserPermission())) {
                     client.checkPermission(node.getUserPermission(),
                                            client + " is not authorized to get the node " + node.getNodeURL() +

@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -70,6 +71,13 @@ public class ClientJobState extends JobState {
 
     private int maxNumberOfExecution;
 
+    /** lock protecting client job state changes */
+    private transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private transient ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
+
+    private transient ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+
     public ClientJobState(JobState jobState) {
         List<TaskState> taskStates = jobState.getTasks();
         this.tasks = new HashMap<>(taskStates.size());
@@ -100,6 +108,22 @@ public class ClientJobState extends JobState {
             clientTaskStates.add(new ClientTaskState(ts));
         }
         addTasks(clientTaskStates);
+    }
+
+    public void readLock() {
+        readLock.lock();
+    }
+
+    public void readUnlock() {
+        readLock.unlock();
+    }
+
+    public void writeLock() {
+        writeLock.lock();
+    }
+
+    public void writeUnlock() {
+        writeLock.unlock();
     }
 
     @Override
