@@ -76,7 +76,23 @@ public class TaskLauncherInitializer implements Serializable {
 
     private String schedulerRestUrl;
 
+    private String schedulerRestPublicUrl;
+
     private String catalogRestUrl;
+
+    private String catalogRestPublicUrl;
+
+    private String cloudAutomationRestUrl;
+
+    private String cloudAutomationRestPublicUrl;
+
+    private String jobPlannerRestUrl;
+
+    private String jobPlannerRestPublicUrl;
+
+    private String notificationServiceRestUrl;
+
+    private String notificationServiceRestPublicUrl;
 
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
@@ -321,12 +337,76 @@ public class TaskLauncherInitializer implements Serializable {
         return schedulerRestUrl;
     }
 
+    public void setSchedulerRestPublicUrl(String schedulerRestPublicUrl) {
+        this.schedulerRestPublicUrl = schedulerRestPublicUrl;
+    }
+
+    public String getSchedulerRestPublicUrl() {
+        return schedulerRestPublicUrl;
+    }
+
     public void setCatalogRestUrl(String catalogRestUrl) {
         this.catalogRestUrl = catalogRestUrl;
     }
 
     public String getCatalogRestUrl() {
         return catalogRestUrl;
+    }
+
+    public void setCatalogRestPublicUrl(String catalogRestPublicUrl) {
+        this.catalogRestPublicUrl = catalogRestPublicUrl;
+    }
+
+    public String getCatalogRestPublicUrl() {
+        return catalogRestPublicUrl;
+    }
+
+    public String getCloudAutomationRestUrl() {
+        return cloudAutomationRestUrl;
+    }
+
+    public void setCloudAutomationRestUrl(String cloudAutomationRestUrl) {
+        this.cloudAutomationRestUrl = cloudAutomationRestUrl;
+    }
+
+    public String getCloudAutomationRestPublicUrl() {
+        return cloudAutomationRestPublicUrl;
+    }
+
+    public void setCloudAutomationRestPublicUrl(String cloudAutomationRestPublicUrl) {
+        this.cloudAutomationRestPublicUrl = cloudAutomationRestPublicUrl;
+    }
+
+    public String getJobPlannerRestUrl() {
+        return jobPlannerRestUrl;
+    }
+
+    public void setJobPlannerRestUrl(String jobPlannerRestUrl) {
+        this.jobPlannerRestUrl = jobPlannerRestUrl;
+    }
+
+    public String getJobPlannerRestPublicUrl() {
+        return jobPlannerRestPublicUrl;
+    }
+
+    public void setJobPlannerRestPublicUrl(String jobPlannerRestPublicUrl) {
+        this.jobPlannerRestPublicUrl = jobPlannerRestPublicUrl;
+    }
+
+    public String getNotificationServiceRestUrl() {
+        return notificationServiceRestUrl;
+    }
+
+    public void setNotificationServiceRestUrl(String notificationServiceRestUrl) {
+        this.notificationServiceRestUrl = notificationServiceRestUrl;
+    }
+
+    public String getNotificationServiceRestPublicUrl() {
+        return notificationServiceRestPublicUrl;
+    }
+
+    public void setNotificationServiceRestPublicUrl(String notificationServiceRestPublicUrl) {
+        this.notificationServiceRestPublicUrl = notificationServiceRestPublicUrl;
     }
 
     /**

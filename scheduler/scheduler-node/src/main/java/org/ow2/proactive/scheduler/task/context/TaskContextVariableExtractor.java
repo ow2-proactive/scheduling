@@ -301,6 +301,18 @@ public class TaskContextVariableExtractor implements Serializable {
         variables.put(SchedulerVars.PA_NODESNUMBER.toString(), taskContext.getOtherNodesURLs().size() + 1);
         variables.put(SchedulerVars.PA_SCHEDULER_REST_URL.toString(), initializer.getSchedulerRestUrl());
         variables.put(SchedulerVars.PA_CATALOG_REST_URL.toString(), initializer.getCatalogRestUrl());
+        variables.put(SchedulerVars.PA_CLOUD_AUTOMATION_REST_URL.toString(), initializer.getCloudAutomationRestUrl());
+        variables.put(SchedulerVars.PA_JOB_PLANNER_REST_URL.toString(), initializer.getJobPlannerRestUrl());
+        variables.put(SchedulerVars.PA_NOTIFICATION_SERVICE_REST_URL.toString(),
+                      initializer.getNotificationServiceRestUrl());
+        variables.put(SchedulerVars.PA_SCHEDULER_REST_PUBLIC_URL.toString(), initializer.getSchedulerRestPublicUrl());
+        variables.put(SchedulerVars.PA_CATALOG_REST_PUBLIC_URL.toString(), initializer.getCatalogRestPublicUrl());
+        variables.put(SchedulerVars.PA_CLOUD_AUTOMATION_REST_PUBLIC_URL.toString(),
+                      initializer.getCloudAutomationRestPublicUrl());
+        variables.put(SchedulerVars.PA_JOB_PLANNER_REST_PUBLIC_URL.toString(),
+                      initializer.getJobPlannerRestPublicUrl());
+        variables.put(SchedulerVars.PA_NOTIFICATION_SERVICE_REST_PUBLIC_URL.toString(),
+                      initializer.getNotificationServiceRestPublicUrl());
         variables.put(SchedulerVars.PA_NODE_URL.toString(), taskContext.getNodeUrl());
         variables.put(SchedulerVars.PA_NODE_NAME.toString(), taskContext.getNodeName());
         variables.put(SchedulerVars.PA_NODE_HOST.toString(), taskContext.getNodeHostName());
