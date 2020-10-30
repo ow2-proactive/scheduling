@@ -36,7 +36,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
@@ -243,29 +242,53 @@ public class SchedulerStarter {
         if (applicationUrls != null) {
             for (String applicationUrl : applicationUrls) {
                 if (applicationUrl.endsWith("/rest") && !PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-                    PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(getPublicUrl(applicationUrl));
+                    PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
+                    if (!PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.isSet()) {
+                        PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.updateProperty(applicationUrl);
+                    } else {
+                        LOGGER.info("Scheduler public rest url is " +
+                                    PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.getValueAsString());
+                    }
                 }
                 if (applicationUrl.endsWith("/catalog") && !PASchedulerProperties.CATALOG_REST_URL.isSet()) {
-                    PASchedulerProperties.CATALOG_REST_URL.updateProperty(getPublicUrl(applicationUrl));
+                    PASchedulerProperties.CATALOG_REST_URL.updateProperty(applicationUrl);
+                    if (!PASchedulerProperties.CATALOG_REST_PUBLIC_URL.isSet()) {
+                        PASchedulerProperties.CATALOG_REST_PUBLIC_URL.updateProperty(applicationUrl);
+                    } else {
+                        LOGGER.info("Catalog public rest url is " +
+                                    PASchedulerProperties.CATALOG_REST_PUBLIC_URL.getValueAsString());
+                    }
+                }
+                if (applicationUrl.endsWith("/cloud-automation-service") &&
+                    !PASchedulerProperties.CLOUD_AUTOMATION_REST_URL.isSet()) {
+                    PASchedulerProperties.CLOUD_AUTOMATION_REST_URL.updateProperty(applicationUrl);
+                    if (!PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.isSet()) {
+                        PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.updateProperty(applicationUrl);
+                    } else {
+                        LOGGER.info("Cloud Automation public rest url is " +
+                                    PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.getValueAsString());
+                    }
+                }
+                if (applicationUrl.endsWith("/job-planner") && !PASchedulerProperties.JOB_PLANNER_REST_URL.isSet()) {
+                    PASchedulerProperties.JOB_PLANNER_REST_URL.updateProperty(applicationUrl);
+                    if (!PASchedulerProperties.JOB_PLANNER_REST_PUBLIC_URL.isSet()) {
+                        PASchedulerProperties.JOB_PLANNER_REST_PUBLIC_URL.updateProperty(applicationUrl);
+                    } else {
+                        LOGGER.info("Job Planner public rest url is " +
+                                    PASchedulerProperties.JOB_PLANNER_REST_PUBLIC_URL.getValueAsString());
+                    }
+                }
+                if (applicationUrl.endsWith("/notification-service") &&
+                    !PASchedulerProperties.NOTIFICATION_SERVICE_REST_URL.isSet()) {
+                    PASchedulerProperties.NOTIFICATION_SERVICE_REST_URL.updateProperty(applicationUrl);
+                    if (!PASchedulerProperties.NOTIFICATION_SERVICE_REST_PUBLIC_URL.isSet()) {
+                        PASchedulerProperties.NOTIFICATION_SERVICE_REST_PUBLIC_URL.updateProperty(applicationUrl);
+                    } else {
+                        LOGGER.info("Notification Service public rest url is " +
+                                    PASchedulerProperties.NOTIFICATION_SERVICE_REST_PUBLIC_URL.getValueAsString());
+                    }
                 }
             }
-        }
-    }
-
-    private static String getPublicUrl(String url) {
-        if (PASchedulerProperties.SERVER_PUBLIC_URL.isSet()) {
-            try {
-                URL publicUrl = new URL(PASchedulerProperties.SERVER_PUBLIC_URL.getValueAsString());
-                URL applicationUrl = new URL(url);
-                URL resolvedUrl = new URL(publicUrl, applicationUrl.getPath().substring(1));
-                return resolvedUrl.toExternalForm();
-
-            } catch (Exception e) {
-                LOGGER.warn("Error when resolving public url for " + url, e);
-                return url;
-            }
-        } else {
-            return url;
         }
     }
 

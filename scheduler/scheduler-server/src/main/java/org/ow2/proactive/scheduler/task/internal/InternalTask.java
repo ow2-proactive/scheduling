@@ -1134,6 +1134,14 @@ public abstract class InternalTask extends TaskState {
         tli.setJobOwner(internalJob.getJobInfo().getJobOwner());
         tli.setSchedulerRestUrl(PASchedulerProperties.SCHEDULER_REST_URL.getValueAsStringOrNull());
         tli.setCatalogRestUrl(PASchedulerProperties.CATALOG_REST_URL.getValueAsStringOrNull());
+        tli.setCloudAutomationRestUrl(PASchedulerProperties.CLOUD_AUTOMATION_REST_URL.getValueAsStringOrNull());
+        tli.setJobPlannerRestUrl(PASchedulerProperties.JOB_PLANNER_REST_URL.getValueAsStringOrNull());
+        tli.setNotificationServiceRestUrl(PASchedulerProperties.NOTIFICATION_SERVICE_REST_URL.getValueAsStringOrNull());
+        tli.setSchedulerRestPublicUrl(PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.getValueAsStringOrNull());
+        tli.setCatalogRestPublicUrl(PASchedulerProperties.CATALOG_REST_PUBLIC_URL.getValueAsStringOrNull());
+        tli.setCloudAutomationRestPublicUrl(PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.getValueAsStringOrNull());
+        tli.setJobPlannerRestPublicUrl(PASchedulerProperties.JOB_PLANNER_REST_PUBLIC_URL.getValueAsStringOrNull());
+        tli.setNotificationServiceRestPublicUrl(PASchedulerProperties.NOTIFICATION_SERVICE_REST_PUBLIC_URL.getValueAsStringOrNull());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
         tli.setControlFlowScript(getFlowScript());
