@@ -2088,6 +2088,23 @@ public class StaxJobFactory extends JobFactory {
                          PASchedulerProperties.CATALOG_REST_URL.getValueAsString());
         replacements.put(SchedulerVars.PA_SCHEDULER_REST_URL.toString(),
                          PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_CLOUD_AUTOMATION_REST_URL.toString(),
+                         PASchedulerProperties.CLOUD_AUTOMATION_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_JOB_PLANNER_REST_URL.toString(),
+                         PASchedulerProperties.JOB_PLANNER_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_NOTIFICATION_SERVICE_REST_URL.toString(),
+                         PASchedulerProperties.NOTIFICATION_SERVICE_REST_URL.getValueAsString());
+
+        replacements.put(SchedulerVars.PA_SCHEDULER_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_CATALOG_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.CATALOG_REST_PUBLIC_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_CLOUD_AUTOMATION_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_JOB_PLANNER_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.JOB_PLANNER_REST_PUBLIC_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_NOTIFICATION_SERVICE_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.NOTIFICATION_SERVICE_REST_PUBLIC_URL.getValueAsString());
 
         // Include given variables if any
         if (variables != null) {

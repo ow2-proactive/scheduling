@@ -320,19 +320,68 @@ public enum PASchedulerProperties implements PACommonProperties {
 
     /**
      * Scheduler rest url
+     * Accessed inside workflows and tasks with the PA_SCHEDULER_REST_URL variable
      */
     SCHEDULER_REST_URL("pa.scheduler.rest.url", PropertyType.STRING),
 
     /**
-     * Catalog rest url 
+     * Catalog rest url
+     * Accessed inside workflows and tasks with the PA_CATALOG_REST_URL variable
      */
     CATALOG_REST_URL("pa.catalog.rest.url", PropertyType.STRING),
 
     /**
-     * Set this property to define the public url of the server (e.g. if behind a reverse proxy or accessed through a domain)
-     * the SCHEDULER_REST_URL and CATALOG_REST_URL properties will be updated accordingly
+     * Cloud Automation rest url
+     * Accessed inside workflows and tasks with the PA_CLOUD_AUTOMATION_REST_URL variable
      */
-    SERVER_PUBLIC_URL("pa.server.public.url", PropertyType.STRING),
+    CLOUD_AUTOMATION_REST_URL("pa.cloud-automation.rest.url", PropertyType.STRING),
+
+    /**
+     * Job Planner rest url
+     * Accessed inside workflows and tasks with the PA_JOB_PLANNER_REST_URL variable
+     */
+    JOB_PLANNER_REST_URL("pa.job-planner.rest.url", PropertyType.STRING),
+
+    /**
+     * Notification Service rest url
+     * Accessed inside workflows and tasks with the PA_NOTIFICATION_SERVICE_REST_URL variable
+     */
+    NOTIFICATION_SERVICE_REST_URL("pa.notification-service.rest.url", PropertyType.STRING),
+
+    /**
+     * Set this property to define the public url of the scheduler (e.g. if behind a reverse proxy or accessed through a domain)
+     * Set automatically by the server to the value of SCHEDULER_REST_URL if not set explicitly.
+     * Accessed inside workflows and tasks with the PA_SCHEDULER_REST_PUBLIC_URL variable.
+     */
+    SCHEDULER_REST_PUBLIC_URL("pa.scheduler.rest.public.url", PropertyType.STRING),
+
+    /**
+     * Set this property to define the public url of the catalog (e.g. if behind a reverse proxy or accessed through a domain)
+     * Set automatically by the server to the value of CATALOG_REST_URL if not set explicitly.
+     * Accessed inside workflows and tasks with the PA_CATALOG_REST_PUBLIC_URL variable.
+     */
+    CATALOG_REST_PUBLIC_URL("pa.catalog.rest.public.url", PropertyType.STRING),
+
+    /**
+     * Set this property to define the public url of cloud-automation (e.g. if behind a reverse proxy or accessed through a domain)
+     * Set automatically by the server to the value of CLOUD_AUTOMATION_REST_URL if not set explicitly.
+     * Accessed inside workflows and tasks with the PA_CLOUD_AUTOMATION_REST_PUBLIC_URL variable.
+     */
+    CLOUD_AUTOMATION_REST_PUBLIC_URL("pa.cloud-automation.rest.public.url", PropertyType.STRING),
+
+    /**
+     * Set this property to define the public url of the job-planner (e.g. if behind a reverse proxy or accessed through a domain)
+     * Set automatically by the server to the value of JOB_PLANNER_REST_URL if not set explicitly.
+     * Accessed inside workflows and tasks with the PA_JOB_PLANNER_REST_PUBLIC_URL variable.
+     */
+    JOB_PLANNER_REST_PUBLIC_URL("pa.job-planner.rest.public.url", PropertyType.STRING),
+
+    /**
+     * Set this property to define the public url of the notification-service (e.g. if behind a reverse proxy or accessed through a domain)
+     * Set automatically by the server to the value of NOTIFICATION_SERVICE_REST_URL if not set explicitly.
+     * Accessed inside workflows and tasks with the PA_NOTIFICATION_SERVICE_REST_PUBLIC_URL variable.
+     */
+    NOTIFICATION_SERVICE_REST_PUBLIC_URL("pa.notification-service.rest.public.url", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************** RM PROPERTIES ************************ */
