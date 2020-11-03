@@ -480,6 +480,14 @@ public interface RMRestInterface {
     int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
             @FormParam("sourcename") String sourceName) throws NotConnectedException, PermissionRestException;
 
+    @POST
+    @Path("nodesource/{sourcename}/nodes")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/json")
+    String acquireNode(@HeaderParam("sessionid") String sessionId, @PathParam("sourcename") String sourceName,
+            @QueryParam("numbernodes") int numberNodes, final String nodeConfigJson)
+            throws NotConnectedException, PermissionRestException;
+
     /**
      * Release a node.
      *

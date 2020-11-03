@@ -902,6 +902,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @Override
+    public BooleanWrapper acquireNodes(String sourceName, int numberNodes, Map<String, ?> nodeConfiguration) {
+        if (this.deployedNodeSources.containsKey(sourceName)) {
+            NodeSource nodeSource = this.deployedNodeSources.get(sourceName);
+            nodeSource.acquireNodes(numberNodes, nodeConfiguration);
+            return new BooleanWrapper(true);
+        } else {
+            throw new AddingNodesException("Unknown node source " + sourceName);
+        }
+    }
+
     /**
      * Removes a node from the RM. This method also handles deploying node removal ( deploying node's url
      * follow the scheme deploying:// ). In such a case, the preempt parameter is not used.
@@ -1950,6 +1961,25 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
             return selectionManager.selectNodes(criteria, caller);
         }
+    }
+
+    @Override
+    public NodeSet getNodesByProperty(String propertyKey, String propertyValue) {
+        return new NodeSet(this.allNodes.values()
+                                        .stream()
+                                        .map(RMNode::getNode)
+                                        .filter(containsProperty(propertyKey, propertyValue))
+                                        .collect(Collectors.toList()));
+    }
+
+    private java.util.function.Predicate<? super Node> containsProperty(String propertyKey, String propertyValue) {
+        return node -> {
+            try {
+                return node != null && propertyValue.equals(node.getProperty(propertyKey));
+            } catch (Exception e) {
+                return false;
+            }
+        };
     }
 
     /**

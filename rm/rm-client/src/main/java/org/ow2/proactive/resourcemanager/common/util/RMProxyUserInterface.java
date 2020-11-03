@@ -113,6 +113,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
+    public BooleanWrapper acquireNodes(String arg0, int arg1, Map<String, ?> arg2) {
+        return target.acquireNodes(arg0, arg1, arg2);
+    }
+
+    @Override
     public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
         return target.getExistingNodeSourcesList();
     }
@@ -415,6 +420,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public NodeSet getNodes(Criteria criteria) {
         return target.getNodes(criteria);
+    }
+
+    @Override
+    public NodeSet getNodesByProperty(String propertyKey, String propertyValue) {
+        return target.getNodesByProperty(propertyKey, propertyValue);
     }
 
     @Override

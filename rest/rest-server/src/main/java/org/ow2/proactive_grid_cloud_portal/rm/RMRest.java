@@ -35,6 +35,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -58,6 +60,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -116,6 +119,8 @@ public class RMRest implements RMRestInterface {
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
+
+    private static final String NODE_PROPERTY_REQUEST_ID_KEY = "acquireRequestId";
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         Session session = null;
@@ -485,6 +490,50 @@ public class RMRest implements RMRestInterface {
             throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
         return orThrowRpe(rm.getNodeSourcePingFrequency(sourceName).getIntValue());
+    }
+
+    @Override
+    public String acquireNode(String sessionId, String sourceName, int numberNodes, String nodeConfigJson)
+            throws NotConnectedException, PermissionRestException {
+        ResourceManager rm = checkAccess(sessionId);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Map<String, Object> nodeConfig = mapper.readValue(nodeConfigJson, new TypeReference<Map<String, ?>>() {
+            });
+            String acquireRequestId = UUID.randomUUID().toString();
+            Map<String, String> nodeProperty = (Map<String, String>) nodeConfig.get("nodeProperty");
+            if (nodeProperty == null) {
+                nodeProperty = new HashMap<String, String>();
+            }
+            nodeProperty.put(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId);
+            nodeConfig.put("nodeProperty", nodeProperty);
+            rm.acquireNodes(sourceName, numberNodes, nodeConfig);
+            waitUntil(() -> rm.getNodesByProperty(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId)
+                              .getTotalNumberOfNodes() == numberNodes);
+            return orThrowRpe(rm.getNodesByProperty(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId)
+                                .getAllNodesUrls()
+                                .toString());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Error during parsing the node configuration: " + nodeConfigJson, e);
+        }
+    }
+
+    private void waitUntil(BooleanSupplier conditionToMatch) {
+        try {
+            int waitedTime = 0;
+            int retryIntervalSeconds = 10;
+            int timeoutSeconds = 600;
+            while (!conditionToMatch.getAsBoolean()) {
+                TimeUnit.SECONDS.sleep(retryIntervalSeconds);
+
+                waitedTime += retryIntervalSeconds;
+                if (waitedTime >= timeoutSeconds) {
+                    throw new RuntimeException("can't match within timeout");
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
