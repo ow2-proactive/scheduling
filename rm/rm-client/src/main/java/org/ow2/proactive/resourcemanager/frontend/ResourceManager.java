@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
@@ -228,6 +229,15 @@ public interface ResourceManager {
      * @return true if new node is added successfully, runtime exception otherwise
      */
     BooleanWrapper addNode(String nodeUrl, String sourceName);
+
+    /**
+     * Acquires new nodes in the particular node source.
+     *
+     * @param sourceName name of the node source that will acquire the new nodes
+     * @param nodeConfiguration configuration of acquiring nodes
+     * @return true if the request of acquiring nodes is successfully received, false or exception otherwise
+     */
+    BooleanWrapper acquireNodes(String sourceName, int numberNodes, Map<String, ?> nodeConfiguration);
 
     /**
      * Removes a node from the resource manager.
@@ -443,6 +453,14 @@ public interface ResourceManager {
      * @return a list of nodes according to the criteria
      */
     NodeSet getNodes(Criteria criteria);
+
+    /**
+     * Get the nodes which contain the specified property key with expected value
+     * @param propertyKey the expected property key which should be specified in the returned nodes
+     * @param propertyValue the expected property value in the returned nodes
+     * @return a list of nodes matching the predict
+     */
+    NodeSet getNodesByProperty(String propertyKey, String propertyValue);
 
     /**
      * Releases the node after computations. The specified node is marked as free and become
