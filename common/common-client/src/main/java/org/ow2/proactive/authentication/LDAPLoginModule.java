@@ -131,6 +131,8 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     private final boolean USE_UID_IN_GROUP_SEARCH = Boolean.parseBoolean(ldapProperties.getProperty(LDAPProperties.LDAP_GROUPSEARCH_USE_UID,
                                                                                                     "false"));
 
+    private final static String FAKE_PASSWORD = "Frth481d";
+
     /** user name used to bind to LDAP (if authentication method is different from none) */
     private final String BIND_LOGIN = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_LOGIN);
 
@@ -435,6 +437,12 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             logger.debug("check password for user: " + userDN);
         }
 
+        if (password == null || password.isEmpty()) {
+            // Some LDAP server can allow connection with an empty password. This is not acceptable when we try to verify some user credentuals
+            // So we use a fake password instead
+            password = FAKE_PASSWORD;
+        }
+
         ContextHandler handler = createLdapContext(userDN, password, true);
         closeContext(handler);
         return handler != null;
@@ -468,7 +476,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             if (!START_TLS) {
                 if (requireAuthentication || !AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
                     if (requireAuthentication) {
-                        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+                        // In case of anonymous bind, when we need to check some user credentials, we must force authentication to be simple
+                        env.put(Context.SECURITY_AUTHENTICATION,
+                                ANONYMOUS_LDAP_CONNECTION.equals(AUTHENTICATION_METHOD) ? "simple"
+                                                                                        : AUTHENTICATION_METHOD);
                     } else {
                         env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
                     }
@@ -506,7 +517,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 }
                 if (requireAuthentication || !AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
                     if (requireAuthentication) {
-                        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+                        // In case of anonymous bind, when we need to check some user credentials, we must force authentication to be simple
+                        ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION,
+                                             ANONYMOUS_LDAP_CONNECTION.equals(AUTHENTICATION_METHOD) ? "simple"
+                                                                                                     : AUTHENTICATION_METHOD);
                     } else {
                         ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
                     }
