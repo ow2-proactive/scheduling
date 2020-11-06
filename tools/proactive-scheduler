@@ -107,7 +107,7 @@ start() {
 	CMD="nohup "
 	if [ $(daemonRunning) == 1 ]
 	then
-			CMD="$CMD $DAEMON"
+			CMD="$CMD $DAEMON $1"
 			if [ "$LOGFILE" != ""  ]
 			then
 				if [ ! -f $LOGFILE ]
@@ -198,6 +198,15 @@ forcestop() {
 case "$1" in
   start)
         start
+        ;;
+  start-frozen)
+        start --frozen
+        ;;
+  start-paused)
+        start --paused
+        ;;
+  start-stopped)
+        start --stopped
         ;;
   stop)
         stop

@@ -101,6 +101,14 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     }
 
     /**
+     * State with status
+     */
+    public SchedulerStateImpl(SchedulerStatus status) {
+        this();
+        this.status = status;
+    }
+
+    /**
      * To get the finishedJobs
      *
      * @return the finishedJobs
