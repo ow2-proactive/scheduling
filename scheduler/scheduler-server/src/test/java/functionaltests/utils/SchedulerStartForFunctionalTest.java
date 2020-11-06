@@ -43,6 +43,7 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.SchedulerHsqldbStarter;
@@ -130,7 +131,8 @@ public class SchedulerStartForFunctionalTest implements Serializable {
         schedulerUrl = "pnp://localhost:" + PNPConfig.PA_PNP_PORT.getValue() + "/";
 
         SchedulerFactory.createScheduler(new URI(schedulerUrl),
-                                         PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
+                                         PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString(),
+                                         SchedulerStatus.STARTED);
 
         SchedulerConnection.waitAndJoin(schedulerUrl);
     }
@@ -161,7 +163,8 @@ public class SchedulerStartForFunctionalTest implements Serializable {
         PASchedulerProperties.updateProperties(schedulerPropertiesPath);
 
         SchedulerFactory.createScheduler(new URI(rmUrl),
-                                         PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
+                                         PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString(),
+                                         SchedulerStatus.STARTED);
 
         SchedulerConnection.waitAndJoin(schedulerUrl);
     }
