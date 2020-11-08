@@ -150,7 +150,28 @@ public class SchedulingService {
             schedulingMethod = new SchedulingMethodImpl(this);
         }
 
-        start();
+        if (recoveredState != null && recoveredState.getSchedulerState() != null &&
+            recoveredState.getSchedulerState().getStatus() != null) {
+            switch (recoveredState.getSchedulerState().getStatus()) {
+                case PAUSED:
+                    status = SchedulerStatus.PAUSED;
+                    logger.info("Scheduler has just been paused !");
+                    listener.schedulerStateUpdated(SchedulerEvent.PAUSED);
+                    break;
+                case STOPPED:
+                    // do nothing, status is stopped by default
+                    break;
+                case FROZEN:
+                    status = SchedulerStatus.FROZEN;
+                    logger.info("Scheduler has just been frozen !");
+                    listener.schedulerStateUpdated(SchedulerEvent.FROZEN);
+                    break;
+                default:
+                    start();
+            }
+        } else {
+            start();
+        }
 
         schedulingThread = new SchedulingThread(schedulingMethod, this);
         schedulingThread.start();

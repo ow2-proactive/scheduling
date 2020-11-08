@@ -218,6 +218,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     private SchedulerSpacesSupport spacesSupport;
 
+    private SchedulerStatus initialStatus = SchedulerStatus.STARTED;
+
     private PublicKey corePublicKey;
 
     private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
@@ -264,7 +266,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * @param policyFullClassName
      *            the full class name of the policy to use.
      */
-    public SchedulerFrontend(URI rmURL, String policyFullClassName) {
+    public SchedulerFrontend(URI rmURL, String policyFullClassName, SchedulerStatus initialStatus) {
         this.dbManager = SchedulerDBManager.createUsingProperties();
         SchedulerAccountsManager accountsManager = new SchedulerAccountsManager(dbManager);
         this.jmxHelper = new SchedulerJMXHelper(accountsManager, dbManager);
@@ -272,6 +274,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         logger.debug("Creating scheduler Front-end...");
         this.rmURL = rmURL;
         this.policyFullName = policyFullClassName;
+        this.initialStatus = initialStatus;
         logger.debug("Policy used is " + policyFullClassName);
     }
 
@@ -338,7 +341,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             SynchronizationInternal publicStore = startSynchronizationService();
 
             RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(dbManager).recover(loadJobPeriod,
-                                                                                                        rmProxy);
+                                                                                                        rmProxy,
+                                                                                                        initialStatus);
 
             this.frontendState = new SchedulerFrontendState(recoveredState.getSchedulerState(), jmxHelper, dbManager);
 

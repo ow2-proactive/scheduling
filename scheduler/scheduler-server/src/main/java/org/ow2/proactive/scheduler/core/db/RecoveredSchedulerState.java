@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -55,11 +56,11 @@ public class RecoveredSchedulerState {
     private final SchedulerStateImpl<ClientJobState> schedulerState;
 
     public RecoveredSchedulerState(Vector<InternalJob> pendingJobs, Vector<InternalJob> runningJobs,
-            Vector<InternalJob> finishedJobs) {
+            Vector<InternalJob> finishedJobs, SchedulerStatus status) {
         this.pendingJobs = pendingJobs;
         this.runningJobs = runningJobs;
         this.finishedJobs = finishedJobs;
-        schedulerState = new SchedulerStateImpl<>();
+        schedulerState = new SchedulerStateImpl<>(status);
         schedulerState.setPendingJobs(convertToClientJobState(pendingJobs));
         schedulerState.setRunningJobs(convertToClientJobState(runningJobs));
         schedulerState.setFinishedJobs(convertToClientJobState(finishedJobs));

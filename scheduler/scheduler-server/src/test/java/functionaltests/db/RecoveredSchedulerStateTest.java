@@ -30,6 +30,7 @@ import static com.google.common.truth.Truth.assertThat;
 import java.util.Vector;
 
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
@@ -56,7 +57,10 @@ public class RecoveredSchedulerStateTest {
         Vector<InternalJob> runningJobs = createJobs(JobStatus.RUNNING, nbJobs);
         Vector<InternalJob> finishedJobs = createJobs(JobStatus.FINISHED, nbJobs);
 
-        RecoveredSchedulerState recoveredState = new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
+        RecoveredSchedulerState recoveredState = new RecoveredSchedulerState(pendingJobs,
+                                                                             runningJobs,
+                                                                             finishedJobs,
+                                                                             SchedulerStatus.STARTED);
 
         assertThat(recoveredState.getPendingJobs()).containsExactlyElementsIn(pendingJobs);
         assertThat(recoveredState.getRunningJobs()).containsExactlyElementsIn(runningJobs);

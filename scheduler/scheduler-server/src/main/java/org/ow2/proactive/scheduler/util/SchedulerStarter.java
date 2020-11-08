@@ -48,6 +48,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
@@ -74,6 +75,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolic
 import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerConfigurationException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -131,6 +133,12 @@ public class SchedulerStarter {
 
     private static final String OPTION_DISCOVERY_PORT = "discovery-port";
 
+    private static final String OPTION_FROZEN = "frozen";
+
+    private static final String OPTION_PAUSED = "paused";
+
+    private static final String OPTION_STOPPED = "stopped";
+
     private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
 
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
@@ -146,6 +154,8 @@ public class SchedulerStarter {
     protected static String schedulerURL;
 
     protected static byte[] credentials;
+
+    protected static SchedulerStatus initialStatus;
 
     /**
      * Start the scheduler creation process.
@@ -211,6 +221,16 @@ public class SchedulerStarter {
 
         if (commandLine.hasOption(OPTION_RM_ONLY)) {
             return;
+        }
+
+        if (commandLine.hasOption(OPTION_PAUSED)) {
+            initialStatus = SchedulerStatus.PAUSED;
+        }
+        if (commandLine.hasOption(OPTION_FROZEN)) {
+            initialStatus = SchedulerStatus.FROZEN;
+        }
+        if (commandLine.hasOption(OPTION_STOPPED)) {
+            initialStatus = SchedulerStatus.STOPPED;
         }
 
         schedulerURL = getSchedulerUrl(commandLine);
@@ -343,7 +363,7 @@ public class SchedulerStarter {
         LOGGER.info("Starting the scheduler...");
         SchedulerAuthenticationInterface sai = null;
         try {
-            sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
+            sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName, initialStatus);
             startDiscovery(commandLine, rmUrl);
             LOGGER.info("The scheduler created on " + sai.getHostURL());
         } catch (Exception e) {
@@ -571,6 +591,25 @@ public class SchedulerStarter {
                                 .hasArg()
                                 .argName("port")
                                 .build());
+
+        OptionGroup stateOptions = new OptionGroup();
+        stateOptions.setRequired(false);
+        stateOptions.addOption(Option.builder()
+                                     .longOpt(OPTION_FROZEN)
+                                     .hasArg(false)
+                                     .desc("start scheduler in frozen mode (default: false)")
+                                     .build());
+        stateOptions.addOption(Option.builder()
+                                     .longOpt(OPTION_PAUSED)
+                                     .hasArg(false)
+                                     .desc("start scheduler in paused mode (default: false)")
+                                     .build());
+        stateOptions.addOption(Option.builder()
+                                     .longOpt(OPTION_STOPPED)
+                                     .hasArg(false)
+                                     .desc("start scheduler in stopped mode (default: false)")
+                                     .build());
+        options.addOptionGroup(stateOptions);
 
         return options;
     }

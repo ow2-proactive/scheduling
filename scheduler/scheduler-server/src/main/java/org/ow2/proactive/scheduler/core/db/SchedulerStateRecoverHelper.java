@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -67,10 +68,10 @@ public class SchedulerStateRecoverHelper {
     }
 
     public RecoveredSchedulerState recover(long loadJobPeriod) {
-        return recover(loadJobPeriod, null);
+        return recover(loadJobPeriod, null, SchedulerStatus.STARTED);
     }
 
-    public RecoveredSchedulerState recover(long loadJobPeriod, RMProxy rmProxy) {
+    public RecoveredSchedulerState recover(long loadJobPeriod, RMProxy rmProxy, SchedulerStatus schedulerStatus) {
         dbManager.setTaskDataOwnerIfNull();
         List<InternalJob> notFinishedJobs = dbManager.loadNotFinishedJobs(true);
 
@@ -140,7 +141,7 @@ public class SchedulerStateRecoverHelper {
         logger.info("[Recovering counters] " + " Pending: " + pendingJobs.size() + " Running: " + runningJobs.size() +
                     " Finished: " + finishedJobs.size());
 
-        return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
+        return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs, schedulerStatus);
     }
 
     private void applyJobUpdates(List<InternalJob> notFinishedJobs) {

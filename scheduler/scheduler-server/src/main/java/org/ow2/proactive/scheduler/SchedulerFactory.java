@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
@@ -122,8 +123,8 @@ public class SchedulerFactory {
      *
      * @throws InternalSchedulerException If Scheduler cannot be created
      */
-    public static synchronized SchedulerAuthenticationInterface startLocal(URI rmURL, SchedulerInitializer initializer)
-            throws InternalSchedulerException {
+    public static synchronized SchedulerAuthenticationInterface startLocal(URI rmURL, SchedulerInitializer initializer,
+            SchedulerStatus initialStatus) throws InternalSchedulerException {
         if (!schedulerStarted) {
             if (!allowNullInit) {
                 if (initializer != null) {
@@ -139,7 +140,7 @@ public class SchedulerFactory {
             try {
                 String policy = initializer.getPolicyFullClassName();
                 //start scheduler
-                createScheduler(rmURL, policy);
+                createScheduler(rmURL, policy, initialStatus);
                 SchedulerAuthenticationInterface sai = SchedulerConnection.waitAndJoin(null);
                 schedulerStarted = true;
                 return sai;
@@ -196,11 +197,12 @@ public class SchedulerFactory {
      *
      * @throws ActiveObjectCreationException If Scheduler cannot be created
      */
-    public static SchedulerAuthenticationInterface startLocal(URI rmURL, String policy) throws Exception {
+    public static SchedulerAuthenticationInterface startLocal(URI rmURL, String policy, SchedulerStatus initialStatus)
+            throws Exception {
         SchedulerInitializer init = new SchedulerInitializer();
         init.setPolicyFullClassName(policy);
         allowNullInit = true;
-        SchedulerAuthenticationInterface sai = startLocal(rmURL, init);
+        SchedulerAuthenticationInterface sai = startLocal(rmURL, init, initialStatus);
         allowNullInit = false;
         return sai;
     }
@@ -214,7 +216,8 @@ public class SchedulerFactory {
      * @param policyFullClassName the full policy class name for the scheduler.
      * @throws AdminSchedulerException If an error occurred during creation process
      */
-    public static void createScheduler(URI rmURL, String policyFullClassName) throws AdminSchedulerException {
+    public static void createScheduler(URI rmURL, String policyFullClassName, SchedulerStatus initialStatus)
+            throws AdminSchedulerException {
         logger.debug("Starting new Scheduler");
 
         //check arguments...
@@ -228,7 +231,8 @@ public class SchedulerFactory {
             // creating the scheduler
             // if this fails then it will not continue.
             logger.debug("Creating scheduler frontend...");
-            PAActiveObject.newActive(SchedulerFrontend.class, new Object[] { rmURL, policyFullClassName });
+            PAActiveObject.newActive(SchedulerFrontend.class,
+                                     new Object[] { rmURL, policyFullClassName, initialStatus });
 
             //ready
             logger.debug("Scheduler is now ready to be started!");
@@ -259,7 +263,7 @@ public class SchedulerFactory {
      */
     public static Scheduler createScheduler(Credentials creds, URI rmURL, String policyFullClassName)
             throws AdminSchedulerException, SchedulerException, LoginException {
-        createScheduler(rmURL, policyFullClassName);
+        createScheduler(rmURL, policyFullClassName, SchedulerStatus.STARTED);
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(null);
         return auth.login(creds);
     }
