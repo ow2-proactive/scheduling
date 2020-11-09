@@ -120,7 +120,11 @@ public class RMRest implements RMRestInterface {
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
-    private static final String NODE_PROPERTY_REQUEST_ID_KEY = "acquireRequestId";
+    protected static final String NODE_CONFIG_PROPERTY_KEY = "nodeProperty";
+
+    protected static final String NODE_PROPERTY_REQUEST_ID_KEY = "acquireRequestId";
+
+    private static final int REQUESTS_INTERVAL_SECONDS = 10; // how long to wait before sending the next request
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         Session session = null;
@@ -493,42 +497,52 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public String acquireNode(String sessionId, String sourceName, int numberNodes, String nodeConfigJson)
-            throws NotConnectedException, PermissionRestException {
+    public String acquireNode(String sessionId, String sourceName, int numberNodes, boolean synchronous, int timeout,
+            String nodeConfigJson) throws RMException, NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
         ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> nodeConfig;
         try {
-            Map<String, Object> nodeConfig = mapper.readValue(nodeConfigJson, new TypeReference<Map<String, ?>>() {
+            nodeConfig = mapper.readValue(nodeConfigJson, new TypeReference<Map<String, ?>>() {
             });
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Error during parsing the node configuration: " + nodeConfigJson, e);
+        }
+        if (synchronous) {
             String acquireRequestId = UUID.randomUUID().toString();
-            Map<String, String> nodeProperty = (Map<String, String>) nodeConfig.get("nodeProperty");
-            if (nodeProperty == null) {
-                nodeProperty = new HashMap<String, String>();
-            }
-            nodeProperty.put(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId);
-            nodeConfig.put("nodeProperty", nodeProperty);
+            setRequestIdInNodeConfig(nodeConfig, acquireRequestId);
             rm.acquireNodes(sourceName, numberNodes, nodeConfig);
-            waitUntil(() -> rm.getNodesByProperty(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId)
+            waitUntil(timeout,
+                      "Nodes are not deployed within the specified timeout.",
+                      () -> rm.getNodesByProperty(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId)
                               .getTotalNumberOfNodes() == numberNodes);
             return orThrowRpe(rm.getNodesByProperty(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId)
                                 .getAllNodesUrls()
                                 .toString());
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Error during parsing the node configuration: " + nodeConfigJson, e);
+        } else {
+            rm.acquireNodes(sourceName, numberNodes, nodeConfig);
+            return "";
         }
     }
 
-    private void waitUntil(BooleanSupplier conditionToMatch) {
+    private void setRequestIdInNodeConfig(Map<String, Object> nodeConfig, String acquireRequestId) {
+        Map<String, String> nodeProperty = (Map<String, String>) nodeConfig.get(NODE_CONFIG_PROPERTY_KEY);
+        if (nodeProperty == null) {
+            nodeProperty = new HashMap<String, String>();
+        }
+        nodeProperty.put(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId);
+        nodeConfig.put("nodeProperty", nodeProperty);
+    }
+
+    private void waitUntil(int timeoutSeconds, String timeoutMessage, BooleanSupplier conditionToMatch)
+            throws RMException {
         try {
             int waitedTime = 0;
-            int retryIntervalSeconds = 10;
-            int timeoutSeconds = 600;
             while (!conditionToMatch.getAsBoolean()) {
-                TimeUnit.SECONDS.sleep(retryIntervalSeconds);
-
-                waitedTime += retryIntervalSeconds;
+                TimeUnit.SECONDS.sleep(REQUESTS_INTERVAL_SECONDS);
+                waitedTime += REQUESTS_INTERVAL_SECONDS;
                 if (waitedTime >= timeoutSeconds) {
-                    throw new RuntimeException("can't match within timeout");
+                    throw new RMException(timeoutMessage);
                 }
             }
         } catch (InterruptedException e) {
@@ -1065,5 +1079,4 @@ public class RMRest implements RMRestInterface {
             throw new PermissionRestException(e);
         }
     }
-
 }

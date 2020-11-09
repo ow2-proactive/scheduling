@@ -485,8 +485,9 @@ public interface RMRestInterface {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/json")
     String acquireNode(@HeaderParam("sessionid") String sessionId, @PathParam("sourcename") String sourceName,
-            @QueryParam("numbernodes") int numberNodes, final String nodeConfigJson)
-            throws NotConnectedException, PermissionRestException;
+            @QueryParam("numbernodes") int numberNodes, @QueryParam("sync") boolean synchronous,
+            @QueryParam("timeout") int timeout, final String nodeConfigJson)
+            throws RMException, NotConnectedException, PermissionRestException;
 
     /**
      * Release a node.
