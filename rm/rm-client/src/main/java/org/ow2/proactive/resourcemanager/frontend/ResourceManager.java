@@ -352,6 +352,12 @@ public interface ResourceManager {
     Set<String> listAliveNodeUrls(Set<String> nodeSourceNames);
 
     /**
+     * Returns a list of all nodes Urls known by RMCore.
+     * @return set of node urls
+     */
+    Set<String> listNodeUrls();
+
+    /**
      * Finds "number" nodes for computations according to the selection script.
      * All nodes which are returned to the client as marked internally as busy and cannot
      * be used by others until the client frees them.
@@ -453,14 +459,6 @@ public interface ResourceManager {
      * @return a list of nodes according to the criteria
      */
     NodeSet getNodes(Criteria criteria);
-
-    /**
-     * Get the nodes which contain the specified property key with expected value
-     * @param propertyKey the expected property key which should be specified in the returned nodes
-     * @param propertyValue the expected property value in the returned nodes
-     * @return a list of nodes matching the predict
-     */
-    NodeSet getNodesByProperty(String propertyKey, String propertyValue);
 
     /**
      * Releases the node after computations. The specified node is marked as free and become
@@ -592,4 +590,12 @@ public interface ResourceManager {
 
     List<String> getNodeTokens(String nodeUrl) throws RMException;
 
+    Set<String> getNodeTags(String nodeUrl) throws RMException;
+
+    /**
+     * Returns a list of nodes Urls which contain the specified tag
+     * @param tag the expected tag which should be contained in the returned node
+     * @return node urls which contain the tag
+     */
+    Set<String> getNodesByTags(String tag);
 }

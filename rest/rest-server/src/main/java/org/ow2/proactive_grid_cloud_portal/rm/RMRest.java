@@ -120,9 +120,7 @@ public class RMRest implements RMRestInterface {
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
-    protected static final String NODE_CONFIG_PROPERTY_KEY = "nodeProperty";
-
-    protected static final String NODE_PROPERTY_REQUEST_ID_KEY = "acquireRequestId";
+    protected static final String NODE_CONFIG_TAGS_KEY = "tags";
 
     private static final int REQUESTS_INTERVAL_SECONDS = 10; // how long to wait before sending the next request
 
@@ -294,6 +292,26 @@ public class RMRest implements RMRestInterface {
     public boolean nodeIsAvailable(String sessionId, String url) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.nodeIsAvailable(url).getBooleanValue();
+    }
+
+    @Override
+    public Set<String> getNodeTags(String sessionId, String url) throws NotConnectedException, RestException {
+        try {
+            ResourceManager rm = checkAccess(sessionId);
+            return rm.getNodeTags(url);
+        } catch (RMException e) {
+            throw new RestException(e);
+        }
+    }
+
+    @Override
+    public Set<String> searchNodes(String sessionId, String tag) throws NotConnectedException, RestException {
+        ResourceManager rm = checkAccess(sessionId);
+        if (tag == null) {
+            return rm.listNodeUrls();
+        } else {
+            return rm.getNodesByTags(tag);
+        }
     }
 
     @Override
@@ -497,8 +515,11 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public String acquireNode(String sessionId, String sourceName, int numberNodes, boolean synchronous, int timeout,
-            String nodeConfigJson) throws RMException, NotConnectedException, PermissionRestException {
+    public Set<String> acquireNodes(String sessionId, String sourceName, int numberNodes, boolean synchronous,
+            int timeout, String nodeConfigJson) throws NotConnectedException, RestException {
+        if (numberNodes <= 0) {
+            throw new IllegalArgumentException("invalid numberNodes: " + numberNodes);
+        }
         ResourceManager rm = checkAccess(sessionId);
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> nodeConfig;
@@ -514,35 +535,29 @@ public class RMRest implements RMRestInterface {
             rm.acquireNodes(sourceName, numberNodes, nodeConfig);
             waitUntil(timeout,
                       "Nodes are not deployed within the specified timeout.",
-                      () -> rm.getNodesByProperty(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId)
-                              .getTotalNumberOfNodes() == numberNodes);
-            return orThrowRpe(rm.getNodesByProperty(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId)
-                                .getAllNodesUrls()
-                                .toString());
+                      () -> rm.getNodesByTags(acquireRequestId).size() == numberNodes);
+            return orThrowRpe(rm.getNodesByTags(acquireRequestId));
         } else {
             rm.acquireNodes(sourceName, numberNodes, nodeConfig);
-            return "";
+            return new HashSet<>();
         }
     }
 
     private void setRequestIdInNodeConfig(Map<String, Object> nodeConfig, String acquireRequestId) {
-        Map<String, String> nodeProperty = (Map<String, String>) nodeConfig.get(NODE_CONFIG_PROPERTY_KEY);
-        if (nodeProperty == null) {
-            nodeProperty = new HashMap<String, String>();
-        }
-        nodeProperty.put(NODE_PROPERTY_REQUEST_ID_KEY, acquireRequestId);
-        nodeConfig.put("nodeProperty", nodeProperty);
+        String nodeTags = (String) nodeConfig.getOrDefault(NODE_CONFIG_TAGS_KEY, "");
+        nodeTags += acquireRequestId;
+        nodeConfig.put(NODE_CONFIG_TAGS_KEY, nodeTags);
     }
 
     private void waitUntil(int timeoutSeconds, String timeoutMessage, BooleanSupplier conditionToMatch)
-            throws RMException {
+            throws RestException {
         try {
             int waitedTime = 0;
             while (!conditionToMatch.getAsBoolean()) {
                 TimeUnit.SECONDS.sleep(REQUESTS_INTERVAL_SECONDS);
                 waitedTime += REQUESTS_INTERVAL_SECONDS;
                 if (waitedTime >= timeoutSeconds) {
-                    throw new RMException(timeoutMessage);
+                    throw new RestException(timeoutMessage);
                 }
             }
         } catch (InterruptedException e) {

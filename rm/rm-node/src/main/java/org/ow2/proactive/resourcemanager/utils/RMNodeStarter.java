@@ -137,6 +137,9 @@ public class RMNodeStarter {
     /** Name of the java property to set the data spaces configuration status */
     public final static String DATASPACES_STATUS_PROP_NAME = "proactive.dataspaces.status";
 
+    /** Name of the java property to set the node tags */
+    public final static String NODE_TAGS_PROP_NAME = "proactive.node.tags";
+
     /** Name of the node property that stores the Sigar JMX connection URL*/
     public static final String JMX_URL = "proactive.node.jmx.sigar.";
 

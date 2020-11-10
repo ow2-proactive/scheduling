@@ -211,6 +211,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return target.listAliveNodeUrls(nodeSourceNames);
     }
 
+    @Override
+    public Set<String> listNodeUrls() {
+        return target.listNodeUrls();
+    }
+
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getNodeSourcePingFrequency(java.lang.String)
      */
@@ -423,11 +428,6 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
-    public NodeSet getNodesByProperty(String propertyKey, String propertyValue) {
-        return target.getNodesByProperty(propertyKey, propertyValue);
-    }
-
-    @Override
     public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets) {
         return this.target.executeScript(script, scriptEngine, targetType, targets);
@@ -501,5 +501,15 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public List<String> getNodeTokens(String nodeUrl) throws RMException {
         return target.getNodeTokens(nodeUrl);
+    }
+
+    @Override
+    public Set<String> getNodeTags(String nodeUrl) throws RMException {
+        return target.getNodeTags(nodeUrl);
+    }
+
+    @Override
+    public Set<String> getNodesByTags(String tag) {
+        return target.getNodesByTags(tag);
     }
 }

@@ -1963,25 +1963,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    @Override
-    public NodeSet getNodesByProperty(String propertyKey, String propertyValue) {
-        return new NodeSet(this.allNodes.values()
-                                        .stream()
-                                        .map(RMNode::getNode)
-                                        .filter(containsProperty(propertyKey, propertyValue))
-                                        .collect(Collectors.toList()));
-    }
-
-    private java.util.function.Predicate<? super Node> containsProperty(String propertyKey, String propertyValue) {
-        return node -> {
-            try {
-                return node != null && propertyValue.equals(node.getProperty(propertyKey));
-            } catch (Exception e) {
-                return false;
-            }
-        };
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -2125,6 +2106,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
         }
         return aliveNodes;
+    }
+
+    @Override
+    public Set<String> listNodeUrls() {
+        return this.allNodes.keySet();
     }
 
     /**
@@ -3169,6 +3155,27 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         } else {
             throw new RMException("Unknown node " + nodeUrl);
         }
+    }
+
+    @Override
+    public Set<String> getNodeTags(String nodeUrl) throws RMException {
+        if (allNodes.containsKey(nodeUrl)) {
+            RMNode rmNode = allNodes.get(nodeUrl);
+            return rmNode.getNodeTags();
+        } else {
+            throw new RMException("Unknown node: " + nodeUrl);
+        }
+    }
+
+    @Override
+    public Set<String> getNodesByTags(String tag) {
+        Set<String> result = new HashSet<>();
+        for (RMNode rmNode : this.allNodes.values()) {
+            if (rmNode.getNodeTags().contains(tag)) {
+                result.add(rmNode.getNodeURL());
+            }
+        }
+        return result;
     }
 
     @Override

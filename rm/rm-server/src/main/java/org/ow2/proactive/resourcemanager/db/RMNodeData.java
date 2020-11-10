@@ -29,16 +29,9 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -96,6 +89,8 @@ public class RMNodeData implements Serializable {
 
     private Map<String, String> usageInfo;
 
+    private Set<String> tags;
+
     /**
      * Create an instance of {@link RMNodeData} and populate its fields with the content of a node.
      * @param rmNode the object to take the values from
@@ -112,7 +107,8 @@ public class RMNodeData implements Serializable {
                               rmNode.getHostName(),
                               rmNode.getJmxUrls(),
                               rmNode.getDescriptorVMName(),
-                              rmNode.getUsageInfo());
+                              rmNode.getUsageInfo(),
+                              rmNode.getNodeTags());
     }
 
     public RMNodeData() {
@@ -132,11 +128,12 @@ public class RMNodeData implements Serializable {
         this.jmxUrls = jmxUrls;
         this.jvmName = jvmName;
         this.usageInfo = Collections.emptyMap();
+        this.tags = Collections.emptySet();
     }
 
     public RMNodeData(String name, String nodeUrl, Client owner, Client provider, Permission permission,
             NodeState state, long stateChangeTime, String hostName, String[] jmxUrls, String jvmName,
-            Map<String, String> usageInfo) {
+            Map<String, String> usageInfo, Set<String> tags) {
         this.name = name;
         this.nodeUrl = nodeUrl;
         this.owner = owner;
@@ -148,6 +145,7 @@ public class RMNodeData implements Serializable {
         this.jmxUrls = jmxUrls;
         this.jvmName = jvmName;
         this.usageInfo = usageInfo;
+        this.tags = tags;
     }
 
     @Id
@@ -262,6 +260,16 @@ public class RMNodeData implements Serializable {
 
     public void setUsageInfo(Map<String, String> usageInfo) {
         this.usageInfo = usageInfo;
+    }
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Column(name = "TAGS")
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
     /**

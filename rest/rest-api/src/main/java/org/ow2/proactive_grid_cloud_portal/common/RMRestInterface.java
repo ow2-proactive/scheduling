@@ -484,10 +484,10 @@ public interface RMRestInterface {
     @Path("nodesource/{sourcename}/nodes")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/json")
-    String acquireNode(@HeaderParam("sessionid") String sessionId, @PathParam("sourcename") String sourceName,
-            @QueryParam("numbernodes") int numberNodes, @QueryParam("sync") boolean synchronous,
-            @QueryParam("timeout") int timeout, final String nodeConfigJson)
-            throws RMException, NotConnectedException, PermissionRestException;
+    Set<String> acquireNodes(@HeaderParam("sessionid") String sessionId, @PathParam("sourcename") String sourceName,
+            @QueryParam("numbernodes") int numberNodes, @DefaultValue("false") @QueryParam("sync") boolean synchronous,
+            @DefaultValue("600") @QueryParam("timeout") int timeout, final String nodeConfigJson)
+            throws NotConnectedException, RestException;
 
     /**
      * Release a node.
@@ -1030,4 +1030,21 @@ public interface RMRestInterface {
     void setNodeTokens(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
             @QueryParam("tokens") List<String> tokens) throws NotConnectedException, RestException;
 
+    @GET
+    @Path("node/tags")
+    @Produces("application/json")
+    Set<String> getNodeTags(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String url)
+            throws NotConnectedException, RestException;
+
+    /**
+     * Search the nodes with specific tag.
+     * @param sessionId current session
+     * @param tag the tag which the return nodes should contains, when it's not specified, all the known nodes urls are returned
+     * @return the set of urls which match the search condition
+     */
+    @GET
+    @Path("nodes/search")
+    @Produces("application/json")
+    Set<String> searchNodes(@HeaderParam("sessionid") String sessionId, @QueryParam("tag") String tag)
+            throws NotConnectedException, RestException;
 }
