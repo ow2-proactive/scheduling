@@ -96,11 +96,11 @@ public class RMNodeConfigurator implements RunActive {
 
             // get the node tags specified in the node property NODE_TAGS_PROP_NAME (separated by comma)
             String tagsString = nodeToAdd.getProperty(RMNodeStarter.NODE_TAGS_PROP_NAME);
-            if(tagsString != null && !tagsString.isEmpty()) {
+            if (tagsString != null && !tagsString.isEmpty()) {
                 Set<String> tags = Arrays.stream(tagsString.split(","))
-                                     .map(String::trim)
-                                     .filter(s -> !s.isEmpty())
-                                     .collect(Collectors.toSet());
+                                         .map(String::trim)
+                                         .filter(s -> !s.isEmpty())
+                                         .collect(Collectors.toSet());
                 rmnodeToAdd.setNodeTags(tags);
             }
 
