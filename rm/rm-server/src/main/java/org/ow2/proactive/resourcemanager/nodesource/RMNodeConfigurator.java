@@ -96,11 +96,13 @@ public class RMNodeConfigurator implements RunActive {
 
             // get the node tags specified in the node property NODE_TAGS_PROP_NAME (separated by comma)
             String tagsString = nodeToAdd.getProperty(RMNodeStarter.NODE_TAGS_PROP_NAME);
-            Set<String> tags = Arrays.stream(tagsString.split(","))
+            if(tagsString != null && !tagsString.isEmpty()) {
+                Set<String> tags = Arrays.stream(tagsString.split(","))
                                      .map(String::trim)
                                      .filter(s -> !s.isEmpty())
                                      .collect(Collectors.toSet());
-            rmnodeToAdd.setNodeTags(tags);
+                rmnodeToAdd.setNodeTags(tags);
+            }
 
             // setting node JMX connector urls
             rmnodeToAdd.setJMXUrl(JMXTransportProtocol.RMI,
