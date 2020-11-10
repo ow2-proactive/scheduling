@@ -30,6 +30,7 @@ import java.security.Permission;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -393,6 +394,16 @@ public final class RMDeployingNode extends AbstractRMNode {
     @Override
     public void setNodeTokens(String nodeUrl, List<String> tokens) {
 
+    }
+
+    @Override
+    public Set<String> getNodeTags() {
+        return null;
+    }
+
+    @Override
+    public void setNodeTags(Set<String> tags) {
+        throw new UnsupportedOperationException();
     }
 }
 
