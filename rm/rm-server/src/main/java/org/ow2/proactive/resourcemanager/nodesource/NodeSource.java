@@ -673,6 +673,15 @@ public class NodeSource implements InitActive, RunActive {
         infrastructureManager.acquireNode();
     }
 
+    public void acquireNodes(int n, long timeout, Map<String, ?> nodeConfiguration) {
+        if (toShutdown) {
+            logger.warn("[" + name + "] acquireNodes request discarded because node source is shutting down");
+            return;
+        }
+
+        infrastructureManager.acquireNodes(n, timeout, nodeConfiguration);
+    }
+
     public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
         if (toShutdown) {
             logger.warn("[" + name + "] acquireNodes request discarded because node source is shutting down");

@@ -234,10 +234,12 @@ public interface ResourceManager {
      * Acquires new nodes in the particular node source.
      *
      * @param sourceName name of the node source that will acquire the new nodes
+     * @param numberNodes the number of nodes to acquire
+     * @param timeout the maxime waiting time (in milliseconds) before starting to acquire nodes
      * @param nodeConfiguration configuration of acquiring nodes
      * @return true if the request of acquiring nodes is successfully received, false or exception otherwise
      */
-    BooleanWrapper acquireNodes(String sourceName, int numberNodes, Map<String, ?> nodeConfiguration);
+    BooleanWrapper acquireNodes(String sourceName, int numberNodes, long timeout, Map<String, ?> nodeConfiguration);
 
     /**
      * Removes a node from the resource manager.

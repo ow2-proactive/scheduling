@@ -113,8 +113,9 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
-    public BooleanWrapper acquireNodes(String arg0, int arg1, Map<String, ?> arg2) {
-        return target.acquireNodes(arg0, arg1, arg2);
+    public BooleanWrapper acquireNodes(String sourceName, int numberNodes, long timeout,
+            Map<String, ?> nodeConfiguration) {
+        return target.acquireNodes(sourceName, numberNodes, timeout, nodeConfiguration);
     }
 
     @Override

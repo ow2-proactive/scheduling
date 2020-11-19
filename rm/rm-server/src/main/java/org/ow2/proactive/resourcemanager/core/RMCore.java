@@ -903,10 +903,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
-    public BooleanWrapper acquireNodes(String sourceName, int numberNodes, Map<String, ?> nodeConfiguration) {
+    public BooleanWrapper acquireNodes(String sourceName, int numberNodes, long timeout,
+            Map<String, ?> nodeConfiguration) {
         if (this.deployedNodeSources.containsKey(sourceName)) {
             NodeSource nodeSource = this.deployedNodeSources.get(sourceName);
-            nodeSource.acquireNodes(numberNodes, nodeConfiguration);
+            nodeSource.acquireNodes(numberNodes, timeout, nodeConfiguration);
             return new BooleanWrapper(true);
         } else {
             throw new AddingNodesException("Unknown node source " + sourceName);

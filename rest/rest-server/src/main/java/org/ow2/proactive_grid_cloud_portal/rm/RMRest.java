@@ -120,7 +120,7 @@ public class RMRest implements RMRestInterface {
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
-    protected static final String NODE_CONFIG_TAGS_KEY = "tags";
+    protected static final String NODE_CONFIG_TAGS_KEY = "nodeTags";
 
     private static final int REQUESTS_INTERVAL_SECONDS = 10; // how long to wait before sending the next request
 
@@ -532,20 +532,24 @@ public class RMRest implements RMRestInterface {
         if (synchronous) {
             String acquireRequestId = UUID.randomUUID().toString();
             setRequestIdInNodeConfig(nodeConfig, acquireRequestId);
-            rm.acquireNodes(sourceName, numberNodes, nodeConfig);
+            rm.acquireNodes(sourceName, numberNodes, timeout * 1000, nodeConfig);
             waitUntil(timeout,
                       "Nodes are not deployed within the specified timeout.",
                       () -> rm.getNodesByTags(acquireRequestId).size() == numberNodes);
             return orThrowRpe(rm.getNodesByTags(acquireRequestId));
         } else {
-            rm.acquireNodes(sourceName, numberNodes, nodeConfig);
+            rm.acquireNodes(sourceName, numberNodes, timeout * 1000, nodeConfig);
             return new HashSet<>();
         }
     }
 
     private void setRequestIdInNodeConfig(Map<String, Object> nodeConfig, String acquireRequestId) {
         String nodeTags = (String) nodeConfig.getOrDefault(NODE_CONFIG_TAGS_KEY, "");
-        nodeTags += acquireRequestId;
+        if (!nodeTags.isEmpty()) {
+            nodeTags += "," + acquireRequestId;
+        } else {
+            nodeTags = acquireRequestId;
+        }
         nodeConfig.put(NODE_CONFIG_TAGS_KEY, nodeTags);
     }
 
