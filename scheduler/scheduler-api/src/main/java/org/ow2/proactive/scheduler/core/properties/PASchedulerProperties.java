@@ -224,6 +224,11 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Number of tasks to fetch per page when pagination is used */
     TASKS_PAGE_SIZE("pa.scheduler.tasks.page.size", PropertyType.INTEGER, "100"),
 
+    /** Maximum duration time of task. If configured, the tasks will be terminated after the walltime exceeded
+     * Format is ss, mm:ss, or hh:mm:ss
+     * */
+    TASK_WALLTIME("pa.scheduler.task.walltime", PropertyType.STRING),
+
     /**
      * If set to non-null value the scheduler can executes only forkenvironment and clean scripts from
      * this directory. All other scripts will be rejected.
