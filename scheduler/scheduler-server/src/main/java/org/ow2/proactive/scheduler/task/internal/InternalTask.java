@@ -47,6 +47,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -73,6 +74,7 @@ import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.Tools;
 
 
 /**
@@ -1165,7 +1167,7 @@ public abstract class InternalTask extends TaskState {
         }
         tli.setForkEnvironment(getForkEnvironment());
         if (isWallTimeSet()) {
-            tli.setWalltime(wallTime);
+            tli.setWalltime(getRuntimeWallTime());
         }
         tli.setPreciousLogs(isPreciousLogs());
         tli.setJobVariables(internalJob.getVariables());
@@ -1302,6 +1304,46 @@ public abstract class InternalTask extends TaskState {
         } else {
             return updatedVariables;
         }
+    }
+
+    @Override
+    public boolean isWallTimeSet() {
+        return getRuntimeWallTime() > 0;
+    }
+
+    protected long getRuntimeWallTime() {
+        Map<String, String> runtimeGenericInfo = getRuntimeGenericInformation();
+        if (wallTime > 0) {
+            // Walltime configured inside the task
+            return wallTime;
+        } else if (runtimeGenericInfo.containsKey(SchedulerConstants.TASK_WALLTIME_GENERIC_INFO)) {
+            // Walltime configured as generic information
+            return resolveWallTime(runtimeGenericInfo.get(SchedulerConstants.TASK_WALLTIME_GENERIC_INFO),
+                                   "Walltime configured by generic information " + SchedulerConstants.TASK_WALLTIME_GENERIC_INFO +
+                                                                                                          " with value " +
+                                                                                                          runtimeGenericInfo.get(SchedulerConstants.TASK_WALLTIME_GENERIC_INFO) +
+                                                                                                          " cannot be parsed.");
+        } else if (PASchedulerProperties.TASK_WALLTIME.isSet()) {
+            // Walltime configured as scheduler property
+            return resolveWallTime(PASchedulerProperties.TASK_WALLTIME.getValueAsStringOrNull(),
+                                   "Walltime configured by scheduler property " + PASchedulerProperties.TASK_WALLTIME.getKey() +
+                                                                                                 " with value " +
+                                                                                                 PASchedulerProperties.TASK_WALLTIME.getValueAsStringOrNull() +
+                                                                                                 " cannot be parsed.");
+        }
+        return 0;
+    }
+
+    private long resolveWallTime(String configuredWalltime, String errorMessage) {
+        if (configuredWalltime == null || configuredWalltime.isEmpty() || configuredWalltime.trim().equals("0")) {
+            return 0;
+        }
+        long resolvedWalltime = Tools.formatDate(configuredWalltime);
+        if (resolvedWalltime == 0) {
+            logger.warn(getId(), errorMessage);
+            return 0;
+        }
+        return resolvedWalltime;
     }
 
     /**
