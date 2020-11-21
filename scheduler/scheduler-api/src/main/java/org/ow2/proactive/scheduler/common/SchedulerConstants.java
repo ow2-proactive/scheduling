@@ -163,4 +163,9 @@ public class SchedulerConstants {
      */
     public static String DISABLE_PROCESS_TREE_KILLER_GENERIC_INFO = "DISABLE_PTK";
 
+    /**
+     * This generic information can be used to configure a task walltime
+     */
+    public static String TASK_WALLTIME_GENERIC_INFO = "WALLTIME";
+
 }
