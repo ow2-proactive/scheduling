@@ -3180,6 +3180,25 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    public Set<String> getNodesByTags(List<String> tags, boolean all) {
+        Set<String> result = new HashSet<>();
+        for (RMNode rmNode : this.allNodes.values()) {
+            if (all) {
+                if (rmNode.getNodeTags().containsAll(tags)) {
+                    result.add(rmNode.getNodeURL());
+                }
+            } else {
+                // include node in the result if node contains any specified tag
+                // (i.e, have common elements between the ndoe tags and specified tags)
+                if (!Collections.disjoint(rmNode.getNodeTags(), tags)) {
+                    result.add(rmNode.getNodeURL());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public void removeNodeToken(String nodeUrl, String token) throws RMException {
         if (token == null || token.isEmpty()) {
             throw new RMException("Invalid empty token");

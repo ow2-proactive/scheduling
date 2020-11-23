@@ -480,13 +480,24 @@ public interface RMRestInterface {
     int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
             @FormParam("sourcename") String sourceName) throws NotConnectedException, PermissionRestException;
 
+    /**
+     * Acquire new nodes of a specified node source
+     * @param sessionId current session
+     * @param sourceName the name of the node source
+     * @param numberNodes the number of nodes to be acquired
+     * @param synchronous whether the request is synchronous or asynchronous, when true, the request returns the url of acquired nodes after the nodes are successfully deployed.
+     * @param timeout the maximum duration of the request, in seconds.
+     * @param nodeConfigJson the specific configuration of nodes to be acquired, in json format
+     * @return When synchronous is true, returns the url of acquired nodes after the nodes are successfully deployed.
+     *         When synchronous is false, returns immediately with an empty list.
+     */
     @POST
     @Path("nodesource/{sourcename}/nodes")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/json")
     Set<String> acquireNodes(@HeaderParam("sessionid") String sessionId, @PathParam("sourcename") String sourceName,
-            @QueryParam("numbernodes") int numberNodes, @DefaultValue("false") @QueryParam("sync") boolean synchronous,
-            @DefaultValue("600") @QueryParam("timeout") int timeout, final String nodeConfigJson)
+            @QueryParam("numbernodes") int numberNodes, @QueryParam("sync") @DefaultValue("false") boolean synchronous,
+            @QueryParam("timeout") @DefaultValue("600") long timeout, final String nodeConfigJson)
             throws NotConnectedException, RestException;
 
     /**
@@ -1030,8 +1041,24 @@ public interface RMRestInterface {
     void setNodeTokens(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
             @QueryParam("tokens") List<String> tokens) throws NotConnectedException, RestException;
 
+    /**
+     * Get the set of all tags present in all nodes
+     * @param sessionId current session
+     * @return a set of all nodes tags
+     */
     @GET
     @Path("node/tags")
+    @Produces("application/json")
+    Set<String> getNodeTags(@HeaderParam("sessionid") String sessionId) throws NotConnectedException, RestException;
+
+    /**
+     * Get the tags of a specific node
+     * @param sessionId current session
+     * @param url the url of the requested node
+     * @return a set of tags for the specified node
+     */
+    @GET
+    @Path("node/tags/search")
     @Produces("application/json")
     Set<String> getNodeTags(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String url)
             throws NotConnectedException, RestException;
@@ -1039,12 +1066,14 @@ public interface RMRestInterface {
     /**
      * Search the nodes with specific tag.
      * @param sessionId current session
-     * @param tag the tag which the return nodes should contains, when it's not specified, all the known nodes urls are returned
+     * @param tags the tag which the return nodes should contains, when it's not specified, all the known nodes urls are returned
+     * @param all When true, the search return nodes which contain all tags;
+     *            when false, the search return nodes which contain any tag among the list tags.
      * @return the set of urls which match the search condition
      */
     @GET
     @Path("nodes/search")
     @Produces("application/json")
-    Set<String> searchNodes(@HeaderParam("sessionid") String sessionId, @QueryParam("tag") String tag)
-            throws NotConnectedException, RestException;
+    Set<String> searchNodes(@HeaderParam("sessionid") String sessionId, @QueryParam("tags") List<String> tags,
+            @QueryParam("all") @DefaultValue("true") boolean all) throws NotConnectedException, RestException;
 }

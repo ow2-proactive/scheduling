@@ -513,4 +513,9 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public Set<String> getNodesByTags(String tag) {
         return target.getNodesByTags(tag);
     }
+
+    @Override
+    public Set<String> getNodesByTags(List<String> tags, boolean all) {
+        return target.getNodesByTags(tags, all);
+    }
 }

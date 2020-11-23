@@ -305,12 +305,27 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public Set<String> searchNodes(String sessionId, String tag) throws NotConnectedException, RestException {
+    public Set<String> getNodeTags(String sessionId) throws NotConnectedException, RestException {
+        try {
+            ResourceManager rm = checkAccess(sessionId);
+            Set<String> allTags = new HashSet<>();
+            for (String nodeUrl : rm.listNodeUrls()) {
+                allTags.addAll(rm.getNodeTags(nodeUrl));
+            }
+            return allTags;
+        } catch (RMException e) {
+            throw new RestException(e);
+        }
+    }
+
+    @Override
+    public Set<String> searchNodes(String sessionId, List<String> tags, boolean all)
+            throws NotConnectedException, RestException {
         ResourceManager rm = checkAccess(sessionId);
-        if (tag == null) {
+        if (tags == null) {
             return rm.listNodeUrls();
         } else {
-            return rm.getNodesByTags(tag);
+            return rm.getNodesByTags(tags, all);
         }
     }
 
@@ -516,7 +531,7 @@ public class RMRest implements RMRestInterface {
 
     @Override
     public Set<String> acquireNodes(String sessionId, String sourceName, int numberNodes, boolean synchronous,
-            int timeout, String nodeConfigJson) throws NotConnectedException, RestException {
+            long timeout, String nodeConfigJson) throws NotConnectedException, RestException {
         if (numberNodes <= 0) {
             throw new IllegalArgumentException("invalid numberNodes: " + numberNodes);
         }
@@ -526,7 +541,7 @@ public class RMRest implements RMRestInterface {
         try {
             nodeConfig = mapper.readValue(nodeConfigJson, new TypeReference<Map<String, ?>>() {
             });
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Error during parsing the node configuration: " + nodeConfigJson, e);
         }
         if (synchronous) {
@@ -544,7 +559,14 @@ public class RMRest implements RMRestInterface {
     }
 
     private void setRequestIdInNodeConfig(Map<String, Object> nodeConfig, String acquireRequestId) {
-        String nodeTags = (String) nodeConfig.getOrDefault(NODE_CONFIG_TAGS_KEY, "");
+        String nodeTags;
+        try {
+            nodeTags = (String) nodeConfig.getOrDefault(NODE_CONFIG_TAGS_KEY, "");
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(String.format("The value of node configuration [%s] can't be casted to String",
+                                                             NODE_CONFIG_TAGS_KEY),
+                                               e);
+        }
         if (!nodeTags.isEmpty()) {
             nodeTags += "," + acquireRequestId;
         } else {
@@ -553,7 +575,7 @@ public class RMRest implements RMRestInterface {
         nodeConfig.put(NODE_CONFIG_TAGS_KEY, nodeTags);
     }
 
-    private void waitUntil(int timeoutSeconds, String timeoutMessage, BooleanSupplier conditionToMatch)
+    private void waitUntil(long timeoutSeconds, String timeoutMessage, BooleanSupplier conditionToMatch)
             throws RestException {
         try {
             int waitedTime = 0;

@@ -31,7 +31,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 /**
  * A policy which does nothing. It leaves users to decide when to acquire nodes.
  */
-public class DefaultPolicy extends NodeSourcePolicy {
+public class EmptyPolicy extends NodeSourcePolicy {
     @Override
     public BooleanWrapper activate() {
         return new BooleanWrapper(true);

@@ -600,4 +600,13 @@ public interface ResourceManager {
      * @return node urls which contain the tag
      */
     Set<String> getNodesByTags(String tag);
+
+    /**
+     * Returns a list of nodes Urls which contain all or any specified list of tags
+     * @param tags list of tags
+     * @param all When true, the search return nodes which contain all tags;
+     *            when false, the search return nodes which contain any tag among the list tags.
+     * @return nodes urls which contain all or any specified list of tags
+     */
+    Set<String> getNodesByTags(List<String> tags, boolean all);
 }
