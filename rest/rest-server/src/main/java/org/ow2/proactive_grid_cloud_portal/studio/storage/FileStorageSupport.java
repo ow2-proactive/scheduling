@@ -39,20 +39,12 @@ public class FileStorageSupport {
 
     private final File userWorkflowsDir;
 
-    private final File templateWorkflowsDir;
-
-    public FileStorageSupport(File userWorkflowsDir, File templateWorkflowsDir) {
+    public FileStorageSupport(File userWorkflowsDir) {
         this.userWorkflowsDir = userWorkflowsDir;
-        this.templateWorkflowsDir = templateWorkflowsDir;
     }
 
     public File getWorkflowsDir(String userName) {
         return new File(userWorkflowsDir, userName);
-    }
-
-    public FileStorage<Workflow> getTemplateStorage() {
-        templateWorkflowsDir.mkdirs();
-        return new FileStorage<>(templateWorkflowsDir, new WorkflowSerializer(), new SmallestAvailableIdGenerator());
     }
 
     public FileStorage<Workflow> getWorkflowStorage(String userName) {

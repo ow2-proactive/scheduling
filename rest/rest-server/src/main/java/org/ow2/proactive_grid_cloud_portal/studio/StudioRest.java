@@ -181,36 +181,6 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public List<Workflow> getTemplates(String sessionId) throws IOException {
-        return getFileStorageSupport().getTemplateStorage().readAll();
-    }
-
-    @Override
-    public Workflow createTemplate(String sessionId, Workflow template) throws IOException {
-        return getFileStorageSupport().getTemplateStorage().store(template);
-    }
-
-    @Override
-    public Workflow getTemplate(String sessionId, String templateId) throws IOException {
-        return getFileStorageSupport().getTemplateStorage().read(templateId);
-    }
-
-    @Override
-    public String getTemplateXmlContent(String sessionId, String templateId) throws IOException {
-        return getFileStorageSupport().getTemplateStorage().read(templateId).getXml();
-    }
-
-    @Override
-    public Workflow updateTemplate(String sessionId, String templateId, Workflow template) throws IOException {
-        return getFileStorageSupport().getTemplateStorage().update(templateId, template);
-    }
-
-    @Override
-    public void deleteTemplate(String sessionId, String templateId) throws IOException {
-        getFileStorageSupport().getTemplateStorage().delete(templateId);
-    }
-
-    @Override
     public List<Script> getScripts(String sessionId) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         return getFileStorageSupport().getScriptStorage(userName).readAll();
