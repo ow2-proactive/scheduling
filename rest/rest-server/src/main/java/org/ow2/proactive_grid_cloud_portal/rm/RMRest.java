@@ -322,10 +322,10 @@ public class RMRest implements RMRestInterface {
     public Set<String> searchNodes(String sessionId, List<String> tags, boolean all)
             throws NotConnectedException, RestException {
         ResourceManager rm = checkAccess(sessionId);
-        if (tags == null) {
+        if (tags == null || tags.isEmpty()) {
             return rm.listNodeUrls();
         } else {
-            return rm.getNodesByTags(tags, all);
+            return rm.getNodesByTags(new HashSet<>(tags), all);
         }
     }
 
@@ -550,8 +550,8 @@ public class RMRest implements RMRestInterface {
             rm.acquireNodes(sourceName, numberNodes, timeout * 1000, nodeConfig);
             waitUntil(timeout,
                       "Nodes are not deployed within the specified timeout.",
-                      () -> rm.getNodesByTags(acquireRequestId).size() == numberNodes);
-            return orThrowRpe(rm.getNodesByTags(acquireRequestId));
+                      () -> rm.getNodesByTag(acquireRequestId).size() == numberNodes);
+            return orThrowRpe(rm.getNodesByTag(acquireRequestId));
         } else {
             rm.acquireNodes(sourceName, numberNodes, timeout * 1000, nodeConfig);
             return new HashSet<>();

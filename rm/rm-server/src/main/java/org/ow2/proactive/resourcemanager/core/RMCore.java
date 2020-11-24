@@ -3169,7 +3169,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
-    public Set<String> getNodesByTags(String tag) {
+    public Set<String> getNodesByTag(String tag) {
         Set<String> result = new HashSet<>();
         for (RMNode rmNode : this.allNodes.values()) {
             if (rmNode.getNodeTags().contains(tag)) {
@@ -3180,7 +3180,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
-    public Set<String> getNodesByTags(List<String> tags, boolean all) {
+    public Set<String> getNodesByTags(Set<String> tags, boolean all) {
         Set<String> result = new HashSet<>();
         for (RMNode rmNode : this.allNodes.values()) {
             if (all) {

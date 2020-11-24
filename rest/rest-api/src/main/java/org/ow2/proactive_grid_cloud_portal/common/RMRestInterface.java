@@ -1064,9 +1064,9 @@ public interface RMRestInterface {
             throws NotConnectedException, RestException;
 
     /**
-     * Search the nodes with specific tag.
+     * Search the nodes with specific tags.
      * @param sessionId current session
-     * @param tags the tag which the return nodes should contains, when it's not specified, all the known nodes urls are returned
+     * @param tags a list of tags which the nodes should contain. When not specified or an empty list, all the nodes known urls are returned
      * @param all When true, the search return nodes which contain all tags;
      *            when false, the search return nodes which contain any tag among the list tags.
      * @return the set of urls which match the search condition

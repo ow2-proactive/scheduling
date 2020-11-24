@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
@@ -599,7 +598,7 @@ public interface ResourceManager {
      * @param tag the expected tag which should be contained in the returned node
      * @return node urls which contain the tag
      */
-    Set<String> getNodesByTags(String tag);
+    Set<String> getNodesByTag(String tag);
 
     /**
      * Returns a list of nodes Urls which contain all or any specified list of tags
@@ -608,5 +607,5 @@ public interface ResourceManager {
      *            when false, the search return nodes which contain any tag among the list tags.
      * @return nodes urls which contain all or any specified list of tags
      */
-    Set<String> getNodesByTags(List<String> tags, boolean all);
+    Set<String> getNodesByTags(Set<String> tags, boolean all);
 }
