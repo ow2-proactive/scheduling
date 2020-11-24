@@ -175,6 +175,17 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
         nodeSource.acquireNodes(n, nodeConfiguration);
     }
 
+    public void acquireNodes(int n, long timeout, Map<String, ?> nodeConfiguration) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Negative nodes number " + n);
+        }
+        if (n == 0) {
+            return;
+        }
+        info("Acquiring " + n + " nodes with configuration");
+        nodeSource.acquireNodes(n, timeout, nodeConfiguration);
+    }
+
     /**
      * Asynchronous request to acquires all possible nodes from infrastructure
      */

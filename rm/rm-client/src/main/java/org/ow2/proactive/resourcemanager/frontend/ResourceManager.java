@@ -230,6 +230,17 @@ public interface ResourceManager {
     BooleanWrapper addNode(String nodeUrl, String sourceName);
 
     /**
+     * Acquires new nodes in the particular node source.
+     *
+     * @param sourceName name of the node source that will acquire the new nodes
+     * @param numberNodes the number of nodes to acquire
+     * @param timeout the maxime waiting time (in milliseconds) before starting to acquire nodes
+     * @param nodeConfiguration configuration of acquiring nodes
+     * @return true if the request of acquiring nodes is successfully received, false or exception otherwise
+     */
+    BooleanWrapper acquireNodes(String sourceName, int numberNodes, long timeout, Map<String, ?> nodeConfiguration);
+
+    /**
      * Removes a node from the resource manager.
      *
      * @param nodeUrl URL of the node to remove.
@@ -340,6 +351,12 @@ public interface ResourceManager {
      * @return list of node urls
      */
     Set<String> listAliveNodeUrls(Set<String> nodeSourceNames);
+
+    /**
+     * Returns a list of all nodes Urls known by RMCore.
+     * @return set of node urls
+     */
+    Set<String> listNodeUrls();
 
     /**
      * Finds "number" nodes for computations according to the selection script.
@@ -574,4 +591,21 @@ public interface ResourceManager {
 
     List<String> getNodeTokens(String nodeUrl) throws RMException;
 
+    Set<String> getNodeTags(String nodeUrl) throws RMException;
+
+    /**
+     * Returns a list of nodes Urls which contain the specified tag
+     * @param tag the expected tag which should be contained in the returned node
+     * @return node urls which contain the tag
+     */
+    Set<String> getNodesByTag(String tag);
+
+    /**
+     * Returns a list of nodes Urls which contain all or any specified list of tags
+     * @param tags list of tags
+     * @param all When true, the search return nodes which contain all tags;
+     *            when false, the search return nodes which contain any tag among the list tags.
+     * @return nodes urls which contain all or any specified list of tags
+     */
+    Set<String> getNodesByTags(Set<String> tags, boolean all);
 }

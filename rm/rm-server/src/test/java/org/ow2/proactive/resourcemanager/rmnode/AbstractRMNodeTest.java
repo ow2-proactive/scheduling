@@ -363,6 +363,16 @@ public class AbstractRMNodeTest {
         public void setNodeTokens(String nodeUrl, List<String> tokens) {
 
         }
+
+        @Override
+        public Set<String> getNodeTags() {
+            return null;
+        }
+
+        @Override
+        public void setNodeTags(Set<String> tags) {
+
+        }
     }
 
 }

@@ -25,6 +25,11 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -87,6 +92,16 @@ public class RMNodeConfigurator implements RunActive {
             } else {
                 // data space is configured
                 logger.debug("Data spaces is already configured for node " + nodeToAdd.getNodeInformation().getURL());
+            }
+
+            // get the node tags specified in the node property NODE_TAGS_PROP_NAME (separated by comma)
+            String tagsString = nodeToAdd.getProperty(RMNodeStarter.NODE_TAGS_PROP_NAME);
+            if (tagsString != null && !tagsString.isEmpty()) {
+                Set<String> tags = Arrays.stream(tagsString.split(","))
+                                         .map(String::trim)
+                                         .filter(s -> !s.isEmpty())
+                                         .collect(Collectors.toSet());
+                rmnodeToAdd.setNodeTags(tags);
             }
 
             // setting node JMX connector urls
