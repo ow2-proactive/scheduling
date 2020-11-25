@@ -18,6 +18,7 @@ ext.functionalTestConfiguration = {
     systemProperties << ['max_test_slice': System.getProperty("max_test_slice")]
     systemProperties << ['proactive.runtime.ping': false]
     systemProperties << ['file.encoding': 'UTF-8']
+    systemProperties << ['proactive.communication.protocol': 'pnp']
     testLogging {
         exceptionFormat = 'full'
     }
