@@ -568,7 +568,26 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      */
     public abstract void acquireNode();
 
+    /**
+     * Asynchronous node acquisition request. The request may be skipped if another concurrent request is on-going.
+     *
+     * @param n the number of nodes to acquire
+     * @param nodeConfiguration the configuration for nodes to be acquired
+     */
     public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
+        this.acquireNodes(n, 0, nodeConfiguration);
+    }
+
+    /**
+     * Asynchronous node acquisition request.
+     *
+     * @param n the number of nodes to acquire
+     * @param timeout The maxime waiting time (in milliseconds) before starting to acquire nodes
+     *                This timeout is used to acquire locks for concurrent deployment if needed.
+     *                The request will be skipped if it can't be started within the specified timeout.
+     * @param nodeConfiguration the configuration for nodes to be acquired
+     */
+    public void acquireNodes(int n, long timeout, Map<String, ?> nodeConfiguration) {
         throw new UnsupportedOperationException("Node configuration is not implemented for this infrastructure manager.");
     }
 

@@ -351,6 +351,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         rmNodeDescriptor.setVNodeName(getVNodeName());
         rmNodeDescriptor.setUsageInfo(getUsageInfo());
         rmNodeDescriptor.setTokens(getNodeTokens());
+        rmNodeDescriptor.setTags(getNodeTags());
         return rmNodeDescriptor;
     }
 
