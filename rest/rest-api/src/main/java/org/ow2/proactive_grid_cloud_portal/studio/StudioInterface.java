@@ -128,40 +128,6 @@ public interface StudioInterface {
             throws NotConnectedRestException, IOException;
 
     @GET
-    @Path("templates")
-    List<Workflow> getTemplates(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedRestException, IOException;
-
-    @POST
-    @Path("templates")
-    @Consumes(APPLICATION_JSON)
-    Workflow createTemplate(@HeaderParam("sessionid") String sessionId, Workflow template)
-            throws NotConnectedRestException, IOException;
-
-    @GET
-    @Path("templates/{id}")
-    @Produces(APPLICATION_JSON)
-    Workflow getTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
-            throws NotConnectedRestException, IOException;
-
-    @GET
-    @Path("templates/{id}/xml")
-    @Produces(APPLICATION_XML)
-    String getTemplateXmlContent(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
-            throws NotConnectedRestException, IOException;
-
-    @PUT
-    @Path("templates/{id}")
-    @Consumes(APPLICATION_JSON)
-    Workflow updateTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId,
-            Workflow template) throws NotConnectedRestException, IOException;
-
-    @DELETE
-    @Path("templates/{id}")
-    void deleteTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
-            throws NotConnectedRestException, IOException;
-
-    @GET
     @Path("scripts")
     List<Script> getScripts(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException, IOException;
 
