@@ -40,8 +40,6 @@ public class FileStorageSupportFactory {
 
     private static final String USER_WORKFLOWS_PROPERTY = "studio.workflows.user.dir";
 
-    private static final String TEMPLATE_WORKFLOWS_PROPERTY = "studio.workflows.template.dir";
-
     private static final String REST_CONFIG_PATH = "config/web/settings.ini";
 
     private static volatile FileStorageSupport fileStorageSupport = createFromConfig();
@@ -55,19 +53,14 @@ public class FileStorageSupportFactory {
 
         Properties properties = getProperties();
         String userWorkflowsDir = properties.getProperty(USER_WORKFLOWS_PROPERTY, "data/defaultuser/");
-        String templateWorkflowsDir = properties.getProperty(TEMPLATE_WORKFLOWS_PROPERTY,
-                                                             "config/workflows/templates/");
 
         userWorkflowsDir = relativeToHomeIfNotAbsolute(userWorkflowsDir);
-        templateWorkflowsDir = relativeToHomeIfNotAbsolute(templateWorkflowsDir);
 
         createIfNotExists(userWorkflowsDir);
-        createIfNotExists(templateWorkflowsDir);
 
         logger.info("Web studio user workflows dir: " + userWorkflowsDir);
-        logger.info("Web studio template workflows dir: " + templateWorkflowsDir);
 
-        return new FileStorageSupport(new File(userWorkflowsDir), new File(templateWorkflowsDir));
+        return new FileStorageSupport(new File(userWorkflowsDir));
     }
 
     public static String relativeToHomeIfNotAbsolute(String path) {
