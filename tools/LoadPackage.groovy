@@ -23,8 +23,6 @@ class LoadPackage {
     private final String SCHEDULER_REST_URL
     private final String SCHEDULER_HOME
     private final String SCHEDULER_VERSION
-    private final File WORKFLOW_TEMPLATES_DIR
-    private final String WORKFLOW_TEMPLATES_DIR_PATH
     private final String CATALOG_URL
     private String sessionId
 
@@ -43,11 +41,6 @@ class LoadPackage {
         this.SCHEDULER_VERSION = org.ow2.proactive.utils.Version.PA_VERSION
         this.sessionId = binding.variables.get("pa.scheduler.session.id")
 
-        // User variables
-        this.WORKFLOW_TEMPLATES_DIR = new File(this.SCHEDULER_HOME, "config/workflows/templates")
-
-        this.WORKFLOW_TEMPLATES_DIR_PATH = this.WORKFLOW_TEMPLATES_DIR.absolutePath
-
         // Deduced variables
         this.CATALOG_URL = this.SCHEDULER_REST_URL.substring(0, this.SCHEDULER_REST_URL.length() - 4) + "catalog"
 
@@ -61,18 +54,6 @@ class LoadPackage {
         logger.info("[" + this.LOAD_PACKAGE_SCRIPT_NAME + "] " + output)
     }
 
-
-    def isAStudioTemplate(workflow_name, templates_dir_path) {
-        try {
-            new File(templates_dir_path).eachDir() { dir ->
-                if (new File(dir, "name").text == workflow_name)
-                    throw new Exception()
-            }
-            return false
-        } catch (Exception e) {
-            return true
-        }
-    }
 
     void unzipFile(src, dest) {
         def zipFile = new ZipFile(src)
@@ -140,24 +121,6 @@ class LoadPackage {
         }
     }
 
-    def getNextTemplateDirName() {
-        String template_dir_name = "1"
-        // If the wkw template dir does not exist, let's create it
-        if (!this.WORKFLOW_TEMPLATES_DIR.exists()) {
-            this.WORKFLOW_TEMPLATES_DIR.mkdirs()
-        }
-        // If it exists, let's iterate over existing templates
-        else {
-            def templates_dirs_list = []
-            new File(this.WORKFLOW_TEMPLATES_DIR_PATH).eachDir { dir ->
-                templates_dirs_list << dir.getName().toInteger()
-            }
-            if (!templates_dirs_list.isEmpty())
-                template_dir_name = (templates_dirs_list.sort().last() + 1) + ""
-        }
-        writeToOutput(" Next template dir name " + template_dir_name)
-        return template_dir_name
-    }
 
     def getHttpClientBuilder() {
         SSLContextBuilder builder = new SSLContextBuilder();
@@ -168,48 +131,6 @@ class LoadPackage {
                 sslsf);
     }
 
-
-    void populateTemplateDir(object, object_absolute_path) {
-        // Start by finding the next template dir index
-        String template_dir_name = getNextTemplateDirName()
-
-        def studio_template = object.get("studio_template")
-        if (studio_template != null) {
-            // Retrieve the studio template name
-            def studio_template_name = studio_template.get("name")
-
-            // Is the workflow already exposed as a studio template ? -------------
-            def studio_template_found = isAStudioTemplate(studio_template_name, this.WORKFLOW_TEMPLATES_DIR_PATH)
-            writeToOutput(" " + studio_template_name + " found in studio templates ? " + studio_template_found)
-
-            if (!studio_template_found) {
-                // Create a new template dir in the targeted directory and copy the workflow into it
-                def template_dir = new File(this.WORKFLOW_TEMPLATES_DIR_PATH, template_dir_name)
-                template_dir.mkdir()
-                writeToOutput("] " + template_dir.absolutePath + " created!")
-
-                // Copy the workflow into it
-                def file_dest = new File(template_dir, "job.xml")
-                def file_dest_path = file_dest.absolutePath
-                Files.copy(Paths.get(object_absolute_path), Paths.get(file_dest_path))
-                writeToOutput(" " + file_dest_path + " created!")
-
-                // Create a name file into it
-                def name_file = new File(template_dir, "name")
-                name_file.text = studio_template_name
-                writeToOutput(" " + name_file.absolutePath + " created!")
-
-                // Create the metadata file into it
-                def studio_metadata_file = new File(template_dir, "metadata")
-                studio_metadata_file.text = studio_template.get("offsets_json_string")
-                writeToOutput(" " + studio_metadata_file.absolutePath + " created!")
-
-                template_dir_name = (template_dir_name.toInteger() + 1) + ""
-            }
-
-        }
-
-    }
 
     def createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, File object_file) {
         def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
@@ -344,9 +265,6 @@ class LoadPackage {
             catalog_map.get("objects").each { object ->
                 //push object in the catalog
                 def object_file = pushObject(object, package_dir,bucket_resources_list, bucket_name)
-
-                // Expose the workflow/object as a studio template
-                populateTemplateDir(object, object_file.absolutePath)
             }
         }
     }

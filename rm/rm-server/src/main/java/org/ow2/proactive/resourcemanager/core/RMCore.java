@@ -902,6 +902,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @Override
+    public BooleanWrapper acquireNodes(String sourceName, int numberNodes, long timeout,
+            Map<String, ?> nodeConfiguration) {
+        if (this.deployedNodeSources.containsKey(sourceName)) {
+            NodeSource nodeSource = this.deployedNodeSources.get(sourceName);
+            nodeSource.acquireNodes(numberNodes, timeout, nodeConfiguration);
+            return new BooleanWrapper(true);
+        } else {
+            throw new AddingNodesException("Unknown node source " + sourceName);
+        }
+    }
+
     /**
      * Removes a node from the RM. This method also handles deploying node removal ( deploying node's url
      * follow the scheme deploying:// ). In such a case, the preempt parameter is not used.
@@ -2097,6 +2109,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return aliveNodes;
     }
 
+    @Override
+    public Set<String> listNodeUrls() {
+        return this.allNodes.keySet();
+    }
+
     /**
      * Unregisters node source from the resource manager core.
      */
@@ -3139,6 +3156,46 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         } else {
             throw new RMException("Unknown node " + nodeUrl);
         }
+    }
+
+    @Override
+    public Set<String> getNodeTags(String nodeUrl) throws RMException {
+        if (allNodes.containsKey(nodeUrl)) {
+            RMNode rmNode = allNodes.get(nodeUrl);
+            return rmNode.getNodeTags();
+        } else {
+            throw new RMException("Unknown node: " + nodeUrl);
+        }
+    }
+
+    @Override
+    public Set<String> getNodesByTag(String tag) {
+        Set<String> result = new HashSet<>();
+        for (RMNode rmNode : this.allNodes.values()) {
+            if (rmNode.getNodeTags().contains(tag)) {
+                result.add(rmNode.getNodeURL());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<String> getNodesByTags(Set<String> tags, boolean all) {
+        Set<String> result = new HashSet<>();
+        for (RMNode rmNode : this.allNodes.values()) {
+            if (all) {
+                if (rmNode.getNodeTags().containsAll(tags)) {
+                    result.add(rmNode.getNodeURL());
+                }
+            } else {
+                // include node in the result if node contains any specified tag
+                // (i.e, have common elements between the ndoe tags and specified tags)
+                if (!Collections.disjoint(rmNode.getNodeTags(), tags)) {
+                    result.add(rmNode.getNodeURL());
+                }
+            }
+        }
+        return result;
     }
 
     @Override

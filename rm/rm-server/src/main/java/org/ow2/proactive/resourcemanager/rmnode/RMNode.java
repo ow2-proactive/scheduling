@@ -30,6 +30,7 @@ import java.security.Permission;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -369,4 +370,7 @@ public interface RMNode extends Comparable<RMNode> {
 
     void setNodeTokens(String nodeUrl, List<String> tokens);
 
+    Set<String> getNodeTags();
+
+    void setNodeTags(Set<String> tags);
 }

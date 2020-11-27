@@ -35,6 +35,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -58,6 +60,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -116,6 +119,10 @@ public class RMRest implements RMRestInterface {
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
+
+    protected static final String NODE_CONFIG_TAGS_KEY = "nodeTags";
+
+    private static final int REQUESTS_INTERVAL_SECONDS = 10; // how long to wait before sending the next request
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         Session session = null;
@@ -285,6 +292,41 @@ public class RMRest implements RMRestInterface {
     public boolean nodeIsAvailable(String sessionId, String url) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.nodeIsAvailable(url).getBooleanValue();
+    }
+
+    @Override
+    public Set<String> getNodeTags(String sessionId, String url) throws NotConnectedException, RestException {
+        try {
+            ResourceManager rm = checkAccess(sessionId);
+            return rm.getNodeTags(url);
+        } catch (RMException e) {
+            throw new RestException(e);
+        }
+    }
+
+    @Override
+    public Set<String> getNodeTags(String sessionId) throws NotConnectedException, RestException {
+        try {
+            ResourceManager rm = checkAccess(sessionId);
+            Set<String> allTags = new HashSet<>();
+            for (String nodeUrl : rm.listNodeUrls()) {
+                allTags.addAll(rm.getNodeTags(nodeUrl));
+            }
+            return allTags;
+        } catch (RMException e) {
+            throw new RestException(e);
+        }
+    }
+
+    @Override
+    public Set<String> searchNodes(String sessionId, List<String> tags, boolean all)
+            throws NotConnectedException, RestException {
+        ResourceManager rm = checkAccess(sessionId);
+        if (tags == null || tags.isEmpty()) {
+            return rm.listNodeUrls();
+        } else {
+            return rm.getNodesByTags(new HashSet<>(tags), all);
+        }
     }
 
     @Override
@@ -485,6 +527,68 @@ public class RMRest implements RMRestInterface {
             throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
         return orThrowRpe(rm.getNodeSourcePingFrequency(sourceName).getIntValue());
+    }
+
+    @Override
+    public Set<String> acquireNodes(String sessionId, String sourceName, int numberNodes, boolean synchronous,
+            long timeout, String nodeConfigJson) throws NotConnectedException, RestException {
+        if (numberNodes <= 0) {
+            throw new IllegalArgumentException("invalid numberNodes: " + numberNodes);
+        }
+        ResourceManager rm = checkAccess(sessionId);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> nodeConfig;
+        try {
+            nodeConfig = mapper.readValue(nodeConfigJson, new TypeReference<Map<String, ?>>() {
+            });
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error during parsing the node configuration: " + nodeConfigJson, e);
+        }
+        if (synchronous) {
+            String acquireRequestId = UUID.randomUUID().toString();
+            setRequestIdInNodeConfig(nodeConfig, acquireRequestId);
+            rm.acquireNodes(sourceName, numberNodes, timeout * 1000, nodeConfig);
+            waitUntil(timeout,
+                      "Nodes are not deployed within the specified timeout.",
+                      () -> rm.getNodesByTag(acquireRequestId).size() == numberNodes);
+            return orThrowRpe(rm.getNodesByTag(acquireRequestId));
+        } else {
+            rm.acquireNodes(sourceName, numberNodes, timeout * 1000, nodeConfig);
+            return new HashSet<>();
+        }
+    }
+
+    private void setRequestIdInNodeConfig(Map<String, Object> nodeConfig, String acquireRequestId) {
+        String nodeTags;
+        try {
+            nodeTags = (String) nodeConfig.getOrDefault(NODE_CONFIG_TAGS_KEY, "");
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(String.format("The value of node configuration [%s] can't be casted to String",
+                                                             NODE_CONFIG_TAGS_KEY),
+                                               e);
+        }
+        if (!nodeTags.isEmpty()) {
+            nodeTags += "," + acquireRequestId;
+        } else {
+            nodeTags = acquireRequestId;
+        }
+        nodeConfig.put(NODE_CONFIG_TAGS_KEY, nodeTags);
+    }
+
+    private void waitUntil(long timeoutSeconds, String timeoutMessage, BooleanSupplier conditionToMatch)
+            throws RestException {
+        try {
+            int waitedTime = 0;
+            while (!conditionToMatch.getAsBoolean()) {
+                TimeUnit.SECONDS.sleep(REQUESTS_INTERVAL_SECONDS);
+                waitedTime += REQUESTS_INTERVAL_SECONDS;
+                if (waitedTime >= timeoutSeconds) {
+                    throw new RestException(timeoutMessage);
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -1016,5 +1120,4 @@ public class RMRest implements RMRestInterface {
             throw new PermissionRestException(e);
         }
     }
-
 }

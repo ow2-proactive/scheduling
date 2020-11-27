@@ -113,6 +113,12 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
+    public BooleanWrapper acquireNodes(String sourceName, int numberNodes, long timeout,
+            Map<String, ?> nodeConfiguration) {
+        return target.acquireNodes(sourceName, numberNodes, timeout, nodeConfiguration);
+    }
+
+    @Override
     public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
         return target.getExistingNodeSourcesList();
     }
@@ -204,6 +210,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames) {
         return target.listAliveNodeUrls(nodeSourceNames);
+    }
+
+    @Override
+    public Set<String> listNodeUrls() {
+        return target.listNodeUrls();
     }
 
     /**
@@ -491,5 +502,20 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public List<String> getNodeTokens(String nodeUrl) throws RMException {
         return target.getNodeTokens(nodeUrl);
+    }
+
+    @Override
+    public Set<String> getNodeTags(String nodeUrl) throws RMException {
+        return target.getNodeTags(nodeUrl);
+    }
+
+    @Override
+    public Set<String> getNodesByTag(String tag) {
+        return target.getNodesByTag(tag);
+    }
+
+    @Override
+    public Set<String> getNodesByTags(Set<String> tags, boolean all) {
+        return target.getNodesByTags(tags, all);
     }
 }

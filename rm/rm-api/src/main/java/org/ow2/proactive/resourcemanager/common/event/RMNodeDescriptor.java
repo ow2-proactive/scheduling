@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.common.event;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ow2.proactive.resourcemanager.common.NodeState;
 
@@ -66,6 +67,8 @@ public final class RMNodeDescriptor {
     private Map<String, String> usageInfo;
 
     private List<String> tokens;
+
+    private Set<String> tags;
 
     public String getNodeURL() {
         return nodeURL;
@@ -201,5 +204,13 @@ public final class RMNodeDescriptor {
 
     public void setTokens(List<String> tokens) {
         this.tokens = tokens;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 }
