@@ -81,7 +81,7 @@ class LoadPackages {
         writeToOutput(" Actions : ")
 
         def examples_dir = new File(this.EXAMPLES_DIR_PATH)
-        def packages_loaded_file = new File(this.SCHEDULER_HOME, "samples/packages.loaded")
+        def packages_loaded_file = new File(this.SCHEDULER_HOME, "samples/loading/packages.loaded")
 
         // If packages.loaded file already exists, do nothing
         if (packages_loaded_file.exists() && !packages_loaded_file.isDirectory()) {
@@ -91,6 +91,7 @@ class LoadPackages {
             return
         } else {
             FileUtils.deleteQuietly(examples_dir)
+            FileUtils.forceMkdirParent(packages_loaded_file)
             // Unzip the examples
             def examples_zip = new File(this.EXAMPLES_ZIP_PATH)
             if (!examples_zip.exists()) {
