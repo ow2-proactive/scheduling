@@ -32,7 +32,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ RestfulSchedulerFreezeTest.class, RestSchedulerJobPaginationTest.class,
                       RestSchedulerJobTaskTest.class, RestSchedulerKillTest.class, RestSchedulerPushPullFileTest.class,
-                      RestSchedulerTagTest.class, RestSchedulerTest.class })
+                      RestSchedulerTagTest.class, RestSchedulerTest.class, RestRMNodeTagTest.class })
 
 /**
  * @author ActiveEon Team
