@@ -188,6 +188,23 @@ public class RMNodeClient implements IRMClient, Serializable {
     }
 
     /**
+     * Acquire new nodes of a specified node source
+     *
+     * @param sourceName the name of the node source
+     * @param numberNodes the number of nodes to be acquired
+     * @param synchronous whether the request is synchronous or asynchronous, when true, the request returns the url of acquired nodes after the nodes are successfully deployed.
+     * @param timeout the maximum duration of the request, in seconds.
+     * @param nodeConfigJson the specific configuration of nodes to be acquired, in json format
+     * @return When synchronous is true, returns the url of acquired nodes after the nodes are successfully deployed.
+     *         When synchronous is false, returns immediately with an empty list.
+     */
+    public Set<String> acquireNodes(String sourceName, int numberNodes, boolean synchronous, long timeout,
+            final String nodeConfigJson) throws NotConnectedException, RestException {
+        checkNonEmptySession();
+        return rm.acquireNodes(sessionId, sourceName, numberNodes, synchronous, timeout, nodeConfigJson);
+    }
+
+    /**
      * @param url
      *            the url of the node
      * @return true if the node nodeUrl is registered (i.e. known by the RM) and not down
