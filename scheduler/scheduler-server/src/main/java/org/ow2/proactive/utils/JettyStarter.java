@@ -202,6 +202,7 @@ public class JettyStarter {
         HttpConfiguration httpConfiguration = new HttpConfiguration();
         httpConfiguration.setSendDateHeader(false);
         httpConfiguration.setSendServerVersion(false);
+        httpConfiguration.setRequestHeaderSize(WebProperties.WEB_REQUEST_HEADER_SIZE.getValueAsInt());
 
         Connector[] connectors;
 
