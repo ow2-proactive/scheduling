@@ -187,6 +187,12 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.addNode(sessionId, url, nodesource);
     }
 
+    public Set<String> acquireNodes(String sourceName, int numberNodes, boolean synchronous, long timeout,
+            final String nodeConfigJson) throws NotConnectedException, RestException {
+        checkNonEmptySession();
+        return rm.acquireNodes(sessionId, sourceName, numberNodes, synchronous, timeout, nodeConfigJson);
+    }
+
     /**
      * @param url
      *            the url of the node
