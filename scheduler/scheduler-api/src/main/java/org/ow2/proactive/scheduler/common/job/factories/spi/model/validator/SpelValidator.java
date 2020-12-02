@@ -47,16 +47,44 @@ public class SpelValidator implements Validator<String> {
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         try {
             context.getSpELContext().setVariable("value", parameterValue);
+            // register true / false functions
+            context.getSpELContext()
+                   .registerFunction("t",
+                                     ModelValidatorContext.SpELVariables.class.getDeclaredMethod("t",
+                                                                                                 new Class[] { Object.class }));
+            context.getSpELContext()
+                   .registerFunction("f",
+                                     ModelValidatorContext.SpELVariables.class.getDeclaredMethod("f",
+                                                                                                 new Class[] { Object.class }));
+            context.getSpELContext()
+                   .registerFunction("s",
+                                     ModelValidatorContext.SpELVariables.class.getDeclaredMethod("s",
+                                                                                                 new Class[] { Object.class }));
             Object untypedResult = spelExpression.getValue(context.getSpELContext());
-            if (!(untypedResult instanceof Boolean)) {
-                throw new ValidationException("SPEL expression did not return a boolean value.");
+
+            // validation can use either the 'valid' variable or the expression result as boolean
+            Boolean validVariable = null;
+            if (context.getSpELVariables() != null) {
+                validVariable = context.getSpELVariables().getValid();
             }
-            boolean evaluationResult = (Boolean) untypedResult;
+
+            if (!(untypedResult instanceof Boolean) && (validVariable == null)) {
+                throw new ValidationException("'valid' variable has not been set and SPEL expression did not return a boolean value.");
+            }
+            boolean evaluationResult;
+            if (validVariable != null) {
+                evaluationResult = validVariable;
+            } else {
+                evaluationResult = (Boolean) untypedResult;
+            }
+
             if (!evaluationResult) {
                 throw new ValidationException("SPEL expression returned false, received " + parameterValue);
             }
         } catch (EvaluationException e) {
             throw new ValidationException("SPEL expression raised an error: " + e.getMessage(), e);
+        } catch (NoSuchMethodException e) {
+            throw new ValidationException("Unexpected error: " + e.getMessage(), e);
         }
         return parameterValue;
     }
