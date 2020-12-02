@@ -65,9 +65,9 @@ public class ModelValidatorContext {
         this.space = space;
     }
 
-    public ModelValidatorContext(Map<String, Serializable> variablesValues, Scheduler scheduler,
-            SchedulerSpaceInterface space) {
-        spELVariables = new SpELVariables(variablesValues);
+    public ModelValidatorContext(Map<String, Serializable> variablesValues, Map<String, String> models,
+            Scheduler scheduler, SchedulerSpaceInterface space) {
+        spELVariables = new SpELVariables(variablesValues, models);
         spelContext = new StandardEvaluationContext(spELVariables);
         spelContext.setTypeLocator(new RestrictedTypeLocator());
         spelContext.setMethodResolvers(Collections.singletonList(new RestrictedMethodResolver()));
@@ -80,6 +80,9 @@ public class ModelValidatorContext {
         this(task.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
                                                            (m, v) -> m.put(v.getName(), v.getValue()),
                                                            HashMap<String, Serializable>::putAll),
+             task.getVariables().values().stream().collect(HashMap<String, String>::new,
+                                                           (m, v) -> m.put(v.getName(), v.getModel()),
+                                                           HashMap<String, String>::putAll),
              scheduler,
              space);
 
@@ -89,6 +92,9 @@ public class ModelValidatorContext {
         this(job.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
                                                           (m, v) -> m.put(v.getName(), v.getValue()),
                                                           HashMap<String, Serializable>::putAll),
+             job.getVariables().values().stream().collect(HashMap<String, String>::new,
+                                                          (m, v) -> m.put(v.getName(), v.getModel()),
+                                                          HashMap<String, String>::putAll),
              scheduler,
              space);
 
@@ -98,8 +104,8 @@ public class ModelValidatorContext {
         this(context, null, null);
     }
 
-    public ModelValidatorContext(Map<String, Serializable> variablesValues) {
-        this(variablesValues, null, null);
+    public ModelValidatorContext(Map<String, Serializable> variablesValues, Map<String, String> models) {
+        this(variablesValues, models, null, null);
     }
 
     public ModelValidatorContext(Task task) {
@@ -116,6 +122,10 @@ public class ModelValidatorContext {
 
     public SpELVariables getSpELVariables() {
         return spELVariables;
+    }
+
+    public void setSpELVariables(SpELVariables spELVariables) {
+        this.spELVariables = spELVariables;
     }
 
     public Scheduler getScheduler() {
@@ -140,6 +150,7 @@ public class ModelValidatorContext {
     public void updateJobWithContext(TaskFlowJob job) {
         for (JobVariable jobVariable : job.getVariables().values()) {
             jobVariable.setValue(spELVariables.getVariables().get(jobVariable.getName()).toString());
+            jobVariable.setModel(spELVariables.getModels().get(jobVariable.getName()));
         }
     }
 
@@ -149,15 +160,66 @@ public class ModelValidatorContext {
     public void updateTaskWithContext(Task task) {
         for (TaskVariable taskVariable : task.getVariables().values()) {
             taskVariable.setValue(spELVariables.getVariables().get(taskVariable.getName()).toString());
+            taskVariable.setModel(spELVariables.getModels().get(taskVariable.getName()));
         }
     }
 
-    public class SpELVariables {
+    public static class SpELVariables {
 
+        /**
+         * Can be used to access or modify variables
+         */
         private Map<String, Serializable> variables;
 
-        public SpELVariables(Map<String, Serializable> variables) {
+        /**
+         * Can be used to access or modify variables models
+         */
+        private Map<String, String> models;
+
+        /**
+         * A temporary object which can be used in SPEL expressions
+         */
+        private Object temp;
+
+        /**
+         * A temporary map which can be used in SPEL expressions
+         */
+        private Map<String, Object> tempMap;
+
+        /**
+         * The 'valid' variable can be defined to set the result of the validation (instead of returning a boolean expression)
+         */
+        private Boolean valid;
+
+        public SpELVariables(Map<String, Serializable> variables, Map<String, String> models) {
             this.variables = variables;
+            this.models = models;
+            this.tempMap = new HashMap<>();
+        }
+
+        /**
+         * Takes any expression and return true
+         * Registered as a SPEL function
+         */
+        public static boolean t(Object expression) {
+            return true;
+        }
+
+        /**
+         * Takes any expression and return false
+         * Registered as a SPEL function
+         */
+        public static boolean f(Object expression) {
+            return false;
+        }
+
+        /**
+         * Takes any expression and return an empty string
+         * This allows to sequence actions with the + operator
+         * Registered as a SPEL function
+         */
+        public static String s(Object expression) {
+            return "";
         }
 
         public Map<String, Serializable> getVariables() {
@@ -166,6 +228,38 @@ public class ModelValidatorContext {
 
         public void setVariables(Map<String, Serializable> variables) {
             this.variables = variables;
+        }
+
+        public Map<String, String> getModels() {
+            return models;
+        }
+
+        public void setModels(Map<String, String> models) {
+            this.models = models;
+        }
+
+        public Object getTemp() {
+            return temp;
+        }
+
+        public void setTemp(Object temp) {
+            this.temp = temp;
+        }
+
+        public Map<String, Object> getTempMap() {
+            return tempMap;
+        }
+
+        public void setTempMap(Map<String, Object> tempMap) {
+            this.tempMap = tempMap;
+        }
+
+        public Boolean getValid() {
+            return valid;
+        }
+
+        public void setValid(Boolean valid) {
+            this.valid = valid;
         }
     }
 }
