@@ -28,10 +28,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.Permission;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -78,6 +75,7 @@ public class RMNodeImpl extends AbstractRMNode {
     private final static Logger logger = Logger.getLogger(RMNodeImpl.class);
 
     /** HashMap associates a selection Script to its result on the node */
+
     private HashMap<SelectionScript, Integer> scriptStatus;
 
     /** ProActive Node Object of the RMNode */
@@ -105,6 +103,8 @@ public class RMNodeImpl extends AbstractRMNode {
 
     /** true if node is protected with token */
     private boolean protectedByToken = false;
+
+    private Set<String> tags;
 
     public static final String NODE_URL_BINDING = "nodeurl";
 
@@ -136,6 +136,7 @@ public class RMNodeImpl extends AbstractRMNode {
         this.node = node;
         this.nodeAccessPermission = nodeAccessPermission;
         this.scriptStatus = new HashMap<>();
+        this.tags = new HashSet<>();
     }
 
     /**
@@ -143,7 +144,8 @@ public class RMNodeImpl extends AbstractRMNode {
      * configuration information.
      */
     public RMNodeImpl(Node node, NodeSource nodeSource, String nodeName, String nodeUrl, Client provider,
-            String hostName, String[] jmxUrls, String jvmName, Permission nodeAccessPermission, NodeState state) {
+            String hostName, String[] jmxUrls, String jvmName, Permission nodeAccessPermission, NodeState state,
+            Set<String> tags) {
         super(nodeSource, nodeName, nodeUrl, provider);
 
         changeState(state);
@@ -154,6 +156,7 @@ public class RMNodeImpl extends AbstractRMNode {
         this.node = node;
         this.nodeAccessPermission = nodeAccessPermission;
         this.scriptStatus = new HashMap<>();
+        this.tags = tags;
     }
 
     /**
@@ -529,5 +532,15 @@ public class RMNodeImpl extends AbstractRMNode {
         PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
         principalPermission.setAllTokens(tokens);
         updateProtectedByToken();
+    }
+
+    @Override
+    public Set<String> getNodeTags() {
+        return this.tags;
+    }
+
+    @Override
+    public void setNodeTags(Set<String> tags) {
+        this.tags = tags;
     }
 }

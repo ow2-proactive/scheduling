@@ -127,7 +127,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_USER_SESSION_TIME("pa.scheduler.core.usersessiontime", PropertyType.INTEGER, "28800"),
 
     /** Timeout for the start task action. Time during which the scheduling could be waiting (in millis) */
-    SCHEDULER_STARTTASK_TIMEOUT("pa.scheduler.core.starttask.timeout", PropertyType.INTEGER, "5000"),
+    SCHEDULER_STARTTASK_TIMEOUT("pa.scheduler.core.starttask.timeout", PropertyType.INTEGER, "20000"),
 
     /** Maximum number of threads used for the start task action. This property defines the number of blocking resources
      * until the scheduling loop will block as well.*/

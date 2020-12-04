@@ -58,7 +58,6 @@ import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.web.WebProperties;
 
-import com.google.common.collect.Sets;
 import com.jayway.awaitility.Duration;
 
 import functionaltests.utils.ProcessStreamReader;
@@ -83,6 +82,8 @@ public class RestFuncTHelper {
     private static String restServerUrl;
 
     private static String restfulSchedulerUrl;
+
+    private static String restfulRmUrl;
 
     private static Process schedProcess;
 
@@ -155,6 +156,7 @@ public class RestFuncTHelper {
 
         restServerUrl = "https://localhost:8443/rest/";
         restfulSchedulerUrl = restServerUrl + "scheduler";
+        restfulRmUrl = restServerUrl + "rm";
 
         await().atMost(new Duration(900, TimeUnit.SECONDS)).until(restIsStarted());
     }
@@ -203,7 +205,7 @@ public class RestFuncTHelper {
             @Override
             public Boolean call() throws Exception {
                 try {
-                    String resourceUrl = getResourceUrl("version");
+                    String resourceUrl = getSchedulerResourceUrl("version");
                     HttpClient client = new HttpClientBuilder().insecure(true).useSystemProperties().build();
                     HttpResponse response = client.execute(new HttpGet(resourceUrl));
                     int statusCode = response.getStatusLine().getStatusCode();
@@ -219,6 +221,10 @@ public class RestFuncTHelper {
 
     public static Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public static ResourceManager getResourceManager() {
+        return rm;
     }
 
     public static PublicKey getSchedulerPublicKey() {
@@ -249,7 +255,7 @@ public class RestFuncTHelper {
         return RestFuncTestConfig.getInstance().getProperty(RestFuncTestConfig.RESTAPI_TEST_SCHEDULER_HOME);
     }
 
-    private static Credentials getRmCredentials() throws Exception {
+    public static Credentials getRmCredentials() throws Exception {
         File rmCredentails = new File(getRmHome(), RM_CRED_RELATIVE_PATH);
         return Credentials.getCredentials(new FileInputStream(rmCredentails));
     }
@@ -303,11 +309,22 @@ public class RestFuncTHelper {
         return restfulSchedulerUrl;
     }
 
-    public static String getResourceUrl(String resource) {
-        String restUrl = RestFuncTHelper.getRestfulSchedulerUrl();
-        if (!restUrl.endsWith("/")) {
-            restUrl = restUrl + "/";
+    public static String getRestfulRmUrl() {
+        return restfulRmUrl;
+    }
+
+    public static String getSchedulerResourceUrl(String resource) {
+        return getResourceUrl(RestFuncTHelper.getRestfulSchedulerUrl(), resource);
+    }
+
+    public static String getRmResourceUrl(String resource) {
+        return getResourceUrl(RestFuncTHelper.getRestfulRmUrl(), resource);
+    }
+
+    public static String getResourceUrl(String baseRestUrl, String resource) {
+        if (!baseRestUrl.endsWith("/")) {
+            baseRestUrl = baseRestUrl + "/";
         }
-        return restUrl + resource;
+        return baseRestUrl + resource;
     }
 }

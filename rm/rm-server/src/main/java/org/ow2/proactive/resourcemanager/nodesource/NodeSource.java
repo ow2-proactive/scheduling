@@ -516,7 +516,8 @@ public class NodeSource implements InitActive, RunActive {
                                            rmNodeData.getJmxUrls(),
                                            rmNodeData.getJvmName(),
                                            rmNodeData.getUserPermission(),
-                                           rmNodeData.getState());
+                                           rmNodeData.getState(),
+                                           rmNodeData.getTags());
         if (rmNodeData.getState().equals(NodeState.BUSY)) {
             logger.info("Node " + rmNodeData.getName() + " was found busy after scheduler recovery with owner " +
                         rmNodeData.getOwner());
@@ -670,6 +671,15 @@ public class NodeSource implements InitActive, RunActive {
         }
 
         infrastructureManager.acquireNode();
+    }
+
+    public void acquireNodes(int n, long timeout, Map<String, ?> nodeConfiguration) {
+        if (toShutdown) {
+            logger.warn("[" + name + "] acquireNodes request discarded because node source is shutting down");
+            return;
+        }
+
+        infrastructureManager.acquireNodes(n, timeout, nodeConfiguration);
     }
 
     public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {

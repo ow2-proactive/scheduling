@@ -23,20 +23,22 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests;
+package org.ow2.proactive.resourcemanager.nodesource.policy;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
-
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ RestfulSchedulerFreezeTest.class, RestSchedulerJobPaginationTest.class,
-                      RestSchedulerJobTaskTest.class, RestSchedulerKillTest.class, RestSchedulerPushPullFileTest.class,
-                      RestSchedulerTagTest.class, RestSchedulerTest.class, RestRMNodeTagTest.class })
 
 /**
- * @author ActiveEon Team
- * @since 12/01/2018
+ * A policy which does nothing. It leaves users to decide when to acquire nodes.
  */
-public class StandardTestSuite {
+public class EmptyPolicy extends NodeSourcePolicy {
+    @Override
+    public BooleanWrapper activate() {
+        return new BooleanWrapper(true);
+    }
+
+    @Override
+    public String getDescription() {
+        return "Acquire nodes upon explicit requests";
+    }
 }

@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class EncryptionValidatorTest {
     public void before() {
         Map<String, Serializable> variables = new HashMap<>();
         variables.put("foo", "value");
-        context = new ModelValidatorContext(variables);
+        context = new ModelValidatorContext(variables, Collections.emptyMap());
         context.setVariableName("foo");
     }
 

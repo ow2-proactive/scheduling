@@ -86,9 +86,27 @@ public class ExecuteForkedTaskInsideNewJvm {
         }
     }
 
+    private void createContextFile(File contextFile) throws InterruptedException {
+        int waitCounter = 0;
+        while (!contextFile.exists() && waitCounter < MAX_CONTEXT_WAIT) {
+            try {
+                waitCounter++;
+                FileUtils.forceMkdirParent(contextFile);
+                FileUtils.touch(contextFile);
+            } catch (Exception e) {
+                if (waitCounter == MAX_CONTEXT_WAIT) {
+                    throw new IllegalStateException("Cannot create " + CONTEXT_FILE + contextFile, e);
+                } else {
+                    Thread.sleep(100);
+                }
+            }
+        }
+    }
+
     // 3 called by forked
-    private void serializeTaskResult(Object result, String contextPath) throws IOException {
+    private void serializeTaskResult(Object result, String contextPath) throws IOException, InterruptedException {
         File file = new File(contextPath);
+        createContextFile(file);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             objectOutputStream.writeObject(result);
         }
