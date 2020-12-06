@@ -119,7 +119,9 @@ public enum SchedulerEvent {
     /** A job has been aborted due to a node failure, manuel kill by the user, or error policy
      * This event is only used in the JobEmailNotification to filter aborted jobs from finished jobs
      * */
-    JOB_ABORTED("Job aborted");
+    JOB_ABORTED("Job aborted"),
+    /** when the visualization is activated on a task*/
+    TASK_VISU_ACTIVATED("Task visualization activated");
     /** Name of the method */
     private String methodName;
 

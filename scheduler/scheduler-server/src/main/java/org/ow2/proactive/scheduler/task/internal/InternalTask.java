@@ -783,6 +783,22 @@ public abstract class InternalTask extends TaskState {
         this.executerInformation = executerInformation;
     }
 
+    public boolean isVisualizationActivated() {
+        return taskInfo.isVisualizationActivated();
+    }
+
+    public void setVisualizationActivated(boolean visualizationActivated) {
+        this.taskInfo.setVisualizationActivated(visualizationActivated);
+    }
+
+    public String getVisualizationConnectionString() {
+        return taskInfo.getVisualizationConnectionString();
+    }
+
+    public void setVisualizationConnectionString(String visualizationConnectionString) {
+        this.taskInfo.setVisualizationConnectionString(visualizationConnectionString);
+    }
+
     /**
      * Returns the node Exclusion group.
      *

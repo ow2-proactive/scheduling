@@ -1914,6 +1914,21 @@ public interface SchedulerRestInterface {
             throws NotConnectedRestException;
 
     /**
+     * Enable Remote Visualization for a task
+     *
+     * @param sessionId current session
+     * @param jobid     id of the job
+     * @param taskname  name of the task
+     * @param connectionString noVNC connection string
+     */
+    @PUT
+    @Path("jobs/{jobid}/tasks/{taskname}/visu")
+    @Produces("application/json")
+    void enableRemoteVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,
+            @PathParam("taskname") String taskname, @QueryParam("connectionString") String connectionString)
+            throws RestException;
+
+    /**
      * Restart a task within a job
      *
      * @param sessionId current session

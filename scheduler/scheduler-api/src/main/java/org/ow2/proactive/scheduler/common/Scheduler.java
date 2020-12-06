@@ -957,6 +957,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
+    void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException;
+
     /**
      * Try to stop the task execution represented by the given task name in the
      * given jobId.<br>

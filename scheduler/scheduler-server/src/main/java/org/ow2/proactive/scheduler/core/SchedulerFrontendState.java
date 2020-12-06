@@ -111,6 +111,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK = "You do not have permission to preempt this task !";
 
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK = "You do not have permission to enable visualization on this task !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB = "You do not have permission to kill this job !";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER = "You do not have permission to remove third-party credentials from the scheduler !";
@@ -1349,7 +1351,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         dispatchTaskStateUpdated(owner, notification);
                         break;
                     case TASK_PROGRESS:
-                        // this event can be sent while task is already finished,
+                    case TASK_VISU_ACTIVATED:
+                        // these events can be sent while task is already finished,
                         // as it is not a correct behavior, event is dropped if task is
                         // already finished.
                         // so if task is not finished, send event

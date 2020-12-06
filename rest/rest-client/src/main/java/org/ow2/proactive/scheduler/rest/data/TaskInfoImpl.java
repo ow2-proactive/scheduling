@@ -60,6 +60,10 @@ public class TaskInfoImpl implements TaskInfo {
 
     private long startTime = -1;
 
+    private boolean visualizationActivated = false;
+
+    private String visualizationConnectionString = null;
+
     private TaskStatus status = TaskStatus.SUBMITTED;
 
     private TaskId taskId;
@@ -192,4 +196,21 @@ public class TaskInfoImpl implements TaskInfo {
         return this.scheduledTime;
     }
 
+    @Override
+    public boolean isVisualizationActivated() {
+        return this.visualizationActivated;
+    }
+
+    @Override
+    public String getVisualizationConnectionString() {
+        return this.visualizationConnectionString;
+    }
+
+    public void setVisualizationActivated(boolean visualizationActivated) {
+        this.visualizationActivated = visualizationActivated;
+    }
+
+    public void setVisualizationConnectionString(String visualizationConnectionString) {
+        this.visualizationConnectionString = visualizationConnectionString;
+    }
 }

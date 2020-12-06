@@ -764,6 +764,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
         return _getScheduler().getPreciousTaskNames(jobsId);
     }
 
+    @Override
+    public void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException {
+        _getScheduler().enableRemoteVisualization(jobId, taskName, connectionString);
+    }
+
     /**
      * notify the socket disconnection
      */

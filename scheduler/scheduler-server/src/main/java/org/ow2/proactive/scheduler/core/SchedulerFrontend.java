@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core;
 
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
@@ -848,6 +849,20 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         logger.info("Request to restart in-error task " + taskName + " of job " + jobId + " received from " +
                     currentUser);
         return schedulingService.restartInErrorTask(jobIdObject, taskName);
+    }
+
+    @Override
+    @ImmediateService
+    public void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException {
+        String currentUser = frontendState.getCurrentUser();
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkPermissions("enableRemoteVisualization",
+                                       frontendState.getIdentifiedJob(jobIdObject),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK);
+        logger.info("Request to enable visualization on task " + taskName + " of job " + jobId + " received from " +
+                    currentUser);
+        schedulingService.enableRemoteVisualization(jobIdObject, taskName, connectionString);
     }
 
     /**

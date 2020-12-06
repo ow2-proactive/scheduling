@@ -522,18 +522,18 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public boolean killTask(JobId jobId, String taskName)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return killTask(jobId.value(), taskName);
     }
 
     @Override
     public boolean killTask(String jobId, String taskName)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         boolean isTaskKilled = false;
         try {
             isTaskKilled = restApi().killTask(sid, jobId, taskName);
         } catch (Exception e) {
-            throwNCEOrPE(e);
+            throwUJEOrNCEOrPEOrUTE(e);
         }
         return isTaskKilled;
     }
@@ -1287,6 +1287,16 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             return restApi().getJobContent(sid, jobId.value());
         } catch (RestException e) {
             throw RestException.unwrapRestException(e);
+        }
+    }
+
+    @Override
+    public void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException {
+        try {
+            restApi().enableRemoteVisualization(sid, jobId, taskName, connectionString);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPEOrUTE(e);
         }
     }
 
