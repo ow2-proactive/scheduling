@@ -54,6 +54,10 @@ public class TaskInfoData implements Serializable {
 
     private int numberOfExecutionOnFailureLeft;
 
+    private boolean visualizationActivated = false;
+
+    private String visualizationConnectionString = null;
+
     private int progress;
 
     public TaskIdData getTaskId() {
@@ -150,5 +154,21 @@ public class TaskInfoData implements Serializable {
 
     public void setScheduledTime(long scheduledTime) {
         this.scheduledTime = scheduledTime;
+    }
+
+    public boolean isVisualizationActivated() {
+        return visualizationActivated;
+    }
+
+    public void setVisualizationActivated(boolean visualizationActivated) {
+        this.visualizationActivated = visualizationActivated;
+    }
+
+    public String getVisualizationConnectionString() {
+        return visualizationConnectionString;
+    }
+
+    public void setVisualizationConnectionString(String visualizationConnectionString) {
+        this.visualizationConnectionString = visualizationConnectionString;
     }
 }

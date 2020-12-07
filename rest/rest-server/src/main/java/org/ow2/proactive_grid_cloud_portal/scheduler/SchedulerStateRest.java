@@ -329,6 +329,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public void enableRemoteVisualization(String sessionId, String jobId, String taskName, String connectionString)
+            throws RestException {
+        Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobId + PATH_TASKS + taskName + "/visualization");
+        Session ss = sessionStore.get(sessionId);
+        try {
+            ss.getScheduler().enableRemoteVisualization(jobId, taskName, connectionString);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (UnknownTaskException e) {
+            throw new UnknownTaskRestException(e);
+        }
+    }
+
+    @Override
     public JobResultData jobResult(String sessionId, String jobId) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/result");
