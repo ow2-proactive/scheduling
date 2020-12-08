@@ -40,10 +40,10 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
@@ -103,11 +103,20 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         SchedulerProxyUserInterface scheduler = session.getScheduler();
 
         try {
+            TaskState taskState = scheduler.getTaskState(JobIdImpl.makeJobId(jobId), taskName);
+            if (taskState != null && taskState.getTaskInfo() != null &&
+                taskState.getTaskInfo().isVisualizationActivated() &&
+                taskState.getTaskInfo().getVisualizationConnectionString() != null) {
+                List<String> connectionInfoRetrievedFromTaskState = Collections.singletonList(taskState.getTaskInfo()
+                                                                                                       .getVisualizationConnectionString());
+                return resolveVncTarget(connectionInfoRetrievedFromTaskState, jobId, taskState.getId().value());
+            }
             TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
-            List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session, jobId, taskResult);
+            List<String> paRemoteConnectionLinesRetrievedFromLogs = retrievePaRemoteConnectionLines(session,
+                                                                                                    jobId,
+                                                                                                    taskResult);
 
-            String taskId = retrieveTaskId(taskName, scheduler.getJobState(jobId));
-            return resolveVncTargetFromLogs(paRemoteConnectionLines, jobId, taskId);
+            return resolveVncTarget(paRemoteConnectionLinesRetrievedFromLogs, jobId, taskState.getId().value());
 
         } catch (NotConnectedException e) {
             LOGGER.warn("Failed to connect to scheduler", e);
@@ -121,8 +130,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return null;
     }
 
-    private InetSocketAddress resolveVncTargetFromLogs(List<String> paRemoteConnectionLines, String jobId,
-            String taskId) {
+    private InetSocketAddress resolveVncTarget(List<String> paRemoteConnectionLines, String jobId, String taskId) {
         for (String paRemoteConnectionLine : paRemoteConnectionLines) {
             String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(PA_REMOTE_CONNECTION);
             if (paRemoteConnectionArgs.length == 2) {
@@ -150,15 +158,6 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
                          "format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
         }
         LOGGER.warn("Could not find the PA_REMOTE_CONNECTION string");
-        return null;
-    }
-
-    private static String retrieveTaskId(String taskName, JobState jobState) {
-        for (TaskState taskState : jobState.getHMTasks().values()) {
-            if (taskState.getName().equals(taskName)) {
-                return taskState.getId().value();
-            }
-        }
         return null;
     }
 

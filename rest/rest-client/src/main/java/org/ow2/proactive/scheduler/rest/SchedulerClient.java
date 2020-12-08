@@ -307,6 +307,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        TaskState taskState = null;
+        try {
+            TaskStateData taskStateData = restApi().jobTask(sid, jobId.toString(), taskName);
+            taskState = new TaskStateImpl(taskStateData);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPEOrUTE(e);
+        }
+        return taskState;
+    }
+
+    @Override
     public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria criteria,
             List<SortParameter<JobSortParameter>> arg3) throws NotConnectedException, PermissionException {
         Page<JobInfo> jobInfos = null;

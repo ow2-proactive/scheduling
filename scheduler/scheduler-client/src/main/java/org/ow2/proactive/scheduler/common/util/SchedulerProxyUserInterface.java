@@ -592,6 +592,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
+    public TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return uischeduler.getTaskState(jobId, taskName);
+    }
+
+    @Override
+    @ImmediateService
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         return uischeduler.getState();
     }

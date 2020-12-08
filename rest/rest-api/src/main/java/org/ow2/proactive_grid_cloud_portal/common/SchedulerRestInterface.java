@@ -599,7 +599,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Returns a list of taskState
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -612,6 +612,21 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/taskstates")
     @Produces("application/json")
     RestPage<TaskStateData> getJobTaskStates(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId) throws RestException;
+
+    /**
+     * Returns a list of taskStates, only tasks with visualization activated
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the job id
+     * @return a list of task' states with visualization activated
+     */
+    @GET
+    @Path("jobs/{jobid}/taskstates/visualization")
+    @Produces("application/json")
+    List<TaskStateData> getJobTaskStatesWithVisualization(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws RestException;
 
     /**
