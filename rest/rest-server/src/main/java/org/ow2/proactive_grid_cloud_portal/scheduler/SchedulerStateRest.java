@@ -660,6 +660,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public List<TaskStateData> getJobTaskStatesWithVisualization(String sessionId, String jobId) throws RestException {
+        List<TaskStateData> answer = new ArrayList<>();
+        try {
+            Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/visualization");
+            JobState jobState = scheduler.getJobState(jobId);
+            for (TaskState task : jobState.getTasks()) {
+                if (task.getTaskInfo().isVisualizationActivated()) {
+                    answer.add(mapper.map(task, TaskStateData.class));
+                }
+            }
+            return answer;
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
     public RestPage<TaskStateData> getJobTaskStatesPaginated(String sessionId, String jobId, int offset, int limit)
             throws RestException {
         if (limit == -1)

@@ -560,6 +560,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        renewSession();
+        return client.getTaskState(jobId, taskName);
+    }
+
+    @Override
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         renewSession();
         return client.getState();

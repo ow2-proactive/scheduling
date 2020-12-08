@@ -1241,6 +1241,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         return frontendState.getJobState(jobId);
     }
 
+    @Override
+    public TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, PermissionException, UnknownTaskException {
+        return frontendState.getTaskState(jobId, taskName);
+    }
+
     /**
      * {@inheritDoc}
      */
