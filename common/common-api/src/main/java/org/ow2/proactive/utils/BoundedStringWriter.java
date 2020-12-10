@@ -61,19 +61,21 @@ public class BoundedStringWriter extends Writer {
     /** {@inheritDoc} */
     @Override
     public void write(char[] c, int off, int len) {
-        int nextLen = this.content.length() + len;
-        if (nextLen <= this.maxSize) {
-            this.content.append(c, off, len);
-        } else { // nextLen > this.maxSize    		
-            if (len <= this.maxSize) {
-                this.content.delete(0, nextLen - this.maxSize);
+        if (len > 0 && off >= 0) {
+            int nextLen = this.content.length() + len;
+            if (nextLen <= this.maxSize) {
                 this.content.append(c, off, len);
-            } else {
-                this.content.delete(0, this.maxSize);
-                this.content.append(c, len - this.maxSize, this.maxSize);
+            } else { // nextLen > this.maxSize
+                if (len <= this.maxSize) {
+                    this.content.delete(0, nextLen - this.maxSize);
+                    this.content.append(c, off, len);
+                } else {
+                    this.content.delete(0, this.maxSize);
+                    this.content.append(c, len - this.maxSize, this.maxSize);
+                }
             }
+            outputSink.print(new String(c, off, len));
         }
-        outputSink.print(new String(c, off, len));
     }
 
     public void setContentBuffer(StringBuilder builder) {
