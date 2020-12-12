@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -981,6 +982,12 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     @Override
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().getJobState(jobId);
+    }
+
+    @Override
+    public TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().getTaskState(jobId, taskName);
     }
 
     @Override

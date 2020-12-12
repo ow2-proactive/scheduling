@@ -605,6 +605,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException {
+        schedulerProxy.enableRemoteVisualization(jobId, taskName, connectionString);
+    }
+
+    @Override
     public boolean restartAllInErrorTasks(String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.restartAllInErrorTasks(jobId);

@@ -307,6 +307,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        TaskState taskState = null;
+        try {
+            TaskStateData taskStateData = restApi().jobTask(sid, jobId.toString(), taskName);
+            taskState = new TaskStateImpl(taskStateData);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPEOrUTE(e);
+        }
+        return taskState;
+    }
+
+    @Override
     public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria criteria,
             List<SortParameter<JobSortParameter>> arg3) throws NotConnectedException, PermissionException {
         Page<JobInfo> jobInfos = null;
@@ -522,18 +535,18 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public boolean killTask(JobId jobId, String taskName)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return killTask(jobId.value(), taskName);
     }
 
     @Override
     public boolean killTask(String jobId, String taskName)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         boolean isTaskKilled = false;
         try {
             isTaskKilled = restApi().killTask(sid, jobId, taskName);
         } catch (Exception e) {
-            throwNCEOrPE(e);
+            throwUJEOrNCEOrPEOrUTE(e);
         }
         return isTaskKilled;
     }
@@ -1287,6 +1300,16 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             return restApi().getJobContent(sid, jobId.value());
         } catch (RestException e) {
             throw RestException.unwrapRestException(e);
+        }
+    }
+
+    @Override
+    public void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException {
+        try {
+            restApi().enableRemoteVisualization(sid, jobId, taskName, connectionString);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPEOrUTE(e);
         }
     }
 

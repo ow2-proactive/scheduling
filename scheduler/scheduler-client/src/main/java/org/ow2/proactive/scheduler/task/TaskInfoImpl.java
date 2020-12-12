@@ -89,6 +89,12 @@ public class TaskInfoImpl implements TaskInfo {
     /** Number of execution left for this task in case of failure (node down) */
     private int numberOfExecutionOnFailureLeft = 1;
 
+    /** true when the visualization is activated on the task **/
+    private boolean visualizationActivated = false;
+
+    /** connection string used for visualization **/
+    private String visualizationConnectionString = null;
+
     public TaskInfoImpl() {
     }
 
@@ -110,6 +116,8 @@ public class TaskInfoImpl implements TaskInfo {
         this.executionHostName = taskInfo.getExecutionHostName();
         this.numberOfExecutionLeft = taskInfo.getNumberOfExecutionLeft();
         this.numberOfExecutionOnFailureLeft = taskInfo.getNumberOfExecutionOnFailureLeft();
+        this.visualizationActivated = taskInfo.isVisualizationActivated();
+        this.visualizationConnectionString = taskInfo.getVisualizationConnectionString();
     }
 
     /**
@@ -362,6 +370,30 @@ public class TaskInfoImpl implements TaskInfo {
      */
     public void setExecutionDuration(long executionDuration) {
         this.executionDuration = executionDuration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isVisualizationActivated() {
+        return visualizationActivated;
+    }
+
+    public void setVisualizationActivated(boolean visualizationActivated) {
+        this.visualizationActivated = visualizationActivated;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVisualizationConnectionString() {
+        return visualizationConnectionString;
+    }
+
+    public void setVisualizationConnectionString(String visualizationConnectionString) {
+        this.visualizationConnectionString = visualizationConnectionString;
     }
 
     /**

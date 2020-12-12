@@ -104,6 +104,8 @@ public class DataUtility {
         impl.setStatus(TaskStatus.valueOf(d.getTaskStatus().name()));
         impl.setName(d.getTaskId().getReadableName());
         impl.setProgress(d.getProgress());
+        impl.setVisualizationActivated(d.isVisualizationActivated());
+        impl.setVisualizationConnectionString(d.getVisualizationConnectionString());
         return impl;
     }
 

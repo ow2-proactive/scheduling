@@ -38,9 +38,11 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
@@ -62,15 +64,30 @@ public class NoVncSecuredTargetResolverTest {
     }
 
     @Before
-    public void mockSchedulerState() throws NotConnectedException, UnknownJobException, PermissionException {
+    public void mockSchedulerState()
+            throws NotConnectedException, UnknownJobException, PermissionException, UnknownTaskException {
         JobState jobState = mock(JobState.class);
         when(schedulerMock.getJobState("42")).thenReturn(jobState);
-        TaskState taskState = mock(TaskState.class);
-        when(taskState.getName()).thenReturn("remoteVisuTask");
         TaskId taskId = mock(TaskId.class);
         when(taskId.value()).thenReturn("1");
+        TaskState taskState = mock(TaskState.class);
+        when(taskState.getName()).thenReturn("remoteVisuTask");
         when(taskState.getId()).thenReturn(taskId);
+        when(schedulerMock.getTaskState(JobIdImpl.makeJobId("42"), "remoteVisuTask")).thenReturn(taskState);
         when(jobState.getHMTasks()).thenReturn(Collections.singletonMap(taskId, taskState));
+
+        JobState jobState2 = mock(JobState.class);
+        when(schedulerMock.getJobState("43")).thenReturn(jobState2);
+        TaskId taskId2 = mock(TaskId.class);
+        when(taskId2.value()).thenReturn("1");
+        TaskState taskState2 = mock(TaskState.class);
+        TaskInfo taskInfo2 = mock(TaskInfo.class);
+        when(taskState2.getTaskInfo()).thenReturn(taskInfo2);
+        when(taskState2.getName()).thenReturn("remoteVisuTask");
+        when(taskState2.getId()).thenReturn(taskId2);
+        when(schedulerMock.getTaskState(JobIdImpl.makeJobId("43"), "remoteVisuTask")).thenReturn(taskState2);
+        when(taskInfo2.isVisualizationActivated()).thenReturn(true);
+        when(taskInfo2.getVisualizationConnectionString()).thenReturn("PA_REMOTE_CONNECTION;43;1;vnc;node.grid.com:5900");
     }
 
     @Test
@@ -96,6 +113,16 @@ public class NoVncSecuredTargetResolverTest {
                                                                                                 true));
 
         InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42", "remoteVisuTask");
+
+        assertEquals(5900, targetVncHost.getPort());
+        assertEquals("node.grid.com", targetVncHost.getHostName());
+    }
+
+    @Test
+    public void testMagicStringFoundInTaskInfo() throws Exception {
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
+
+        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "43", "remoteVisuTask");
 
         assertEquals(5900, targetVncHost.getPort());
         assertEquals("node.grid.com", targetVncHost.getHostName());

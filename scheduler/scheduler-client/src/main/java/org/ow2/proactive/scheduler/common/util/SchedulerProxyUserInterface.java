@@ -438,6 +438,14 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
+    public void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException {
+        checkSchedulerConnection();
+        uischeduler.enableRemoteVisualization(jobId, taskName, connectionString);
+    }
+
+    @Override
+    @ImmediateService
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.killJob(jobId);
@@ -580,6 +588,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @ImmediateService
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.getJobState(jobId);
+    }
+
+    @Override
+    @ImmediateService
+    public TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return uischeduler.getTaskState(jobId, taskName);
     }
 
     @Override

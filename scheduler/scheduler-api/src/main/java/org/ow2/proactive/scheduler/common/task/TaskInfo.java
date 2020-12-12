@@ -152,4 +152,16 @@ public interface TaskInfo extends Serializable {
      */
     long getScheduledTime();
 
+    /**
+     * If the visualization is activated on the task
+     * @return visualization status
+     */
+    boolean isVisualizationActivated();
+
+    /**
+     * If the visualization is activated, return the connection string
+     * @return visualization connection string
+     */
+    String getVisualizationConnectionString();
+
 }

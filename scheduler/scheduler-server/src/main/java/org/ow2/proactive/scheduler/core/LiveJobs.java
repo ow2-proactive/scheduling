@@ -863,6 +863,35 @@ class LiveJobs {
         }
     }
 
+    boolean enableRemoteVisualization(JobId jobId, String taskName, String connectionString)
+            throws UnknownJobException, UnknownTaskException {
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            throw new UnknownJobException(jobId);
+        }
+        try {
+            InternalTask task = jobData.job.getTask(taskName);
+            tlogger.info(task.getId(),
+                         "Enabling Remote visualization for task " + task.getId() + " with connection string " +
+                                       connectionString);
+            if (task.getStatus() != TaskStatus.RUNNING) {
+                tlogger.warn(task.getId(),
+                             "Cannot enable visualization as the task is not currently running. Current status: " +
+                                           task.getStatus());
+                return false;
+            }
+            task.setVisualizationConnectionString(connectionString);
+            task.setVisualizationActivated(true);
+            TaskInfo ti = new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo());
+            listener.taskStateUpdated(jobData.job.getOwner(),
+                                      new NotificationData<>(SchedulerEvent.TASK_VISU_ACTIVATED, ti));
+            return true;
+
+        } finally {
+            jobData.unlock();
+        }
+    }
+
     TerminationData preemptTask(JobId jobId, String taskName, int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         JobData jobData = lockJob(jobId);

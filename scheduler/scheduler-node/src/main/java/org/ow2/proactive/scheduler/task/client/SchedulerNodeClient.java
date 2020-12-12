@@ -510,6 +510,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException {
+        client.enableRemoteVisualization(jobId, taskName, connectionString);
+    }
+
+    @Override
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.pauseJob(jobId);
@@ -551,6 +557,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.getJobState(jobId);
+    }
+
+    @Override
+    public TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        renewSession();
+        return client.getTaskState(jobId, taskName);
     }
 
     @Override

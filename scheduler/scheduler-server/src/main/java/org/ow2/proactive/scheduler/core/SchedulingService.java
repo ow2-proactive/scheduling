@@ -716,6 +716,30 @@ public class SchedulingService {
         }
     }
 
+    public boolean enableRemoteVisualization(final JobId jobId, final String taskName, final String connectionString)
+            throws UnknownJobException, UnknownTaskException {
+        try {
+            if (status.isUnusable()) {
+                return false;
+            }
+
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                return jobs.enableRemoteVisualization(jobId, taskName, connectionString);
+            }).get();
+
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof UnknownTaskException) {
+                throw (UnknownTaskException) e.getCause();
+            } else if (e.getCause() instanceof UnknownJobException) {
+                throw (UnknownJobException) e.getCause();
+            } else {
+                throw launderThrowable(e.getCause());
+            }
+        } catch (Exception e) {
+            throw launderThrowable(e);
+        }
+    }
+
     public boolean restartTask(final JobId jobId, final String taskName, final int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         try {

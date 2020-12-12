@@ -957,6 +957,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
+    void enableRemoteVisualization(String jobId, String taskName, String connectionString)
+            throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException;
+
     /**
      * Try to stop the task execution represented by the given task name in the
      * given jobId.<br>
@@ -1120,7 +1123,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Return the state of the given job.<br>
-     * The state contains informations about the job, every tasks and
+     * The state contains information about the job, every tasks and
      * informations about the tasks.<br>
      * <br>
      * A user can only get the state of HIS job.<br>
@@ -1138,6 +1141,29 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if you can't access to this particular job.
      */
     JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
+
+    /**
+     * Return the state of the given task.<br>
+     * The state contains information about a single task.<br>
+     * <br>
+     * A standard user can only get the state of HIS jobs.<br>
+     * If the job or the task does not exist, a schedulerException is sent with the proper
+     * message.
+     *
+     * @param jobId
+     *            the job on which to get the state.
+     * @param taskName
+     *            the name of the task.
+     * @return the current state of the given task
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws UnknownJobException
+     *             if the job does not exist.
+     * @throws PermissionException
+     *             if you can't access to this particular job.
+     */
+    TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
      * Get the list of job states that describe every jobs in the Scheduler. The
