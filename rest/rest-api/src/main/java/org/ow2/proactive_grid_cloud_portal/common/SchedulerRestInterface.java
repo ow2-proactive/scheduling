@@ -1387,6 +1387,31 @@ public interface SchedulerRestInterface {
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
+     * Submits a workflow to the scheduler from a workflow URL, creating hence a
+     * new job resource.
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param url
+     *            url to the workflow content
+     * @param pathSegment
+     *            variables of the workflow
+     * @param multipart
+     *            a form with the variables of the workflow
+     * @param contextInfos
+     *            the context informations (generic parameters,..)
+     * @return the <code>jobid</code> of the newly created job
+     */
+    @POST
+    @Path("{path:jobs}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
+            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart, @Context UriInfo contextInfos)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException;
+
+    /**
      * Pushes a file from the local file system into the given DataSpace
      * 
      * @param sessionId
@@ -2045,6 +2070,27 @@ public interface SchedulerRestInterface {
     public JobValidationData validateFromUrl(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("link") String url, @PathParam("path") PathSegment pathSegment)
             throws NotConnectedRestException;
+
+    /**
+     * Validates a workflow taken from a given URL
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param url
+     *            url to the workflow content
+     * @param pathSegment
+     *            variables of the workflow
+     * @param multipart
+     *            a form with the variables of the workflow
+     * @return the result of job validation
+     */
+    @POST
+    @Path("{path:validateurl}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public JobValidationData validateFromUrl(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("link") String url, @PathParam("path") PathSegment pathSegment,
+            MultipartFormDataInput multipart) throws NotConnectedRestException;
 
     @POST
     @Path("/credentials/{key}")

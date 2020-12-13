@@ -59,6 +59,7 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.websocket.WebSocketEventListenerAdapter;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -96,7 +97,6 @@ import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl;
-import org.ow2.proactive_grid_cloud_portal.dataspace.SchedulerDataspaceImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
@@ -117,13 +117,13 @@ import com.google.common.base.Charsets;
 @Path("/scheduler/")
 public class SchedulerStateRest implements SchedulerRestInterface {
 
+    private static final Logger logger = ProActiveLogger.getLogger(SchedulerStateRest.class);
+
     /**
      * If the rest api was unable to instantiate the value from byte array
      * representation
      */
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
-
-    private static final Logger logger = ProActiveLogger.getLogger(SchedulerStateRest.class);
 
     private static final String ATM_BROADCASTER_ID = "atmosphere.broadcaster.id";
 
@@ -132,6 +132,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private static final String NL = System.getProperty("line.separator");
 
     public static final String YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the scheduler, you should log on first";
+
+    private static final String VARIABLES_KEY = "variables";
 
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
@@ -1352,6 +1354,56 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public JobIdData submitFromUrl(String sessionId, String url, PathSegment pathSegment,
+            MultipartFormDataInput multipart, UriInfo contextInfos) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
+        Scheduler scheduler = checkAccess(sessionId, "jobs");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        File tmpWorkflowFile = null;
+        try {
+            String jobXml = downloadWorkflowContent(sessionId, url);
+            tmpWorkflowFile = File.createTempFile("job", "d");
+            JobId jobId;
+            try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
+                IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
+
+                // Get the job submission variables from pathSegment
+                Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+                // Get job variables from multipart
+                if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
+                    InputPart jobVariablesInputPart = multipart.getFormDataMap().get(VARIABLES_KEY).get(0);
+                    InputStream jobVariablesInputStream = jobVariablesInputPart.getBody(new GenericType<InputStream>() {
+                    });
+                    Map<String, String> jobVariablesFromMultipart = new ObjectMapper().readValue(jobVariablesInputStream,
+                                                                                                 Map.class);
+
+                    if (jobVariables != null) {
+                        jobVariables.putAll(jobVariablesFromMultipart);
+                    } else {
+                        jobVariables = jobVariablesFromMultipart;
+                    }
+                }
+
+                // Get the job submission generic infos
+                Map<String, String> genericInfos = null;
+                if (contextInfos != null)
+                    genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
+
+                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+                jobId = workflowSubmitter.submit(tmpWorkflowFile, jobVariables, genericInfos);
+            }
+
+            return mapper.map(jobId, JobIdData.class);
+        } catch (IOException e) {
+            throw new IOException("Cannot save temporary job file on submission: " + e.getMessage(), e);
+        } finally {
+            FileUtils.deleteQuietly(tmpWorkflowFile);
+        }
+    }
+
+    @Override
     public JobIdData submit(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart,
             UriInfo contextInfos) throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
             SubmissionClosedRestException, IOException {
@@ -1359,13 +1411,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler scheduler = checkAccess(sessionId, "submit");
             SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
-            Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
-
-            String name = formDataMap.keySet().iterator().next();
             File tmpJobFile = null;
             try {
 
-                InputPart part1 = multipart.getFormDataMap().get(name).get(0); // "file"
+                List<InputPart> jobVariablesListInputPart = multipart.getFormDataMap().remove(VARIABLES_KEY);
+
+                InputPart part1 = multipart.getFormDataMap().values().iterator().next().get(0); // "file"
 
                 String fileType = part1.getMediaType().toString().toLowerCase();
                 if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase()) &&
@@ -1386,6 +1437,21 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
                     // Get the job submission variables
                     Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+                    // Get job variables from multipart
+                    if (jobVariablesListInputPart != null) {
+                        InputStream jobVariablesInputStream = jobVariablesListInputPart.get(0)
+                                                                                       .getBody(new GenericType<InputStream>() {
+                                                                                       });
+                        Map<String, String> jobVariablesFromMultipart = new ObjectMapper().readValue(jobVariablesInputStream,
+                                                                                                     Map.class);
+
+                        if (jobVariables != null) {
+                            jobVariables.putAll(jobVariablesFromMultipart);
+                        } else {
+                            jobVariables = jobVariablesFromMultipart;
+                        }
+                    }
 
                     // Get the job submission generic infos
                     Map<String, String> genericInfos = null;
@@ -1441,7 +1507,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         Map<String, Object> requestBody = new HashMap<>(2);
-        requestBody.put("variables", jobVariables);
+        requestBody.put(VARIABLES_KEY, jobVariables);
         requestBody.put("xmlContentString", jobContentXmlString.entrySet().iterator().next().getValue());
 
         Response response = null;
@@ -2020,19 +2086,41 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 scheduler = checkAccess(sessionId);
                 space = getSpaceInterface(sessionId);
             }
-            Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
-            String name = formDataMap.keySet().iterator().next();
-            InputPart part1 = formDataMap.get(name).get(0);
-            InputStream is = part1.getBody(new GenericType<InputStream>() {
 
-            });
+            List<InputPart> jobVariablesListInputPart = multipart.getFormDataMap().remove(VARIABLES_KEY);
 
+            // Get job from multipart
+            InputStream is = multipart.getFormDataMap()
+                                      .values()
+                                      .iterator()
+                                      .next()
+                                      .get(0)
+                                      .getBody(new GenericType<InputStream>() {
+                                      });
+
+            // Write job to file
             tmpFile = File.createTempFile("valid-job", "d");
             Map<String, String> jobVariables;
             try (OutputStream outputStream = new FileOutputStream(tmpFile)) {
                 IOUtils.copy(is, outputStream);
 
+                // Get the job variables
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+                // Get job variables from multipart
+                if (jobVariablesListInputPart != null) {
+                    InputStream jobVariablesInputStream = jobVariablesListInputPart.get(0)
+                                                                                   .getBody(new GenericType<InputStream>() {
+                                                                                   });
+                    Map<String, String> jobVariablesFromMultipart = new ObjectMapper().readValue(jobVariablesInputStream,
+                                                                                                 Map.class);
+
+                    if (jobVariables != null) {
+                        jobVariables.putAll(jobVariablesFromMultipart);
+                    } else {
+                        jobVariables = jobVariablesFromMultipart;
+                    }
+                }
             }
 
             return ValidationUtil.validateJobDescriptor(tmpFile, jobVariables, scheduler, space);
@@ -2068,6 +2156,52 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
 
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+            }
+
+            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler, space);
+
+        } catch (JobCreationRestException | IOException e) {
+            JobValidationData validation = new JobValidationData();
+            validation.setErrorMessage("Error while reading workflow at url: " + url);
+            validation.setStackTrace(getStackTrace(e));
+            return validation;
+        } finally {
+            FileUtils.deleteQuietly(tmpWorkflowFile);
+        }
+    }
+
+    @Override
+    public JobValidationData validateFromUrl(String sessionId, String url, PathSegment pathSegment,
+            MultipartFormDataInput multipart) throws NotConnectedRestException {
+
+        File tmpWorkflowFile = null;
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+            String jobXml = downloadWorkflowContent(sessionId, url);
+            tmpWorkflowFile = File.createTempFile("job", "d");
+            Map<String, String> jobVariables;
+            try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
+                IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
+
+                // Get the job submission variables from pathSegment
+                jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+                // Get job variables from multipart
+                if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
+                    InputPart jobVariablesPart = multipart.getFormDataMap().get(VARIABLES_KEY).get(0);
+                    InputStream jobVariablesPartIs = jobVariablesPart.getBody(new GenericType<InputStream>() {
+                    });
+                    Map<String, String> jobVariablesFromMultipart = new ObjectMapper().readValue(jobVariablesPartIs,
+                                                                                                 Map.class);
+
+                    if (jobVariables != null) {
+                        jobVariables.putAll(jobVariablesFromMultipart);
+                    } else {
+                        jobVariables = jobVariablesFromMultipart;
+                    }
+                }
+
             }
 
             return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler, space);
