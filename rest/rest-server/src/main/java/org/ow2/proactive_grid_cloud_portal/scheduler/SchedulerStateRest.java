@@ -1413,10 +1413,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             File tmpJobFile = null;
             try {
-
+                // In multipart, we can find the "variables" key for job variables, AND/OR ...
+                // ... "job.xml" for a job submitted from the studio OR "file" for a job submitted by job planner
+                // remove and take the "variables" key before
                 List<InputPart> jobVariablesListInputPart = multipart.getFormDataMap().remove(VARIABLES_KEY);
 
-                InputPart part1 = multipart.getFormDataMap().values().iterator().next().get(0); // "file"
+                // Get job from multipart
+                InputPart part1 = multipart.getFormDataMap().values().iterator().next().get(0);
 
                 String fileType = part1.getMediaType().toString().toLowerCase();
                 if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase()) &&
@@ -2086,7 +2089,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 scheduler = checkAccess(sessionId);
                 space = getSpaceInterface(sessionId);
             }
-
+            // In multipart, we can find the "variables" key for job variables, AND/OR ...
+            // ... "job.xml" for a job submitted from the studio OR "file" for a job submitted by job planner
+            // remove and take the "variables" key before
             List<InputPart> jobVariablesListInputPart = multipart.getFormDataMap().remove(VARIABLES_KEY);
 
             // Get job from multipart
