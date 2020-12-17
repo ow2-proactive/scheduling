@@ -80,6 +80,10 @@ import com.google.common.net.UrlEscapers;
 
 public class SchedulerRestClient {
 
+    public static final String VARIABLES_KEY = "variables";
+
+    public static final String FILE_KEY = "file";
+
     private SchedulerRestInterface scheduler;
 
     private String restEndpointURL;
@@ -478,13 +482,6 @@ public class SchedulerRestClient {
 
         ResteasyWebTarget target = client.target(uriTmpl);
 
-        // Variables
-        if (variables != null) {
-            for (String key : variables.keySet()) {
-                target = target.matrixParam(key, variables.get(key));
-            }
-        }
-
         // Generic infos
         if (genericInfos != null) {
             for (String key : genericInfos.keySet()) {
@@ -492,8 +489,21 @@ public class SchedulerRestClient {
             }
         }
 
+        // Multipart form
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
-        formData.addFormData("file", job, mediaType);
+        // Add job to multipart
+        formData.addFormData(FILE_KEY, job, mediaType);
+        // Add variables to multipart
+        if (variables != null && variables.size() > 0) {
+            try {
+                String variablesJson = new ObjectMapper().writeValueAsString(variables);
+                InputStream variablesInputStream = new ByteArrayInputStream(variablesJson.getBytes());
+                formData.addFormData(VARIABLES_KEY, variablesInputStream, MediaType.APPLICATION_JSON_TYPE);
+            } catch (IOException e) {
+                throwException(e.getMessage(), Response.serverError().build());
+            }
+        }
+        //  Multipart form entity
         GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(formData) {
         };
 
