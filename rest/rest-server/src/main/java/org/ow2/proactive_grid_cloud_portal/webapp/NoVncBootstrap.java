@@ -34,6 +34,7 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import com.netiq.websockify.WebsockifyServer;
 
@@ -53,7 +54,7 @@ public class NoVncBootstrap implements ServletContextListener, HttpSessionListen
 
             int port = PortalConfiguration.NOVNC_PORT.getValueAsInt();
             WebsockifyServer.SSLSetting sslSetting = WebsockifyServer.SSLSetting.valueOf(PortalConfiguration.NOVNC_SECURED.getValueAsString());
-            String keystorePath = PortalConfiguration.NOVNC_KEYSTORE.getValueAsString();
+            String keystorePath = PortalConfiguration.getAbsolutePath(PortalConfiguration.NOVNC_KEYSTORE.getValueAsString());
             String password = PortalConfiguration.NOVNC_PASSWORD.getValueAsString();
             String keyPassword = PortalConfiguration.NOVNC_KEYPASSWORD.getValueAsString();
 
@@ -66,7 +67,20 @@ public class NoVncBootstrap implements ServletContextListener, HttpSessionListen
                                    keyPassword,
                                    null); // not used parameter
 
-            LOGGER.info("noVNC websocket proxy started");
+            String noVncProxyUrl = null;
+            if (PortalConfiguration.NOVNC_URL.isSet()) {
+                noVncProxyUrl = PortalConfiguration.NOVNC_URL.getValueAsString();
+            } else if (PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+                String schedulerRestUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
+                int portIndex = schedulerRestUrl.lastIndexOf(":");
+                String baseUrl = schedulerRestUrl.substring(0, portIndex);
+                noVncProxyUrl = baseUrl + ":" + port;
+                PortalConfiguration.NOVNC_URL.updateProperty(noVncProxyUrl);
+            } else {
+                LOGGER.warn("Cannot determine NoVNC proxy url");
+            }
+
+            LOGGER.info("noVNC websocket proxy started at " + noVncProxyUrl);
         }
     }
 
