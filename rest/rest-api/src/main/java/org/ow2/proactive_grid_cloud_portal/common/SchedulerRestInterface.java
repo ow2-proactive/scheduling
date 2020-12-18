@@ -2135,7 +2135,7 @@ public interface SchedulerRestInterface {
     public Map<Object, Object> getPortalConfiguration(@HeaderParam("sessionid") String sessionId) throws RestException;
 
     /**
-     * returns scheduler properties
+     * returns scheduler properties and web properties in a single map
      *
      * @param sessionId
      *            the session id associated to this new connection

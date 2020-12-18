@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.webapp;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.ow2.proactive.core.properties.PACommonProperties;
 import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
@@ -167,6 +168,13 @@ public enum PortalConfiguration implements PACommonProperties {
                 return pathName.getAbsolutePath();
             }
         }
+    }
+
+    /**
+     * Return all properties as a HashMap.
+     */
+    public static Map<String, Object> getPropertiesAsHashMap() {
+        return propertiesHelper.getPropertiesAsHashMap();
     }
 
     /**
