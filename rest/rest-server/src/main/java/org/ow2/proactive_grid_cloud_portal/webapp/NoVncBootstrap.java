@@ -25,6 +25,14 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSessionAttributeListener;
@@ -33,8 +41,10 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.web.WebProperties;
 
 import com.netiq.websockify.WebsockifyServer;
 
@@ -70,17 +80,27 @@ public class NoVncBootstrap implements ServletContextListener, HttpSessionListen
             String noVncProxyUrl = null;
             if (PortalConfiguration.NOVNC_URL.isSet()) {
                 noVncProxyUrl = PortalConfiguration.NOVNC_URL.getValueAsString();
-            } else if (PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-                String schedulerRestUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
-                int portIndex = schedulerRestUrl.lastIndexOf(":");
-                String baseUrl = schedulerRestUrl.substring(0, portIndex);
-                noVncProxyUrl = baseUrl + ":" + port;
+            } else if (websocketProxy.getChannel().isBound()) {
+                String protocol = "http://";
+                if (WebProperties.WEB_HTTPS.getValueAsBoolean() &&
+                    (sslSetting == WebsockifyServer.SSLSetting.ON ||
+                     sslSetting == WebsockifyServer.SSLSetting.REQUIRED)) {
+
+                    // Testing that the keystore configuration is correct, otherwise NoVNC will not accept https connections
+                    try {
+                        websocketProxy.validateKeystore(keystorePath, password, keyPassword);
+                        protocol = "https://";
+                    } catch (Exception e) {
+                        LOGGER.warn("NoVNC keystore invalid", e);
+                    }
+                }
+                noVncProxyUrl = protocol + ProActiveInet.getInstance().getHostname() + ":" + port;
                 PortalConfiguration.NOVNC_URL.updateProperty(noVncProxyUrl);
             } else {
                 LOGGER.warn("Cannot determine NoVNC proxy url");
             }
 
-            LOGGER.info("noVNC websocket proxy started at " + noVncProxyUrl);
+            LOGGER.info("NoVNC websocket proxy started at " + noVncProxyUrl);
         }
     }
 
