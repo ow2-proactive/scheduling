@@ -1374,16 +1374,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
                 // Get job variables from multipart
                 if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
-                    InputPart jobVariablesInputPart = multipart.getFormDataMap().get(VARIABLES_KEY).get(0);
-                    InputStream jobVariablesInputStream = jobVariablesInputPart.getBody(new GenericType<InputStream>() {
-                    });
-                    Map<String, String> jobVariablesFromMultipart = new ObjectMapper().readValue(jobVariablesInputStream,
-                                                                                                 Map.class);
+                    Map<String, String> variablesFromMultipart = multipart.getFormDataPart(VARIABLES_KEY,
+                                                                                           new GenericType<Map<String, String>>() {
+                                                                                           });
 
                     if (jobVariables != null) {
-                        jobVariables.putAll(jobVariablesFromMultipart);
+                        jobVariables.putAll(variablesFromMultipart);
                     } else {
-                        jobVariables = jobVariablesFromMultipart;
+                        jobVariables = variablesFromMultipart;
                     }
                 }
 
@@ -1416,8 +1414,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             try {
                 // In multipart, we can find the "variables" key for job variables, AND/OR ...
                 // ... "job.xml" for a job submitted from the studio OR "file" for a job submitted by job planner
-                // remove and take the "variables" key before
-                List<InputPart> jobVariablesListInputPart = multipart.getFormDataMap().remove(VARIABLES_KEY);
+                // take and remove the "variables" key before
+                Map<String, String> variablesFromMultipart = null;
+                if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
+                    variablesFromMultipart = multipart.getFormDataPart(VARIABLES_KEY,
+                                                                       new GenericType<Map<String, String>>() {
+                                                                       });
+                    multipart.getFormDataMap().remove(VARIABLES_KEY);
+                }
 
                 // Get job from multipart
                 InputPart part1 = multipart.getFormDataMap().values().iterator().next().get(0);
@@ -1442,18 +1446,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     // Get the job submission variables
                     Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-                    // Get job variables from multipart
-                    if (jobVariablesListInputPart != null) {
-                        InputStream jobVariablesInputStream = jobVariablesListInputPart.get(0)
-                                                                                       .getBody(new GenericType<InputStream>() {
-                                                                                       });
-                        Map<String, String> jobVariablesFromMultipart = new ObjectMapper().readValue(jobVariablesInputStream,
-                                                                                                     Map.class);
+                    // Add multipart variables to variables
+                    if (variablesFromMultipart != null) {
 
                         if (jobVariables != null) {
-                            jobVariables.putAll(jobVariablesFromMultipart);
+                            jobVariables.putAll(variablesFromMultipart);
                         } else {
-                            jobVariables = jobVariablesFromMultipart;
+                            jobVariables = variablesFromMultipart;
                         }
                     }
 
@@ -2092,8 +2091,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             // In multipart, we can find the "variables" key for job variables, AND/OR ...
             // ... "job.xml" for a job submitted from the studio OR "file" for a job submitted by job planner
-            // remove and take the "variables" key before
-            List<InputPart> jobVariablesListInputPart = multipart.getFormDataMap().remove(VARIABLES_KEY);
+            // take and remove the "variables" key before
+            Map<String, String> variablesFromMultipart = null;
+            if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
+                variablesFromMultipart = multipart.getFormDataPart(VARIABLES_KEY,
+                                                                   new GenericType<Map<String, String>>() {
+                                                                   });
+                multipart.getFormDataMap().remove(VARIABLES_KEY);
+            }
 
             // Get job from multipart
             InputStream is = multipart.getFormDataMap()
@@ -2113,18 +2118,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 // Get the job variables
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-                // Get job variables from multipart
-                if (jobVariablesListInputPart != null) {
-                    InputStream jobVariablesInputStream = jobVariablesListInputPart.get(0)
-                                                                                   .getBody(new GenericType<InputStream>() {
-                                                                                   });
-                    Map<String, String> jobVariablesFromMultipart = new ObjectMapper().readValue(jobVariablesInputStream,
-                                                                                                 Map.class);
+                // Add multipart variables to variables
+                if (variablesFromMultipart != null) {
 
                     if (jobVariables != null) {
-                        jobVariables.putAll(jobVariablesFromMultipart);
+                        jobVariables.putAll(variablesFromMultipart);
                     } else {
-                        jobVariables = jobVariablesFromMultipart;
+                        jobVariables = variablesFromMultipart;
                     }
                 }
             }
@@ -2195,16 +2195,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
                 // Get job variables from multipart
                 if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
-                    InputPart jobVariablesPart = multipart.getFormDataMap().get(VARIABLES_KEY).get(0);
-                    InputStream jobVariablesPartIs = jobVariablesPart.getBody(new GenericType<InputStream>() {
-                    });
-                    Map<String, String> jobVariablesFromMultipart = new ObjectMapper().readValue(jobVariablesPartIs,
-                                                                                                 Map.class);
+                    Map<String, String> variablesFromMultipart = multipart.getFormDataPart(VARIABLES_KEY,
+                                                                                           new GenericType<Map<String, String>>() {
+                                                                                           });
 
                     if (jobVariables != null) {
-                        jobVariables.putAll(jobVariablesFromMultipart);
+                        jobVariables.putAll(variablesFromMultipart);
                     } else {
-                        jobVariables = jobVariablesFromMultipart;
+                        jobVariables = variablesFromMultipart;
                     }
                 }
 

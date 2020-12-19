@@ -495,13 +495,7 @@ public class SchedulerRestClient {
         formData.addFormData(FILE_KEY, job, mediaType);
         // Add variables to multipart
         if (variables != null && variables.size() > 0) {
-            try {
-                String variablesJson = new ObjectMapper().writeValueAsString(variables);
-                InputStream variablesInputStream = new ByteArrayInputStream(variablesJson.getBytes());
-                formData.addFormData(VARIABLES_KEY, variablesInputStream, MediaType.APPLICATION_JSON_TYPE);
-            } catch (IOException e) {
-                throwException(e.getMessage(), Response.serverError().build());
-            }
+            formData.addFormData(VARIABLES_KEY, variables, MediaType.APPLICATION_JSON_TYPE);
         }
         //  Multipart form entity
         GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(formData) {
