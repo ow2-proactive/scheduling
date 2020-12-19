@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.webapp;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.ow2.proactive.core.properties.PACommonProperties;
 import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
@@ -69,11 +70,15 @@ public enum PortalConfiguration implements PACommonProperties {
 
     NOVNC_SECURED("novnc.secured", PropertyType.STRING, "ON"),
 
-    NOVNC_KEYSTORE("novnc.keystore", PropertyType.STRING, "keystore.jks"),
+    NOVNC_KEYSTORE("novnc.keystore", PropertyType.STRING, "config/web/keystore"),
 
-    NOVNC_PASSWORD("novnc.password", PropertyType.STRING, "password"),
+    NOVNC_PASSWORD("novnc.password", PropertyType.STRING, "activeeon"),
 
-    NOVNC_KEYPASSWORD("novnc.keypassword", PropertyType.STRING, "password"),
+    NOVNC_KEYPASSWORD("novnc.keypassword", PropertyType.STRING, "activeeon"),
+
+    // Url of the NoVNC proxy, created automatically when the NoBNC proxy is started.
+    // the property can be defined manually if the ProActive server is behind a reverse proxy
+    NOVNC_URL("novnc.url", PropertyType.STRING),
 
     JOBPLANNER_URL("jp.url", PropertyType.STRING, "http://localhost:8080/job-planner/planned_jobs");
 
@@ -163,6 +168,13 @@ public enum PortalConfiguration implements PACommonProperties {
                 return pathName.getAbsolutePath();
             }
         }
+    }
+
+    /**
+     * Return all properties as a HashMap.
+     */
+    public static Map<String, Object> getPropertiesAsHashMap() {
+        return propertiesHelper.getPropertiesAsHashMap();
     }
 
     /**

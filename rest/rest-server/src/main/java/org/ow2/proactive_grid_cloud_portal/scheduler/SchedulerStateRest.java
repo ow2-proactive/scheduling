@@ -91,6 +91,7 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.web.WebProperties;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
@@ -2509,6 +2510,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Map<String, Object> schedulerProperties;
         try {
             schedulerProperties = scheduler.getSchedulerProperties();
+            schedulerProperties.putAll(WebProperties.getPropertiesAsHashMap());
+            schedulerProperties.putAll(PortalConfiguration.getPropertiesAsHashMap());
 
         } catch (SchedulerException e) {
             logger.warn("Attempt to retrieve scheduler properties but failed because connection exception", e);
