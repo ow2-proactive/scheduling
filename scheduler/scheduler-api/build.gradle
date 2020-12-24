@@ -15,6 +15,12 @@ dependencies {
 
     compile project(':common:common-api')
 
+    //=========================================================================================
+    compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
+    compile 'org.codehaus.groovy:groovy-all:2.4.12'
+    compile 'org.fusesource.jdbm:jdbm:2.0.1'
+     //=========================================================================================
+
     compile 'org.apache.commons:commons-lang3:3.5'
 
     runtime 'com.fasterxml.woodstox:woodstox-core:5.0.1'
@@ -49,6 +55,8 @@ task convertSchemas
 }
 
 task stub(type: StubTask) {
-    classes = ['org.ow2.proactive.scheduler.common.Scheduler', 'org.ow2.proactive.scheduler.synchronization.SynchronizationInternal']
+    classes = ['org.ow2.proactive.scheduler.common.Scheduler',
+               'org.ow2.proactive.scheduler.synchronization.SynchronizationInternal',
+               'org.ow2.proactive.scheduler.synchronization.AOSynchronization']
 }
 serialver.dependsOn stub

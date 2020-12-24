@@ -73,7 +73,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
@@ -82,7 +81,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 
 
 @Path("/scheduler/")
