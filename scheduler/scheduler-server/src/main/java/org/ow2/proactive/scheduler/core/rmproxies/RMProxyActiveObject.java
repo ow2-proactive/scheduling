@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
+import org.ow2.proactive.scheduler.signal.Signal;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
@@ -167,13 +168,21 @@ public class RMProxyActiveObject {
      */
     @ImmediateService
     public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store) {
+            Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store,
+            Signal signalAPI) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes).booleanValue();
                 closeTaskLogger(taskId);
             } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript)) {
-                handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId, creds, store);
+                handleCleaningScript(nodes,
+                                     cleaningScript,
+                                     variables,
+                                     genericInformation,
+                                     taskId,
+                                     creds,
+                                     store,
+                                     signalAPI);
             } else {
                 TaskLogger.getInstance().error(taskId,
                                                "Unauthorized clean script: " + System.getProperty("line.separator") +
@@ -203,7 +212,8 @@ public class RMProxyActiveObject {
      * @param creds credentials with CredData containing third party credentials
      */
     private void handleCleaningScript(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store) {
+            Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store,
+            Signal signalAPI) {
         TaskLogger instance = TaskLogger.getInstance();
 
         try {
@@ -241,6 +251,7 @@ public class RMProxyActiveObject {
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) resolvedMap);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
             handler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME, store);
+            handler.addBinding(SchedulerConstants.SIGNAL_API_BINDING_NAME, signalAPI);
 
             //retrieve scheduler URL to bind with schedulerapi, globalspaceapi, and userspaceapi
             String schedulerUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();

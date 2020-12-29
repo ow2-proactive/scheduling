@@ -69,6 +69,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.signal.SignalWrapper;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
@@ -705,6 +706,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                          (Serializable) new SynchronizationWrapper(job.getOwner(),
                                                                    task.getId(),
                                                                    service.getSynchronizationAPI()));
+
+            bindings.put(SchedulerConstants.SIGNAL_API_BINDING_NAME,
+                         (Serializable) new SignalWrapper(job.getOwner(),
+                                                          task.getId(),
+                                                          service.getSynchronizationAPI()));
         }
         return bindings;
     }

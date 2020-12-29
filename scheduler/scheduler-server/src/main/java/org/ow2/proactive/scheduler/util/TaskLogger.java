@@ -32,6 +32,7 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.utils.appenders.FileAppender;
 
 
 public class TaskLogger {

@@ -796,4 +796,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
         return (_getScheduler()).checkJobPermissionMethod(sessionId, jobId, method);
     }
 
+    @Override
+    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+        return (_getScheduler()).addJobSignal(sessionId, jobId, signal);
+    }
+
 }

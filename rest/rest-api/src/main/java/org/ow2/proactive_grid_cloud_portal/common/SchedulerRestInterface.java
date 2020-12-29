@@ -2157,4 +2157,17 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     boolean checkJobPermissionMethod(@HeaderParam("sessionid") String sessionId, @PathParam("method") String method,
             @PathParam("jobid") String jobId) throws RestException;
+
+    /**
+     *
+     * Add a signal to the list of signals used by the considered job
+     *
+     * @return true if the given signal is added to the list of job signals
+     */
+    @POST
+    @Path("job/{jobid}/signals")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces("application/json")
+    boolean addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
+            @PathParam("jobid") String jobId) throws RestException;
 }

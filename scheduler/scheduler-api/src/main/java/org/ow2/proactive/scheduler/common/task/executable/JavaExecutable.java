@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.signal.Signal;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scripting.helper.progress.ProgressFile;
@@ -66,6 +67,8 @@ public abstract class JavaExecutable {
     private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
 
     private Synchronization synchronizationAPI;
+
+    private Signal signalAPI;
 
     /**
      * Initialize the executable using the given executable Initializer.
@@ -171,6 +174,7 @@ public abstract class JavaExecutable {
 
     public void initAPIs(ScriptContext sc) {
         this.synchronizationAPI = (Synchronization) sc.getAttribute(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME);
+        this.signalAPI = (Signal) sc.getAttribute(SchedulerConstants.SIGNAL_API_BINDING_NAME);
     }
 
     /**
@@ -348,4 +352,9 @@ public abstract class JavaExecutable {
     public Synchronization getSynchronizationAPI() {
         return this.synchronizationAPI;
     }
+
+    public Signal getSignalAPI() {
+        return this.signalAPI;
+    }
+
 }

@@ -91,6 +91,17 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException;
 
     /**
+     * Check if the user has the permission to execute the method passed as argument
+     * @param sessionId
+     * @param jobId
+     * @param signal
+     * @return true if the signal is added to the list of signals used by the considered job
+     * @throws NotConnectedException
+     * @throws UnknownJobException
+     */
+    boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException;
+
+    /**
      * Returns the USER DataSpace URIs associated with the current user
      * 
      * @return USER Space URIs (one element for each available protocol)

@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
+import org.ow2.proactive.scheduler.signal.Signal;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scripting.Script;
 
@@ -124,6 +125,8 @@ public class TaskLauncherInitializer implements Serializable {
     private ForkEnvironment forkEnvironment;
 
     private Synchronization synchronizationAPI;
+
+    private Signal signalAPI;
 
     /**
      * Get the taskId
@@ -520,6 +523,14 @@ public class TaskLauncherInitializer implements Serializable {
 
     public void setSynchronizationAPI(Synchronization synchronizationAPI) {
         this.synchronizationAPI = synchronizationAPI;
+    }
+
+    public Signal getSignalAPI() {
+        return signalAPI;
+    }
+
+    public void setSignalAPI(Signal signalAPI) {
+        this.signalAPI = signalAPI;
     }
 
 }
