@@ -111,8 +111,7 @@ import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
 public class RMRest implements RMRestInterface {
 
     protected static final String[] dataSources = { "AvailableNodesCount", "FreeNodesCount", "NeededNodesCount",
-                                                    "BusyNodesCount", "DeployingNodesCount", "ConfigNodesCount",
-                                                    // it is Config and not Configuring because RRDDataStore limits name 20 characters
+                                                    "BusyNodesCount", "DeployingNodesCount", "ConfigNodesCount", // it is Config and not Configuring because RRDDataStore limits name 20 characters
                                                     "DownNodesCount", "LostNodesCount", "AverageActivity" };
 
     public static final Logger LOGGER = Logger.getLogger(RMRest.class);
