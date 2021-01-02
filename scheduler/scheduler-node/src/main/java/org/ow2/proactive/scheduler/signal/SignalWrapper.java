@@ -38,11 +38,15 @@ import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 
 
+/**
+ * SignalWrapper acts as a high level signal service that uses the synchronization API.
+ *
+ * It enables workflow tasks handle signals in an easy manner.
+ *
+ * @author ActiveEon Team
+ * @since 24/11/2020
+ */
 public class SignalWrapper implements Signal {
-
-    private String originator;
-
-    private TaskId taskId;
 
     private SynchronizationWrapper synchronization;
 
@@ -50,34 +54,59 @@ public class SignalWrapper implements Signal {
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
+    private static final int SIGNAL_WAIT_DURATION = PASchedulerProperties.SCHEDULER_SIGNAL_WAIT_DURATION.getValueAsInt();
+
     private static final String READY_PREFIX = "ready_";
 
     private static Logger logger = Logger.getLogger(SignalWrapper.class);
 
     public SignalWrapper(String originator, TaskId taskId, SynchronizationInternal synchronizationInternal) {
-        this.originator = originator;
-        this.taskId = taskId;
         jobId = taskId.getJobId().value();
         synchronization = new SynchronizationWrapper(originator, taskId, synchronizationInternal);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean ready(String signalName) {
         try {
             synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
-            addSignalToJobSignals(READY_PREFIX + signalName);
+            List<String> jobSignals = (List<String>) synchronization.get(SIGNALS_CHANNEL, jobId);
+            if (jobSignals == null) {
+                jobSignals = new ArrayList<>();
+            }
+            jobSignals.add(READY_PREFIX + signalName);
+            synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
         } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not send ready for the signal '" + signalName + "' of taskId " + taskId, e);
+            logger.warn("Could not send ready for the signal '" + signalName + "' of jobId " + jobId, e);
         }
         return true;
     }
 
-    public void addSignalToJobSignals(String signalName) throws IOException, InvalidChannelException {
-        List<String> jobSignals = (List<String>) synchronization.get(SIGNALS_CHANNEL, jobId);
-        if (jobSignals == null) {
-            jobSignals = new ArrayList<>();
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean isReceived(String signalName) throws InvalidChannelException {
+        List<String> signals = (List) synchronization.get(SIGNALS_CHANNEL, jobId);
+        if (signals != null && !signals.isEmpty()) {
+            return signals.contains(signalName);
+        } else {
+            return false;
         }
-        jobSignals.add(signalName);
-        synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
+    }
+
+    @Override
+    public void waitFor(String signalName) throws InvalidChannelException, InterruptedException {
+        while (!isReceived(signalName)) {
+            Thread.sleep(SIGNAL_WAIT_DURATION);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void waitForAny(List<String> signalsList) throws InterruptedException, InvalidChannelException {
+        List<String> signals = (List) synchronization.get(SIGNALS_CHANNEL, jobId);
+        while (signalsList.stream().parallel().filter(signals::contains).findFirst().orElse(null) == null) {
+            Thread.sleep(SIGNAL_WAIT_DURATION);
+            signals = (List) synchronization.get(SIGNALS_CHANNEL, jobId);
+        }
     }
 }

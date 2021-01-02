@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -69,6 +71,8 @@ public class JobInfoData implements java.io.Serializable {
     private Map<String, String> genericInformation;
 
     private Map<String, String> variables;
+
+    private List<String> signals;
 
     public void setToBeRemoved() {
         toBeRemoved = true;
@@ -230,6 +234,14 @@ public class JobInfoData implements java.io.Serializable {
         this.variables = variables;
     }
 
+    public List<String> getSignals() {
+        return signals;
+    }
+
+    public void setSignals(ArrayList<String> signals) {
+        this.signals = signals;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
@@ -239,7 +251,7 @@ public class JobInfoData implements java.io.Serializable {
                ", numberOfFailedTasks=" + numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks +
                ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
                "', projectName='" + projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" +
-               genericInformation + ", variables=" + variables + '}';
+               genericInformation + ", variables=" + variables + ", signals=" + signals + '}';
     }
 
 }

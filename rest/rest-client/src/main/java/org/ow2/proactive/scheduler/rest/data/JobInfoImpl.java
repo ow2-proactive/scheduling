@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -78,6 +80,8 @@ public class JobInfoImpl implements JobInfo {
     private Map<String, String> genericInformation;
 
     private Map<String, String> variables;
+
+    private List<String> signals;
 
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
@@ -280,6 +284,20 @@ public class JobInfoImpl implements JobInfo {
 
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
+    }
+
+    @Override
+    public List<String> getSignals() {
+        if (signals == null) {
+            return new ArrayList<>();
+        } else {
+            return signals;
+        }
+    }
+
+    @Override
+    public void setSignals(List<String> signals) {
+        this.signals = signals;
     }
 
 }

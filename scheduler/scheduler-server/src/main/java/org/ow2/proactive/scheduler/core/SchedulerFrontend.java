@@ -234,6 +234,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     private SynchronizationInternal publicStore;
 
+    private String signalsChannel = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
+
     private static final String SIGNAL_ORIGINATOR = "SCHEDULER";
 
     private static final String SIGNAL_TASK = "0000000t0";
@@ -426,6 +428,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
         // register this service and give it a name
         PAActiveObject.registerByName(publicStore, SchedulerConstants.SYNCHRONIZATION_DEFAULT_NAME);
+
+        publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, true);
+
         return publicStore;
     }
 
@@ -1552,13 +1557,51 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         if (myJobsOnly) {
             user = ident.getUsername();
         }
-        return dbManager.getJobs(offset,
-                                 limit,
-                                 user,
-                                 filterCriteria.isPending(),
-                                 filterCriteria.isRunning(),
-                                 filterCriteria.isFinished(),
-                                 sortParameters);
+
+        Page<JobInfo> jobsInfo = dbManager.getJobs(offset,
+                                                   limit,
+                                                   user,
+                                                   filterCriteria.isPending(),
+                                                   filterCriteria.isRunning(),
+                                                   filterCriteria.isFinished(),
+                                                   sortParameters);
+
+        /**
+         * Add/inject to each JobInfo the list of signals, if they exist, used by the job.
+         */
+        try {
+            List<String> jobHavingSignalsIds = new ArrayList(publicStore.keySet(SIGNAL_ORIGINATOR,
+                                                                                SIGNAL_TASK_ID,
+                                                                                signalsChannel));
+            jobsInfo.getList()
+                    .stream()
+                    .parallel()
+                    .filter(jobInfo -> jobHavingSignalsIds.contains(jobInfo.getJobId().value()))
+                    .map(jobInfo -> {
+                        try {
+                            List<String> signalsToBeAdded = jobInfo.getSignals();
+
+                            signalsToBeAdded.addAll((List) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                           SIGNAL_TASK_ID,
+                                                                           signalsChannel,
+                                                                           jobInfo.getJobId().value()));
+
+                            jobInfo.setSignals(signalsToBeAdded);
+
+                            return jobInfo;
+
+                        } catch (InvalidChannelException e) {
+                            logger.warn("Could not acquire the signals of the job with job ID " +
+                                        jobInfo.getJobId().value());
+                            return jobInfo;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (InvalidChannelException e) {
+            logger.warn("Could not acquire the list of jobs having signals. No signals will be included in the returned jobs info");
+        }
+
+        return jobsInfo;
     }
 
     /**
@@ -1770,22 +1813,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public boolean addJobSignal(String sessionId, String jobId, String signal) {
         try {
 
-            List<String> signals = (List) publicStore.get(SIGNAL_ORIGINATOR,
-                                                          SIGNAL_TASK_ID,
-                                                          PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
-                                                          jobId);
-
+            List<String> signals = (List) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
             if (signals == null) {
                 signals = new ArrayList<>();
             }
 
             signals.add(signal);
-
-            publicStore.put(SIGNAL_ORIGINATOR,
-                            SIGNAL_TASK_ID,
-                            PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
-                            jobId,
-                            (Serializable) signals);
+            publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, (Serializable) signals);
 
         } catch (IOException | InvalidChannelException p) {
             return false;

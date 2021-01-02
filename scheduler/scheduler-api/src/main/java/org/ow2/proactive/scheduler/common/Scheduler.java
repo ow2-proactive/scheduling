@@ -58,6 +58,7 @@ import org.ow2.proactive.scheduler.common.usage.SchedulerUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 
 
 /**

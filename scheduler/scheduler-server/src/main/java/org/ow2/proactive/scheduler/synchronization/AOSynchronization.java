@@ -29,13 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -389,7 +383,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     @Override
     public Set<String> keySet(String originator, TaskId taskid, String channel) throws InvalidChannelException {
-        return getChannel(channel).keySet();
+        return new HashSet(getChannel(channel).keySet());
     }
 
     @Override

@@ -88,7 +88,7 @@ public class SynchronizationWrapper implements Synchronization {
             }
             throw new IllegalStateException("Could not locate the Synchronization service at " +
                                             Arrays.toString(internalAPIUrls));
-        } else if (this.internalAPI == null && this.internalAPIUrls == null) {
+        } else if (this.internalAPI == null) {
             throw new IllegalStateException("Synchronization api was not initialized properly (see Scheduler logs for details)");
         }
     }

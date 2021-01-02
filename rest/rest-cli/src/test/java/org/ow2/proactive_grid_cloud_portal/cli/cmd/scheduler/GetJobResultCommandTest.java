@@ -65,7 +65,6 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
         jobResultFaker.setGenerator("allResults.value.id.readableName", new PrefixPropertyGenerator("task", 1));
         jobResultFaker.setGenerator("allResults.value.serializedValue",
                                     new FixedPropertyGenerator(ObjectByteConverter.serializableToBase64String("Hello")));
-
         jobResult = jobResultFaker.fake();
 
         DataFaker<TaskResultData> taskResultsDataFaker = new DataFaker<TaskResultData>(TaskResultData.class);
