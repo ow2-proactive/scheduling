@@ -41,7 +41,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
@@ -49,10 +48,9 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.signal.SignalWrapper;
+import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -273,7 +271,7 @@ final class TerminationData {
                                         new SynchronizationWrapper(taskToTerminate.internalJob.getOwner(),
                                                                    taskData.getTask().getId(),
                                                                    taskToTerminate.internalJob.getSynchronizationAPI()),
-                                        new SignalWrapper(taskToTerminate.internalJob.getOwner(),
+                                        new SignalApiImpl(taskToTerminate.internalJob.getOwner(),
                                                           taskData.getTask().getId(),
                                                           taskToTerminate.internalJob.getSynchronizationAPI()));
 

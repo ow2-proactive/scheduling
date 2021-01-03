@@ -65,7 +65,7 @@ import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.signal.SignalWrapper;
+import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
@@ -1197,7 +1197,7 @@ public abstract class InternalTask extends TaskState {
                                                              getId(),
                                                              internalJob.getSynchronizationAPI()));
 
-        tli.setSignalAPI(new SignalWrapper(internalJob.getOwner(), getId(), internalJob.getSynchronizationAPI()));
+        tli.setSignalAPI(new SignalApiImpl(internalJob.getOwner(), getId(), internalJob.getSynchronizationAPI()));
 
         return tli;
     }

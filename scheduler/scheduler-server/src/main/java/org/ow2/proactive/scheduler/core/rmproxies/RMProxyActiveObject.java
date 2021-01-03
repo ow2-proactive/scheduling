@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
@@ -55,7 +54,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
-import org.ow2.proactive.scheduler.signal.Signal;
+import org.ow2.proactive.scheduler.signal.SignalApi;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
@@ -169,7 +168,7 @@ public class RMProxyActiveObject {
     @ImmediateService
     public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
             Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store,
-            Signal signalAPI) {
+            SignalApi signalAPI) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes).booleanValue();
@@ -213,7 +212,7 @@ public class RMProxyActiveObject {
      */
     private void handleCleaningScript(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
             Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store,
-            Signal signalAPI) {
+            SignalApi signalAPI) {
         TaskLogger instance = TaskLogger.getInstance();
 
         try {

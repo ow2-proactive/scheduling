@@ -38,7 +38,7 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.signal.Signal;
+import org.ow2.proactive.scheduler.signal.SignalApi;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
@@ -133,7 +133,7 @@ public class RMProxy {
 
     public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, VariablesMap variables,
             Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store,
-            Signal signalAPI) {
+            SignalApi signalAPI) {
 
         if (nodeSet.size() == 0) {
             if (nodeSet.getExtraNodes() == null || nodeSet.getExtraNodes().size() == 0) {

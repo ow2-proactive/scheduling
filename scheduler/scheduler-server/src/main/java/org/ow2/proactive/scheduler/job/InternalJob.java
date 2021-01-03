@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -64,20 +63,18 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
-import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateIfTaskHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateLoopHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateReplicateTaskHandler;
-import org.ow2.proactive.scheduler.signal.SignalWrapper;
+import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.utils.ObjectByteConverter;
 
 import it.sauronsoftware.cron4j.Predictor;
 
@@ -159,7 +156,7 @@ public abstract class InternalJob extends JobState {
     private SynchronizationInternal synchronizationAPI;
 
     @XmlTransient
-    private SignalWrapper signalAPI;
+    private SignalApiImpl signalAPI;
 
     /**
      * Hibernate default constructor
@@ -326,7 +323,7 @@ public abstract class InternalJob extends JobState {
         return synchronizationAPI;
     }
 
-    public SignalWrapper getSignalAPI() {
+    public SignalApiImpl getSignalAPI() {
         return signalAPI;
     }
 

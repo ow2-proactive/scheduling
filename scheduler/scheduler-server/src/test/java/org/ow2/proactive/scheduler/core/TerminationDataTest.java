@@ -51,7 +51,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.signal.Signal;
+import org.ow2.proactive.scheduler.signal.SignalApi;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -212,7 +212,7 @@ public class TerminationDataTest extends ProActiveTestClean {
                                                                Mockito.any(TaskId.class),
                                                                Mockito.any(Credentials.class),
                                                                Mockito.any(Synchronization.class),
-                                                               Mockito.any(Signal.class));
+                                                               Mockito.any(SignalApi.class));
     }
 
     @Test

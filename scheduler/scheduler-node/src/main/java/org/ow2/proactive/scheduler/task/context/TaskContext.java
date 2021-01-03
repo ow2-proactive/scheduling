@@ -34,7 +34,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.signal.Signal;
+import org.ow2.proactive.scheduler.signal.SignalApi;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
@@ -177,7 +177,7 @@ public class TaskContext implements Serializable {
         return initializer.getSynchronizationAPI();
     }
 
-    public Signal getSignalAPI() {
+    public SignalApi getSignalAPI() {
         return initializer.getSignalAPI();
     }
 

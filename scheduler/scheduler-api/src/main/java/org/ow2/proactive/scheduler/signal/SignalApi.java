@@ -28,33 +28,46 @@ package org.ow2.proactive.scheduler.signal;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 
 
 /**
- * Signal uses the synchronization API store to provide a persistent <i>key/value channel</i> for job signals.
+ * SignalApi uses the synchronization API store to provide a persistent <i>key/value channel</i> for job signals.
  *
- * Signal uses a single system channel to store all signals needed by jobs.
+ * SignalApi uses a single system channel to store all signals needed by jobs.
  * The signal channel contains an entry per job.
  * The key of each entry is the job id, whereas the value of the entry is the list of signals used by the considered job.
  *
- * The Signal service is automatically started with the ProActive Server.
+ * The SignalApi service is automatically started with the ProActive Server.
  *
  * @author ActiveEon Team
  * @since 24/11/2020
  * @see org.ow2.proactive.scheduler.synchronization
  */
 @PublicAPI
-public interface Signal extends Serializable {
+public interface SignalApi extends Serializable {
 
-    boolean ready(String signalName) throws IOException, InvalidChannelException;
+    boolean readyForSignal(String signalName);
 
     boolean isReceived(String signalName) throws InvalidChannelException;
 
     void waitFor(String signalName) throws InvalidChannelException, InterruptedException;
 
     void waitForAny(List<String> signalsList) throws InterruptedException, InvalidChannelException;
+
+    boolean sendSignal(String signalName);
+
+    boolean sendAllSignals(List<String> signalsSubList);
+
+    boolean removeSignal(String signalName);
+
+    boolean removeAllSignals(List<String> signalsSubList);
+
+    List<String> getJobSignals() throws InvalidChannelException;
+
+    void clearJobSignals();
 
 }
