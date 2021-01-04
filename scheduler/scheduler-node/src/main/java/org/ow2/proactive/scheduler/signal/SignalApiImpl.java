@@ -50,6 +50,8 @@ public class SignalApiImpl implements SignalApi {
 
     private static Logger logger = Logger.getLogger(SignalApiImpl.class);
 
+    private static final String LOG_WARNING_CONSTANT = " of the job ";
+
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
     private static final int SIGNAL_WAIT_DURATION = PASchedulerProperties.SCHEDULER_SIGNAL_WAIT_DURATION.getValueAsInt();
@@ -72,7 +74,7 @@ public class SignalApiImpl implements SignalApi {
                 synchronization.put(SIGNALS_CHANNEL, jobId, new ArrayList<>());
             }
         } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not instantiate SignalApi API for job " + jobId, e);
+            logger.warn("Could not instantiate Signal API for the job " + jobId, e);
         }
     }
 
@@ -117,7 +119,7 @@ public class SignalApiImpl implements SignalApi {
             synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
             return true;
         } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not send signal '" + signalName + "' of jobId " + jobId, e);
+            logger.warn("Could not send signal " + signalName + LOG_WARNING_CONSTANT + jobId, e);
             return false;
         }
     }
@@ -130,7 +132,7 @@ public class SignalApiImpl implements SignalApi {
             synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
             return true;
         } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not send the signals '" + signalsSubList + "' of jobId " + jobId, e);
+            logger.warn("Could not send the signals " + signalsSubList + LOG_WARNING_CONSTANT + jobId, e);
             return false;
         }
     }
@@ -143,7 +145,7 @@ public class SignalApiImpl implements SignalApi {
             synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
             return true;
         } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not delete the signal '" + signalName + "' of jobId " + jobId, e);
+            logger.warn("Could not delete the signal " + signalName + LOG_WARNING_CONSTANT + jobId, e);
             return false;
         }
     }
@@ -156,7 +158,7 @@ public class SignalApiImpl implements SignalApi {
             synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
             return true;
         } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not delete the signals '" + signalsSubList + "' of jobId " + jobId, e);
+            logger.warn("Could not delete the signals " + signalsSubList + LOG_WARNING_CONSTANT + jobId, e);
             return false;
         }
     }

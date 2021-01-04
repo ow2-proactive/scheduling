@@ -228,9 +228,4 @@ public interface JobInfo extends Serializable {
      * @return signals List
      */
     List<String> getSignals();
-
-    /**
-     * Assigns the given signals to the list of job signals, i.e., signals used by the job
-     */
-    void setSignals(List<String> signals);
 }

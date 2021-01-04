@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -236,10 +235,6 @@ public class JobInfoData implements java.io.Serializable {
 
     public List<String> getSignals() {
         return signals;
-    }
-
-    public void setSignals(ArrayList<String> signals) {
-        this.signals = signals;
     }
 
     @Override

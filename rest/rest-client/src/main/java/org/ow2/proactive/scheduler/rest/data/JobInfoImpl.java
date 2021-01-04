@@ -294,10 +294,4 @@ public class JobInfoImpl implements JobInfo {
             return signals;
         }
     }
-
-    @Override
-    public void setSignals(List<String> signals) {
-        this.signals = signals;
-    }
-
 }

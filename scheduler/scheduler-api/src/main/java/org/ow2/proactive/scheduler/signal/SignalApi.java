@@ -25,10 +25,8 @@
  */
 package org.ow2.proactive.scheduler.signal;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
