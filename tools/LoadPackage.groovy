@@ -5,11 +5,12 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import org.apache.log4j.Logger
 import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.FileUtils
 import org.apache.http.conn.ssl.*
 import org.apache.http.impl.client.*
 import javax.net.ssl.*
 import java.util.zip.ZipFile
-import java.util.regex.*
+
 
 
 class LoadPackage {
@@ -114,20 +115,10 @@ class LoadPackage {
             def file_src = new File(package_dir.absolutePath, file_relative_path)
             def file_src_path = file_src.absolutePath
             def file_name = file_src.getName()
-            def file_dest = new File(target_dir_path, file_name)
-            def file_dest_path
-            def dataspace_matcher = Pattern.compile("dataspace").matcher(file_relative_path)
-            def dataspace_index = dataspace_matcher.find() ? dataspace_matcher.start() : -1
-            def folders_to_be_created = file_relative_path.substring(dataspace_index + "dataspace".length(), file_relative_path.lastIndexOf("/"))
-            if (!folders_to_be_created) {
-                file_dest_path = file_dest.absolutePath
-            }
-            else {
-                def folders_dest = Paths.get(target_dir_path, folders_to_be_created)
-                def folders = new File(folders_dest.toString())
-                folders.mkdirs()
-                file_dest_path = Paths.get(folders_dest.toString(), file_name.toString()).toString()
-            }
+            def file_dest = file_relative_path.replace("resources/dataspace/", "")
+            def file_dest_path = Paths.get(target_dir_path,file_dest).toString()
+            // Create nonexistent parent directories
+            FileUtils.forceMkdirParent(new File(file_dest_path))
             Files.copy(Paths.get(file_src_path), Paths.get(file_dest_path), StandardCopyOption.REPLACE_EXISTING)
             writeToOutput(file_src_path + " copied to " + file_dest_path + "!")
         }
