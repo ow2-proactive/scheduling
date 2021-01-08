@@ -48,13 +48,13 @@ import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 @PublicAPI
 public interface SignalApi extends Serializable {
 
-    boolean readyForSignal(String signalName);
+    boolean readyForSignal(String signalName) throws InvalidChannelException;
 
     boolean isReceived(String signalName) throws InvalidChannelException;
 
-    void waitFor(String signalName) throws InvalidChannelException, InterruptedException;
+    void waitFor(String signalName);
 
-    void waitForAny(List<String> signalsList) throws InterruptedException, InvalidChannelException;
+    void waitForAny(List<String> signalsList);
 
     boolean sendSignal(String signalName);
 

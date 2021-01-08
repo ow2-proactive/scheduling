@@ -25,8 +25,6 @@
  */
 package org.ow2.proactive.scheduler.synchronization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -35,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.BasicConfigurator;
@@ -180,7 +179,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
         Thread thread = new Thread(() -> {
             try {
                 synchronization.freeze();
-                Thread.sleep(FREEZE_RESUME_SLEEP_TIME);
+                TimeUnit.MILLISECONDS.sleep(FREEZE_RESUME_SLEEP_TIME);
                 synchronization.resume();
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
@@ -424,7 +423,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000);
+                    TimeUnit.MILLISECONDS.sleep(1000);
                     synchronization.compute(CHANNEL1, "a", BIFUNCTION_DECREMENT_ONE);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -446,7 +445,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
         Runnable decrementRunnable = () -> {
             try {
-                Thread.sleep(FREEZE_RESUME_SLEEP_TIME + 600);
+                TimeUnit.MILLISECONDS.sleep(FREEZE_RESUME_SLEEP_TIME + 600);
                 synchronization.compute(CHANNEL1, "a", BIFUNCTION_DECREMENT_ONE);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -489,17 +488,14 @@ public class AOSynchronizationTest extends ProActiveTestClean {
             // expected
         }
 
-        Runnable decrementRunnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    synchronization.waitUntilThen(CHANNEL1, "a", PREDICATE_GT_ZERO, BIFUNCTION_DECREMENT_ONE);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+        Runnable decrementRunnable = () -> {
+            try {
+                TimeUnit.MILLISECONDS.sleep(1000);
+                synchronization.waitUntilThen(CHANNEL1, "a", PREDICATE_GT_ZERO, BIFUNCTION_DECREMENT_ONE);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         };
 
         // this is a producer/consumer pattern

@@ -964,8 +964,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
      * @param request request used to extract parameters
      * @return the result of the waitUntil method call
      */
-    private boolean executeWaitPredicateFunction(Request request) throws InvocationTargetException,
-            MethodCallExecutionFailedException, InvalidChannelException, CompilationException {
+    private boolean executeWaitPredicateFunction(Request request) throws InvalidChannelException, CompilationException {
         // extract the parameters which match the waitUntil call
         int paramIndex = 0;
         String originator = (String) request.getParameter(paramIndex++);

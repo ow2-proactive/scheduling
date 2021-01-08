@@ -13,13 +13,12 @@ buildscript {
     }
 }
 
-
-
 dependencies {
     compile(
             "org.objectweb.proactive:programming-extension-processbuilder:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}",
             "org.ow2.proactive:emailnotification-addons:${schedulingVersion}",
+            "org.awaitility:awaitility:4.0.3",
 
             project(':scheduler:scheduler-client'),
             project(':rest:rest-client'),

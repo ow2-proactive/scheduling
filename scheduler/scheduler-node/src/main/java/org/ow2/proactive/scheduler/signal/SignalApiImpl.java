@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.awaitility.Awaitility;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
@@ -54,9 +55,7 @@ public class SignalApiImpl implements SignalApi {
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
-    private static final int SIGNAL_WAIT_DURATION = PASchedulerProperties.SCHEDULER_SIGNAL_WAIT_DURATION.getValueAsInt();
-
-    private static final String READY_PREFIX = "ready_";
+    protected static final String READY_PREFIX = "ready_";
 
     private SynchronizationWrapper synchronization;
 
@@ -79,7 +78,10 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean readyForSignal(String signalName) {
+    public boolean readyForSignal(String signalName) throws InvalidChannelException {
+        if (isReceived(signalName)) {
+            removeSignal(signalName);
+        }
         return sendSignal(READY_PREFIX + signalName);
     }
 
@@ -91,23 +93,6 @@ public class SignalApiImpl implements SignalApi {
             return signals.contains(signalName);
         } else {
             return false;
-        }
-    }
-
-    @Override
-    public void waitFor(String signalName) throws InterruptedException, InvalidChannelException {
-        while (!isReceived(signalName)) {
-            Thread.sleep(SIGNAL_WAIT_DURATION);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void waitForAny(List<String> signalsList) throws InvalidChannelException, InterruptedException {
-        List<String> signals = getJobSignals();
-        while (signalsList.stream().parallel().filter(signals::contains).findFirst().orElse(null) == null) {
-            Thread.sleep(SIGNAL_WAIT_DURATION);
-            signals = (List) synchronization.get(SIGNALS_CHANNEL, jobId);
         }
     }
 
@@ -175,5 +160,19 @@ public class SignalApiImpl implements SignalApi {
         } catch (IOException | InvalidChannelException e) {
             logger.warn("Could not clear the job" + jobId + " from the signals channel", e);
         }
+    }
+
+    @Override
+    public void waitFor(String signalName) {
+        Awaitility.await().until(() -> isReceived(signalName));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void waitForAny(List<String> signalsList) {
+        Awaitility.await().until(() -> {
+            List<String> signals = getJobSignals();
+            return signalsList.stream().parallel().filter(signals::contains).findFirst().orElse(null) != null;
+        });
     }
 }

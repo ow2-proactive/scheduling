@@ -37,6 +37,7 @@ import java.rmi.AlreadyBoundException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -421,7 +422,7 @@ public class RMTHelper {
             if (newNode != null) {
                 return new TestNode(nodeProcess, newNode);
             } else {
-                Thread.sleep(100);
+                TimeUnit.MILLISECONDS.sleep(100);
             }
         }
         throw toThrow == null ? new NodeException("unable to create the node " + nodeName) : toThrow;
