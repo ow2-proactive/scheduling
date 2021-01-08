@@ -478,9 +478,6 @@ public class JobInfoImpl implements JobInfo {
 
     @Override
     public List<String> getSignals() {
-        if (signals == null) {
-            signals = new ArrayList<>();
-        }
-        return signals;
+        return (signals == null) ? new ArrayList<>() : signals;
     }
 }

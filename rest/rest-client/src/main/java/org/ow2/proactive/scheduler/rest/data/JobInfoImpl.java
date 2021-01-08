@@ -288,10 +288,6 @@ public class JobInfoImpl implements JobInfo {
 
     @Override
     public List<String> getSignals() {
-        if (signals == null) {
-            return new ArrayList<>();
-        } else {
-            return signals;
-        }
+        return (signals == null) ? new ArrayList<>() : signals;
     }
 }
