@@ -15,8 +15,6 @@ dependencies {
 
     compile project(':common:common-api')
 
-    compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
-
     compile 'org.apache.commons:commons-lang3:3.5'
 
     runtime 'com.fasterxml.woodstox:woodstox-core:5.0.1'
