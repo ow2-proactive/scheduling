@@ -205,7 +205,9 @@ public class SignalApiTest extends ProActiveTestClean {
         };
 
         executor.submit(addSignalRunnable(signal, durationInMillis));
-        Awaitility.await().atMost(FREEZE_RESUME_SLEEP_TIME + 2 * durationInMillis, TimeUnit.MILLISECONDS).until(waitForSignalThread);
+        Awaitility.await()
+                  .atMost(FREEZE_RESUME_SLEEP_TIME + 2 * durationInMillis, TimeUnit.MILLISECONDS)
+                  .until(waitForSignalThread);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
 
@@ -227,7 +229,9 @@ public class SignalApiTest extends ProActiveTestClean {
 
         executor.submit(addSignalRunnable(signal_1, durationInMillis_1));
         executor.submit(addSignalRunnable(signal_2, durationInMillis_2));
-        Awaitility.await().atMost(FREEZE_RESUME_SLEEP_TIME + 2 * durationInMillis_1, TimeUnit.MILLISECONDS).until(waitForSignalThread);
+        Awaitility.await()
+                  .atMost(FREEZE_RESUME_SLEEP_TIME + 2 * durationInMillis_1, TimeUnit.MILLISECONDS)
+                  .until(waitForSignalThread);
         Assert.assertTrue(signalApi.isReceived(signal_1));
         Assert.assertFalse(signalApi.isReceived(signal_2));
     }
