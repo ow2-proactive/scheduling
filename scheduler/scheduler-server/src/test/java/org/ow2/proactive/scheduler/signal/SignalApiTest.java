@@ -61,6 +61,8 @@ public class SignalApiTest extends ProActiveTestClean {
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
+    private static final int FREEZE_RESUME_SLEEP_TIME = 2000;
+
     private SignalApi signalApi;
 
     private AOSynchronization synchronizationInternal;
@@ -90,12 +92,26 @@ public class SignalApiTest extends ProActiveTestClean {
         tempFolder = folder.newFolder();
         initSignalAPI(tempFolder);
         executor = Executors.newFixedThreadPool(2);
+        freezeAndSleepInParallel();
     }
 
     private void initSignalAPI(File tempFolder) throws ActiveObjectCreationException, NodeException {
         synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
                                                            new Object[] { tempFolder.getAbsolutePath() });
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
+    }
+
+    private void freezeAndSleepInParallel() {
+        Thread thread = new Thread(() -> {
+            try {
+                synchronizationInternal.freeze();
+                TimeUnit.MILLISECONDS.sleep(FREEZE_RESUME_SLEEP_TIME);
+                synchronizationInternal.resume();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        thread.start();
     }
 
     @After
@@ -189,7 +205,7 @@ public class SignalApiTest extends ProActiveTestClean {
         };
 
         executor.submit(addSignalRunnable(signal, durationInMillis));
-        Awaitility.await().atMost(2 * durationInMillis, TimeUnit.MILLISECONDS).until(waitForSignalThread);
+        Awaitility.await().atMost(FREEZE_RESUME_SLEEP_TIME + 2 * durationInMillis, TimeUnit.MILLISECONDS).until(waitForSignalThread);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
 
@@ -199,7 +215,7 @@ public class SignalApiTest extends ProActiveTestClean {
         String signal_2 = "test_signal_10_2";
         List<String> signals = new ArrayList<>(Arrays.asList(signal_1, signal_2));
         long durationInMillis_1 = 1000;
-        long durationInMillis_2 = 2000;
+        long durationInMillis_2 = 3000;
 
         //Define a thread that waits for the signal reception
         Runnable waitForSignalThread = () -> {
@@ -211,7 +227,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
         executor.submit(addSignalRunnable(signal_1, durationInMillis_1));
         executor.submit(addSignalRunnable(signal_2, durationInMillis_2));
-        Awaitility.await().atMost(2 * durationInMillis_1, TimeUnit.MILLISECONDS).until(waitForSignalThread);
+        Awaitility.await().atMost(FREEZE_RESUME_SLEEP_TIME + 2 * durationInMillis_1, TimeUnit.MILLISECONDS).until(waitForSignalThread);
         Assert.assertTrue(signalApi.isReceived(signal_1));
         Assert.assertFalse(signalApi.isReceived(signal_2));
     }
