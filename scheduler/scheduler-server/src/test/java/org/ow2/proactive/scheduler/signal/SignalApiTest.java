@@ -32,10 +32,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
+import org.apache.log4j.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -58,6 +60,8 @@ public class SignalApiTest {
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
+    private static final int FREEZE_RESUME_SLEEP_TIME = 2000;
+
     private SignalApi signalApi;
 
     private AOSynchronization synchronizationInternal;
@@ -68,6 +72,18 @@ public class SignalApiTest {
     public static TemporaryFolder folder = new TemporaryFolder();
 
     private File tempFolder;
+
+    @BeforeClass
+    public static void classInit() {
+        CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
+        if (System.getProperty("log4j.configuration") == null) {
+            // While logger is not configured and it not set with sys properties, use Console logger
+            Logger.getRootLogger().getLoggerRepository().resetConfiguration();
+            BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%m%n")));
+            Logger.getRootLogger().setLevel(Level.INFO);
+        }
+        Logger.getLogger(SignalApiImpl.class).setLevel(Level.TRACE);
+    }
 
     @Before
     public void init() throws IOException, ActiveObjectCreationException, NodeException {
@@ -86,6 +102,19 @@ public class SignalApiTest {
     public void cleanUp() {
         executor.shutdownNow();
         PAActiveObject.terminateActiveObject(synchronizationInternal, true);
+    }
+
+    private void freezeAndSleepInParallel() {
+        Thread thread = new Thread(() -> {
+            try {
+                synchronizationInternal.freeze();
+                TimeUnit.MILLISECONDS.sleep(FREEZE_RESUME_SLEEP_TIME);
+                synchronizationInternal.resume();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        thread.start();
     }
 
     @Test
