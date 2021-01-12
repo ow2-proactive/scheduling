@@ -445,7 +445,7 @@ public class AOSynchronizationTest extends ProActiveTestClean {
 
         Runnable decrementRunnable = () -> {
             try {
-                TimeUnit.MILLISECONDS.sleep(FREEZE_RESUME_SLEEP_TIME + 600);
+                TimeUnit.MILLISECONDS.sleep(FREEZE_RESUME_SLEEP_TIME + 1000);
                 synchronization.compute(CHANNEL1, "a", BIFUNCTION_DECREMENT_ONE);
             } catch (Exception e) {
                 e.printStackTrace();
