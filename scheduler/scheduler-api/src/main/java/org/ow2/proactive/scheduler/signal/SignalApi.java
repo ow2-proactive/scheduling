@@ -48,24 +48,81 @@ import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 @PublicAPI
 public interface SignalApi extends Serializable {
 
-    boolean readyForSignal(String signalName) throws InvalidChannelException;
+    /**
+     * Add a new signal to the list of job signals
+     * The new signal is composed of a prefix (i.e., "ready_") and the given signal
+     *
+     * @param signal name of the signal to be added
+     * @return true if the signal is successfully added to the list of job signals
+     * @throws InvalidChannelException if an error occurred while reading in the signals channel
+     */
+    boolean readyForSignal(String signal) throws InvalidChannelException;
 
-    boolean isReceived(String signalName) throws InvalidChannelException;
+    /**
+     * Check if the given signal exists among the list of job signals
+     *
+     * @param signal name of the signal to be checked
+     * @return true if the signal exists among the list of job signals
+     * @throws InvalidChannelException if an error occurred while reading in the signals channel
+     */
+    boolean isReceived(String signal) throws InvalidChannelException;
 
-    void waitFor(String signalName);
+    /**
+     * Wait until the given signal is added to the list of job signals
+     *
+     * @param signal name of the signal to wait for
+     */
+    void waitFor(String signal);
 
+    /**
+     * Wait until one signal (among those of the given {@code signalsList}) is added to the list of job signals
+     *
+     * @param signalsList list of the signals to wait for any of them
+     */
     void waitForAny(List<String> signalsList);
 
-    boolean sendSignal(String signalName);
+    /**
+     * Add the given {@code signal} to the list of job signals
+     *
+     * @param signal name of the signal to be added to job signals
+     * @return true if the signal is successfully added to job signals
+     */
+    boolean addSignal(String signal);
 
-    boolean sendAllSignals(List<String> signalsSubList);
+    /**
+     * Add the given list of signals to job signals
+     *
+     * @param signalsList list of the signals to be added to job signals
+     * @return true if all the given signals are successfully added to job signals
+     */
+    boolean addAllSignals(List<String> signalsList);
 
-    boolean removeSignal(String signalName);
+    /**
+     * Remove the given {@code signal} from the list of job signals
+     *
+     * @param signal name of the signal to be removed from job signals
+     * @return true if the signal is successfully removed from the list of job signals
+     */
+    boolean removeSignal(String signal);
 
-    boolean removeAllSignals(List<String> signalsSubList);
+    /**
+     * Remove the given list of signals from job signals
+     *
+     * @param signalsList list of the signals to be removed from job signals
+     * @return true if all the given signals are successfully removed from job signals
+     */
+    boolean removeAllSignals(List<String> signalsList);
 
+    /**
+     * Return the list of job signals
+     *
+     * @return the list of job signals
+     * @throws InvalidChannelException if an error occurred while reading in the signals channel
+     */
     List<String> getJobSignals() throws InvalidChannelException;
 
+    /**
+     * Remove the entry corresponding to job signals from the signals channel
+     */
     void clearJobSignals();
-
 }

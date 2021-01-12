@@ -41,15 +41,16 @@ import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 
 /**
  * SignalApiImpl acts as a high level signal service that uses the synchronization API.
- *
  * It enables workflow tasks handle signals in an easy manner.
+ *
+ * It implements the methods defined in the interface @see org.ow2.proactive.scheduler.signal.SignalApi.
  *
  * @author ActiveEon Team
  * @since 24/11/2020
  */
 public class SignalApiImpl implements SignalApi {
 
-    private static Logger logger = Logger.getLogger(SignalApiImpl.class);
+    private static final Logger logger = Logger.getLogger(SignalApiImpl.class);
 
     private static final String LOG_WARNING_CONSTANT = " of the job ";
 
@@ -82,10 +83,9 @@ public class SignalApiImpl implements SignalApi {
         if (isReceived(signalName)) {
             removeSignal(signalName);
         }
-        return sendSignal(READY_PREFIX + signalName);
+        return addSignal(READY_PREFIX + signalName);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean isReceived(String signalName) throws InvalidChannelException {
         List<String> signals = getJobSignals();
@@ -97,27 +97,27 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean sendSignal(String signalName) {
+    public boolean addSignal(String signalName) {
         try {
             List<String> jobSignals = getJobSignals();
             jobSignals.add(signalName);
             synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
             return true;
         } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not send signal " + signalName + LOG_WARNING_CONSTANT + jobId, e);
+            logger.warn("Could not add signal " + signalName + LOG_WARNING_CONSTANT + jobId, e);
             return false;
         }
     }
 
     @Override
-    public boolean sendAllSignals(List<String> signalsSubList) {
+    public boolean addAllSignals(List<String> signalsSubList) {
         try {
             List<String> jobSignals = getJobSignals();
             jobSignals.addAll(signalsSubList);
             synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
             return true;
         } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not send the signals " + signalsSubList + LOG_WARNING_CONSTANT + jobId, e);
+            logger.warn("Could not add the signals " + signalsSubList + LOG_WARNING_CONSTANT + jobId, e);
             return false;
         }
     }
@@ -167,7 +167,6 @@ public class SignalApiImpl implements SignalApi {
         Awaitility.await().until(() -> isReceived(signalName));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void waitForAny(List<String> signalsList) {
         Awaitility.await().until(() -> {

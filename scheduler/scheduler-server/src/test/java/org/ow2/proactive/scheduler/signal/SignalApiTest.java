@@ -46,11 +46,12 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.tests.ProActiveTestClean;
 
 import com.jayway.awaitility.Awaitility;
 
 
-public class SignalApiTest {
+public class SignalApiTest extends ProActiveTestClean {
 
     private static final String USER = "user";
 
@@ -59,8 +60,6 @@ public class SignalApiTest {
     private static final TaskId TASK_ID = TaskIdImpl.createTaskId(JOB_ID, "Task", 0);
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
-
-    private static final int FREEZE_RESUME_SLEEP_TIME = 2000;
 
     private SignalApi signalApi;
 
@@ -80,8 +79,9 @@ public class SignalApiTest {
             // While logger is not configured and it not set with sys properties, use Console logger
             Logger.getRootLogger().getLoggerRepository().resetConfiguration();
             BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%m%n")));
-            Logger.getRootLogger().setLevel(Level.INFO);
+            Logger.getRootLogger().setLevel(Level.DEBUG);
         }
+        System.setProperty("proactive.communication.protocol", "pnp");
         Logger.getLogger(SignalApiImpl.class).setLevel(Level.TRACE);
     }
 
@@ -90,7 +90,6 @@ public class SignalApiTest {
         tempFolder = folder.newFolder();
         initSignalAPI(tempFolder);
         executor = Executors.newFixedThreadPool(2);
-        freezeAndSleepInParallel();
     }
 
     private void initSignalAPI(File tempFolder) throws ActiveObjectCreationException, NodeException {
@@ -103,19 +102,6 @@ public class SignalApiTest {
     public void cleanUp() {
         executor.shutdownNow();
         PAActiveObject.terminateActiveObject(synchronizationInternal, true);
-    }
-
-    private void freezeAndSleepInParallel() {
-        Thread thread = new Thread(() -> {
-            try {
-                synchronizationInternal.freeze();
-                TimeUnit.MILLISECONDS.sleep(FREEZE_RESUME_SLEEP_TIME);
-                synchronizationInternal.resume();
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        thread.start();
     }
 
     @Test
@@ -132,14 +118,14 @@ public class SignalApiTest {
     @Test
     public void testIsReceived() throws InvalidChannelException {
         String signal = "test_signal_2";
-        signalApi.sendSignal(signal);
+        signalApi.addSignal(signal);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
 
     @Test
     public void testSendSignal() throws InvalidChannelException {
         String signal = "test_signal_3";
-        signalApi.sendSignal(signal);
+        signalApi.addSignal(signal);
         Assert.assertTrue(((List) synchronizationInternal.get(USER,
                                                               TASK_ID,
                                                               SIGNALS_CHANNEL,
@@ -149,7 +135,7 @@ public class SignalApiTest {
     @Test
     public void testSendAllSignals() throws InvalidChannelException {
         List<String> signalsToBeSent = new ArrayList<>(Arrays.asList("test_signal_4_1", "test_signal_4_2"));
-        signalApi.sendAllSignals(signalsToBeSent);
+        signalApi.addAllSignals(signalsToBeSent);
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
         signalsToBeSent.forEach(signal -> Assert.assertTrue(allSignals.contains(signal)));
     }
@@ -157,7 +143,7 @@ public class SignalApiTest {
     @Test
     public void testRemoveSignal() throws InvalidChannelException {
         String signal = "test_signal_5";
-        signalApi.sendSignal(signal);
+        signalApi.addSignal(signal);
         signalApi.removeSignal(signal);
         Assert.assertFalse(((List) synchronizationInternal.get(USER,
                                                                TASK_ID,
@@ -168,7 +154,7 @@ public class SignalApiTest {
     @Test
     public void testRemoveAllSignals() throws InvalidChannelException {
         List<String> signalsToBeRemoved = new ArrayList<>(Arrays.asList("test_signal_6_1", "test_signal_6_2"));
-        signalApi.sendAllSignals(signalsToBeRemoved);
+        signalApi.addAllSignals(signalsToBeRemoved);
         signalApi.removeAllSignals(signalsToBeRemoved);
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
         signalsToBeRemoved.forEach(signal -> Assert.assertFalse(allSignals.contains(signal)));
@@ -177,14 +163,14 @@ public class SignalApiTest {
     @Test
     public void testGetJobSignals() throws InvalidChannelException {
         String signal = "test_signal_7";
-        signalApi.sendSignal(signal);
+        signalApi.addSignal(signal);
         Assert.assertFalse(signalApi.getJobSignals().isEmpty());
     }
 
     @Test
     public void testClearJobSignals() throws InvalidChannelException {
         String signal = "test_signal_8";
-        signalApi.sendSignal(signal);
+        signalApi.addSignal(signal);
         signalApi.clearJobSignals();
         Assert.assertFalse(synchronizationInternal.containsKey(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value()));
     }
@@ -202,7 +188,7 @@ public class SignalApiTest {
             }
         };
 
-        executor.submit(sendSignalRunnable(signal, durationInMillis));
+        executor.submit(addSignalRunnable(signal, durationInMillis));
         Awaitility.await().atMost(2 * durationInMillis, TimeUnit.MILLISECONDS).until(waitForSignalThread);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
@@ -223,18 +209,18 @@ public class SignalApiTest {
             }
         };
 
-        executor.submit(sendSignalRunnable(signal_1, durationInMillis_1));
-        executor.submit(sendSignalRunnable(signal_2, durationInMillis_2));
+        executor.submit(addSignalRunnable(signal_1, durationInMillis_1));
+        executor.submit(addSignalRunnable(signal_2, durationInMillis_2));
         Awaitility.await().atMost(2 * durationInMillis_1, TimeUnit.MILLISECONDS).until(waitForSignalThread);
         Assert.assertTrue(signalApi.isReceived(signal_1));
         Assert.assertFalse(signalApi.isReceived(signal_2));
     }
 
-    private Runnable sendSignalRunnable(String signal, long duration) {
+    private Runnable addSignalRunnable(String signal, long duration) {
         Runnable waitForSignalThread = () -> {
             try {
                 TimeUnit.MILLISECONDS.sleep(duration);
-                signalApi.sendSignal(signal);
+                signalApi.addSignal(signal);
             } catch (Exception e) {
             }
         };
