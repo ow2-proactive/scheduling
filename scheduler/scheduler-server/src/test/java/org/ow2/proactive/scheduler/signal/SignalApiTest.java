@@ -90,6 +90,7 @@ public class SignalApiTest {
         tempFolder = folder.newFolder();
         initSignalAPI(tempFolder);
         executor = Executors.newFixedThreadPool(2);
+        freezeAndSleepInParallel();
     }
 
     private void initSignalAPI(File tempFolder) throws ActiveObjectCreationException, NodeException {
