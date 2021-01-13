@@ -39,8 +39,11 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -54,6 +57,7 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.web.WebProperties;
@@ -220,6 +224,15 @@ public class RestFuncTHelper {
     }
 
     public static Scheduler getScheduler() {
+        try {
+            PAActiveObject.newActive(AOSynchronization.class,
+                                     new Object[] { PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_SYNCHRONIZATION_DATABASE.getValueAsString()) });
+        } catch (ActiveObjectCreationException e) {
+            System.err.println("Could not start synchronization service.");
+        } catch (NodeException e) {
+            System.err.println("Could not start synchronization service.");
+        }
+
         return scheduler;
     }
 

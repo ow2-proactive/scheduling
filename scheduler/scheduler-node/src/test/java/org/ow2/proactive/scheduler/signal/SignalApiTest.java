@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.*;
 import org.junit.*;
@@ -46,6 +48,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.tests.ProActiveTestClean;
@@ -54,7 +57,7 @@ import com.jayway.awaitility.Awaitility;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class SignalApiTest extends ProActiveTestClean {
+public class SignalApiTest {
 
     private static final String USER = "user";
 
@@ -66,7 +69,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
     private static final int FREEZE_RESUME_SLEEP_TIME = 2000;
 
-    private static AOSynchronization synchronizationInternal;
+    private static SynchronizationInternal synchronizationInternal;
 
     private static SignalApi signalApi;
 
@@ -93,20 +96,6 @@ public class SignalApiTest extends ProActiveTestClean {
                                                            new Object[] { tempFolder.getAbsolutePath() });
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
         executor = Executors.newFixedThreadPool(2);
-        freezeAndSleepInParallel();
-    }
-
-    private static void freezeAndSleepInParallel() {
-        Thread thread = new Thread(() -> {
-            try {
-                synchronizationInternal.freeze();
-                TimeUnit.MILLISECONDS.sleep(FREEZE_RESUME_SLEEP_TIME);
-                synchronizationInternal.resume();
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        thread.start();
     }
 
     @AfterClass

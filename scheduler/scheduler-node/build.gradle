@@ -34,6 +34,7 @@ dependencies {
 
     runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
 
+    testCompile project(':scheduler:scheduler-server')
     testCompile project(':scheduler:scheduler-examples')
     testCompile project(':common:common-api').sourceSets.test.output
 }
