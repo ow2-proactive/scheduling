@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.tests.ProActiveTestClean;
 
@@ -87,7 +88,7 @@ public class SignalApiTest extends ProActiveTestClean {
         }
         Logger.getLogger(SignalApiImpl.class).setLevel(Level.TRACE);
 
-        tempFolder = folder.newFolder();
+        tempFolder = folder.newFolder("signal");
         synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
                                                            new Object[] { tempFolder.getAbsolutePath() });
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
@@ -112,6 +113,7 @@ public class SignalApiTest extends ProActiveTestClean {
     public static void cleanUp() {
         executor.shutdownNow();
         PAActiveObject.terminateActiveObject(synchronizationInternal, true);
+        tempFolder.delete();
     }
 
     @Test
