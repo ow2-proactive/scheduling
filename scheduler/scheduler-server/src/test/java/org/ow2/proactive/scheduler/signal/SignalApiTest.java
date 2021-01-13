@@ -35,6 +35,7 @@ import java.util.concurrent.*;
 import org.apache.log4j.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runners.MethodSorters;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -51,6 +52,7 @@ import org.ow2.tests.ProActiveTestClean;
 import com.jayway.awaitility.Awaitility;
 
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SignalApiTest extends ProActiveTestClean {
 
     private static final String USER = "user";
@@ -63,19 +65,19 @@ public class SignalApiTest extends ProActiveTestClean {
 
     private static final int FREEZE_RESUME_SLEEP_TIME = 2000;
 
-    private SignalApi signalApi;
+    private static AOSynchronization synchronizationInternal;
 
-    private AOSynchronization synchronizationInternal;
-
-    private ExecutorService executor;
+    private static SignalApi signalApi;
 
     @ClassRule
     public static TemporaryFolder folder = new TemporaryFolder();
 
-    private File tempFolder;
+    private static File tempFolder;
+
+    private static ExecutorService executor;
 
     @BeforeClass
-    public static void classInit() {
+    public static void classInit() throws IOException, ActiveObjectCreationException, NodeException {
         CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
         if (System.getProperty("log4j.configuration") == null) {
             // While logger is not configured and it not set with sys properties, use Console logger
@@ -83,25 +85,17 @@ public class SignalApiTest extends ProActiveTestClean {
             BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%m%n")));
             Logger.getRootLogger().setLevel(Level.DEBUG);
         }
-        System.setProperty("proactive.communication.protocol", "pnp");
         Logger.getLogger(SignalApiImpl.class).setLevel(Level.TRACE);
-    }
 
-    @Before
-    public void init() throws IOException, ActiveObjectCreationException, NodeException {
         tempFolder = folder.newFolder();
-        initSignalAPI(tempFolder);
+        synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
+                                                           new Object[] { tempFolder.getAbsolutePath() });
+        signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
         executor = Executors.newFixedThreadPool(2);
         freezeAndSleepInParallel();
     }
 
-    private void initSignalAPI(File tempFolder) throws ActiveObjectCreationException, NodeException {
-        synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
-                                                           new Object[] { tempFolder.getAbsolutePath() });
-        signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
-    }
-
-    private void freezeAndSleepInParallel() {
+    private static void freezeAndSleepInParallel() {
         Thread thread = new Thread(() -> {
             try {
                 synchronizationInternal.freeze();
@@ -114,8 +108,8 @@ public class SignalApiTest extends ProActiveTestClean {
         thread.start();
     }
 
-    @After
-    public void cleanUp() {
+    @AfterClass
+    public static void cleanUp() {
         executor.shutdownNow();
         PAActiveObject.terminateActiveObject(synchronizationInternal, true);
     }
@@ -184,14 +178,6 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testClearJobSignals() throws InvalidChannelException {
-        String signal = "test_signal_8";
-        signalApi.addSignal(signal);
-        signalApi.clearJobSignals();
-        Assert.assertFalse(synchronizationInternal.containsKey(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value()));
-    }
-
-    @Test
     public void testWaitFor() throws InvalidChannelException {
         String signal = "test_signal_9";
         long durationInMillis = 1000;
@@ -205,9 +191,7 @@ public class SignalApiTest extends ProActiveTestClean {
         };
 
         executor.submit(addSignalRunnable(signal, durationInMillis));
-        Awaitility.await()
-                  .atMost(FREEZE_RESUME_SLEEP_TIME + 2 * durationInMillis, TimeUnit.MILLISECONDS)
-                  .until(waitForSignalThread);
+        Awaitility.await().atMost(2 * durationInMillis, TimeUnit.MILLISECONDS).until(waitForSignalThread);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
 
@@ -217,10 +201,10 @@ public class SignalApiTest extends ProActiveTestClean {
         String signal_2 = "test_signal_10_2";
         List<String> signals = new ArrayList<>(Arrays.asList(signal_1, signal_2));
         long durationInMillis_1 = 1000;
-        long durationInMillis_2 = 3000;
+        long durationInMillis_2 = 4000;
 
         //Define a thread that waits for the signal reception
-        Runnable waitForSignalThread = () -> {
+        Runnable waitForAnySignalThread = () -> {
             try {
                 signalApi.waitForAny(signals);
             } catch (Exception e) {
@@ -229,9 +213,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
         executor.submit(addSignalRunnable(signal_1, durationInMillis_1));
         executor.submit(addSignalRunnable(signal_2, durationInMillis_2));
-        Awaitility.await()
-                  .atMost(FREEZE_RESUME_SLEEP_TIME + 2 * durationInMillis_1, TimeUnit.MILLISECONDS)
-                  .until(waitForSignalThread);
+        Awaitility.await().atMost(3 * durationInMillis_1, TimeUnit.MILLISECONDS).until(waitForAnySignalThread);
         Assert.assertTrue(signalApi.isReceived(signal_1));
         Assert.assertFalse(signalApi.isReceived(signal_2));
     }
@@ -246,4 +228,13 @@ public class SignalApiTest extends ProActiveTestClean {
         };
         return waitForSignalThread;
     }
+
+    @Test
+    public void z_testClearJobSignals() throws InvalidChannelException {
+        String signal = "test_signal_8";
+        signalApi.addSignal(signal);
+        signalApi.clearJobSignals();
+        Assert.assertFalse(synchronizationInternal.containsKey(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value()));
+    }
+
 }
