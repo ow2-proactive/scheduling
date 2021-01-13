@@ -122,6 +122,8 @@ public class RMRest implements RMRestInterface {
 
     protected static final String NODE_CONFIG_TAGS_KEY = "nodeTags";
 
+    private static final String NODE_SOURCE_DEPLOYED_STATUS = "deployed";
+
     private static final int REQUESTS_INTERVAL_SECONDS = 10; // how long to wait before sending the next request
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
@@ -170,7 +172,7 @@ public class RMRest implements RMRestInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#loginWithCredential(org.ow2.
      * proactive_grid_cloud_portal.LoginForm)
      */
@@ -533,9 +535,23 @@ public class RMRest implements RMRestInterface {
     public Set<String> acquireNodes(String sessionId, String sourceName, int numberNodes, boolean synchronous,
             long timeout, String nodeConfigJson) throws NotConnectedException, RestException {
         if (numberNodes <= 0) {
-            throw new IllegalArgumentException("invalid numberNodes: " + numberNodes);
+            throw new IllegalArgumentException("Invalid number of nodes: " + numberNodes);
         }
         ResourceManager rm = checkAccess(sessionId);
+        if (sourceName == null) {
+            throw new IllegalArgumentException("Node source name should not be null.");
+        }
+        Optional<RMNodeSourceEvent> nodeSource = rm.getExistingNodeSourcesList()
+                                                   .stream()
+                                                   .filter(ns -> sourceName.equals(ns.getSourceName()))
+                                                   .findAny();
+        if (!nodeSource.isPresent()) {
+            throw new IllegalArgumentException(String.format("Specified node source [%s] not exist.", sourceName));
+        }
+        if (!NODE_SOURCE_DEPLOYED_STATUS.equals(nodeSource.get().getNodeSourceStatus())) {
+            throw new IllegalArgumentException(String.format("Specified node source [%s] is not deployed.",
+                                                             sourceName));
+        }
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> nodeConfig;
         try {
@@ -545,7 +561,7 @@ public class RMRest implements RMRestInterface {
             throw new IllegalArgumentException("Error during parsing the node configuration: " + nodeConfigJson, e);
         }
         if (synchronous) {
-            String acquireRequestId = UUID.randomUUID().toString();
+            String acquireRequestId = "tmp:" + UUID.randomUUID().toString();
             setRequestIdInNodeConfig(nodeConfig, acquireRequestId);
             rm.acquireNodes(sourceName, numberNodes, timeout * 1000, nodeConfig);
             waitUntil(timeout,

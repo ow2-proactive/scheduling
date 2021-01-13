@@ -179,7 +179,11 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected String getResourceUrl(String resource) {
-        return RestFuncTHelper.getResourceUrl(resource);
+        return RestFuncTHelper.getSchedulerResourceUrl(resource);
+    }
+
+    protected String getRmResourceUrl(String resource) {
+        return RestFuncTHelper.getRmResourceUrl(resource);
     }
 
     protected String getLogin() throws Exception {

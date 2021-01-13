@@ -188,6 +188,23 @@ public class RMNodeClient implements IRMClient, Serializable {
     }
 
     /**
+     * Acquire new nodes of a specified node source
+     *
+     * @param sourceName the name of the node source
+     * @param numberNodes the number of nodes to be acquired
+     * @param synchronous whether the request is synchronous or asynchronous, when true, the request returns the url of acquired nodes after the nodes are successfully deployed.
+     * @param timeout the maximum duration of the request, in seconds.
+     * @param nodeConfigJson the specific configuration of nodes to be acquired, in json format
+     * @return When synchronous is true, returns the url of acquired nodes after the nodes are successfully deployed.
+     *         When synchronous is false, returns immediately with an empty list.
+     */
+    public Set<String> acquireNodes(String sourceName, int numberNodes, boolean synchronous, long timeout,
+            final String nodeConfigJson) throws NotConnectedException, RestException {
+        checkNonEmptySession();
+        return rm.acquireNodes(sessionId, sourceName, numberNodes, synchronous, timeout, nodeConfigJson);
+    }
+
+    /**
      * @param url
      *            the url of the node
      * @return true if the node nodeUrl is registered (i.e. known by the RM) and not down
@@ -689,5 +706,36 @@ public class RMNodeClient implements IRMClient, Serializable {
     public void setNodeTokens(String nodeUrl, List<String> tokens) throws NotConnectedException, RestException {
         checkNonEmptySession();
         rm.setNodeTokens(sessionId, nodeUrl, tokens);
+    }
+
+    /**
+     * Get the set of all tags present in all nodes
+     * @return a set of all nodes tags
+     */
+    Set<String> getNodeTags() throws NotConnectedException, RestException {
+        checkNonEmptySession();
+        return rm.getNodeTags(sessionId);
+    }
+
+    /**
+     * Get the tags of a specific node
+     * @param url the url of the requested node
+     * @return a set of tags for the specified node
+     */
+    Set<String> getNodeTags(String url) throws NotConnectedException, RestException {
+        checkNonEmptySession();
+        return rm.getNodeTags(sessionId, url);
+    }
+
+    /**
+     * Search the nodes with specific tags.
+     * @param tags a list of tags which the nodes should contain. When not specified or an empty list, all the nodes known urls are returned
+     * @param all When true, the search return nodes which contain all tags;
+     *            when false, the search return nodes which contain any tag among the list tags.
+     * @return the set of urls which match the search condition
+     */
+    Set<String> searchNodes(List<String> tags, boolean all) throws NotConnectedException, RestException {
+        checkNonEmptySession();
+        return rm.searchNodes(sessionId, tags, all);
     }
 }
