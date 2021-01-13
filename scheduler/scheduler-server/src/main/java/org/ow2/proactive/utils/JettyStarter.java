@@ -408,7 +408,6 @@ public class JettyStarter {
         WebAppContext webApp = new WebAppContext();
         webApp.setParentLoaderPriority(true);
         // The following setting allows to avoid conflicts between server jackson jars and individual war jackson versions.
-        webApp.addServerClass("com.fasterxml.jackson.");
         webApp.addServerClass("com.google.gson.");
         if (contextPath.contains("cloud-automation-service")) {
             // Make jetty.util not overridable and not hidden for cloud-automation

@@ -57,6 +57,9 @@ dependencies {
     testCompile 'org.eclipse.jetty:jetty-client:9.2.29.v20191105'
     testCompile 'org.zeroturnaround:zt-zip:1.13'
 
+    testCompile 'com.fasterxml.jackson.core:jackson-core:2.7.9'
+    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.7.9'
+
     testCompile project (':common:common-api').sourceSets.test.output
 
     runtime 'org.eclipse.jetty.websocket:websocket-server:9.2.29.v20191105'
