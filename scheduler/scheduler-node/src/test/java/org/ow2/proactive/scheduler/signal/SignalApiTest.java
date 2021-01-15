@@ -82,7 +82,8 @@ public class SignalApiTest extends ProActiveTestClean {
     private static ExecutorService executor;
 
     @BeforeClass
-    public static void classInit() throws IOException, ActiveObjectCreationException, NodeException, AlreadyBoundException {
+    public static void classInit()
+            throws IOException, ActiveObjectCreationException, NodeException, AlreadyBoundException {
         CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
         if (System.getProperty("log4j.configuration") == null) {
             // While logger is not configured and it not set with sys properties, use Console logger
@@ -96,9 +97,11 @@ public class SignalApiTest extends ProActiveTestClean {
 
         System.out.println(Arrays.asList(ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes()));
 
-        if (ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes().isEmpty()){
-            for(int i=0; i<NUMBER_OF_NODES;i++) {
-                ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode("signal-node-"+i,true,"signal-v-node-"+i);
+        if (ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes().isEmpty()) {
+            for (int i = 0; i < NUMBER_OF_NODES; i++) {
+                ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode("signal-node-" + i,
+                                                                           true,
+                                                                           "signal-v-node-" + i);
             }
         }
 
