@@ -25,7 +25,16 @@
  */
 package org.ow2.proactive.scheduler.signal;
 
-import com.jayway.awaitility.Awaitility;
+import java.io.File;
+import java.io.IOException;
+import java.rmi.AlreadyBoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -46,15 +55,7 @@ import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.tests.ProActiveTestClean;
 
-import java.io.File;
-import java.io.IOException;
-import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import com.jayway.awaitility.Awaitility;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -95,12 +96,13 @@ public class SignalApiTest extends ProActiveTestClean {
 
         tempFolder = folder.newFolder("signal");
 
-        Node localNode =  ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode("signal-node-0",
-                                                                           true,
-                                                                           "signal-v-node-0");
+        Node localNode = ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode("signal-node-0",
+                                                                                    true,
+                                                                                    "signal-v-node-0");
 
         synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
-                                                           new Object[] { tempFolder.getAbsolutePath() },localNode);
+                                                           new Object[] { tempFolder.getAbsolutePath() },
+                                                           localNode);
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
         executor = Executors.newFixedThreadPool(2);
     }
