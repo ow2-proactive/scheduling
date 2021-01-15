@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.signal;
 
 import java.io.File;
 import java.io.IOException;
+import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -49,7 +51,6 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
-import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.tests.ProActiveTestClean;
 
@@ -57,7 +58,7 @@ import com.jayway.awaitility.Awaitility;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class SignalApiTest {
+public class SignalApiTest extends ProActiveTestClean {
 
     private static final String USER = "user";
 
@@ -67,7 +68,7 @@ public class SignalApiTest {
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
-    private static final int FREEZE_RESUME_SLEEP_TIME = 2000;
+    private static final int NUMBER_OF_NODES = 1;
 
     private static SynchronizationInternal synchronizationInternal;
 
@@ -81,7 +82,7 @@ public class SignalApiTest {
     private static ExecutorService executor;
 
     @BeforeClass
-    public static void classInit() throws IOException, ActiveObjectCreationException, NodeException {
+    public static void classInit() throws IOException, ActiveObjectCreationException, NodeException, AlreadyBoundException {
         CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
         if (System.getProperty("log4j.configuration") == null) {
             // While logger is not configured and it not set with sys properties, use Console logger
@@ -92,6 +93,15 @@ public class SignalApiTest {
         Logger.getLogger(SignalApiImpl.class).setLevel(Level.TRACE);
 
         tempFolder = folder.newFolder("signal");
+
+        System.out.println(Arrays.asList(ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes()));
+
+        if (ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes().isEmpty()){
+            for(int i=0; i<NUMBER_OF_NODES;i++) {
+                ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode("signal-node-"+i,true,"signal-v-node-"+i);
+            }
+        }
+
         synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
                                                            new Object[] { tempFolder.getAbsolutePath() });
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
