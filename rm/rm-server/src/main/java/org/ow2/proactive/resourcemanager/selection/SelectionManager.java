@@ -262,58 +262,60 @@ public abstract class SelectionManager {
         List<Node> matchedNodes;
         if (hasScripts) {
             // checking if all scripts are authorized
-            checkAuthorizedScripts(criteria.getScripts());
+            if (checkAuthorizedScripts(criteria.getScripts())) {
 
-            // arranging nodes for script execution
-            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes,
-                                                                        criteria.getScripts(),
-                                                                        criteria.getBindings());
-            List<RMNode> arrangedFilteredNodes = arrangedNodes;
-            if (criteria.getTopology().isTopologyBased()) {
-                arrangedFilteredNodes = topologyNodesFilter.filterNodes(criteria, arrangedNodes);
-            }
+                // arranging nodes for script execution
+                List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes,
+                                                                            criteria.getScripts(),
+                                                                            criteria.getBindings());
+                List<RMNode> arrangedFilteredNodes = arrangedNodes;
+                if (criteria.getTopology().isTopologyBased()) {
+                    arrangedFilteredNodes = topologyNodesFilter.filterNodes(criteria, arrangedNodes);
+                }
 
-            if (arrangedFilteredNodes.isEmpty()) {
-                matchedNodes = new LinkedList<>();
-            } else if (electedToRunOnAllNodes(criteria)) {
-                // run scripts on all available nodes
-                matchedNodes = runScripts(arrangedFilteredNodes, criteria);
+                if (arrangedFilteredNodes.isEmpty()) {
+                    matchedNodes = new LinkedList<>();
+                } else if (electedToRunOnAllNodes(criteria)) {
+                    // run scripts on all available nodes
+                    matchedNodes = runScripts(arrangedFilteredNodes, criteria);
+                } else {
+                    // run scripts not on all nodes, but always on missing number of
+                    // nodes
+                    // until required node set is found
+                    matchedNodes = new LinkedList<>();
+                    while (matchedNodes.size() < criteria.getSize()) {
+                        int numberOfNodesForScriptExecution = criteria.getSize() - matchedNodes.size();
+
+                        if (numberOfNodesForScriptExecution < PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()) {
+                            // we can run
+                            // "PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()"
+                            // scripts in parallel
+                            // in case when we need less nodes it still useful to
+                            // the full capacity of the thread pool to find nodes
+                            // quicker
+
+                            // it is not important if we find more nodes than needed
+                            // subset will be selected later (topology handlers)
+                            numberOfNodesForScriptExecution = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt();
+                        }
+
+                        List<RMNode> subset = arrangedFilteredNodes.subList(0,
+                                                                            Math.min(numberOfNodesForScriptExecution,
+                                                                                     arrangedFilteredNodes.size()));
+                        matchedNodes.addAll(runScripts(subset, criteria));
+                        // removing subset of arrangedNodes
+                        subset.clear();
+
+                        if (arrangedFilteredNodes.size() == 0) {
+                            break;
+                        }
+                    }
+                    if (loggerIsDebugEnabled) {
+                        logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+                    }
+                }
             } else {
-
-                // run scripts not on all nodes, but always on missing number of
-                // nodes
-                // until required node set is found
                 matchedNodes = new LinkedList<>();
-                while (matchedNodes.size() < criteria.getSize()) {
-                    int numberOfNodesForScriptExecution = criteria.getSize() - matchedNodes.size();
-
-                    if (numberOfNodesForScriptExecution < PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()) {
-                        // we can run
-                        // "PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()"
-                        // scripts in parallel
-                        // in case when we need less nodes it still useful to
-                        // the full capacity of the thread pool to find nodes
-                        // quicker
-
-                        // it is not important if we find more nodes than needed
-                        // subset will be selected later (topology handlers)
-                        numberOfNodesForScriptExecution = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt();
-                    }
-
-                    List<RMNode> subset = arrangedFilteredNodes.subList(0,
-                                                                        Math.min(numberOfNodesForScriptExecution,
-                                                                                 arrangedFilteredNodes.size()));
-                    matchedNodes.addAll(runScripts(subset, criteria));
-                    // removing subset of arrangedNodes
-                    subset.clear();
-
-                    if (arrangedFilteredNodes.size() == 0) {
-                        break;
-                    }
-                }
-                if (loggerIsDebugEnabled) {
-                    logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
-                }
             }
 
         } else {
@@ -428,22 +430,26 @@ public abstract class SelectionManager {
     /**
      * Checks is all scripts are authorized. If not throws an exception.
      */
-    private void checkAuthorizedScripts(List<SelectionScript> scripts) {
+    private boolean checkAuthorizedScripts(List<SelectionScript> scripts) {
         updateAuthorizedScriptsSignatures();
         if (authorizedSelectionScripts == null || scripts == null)
-            return;
+            return true;
+
+        boolean allAuthorized = true;
 
         for (SelectionScript script : scripts) {
-            checkContentAuthorization(script.fetchScript());
+            allAuthorized = allAuthorized && checkContentAuthorization(script.fetchScript());
         }
+        return allAuthorized;
     }
 
-    private void checkContentAuthorization(String content) {
+    private boolean checkContentAuthorization(String content) {
         if (content != null && !authorizedSelectionScripts.contains(Script.digest(content.trim()))) {
             // unauthorized selection script
-            throw new SecurityException("Cannot execute unauthorized script: " + System.getProperty("line.separator") +
-                                        content);
+            logger.error("Cannot execute unauthorized script: " + System.getProperty("line.separator") + content);
+            return false;
         }
+        return true;
     }
 
     /**
