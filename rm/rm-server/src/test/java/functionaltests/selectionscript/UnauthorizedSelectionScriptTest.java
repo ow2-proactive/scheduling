@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -59,32 +60,44 @@ public class UnauthorizedSelectionScriptTest extends RMFunctionalTest {
 
         this.rmHelper.createNodeSource("Dummy", 1);
 
+        String authorizedScriptPath = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                                      "/samples/scripts/selection/checkPhysicalFreeMem.js";
+        URL unauthorizedSelectionScriptpath = this.getClass().getResource("dummySelectionScript.js");
+
         log("Test 1 - unautorized script");
         Criteria criteria = new Criteria(1);
-
-        URL vmPropSelectionScriptpath = this.getClass().getResource("dummySelectionScript.js");
         List<SelectionScript> scripts = new ArrayList<>();
-        scripts.add(new SelectionScript(new File(vmPropSelectionScriptpath.toURI()), null, true));
+        scripts.add(new SelectionScript(new File(unauthorizedSelectionScriptpath.toURI()), null, true));
         criteria.setScripts(scripts);
-        try {
-            NodeSet ns = rm.getNodes(criteria);
-            System.out.println("Number of nodes matched " + ns.size());
-            fail("Executed unauthorized selection script");
-        } catch (SecurityException ex) {
-            log("Test 1 - passed");
-        }
+
+        NodeSet ns = rm.getNodes(criteria);
+        System.out.println("Number of nodes matched " + ns.size());
+        Assert.assertEquals("No nodes should be selected by the unauthorized script", 0, ns.size());
+        log("Test 1 - passed");
 
         log("Test 2 - authorized script");
 
-        String authorizedScriptPath = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                                      "/samples/scripts/selection/checkPhysicalFreeMem.js";
+        criteria = new Criteria(1);
         scripts = new ArrayList<>();
         scripts.add(new SelectionScript(new File(authorizedScriptPath), new String[] { "1" }, true));
         criteria.setScripts(scripts);
-        NodeSet ns = rm.getNodes(criteria);
+        ns = rm.getNodes(criteria);
         System.out.println("Number of nodes matched " + ns.size());
         assertEquals(1, ns.size());
 
+        rm.releaseNodes(ns);
         log("Test 2 - passed");
+
+        log("Test 3 - list with authorized and unauthorized scripts");
+        criteria = new Criteria(1);
+        scripts = new ArrayList<>();
+        scripts.add(new SelectionScript(new File(unauthorizedSelectionScriptpath.toURI()), null, true));
+        scripts.add(new SelectionScript(new File(authorizedScriptPath), new String[] { "1" }, true));
+        criteria.setScripts(scripts);
+        ns = rm.getNodes(criteria);
+        System.out.println("Number of nodes matched " + ns.size());
+        Assert.assertEquals("No nodes should be selected by the unauthorized script", 0, ns.size());
+
+        log("Test 3 - passed");
     }
 }
