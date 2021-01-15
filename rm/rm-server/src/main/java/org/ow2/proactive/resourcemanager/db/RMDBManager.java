@@ -104,7 +104,7 @@ public class RMDBManager {
 
             if (logger.isInfoEnabled()) {
                 logger.info("Starting RM DB Manager " + "with drop DB = " + drop + " and drop nodesources = " + dropNS +
-                        " and configuration file = " + configFile.getAbsolutePath());
+                            " and configuration file = " + configFile.getAbsolutePath());
             }
 
             Configuration configuration = new Configuration();
@@ -119,7 +119,7 @@ public class RMDBManager {
                     // Unwrap the decrypted property to let the connection pool framework see it
                     // (as the connection pool framework reads properties using entryset iterators and jasypt EncryptableProperties does not override them)
                     configuration.setProperty(PROP_HIBERNATE_CONNECTION_PASSWORD,
-                            properties.getProperty(PROP_HIBERNATE_CONNECTION_PASSWORD));
+                                              properties.getProperty(PROP_HIBERNATE_CONNECTION_PASSWORD));
                 } catch (IOException e) {
                     throw new IllegalArgumentException(e);
                 }
@@ -133,7 +133,7 @@ public class RMDBManager {
         Configuration config = new Configuration();
         config.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbc.JDBCDriver");
         config.setProperty("hibernate.connection.url",
-                "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
+                           "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
         config.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         return new RMDBManager(config, true, true);
     }
@@ -141,8 +141,8 @@ public class RMDBManager {
     public void startHouseKeeping() {
         houseKeepingScheduler = new Scheduler();
         if (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.isSet() &&
-                PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0 &&
-                PAResourceManagerProperties.RM_HISTORY_REMOVAL_CRONPERIOD.isSet()) {
+            PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0 &&
+            PAResourceManagerProperties.RM_HISTORY_REMOVAL_CRONPERIOD.isSet()) {
             String cronExpr = PAResourceManagerProperties.RM_HISTORY_REMOVAL_CRONPERIOD.getValueAsString();
             houseKeepingScheduler.schedule(cronExpr, new HousekeepingRunner());
             houseKeepingScheduler.start();
@@ -229,10 +229,10 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 int updated = session.createSQLQuery("update NodeHistory set endTime = :endTime where endTime = 0")
-                        .setParameter("endTime", lastAliveTime)
-                        .executeUpdate();
+                                     .setParameter("endTime", lastAliveTime)
+                                     .executeUpdate();
                 updated = +session.createSQLQuery("update NodeHistory set endTime = startTime where endTime < startTime")
-                        .executeUpdate();
+                                  .executeUpdate();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("Restoring the node history: " + updated + " raws updated");
@@ -247,10 +247,10 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 int updated = session.createSQLQuery("update UserHistory set endTime = :endTime where endTime = 0")
-                        .setParameter("endTime", lastAliveTime)
-                        .executeUpdate();
+                                     .setParameter("endTime", lastAliveTime)
+                                     .executeUpdate();
                 updated = +session.createSQLQuery("update UserHistory set endTime = startTime where endTime < startTime")
-                        .executeUpdate();
+                                  .executeUpdate();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("Restoring the user history: " + updated + " raws updated");
@@ -324,7 +324,7 @@ public class RMDBManager {
             return persisted;
         } catch (RuntimeException e) {
             throw new RuntimeException("Exception occurred while adding new node source " + nodeSourceData.getName(),
-                    e);
+                                       e);
         }
     }
 
@@ -513,14 +513,14 @@ public class RMDBManager {
                 @Override
                 public Void doInTransaction(Session session) {
                     session.getNamedQuery("deleteAllRMNodeDataFromNodeSource")
-                            .setParameter("name", nodeSourceName)
-                            .executeUpdate();
+                           .setParameter("name", nodeSourceName)
+                           .executeUpdate();
                     return null;
                 }
             });
         } catch (RuntimeException e) {
             throw new RuntimeException("Exception occurred while removing all nodes from node source " +
-                    nodeSourceName + " in the database", e);
+                                       nodeSourceName + " in the database", e);
         }
     }
 
@@ -533,8 +533,8 @@ public class RMDBManager {
                 public RMNodeData doInTransaction(Session session) {
                     logger.debug("Retrieve node " + nodeName + IN_DATABASE_STRING);
                     Query query = session.getNamedQuery("getRMNodeDataByNameAndUrl")
-                            .setParameter("name", nodeName)
-                            .setParameter("url", nodeUrl);
+                                         .setParameter("name", nodeName)
+                                         .setParameter("url", nodeUrl);
                     return (RMNodeData) query.uniqueResult();
                 }
             });
@@ -545,7 +545,7 @@ public class RMDBManager {
 
     public Collection<RMNodeData> getNodesByNodeSource(final String nodeSourceName) {
         logger.debug(REQUEST_BUFFER_STRING + "retrieve node with node source name " + nodeSourceName +
-                IN_DATABASE_STRING);
+                     IN_DATABASE_STRING);
         rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
             logger.debug("Retrieve nodes from node source " + nodeSourceName + IN_DATABASE_STRING);
@@ -554,13 +554,13 @@ public class RMDBManager {
                 @SuppressWarnings("unchecked")
                 public Collection<RMNodeData> doInTransaction(Session session) {
                     Query query = session.getNamedQuery("getRMNodeDataByNodeSource").setParameter("name",
-                            nodeSourceName);
+                                                                                                  nodeSourceName);
                     return (Collection<RMNodeData>) query.list();
                 }
             });
         } catch (RuntimeException e) {
             throw new RuntimeException("Exception occurred while getting node by node source name " + nodeSourceName,
-                    e);
+                                       e);
         }
     }
 
@@ -607,9 +607,9 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 session.createSQLQuery("update NodeHistory set endTime=:endTime where nodeUrl=:nodeUrl and endTime=0")
-                        .setParameter("endTime", nodeHistory.getStartTime())
-                        .setParameter("nodeUrl", nodeHistory.getNodeUrl())
-                        .executeUpdate();
+                       .setParameter("endTime", nodeHistory.getStartTime())
+                       .setParameter("nodeUrl", nodeHistory.getNodeUrl())
+                       .executeUpdate();
 
                 if (nodeHistory.isStoreInDataBase()) {
                     session.save(nodeHistory);
@@ -624,13 +624,13 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 if (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.isSet() &&
-                        PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0) {
+                    PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0) {
                     long oldestTime = System.currentTimeMillis() -
-                            (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() * 1000);
+                                      (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() * 1000);
 
                     int nbEntriesDeleted = session.createSQLQuery("delete from NodeHistory where startTime<:minTime")
-                            .setParameter("minTime", oldestTime)
-                            .executeUpdate();
+                                                  .setParameter("minTime", oldestTime)
+                                                  .executeUpdate();
                     if (nbEntriesDeleted > 0) {
                         logger.info("HOUSEKEEPING of NodeHistory performed, deleted " + nbEntriesDeleted + " entries");
                     }
@@ -645,13 +645,13 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 if (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.isSet() &&
-                        PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0) {
+                    PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0) {
                     long oldestTime = System.currentTimeMillis() -
-                            (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() * 1000);
+                                      (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() * 1000);
 
                     int nbEntriesDeleted = session.createSQLQuery("delete from UserHistory where startTime<:minTime")
-                            .setParameter("minTime", oldestTime)
-                            .executeUpdate();
+                                                  .setParameter("minTime", oldestTime)
+                                                  .executeUpdate();
                     if (nbEntriesDeleted > 0) {
                         logger.info("HOUSEKEEPING of UserHistory performed, deleted " + nbEntriesDeleted + " entries");
                     }
@@ -724,8 +724,8 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 session.createSQLQuery("update Alive set " + columnName + " = :time")
-                        .setParameter("time", value)
-                        .executeUpdate();
+                       .setParameter("time", value)
+                       .executeUpdate();
                 return null;
             }
         });
@@ -758,13 +758,13 @@ public class RMDBManager {
                     }
 
                     int nbUpdates = session.createSQLQuery("update LockHistory set lockCount = :lockCount where nodeSource = :nodeSource")
-                            .setParameter("lockCount", lockHistory.getLockCount())
-                            .setParameter("nodeSource", lockHistory.getNodeSource())
-                            .executeUpdate();
+                                           .setParameter("lockCount", lockHistory.getLockCount())
+                                           .setParameter("nodeSource", lockHistory.getNodeSource())
+                                           .executeUpdate();
 
                     if (nbUpdates <= 0) {
                         logger.warn("Lock history update has failed for a node that belongs to Node source " +
-                                nodeSource);
+                                    nodeSource);
                     }
                 }
 
@@ -828,7 +828,7 @@ public class RMDBManager {
             //            we include everything else
             //            when an event as no endingtime the  value of the endingtime will be 0
             Query query = session.createQuery("FROM NodeHistory " + "WHERE (endTime = 0 OR :windowStart <= endTime) " +
-                    "AND ( startTime <= :windowEnd )");
+                                              "AND ( startTime <= :windowEnd )");
             query.setParameter("windowStart", windowStart);
             query.setParameter("windowEnd", windowEnd);
             return (List<NodeHistory>) query.list();
