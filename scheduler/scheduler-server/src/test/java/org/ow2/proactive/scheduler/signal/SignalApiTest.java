@@ -25,16 +25,7 @@
  */
 package org.ow2.proactive.scheduler.signal;
 
-import java.io.File;
-import java.io.IOException;
-import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+import com.jayway.awaitility.Awaitility;
 import org.apache.log4j.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -42,6 +33,7 @@ import org.junit.runners.MethodSorters;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -54,7 +46,15 @@ import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.tests.ProActiveTestClean;
 
-import com.jayway.awaitility.Awaitility;
+import java.io.File;
+import java.io.IOException;
+import java.rmi.AlreadyBoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -95,18 +95,12 @@ public class SignalApiTest extends ProActiveTestClean {
 
         tempFolder = folder.newFolder("signal");
 
-        System.out.println(Arrays.asList(ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes()));
-
-        if (ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes().isEmpty()) {
-            for (int i = 0; i < NUMBER_OF_NODES; i++) {
-                ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode("signal-node-" + i,
+        Node localNode =  ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode("signal-node-0",
                                                                            true,
-                                                                           "signal-v-node-" + i);
-            }
-        }
+                                                                           "signal-v-node-0");
 
         synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
-                                                           new Object[] { tempFolder.getAbsolutePath() });
+                                                           new Object[] { tempFolder.getAbsolutePath() },localNode);
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
         executor = Executors.newFixedThreadPool(2);
     }
