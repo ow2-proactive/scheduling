@@ -931,9 +931,6 @@ public class RMRest implements RMRestInterface {
                                                                                                                                                Collectors.groupingBy(this::getNodeName))));
         grouped.values().forEach(a -> a.values().forEach(b -> {
             b.values().forEach(c -> {
-                // sorting by startTime
-                c.sort(Comparator.comparing(RMNodeHistory::getStartTime));
-
                 c.forEach(nh -> {
                     // if startTime before window
                     if (nh.getStartTime() < windowStart) {
@@ -949,6 +946,9 @@ public class RMRest implements RMRestInterface {
                         nh.setEndTime(windowEnd);
                     }
                 });
+
+                // sorting by startTime
+                c.sort(Comparator.comparing(RMNodeHistory::getStartTime));
             });
         }));
 
