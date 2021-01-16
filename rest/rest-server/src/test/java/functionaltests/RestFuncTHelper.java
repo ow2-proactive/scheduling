@@ -26,6 +26,7 @@
 package functionaltests;
 
 import static com.jayway.awaitility.Awaitility.await;
+import static functionaltests.utils.RestFuncTUtils.cleanupActiveObjectRegistry;
 
 import java.io.*;
 import java.net.URI;
@@ -39,12 +40,12 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.http.HttpClientBuilder;
@@ -96,6 +97,12 @@ public class RestFuncTHelper {
     private static ResourceManager rm;
 
     private static PublicKey schedulerPublicKey;
+
+    private static final String SYNCHRONIZATION_NODE_NAME = "synchronization-node-0";
+
+    private static final String SYNCHRONIZATION_V_NODE_NAME = "synchronization-v-node-0";
+
+    private static AOSynchronization synchronization;
 
     private RestFuncTHelper() {
     }
@@ -162,6 +169,8 @@ public class RestFuncTHelper {
         restfulSchedulerUrl = restServerUrl + "scheduler";
         restfulRmUrl = restServerUrl + "rm";
 
+        startSynchronizationAPI();
+
         await().atMost(new Duration(900, TimeUnit.SECONDS)).until(restIsStarted());
     }
 
@@ -196,7 +205,9 @@ public class RestFuncTHelper {
                 error.printStackTrace();
             } finally {
                 try {
-                    RestFuncTUtils.cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
+                    // clean synchronization api
+                    cleanSynchronizationAPI();
+                    cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
                 } catch (Throwable error) {
 
                 }
@@ -224,15 +235,6 @@ public class RestFuncTHelper {
     }
 
     public static Scheduler getScheduler() {
-        try {
-            PAActiveObject.newActive(AOSynchronization.class,
-                                     new Object[] { PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_SYNCHRONIZATION_DATABASE.getValueAsString()) });
-        } catch (ActiveObjectCreationException e) {
-            System.err.println("Could not start synchronization service.");
-        } catch (NodeException e) {
-            System.err.println("Could not start synchronization service.");
-        }
-
         return scheduler;
     }
 
@@ -339,5 +341,32 @@ public class RestFuncTHelper {
             baseRestUrl = baseRestUrl + "/";
         }
         return baseRestUrl + resource;
+    }
+
+    private static void startSynchronizationAPI() {
+        try {
+            System.out.println("Starting Synchronization API");
+            Node localNode = ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode(SYNCHRONIZATION_NODE_NAME,
+                                                                                        true,
+                                                                                        SYNCHRONIZATION_V_NODE_NAME);
+            AOSynchronization synchronization = PAActiveObject.newActive(AOSynchronization.class,
+                                                                         new Object[] { PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_SYNCHRONIZATION_DATABASE.getValueAsString()) },
+                                                                         localNode);
+            PAActiveObject.registerByName(synchronization, SchedulerConstants.SYNCHRONIZATION_DEFAULT_NAME);
+
+        } catch (Exception e) {
+            System.err.println("Could not start synchronization service.");
+        }
+    }
+
+    private static void cleanSynchronizationAPI() {
+        try {
+            PAActiveObject.unregister(PAActiveObject.getActiveObjectNodeUrl(synchronization));
+            PAActiveObject.terminateActiveObject(synchronization, true);
+            ProActiveRuntimeImpl.getProActiveRuntime().killNode(SYNCHRONIZATION_NODE_NAME);
+
+        } catch (Exception e) {
+            System.err.println("Could not start synchronization service.");
+        }
     }
 }
