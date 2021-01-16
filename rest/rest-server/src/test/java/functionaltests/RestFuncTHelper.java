@@ -30,6 +30,7 @@ import static com.jayway.awaitility.Awaitility.await;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.rmi.AlreadyBoundException;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -43,8 +44,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.http.HttpClientBuilder;
@@ -225,11 +228,17 @@ public class RestFuncTHelper {
 
     public static Scheduler getScheduler() {
         try {
+            Node localNode = ProActiveRuntimeImpl.getProActiveRuntime().createLocalNode("local-node-0",
+                                                                                        true,
+                                                                                        "local-v-node-0");
             PAActiveObject.newActive(AOSynchronization.class,
-                                     new Object[] { PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_SYNCHRONIZATION_DATABASE.getValueAsString()) });
+                                     new Object[] { PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_SYNCHRONIZATION_DATABASE.getValueAsString()) },
+                                     localNode);
         } catch (ActiveObjectCreationException e) {
             System.err.println("Could not start synchronization service.");
         } catch (NodeException e) {
+            System.err.println("Could not start synchronization service.");
+        } catch (AlreadyBoundException e) {
             System.err.println("Could not start synchronization service.");
         }
 
