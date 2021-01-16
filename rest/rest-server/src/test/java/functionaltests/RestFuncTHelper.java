@@ -31,6 +31,7 @@ import static functionaltests.utils.RestFuncTUtils.cleanupActiveObjectRegistry;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.rmi.AlreadyBoundException;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -44,6 +45,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
@@ -364,9 +366,8 @@ public class RestFuncTHelper {
             PAActiveObject.unregister(PAActiveObject.getActiveObjectNodeUrl(synchronization));
             PAActiveObject.terminateActiveObject(synchronization, true);
             ProActiveRuntimeImpl.getProActiveRuntime().killNode(SYNCHRONIZATION_NODE_NAME);
-
-        } catch (Exception e) {
-            System.err.println("Could not start synchronization service.");
+        } catch (IOException e) {
+            System.err.println("Could not properly clean synchronization service.");
         }
     }
 }
