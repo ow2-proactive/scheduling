@@ -1578,22 +1578,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                     .stream()
                     .parallel()
                     .filter(jobInfo -> jobHavingSignalsIds.contains(jobInfo.getJobId().value()))
-                    .map(jobInfo -> {
-                        try {
-                            jobInfo.getSignals()
-                                   .addAll((List) publicStore.get(SIGNAL_ORIGINATOR,
-                                                                  SIGNAL_TASK_ID,
-                                                                  signalsChannel,
-                                                                  jobInfo.getJobId().value()));
-
-                            return jobInfo;
-
-                        } catch (InvalidChannelException e) {
-                            logger.warn("Could not acquire the signals of the job with job ID " +
-                                        jobInfo.getJobId().value());
-                            return jobInfo;
-                        }
-                    })
+                    .map(jobInfo -> insertJobSignals(jobInfo))
                     .collect(Collectors.toList());
         } catch (InvalidChannelException e) {
             logger.warn("Could not acquire the list of jobs having signals. No signals will be included in the returned jobs info");
@@ -1742,22 +1727,32 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         JobInfo jobInfo = getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
 
-        try {
-            if (publicStore.containsKey(SIGNAL_ORIGINATOR,
-                                        SIGNAL_TASK_ID,
-                                        signalsChannel,
-                                        jobInfo.getJobId().value())) {
+        insertJobSignals(jobInfo);
 
-                jobInfo.getSignals()
-                       .addAll((List) publicStore.get(SIGNAL_ORIGINATOR,
-                                                      SIGNAL_TASK_ID,
-                                                      signalsChannel,
-                                                      jobInfo.getJobId().value()));
+        return jobInfo;
+    }
+
+    private JobInfo insertJobSignals(JobInfo jobInfo) {
+
+        String jobid = jobInfo.getJobId().value();
+
+        try {
+
+            if (publicStore.containsKey(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobid)) {
+
+                List<String> jobSignals = jobInfo.getSignals();
+                List<String> signalsToBeAdded = (List) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                       SIGNAL_TASK_ID,
+                                                                       signalsChannel,
+                                                                       jobid);
+                if (!signalsToBeAdded.isEmpty()) {
+                    jobSignals.addAll(signalsToBeAdded);
+                    jobInfo.setSignals(jobSignals);
+                }
             }
         } catch (InvalidChannelException e) {
-            logger.warn("Could not retrieve the signals of the job " + jobId);
+            logger.warn("Could not retrieve the signals of the job " + jobid);
         }
-
         return jobInfo;
     }
 
