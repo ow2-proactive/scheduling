@@ -1747,6 +1747,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                          SIGNAL_TASK_ID,
                                                          signalsChannel,
                                                          jobInfo.getJobId().value()));
+
                 jobInfo.setSignals(jobSignals);
             }
         } catch (InvalidChannelException e) {
