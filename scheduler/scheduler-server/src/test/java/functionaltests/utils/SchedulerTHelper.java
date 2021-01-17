@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
@@ -1262,7 +1263,7 @@ public class SchedulerTHelper {
 
         long wait = 0;
         while (remainingAO && wait < timeoutValue) {
-            Thread.sleep(50);
+            TimeUnit.MILLISECONDS.sleep(50);
             wait += 50;
             remainingAO = false;
             nodesWithRemainingAO.clear();

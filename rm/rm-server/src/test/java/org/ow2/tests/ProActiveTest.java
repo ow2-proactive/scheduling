@@ -43,8 +43,13 @@ public class ProActiveTest {
 
     static {
         configureSecurityManager();
+        configureProtocol();
         configurePAHome();
         configureLog4j();
+    }
+
+    private static void configureProtocol() {
+        CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.setValue("pnp");
     }
 
     private static void configureLog4j() {

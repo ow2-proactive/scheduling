@@ -1461,6 +1461,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
+    @Override
+    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+        try {
+            return restApi().addJobSignal(sessionId, jobId, signal);
+        } catch (RestException e) {
+            throw RestException.unwrapRestException(e);
+        }
+    }
+
     private org.apache.http.impl.client.HttpClientBuilder getHttpClientBuilder()
             throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         SSLContextBuilder builder = new SSLContextBuilder();

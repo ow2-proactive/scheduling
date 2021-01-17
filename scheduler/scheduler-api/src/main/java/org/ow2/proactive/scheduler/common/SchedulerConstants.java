@@ -107,6 +107,11 @@ public class SchedulerConstants {
     public static final String SYNCHRONIZATION_API_BINDING_NAME = "synchronizationapi";
 
     /**
+     * The variable containing a proxy to the signal API
+     */
+    public static final String SIGNAL_API_BINDING_NAME = "signalapi";
+
+    /**
      * Marker in the task output to locate the remote connection hint
      *  
      * for the hint to be detected client side, the following String has 

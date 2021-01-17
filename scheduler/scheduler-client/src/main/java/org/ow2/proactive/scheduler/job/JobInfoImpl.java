@@ -131,6 +131,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> variables;
 
+    private List<String> signals;
+
     public JobInfoImpl() {
     }
 
@@ -171,6 +173,7 @@ public class JobInfoImpl implements JobInfo {
         }
         this.genericInformation = jobInfo.getGenericInformation();
         this.variables = jobInfo.getVariables();
+        this.signals = jobInfo.getSignals();
     }
 
     /**
@@ -471,6 +474,11 @@ public class JobInfoImpl implements JobInfo {
 
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
+    }
+
+    @Override
+    public List<String> getSignals() {
+        return (signals == null) ? new ArrayList<>() : signals;
     }
 
 }

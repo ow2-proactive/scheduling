@@ -55,6 +55,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -94,7 +95,6 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
-import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
@@ -160,7 +160,9 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
+import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
@@ -226,6 +228,19 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
 
     private it.sauronsoftware.cron4j.Scheduler metricsMonitorScheduler;
+
+    /**
+     * Attributes used for the signal api
+     */
+    private SynchronizationInternal publicStore;
+
+    private String signalsChannel = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
+
+    private static final String SIGNAL_ORIGINATOR = "SCHEDULER";
+
+    private static final String SIGNAL_TASK = "0000000t0";
+
+    private static final TaskId SIGNAL_TASK_ID = TaskIdImpl.makeTaskId(SIGNAL_TASK);
 
     /*
      * ######################################################################### ##################
@@ -339,7 +354,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
             logger.debug("Booting jmx...");
             this.jmxHelper.boot(authentication);
-            SynchronizationInternal publicStore = startSynchronizationService();
+            publicStore = startSynchronizationService();
 
             RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(dbManager).recover(loadJobPeriod,
                                                                                                         rmProxy,
@@ -414,6 +429,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
         // register this service and give it a name
         PAActiveObject.registerByName(publicStore, SchedulerConstants.SYNCHRONIZATION_DEFAULT_NAME);
+
+        publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, true);
+
         return publicStore;
     }
 
@@ -1540,13 +1558,48 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         if (myJobsOnly) {
             user = ident.getUsername();
         }
-        return dbManager.getJobs(offset,
-                                 limit,
-                                 user,
-                                 filterCriteria.isPending(),
-                                 filterCriteria.isRunning(),
-                                 filterCriteria.isFinished(),
-                                 sortParameters);
+
+        Page<JobInfo> jobsInfo = dbManager.getJobs(offset,
+                                                   limit,
+                                                   user,
+                                                   filterCriteria.isPending(),
+                                                   filterCriteria.isRunning(),
+                                                   filterCriteria.isFinished(),
+                                                   sortParameters);
+
+        /**
+         * Add/inject to each JobInfo the list of signals, if they exist, used by the job.
+         */
+        try {
+            List<String> jobHavingSignalsIds = new ArrayList(publicStore.keySet(SIGNAL_ORIGINATOR,
+                                                                                SIGNAL_TASK_ID,
+                                                                                signalsChannel));
+            jobsInfo.getList()
+                    .stream()
+                    .parallel()
+                    .filter(jobInfo -> jobHavingSignalsIds.contains(jobInfo.getJobId().value()))
+                    .map(jobInfo -> {
+                        try {
+                            jobInfo.getSignals()
+                                   .addAll((List) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                  SIGNAL_TASK_ID,
+                                                                  signalsChannel,
+                                                                  jobInfo.getJobId().value()));
+
+                            return jobInfo;
+
+                        } catch (InvalidChannelException e) {
+                            logger.warn("Could not acquire the signals of the job with job ID " +
+                                        jobInfo.getJobId().value());
+                            return jobInfo;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (InvalidChannelException e) {
+            logger.warn("Could not acquire the list of jobs having signals. No signals will be included in the returned jobs info");
+        }
+
+        return jobsInfo;
     }
 
     /**
@@ -1687,7 +1740,25 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
-        return getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
+        JobInfo jobInfo = getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
+
+        try {
+            if (publicStore.containsKey(SIGNAL_ORIGINATOR,
+                                        SIGNAL_TASK_ID,
+                                        signalsChannel,
+                                        jobInfo.getJobId().value())) {
+
+                jobInfo.getSignals()
+                       .addAll((List) publicStore.get(SIGNAL_ORIGINATOR,
+                                                      SIGNAL_TASK_ID,
+                                                      signalsChannel,
+                                                      jobInfo.getJobId().value()));
+            }
+        } catch (InvalidChannelException e) {
+            logger.warn("Could not retrieve the signals of the job " + jobId);
+        }
+
+        return jobInfo;
     }
 
     /**
@@ -1786,5 +1857,24 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public void endActivity(Body body) {
         ServerJobAndTaskLogs.terminateActiveInstance();
         PAActiveObject.terminateActiveObject(authentication, true);
+    }
+
+    @Override
+    @ImmediateService
+    public boolean addJobSignal(String sessionId, String jobId, String signal) {
+        try {
+
+            List<String> signals = (List) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
+            if (signals == null) {
+                signals = new ArrayList<>();
+            }
+
+            signals.add(signal);
+            publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, (Serializable) signals);
+
+        } catch (IOException | InvalidChannelException p) {
+            return false;
+        }
+        return true;
     }
 }
