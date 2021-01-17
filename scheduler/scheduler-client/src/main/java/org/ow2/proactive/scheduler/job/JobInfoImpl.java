@@ -481,4 +481,8 @@ public class JobInfoImpl implements JobInfo {
         return (signals == null) ? new ArrayList<>() : signals;
     }
 
+    @Override
+    public void setSignals(List<String> signals) {
+        this.signals = signals;
+    }
 }
