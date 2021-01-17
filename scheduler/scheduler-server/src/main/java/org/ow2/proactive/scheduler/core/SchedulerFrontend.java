@@ -1745,6 +1745,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                                        SIGNAL_TASK_ID,
                                                                        signalsChannel,
                                                                        jobid);
+
                 if (signalsToBeAdded != null && !signalsToBeAdded.isEmpty()) {
                     jobSignals.addAll(signalsToBeAdded);
                     jobInfo.setSignals(jobSignals);
