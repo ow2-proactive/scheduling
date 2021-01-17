@@ -480,4 +480,9 @@ public class JobInfoImpl implements JobInfo {
     public List<String> getSignals() {
         return (signals == null) ? new ArrayList<>() : signals;
     }
+
+    @Override
+    public void setSignals(List<String> signals) {
+        this.signals = signals;
+    }
 }
