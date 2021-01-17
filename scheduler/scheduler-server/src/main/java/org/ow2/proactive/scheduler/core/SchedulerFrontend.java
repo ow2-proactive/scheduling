@@ -61,13 +61,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -1747,11 +1741,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                         signalsChannel,
                                         jobInfo.getJobId().value())) {
 
-                jobInfo.getSignals()
-                       .addAll((List) publicStore.get(SIGNAL_ORIGINATOR,
-                                                      SIGNAL_TASK_ID,
-                                                      signalsChannel,
-                                                      jobInfo.getJobId().value()));
+                List<String> jobSignals = jobInfo.getSignals();
+
+                jobSignals.addAll((List) publicStore.get(SIGNAL_ORIGINATOR,
+                                                         SIGNAL_TASK_ID,
+                                                         signalsChannel,
+                                                         jobInfo.getJobId().value()));
+                jobInfo.setSignals(jobSignals);
             }
         } catch (InvalidChannelException e) {
             logger.warn("Could not retrieve the signals of the job " + jobId);
