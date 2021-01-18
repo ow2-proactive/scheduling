@@ -158,7 +158,7 @@ configure(javaSubprojects) {
         testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
 
         testCompile 'org.mockito:mockito-core:1.10.19'
-        testCompile 'ObjectFaker:ObjectFaker:0.1'
+        testCompile 'ObjectFaker:ObjectFaker:0.2'
         testCompile 'com.jayway.awaitility:awaitility:1.6.0'
         testCompile 'org.apache.commons:commons-lang3:3.4'
 

@@ -68,10 +68,8 @@ public class SignalApiImpl implements SignalApi {
         try {
 
             synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
+            synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new ArrayList<>());
 
-            if (!synchronization.containsKey(SIGNALS_CHANNEL, jobId)) {
-                synchronization.put(SIGNALS_CHANNEL, jobId, new ArrayList<>());
-            }
         } catch (IOException | InvalidChannelException e) {
             logger.warn("Could not instantiate Signal API for the job " + jobId, e);
         }

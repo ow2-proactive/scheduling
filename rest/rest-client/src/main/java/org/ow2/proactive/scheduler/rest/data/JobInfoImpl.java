@@ -81,7 +81,7 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> variables;
 
-    private List<String> signals = new ArrayList<>();
+    private List<String> signals;
 
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
@@ -288,7 +288,7 @@ public class JobInfoImpl implements JobInfo {
 
     @Override
     public List<String> getSignals() {
-        return (signals == null) ? new ArrayList<>() : signals;
+        return (signals == null) ? new ArrayList<String>() : signals;
     }
 
     @Override

@@ -230,9 +230,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     private String signalsChannel = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
-    private static final String SIGNAL_ORIGINATOR = "SCHEDULER";
+    private static final String SIGNAL_ORIGINATOR = "scheduler";
 
-    private static final String SIGNAL_TASK = "0000000t0";
+    private static final String SIGNAL_TASK = "0t0";
 
     private static final TaskId SIGNAL_TASK_ID = TaskIdImpl.makeTaskId(SIGNAL_TASK);
 
