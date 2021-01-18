@@ -81,7 +81,7 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> variables;
 
-    private List<String> signals;
+    private List<String> signals = new ArrayList<>();
 
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;

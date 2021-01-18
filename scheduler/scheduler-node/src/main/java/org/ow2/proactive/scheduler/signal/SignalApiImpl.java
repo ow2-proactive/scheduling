@@ -66,9 +66,8 @@ public class SignalApiImpl implements SignalApi {
         jobId = taskId.getJobId().value();
         synchronization = new SynchronizationWrapper(originator, taskId, synchronizationInternal);
         try {
-            if (!synchronization.channelExists(SIGNALS_CHANNEL)) {
-                synchronization.createChannel(SIGNALS_CHANNEL, true);
-            }
+
+            synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
 
             if (!synchronization.containsKey(SIGNALS_CHANNEL, jobId)) {
                 synchronization.put(SIGNALS_CHANNEL, jobId, new ArrayList<>());

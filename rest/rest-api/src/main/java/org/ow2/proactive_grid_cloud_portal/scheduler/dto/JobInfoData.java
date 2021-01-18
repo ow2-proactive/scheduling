@@ -237,6 +237,10 @@ public class JobInfoData implements java.io.Serializable {
         return signals;
     }
 
+    public void setSignals(List<String> signals) {
+        this.signals = signals;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +

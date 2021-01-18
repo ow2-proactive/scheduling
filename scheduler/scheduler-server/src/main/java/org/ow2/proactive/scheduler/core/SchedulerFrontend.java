@@ -61,13 +61,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -1571,12 +1565,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
          * Add/inject to each JobInfo the list of signals, if they exist, used by the job.
          */
         try {
-            List<String> jobHavingSignalsIds = new ArrayList(publicStore.keySet(SIGNAL_ORIGINATOR,
-                                                                                SIGNAL_TASK_ID,
-                                                                                signalsChannel));
+            List<String> jobHavingSignalsIds = new ArrayList<String>(publicStore.keySet(SIGNAL_ORIGINATOR,
+                                                                                        SIGNAL_TASK_ID,
+                                                                                        signalsChannel));
             jobsInfo.getList()
                     .stream()
-                    .parallel()
                     .filter(jobInfo -> jobHavingSignalsIds.contains(jobInfo.getJobId().value()))
                     .map(jobInfo -> insertJobSignals(jobInfo))
                     .collect(Collectors.toList());
@@ -1726,10 +1719,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         JobInfo jobInfo = getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
-
-        insertJobSignals(jobInfo);
-
-        return jobInfo;
+        return insertJobSignals(jobInfo);
     }
 
     private JobInfo insertJobSignals(JobInfo jobInfo) {
@@ -1745,7 +1735,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                                        SIGNAL_TASK_ID,
                                                                        signalsChannel,
                                                                        jobid);
-
                 if (signalsToBeAdded != null && !signalsToBeAdded.isEmpty()) {
                     jobSignals.addAll(signalsToBeAdded);
                     jobInfo.setSignals(jobSignals);
