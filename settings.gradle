@@ -25,5 +25,4 @@ include 'rest:rest-server'
 include 'rest:rest-client'
 include 'rest:rest-smartproxy'
 
-include 'war-wrapper'
 include 'rm:rm-api'

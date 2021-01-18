@@ -868,6 +868,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.checkJobPermissionMethod(sessionId, jobId, method);
     }
 
+    @Override
+    @ImmediateService
+    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+        return uischeduler.addJobSignal(sessionId, jobId, signal);
+    }
+
     public String getStatHistory(String mbeanName, String range, String[] dataSources, String function) {
         return mbeaninfoviewer.retrieveStats(mbeanName, range, dataSources, function);
     }

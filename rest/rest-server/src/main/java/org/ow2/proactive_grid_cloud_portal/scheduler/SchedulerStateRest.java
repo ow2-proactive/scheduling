@@ -204,6 +204,18 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public boolean addJobSignal(String sessionId, String signal, String jobId) throws RestException {
+        boolean signalAdded = false;
+        try {
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
+            signalAdded = s.addJobSignal(sessionId, jobId, signal);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+        return signalAdded;
+    }
+
+    @Override
     public RestPage<UserJobData> jobsInfo(String sessionId, int index, int limit) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
