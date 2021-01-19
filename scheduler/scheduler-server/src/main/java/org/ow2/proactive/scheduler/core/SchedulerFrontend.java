@@ -1562,7 +1562,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    sortParameters);
 
         /**
-         * Add/inject to each JobInfo the list of signals, if they exist, used by the job.
+         * Add/inject to each JobInfo the list of signals used by the job, if they exist.
          */
         try {
             List<String> jobHavingSignalsIds = new ArrayList<String>(publicStore.keySet(SIGNAL_ORIGINATOR,

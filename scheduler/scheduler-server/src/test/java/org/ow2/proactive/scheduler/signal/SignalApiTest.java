@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
+import org.ow2.proactive.scheduler.synchronization.CompilationException;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -107,6 +108,11 @@ public class SignalApiTest extends ProActiveTestClean {
         executor = Executors.newFixedThreadPool(2);
     }
 
+    @Before
+    public void clearJobSignals() {
+        signalApi.clearJobSignals();
+    }
+
     @AfterClass
     public static void cleanUp() {
         executor.shutdownNow();
@@ -115,9 +121,16 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testReadyForSignal() throws InvalidChannelException {
+    public void testReadyForSignal() throws InvalidChannelException, IOException, CompilationException {
         String signal = "test_signal_1";
+        signalApi.addSignal(signal);
         signalApi.readyForSignal(signal);
+
+        Assert.assertFalse(((List) synchronizationInternal.get(USER,
+                                                               TASK_ID,
+                                                               SIGNALS_CHANNEL,
+                                                               JOB_ID.value())).contains(signal));
+
         Assert.assertTrue(((List) synchronizationInternal.get(USER,
                                                               TASK_ID,
                                                               SIGNALS_CHANNEL,
@@ -126,14 +139,14 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testIsReceived() throws InvalidChannelException {
+    public void testIsReceived() throws InvalidChannelException, IOException, CompilationException {
         String signal = "test_signal_2";
         signalApi.addSignal(signal);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
 
     @Test
-    public void testSendSignal() throws InvalidChannelException {
+    public void testSendSignal() throws InvalidChannelException, IOException, CompilationException {
         String signal = "test_signal_3";
         signalApi.addSignal(signal);
         Assert.assertTrue(((List) synchronizationInternal.get(USER,
@@ -143,7 +156,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testSendAllSignals() throws InvalidChannelException {
+    public void testSendAllSignals() throws InvalidChannelException, IOException, CompilationException {
         List<String> signalsToBeSent = new ArrayList<>(Arrays.asList("test_signal_4_1", "test_signal_4_2"));
         signalApi.addAllSignals(signalsToBeSent);
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
@@ -151,7 +164,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testRemoveSignal() throws InvalidChannelException {
+    public void testRemoveSignal() throws InvalidChannelException, IOException, CompilationException {
         String signal = "test_signal_5";
         signalApi.addSignal(signal);
         signalApi.removeSignal(signal);
@@ -162,7 +175,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testRemoveAllSignals() throws InvalidChannelException {
+    public void testRemoveAllSignals() throws InvalidChannelException, IOException, CompilationException {
         List<String> signalsToBeRemoved = new ArrayList<>(Arrays.asList("test_signal_6_1", "test_signal_6_2"));
         signalApi.addAllSignals(signalsToBeRemoved);
         signalApi.removeAllSignals(signalsToBeRemoved);
@@ -171,7 +184,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testGetJobSignals() throws InvalidChannelException {
+    public void testGetJobSignals() throws InvalidChannelException, IOException, CompilationException {
         String signal = "test_signal_7";
         signalApi.addSignal(signal);
         Assert.assertFalse(signalApi.getJobSignals().isEmpty());
@@ -230,7 +243,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void z_testClearJobSignals() throws InvalidChannelException {
+    public void z_testClearJobSignals() throws InvalidChannelException, IOException, CompilationException {
         String signal = "test_signal_8";
         signalApi.addSignal(signal);
         signalApi.clearJobSignals();

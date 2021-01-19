@@ -25,10 +25,12 @@
  */
 package org.ow2.proactive.scheduler.signal;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.synchronization.CompilationException;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 
 
@@ -56,7 +58,7 @@ public interface SignalApi extends Serializable {
      * @return true if the signal is successfully added to the list of job signals
      * @throws InvalidChannelException if an error occurred while reading in the signals channel
      */
-    boolean readyForSignal(String signal) throws InvalidChannelException;
+    boolean readyForSignal(String signal) throws InvalidChannelException, IOException, CompilationException;
 
     /**
      * Check if the given signal exists among the list of job signals
@@ -87,7 +89,7 @@ public interface SignalApi extends Serializable {
      * @param signal name of the signal to be added to job signals
      * @return true if the signal is successfully added to job signals
      */
-    boolean addSignal(String signal);
+    boolean addSignal(String signal) throws InvalidChannelException, CompilationException, IOException;
 
     /**
      * Add the given list of signals to job signals
@@ -95,7 +97,7 @@ public interface SignalApi extends Serializable {
      * @param signalsList list of the signals to be added to job signals
      * @return true if all the given signals are successfully added to job signals
      */
-    boolean addAllSignals(List<String> signalsList);
+    boolean addAllSignals(List<String> signalsList) throws InvalidChannelException, CompilationException, IOException;
 
     /**
      * Remove the given {@code signal} from the list of job signals
@@ -103,7 +105,7 @@ public interface SignalApi extends Serializable {
      * @param signal name of the signal to be removed from job signals
      * @return true if the signal is successfully removed from the list of job signals
      */
-    boolean removeSignal(String signal);
+    boolean removeSignal(String signal) throws InvalidChannelException, CompilationException, IOException;
 
     /**
      * Remove the given list of signals from job signals
@@ -111,7 +113,8 @@ public interface SignalApi extends Serializable {
      * @param signalsList list of the signals to be removed from job signals
      * @return true if all the given signals are successfully removed from job signals
      */
-    boolean removeAllSignals(List<String> signalsList);
+    boolean removeAllSignals(List<String> signalsList)
+            throws IOException, InvalidChannelException, CompilationException;
 
     /**
      * Return the list of job signals
