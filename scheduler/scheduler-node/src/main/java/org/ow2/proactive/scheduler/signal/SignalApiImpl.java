@@ -71,7 +71,7 @@ public class SignalApiImpl implements SignalApi {
                 synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
                 synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new ArrayList<>());
             } catch (IOException | InvalidChannelException e) {
-                throw new SignalApiException("Could not instantiate Signal API for the job" + jobId, e);
+                throw new SignalApiException("Could not instantiate Signal API for the job " + jobId, e);
             }
             isInitialized = true;
         }
@@ -90,7 +90,7 @@ public class SignalApiImpl implements SignalApi {
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
-            throw new SignalApiException("Could not add ready signal for the job" + jobId, e);
+            throw new SignalApiException("Could not add ready signal for the job " + jobId, e);
         }
         return true;
     }
@@ -115,7 +115,7 @@ public class SignalApiImpl implements SignalApi {
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
-            throw new SignalApiException("Could not add signal for the job" + jobId, e);
+            throw new SignalApiException("Could not add signal for the job " + jobId, e);
         }
     }
 
@@ -132,7 +132,7 @@ public class SignalApiImpl implements SignalApi {
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
-            throw new SignalApiException("Could not add signals for the job" + jobId, e);
+            throw new SignalApiException("Could not add signals for the job " + jobId, e);
         }
     }
 
@@ -145,7 +145,7 @@ public class SignalApiImpl implements SignalApi {
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
-            throw new SignalApiException("Could not remove signal for the job" + jobId, e);
+            throw new SignalApiException("Could not remove signal for the job " + jobId, e);
         }
     }
 
@@ -167,7 +167,7 @@ public class SignalApiImpl implements SignalApi {
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
-            throw new SignalApiException("Could not add ready signals for the job" + jobId, e);
+            throw new SignalApiException("Could not add ready signals for the job " + jobId, e);
         }
     }
 
@@ -191,7 +191,7 @@ public class SignalApiImpl implements SignalApi {
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (IOException e) {
-            throw new SignalApiException("Could not clear the job entry" + jobId + " from the signals channel", e);
+            throw new SignalApiException("Could not clear the job entry " + jobId + " from the signals channel", e);
         }
     }
 
