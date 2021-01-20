@@ -1230,9 +1230,9 @@ class LiveJobs {
                                                jobId.value());
             }
         } catch (InvalidChannelException e) {
-            jlogger.info(jobId, "Signals channel does not exist. No signals are cleared for the job" + jobId);
+            jlogger.info(jobId, "Signals channel does not exist. No signals are cleared for the job " + jobId);
         } catch (IOException e) {
-            jlogger.warn(jobId, "Could not clear the job" + jobId + " from the signals channel");
+            jlogger.warn(jobId, "Could not clear the job " + jobId + " from the signals channel");
         }
     }
 
