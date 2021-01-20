@@ -50,7 +50,6 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
-import org.ow2.proactive.scheduler.synchronization.CompilationException;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -69,8 +68,6 @@ public class SignalApiTest extends ProActiveTestClean {
     private static final TaskId TASK_ID = TaskIdImpl.createTaskId(JOB_ID, "Task", 0);
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
-
-    private static final int NUMBER_OF_NODES = 1;
 
     private static SynchronizationInternal synchronizationInternal;
 
@@ -109,7 +106,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Before
-    public void clearJobSignals() {
+    public void clearJobSignals() throws SignalApiException {
         signalApi.clearJobSignals();
     }
 
@@ -121,7 +118,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testReadyForSignal() throws InvalidChannelException, IOException, CompilationException {
+    public void testReadyForSignal() throws SignalApiException, InvalidChannelException {
         String signal = "test_signal_1";
         signalApi.addSignal(signal);
         signalApi.readyForSignal(signal);
@@ -139,14 +136,14 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testIsReceived() throws InvalidChannelException, IOException, CompilationException {
+    public void testIsReceived() throws SignalApiException {
         String signal = "test_signal_2";
         signalApi.addSignal(signal);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
 
     @Test
-    public void testSendSignal() throws InvalidChannelException, IOException, CompilationException {
+    public void testSendSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_3";
         signalApi.addSignal(signal);
         Assert.assertTrue(((List) synchronizationInternal.get(USER,
@@ -156,7 +153,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testSendAllSignals() throws InvalidChannelException, IOException, CompilationException {
+    public void testSendAllSignals() throws InvalidChannelException, SignalApiException {
         List<String> signalsToBeSent = new ArrayList<>(Arrays.asList("test_signal_4_1", "test_signal_4_2"));
         signalApi.addAllSignals(signalsToBeSent);
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
@@ -164,7 +161,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testRemoveSignal() throws InvalidChannelException, IOException, CompilationException {
+    public void testRemoveSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_5";
         signalApi.addSignal(signal);
         signalApi.removeSignal(signal);
@@ -175,7 +172,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testRemoveAllSignals() throws InvalidChannelException, IOException, CompilationException {
+    public void testRemoveAllSignals() throws InvalidChannelException, SignalApiException {
         List<String> signalsToBeRemoved = new ArrayList<>(Arrays.asList("test_signal_6_1", "test_signal_6_2"));
         signalApi.addAllSignals(signalsToBeRemoved);
         signalApi.removeAllSignals(signalsToBeRemoved);
@@ -184,14 +181,14 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testGetJobSignals() throws InvalidChannelException, IOException, CompilationException {
+    public void testGetJobSignals() throws SignalApiException {
         String signal = "test_signal_7";
         signalApi.addSignal(signal);
         Assert.assertFalse(signalApi.getJobSignals().isEmpty());
     }
 
     @Test
-    public void testWaitFor() throws InvalidChannelException {
+    public void testWaitFor() throws SignalApiException {
         String signal = "test_signal_9";
         long durationInMillis = 1000;
 
@@ -209,7 +206,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testWaitForAny() throws InvalidChannelException {
+    public void testWaitForAny() throws SignalApiException {
         String signal_1 = "test_signal_10_1";
         String signal_2 = "test_signal_10_2";
         List<String> signals = new ArrayList<>(Arrays.asList(signal_1, signal_2));
@@ -236,18 +233,17 @@ public class SignalApiTest extends ProActiveTestClean {
             try {
                 TimeUnit.MILLISECONDS.sleep(duration);
                 signalApi.addSignal(signal);
-            } catch (Exception e) {
+            } catch (SignalApiException | InterruptedException e) {
             }
         };
         return waitForSignalThread;
     }
 
     @Test
-    public void z_testClearJobSignals() throws InvalidChannelException, IOException, CompilationException {
+    public void z_testClearJobSignals() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_8";
         signalApi.addSignal(signal);
         signalApi.clearJobSignals();
         Assert.assertFalse(synchronizationInternal.containsKey(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value()));
     }
-
 }

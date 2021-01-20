@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -51,8 +50,6 @@ import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
  */
 public class SignalApiImpl implements SignalApi {
 
-    private static final Logger logger = Logger.getLogger(SignalApiImpl.class);
-
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
     protected static final String READY_PREFIX = "ready_";
@@ -68,32 +65,38 @@ public class SignalApiImpl implements SignalApi {
         synchronization = new SynchronizationWrapper(originator, taskId, synchronizationInternal);
     }
 
-    private void init() {
+    private void init() throws SignalApiException {
         if (!isInitialized) {
             try {
                 synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
                 synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new ArrayList<>());
             } catch (IOException | InvalidChannelException e) {
-                logger.warn("Could not instantiate Signal API for the job " + jobId, e);
+                throw new SignalApiException("Could not instantiate Signal API for the job" + jobId, e);
             }
             isInitialized = true;
         }
     }
 
     @Override
-    public boolean readyForSignal(String signalName) throws InvalidChannelException, IOException, CompilationException {
-        init();
-        synchronization.conditionalCompute(SIGNALS_CHANNEL,
-                                           jobId,
-                                           "{k, x -> x.contains('" + signalName + "')}",
-                                           "{k, x -> x.remove('" + signalName + "');x.add('" + READY_PREFIX +
-                                                                                         signalName + "');x}",
-                                           "{k, x -> x.add('" + READY_PREFIX + signalName + "');x}");
+    public boolean readyForSignal(String signalName) throws SignalApiException {
+        try {
+            init();
+            synchronization.conditionalCompute(SIGNALS_CHANNEL,
+                                               jobId,
+                                               "{k, x -> x.contains('" + signalName + "')}",
+                                               "{k, x -> x.remove('" + signalName + "');x.add('" + READY_PREFIX +
+                                                                                             signalName + "');x}",
+                                               "{k, x -> x.add('" + READY_PREFIX + signalName + "');x}");
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException | IOException e) {
+            throw new SignalApiException("Could not add ready signal for the job" + jobId, e);
+        }
         return true;
     }
 
     @Override
-    public boolean isReceived(String signalName) throws InvalidChannelException {
+    public boolean isReceived(String signalName) throws SignalApiException {
         init();
         List<String> signals = getJobSignals();
         if (!signals.isEmpty()) {
@@ -104,77 +107,102 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean addSignal(String signalName) throws InvalidChannelException, CompilationException, IOException {
-        init();
-        synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.add('" + signalName + "');x}");
-        return true;
-
-    }
-
-    @Override
-    public boolean addAllSignals(List<String> signalsSubList)
-            throws InvalidChannelException, CompilationException, IOException {
-        init();
-        StringBuilder actions = new StringBuilder();
-        for (String signal : signalsSubList) {
-            actions.append("x.add('" + signal + "');");
-        }
-        synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");
-        return true;
-
-    }
-
-    @Override
-    public boolean removeSignal(String signalName) throws InvalidChannelException, CompilationException, IOException {
-        init();
-        synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.remove('" + signalName + "');x}");
-        return true;
-
-    }
-
-    @Override
-    public boolean removeAllSignals(List<String> signalsSubList)
-            throws IOException, InvalidChannelException, CompilationException {
-        init();
-
-        StringBuilder actions = new StringBuilder();
-        for (String signal : signalsSubList) {
-            actions.append("x.remove('" + signal + "');");
-        }
-        synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");
-
-        List<String> jobSignals = getJobSignals();
-        jobSignals.removeAll(signalsSubList);
-        synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
-        return true;
-    }
-
-    @Override
-    public List<String> getJobSignals() throws InvalidChannelException {
-        init();
-        //noinspection unchecked
-        return (List<String>) synchronization.get(SIGNALS_CHANNEL, jobId);
-    }
-
-    @Override
-    public void clearJobSignals() {
-        init();
+    public boolean addSignal(String signalName) throws SignalApiException {
         try {
+            init();
+            synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.add('" + signalName + "');x}");
+            return true;
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException | IOException e) {
+            throw new SignalApiException("Could not add signal for the job" + jobId, e);
+        }
+    }
+
+    @Override
+    public boolean addAllSignals(List<String> signalsSubList) throws SignalApiException {
+        try {
+            init();
+            StringBuilder actions = new StringBuilder();
+            for (String signal : signalsSubList) {
+                actions.append("x.add('" + signal + "');");
+            }
+            synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");
+            return true;
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException | IOException e) {
+            throw new SignalApiException("Could not add signals for the job" + jobId, e);
+        }
+    }
+
+    @Override
+    public boolean removeSignal(String signalName) throws SignalApiException {
+        try {
+            init();
+            synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.remove('" + signalName + "');x}");
+            return true;
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException | IOException e) {
+            throw new SignalApiException("Could not remove signal for the job" + jobId, e);
+        }
+    }
+
+    @Override
+    public boolean removeAllSignals(List<String> signalsSubList) throws SignalApiException {
+        try {
+            init();
+
+            StringBuilder actions = new StringBuilder();
+            for (String signal : signalsSubList) {
+                actions.append("x.remove('" + signal + "');");
+            }
+            synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");
+
+            List<String> jobSignals = getJobSignals();
+            jobSignals.removeAll(signalsSubList);
+            synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
+            return true;
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException | IOException e) {
+            throw new SignalApiException("Could not add ready signals for the job" + jobId, e);
+        }
+    }
+
+    @Override
+    public List<String> getJobSignals() throws SignalApiException {
+        try {
+            init();
+            //noinspection unchecked
+            return (List<String>) synchronization.get(SIGNALS_CHANNEL, jobId);
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        }
+    }
+
+    @Override
+    public void clearJobSignals() throws SignalApiException {
+        try {
+            init();
             synchronization.remove(SIGNALS_CHANNEL, jobId);
             isInitialized = false;
-        } catch (IOException | InvalidChannelException e) {
-            logger.warn("Could not clear the job" + jobId + " from the signals channel", e);
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (IOException e) {
+            throw new SignalApiException("Could not clear the job entry" + jobId + " from the signals channel", e);
         }
     }
 
     @Override
-    public void waitFor(String signalName) {
+    public void waitFor(String signalName) throws SignalApiException {
         init();
         Awaitility.await().until(() -> isReceived(signalName));
     }
 
     @Override
-    public void waitForAny(List<String> signalsList) {
+    public void waitForAny(List<String> signalsList) throws SignalApiException {
         init();
         Awaitility.await().until(() -> {
             List<String> signals = getJobSignals();
