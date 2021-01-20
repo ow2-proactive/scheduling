@@ -1013,6 +1013,10 @@ class LiveJobs {
         if (jobFinished) {
             // terminating job
             job.terminate();
+
+            // Cleaning job signals
+            cleanJobSignals(job.getId());
+
             jlogger.debug(job.getId(), "terminated");
             terminationData.addJobToTerminate(job.getId(), job.getGenericInformation());
             jobs.remove(job.getId());
@@ -1123,6 +1127,10 @@ class LiveJobs {
                 } else {
                     event = SchedulerEvent.JOB_RUNNING_TO_FINISHED;
                 }
+
+                // Cleaning job signals
+                cleanJobSignals(jobData.job.getId());
+
                 // update job and tasks events list and send it to front-end
                 updateJobInSchedulerState(job, event);
 
@@ -1146,6 +1154,7 @@ class LiveJobs {
         JobId jobId = jobData.job.getId();
 
         jobs.remove(jobId);
+
         terminationData.addJobToTerminate(jobId, jobData.job.getGenericInformation());
 
         InternalJob job = jobData.job;
@@ -1198,31 +1207,32 @@ class LiveJobs {
             }
         }
 
+        // Cleaning job signals
+        cleanJobSignals(job.getId());
+
         // update job and tasks events list and send it to front-end
         updateJobInSchedulerState(job, event);
-
-        cleanJobSignals(jobId);
 
         jlogger.info(job.getId(), "finished (" + jobStatus + ")");
         jlogger.close(job.getId());
     }
 
     private void cleanJobSignals(JobId jobId) {
+
         try {
-            if (synchronizationInternal != null) {
-
-                synchronizationInternal.createChannelIfAbsent(SIGNAL_ORIGINATOR,
-                                                              SIGNAL_TASK_ID,
-                                                              PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
-                                                              true);
-
+            if (synchronizationInternal != null && synchronizationInternal.containsKey(SIGNAL_ORIGINATOR,
+                                                                                       SIGNAL_TASK_ID,
+                                                                                       PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
+                                                                                       jobId.value())) {
                 synchronizationInternal.remove(SIGNAL_ORIGINATOR,
                                                SIGNAL_TASK_ID,
                                                PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
                                                jobId.value());
             }
-        } catch (IOException | InvalidChannelException e) {
-            jlogger.warn(jobId, "Could not clear the job" + jobId + " from the signals channel");
+        } catch (InvalidChannelException e) {
+            jlogger.info(jobId, "Signals channel does not exist. No signals are cleared for the job " + jobId);
+        } catch (IOException e) {
+            jlogger.warn(jobId, "Could not clear the job " + jobId + " from the signals channel");
         }
     }
 
