@@ -27,8 +27,10 @@ package org.ow2.proactive.scheduler.signal;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.awaitility.Awaitility;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -68,6 +70,12 @@ public class SignalApiImpl implements SignalApi {
     private void init() throws SignalApiException {
         if (!isInitialized) {
             try {
+                // Set waiting parameters
+                Awaitility.setDefaultPollInterval(1000, TimeUnit.MILLISECONDS);
+                Awaitility.setDefaultPollDelay(Duration.ZERO);
+                Awaitility.setDefaultTimeout(Duration.ofSeconds(Long.MAX_VALUE));
+
+                // Initialize synchronization signals channel
                 synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
                 synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new ArrayList<>());
             } catch (IOException | InvalidChannelException e) {
