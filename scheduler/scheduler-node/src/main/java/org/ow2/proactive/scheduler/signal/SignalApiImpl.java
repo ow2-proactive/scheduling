@@ -107,7 +107,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean addSignal(String signalName) throws SignalApiException {
+    public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
             synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.add('" + signalName + "');x}");
