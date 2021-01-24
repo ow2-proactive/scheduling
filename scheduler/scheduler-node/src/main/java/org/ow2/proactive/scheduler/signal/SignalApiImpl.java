@@ -27,8 +27,10 @@ package org.ow2.proactive.scheduler.signal;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.awaitility.Awaitility;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -68,6 +70,12 @@ public class SignalApiImpl implements SignalApi {
     private void init() throws SignalApiException {
         if (!isInitialized) {
             try {
+                // Set waiting parameters
+                Awaitility.setDefaultPollInterval(1000, TimeUnit.MILLISECONDS);
+                Awaitility.setDefaultPollDelay(Duration.ZERO);
+                Awaitility.setDefaultTimeout(Duration.ofDays(365));
+
+                // Initialize synchronization signals channel
                 synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
                 synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new ArrayList<>());
             } catch (IOException | InvalidChannelException e) {
@@ -107,7 +115,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean addSignal(String signalName) throws SignalApiException {
+    public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
             synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.add('" + signalName + "');x}");
@@ -120,7 +128,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean addAllSignals(List<String> signalsSubList) throws SignalApiException {
+    public boolean sendManySignals(List<String> signalsSubList) throws SignalApiException {
         try {
             init();
             StringBuilder actions = new StringBuilder();
@@ -150,7 +158,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean removeAllSignals(List<String> signalsSubList) throws SignalApiException {
+    public boolean removeManySignals(List<String> signalsSubList) throws SignalApiException {
         try {
             init();
 
