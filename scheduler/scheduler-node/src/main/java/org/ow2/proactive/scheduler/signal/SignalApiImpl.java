@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.signal;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
