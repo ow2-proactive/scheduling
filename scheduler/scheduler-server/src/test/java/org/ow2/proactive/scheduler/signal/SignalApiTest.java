@@ -120,7 +120,7 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testReadyForSignal() throws SignalApiException, InvalidChannelException {
         String signal = "test_signal_1";
-        signalApi.addSignal(signal);
+        signalApi.sendSignal(signal);
         signalApi.readyForSignal(signal);
 
         Assert.assertFalse(((List) synchronizationInternal.get(USER,
@@ -138,14 +138,14 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testIsReceived() throws SignalApiException {
         String signal = "test_signal_2";
-        signalApi.addSignal(signal);
+        signalApi.sendSignal(signal);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
 
     @Test
     public void testSendSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_3";
-        signalApi.addSignal(signal);
+        signalApi.sendSignal(signal);
         Assert.assertTrue(((List) synchronizationInternal.get(USER,
                                                               TASK_ID,
                                                               SIGNALS_CHANNEL,
@@ -155,7 +155,7 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testSendAllSignals() throws InvalidChannelException, SignalApiException {
         List<String> signalsToBeSent = new ArrayList<>(Arrays.asList("test_signal_4_1", "test_signal_4_2"));
-        signalApi.addAllSignals(signalsToBeSent);
+        signalApi.sendAllSignals(signalsToBeSent);
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
         signalsToBeSent.forEach(signal -> Assert.assertTrue(allSignals.contains(signal)));
     }
@@ -163,7 +163,7 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testRemoveSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_5";
-        signalApi.addSignal(signal);
+        signalApi.sendSignal(signal);
         signalApi.removeSignal(signal);
         Assert.assertFalse(((List) synchronizationInternal.get(USER,
                                                                TASK_ID,
@@ -174,7 +174,7 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testRemoveAllSignals() throws InvalidChannelException, SignalApiException {
         List<String> signalsToBeRemoved = new ArrayList<>(Arrays.asList("test_signal_6_1", "test_signal_6_2"));
-        signalApi.addAllSignals(signalsToBeRemoved);
+        signalApi.sendAllSignals(signalsToBeRemoved);
         signalApi.removeAllSignals(signalsToBeRemoved);
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
         signalsToBeRemoved.forEach(signal -> Assert.assertFalse(allSignals.contains(signal)));
@@ -183,7 +183,7 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testGetJobSignals() throws SignalApiException {
         String signal = "test_signal_7";
-        signalApi.addSignal(signal);
+        signalApi.sendSignal(signal);
         Assert.assertFalse(signalApi.getJobSignals().isEmpty());
     }
 
@@ -200,7 +200,7 @@ public class SignalApiTest extends ProActiveTestClean {
             }
         };
 
-        executor.submit(addSignalRunnable(signal, durationInMillis));
+        executor.submit(sendSignalRunnable(signal, durationInMillis));
         Awaitility.await().atMost(2 * durationInMillis, TimeUnit.MILLISECONDS).until(waitForSignalThread);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
@@ -221,18 +221,18 @@ public class SignalApiTest extends ProActiveTestClean {
             }
         };
 
-        executor.submit(addSignalRunnable(signal_1, durationInMillis_1));
-        executor.submit(addSignalRunnable(signal_2, durationInMillis_2));
+        executor.submit(sendSignalRunnable(signal_1, durationInMillis_1));
+        executor.submit(sendSignalRunnable(signal_2, durationInMillis_2));
         Awaitility.await().atMost(3 * durationInMillis_1, TimeUnit.MILLISECONDS).until(waitForAnySignalThread);
         Assert.assertTrue(signalApi.isReceived(signal_1));
         Assert.assertFalse(signalApi.isReceived(signal_2));
     }
 
-    private Runnable addSignalRunnable(String signal, long duration) {
+    private Runnable sendSignalRunnable(String signal, long duration) {
         Runnable waitForSignalThread = () -> {
             try {
                 TimeUnit.MILLISECONDS.sleep(duration);
-                signalApi.addSignal(signal);
+                signalApi.sendSignal(signal);
             } catch (SignalApiException | InterruptedException e) {
             }
         };
@@ -242,7 +242,7 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void z_testClearJobSignals() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_8";
-        signalApi.addSignal(signal);
+        signalApi.sendSignal(signal);
         signalApi.clearJobSignals();
         Assert.assertFalse(synchronizationInternal.containsKey(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value()));
     }

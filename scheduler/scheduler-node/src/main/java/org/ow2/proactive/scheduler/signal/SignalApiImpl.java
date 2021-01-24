@@ -107,7 +107,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean addSignal(String signalName) throws SignalApiException {
+    public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
             synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.add('" + signalName + "');x}");
@@ -120,7 +120,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean addAllSignals(List<String> signalsSubList) throws SignalApiException {
+    public boolean sendAllSignals(List<String> signalsSubList) throws SignalApiException {
         try {
             init();
             StringBuilder actions = new StringBuilder();
