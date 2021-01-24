@@ -153,9 +153,9 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testSendAllSignals() throws InvalidChannelException, SignalApiException {
+    public void testSendManySignals() throws InvalidChannelException, SignalApiException {
         List<String> signalsToBeSent = new ArrayList<>(Arrays.asList("test_signal_4_1", "test_signal_4_2"));
-        signalApi.sendAllSignals(signalsToBeSent);
+        signalApi.sendManySignals(signalsToBeSent);
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
         signalsToBeSent.forEach(signal -> Assert.assertTrue(allSignals.contains(signal)));
     }
@@ -172,10 +172,10 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testRemoveAllSignals() throws InvalidChannelException, SignalApiException {
+    public void testRemoveManySignals() throws InvalidChannelException, SignalApiException {
         List<String> signalsToBeRemoved = new ArrayList<>(Arrays.asList("test_signal_6_1", "test_signal_6_2"));
-        signalApi.sendAllSignals(signalsToBeRemoved);
-        signalApi.removeAllSignals(signalsToBeRemoved);
+        signalApi.sendManySignals(signalsToBeRemoved);
+        signalApi.removeManySignals(signalsToBeRemoved);
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
         signalsToBeRemoved.forEach(signal -> Assert.assertFalse(allSignals.contains(signal)));
     }

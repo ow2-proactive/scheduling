@@ -120,7 +120,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean sendAllSignals(List<String> signalsSubList) throws SignalApiException {
+    public boolean sendManySignals(List<String> signalsSubList) throws SignalApiException {
         try {
             init();
             StringBuilder actions = new StringBuilder();
@@ -150,7 +150,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean removeAllSignals(List<String> signalsSubList) throws SignalApiException {
+    public boolean removeManySignals(List<String> signalsSubList) throws SignalApiException {
         try {
             init();
 
