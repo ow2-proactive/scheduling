@@ -27,12 +27,9 @@ package org.ow2.proactive.scheduler.signal;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import org.awaitility.Awaitility;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.synchronization.CompilationException;
@@ -70,11 +67,6 @@ public class SignalApiImpl implements SignalApi {
     private void init() throws SignalApiException {
         if (!isInitialized) {
             try {
-                // Set waiting parameters
-                Awaitility.setDefaultPollInterval(1000, TimeUnit.MILLISECONDS);
-                Awaitility.setDefaultPollDelay(Duration.ZERO);
-                Awaitility.setDefaultTimeout(Duration.ofDays(365));
-
                 // Initialize synchronization signals channel
                 synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
                 synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new ArrayList<>());
@@ -206,15 +198,30 @@ public class SignalApiImpl implements SignalApi {
     @Override
     public void waitFor(String signalName) throws SignalApiException {
         init();
-        Awaitility.await().until(() -> isReceived(signalName));
+        try {
+            synchronization.waitUntil(SIGNALS_CHANNEL, jobId, "{k, x -> x.contains('" + signalName + "')}");
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException e) {
+            throw new SignalApiException("Could not check signals of the job " + jobId, e);
+        }
     }
 
     @Override
     public void waitForAny(List<String> signalsList) throws SignalApiException {
         init();
-        Awaitility.await().until(() -> {
-            List<String> signals = getJobSignals();
-            return signalsList.stream().filter(signals::contains).findFirst().orElse(null) != null;
-        });
+        StringBuilder conditions = new StringBuilder();
+        for (String signal : signalsList) {
+            conditions.append("x.contains('" + signal + "') || ");
+        }
+        String allConditions = conditions.substring(0, conditions.toString().lastIndexOf("||"));
+
+        try {
+            synchronization.waitUntil(SIGNALS_CHANNEL, jobId, "{k, x -> " + allConditions + " }");
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException e) {
+            throw new SignalApiException("Could not check signals of the job " + jobId, e);
+        }
     }
 }
