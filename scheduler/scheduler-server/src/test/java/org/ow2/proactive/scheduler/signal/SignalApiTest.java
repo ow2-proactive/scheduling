@@ -195,15 +195,13 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test
     public void testClearJobSignals() throws InvalidChannelException, SignalApiException {
-        String signal = "test_signal_9";
-        signalApi.sendSignal(signal);
         signalApi.clearJobSignals();
         Assert.assertFalse(synchronizationInternal.containsKey(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value()));
     }
 
     @Test
     public void testWaitFor() throws SignalApiException {
-        String signal = "test_signal_10";
+        String signal = "test_signal_9";
         long durationInMillis = 1000;
 
         //Define a thread that waits for the signal reception
@@ -221,8 +219,8 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test
     public void testWaitForAny() throws SignalApiException {
-        String signal_1 = "test_signal_11_1";
-        String signal_2 = "test_signal_11_2";
+        String signal_1 = "test_signal_10_1";
+        String signal_2 = "test_signal_10_2";
         List<String> signals = new ArrayList<>(Arrays.asList(signal_1, signal_2));
         long durationInMillis_1 = 1000;
         long durationInMillis_2 = 4000;
