@@ -921,4 +921,9 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         return client.checkJobPermissionMethod(sessionId, jobId, method);
     }
 
+    @Override
+    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+        renewSession();
+        return client.addJobSignal(sessionId, jobId, signal);
+    }
 }

@@ -73,7 +73,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
@@ -82,7 +81,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 
 
 @Path("/scheduler/")
@@ -2158,5 +2156,18 @@ public interface SchedulerRestInterface {
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces("application/json")
     boolean checkJobPermissionMethod(@HeaderParam("sessionid") String sessionId, @PathParam("method") String method,
+            @PathParam("jobid") String jobId) throws RestException;
+
+    /**
+     *
+     * Add a signal to the list of signals used by the considered job
+     *
+     * @return true if the given signal is added to the list of job signals
+     */
+    @POST
+    @Path("job/{jobid}/signals")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces("application/json")
+    boolean addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
             @PathParam("jobid") String jobId) throws RestException;
 }

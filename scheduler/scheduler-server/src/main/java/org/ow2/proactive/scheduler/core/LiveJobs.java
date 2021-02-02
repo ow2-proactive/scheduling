@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -52,12 +53,16 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.helpers.StartAtUpdater;
 import org.ow2.proactive.scheduler.core.helpers.TaskResultCreator;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
+import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -106,9 +111,18 @@ class LiveJobs {
 
     private final StartAtUpdater startAtUpdater = new StartAtUpdater();
 
-    LiveJobs(SchedulerDBManager dbManager, SchedulerStateUpdate listener) {
+    private final SynchronizationInternal synchronizationInternal;
+
+    private static final String SIGNAL_ORIGINATOR = "scheduler";
+
+    private static final String SIGNAL_TASK = "0t0";
+
+    private static final TaskId SIGNAL_TASK_ID = TaskIdImpl.makeTaskId(SIGNAL_TASK);
+
+    LiveJobs(SchedulerDBManager dbManager, SchedulerStateUpdate listener, SynchronizationInternal synchronizationAPI) {
         this.dbManager = dbManager;
         this.listener = listener;
+        this.synchronizationInternal = synchronizationAPI;
     }
 
     Collection<RunningTaskData> getRunningTasks() {
@@ -999,6 +1013,10 @@ class LiveJobs {
         if (jobFinished) {
             // terminating job
             job.terminate();
+
+            // Cleaning job signals
+            cleanJobSignals(job.getId());
+
             jlogger.debug(job.getId(), "terminated");
             terminationData.addJobToTerminate(job.getId(), job.getGenericInformation());
             jobs.remove(job.getId());
@@ -1109,6 +1127,10 @@ class LiveJobs {
                 } else {
                     event = SchedulerEvent.JOB_RUNNING_TO_FINISHED;
                 }
+
+                // Cleaning job signals
+                cleanJobSignals(jobData.job.getId());
+
                 // update job and tasks events list and send it to front-end
                 updateJobInSchedulerState(job, event);
 
@@ -1132,6 +1154,7 @@ class LiveJobs {
         JobId jobId = jobData.job.getId();
 
         jobs.remove(jobId);
+
         terminationData.addJobToTerminate(jobId, jobData.job.getGenericInformation());
 
         InternalJob job = jobData.job;
@@ -1184,11 +1207,33 @@ class LiveJobs {
             }
         }
 
+        // Cleaning job signals
+        cleanJobSignals(job.getId());
+
         // update job and tasks events list and send it to front-end
         updateJobInSchedulerState(job, event);
 
         jlogger.info(job.getId(), "finished (" + jobStatus + ")");
         jlogger.close(job.getId());
+    }
+
+    private void cleanJobSignals(JobId jobId) {
+
+        try {
+            if (synchronizationInternal != null && synchronizationInternal.containsKey(SIGNAL_ORIGINATOR,
+                                                                                       SIGNAL_TASK_ID,
+                                                                                       PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
+                                                                                       jobId.value())) {
+                synchronizationInternal.remove(SIGNAL_ORIGINATOR,
+                                               SIGNAL_TASK_ID,
+                                               PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
+                                               jobId.value());
+            }
+        } catch (InvalidChannelException e) {
+            jlogger.info(jobId, "Signals channel does not exist. No signals are cleared for the job " + jobId);
+        } catch (IOException e) {
+            jlogger.warn(jobId, "Could not clear the job " + jobId + " from the signals channel");
+        }
     }
 
     private void updateTasksInSchedulerState(InternalJob job, Set<TaskId> tasksToUpdate) {

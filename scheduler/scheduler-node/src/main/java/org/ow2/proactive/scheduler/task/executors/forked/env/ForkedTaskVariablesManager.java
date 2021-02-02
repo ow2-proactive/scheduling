@@ -116,7 +116,7 @@ public class ForkedTaskVariablesManager implements Serializable {
         }
         scriptHandler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME,
                                  taskContext.getSynchronizationAPI());
-
+        scriptHandler.addBinding(SchedulerConstants.SIGNAL_API_BINDING_NAME, taskContext.getSignalAPI());
         scriptHandler.addBinding(SchedulerConstants.DS_SCRATCH_BINDING_NAME,
                                  convertToLinuxIfNeeded(isDockerWindows2Linux,
                                                         taskContext.getNodeDataSpaceURIs().getScratchURI()));
