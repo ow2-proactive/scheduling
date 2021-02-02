@@ -145,7 +145,7 @@ public class SignalApiTest extends ProActiveTestClean {
         List<String> signalsToBeChecked = new ArrayList<>(Arrays.asList("test_signal_3_1", "test_signal_3_2"));
         signalApi.sendManySignals(signalsToBeChecked);
         String receivedSignal = signalApi.checkForSignals(signalsToBeChecked);
-        Assert.assertTrue((receivedSignal=="test_signal_3_1") || receivedSignal=="test_signal_3_2");
+        Assert.assertTrue((receivedSignal == "test_signal_3_1") || receivedSignal == "test_signal_3_2");
     }
 
     @Test
