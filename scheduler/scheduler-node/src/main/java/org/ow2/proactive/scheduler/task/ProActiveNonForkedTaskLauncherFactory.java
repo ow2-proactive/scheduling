@@ -33,14 +33,15 @@ import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.data.TaskProActiveDataspaces;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
+import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
 
 public class ProActiveNonForkedTaskLauncherFactory implements TaskLauncherFactory {
 
     @Override
     public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
-            TaskLogger taskLogger) throws Exception {
-        return new TaskProActiveDataspaces(taskId, namingService, isRunAsUser, taskLogger);
+            Decrypter decrypter, TaskLogger taskLogger) throws Exception {
+        return new TaskProActiveDataspaces(taskId, namingService, isRunAsUser, decrypter, taskLogger);
     }
 
     @Override

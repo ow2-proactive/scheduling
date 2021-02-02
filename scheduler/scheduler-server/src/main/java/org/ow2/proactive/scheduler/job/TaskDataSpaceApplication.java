@@ -31,6 +31,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.api.UserCredentials;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -70,7 +71,7 @@ public class TaskDataSpaceApplication implements Serializable {
      * @param jobId     unique identifier for the current job; can used to separated GLOBAL space among jobs
      */
     public void startDataSpaceApplication(String inputURL, String outputURL, String globalURL, String userURL,
-            String username, JobId jobId) {
+            String username, UserCredentials userCredentials, JobId jobId) {
         if (!alreadyRegistered) {
             try {
 
@@ -93,6 +94,7 @@ public class TaskDataSpaceApplication implements Serializable {
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME.getValueAsStringOrNull();
                     DataSpaceServiceStarter.getDataSpaceServiceStarter()
                                            .createSpaceWithUserNameSubfolder(username,
+                                                                             userCredentials,
                                                                              applicationId,
                                                                              PADataSpaces.DEFAULT_IN_OUT_NAME,
                                                                              PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.getValueAsString(),
@@ -120,6 +122,7 @@ public class TaskDataSpaceApplication implements Serializable {
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME.getValueAsStringOrNull();
                     DataSpaceServiceStarter.getDataSpaceServiceStarter()
                                            .createSpaceWithUserNameSubfolder(username,
+                                                                             userCredentials,
                                                                              applicationId,
                                                                              PADataSpaces.DEFAULT_IN_OUT_NAME,
                                                                              PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.getValueAsString(),
@@ -176,6 +179,7 @@ public class TaskDataSpaceApplication implements Serializable {
 
                     DataSpaceServiceStarter.getDataSpaceServiceStarter()
                                            .createSpaceWithUserNameSubfolder(username,
+                                                                             userCredentials,
                                                                              applicationId,
                                                                              SchedulerConstants.USERSPACE_NAME,
                                                                              PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(),

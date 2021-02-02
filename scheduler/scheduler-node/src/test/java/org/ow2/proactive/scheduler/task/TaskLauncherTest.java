@@ -62,6 +62,7 @@ import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
+import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
@@ -226,7 +227,7 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
 
             @Override
             public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
-                    TaskLogger taskLogger) {
+                    Decrypter decrypter, TaskLogger taskLogger) {
                 return dataspacesMock;
             }
         }), executableContainer);
@@ -251,7 +252,7 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
 
             @Override
             public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
-                    TaskLogger taskLogger) {
+                    Decrypter decrypter, TaskLogger taskLogger) {
                 return dataspacesMock;
             }
         }), executableContainer);
@@ -274,7 +275,7 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
 
             @Override
             public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
-                    TaskLogger taskLogger) {
+                    Decrypter decrypter, TaskLogger taskLogger) {
                 return dataspacesMock;
             }
         }), executableContainer);

@@ -44,6 +44,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
@@ -131,21 +132,21 @@ public class ServerJobAndTaskLogs {
 
     }
 
-    public void remove(JobId jobId, String jobOwner) {
+    public void remove(JobId jobId, String jobOwner, Credentials userCredentials) {
         jlogger.close(jobId);
         removeFolderLog(jobId.value());
         removeVisualizationFile(jobId.value());
-        removePreciousLogs(jobId, jobOwner);
+        removePreciousLogs(jobId, jobOwner, userCredentials);
     }
 
-    private void removePreciousLogs(JobId jobId, String jobOwner) {
+    private void removePreciousLogs(JobId jobId, String jobOwner, Credentials credentials) {
         if (spacesSupport == null) {
             logger.warn("DataSpaces not initialized, cannot remove precious logs for job " + jobId);
             return;
         }
         try {
             Validate.notBlank(jobOwner);
-            DataSpacesFileObject userspace = spacesSupport.getUserSpace(jobOwner);
+            DataSpacesFileObject userspace = spacesSupport.getUserSpace(jobOwner, credentials);
             Validate.notNull(userspace,
                              "Cannot find user space for user " + jobOwner +
                                         ". User spaces are probably not configured properly.");

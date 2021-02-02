@@ -283,6 +283,21 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** */
     DATASPACE_DEFAULTUSER_HOSTNAME("pa.scheduler.dataspace.defaultuser.hostname", PropertyType.STRING),
 
+    /** Is userspace based on impersonation (true) or path (false)
+     * Examples:
+     *   sftp is based on impersonation, a user space url will be sftp://user@server
+     *   file is based on path, a user space url will be file://user_space_root/user/
+     */
+    DATASPACE_DEFAULTUSER_IMPERSONATION("pa.scheduler.dataspace.defaultuser.impersonation", PropertyType.BOOLEAN, "false"),
+
+    /**
+     * When using userspace impersonation, internal accounts of the ProActive scheduler need to be discarded
+     * For example, in a sftp server, there will be no account matching users rm, scheduler, etc
+     * For these internal accounts, a user space will not be mounted.
+     *
+     */
+    DATASPACE_DEFAULTUSER_INTERNAL_ACCOUNTS("pa.scheduler.dataspace.defaultuser.internal.accounts", PropertyType.LIST, "admin,rm,scheduler,watcher,user,demo,guest,nsadmin,nsadmin2,provider,radmin,test,test_executor"),
+
     /* ***************************************************************** */
     /* ************************* LOGS PROPERTIES *********************** */
     /* ***************************************************************** */

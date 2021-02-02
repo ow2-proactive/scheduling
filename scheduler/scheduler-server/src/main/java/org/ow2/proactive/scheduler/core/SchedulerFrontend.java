@@ -485,7 +485,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                         " from " + identification.getHostName());
         }
         this.frontendState.connect(sourceBodyID, identification, enrichedCreds);
-        this.spacesSupport.registerUserSpace(identification.getUsername());
+
+        this.spacesSupport.registerUserSpace(identification.getUsername(), cred);
     }
 
     /**
@@ -553,9 +554,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getUserSpaceURIs",
-                                                                     "You don't have permissions to read the USER Space URIs");
-        return this.spacesSupport.getUserSpaceURIs(ident.getUsername());
+        SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials("getUserSpaceURIs",
+                                                                                                                         "You don't have permissions to read the USER Space URIs",
+                                                                                                                         false);
+        return this.spacesSupport.getUserSpaceURIs(userAndCredentials.getListeningUser().getUser().getUsername(),
+                                                   userAndCredentials.getCredentials());
     }
 
     /**
@@ -1813,9 +1816,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     public boolean isFolder(String dataspace, String pathname) throws NotConnectedException, PermissionException {
         try {
-            UserIdentificationImpl userId = frontendState.checkPermission("isFolder",
-                                                                          "You don't have permissions to check the file type in the DataSpace");
-            DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace, userId.getUsername(), pathname);
+            SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials("isFolder",
+                                                                                                                             "You don't have permissions to check the file type in the DataSpace",
+                                                                                                                             false);
+            DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace,
+                                                                       userAndCredentials.getListeningUser()
+                                                                                         .getUser()
+                                                                                         .getUsername(),
+                                                                       userAndCredentials.getCredentials(),
+                                                                       pathname);
             return file.isFolder();
         } catch (FileSystemException e) {
             logger.debug(String.format("Can't parse the directory [%s] in the user space.", pathname), e);
@@ -1828,9 +1837,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public boolean checkFileExists(String dataspace, String pathname)
             throws NotConnectedException, PermissionException {
         try {
-            UserIdentificationImpl userId = frontendState.checkPermission("checkFileExists",
-                                                                          "You don't have permissions to check the file existence in the DataSpace");
-            DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace, userId.getUsername(), pathname);
+            SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials("checkFileExists",
+                                                                                                                             "You don't have permissions to check the file existence in the DataSpace",
+                                                                                                                             false);
+            DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace,
+                                                                       userAndCredentials.getListeningUser()
+                                                                                         .getUser()
+                                                                                         .getUsername(),
+                                                                       userAndCredentials.getCredentials(),
+                                                                       pathname);
             return file.exists();
         } catch (FileSystemException e) {
             logger.debug(String.format("Can't parse the directory [%s] in the user space.", pathname), e);

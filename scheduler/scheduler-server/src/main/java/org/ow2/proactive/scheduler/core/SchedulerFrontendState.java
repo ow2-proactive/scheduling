@@ -606,6 +606,34 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
+    UserAndCredentials checkPermissionReturningCredentials(String methodName, String permissionMsg,
+            boolean clearListener) throws NotConnectedException, PermissionException {
+
+        UniqueID id = checkAccess();
+        UserAndCredentials userAndCredentials = identifications.get(id);
+        ListeningUser listeningUser = userAndCredentials.getListeningUser();
+        UserIdentificationImpl ident = listeningUser.getUser();
+        if (clearListener) {
+            listeningUser.clearListener();
+        }
+        // renew session for this user
+        renewUserSession(id, ident);
+
+        Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
+
+        final String fullMethodName = SchedulerFrontend.class.getName() + "." + methodName;
+        final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
+
+        try {
+            userSessionInfo.getRight().checkPermission(methodCallPermission, permissionMsg);
+        } catch (PermissionException ex) {
+            logger.debug(permissionMsg);
+            throw ex;
+        }
+        return userAndCredentials;
+
+    }
+
     ListeningUser checkPermissionReturningListeningUser(String methodName, String permissionMsg)
             throws NotConnectedException, PermissionException {
 

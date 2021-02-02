@@ -50,6 +50,7 @@ import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.api.FileType;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.api.UserCredentials;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
@@ -59,12 +60,14 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegi
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.objectweb.proactive.utils.StackTraceUtil;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.task.TaskLogger;
+import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
 
 public class TaskProActiveDataspaces implements TaskDataspaces {
@@ -104,6 +107,8 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     private transient TaskLogger taskLogger;
 
+    private transient Decrypter decrypter;
+
     /**
      * Mainly for testing purposes
      */
@@ -111,17 +116,19 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     }
 
-    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) throws Exception {
-        this(taskId, namingService, isRunAsUser, null);
+    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser, Decrypter decrypter)
+            throws Exception {
+        this(taskId, namingService, isRunAsUser, decrypter, null);
     }
 
-    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
+    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser, Decrypter decrypter,
             TaskLogger taskLogger) throws Exception {
         this.taskId = taskId;
         this.namingService = namingService;
         this.runAsUser = isRunAsUser;
         this.linuxOS = OperatingSystem.getOperatingSystem() == OperatingSystem.unix;
         this.taskLogger = taskLogger;
+        this.decrypter = decrypter;
         initDataSpaces();
     }
 
@@ -241,6 +248,17 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         } else {
             logger.error("No Cache space configuration found, cache space is disabled.");
         }
+        UserCredentials userCredentials;
+        if (decrypter != null) {
+            CredData credData = decrypter.decrypt();
+            userCredentials = new UserCredentials(credData.getLogin(),
+                                                  credData.getPassword(),
+                                                  credData.getDomain(),
+                                                  credData.getKey());
+        } else {
+            logger.warn("No decryter found");
+            userCredentials = new UserCredentials();
+        }
 
         INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
@@ -266,7 +284,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         USER = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
             public DataSpacesFileObject call() throws Exception {
-                return PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
+                return PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME, userCredentials);
             }
         }, "USER", false);
 

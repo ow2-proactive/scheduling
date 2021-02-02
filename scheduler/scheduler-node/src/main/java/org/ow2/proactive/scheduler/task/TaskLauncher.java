@@ -183,11 +183,15 @@ public class TaskLauncher implements InitActive {
             taskLauncherRebinder = new TaskLauncherRebinder(taskId, terminateNotificationNodeURL, taskRecoverable);
 
             addShutdownHook();
+            if (decrypter != null) {
+                decrypter.setCredentials(executableContainer.getCredentials());
+            }
             // lock the cache space cleaning mechanism
             DataSpaceNodeConfigurationAgent.lockCacheSpaceCleaning();
             dataspaces = factory.createTaskDataspaces(taskId,
                                                       initializer.getNamingService(),
                                                       executableContainer.isRunAsUser(),
+                                                      decrypter,
                                                       taskLogger);
 
             copyTaskLogsFromUserSpace(taskLogger.createLogFilePath(dataspaces.getScratchFolder()), dataspaces);
@@ -222,10 +226,6 @@ public class TaskLauncher implements InitActive {
             wallTimer.start();
 
             dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
-
-            if (decrypter != null) {
-                decrypter.setCredentials(executableContainer.getCredentials());
-            }
 
             TaskExecutor taskExecutor = factory.createTaskExecutor(workingDir);
 

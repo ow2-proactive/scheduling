@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.job;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.KeyException;
+import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +45,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.extensions.dataspaces.api.UserCredentials;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -161,6 +165,9 @@ public abstract class InternalJob extends JobState {
     @XmlTransient
     private SignalApiImpl signalAPI;
 
+    @XmlTransient
+    private static PrivateKey corePrivateKey;
+
     /**
      * Hibernate default constructor
      */
@@ -169,6 +176,17 @@ public abstract class InternalJob extends JobState {
         this.terminateLoopHandler = new TerminateLoopHandler(this);
         this.terminateIfTaskHandler = new TerminateIfTaskHandler(this);
         this.terminateReplicateTaskHandler = new TerminateReplicateTaskHandler(this);
+        initPrivateKey();
+    }
+
+    private static synchronized void initPrivateKey() {
+        if (corePrivateKey == null) {
+            try {
+                corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
+            } catch (Exception e) {
+                LOGGER.error("Could not initialize private key", e);
+            }
+        }
     }
 
     /**
@@ -297,6 +315,8 @@ public abstract class InternalJob extends JobState {
             taskDataSpaceApplications = new HashMap<>();
         }
 
+        UserCredentials userCredentials = getUserCredentials();
+
         for (InternalTask internalTask : tasks) {
             long taskId = internalTask.getId().longValue();
 
@@ -313,9 +333,28 @@ public abstract class InternalJob extends JobState {
                                                                    getGlobalSpace(),
                                                                    getUserSpace(),
                                                                    getOwner(),
+                                                                   userCredentials,
                                                                    getId());
             }
         }
+    }
+
+    private UserCredentials getUserCredentials() {
+        UserCredentials userCredentials = null;
+        try {
+            CredData decryptedUserCredentials = credentials.decrypt(corePrivateKey);
+            if (PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.isSet() &&
+                decryptedUserCredentials.getDomain() == null) {
+                decryptedUserCredentials.setDomain(PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.getValueAsString());
+            }
+            userCredentials = new UserCredentials(decryptedUserCredentials.getLogin(),
+                                                  decryptedUserCredentials.getPassword(),
+                                                  decryptedUserCredentials.getDomain(),
+                                                  decryptedUserCredentials.getKey());
+        } catch (Exception e) {
+            LOGGER.error("Could not decrypt user credentials", e);
+        }
+        return userCredentials;
     }
 
     public void setSynchronizationAPI(SynchronizationInternal synchronizationAPI) {

@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
+import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
@@ -105,7 +106,7 @@ public class WalltimeTaskLauncherTest extends TaskLauncherTestAbstract {
     private class ForkingTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
         @Override
         public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
-                TaskLogger taskLogger) {
+                Decrypter decrypter, TaskLogger taskLogger) {
             return new TestTaskLauncherFactory.TaskFileDataspaces();
         }
 

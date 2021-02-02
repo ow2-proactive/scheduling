@@ -109,7 +109,7 @@ public class JobRemoveHandler implements Callable<Boolean> {
                 dbManager.removeJob(jobIds, removedTime, removeFromDb);
 
                 for (InternalJob job : jobs) {
-                    ServerJobAndTaskLogs.getInstance().remove(job.getId(), job.getOwner());
+                    ServerJobAndTaskLogs.getInstance().remove(job.getId(), job.getOwner(), job.getCredentials());
                     if (logger.isInfoEnabled()) {
                         logger.info("Job " + job.getId() + " removed in " + (System.currentTimeMillis() - start) +
                                     "ms");

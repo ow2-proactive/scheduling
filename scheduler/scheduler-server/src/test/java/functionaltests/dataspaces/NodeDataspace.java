@@ -71,7 +71,7 @@ public class NodeDataspace implements EndActive, Serializable {
 
         NamingService namingServiceStub = NamingService.createNamingServiceStub(namingServiceUrl);
 
-        taskProActiveDataspaces = new TaskProActiveDataspaces(taskId, namingServiceStub, false);
+        taskProActiveDataspaces = new TaskProActiveDataspaces(taskId, namingServiceStub, false, null);
 
         System.out.println("Node scratch folder is " + getScratchFolder());
     }

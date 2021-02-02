@@ -79,7 +79,11 @@ public class RestDataspaceImpl implements RestDataspace {
         try {
             checkPathParams(dataspace, pathname);
             logger.debug(String.format("Storing file(s) in %s/%s", dataspace.toUpperCase(), pathname));
-            writeFile(is, resolveFile(session, dataspace, pathname), encoding);
+            FileObject fileObject = resolveFile(session, dataspace, pathname);
+            if (!fileObject.isWriteable()) {
+                return unauthorizedWriteRes(pathname);
+            }
+            writeFile(is, fileObject, encoding);
         } catch (Throwable error) {
             logger.error(String.format("Cannot save the requested file to %s in %s.",
                                        pathname,
@@ -110,6 +114,9 @@ public class RestDataspaceImpl implements RestDataspace {
 
             if (!fo.exists()) {
                 return notFoundRes();
+            }
+            if (!fo.isReadable()) {
+                return unauthorizedReadRes(pathname);
             }
             if (!Strings.isNullOrEmpty(component)) {
                 return componentResponse(component, fo, includes, excludes);
@@ -156,6 +163,9 @@ public class RestDataspaceImpl implements RestDataspace {
             if (!fo.exists()) {
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
+            if (!fo.isWriteable()) {
+                return unauthorizedWriteRes(pathname);
+            }
             if (fo.getType() == FileType.FOLDER) {
                 logger.debug(String.format("Deleting directory %s in %s", pathname, dataspace.toUpperCase()));
                 return deleteDir(fo, includes, excludes);
@@ -199,6 +209,10 @@ public class RestDataspaceImpl implements RestDataspace {
         try {
             checkPathParams(dataspacePath, pathname);
             FileObject fileObject = resolveFile(session, dataspacePath, pathname);
+
+            if (!fileObject.isWriteable()) {
+                return unauthorizedWriteRes(pathname);
+            }
 
             if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FOLDER.getMimeType())) {
                 logger.debug(String.format("Creating folder %s in %s", pathname, dataspacePath.toUpperCase()));
@@ -310,6 +324,14 @@ public class RestDataspaceImpl implements RestDataspace {
         return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
     }
 
+    private Response unauthorizedReadRes(String pathname) {
+        return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized read access to " + pathname).build();
+    }
+
+    private Response unauthorizedWriteRes(String pathname) {
+        return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized write access to " + pathname).build();
+    }
+
     private Response serverErrorRes(String format, Object... args) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                        .entity((args == null || args.length == 0) ? format : String.format(format, args))
@@ -384,7 +406,7 @@ public class RestDataspaceImpl implements RestDataspace {
             synchronized (session) {
                 fs = session.fileSystem();
                 if (fs == null) {
-                    fs = FileSystem.Builder.create(session.getScheduler());
+                    fs = FileSystem.Builder.create(session);
                     session.fileSystem(fs);
                 }
             }

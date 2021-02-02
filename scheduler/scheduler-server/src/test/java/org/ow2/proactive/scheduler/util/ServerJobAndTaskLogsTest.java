@@ -134,7 +134,7 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
 
         assertEquals(4, new File(ServerJobAndTaskLogs.getInstance().getLogsLocation() + "/" + jobId).list().length);
 
-        ServerJobAndTaskLogs.getInstance().remove(jobId, "test");
+        ServerJobAndTaskLogs.getInstance().remove(jobId, "test", null);
 
         assertEquals(0, new File(ServerJobAndTaskLogs.getInstance().getLogsLocation()).list().length);
     }

@@ -168,6 +168,10 @@ public class Session {
         return userName;
     }
 
+    public CredData getCredData() {
+        return credData;
+    }
+
     protected void setUserName(String userName) {
         this.userName = userName;
     }
