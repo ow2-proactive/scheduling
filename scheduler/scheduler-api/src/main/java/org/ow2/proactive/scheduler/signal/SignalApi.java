@@ -67,6 +67,15 @@ public interface SignalApi extends Serializable {
     boolean isReceived(String signal) throws SignalApiException;
 
     /**
+     * Check if any of the signals given as input exist among the list of job signals
+     *
+     * @param signalsSubList list of the signals to be checked
+     * @return the first signal found in the list of job signals, null if no signals are found
+     * @throws SignalApiException if an error occurred while reading in the signals channel
+     */
+    String checkForSignals(List<String> signalsSubList) throws SignalApiException;
+
+    /**
      * Wait until the given signal is added to the list of job signals
      *
      * @param signal name of the signal to wait for
@@ -78,9 +87,10 @@ public interface SignalApi extends Serializable {
      * Wait until one signal (among those of the given {@code signalsList}) is added to the list of job signals
      *
      * @param signalsList list of the signals to wait for any of them
+     * @return the first signal received among those given as input
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
-    void waitForAny(List<String> signalsList) throws SignalApiException;
+    String waitForAny(List<String> signalsList) throws SignalApiException;
 
     /**
      * Add the given {@code signal} to the list of job signals
