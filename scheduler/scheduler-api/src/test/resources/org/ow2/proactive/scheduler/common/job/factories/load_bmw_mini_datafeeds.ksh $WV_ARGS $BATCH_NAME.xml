@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<job xmlns="urn:proactive:jobdescriptor:3.12" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" maxNumberOfExecution="1" name="load_bmw_mini_datafeeds.ksh $WV_ARGS $BATCH_NAME" onTaskError="cancelJob" priority="${WV_PRIORITY}" projectName="DP" taskRetryDelay="5" xsi:schemaLocation="urn:proactive:jobdescriptor:3.12 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.12/schedulerjob.xsd">
+<variables>
+<variable name="BATCH_NAME" value=" -- BMWLOAD"/>
+<variable name="WV_COMMAND" value="load_bmw_mini_datafeeds.ksh  -f ${WV_CONFIG_FILE}  -t ${WV_FILE_TYPE} "/>
+<variable name="WV_ARGS" value=" -f ${WV_CONFIG_FILE}  -t ${WV_FILE_TYPE} "/>
+<variable model="PA:List(lowest,low,normal,high,highest)" name="WV_PRIORITY" value="high"/>
+<variable model="" name="REMOVE_DELAY" value="60d"/>
+<variable name="WV_SCH_ORGID" value="NGR"/>
+<variable name="WV_CONFIG_FILE" value="load_bmw_datafeeds.cfg"/>
+<variable model="PA:List(Agreement,Cancellation,Sales,Service,ServiceAppointment,Teleservice,VSP,Waiver)" name="WV_FILE_TYPE" value="Service"/>
+</variables>
+<description><![CDATA[ Cadence job ]]></description>
+<genericInformation>
+<info name="bucketName" value="auto-cadence"/>
+<info name="START_AT" value="2020-07-01T00:00:00-08:00"/>
+<info name="REMOVE_DELAY" value="${REMOVE_DELAY}"/>
+<info name="REQUIRED_LICENSES" value="process_DP,process_DLR_${WV_SCH_ORGID}"/>
+<info name="group" value="public-objects"/>
+</genericInformation>
+<taskFlow>
+<task fork="false" name="CadenceTask">
+<description><![CDATA[ CadenceTask ]]></description>
+<variables>
+<variable inherited="false" name="TASK_NODE_TYPE" value="CADENCE"/>
+</variables>
+<scriptExecutable>
+<script>
+    <code language="bash">
+        <![CDATA[
+ls -la
+]]>
+    </code>
+</script>
+</scriptExecutable>
+<controlFlow>
+<loop target="CadenceTask">
+<script>
+<code language="groovy"><![CDATA[
+                             loop=false]]></code>
+</script>
+</loop>
+</controlFlow>
+</task>
+</taskFlow>
+</job>

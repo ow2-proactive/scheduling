@@ -83,6 +83,8 @@ public class TestStaxJobFactory {
 
     private static URI jobDescriptorAttrDefVariableXmlElement;
 
+    private static URI jobWithParsingIssue;
+
     private static URI jobDescriptorTaskVariable;
 
     private static URI jobDescriptorVariableOrder;
@@ -123,6 +125,9 @@ public class TestStaxJobFactory {
 
         jobDescriptorVariableOrder = TestStaxJobFactory.class.getResource("job_variables_order.xml").toURI();
 
+        jobWithParsingIssue = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/load_bmw_mini_datafeeds.ksh $WV_ARGS $BATCH_NAME.xml")
+                                                      .toURI();
+
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
     }
@@ -144,6 +149,11 @@ public class TestStaxJobFactory {
     public void testCreateJobShouldUseJobVariablesToReplaceJobNameVariable() throws Exception {
         Job testScriptJob = factory.createJob(jobDescriptorUri);
         assertEquals("updated_job_name", testScriptJob.getName());
+    }
+
+    @Test
+    public void testJobWithParsingIssue() throws Exception {
+        factory.createJob(jobWithParsingIssue);
     }
 
     @Test
