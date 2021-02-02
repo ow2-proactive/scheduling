@@ -187,7 +187,7 @@ public class VariableSubstitutor {
         substitutor.setVariablePrefixMatcher(new StrMatcher() {
             @Override
             public int isMatch(char[] buffer, int pos, int bufferStart, int bufferEnd) {
-                if (pos + 1 == bufferEnd) {
+                if (pos + 1 >= bufferEnd) {
                     return -1;
                 }
                 char firstChar = buffer[pos];
