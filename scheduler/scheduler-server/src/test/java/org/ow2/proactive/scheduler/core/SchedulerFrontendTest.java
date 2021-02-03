@@ -110,7 +110,7 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
     public void testConnection() throws KeyException, AlreadyConnectedException {
         schedulerFrontend.connect(new UniqueID(), new UserIdentificationImpl("admin"), null);
 
-        Mockito.verify(spacesSupport, times(1)).registerUserSpace("admin");
+        Mockito.verify(spacesSupport, times(1)).registerUserSpace("admin", null);
     }
 
     @Test

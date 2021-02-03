@@ -64,7 +64,7 @@ public class SchedulerDataspace implements EndActive, Serializable {
         taskDataSpaceApplication = new TaskDataSpaceApplication(taskId.toString(),
                                                                 dataSpaceServiceStarter.getNamingService());
 
-        taskDataSpaceApplication.startDataSpaceApplication(null, null, null, null, user, jobId);
+        taskDataSpaceApplication.startDataSpaceApplication(null, null, null, null, user, null, jobId);
     }
 
     public String getNamingServiceUrl() {

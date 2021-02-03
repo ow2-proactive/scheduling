@@ -38,6 +38,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
+import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
 
 public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
@@ -52,7 +53,7 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
 
     @Override
     public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
-            TaskLogger taskLogger) {
+            Decrypter decrypter, TaskLogger taskLogger) {
         return new SlowDataspaces(taskRunning);
     }
 

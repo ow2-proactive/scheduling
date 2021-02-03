@@ -1200,15 +1200,18 @@ public class SchedulingService {
                 JobId jobId = jobIdStringEntry.getKey();
                 String owner = jobIdStringEntry.getValue();
 
+                Credentials credentials = null;
+
                 if (jobs.isJobAlive(jobId)) {
                     TerminationData terminationData = jobs.removeJob(jobId);
+                    credentials = terminationData.getCredentials(jobId);
                     submitTerminationDataHandler(terminationData);
                 }
 
                 getListener().jobStateUpdated(owner,
                                               new NotificationData<>(SchedulerEvent.JOB_REMOVE_FINISHED,
                                                                      new JobInfoImpl(jobId, owner)));
-                ServerJobAndTaskLogs.getActiveInstance().remove(jobId, owner);
+                ServerJobAndTaskLogs.getActiveInstance().remove(jobId, owner, credentials);
                 logger.debug("HOUSEKEEPING sent JOB_REMOVE_FINISHED notification for job " + jobId);
 
             }

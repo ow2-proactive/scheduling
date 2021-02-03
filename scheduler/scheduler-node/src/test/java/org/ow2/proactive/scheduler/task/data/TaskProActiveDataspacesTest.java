@@ -64,7 +64,9 @@ public class TaskProActiveDataspacesTest extends ProActiveTestClean {
                                                                                                  "job",
                                                                                                  1000L),
                                                                          null,
-                                                                         false);
+                                                                         false,
+                                                                         null,
+                                                                         null);
 
         dataspaces.copyInputDataToScratch(Collections.<InputSelector> emptyList());
     }

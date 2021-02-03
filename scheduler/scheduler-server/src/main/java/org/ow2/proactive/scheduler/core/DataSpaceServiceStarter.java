@@ -38,11 +38,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.api.UserCredentials;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
@@ -51,6 +54,7 @@ import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDeployer;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.extensions.vfsprovider.util.URIHelper;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -332,6 +336,7 @@ public class DataSpaceServiceStarter implements Serializable {
      * If the localpath is provided, it will also create sub folders to the dataspace root with this username
      *
      * @param username username used to update urls and create folders
+     * @param userCredentials credentials of the user
      * @param appID the Application ID
      * @param spaceName the name of the dataspace
      * @param urls the url list of the Virtual File Systems (for different protocols)
@@ -344,23 +349,25 @@ public class DataSpaceServiceStarter implements Serializable {
      * @throws ProActiveException
      * @throws FileSystemException
      */
-    public void createSpaceWithUserNameSubfolder(String username, String appID, String spaceName, String urls,
-            String localpath, String hostname, boolean inputConfiguration, boolean localConfiguration)
-            throws URISyntaxException, IOException, ProActiveException {
+    public void createSpaceWithUserNameSubfolder(String username, UserCredentials userCredentials, String appID,
+            String spaceName, String urls, String localpath, String hostname, boolean inputConfiguration,
+            boolean localConfiguration) throws URISyntaxException, IOException, ProActiveException {
+        // updates the urls with the username
+        String[] urlsArray = Tools.dataSpaceConfigPropertyToUrls(urls);
+
         // create a local folder with the username
 
         if (localpath != null) {
-            localpath = localpath + File.separator + username;
-            File localPathFile = new File(localpath);
-            if (!localPathFile.exists()) {
-                FileUtils.forceMkdir(localPathFile);
+            DefaultFileSystemManager manager = VFSFactory.createDefaultFileSystemManager(userCredentials);
+            try {
+                FileObject folder = manager.resolveFile(urlsArray[0] + "/" + username);
+                folder.createFolder();
+            } finally {
+                manager.close();
             }
         }
 
-        // updates the urls with the username
-        String[] urlarray = Tools.dataSpaceConfigPropertyToUrls(urls);
-
-        String[] updatedArray = urlsWithUserDir(urlarray, username);
+        String[] updatedArray = urlsWithUserDir(urlsArray, username);
 
         String newPropertyValue = urlsToDSConfigProperty(updatedArray);
 
@@ -404,7 +411,11 @@ public class DataSpaceServiceStarter implements Serializable {
             String url = inputUrls[i];
 
             String urlToAdd;
-            if (!url.endsWith("/")) {
+            if (PASchedulerProperties.DATASPACE_DEFAULTUSER_IMPERSONATION.getValueAsBoolean() &&
+                (url.startsWith("sftp") || url.startsWith("vsftp"))) {
+                // In case of impersonation, the root folder should not be manipulated
+                urlToAdd = url;
+            } else if (!url.endsWith("/")) {
                 urlToAdd = url + "/" + username;
             } else {
                 urlToAdd = url + username;

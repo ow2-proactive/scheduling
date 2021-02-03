@@ -125,7 +125,7 @@ public class TestDataSpaceConfiguration extends SchedulerFunctionalTestNoRestart
         NamingService namingService = dsServiceStarter.getNamingService();
 
         TaskDataSpaceApplication jdsa = new TaskDataSpaceApplication(appid, dsServiceStarter.getNamingService());
-        jdsa.startDataSpaceApplication(null, null, null, null, username, null);
+        jdsa.startDataSpaceApplication(null, null, null, null, username, null, null);
 
         DataSpacesNodes.configureApplication(PAActiveObject.getNode(), appid, dsServiceStarter.getNamingServiceURL());
 

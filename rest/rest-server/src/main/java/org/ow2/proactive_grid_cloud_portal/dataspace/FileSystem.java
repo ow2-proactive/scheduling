@@ -38,10 +38,13 @@ import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.commons.vfs2.*;
+import org.objectweb.proactive.extensions.dataspaces.api.UserCredentials;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
 import com.google.common.collect.Lists;
@@ -51,6 +54,10 @@ import com.google.common.io.Closer;
 
 
 public class FileSystem {
+
+    public static final String X_PROACTIVE_DS_TYPE = "x-proactive-ds-type";
+
+    public static final String X_PROACTIVE_DS_PERMISSIONS = "x-proactive-ds-permissions";
 
     private FileSystemManager fsm;
 
@@ -154,15 +161,37 @@ public class FileSystem {
     }
 
     private static void fillDirProps(FileObject fo, Map<String, Object> properties) throws FileSystemException {
-        properties.put("x-proactive-ds-type", "DIRECTORY");
+        properties.put(X_PROACTIVE_DS_TYPE, "DIRECTORY");
         properties.put("Last-Modified", new Date(fo.getContent().getLastModifiedTime()));
+        properties.put(X_PROACTIVE_DS_PERMISSIONS, getPermissionsString(fo));
+    }
+
+    private static String getPermissionsString(FileObject fo) throws FileSystemException {
+        String permissionString = "";
+        if (fo.isReadable()) {
+            permissionString += "r";
+        } else {
+            permissionString += "-";
+        }
+        if (fo.isWriteable()) {
+            permissionString += "w";
+        } else {
+            permissionString += "-";
+        }
+        if (fo.isExecutable()) {
+            permissionString += "x";
+        } else {
+            permissionString += "-";
+        }
+        return permissionString;
     }
 
     private static void fillFileProps(FileObject fo, Map<String, Object> properties) throws FileSystemException {
-        properties.put("x-proactive-ds-type", "FILE");
+        properties.put(X_PROACTIVE_DS_TYPE, "FILE");
         properties.put(HttpHeaders.LAST_MODIFIED, new Date(fo.getContent().getLastModifiedTime()));
         properties.put(HttpHeaders.CONTENT_TYPE, contentType(fo));
         properties.put(HttpHeaders.CONTENT_LENGTH, fo.getContent().getSize());
+        properties.put(X_PROACTIVE_DS_PERMISSIONS, getPermissionsString(fo));
     }
 
     public static List<FileObject> findFiles(FileObject root, List<String> includes, List<String> excludes)
@@ -226,11 +255,15 @@ public class FileSystem {
     }
 
     static class Builder {
-        public static FileSystem create(SchedulerProxyUserInterface schedulerProxy)
+        public static FileSystem create(Session session)
                 throws FileSystemException, NotConnectedException, PermissionException {
-            return new FileSystem(schedulerProxy.getUserSpaceURIs().get(0),
-                                  schedulerProxy.getGlobalSpaceURIs().get(0),
-                                  VFSFactory.createDefaultFileSystemManager());
+            CredData credData = session.getCredData();
+            return new FileSystem(session.getScheduler().getUserSpaceURIs().get(0),
+                                  session.getScheduler().getGlobalSpaceURIs().get(0),
+                                  VFSFactory.createDefaultFileSystemManager(new UserCredentials(credData.getLogin(),
+                                                                                                credData.getPassword(),
+                                                                                                credData.getDomain(),
+                                                                                                credData.getKey())));
         }
     }
 

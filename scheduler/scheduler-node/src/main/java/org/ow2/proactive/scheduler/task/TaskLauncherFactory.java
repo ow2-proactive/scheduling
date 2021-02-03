@@ -32,12 +32,13 @@ import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
+import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
 
 public interface TaskLauncherFactory extends Serializable {
 
     TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser,
-            TaskLogger taskLogger) throws Exception;
+            Decrypter decrypter, TaskLogger taskLogger) throws Exception;
 
     TaskExecutor createTaskExecutor(File workingDir);
 

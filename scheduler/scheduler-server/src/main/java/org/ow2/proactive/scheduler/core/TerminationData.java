@@ -43,6 +43,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -119,6 +120,8 @@ final class TerminationData {
 
     private final Map<JobId, Map<String, String>> jobsToTerminateGenericInformation;
 
+    private final Map<JobId, Credentials> jobsToTerminateCredentials;
+
     private final Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate;
 
     private final Map<TaskIdWrapper, TaskRestartData> tasksToRestart;
@@ -128,25 +131,33 @@ final class TerminationData {
     static final TerminationData EMPTY = new TerminationData(Collections.emptySet(),
                                                              Collections.emptyMap(),
                                                              Collections.emptyMap(),
+                                                             Collections.emptyMap(),
                                                              Collections.emptyMap());
 
     static TerminationData newTerminationData() {
-        return new TerminationData(new HashSet<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+        return new TerminationData(new HashSet<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
     }
 
     private TerminationData(Set<JobId> jobsToTerminate, Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate,
             Map<TaskIdWrapper, TaskRestartData> tasksToRestart,
-            Map<JobId, Map<String, String>> jobsToTerminateGenericInformation) {
+            Map<JobId, Map<String, String>> jobsToTerminateGenericInformation,
+            Map<JobId, Credentials> jobsToTerminateCredentials) {
         this.jobsToTerminate = jobsToTerminate;
         this.tasksToTerminate = tasksToTerminate;
         this.jobsToTerminateGenericInformation = jobsToTerminateGenericInformation;
         this.tasksToRestart = tasksToRestart;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
+        this.jobsToTerminateCredentials = jobsToTerminateCredentials;
     }
 
-    void addJobToTerminate(JobId jobId, Map<String, String> jobGenericInfo) {
+    void addJobToTerminate(JobId jobId, Map<String, String> jobGenericInfo, Credentials credentials) {
         jobsToTerminate.add(jobId);
         jobsToTerminateGenericInformation.put(jobId, jobGenericInfo);
+        jobsToTerminateCredentials.put(jobId, credentials);
+    }
+
+    public Credentials getCredentials(JobId jobId) {
+        return jobsToTerminateCredentials.get(jobId);
     }
 
     void addTaskData(InternalJob jobData, RunningTaskData taskData, TerminationStatus terminationStatus,
