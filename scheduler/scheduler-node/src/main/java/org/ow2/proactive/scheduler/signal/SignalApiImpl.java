@@ -107,6 +107,17 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
+    public String checkForSignals(List<String> signalsSubList) throws SignalApiException {
+        init();
+        List<String> signals = getJobSignals();
+        if (!signals.isEmpty()) {
+            return signalsSubList.stream().filter(signals::contains).findFirst().orElse(null);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
@@ -208,7 +219,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public void waitForAny(List<String> signalsList) throws SignalApiException {
+    public String waitForAny(List<String> signalsList) throws SignalApiException {
         init();
         StringBuilder conditions = new StringBuilder();
         for (String signal : signalsList) {
@@ -218,6 +229,7 @@ public class SignalApiImpl implements SignalApi {
 
         try {
             synchronization.waitUntil(SIGNALS_CHANNEL, jobId, "{k, x -> " + allConditions + " }");
+            return checkForSignals(signalsList);
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException e) {
