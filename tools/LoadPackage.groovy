@@ -170,7 +170,7 @@ class LoadPackage {
             def contentType = metadata_map.get("contentType")
 
             // For POST queries
-            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.2.jar").absolutePath);
+            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.13.jar").absolutePath);
             def boundary = "---------------" + UUID.randomUUID().toString();
 
             // POST QUERY
@@ -182,7 +182,7 @@ class LoadPackage {
             def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage") + " (" + SCHEDULER_VERSION + ")", "UTF-8")
 
             // For POST queries
-            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.2.jar").absolutePath);
+            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.13.jar").absolutePath);
             def boundary = "---------------" + UUID.randomUUID().toString();
 
             // POST QUERY
