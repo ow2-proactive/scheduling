@@ -4,7 +4,7 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile 'jline:jline:2.14.6'
 
-    compile 'org.apache.httpcomponents:httpmime:4.5.2'
+    compile 'org.apache.httpcomponents:httpmime:4.5.13'
 
     compile project(":common:common-api")
     compile project(":common:common-http")
