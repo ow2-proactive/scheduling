@@ -325,11 +325,11 @@ public class RestDataspaceImpl implements RestDataspace {
     }
 
     private Response unauthorizedReadRes(String pathname) {
-        return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized read access to " + pathname).build();
+        return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized read access to " + pathname).build();
     }
 
     private Response unauthorizedWriteRes(String pathname) {
-        return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized write access to " + pathname).build();
+        return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized write access to " + pathname).build();
     }
 
     private Response serverErrorRes(String format, Object... args) {
