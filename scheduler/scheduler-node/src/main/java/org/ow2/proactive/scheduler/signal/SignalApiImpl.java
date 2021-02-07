@@ -82,11 +82,16 @@ public class SignalApiImpl implements SignalApi {
     public boolean readyForSignal(String signalName) throws SignalApiException {
         try {
             init();
+            // If the signal already exists, remove it
             synchronization.conditionalCompute(SIGNALS_CHANNEL,
                                                jobId,
                                                "{k, x -> x.contains('" + signalName + "')}",
                                                "{k, x -> x.remove('" + signalName + "');x}");
-            sendSignal(READY_PREFIX + signalName);
+            // If the ready signal does not exist, add it
+            synchronization.conditionalCompute(SIGNALS_CHANNEL,
+                                               jobId,
+                                               "{k, x -> !x.contains('" + READY_PREFIX + signalName + "')}",
+                                               "{k, x -> x.add('" + READY_PREFIX + signalName + "');x}");
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
@@ -121,6 +126,14 @@ public class SignalApiImpl implements SignalApi {
     public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
+
+            // If the ready signal already exists, remove it
+            synchronization.conditionalCompute(SIGNALS_CHANNEL,
+                                               jobId,
+                                               "{k, x -> x.contains('" + READY_PREFIX + signalName + "')}",
+                                               "{k, x -> x.remove('" + READY_PREFIX + signalName + "');x}");
+
+            // If the signal does not exist, add it
             synchronization.conditionalCompute(SIGNALS_CHANNEL,
                                                jobId,
                                                "{k, x -> !x.contains('" + signalName + "')}",
@@ -139,10 +152,19 @@ public class SignalApiImpl implements SignalApi {
             init();
             List<String> signals = getJobSignals();
             StringBuilder actions = new StringBuilder();
+
+            // Filter signals to add only those signals that are not already sent
             for (String signal : signalsSubList.stream()
                                                .filter(signal -> !signals.contains(signal))
                                                .collect(Collectors.toList())) {
                 actions.append("x.add('" + signal + "');");
+            }
+
+            // Filter signals to remove ready signals that are already sent
+            for (String signal : signalsSubList.stream()
+                                               .filter(signal -> signals.contains(READY_PREFIX + signal))
+                                               .collect(Collectors.toList())) {
+                actions.append("x.remove('" + READY_PREFIX + signal + "');");
             }
             synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");
             return true;
@@ -157,7 +179,11 @@ public class SignalApiImpl implements SignalApi {
     public boolean removeSignal(String signalName) throws SignalApiException {
         try {
             init();
-            synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.remove('" + signalName + "');x}");
+            // If the signal already exists, remove it
+            synchronization.conditionalCompute(SIGNALS_CHANNEL,
+                                               jobId,
+                                               "{k, x -> x.contains('" + signalName + "')}",
+                                               "{k, x -> x.remove('" + signalName + "');x}");
             return true;
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
@@ -170,9 +196,11 @@ public class SignalApiImpl implements SignalApi {
     public boolean removeManySignals(List<String> signalsSubList) throws SignalApiException {
         try {
             init();
-
+            List<String> signals = getJobSignals();
             StringBuilder actions = new StringBuilder();
-            for (String signal : signalsSubList) {
+
+            // Filter signals and remove only those signals that are already sent
+            for (String signal : signalsSubList.stream().filter(signals::contains).collect(Collectors.toList())) {
                 actions.append("x.remove('" + signal + "');");
             }
             synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");

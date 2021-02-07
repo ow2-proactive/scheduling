@@ -151,9 +151,18 @@ public class SignalApiTest extends ProActiveTestClean {
     public void testSendSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_4";
 
-        // Send signal twice and check that it is added only once
+        // Send ready for signal then check that when the signal is sent, its associated ready signal is removed
+        signalApi.readyForSignal(signal);
+
+        // Send signal twice then check that it is added only once
         signalApi.sendSignal(signal);
         signalApi.sendSignal(signal);
+
+        Assert.assertFalse(((List) synchronizationInternal.get(USER,
+                                                               TASK_ID,
+                                                               SIGNALS_CHANNEL,
+                                                               JOB_ID.value())).contains(((SignalApiImpl) signalApi).READY_PREFIX +
+                                                                                         signal));
 
         Assert.assertEquals(1,
                             ((List) synchronizationInternal.get(USER,
@@ -166,13 +175,23 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test
     public void testSendManySignals() throws InvalidChannelException, SignalApiException {
-        List<String> signalsToBeSent = new ArrayList<>(Arrays.asList("test_signal_5_1", "test_signal_5_2"));
+        String signal1 = "test_signal_5_1";
+        String signal2 = "test_signal_5_2";
+        List<String> signalsToBeSent = new ArrayList<>(Arrays.asList(signal1, signal2));
+
+        // Send ready for both signals then check that when the signals are sent, their associated ready signals are removed
+        signalApi.readyForSignal(signal1);
+        signalApi.readyForSignal(signal2);
 
         // Send signals twice and check that each signal is added only once
         signalApi.sendManySignals(signalsToBeSent);
         signalApi.sendManySignals(signalsToBeSent);
 
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
+
+        Assert.assertFalse(allSignals.contains(((SignalApiImpl) signalApi).READY_PREFIX + signal1) ||
+                           allSignals.contains(((SignalApiImpl) signalApi).READY_PREFIX + signal2));
+
         signalsToBeSent.forEach(signal -> Assert.assertEquals(1,
                                                               allSignals.stream()
                                                                         .filter(sig -> sig.equals(signal))
