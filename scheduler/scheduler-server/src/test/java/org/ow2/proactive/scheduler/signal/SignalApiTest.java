@@ -125,7 +125,6 @@ public class SignalApiTest extends ProActiveTestClean {
                                                                TASK_ID,
                                                                SIGNALS_CHANNEL,
                                                                JOB_ID.value())).contains(signal));
-
         Assert.assertTrue(((List) synchronizationInternal.get(USER,
                                                               TASK_ID,
                                                               SIGNALS_CHANNEL,
@@ -151,19 +150,33 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testSendSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_4";
+
+        // Send signal twice and check that it is added only once
         signalApi.sendSignal(signal);
-        Assert.assertTrue(((List) synchronizationInternal.get(USER,
-                                                              TASK_ID,
-                                                              SIGNALS_CHANNEL,
-                                                              JOB_ID.value())).contains(signal));
+        signalApi.sendSignal(signal);
+
+        Assert.assertEquals(1,
+                            ((List) synchronizationInternal.get(USER,
+                                                                TASK_ID,
+                                                                SIGNALS_CHANNEL,
+                                                                JOB_ID.value())).stream()
+                                                                                .filter(sig -> sig.equals(signal))
+                                                                                .count());
     }
 
     @Test
     public void testSendManySignals() throws InvalidChannelException, SignalApiException {
         List<String> signalsToBeSent = new ArrayList<>(Arrays.asList("test_signal_5_1", "test_signal_5_2"));
+
+        // Send signals twice and check that each signal is added only once
         signalApi.sendManySignals(signalsToBeSent);
+        signalApi.sendManySignals(signalsToBeSent);
+
         List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
-        signalsToBeSent.forEach(signal -> Assert.assertTrue(allSignals.contains(signal)));
+        signalsToBeSent.forEach(signal -> Assert.assertEquals(1,
+                                                              allSignals.stream()
+                                                                        .filter(sig -> sig.equals(signal))
+                                                                        .count()));
     }
 
     @Test

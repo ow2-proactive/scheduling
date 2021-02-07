@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -84,9 +85,8 @@ public class SignalApiImpl implements SignalApi {
             synchronization.conditionalCompute(SIGNALS_CHANNEL,
                                                jobId,
                                                "{k, x -> x.contains('" + signalName + "')}",
-                                               "{k, x -> x.remove('" + signalName + "');x.add('" + READY_PREFIX +
-                                                                                             signalName + "');x}",
-                                               "{k, x -> x.add('" + READY_PREFIX + signalName + "');x}");
+                                               "{k, x -> x.remove('" + signalName + "');x}");
+            sendSignal(READY_PREFIX + signalName);
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
@@ -121,7 +121,10 @@ public class SignalApiImpl implements SignalApi {
     public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
-            synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.add('" + signalName + "');x}");
+            synchronization.conditionalCompute(SIGNALS_CHANNEL,
+                                               jobId,
+                                               "{k, x -> !x.contains('" + signalName + "')}",
+                                               "{k, x -> x.add('" + signalName + "');x}");
             return true;
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
@@ -134,8 +137,11 @@ public class SignalApiImpl implements SignalApi {
     public boolean sendManySignals(List<String> signalsSubList) throws SignalApiException {
         try {
             init();
+            List<String> signals = getJobSignals();
             StringBuilder actions = new StringBuilder();
-            for (String signal : signalsSubList) {
+            for (String signal : signalsSubList.stream()
+                                               .filter(signal -> !signals.contains(signal))
+                                               .collect(Collectors.toList())) {
                 actions.append("x.add('" + signal + "');");
             }
             synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");
