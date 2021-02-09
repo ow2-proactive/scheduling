@@ -131,7 +131,7 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> variables;
 
-    private List<String> signals;
+    private Set<String> signals;
 
     public JobInfoImpl() {
     }
@@ -477,12 +477,12 @@ public class JobInfoImpl implements JobInfo {
     }
 
     @Override
-    public List<String> getSignals() {
-        return (signals == null) ? new ArrayList<String>() : signals;
+    public Set<String> getSignals() {
+        return (signals == null) ? new HashSet<>() : signals;
     }
 
     @Override
-    public void setSignals(List<String> signals) {
+    public void setSignals(Set<String> signals) {
         this.signals = signals;
     }
 }

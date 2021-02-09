@@ -26,7 +26,7 @@
 package org.ow2.proactive.scheduler.signal;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -36,7 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  * SignalApi uses a single system channel to store all signals needed by jobs.
  * The signal channel contains an entry per job.
- * The key of each entry is the job id, whereas the value of the entry is the list of signals used by the considered job.
+ * The key of each entry is the job id, whereas the value of the entry is the set of signals used by the considered job.
  *
  * The SignalApi service is automatically started with the ProActive Server.
  *
@@ -48,35 +48,35 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public interface SignalApi extends Serializable {
 
     /**
-     * Add a new signal to the list of job signals
+     * Add a new signal to the set of job signals
      * The new signal is composed of a prefix (i.e., "ready_") and the given signal
      *
      * @param signal name of the signal to be added
-     * @return true if the signal is successfully added to the list of job signals
+     * @return true if the signal is successfully added to the set of job signals
      * @throws SignalApiException if an error occurred while reading in the signals channel, or when adding the ready signal to job signals
      */
     boolean readyForSignal(String signal) throws SignalApiException;
 
     /**
-     * Check if the given signal exists among the list of job signals
+     * Check if the given signal exists among the set of job signals
      *
      * @param signal name of the signal to be checked
-     * @return true if the signal exists among the list of job signals
+     * @return true if the signal exists among the set of job signals
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
     boolean isReceived(String signal) throws SignalApiException;
 
     /**
-     * Check if any of the signals given as input exist among the list of job signals
+     * Check if any of the signals given as input exist among the set of job signals
      *
-     * @param signalsSubList list of the signals to be checked
-     * @return the first signal found in the list of job signals, null if no signals are found
+     * @param signalsSubSet set of the signals to be checked
+     * @return the first signal found in the set of job signals, null if no signals are found
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
-    String checkForSignals(List<String> signalsSubList) throws SignalApiException;
+    String checkForSignals(Set<String> signalsSubSet) throws SignalApiException;
 
     /**
-     * Wait until the given signal is added to the list of job signals
+     * Wait until the given signal is added to the set of job signals
      *
      * @param signal name of the signal to wait for
      * @throws SignalApiException if an error occurred while reading in the signals channel
@@ -84,16 +84,16 @@ public interface SignalApi extends Serializable {
     void waitFor(String signal) throws SignalApiException;
 
     /**
-     * Wait until one signal (among those of the given {@code signalsList}) is added to the list of job signals
+     * Wait until one signal (among those of the given {@code signalsSubSet}) is added to the set of job signals
      *
-     * @param signalsList list of the signals to wait for any of them
+     * @param signalsSubSet set of the signals to wait for any of them
      * @return the first signal received among those given as input
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
-    String waitForAny(List<String> signalsList) throws SignalApiException;
+    String waitForAny(Set<String> signalsSubSet) throws SignalApiException;
 
     /**
-     * Add the given {@code signal} to the list of job signals
+     * Add the given {@code signal} to the set of job signals
      *
      * @param signal name of the signal to be added to job signals
      * @return true if the signal is successfully added to job signals
@@ -102,39 +102,39 @@ public interface SignalApi extends Serializable {
     boolean sendSignal(String signal) throws SignalApiException;
 
     /**
-     * Add the given list of signals to job signals
+     * Add the given set of signals to job signals
      *
-     * @param signalsList list of the signals to be added to job signals
+     * @param signalsSubSet set of the signals to be added to job signals
      * @return true if all the given signals are successfully added to job signal
      * @throws SignalApiException if an error occurred while reading in the signals channel, or when adding the signals to job signals
      */
-    boolean sendManySignals(List<String> signalsList) throws SignalApiException;
+    boolean sendManySignals(Set<String> signalsSubSet) throws SignalApiException;
 
     /**
-     * Remove the given {@code signal} from the list of job signals
+     * Remove the given {@code signal} from the set of job signals
      *
      * @param signal name of the signal to be removed from job signals
-     * @return true if the signal is successfully removed from the list of job signals
+     * @return true if the signal is successfully removed from the set of job signals
      * @throws SignalApiException if an error occurred while reading in the signals channel, or when removing the signal from job signals
      */
     boolean removeSignal(String signal) throws SignalApiException;
 
     /**
-     * Remove the given list of signals from job signals
+     * Remove the given set of signals from job signals
      *
-     * @param signalsList list of the signals to be removed from job signals
+     * @param signalsSubSet set of the signals to be removed from job signals
      * @return true if all the given signals are successfully removed from job signals
      * @throws SignalApiException if an error occurred while reading in the signals channel, or when removing the signals from job signals
      */
-    boolean removeManySignals(List<String> signalsList) throws SignalApiException;
+    boolean removeManySignals(Set<String> signalsSubSet) throws SignalApiException;
 
     /**
-     * Return the list of job signals
+     * Return the set of job signals
      *
-     * @return the list of job signals
+     * @return the set of job signals
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
-    List<String> getJobSignals() throws SignalApiException;
+    Set<String> getJobSignals() throws SignalApiException;
 
     /**
      * Remove the entry corresponding to job signals from the signals channel

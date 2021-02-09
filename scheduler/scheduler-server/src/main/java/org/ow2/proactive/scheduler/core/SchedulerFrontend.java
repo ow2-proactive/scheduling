@@ -1568,13 +1568,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
          */
         try {
-            List<String> jobHavingSignalsIds = new ArrayList<String>(publicStore.keySet(SIGNAL_ORIGINATOR,
-                                                                                        SIGNAL_TASK_ID,
-                                                                                        signalsChannel));
+            List<String> jobHavingSignalsIds = new ArrayList<>(publicStore.keySet(SIGNAL_ORIGINATOR,
+                                                                                  SIGNAL_TASK_ID,
+                                                                                  signalsChannel));
             jobsInfo.getList()
                     .stream()
                     .filter(jobInfo -> jobHavingSignalsIds.contains(jobInfo.getJobId().value()))
-                    .map(jobInfo -> insertJobSignals(jobInfo))
+                    .map(this::insertJobSignals)
                     .collect(Collectors.toList());
         } catch (InvalidChannelException e) {
             logger.warn("Could not acquire the list of jobs having signals. No signals will be included in the returned jobs info");
@@ -1733,11 +1733,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
             if (publicStore.containsKey(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobid)) {
 
-                List<String> jobSignals = jobInfo.getSignals();
-                List<String> signalsToBeAdded = (List) publicStore.get(SIGNAL_ORIGINATOR,
-                                                                       SIGNAL_TASK_ID,
-                                                                       signalsChannel,
-                                                                       jobid);
+                Set<String> jobSignals = jobInfo.getSignals();
+                Set<String> signalsToBeAdded = (HashSet) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                         SIGNAL_TASK_ID,
+                                                                         signalsChannel,
+                                                                         jobid);
                 if (signalsToBeAdded != null && !signalsToBeAdded.isEmpty()) {
                     jobSignals.addAll(signalsToBeAdded);
                     jobInfo.setSignals(jobSignals);
@@ -1864,9 +1864,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public boolean addJobSignal(String sessionId, String jobId, String signal) {
         try {
 
-            List<String> signals = (List) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
+            Set<String> signals = (Set) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
             if (signals == null) {
-                signals = new ArrayList<>();
+                signals = new HashSet<>();
             }
 
             signals.add(signal);
