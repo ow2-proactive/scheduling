@@ -81,6 +81,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Set<String> signals;
 
+    private Map<String, String> visualizationConnectionStrings;
+
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
     }
@@ -292,5 +294,14 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public void setSignals(Set<String> signals) {
         this.signals = signals;
+    }
+
+    @Override
+    public Map<String, String> getVisualizationConnectionStrings() {
+        return visualizationConnectionStrings;
+    }
+
+    public void setVisualizationConnectionStrings(Map<String, String> visualizationConnectionStrings) {
+        this.visualizationConnectionStrings = visualizationConnectionStrings;
     }
 }

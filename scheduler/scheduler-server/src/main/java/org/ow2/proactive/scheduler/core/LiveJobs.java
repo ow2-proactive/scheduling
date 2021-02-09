@@ -896,9 +896,21 @@ class LiveJobs {
             }
             task.setVisualizationConnectionString(connectionString);
             task.setVisualizationActivated(true);
+
+            Map<String, String> connectionStringMap = new HashMap<>();
+            jobData.job.getIHMTasks()
+                       .entrySet()
+                       .stream()
+                       .filter(entry -> entry.getValue().isVisualizationActivated())
+                       .forEach(entry -> connectionStringMap.put(entry.getKey().getReadableName(),
+                                                                 entry.getValue().getVisualizationConnectionString()));
+            jobData.job.getJobInfo().setVisualizationConnectionStrings(connectionStringMap);
+
             TaskInfo ti = new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo());
             listener.taskStateUpdated(jobData.job.getOwner(),
                                       new NotificationData<>(SchedulerEvent.TASK_VISU_ACTIVATED, ti));
+            listener.jobStateUpdated(jobData.job.getOwner(),
+                                     new NotificationData<>(SchedulerEvent.JOB_UPDATED, jobData.job.getJobInfo()));
             return true;
 
         } finally {

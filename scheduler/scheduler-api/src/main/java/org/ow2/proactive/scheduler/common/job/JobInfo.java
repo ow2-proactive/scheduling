@@ -224,6 +224,20 @@ public interface JobInfo extends Serializable {
     Map<String, String> getVariables();
 
     /**
+     * Return a map of visualization connection strings
+     * key: task name
+     * value: connection string
+     * @return a map of connection strings
+     */
+    Map<String, String> getVisualizationConnectionStrings();
+
+    /**
+     * Sets the visualization connection string map
+     * @param connectionStrings
+     */
+    void setVisualizationConnectionStrings(Map<String, String> connectionStrings);
+
+    /**
      * Returns the set of signals used by the job
      * @return signals set
      */

@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -133,6 +134,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Set<String> signals;
 
+    private Map<String, String> visualizationConnectionStrings = Collections.emptyMap();
+
     public JobInfoImpl() {
     }
 
@@ -174,6 +177,7 @@ public class JobInfoImpl implements JobInfo {
         this.genericInformation = jobInfo.getGenericInformation();
         this.variables = jobInfo.getVariables();
         this.signals = jobInfo.getSignals();
+        this.visualizationConnectionStrings = jobInfo.getVisualizationConnectionStrings();
     }
 
     /**
@@ -484,5 +488,14 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public void setSignals(Set<String> signals) {
         this.signals = signals;
+    }
+
+    @Override
+    public Map<String, String> getVisualizationConnectionStrings() {
+        return visualizationConnectionStrings;
+    }
+
+    public void setVisualizationConnectionStrings(Map<String, String> visualizationConnectionStrings) {
+        this.visualizationConnectionStrings = visualizationConnectionStrings;
     }
 }
