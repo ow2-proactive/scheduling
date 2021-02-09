@@ -28,9 +28,7 @@ package org.ow2.proactive.scheduler.signal;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -121,16 +119,15 @@ public class SignalApiTest extends ProActiveTestClean {
         signalApi.sendSignal(signal);
         signalApi.readyForSignal(signal);
 
-        Assert.assertFalse(((List) synchronizationInternal.get(USER,
-                                                               TASK_ID,
-                                                               SIGNALS_CHANNEL,
-                                                               JOB_ID.value())).contains(signal));
-
-        Assert.assertTrue(((List) synchronizationInternal.get(USER,
-                                                              TASK_ID,
-                                                              SIGNALS_CHANNEL,
-                                                              JOB_ID.value())).contains(((SignalApiImpl) signalApi).READY_PREFIX +
-                                                                                        signal));
+        Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
+                                                                  TASK_ID,
+                                                                  SIGNALS_CHANNEL,
+                                                                  JOB_ID.value())).contains(signal));
+        Assert.assertTrue(((HashSet) synchronizationInternal.get(USER,
+                                                                 TASK_ID,
+                                                                 SIGNALS_CHANNEL,
+                                                                 JOB_ID.value())).contains(((SignalApiImpl) signalApi).READY_PREFIX +
+                                                                                           signal));
     }
 
     @Test
@@ -142,7 +139,12 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test
     public void testCheckForSignals() throws SignalApiException {
-        List<String> signalsToBeChecked = new ArrayList<>(Arrays.asList("test_signal_3_1", "test_signal_3_2"));
+        Set<String> signalsToBeChecked = new HashSet<String>() {
+            {
+                add("test_signal_3_1");
+                add("test_signal_3_2");
+            }
+        };
         signalApi.sendManySignals(signalsToBeChecked);
         String receivedSignal = signalApi.checkForSignals(signalsToBeChecked);
         Assert.assertTrue((receivedSignal == "test_signal_3_1") || receivedSignal == "test_signal_3_2");
@@ -151,19 +153,57 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testSendSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_4";
+
+        // Send ready for signal then check that when the signal is sent, its associated ready signal is removed
+        signalApi.readyForSignal(signal);
+
+        // Send signal twice then check that it is added only once
         signalApi.sendSignal(signal);
-        Assert.assertTrue(((List) synchronizationInternal.get(USER,
-                                                              TASK_ID,
-                                                              SIGNALS_CHANNEL,
-                                                              JOB_ID.value())).contains(signal));
+        signalApi.sendSignal(signal);
+
+        Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
+                                                                  TASK_ID,
+                                                                  SIGNALS_CHANNEL,
+                                                                  JOB_ID.value())).contains(((SignalApiImpl) signalApi).READY_PREFIX +
+                                                                                            signal));
+
+        Assert.assertEquals(1,
+                            ((HashSet) synchronizationInternal.get(USER,
+                                                                   TASK_ID,
+                                                                   SIGNALS_CHANNEL,
+                                                                   JOB_ID.value())).stream()
+                                                                                   .filter(sig -> sig.equals(signal))
+                                                                                   .count());
     }
 
     @Test
     public void testSendManySignals() throws InvalidChannelException, SignalApiException {
-        List<String> signalsToBeSent = new ArrayList<>(Arrays.asList("test_signal_5_1", "test_signal_5_2"));
+        String signal1 = "test_signal_5_1";
+        String signal2 = "test_signal_5_2";
+        Set<String> signalsToBeSent = new HashSet<String>() {
+            {
+                add(signal1);
+                add(signal2);
+            }
+        };
+
+        // Send ready for both signals then check that when the signals are sent, their associated ready signals are removed
+        signalApi.readyForSignal(signal1);
+        signalApi.readyForSignal(signal2);
+
+        // Send signals twice and check that each signal is added only once
         signalApi.sendManySignals(signalsToBeSent);
-        List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
-        signalsToBeSent.forEach(signal -> Assert.assertTrue(allSignals.contains(signal)));
+        signalApi.sendManySignals(signalsToBeSent);
+
+        Set<String> allSignals = (HashSet) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
+
+        Assert.assertFalse(allSignals.contains(((SignalApiImpl) signalApi).READY_PREFIX + signal1) ||
+                           allSignals.contains(((SignalApiImpl) signalApi).READY_PREFIX + signal2));
+
+        signalsToBeSent.forEach(signal -> Assert.assertEquals(1,
+                                                              allSignals.stream()
+                                                                        .filter(sig -> sig.equals(signal))
+                                                                        .count()));
     }
 
     @Test
@@ -171,18 +211,23 @@ public class SignalApiTest extends ProActiveTestClean {
         String signal = "test_signal_6";
         signalApi.sendSignal(signal);
         signalApi.removeSignal(signal);
-        Assert.assertFalse(((List) synchronizationInternal.get(USER,
-                                                               TASK_ID,
-                                                               SIGNALS_CHANNEL,
-                                                               JOB_ID.value())).contains(signal));
+        Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
+                                                                  TASK_ID,
+                                                                  SIGNALS_CHANNEL,
+                                                                  JOB_ID.value())).contains(signal));
     }
 
     @Test
     public void testRemoveManySignals() throws InvalidChannelException, SignalApiException {
-        List<String> signalsToBeRemoved = new ArrayList<>(Arrays.asList("test_signal_7_1", "test_signal_7_2"));
+        Set<String> signalsToBeRemoved = new HashSet<String>() {
+            {
+                add("test_signal_7_1");
+                add("test_signal_7_2");
+            }
+        };
         signalApi.sendManySignals(signalsToBeRemoved);
         signalApi.removeManySignals(signalsToBeRemoved);
-        List<String> allSignals = (List) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
+        Set<String> allSignals = (HashSet) synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL, JOB_ID.value());
         signalsToBeRemoved.forEach(signal -> Assert.assertFalse(allSignals.contains(signal)));
     }
 
@@ -221,7 +266,12 @@ public class SignalApiTest extends ProActiveTestClean {
     public void testWaitForAny() throws SignalApiException {
         String signal_1 = "test_signal_10_1";
         String signal_2 = "test_signal_10_2";
-        List<String> signals = new ArrayList<>(Arrays.asList(signal_1, signal_2));
+        Set<String> signals = new HashSet<String>() {
+            {
+                add(signal_1);
+                add(signal_2);
+            }
+        };
         long durationInMillis_1 = 1000;
         long durationInMillis_2 = 4000;
 

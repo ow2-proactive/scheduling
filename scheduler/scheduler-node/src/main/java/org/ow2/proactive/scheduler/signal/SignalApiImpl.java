@@ -26,9 +26,8 @@
 package org.ow2.proactive.scheduler.signal;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -69,7 +68,7 @@ public class SignalApiImpl implements SignalApi {
             try {
                 // Initialize synchronization signals channel
                 synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
-                synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new ArrayList<>());
+                synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new HashSet<String>());
             } catch (IOException | InvalidChannelException e) {
                 throw new SignalApiException("Could not instantiate Signal API for the job " + jobId, e);
             }
@@ -81,12 +80,11 @@ public class SignalApiImpl implements SignalApi {
     public boolean readyForSignal(String signalName) throws SignalApiException {
         try {
             init();
-            synchronization.conditionalCompute(SIGNALS_CHANNEL,
-                                               jobId,
-                                               "{k, x -> x.contains('" + signalName + "')}",
-                                               "{k, x -> x.remove('" + signalName + "');x.add('" + READY_PREFIX +
-                                                                                             signalName + "');x}",
-                                               "{k, x -> x.add('" + READY_PREFIX + signalName + "');x}");
+            // Remove the signal if it already exists, then add the ready signal if it does not exist
+            synchronization.compute(SIGNALS_CHANNEL,
+                                    jobId,
+                                    "{k, x -> x.remove('" + signalName + "'); x.add('" + READY_PREFIX + signalName +
+                                           "');x}");
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
@@ -98,7 +96,7 @@ public class SignalApiImpl implements SignalApi {
     @Override
     public boolean isReceived(String signalName) throws SignalApiException {
         init();
-        List<String> signals = getJobSignals();
+        HashSet<String> signals = getJobSignals();
         if (!signals.isEmpty()) {
             return signals.contains(signalName);
         } else {
@@ -107,11 +105,11 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public String checkForSignals(List<String> signalsSubList) throws SignalApiException {
+    public String checkForSignals(Set<String> signalsSubSet) throws SignalApiException {
         init();
-        List<String> signals = getJobSignals();
+        HashSet<String> signals = getJobSignals();
         if (!signals.isEmpty()) {
-            return signalsSubList.stream().filter(signals::contains).findFirst().orElse(null);
+            return signalsSubSet.stream().filter(signals::contains).findFirst().orElse(null);
         } else {
             return null;
         }
@@ -121,7 +119,11 @@ public class SignalApiImpl implements SignalApi {
     public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
-            synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> x.add('" + signalName + "');x}");
+            // Remove the ready signal if it already exists, then add the signal if it does not exist
+            synchronization.compute(SIGNALS_CHANNEL,
+                                    jobId,
+                                    "{k, x -> x.remove('" + READY_PREFIX + signalName + "'); x.add('" + signalName +
+                                           "'); x}");
             return true;
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
@@ -131,12 +133,12 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean sendManySignals(List<String> signalsSubList) throws SignalApiException {
+    public boolean sendManySignals(Set<String> signalsSubSet) throws SignalApiException {
         try {
             init();
             StringBuilder actions = new StringBuilder();
-            for (String signal : signalsSubList) {
-                actions.append("x.add('" + signal + "');");
+            for (String signal : signalsSubSet) {
+                actions.append(" x.remove('" + READY_PREFIX + signal + "'); x.add('" + signal + "'); ");
             }
             synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");
             return true;
@@ -161,19 +163,14 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean removeManySignals(List<String> signalsSubList) throws SignalApiException {
+    public boolean removeManySignals(Set<String> signalsSubSet) throws SignalApiException {
         try {
             init();
-
             StringBuilder actions = new StringBuilder();
-            for (String signal : signalsSubList) {
-                actions.append("x.remove('" + signal + "');");
+            for (String signal : signalsSubSet) {
+                actions.append(" x.remove('" + signal + "'); ");
             }
             synchronization.compute(SIGNALS_CHANNEL, jobId, "{k, x -> " + actions.toString() + "x}");
-
-            List<String> jobSignals = getJobSignals();
-            jobSignals.removeAll(signalsSubList);
-            synchronization.put(SIGNALS_CHANNEL, jobId, (Serializable) jobSignals);
             return true;
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
@@ -183,11 +180,11 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public List<String> getJobSignals() throws SignalApiException {
+    public HashSet<String> getJobSignals() throws SignalApiException {
         try {
             init();
             //noinspection unchecked
-            return (List<String>) synchronization.get(SIGNALS_CHANNEL, jobId);
+            return (HashSet<String>) synchronization.get(SIGNALS_CHANNEL, jobId);
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         }
@@ -219,17 +216,17 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public String waitForAny(List<String> signalsList) throws SignalApiException {
+    public String waitForAny(Set<String> signalsSubSet) throws SignalApiException {
         init();
         StringBuilder conditions = new StringBuilder();
-        for (String signal : signalsList) {
+        for (String signal : signalsSubSet) {
             conditions.append("x.contains('" + signal + "') || ");
         }
         String allConditions = conditions.substring(0, conditions.toString().lastIndexOf("||"));
 
         try {
             synchronization.waitUntil(SIGNALS_CHANNEL, jobId, "{k, x -> " + allConditions + " }");
-            return checkForSignals(signalsList);
+            return checkForSignals(signalsSubSet);
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException e) {

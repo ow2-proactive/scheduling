@@ -1760,11 +1760,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
             if (publicStore.containsKey(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobid)) {
 
-                List<String> jobSignals = jobInfo.getSignals();
-                List<String> signalsToBeAdded = (List) publicStore.get(SIGNAL_ORIGINATOR,
-                                                                       SIGNAL_TASK_ID,
-                                                                       signalsChannel,
-                                                                       jobid);
+                Set<String> jobSignals = jobInfo.getSignals();
+                Set<String> signalsToBeAdded = (HashSet) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                         SIGNAL_TASK_ID,
+                                                                         signalsChannel,
+                                                                         jobid);
                 if (signalsToBeAdded != null && !signalsToBeAdded.isEmpty()) {
                     jobSignals.addAll(signalsToBeAdded);
                     jobInfo.setSignals(jobSignals);
@@ -1891,9 +1891,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public boolean addJobSignal(String sessionId, String jobId, String signal) {
         try {
 
-            List<String> signals = (List) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
+            Set<String> signals = (Set) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
             if (signals == null) {
-                signals = new ArrayList<>();
+                signals = new HashSet<>();
             }
 
             signals.add(signal);
