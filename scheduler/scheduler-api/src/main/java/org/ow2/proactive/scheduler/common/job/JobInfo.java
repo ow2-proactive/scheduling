@@ -26,8 +26,8 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -224,13 +224,13 @@ public interface JobInfo extends Serializable {
     Map<String, String> getVariables();
 
     /**
-     * Returns the list of signals used by the job
-     * @return signals List
+     * Returns the set of signals used by the job
+     * @return signals set
      */
-    List<String> getSignals();
+    Set<String> getSignals();
 
     /**
-     * Sets the list of job signals
+     * Sets the set of job signals
      */
-    void setSignals(List<String> signals);
+    void setSignals(Set<String> signals);
 }
