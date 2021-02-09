@@ -73,6 +73,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private List<String> signals;
 
+    private Map<String, String> visualizationConnectionStrings;
+
     public void setToBeRemoved() {
         toBeRemoved = true;
     }
@@ -239,6 +241,14 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setSignals(List<String> signals) {
         this.signals = signals;
+    }
+
+    public Map<String, String> getVisualizationConnectionStrings() {
+        return visualizationConnectionStrings;
+    }
+
+    public void setVisualizationConnectionStrings(Map<String, String> visualizationConnectionStrings) {
+        this.visualizationConnectionStrings = visualizationConnectionStrings;
     }
 
     @Override

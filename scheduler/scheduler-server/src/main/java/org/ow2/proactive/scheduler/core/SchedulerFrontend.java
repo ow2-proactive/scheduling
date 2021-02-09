@@ -1563,24 +1563,38 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.isRunning(),
                                                    filterCriteria.isFinished(),
                                                    sortParameters);
-
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
          */
+        insertSignals(jobsInfo);
+
+        /**
+         * Inject visualization connection strings for running job when available
+         */
+        insertVisualization(jobsInfo);
+
+        return jobsInfo;
+    }
+
+    private void insertVisualization(Page<JobInfo> jobsInfo) {
+        jobsInfo.getList()
+                .stream()
+                .filter(jobInfo -> jobInfo.isStarted() && jobInfo.getFinishedTime() <= 0)
+                .forEach(jobInfo -> insertVisualization(jobInfo));
+    }
+
+    private void insertSignals(Page<JobInfo> jobsInfo) {
         try {
-            List<String> jobHavingSignalsIds = new ArrayList<String>(publicStore.keySet(SIGNAL_ORIGINATOR,
-                                                                                        SIGNAL_TASK_ID,
-                                                                                        signalsChannel));
+            List<String> jobHavingSignalsIds = new ArrayList<>(publicStore.keySet(SIGNAL_ORIGINATOR,
+                                                                                  SIGNAL_TASK_ID,
+                                                                                  signalsChannel));
             jobsInfo.getList()
                     .stream()
                     .filter(jobInfo -> jobHavingSignalsIds.contains(jobInfo.getJobId().value()))
-                    .map(jobInfo -> insertJobSignals(jobInfo))
-                    .collect(Collectors.toList());
+                    .forEach(jobInfo -> insertJobSignals(jobInfo));
         } catch (InvalidChannelException e) {
             logger.warn("Could not acquire the list of jobs having signals. No signals will be included in the returned jobs info");
         }
-
-        return jobsInfo;
     }
 
     /**
@@ -1722,7 +1736,20 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         JobInfo jobInfo = getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
-        return insertJobSignals(jobInfo);
+        insertJobSignals(jobInfo);
+        insertVisualization(jobInfo);
+        return jobInfo;
+    }
+
+    private JobInfo insertVisualization(JobInfo jobInfo) {
+        try {
+            jobInfo.setVisualizationConnectionStrings(frontendState.getJobState(jobInfo.getJobId())
+                                                                   .getJobInfo()
+                                                                   .getVisualizationConnectionStrings());
+        } catch (UnknownJobException | NotConnectedException | PermissionException e) {
+            logger.warn("Could not add visualization info for job " + jobInfo.getJobId(), e);
+        }
+        return jobInfo;
     }
 
     private JobInfo insertJobSignals(JobInfo jobInfo) {

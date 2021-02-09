@@ -82,6 +82,8 @@ public class DataUtility {
         impl.setTotalNumberOfTasks(d.getTotalNumberOfTasks());
         impl.setGenericInformation(d.getGenericInformation());
         impl.setVariables(d.getVariables());
+        impl.setSignals(d.getSignals());
+        impl.setVisualizationConnectionStrings(d.getVisualizationConnectionStrings());
         return impl;
     }
 

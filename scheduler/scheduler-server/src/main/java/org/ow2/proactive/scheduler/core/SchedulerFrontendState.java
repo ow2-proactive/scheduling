@@ -1326,6 +1326,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         case JOB_CHANGE_PRIORITY:
                         case TASK_REPLICATED:
                         case TASK_SKIPPED:
+                        case JOB_UPDATED:
                             break;
                         case JOB_PENDING_TO_FINISHED:
                             schedulerState.pendingToFinished(js);
