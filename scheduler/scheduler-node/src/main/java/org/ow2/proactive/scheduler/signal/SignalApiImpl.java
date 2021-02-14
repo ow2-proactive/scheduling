@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.signal;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -108,17 +109,26 @@ public class SignalApiImpl implements SignalApi {
     public String checkForSignals(Set<String> signalsSubSet) throws SignalApiException {
         init();
         HashSet<String> signals = getJobSignals();
+        String receivedString = null;
         if (!signals.isEmpty()) {
-            return signalsSubSet.stream().filter(signals::contains).findFirst().orElse(null);
-        } else {
-            return null;
+            receivedString = signalsSubSet.stream().filter(signals::contains).findFirst().get();
+            // Remove ready signals if a signal is received
+            if (receivedString != null) {
+                removeManySignals(signalsSubSet.stream()
+                                               .map(signal -> signal = READY_PREFIX + signal)
+                                               .collect(Collectors.toSet()));
+            }
         }
+        return receivedString;
     }
 
     @Override
     public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
+            if (isReceived(READY_PREFIX + signalName)) {
+                throw new SignalApiException("The job is not ready for the signal " + signalName);
+            }
             // Remove the ready signal if it already exists, then add the signal if it does not exist
             synchronization.compute(SIGNALS_CHANNEL,
                                     jobId,

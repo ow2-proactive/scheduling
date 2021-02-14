@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.*;
 import org.junit.*;
@@ -138,27 +139,37 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testCheckForSignals() throws SignalApiException {
+    public void testCheckForSignals() throws SignalApiException, InvalidChannelException {
+        String signal1 = "test_signal_3_1";
+        String signal2 = "test_signal_3_2";
         Set<String> signalsToBeChecked = new HashSet<String>() {
             {
-                add("test_signal_3_1");
-                add("test_signal_3_2");
+                add(signal1);
+                add(signal2);
             }
         };
-        signalApi.sendManySignals(signalsToBeChecked);
+        signalApi.readyForSignal(signal1);
+        signalApi.sendSignal(signal2);
         String receivedSignal = signalApi.checkForSignals(signalsToBeChecked);
-        Assert.assertTrue((receivedSignal == "test_signal_3_1") || receivedSignal == "test_signal_3_2");
+
+        // Check that the sent signal is received
+        Assert.assertTrue(receivedSignal == signal2);
+
+        // Check that the sent ready signal is removed
+        Assert.assertFalse(((HashSet<String>) synchronizationInternal.get(USER,
+                                                                          TASK_ID,
+                                                                          SIGNALS_CHANNEL,
+                                                                          JOB_ID.value())).contains(((SignalApiImpl) signalApi).READY_PREFIX +
+                                                                                                    signal1));
     }
 
-    @Test
+    @Test(expected = SignalApiException.class)
     public void testSendSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_4";
 
         // Send ready for signal then check that when the signal is sent, its associated ready signal is removed
         signalApi.readyForSignal(signal);
 
-        // Send signal twice then check that it is added only once
-        signalApi.sendSignal(signal);
         signalApi.sendSignal(signal);
 
         Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
@@ -174,6 +185,8 @@ public class SignalApiTest extends ProActiveTestClean {
                                                                    JOB_ID.value())).stream()
                                                                                    .filter(sig -> sig.equals(signal))
                                                                                    .count());
+        // Send the signal a second time (without sending ready a priori) then assert a SignalAPIException is thrown
+        signalApi.sendSignal(signal);
     }
 
     @Test
