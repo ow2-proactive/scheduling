@@ -126,7 +126,7 @@ public class SignalApiImpl implements SignalApi {
     public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
-            if (isReceived(READY_PREFIX + signalName)) {
+            if (!isReceived(READY_PREFIX + signalName)) {
                 throw new SignalApiException("The job is not ready for the signal " + signalName);
             }
             // Remove the ready signal if it already exists, then add the signal if it does not exist
