@@ -82,6 +82,8 @@ class LiveJobs {
 
     private static final TaskResultCreator taskResultCreator = TaskResultCreator.getInstance();
 
+    public static final String TASK_ICON = "task.icon";
+
     public static String KILL_TASK_DEFAULT_MESSAGE = "The task has been manually killed.";
 
     public static class JobData {
@@ -898,13 +900,20 @@ class LiveJobs {
             task.setVisualizationActivated(true);
 
             Map<String, String> connectionStringMap = new HashMap<>();
+            Map<String, String> visualizationIconsMap = new HashMap<>();
             jobData.job.getIHMTasks()
                        .entrySet()
                        .stream()
-                       .filter(entry -> entry.getValue().isVisualizationActivated())
-                       .forEach(entry -> connectionStringMap.put(entry.getKey().getReadableName(),
-                                                                 entry.getValue().getVisualizationConnectionString()));
+                       .filter(entry -> entry.getValue().isVisualizationActivated() &&
+                                        entry.getValue().getFinishedTime() <= 0)
+                       .forEach(entry -> {
+                           connectionStringMap.put(entry.getKey().getReadableName(),
+                                                   entry.getValue().getVisualizationConnectionString());
+                           visualizationIconsMap.put(entry.getKey().getReadableName(),
+                                                     entry.getValue().getGenericInformation().get(TASK_ICON));
+                       });
             jobData.job.getJobInfo().setVisualizationConnectionStrings(connectionStringMap);
+            jobData.job.getJobInfo().setVisualizationIcons(visualizationIconsMap);
 
             TaskInfo ti = new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo());
             listener.taskStateUpdated(jobData.job.getOwner(),

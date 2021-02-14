@@ -1743,9 +1743,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     private JobInfo insertVisualization(JobInfo jobInfo) {
         try {
-            jobInfo.setVisualizationConnectionStrings(frontendState.getJobState(jobInfo.getJobId())
-                                                                   .getJobInfo()
-                                                                   .getVisualizationConnectionStrings());
+            JobInfo jobInfoState = frontendState.getJobState(jobInfo.getJobId()).getJobInfo();
+            jobInfo.setVisualizationConnectionStrings(jobInfoState.getVisualizationConnectionStrings());
+            jobInfo.setVisualizationIcons(jobInfoState.getVisualizationIcons());
         } catch (UnknownJobException | NotConnectedException | PermissionException e) {
             logger.warn("Could not add visualization info for job " + jobInfo.getJobId(), e);
         }
