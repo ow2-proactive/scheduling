@@ -190,7 +190,7 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test(expected = SignalApiException.class)
-    public void testSendSignalWithException() throws InvalidChannelException, SignalApiException {
+    public void testSendSignalWithException() throws SignalApiException {
         String signal = "test_signal_4_2";
 
         // Send the signal (without sending ready a priori) then assert a SignalAPIException is thrown
