@@ -105,6 +105,8 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      */
     private final String AUTHENTICATION_METHOD = ldapProperties.getProperty(LDAPProperties.LDAP_AUTHENTICATION_METHOD);
 
+    private final static String FAKE_PASSWORD = "Frth481d";
+
     /** user name used to bind to LDAP (if authentication method is different from none) */
     private final String BIND_LOGIN = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_LOGIN);
 
@@ -397,7 +399,15 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             logger.debug("check password for user: " + userDN);
         }
 
+        if (password == null || password.isEmpty()) {
+            // Some LDAP server can allow connection with an empty password. This is not acceptable when we try to verify some user credentuals
+            // So we use a fake password instead
+            password = FAKE_PASSWORD;
+        }
+
         Hashtable<String, String> env = createBasicEnvForInitalContext();
+        env.put(Context.SECURITY_AUTHENTICATION,
+                ANONYMOUS_LDAP_CONNECTION.equals(AUTHENTICATION_METHOD) ? "simple" : AUTHENTICATION_METHOD);
         env.put(Context.SECURITY_PRINCIPAL, userDN);
         env.put(Context.SECURITY_CREDENTIALS, password);
 
@@ -406,7 +416,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             // Create the initial directory context
             ctx = new InitialDirContext(env);
         } catch (NamingException e) {
-            logger.error("Problem checkin user password, user password may be wrong: " + e);
+            logger.error("Problem checking user password, user password may be wrong: " + e);
             return false;
         }
 
