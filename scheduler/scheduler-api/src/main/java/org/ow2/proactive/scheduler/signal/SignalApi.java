@@ -97,7 +97,7 @@ public interface SignalApi extends Serializable {
      *
      * @param signal name of the signal to be added to job signals
      * @return true if the signal is successfully added to job signals
-     * @throws SignalApiException if an error occurred while reading in the signals channel, or when adding the signal to job signals
+     * @throws SignalApiException if the corresponding ready signal does not exist, or when an error occurs while sending the signal
      */
     boolean sendSignal(String signal) throws SignalApiException;
 
