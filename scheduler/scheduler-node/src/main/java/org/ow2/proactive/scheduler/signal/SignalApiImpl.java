@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.signal;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;

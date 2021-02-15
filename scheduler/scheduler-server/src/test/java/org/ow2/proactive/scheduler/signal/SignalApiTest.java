@@ -138,31 +138,16 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testCheckForSignals() throws SignalApiException, InvalidChannelException {
-        String signal1 = "test_signal_3_1";
-        String signal2 = "test_signal_3_2";
+    public void testCheckForSignals() throws SignalApiException {
         Set<String> signalsToBeChecked = new HashSet<String>() {
             {
-                add(signal1);
-                add(signal2);
+                add("test_signal_3_1");
+                add("test_signal_3_2");
             }
         };
-        signalApi.readyForSignal(signal1);
-        signalApi.readyForSignal(signal2);
-        signalApi.sendSignal(signal1);
+        signalApi.sendManySignals(signalsToBeChecked);
         String receivedSignal = signalApi.checkForSignals(signalsToBeChecked);
-
-        // Check that the sent signal is received
-        Assert.assertSame(signal1, receivedSignal);
-
-        // Check that all ready signals are removed
-        Assert.assertEquals(0,
-                            ((HashSet<String>) synchronizationInternal.get(USER,
-                                                                           TASK_ID,
-                                                                           SIGNALS_CHANNEL,
-                                                                           JOB_ID.value())).stream()
-                                                                                           .filter(sig -> sig.startsWith(((SignalApiImpl) signalApi).READY_PREFIX))
-                                                                                           .count());
+        Assert.assertTrue((receivedSignal == "test_signal_3_1") || receivedSignal == "test_signal_3_2");
     }
 
     @Test
