@@ -110,7 +110,7 @@ public class SignalApiImpl implements SignalApi {
         HashSet<String> signals = getJobSignals();
 
         if (!signals.isEmpty()) {
-            return signalsSubSet.stream().filter(signals::contains).findFirst().get();
+            return signalsSubSet.stream().filter(signals::contains).findFirst().orElse(null);
         } else {
             return null;
         }
