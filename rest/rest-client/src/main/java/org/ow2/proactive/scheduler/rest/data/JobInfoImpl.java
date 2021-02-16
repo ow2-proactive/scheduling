@@ -83,6 +83,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> visualizationConnectionStrings;
 
+    private Map<String, String> visualizationIcons;
+
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
     }
@@ -301,7 +303,18 @@ public class JobInfoImpl implements JobInfo {
         return visualizationConnectionStrings;
     }
 
+    @Override
     public void setVisualizationConnectionStrings(Map<String, String> visualizationConnectionStrings) {
         this.visualizationConnectionStrings = visualizationConnectionStrings;
+    }
+
+    @Override
+    public Map<String, String> getVisualizationIcons() {
+        return visualizationIcons;
+    }
+
+    @Override
+    public void setVisualizationIcons(Map<String, String> visualizationIcons) {
+        this.visualizationIcons = visualizationIcons;
     }
 }

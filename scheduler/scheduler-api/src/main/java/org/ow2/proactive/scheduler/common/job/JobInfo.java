@@ -238,6 +238,20 @@ public interface JobInfo extends Serializable {
     void setVisualizationConnectionStrings(Map<String, String> connectionStrings);
 
     /**
+     * Return a map of visualization icons
+     * key: task name
+     * value: icon associated with the task
+     * @return a map of task icons
+     */
+    Map<String, String> getVisualizationIcons();
+
+    /**
+     * Sets the visualization icons
+     * @param visualizationIcons
+     */
+    void setVisualizationIcons(Map<String, String> visualizationIcons);
+
+    /**
      * Returns the set of signals used by the job
      * @return signals set
      */

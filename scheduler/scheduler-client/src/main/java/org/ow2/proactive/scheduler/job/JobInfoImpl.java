@@ -136,6 +136,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> visualizationConnectionStrings = Collections.emptyMap();
 
+    private Map<String, String> visualizationIcons = Collections.emptyMap();
+
     public JobInfoImpl() {
     }
 
@@ -178,6 +180,7 @@ public class JobInfoImpl implements JobInfo {
         this.variables = jobInfo.getVariables();
         this.signals = jobInfo.getSignals();
         this.visualizationConnectionStrings = jobInfo.getVisualizationConnectionStrings();
+        this.visualizationIcons = jobInfo.getVisualizationIcons();
     }
 
     /**
@@ -495,7 +498,18 @@ public class JobInfoImpl implements JobInfo {
         return visualizationConnectionStrings;
     }
 
+    @Override
     public void setVisualizationConnectionStrings(Map<String, String> visualizationConnectionStrings) {
         this.visualizationConnectionStrings = visualizationConnectionStrings;
+    }
+
+    @Override
+    public Map<String, String> getVisualizationIcons() {
+        return visualizationIcons;
+    }
+
+    @Override
+    public void setVisualizationIcons(Map<String, String> visualizationIcons) {
+        this.visualizationIcons = visualizationIcons;
     }
 }

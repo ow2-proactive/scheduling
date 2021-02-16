@@ -84,6 +84,7 @@ public class DataUtility {
         impl.setVariables(d.getVariables());
         impl.setSignals(d.getSignals());
         impl.setVisualizationConnectionStrings(d.getVisualizationConnectionStrings());
+        impl.setVisualizationIcons(d.getVisualizationIcons());
         return impl;
     }
 
