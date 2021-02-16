@@ -108,6 +108,7 @@ public class SignalApiImpl implements SignalApi {
     public String checkForSignals(Set<String> signalsSubSet) throws SignalApiException {
         init();
         HashSet<String> signals = getJobSignals();
+
         if (!signals.isEmpty()) {
             return signalsSubSet.stream().filter(signals::contains).findFirst().orElse(null);
         } else {
@@ -119,6 +120,9 @@ public class SignalApiImpl implements SignalApi {
     public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
+            if (!isReceived(READY_PREFIX + signalName)) {
+                throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signalName);
+            }
             // Remove the ready signal if it already exists, then add the signal if it does not exist
             synchronization.compute(SIGNALS_CHANNEL,
                                     jobId,
