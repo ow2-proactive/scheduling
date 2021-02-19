@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1619,6 +1620,17 @@ public class SchedulerDBManager {
         session.save(resultData);
 
         return resultData;
+    }
+
+    public void updateAttachedServices(final InternalJob job) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            long jobId = jobId(job);
+            session.getNamedQuery("updateJobDataAttachedServices")
+                   .setParameter("jobId", jobId)
+                   .setParameter("attachedServices", new LinkedHashSet<>(job.getAttachedServices()))
+                   .executeUpdate();
+            return null;
+        });
     }
 
     public void jobSetToBeRemoved(final JobId jobId) {

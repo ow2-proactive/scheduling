@@ -1279,6 +1279,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             jobInfoImpl.setToBeRemoved();
         jobInfoImpl.setGenericInformation(jobInfoData.getGenericInformation());
         jobInfoImpl.setVariables(jobInfoData.getVariables());
+        jobInfoImpl.setSignals(jobInfoData.getSignals());
+        jobInfoImpl.setVisualizationConnectionStrings(jobInfoData.getVisualizationConnectionStrings());
+        jobInfoImpl.setVisualizationIcons(jobInfoData.getVisualizationIcons());
+        jobInfoImpl.setAttachedServices(jobInfoData.getAttachedServices());
         return jobInfoImpl;
     }
 
@@ -1310,6 +1314,26 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             restApi().enableRemoteVisualization(sid, jobId, taskName, connectionString);
         } catch (Exception e) {
             throwUJEOrNCEOrPEOrUTE(e);
+        }
+    }
+
+    @Override
+    public void registerService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        try {
+            restApi().registerService(sid, jobId, serviceId);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+    }
+
+    @Override
+    public void detachService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        try {
+            restApi().detachService(sid, jobId, serviceId);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
         }
     }
 

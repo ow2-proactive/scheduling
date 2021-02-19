@@ -516,6 +516,18 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public void registerService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        client.registerService(jobId, serviceId);
+    }
+
+    @Override
+    public void detachService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        client.detachService(jobId, serviceId);
+    }
+
+    @Override
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.pauseJob(jobId);

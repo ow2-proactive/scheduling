@@ -85,6 +85,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> visualizationIcons;
 
+    private Set<Integer> attachedServices;
+
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
     }
@@ -316,5 +318,14 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public void setVisualizationIcons(Map<String, String> visualizationIcons) {
         this.visualizationIcons = visualizationIcons;
+    }
+
+    @Override
+    public Set<Integer> getAttachedServices() {
+        return attachedServices;
+    }
+
+    public void setAttachedServices(Set<Integer> attachedServices) {
+        this.attachedServices = attachedServices;
     }
 }

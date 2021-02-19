@@ -611,6 +611,18 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public void registerService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        schedulerProxy.registerService(jobId, serviceId);
+    }
+
+    @Override
+    public void detachService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        schedulerProxy.detachService(jobId, serviceId);
+    }
+
+    @Override
     public boolean restartAllInErrorTasks(String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.restartAllInErrorTasks(jobId);

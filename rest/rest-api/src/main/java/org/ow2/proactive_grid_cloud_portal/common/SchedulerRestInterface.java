@@ -1967,6 +1967,38 @@ public interface SchedulerRestInterface {
             throws RestException;
 
     /**
+     * Register a cloud automation service associated with a job.<br>
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            id of the job
+     * @param serviceid
+     *            id of the cloud automation service to register
+     */
+    @POST
+    @Path("jobs/{jobid}/services")
+    @Produces("application/json")
+    void registerService(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @QueryParam("serviceid") int serviceid) throws RestException;
+
+    /**
+     * Detach a cloud automation service previously associated with a job.<br>
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            id of the job
+     * @param serviceid
+     *            id of the cloud automation service to detach
+     */
+    @DELETE
+    @Path("jobs/{jobid}/services")
+    @Produces("application/json")
+    void detachService(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @QueryParam("serviceid") int serviceid) throws RestException;
+
+    /**
      * Restart a task within a job
      *
      * @param sessionId current session

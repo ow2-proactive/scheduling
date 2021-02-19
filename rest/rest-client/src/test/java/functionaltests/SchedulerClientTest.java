@@ -135,6 +135,19 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
+    public void testAttachService() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/register_service.groovy", null, null);
+        JobId jobId = submitJob(job, client);
+        client.waitForJob(jobId.toString(), TimeUnit.MINUTES.toMillis(5));
+        JobInfo jobInfo = client.getJobInfo(jobId.toString());
+        Assert.assertNotNull(jobInfo);
+        Assert.assertNotNull(jobInfo.getAttachedServices());
+        Assert.assertEquals(1, jobInfo.getAttachedServices().size());
+        Assert.assertTrue(jobInfo.getAttachedServices().contains(12));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
     public void testDisconnect() throws Exception {
         ISchedulerClient client = clientInstance();
         client.disconnect();

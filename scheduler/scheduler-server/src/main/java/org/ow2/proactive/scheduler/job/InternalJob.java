@@ -1361,4 +1361,8 @@ public abstract class InternalJob extends JobState {
     public void setResultMap(Map<String, Serializable> resultMap) {
         this.resultMap = resultMap;
     }
+
+    public Set<Integer> getAttachedServices() {
+        return jobInfo.getAttachedServices();
+    }
 }

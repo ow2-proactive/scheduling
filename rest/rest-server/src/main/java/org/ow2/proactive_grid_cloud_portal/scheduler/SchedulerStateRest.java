@@ -150,6 +150,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private static final String PATH_TASKS = "/tasks/";
 
+    private static final String PATH_SERVICES = "/services";
+
     static {
         sortableTaskAttrMap = createSortableTaskAttrMap();
     }
@@ -358,6 +360,36 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new UnknownJobRestException(e);
         } catch (UnknownTaskException e) {
             throw new UnknownTaskRestException(e);
+        }
+    }
+
+    @Override
+    public void registerService(String sessionId, String jobId, int serviceid) throws RestException {
+        Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + PATH_SERVICES);
+        Session ss = sessionStore.get(sessionId);
+        try {
+            ss.getScheduler().registerService(jobId, serviceid);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        }
+    }
+
+    @Override
+    public void detachService(String sessionId, String jobId, int serviceid) throws RestException {
+        Scheduler s = checkAccess(sessionId, "DELETE jobs/" + jobId + PATH_SERVICES);
+        Session ss = sessionStore.get(sessionId);
+        try {
+            ss.getScheduler().detachService(jobId, serviceid);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
         }
     }
 

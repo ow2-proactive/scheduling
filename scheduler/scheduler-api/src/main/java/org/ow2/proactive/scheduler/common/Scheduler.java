@@ -967,8 +967,53 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
+    /**
+     * Enable Remote visualization for the given job and task
+     *
+     * @param jobId id of the job
+     * @param taskName name of the task which enables visualization
+     * @param connectionString visualization connection string
+     * @throws NotConnectedException
+     *              if you are not authenticated.
+     * @throws PermissionException
+     *              if you can't access to this particular job and task.
+     * @throws UnknownJobException
+     *              if the job does not exist.
+     * @throws UnknownTaskException
+     *              if this task does not exist in the job.
+     */
     void enableRemoteVisualization(String jobId, String taskName, String connectionString)
             throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException;
+
+    /**
+     * Register a cloud automation service associated with the given job
+     *
+     * @param jobId id of the job
+     * @param serviceId id of the cloud automation service to register
+     * @throws NotConnectedException
+     *              if you are not authenticated.
+     * @throws PermissionException
+     *              if you can't access to this particular job.
+     * @throws UnknownJobException
+     *              if the job does not exist.
+     */
+    void registerService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException;
+
+    /**
+     * Detach a cloud automation service previously associated with the given job
+     *
+     * @param jobId id of the job
+     * @param serviceId id of the cloud automation service to detach
+     * @throws NotConnectedException
+     *              if you are not authenticated.
+     * @throws PermissionException
+     *              if you can't access to this particular job.
+     * @throws UnknownJobException
+     *              if the job does not exist.
+     */
+    void detachService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**
      * Try to stop the task execution represented by the given task name in the

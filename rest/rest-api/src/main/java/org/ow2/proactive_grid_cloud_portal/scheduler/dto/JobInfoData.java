@@ -77,6 +77,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private Map<String, String> visualizationIcons;
 
+    private Set<Integer> attachedServices;
+
     public void setToBeRemoved() {
         toBeRemoved = true;
     }
@@ -261,6 +263,14 @@ public class JobInfoData implements java.io.Serializable {
         this.visualizationIcons = visualizationIcons;
     }
 
+    public Set<Integer> getAttachedServices() {
+        return attachedServices;
+    }
+
+    public void setAttachedServices(Set<Integer> attachedServices) {
+        this.attachedServices = attachedServices;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
@@ -270,7 +280,8 @@ public class JobInfoData implements java.io.Serializable {
                ", numberOfFailedTasks=" + numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks +
                ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
                "', projectName='" + projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" +
-               genericInformation + ", variables=" + variables + ", signals=" + signals + '}';
+               genericInformation + ", variables=" + variables + ", signals=" + signals + ", attachedServices=" +
+               attachedServices + '}';
     }
 
 }

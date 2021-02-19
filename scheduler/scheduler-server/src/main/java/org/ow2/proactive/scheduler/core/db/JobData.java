@@ -27,9 +27,12 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -125,7 +128,8 @@ import com.google.common.collect.Lists;
                                                                          "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskStarted", query = "update JobData set status = :status, " +
                                                                        "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
-                                                                       "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId") })
+                                                                       "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                @NamedQuery(name = "updateJobDataAttachedServices", query = "update JobData set attachedServices = :attachedServices where id = :jobId") })
 @Table(name = "JOB_DATA", indexes = { @Index(name = "JOB_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
                                       @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
                                       @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
@@ -213,6 +217,8 @@ public class JobData implements Serializable {
 
     private List<JobContent> jobContent = Lists.newArrayList();
 
+    private Set<Integer> attachedServices;
+
     private long lastUpdatedTime;
 
     JobInfoImpl createJobInfo(JobId jobId) {
@@ -241,6 +247,7 @@ public class JobData implements Serializable {
         }
         jobInfo.setGenericInformation(getGenericInformation());
         jobInfo.setVariables(createVariablesStringMap());
+        jobInfo.setAttachedServices(Collections.synchronizedSet(getAttachedServices()));
         return jobInfo;
     }
 
@@ -329,6 +336,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
         jobRuntimeData.setParentId(job.getParentId());
+        jobRuntimeData.setAttachedServices(new LinkedHashSet<>(job.getAttachedServices()));
 
         return jobRuntimeData;
     }
@@ -687,6 +695,16 @@ public class JobData implements Serializable {
 
     public void setLastUpdatedTime(long lastUpdatedTime) {
         this.lastUpdatedTime = lastUpdatedTime;
+    }
+
+    @Column(name = "ATTACHED_SERVICES", length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Set<Integer> getAttachedServices() {
+        return attachedServices;
+    }
+
+    public void setAttachedServices(Set<Integer> attachedServices) {
+        this.attachedServices = attachedServices;
     }
 
     public void addJobContent(Job job) {

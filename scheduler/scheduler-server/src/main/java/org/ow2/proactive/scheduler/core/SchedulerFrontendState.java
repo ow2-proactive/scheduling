@@ -113,6 +113,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK = "You do not have permission to enable visualization on this task !";
 
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB = "You do not have permission to attach service to this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB = "You do not have permission to kill this job !";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER = "You do not have permission to remove third-party credentials from the scheduler !";
