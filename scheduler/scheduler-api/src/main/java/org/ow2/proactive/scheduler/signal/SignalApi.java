@@ -96,10 +96,10 @@ public interface SignalApi extends Serializable {
      * Add the given {@code signal} to the set of job signals
      *
      * @param signal name of the signal to be added to job signals
-     * @return true if the signal is successfully added to job signals
+     * @return the set of job signals including the added signal
      * @throws SignalApiException if the corresponding ready signal does not exist, or when an error occurs while sending the signal
      */
-    boolean sendSignal(String signal) throws SignalApiException;
+    Set<String> sendSignal(String signal) throws SignalApiException;
 
     /**
      * Add the given set of signals to job signals

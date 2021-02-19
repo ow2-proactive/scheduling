@@ -157,21 +157,11 @@ public class SignalApiTest extends ProActiveTestClean {
         // Send ready for signal then check that when the signal is sent, its associated ready signal is removed
         signalApi.readyForSignal(signal);
 
-        signalApi.sendSignal(signal);
+        Set<String> signals = signalApi.sendSignal(signal);
 
-        Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
-                                                                  TASK_ID,
-                                                                  SIGNALS_CHANNEL,
-                                                                  JOB_ID.value())).contains(((SignalApiImpl) signalApi).READY_PREFIX +
-                                                                                            signal));
+        Assert.assertFalse(signals.contains(((SignalApiImpl) signalApi).READY_PREFIX + signal));
 
-        Assert.assertEquals(1,
-                            ((HashSet) synchronizationInternal.get(USER,
-                                                                   TASK_ID,
-                                                                   SIGNALS_CHANNEL,
-                                                                   JOB_ID.value())).stream()
-                                                                                   .filter(sig -> sig.equals(signal))
-                                                                                   .count());
+        Assert.assertEquals(1, signals.stream().filter(sig -> sig.equals(signal)).count());
     }
 
     @Test(expected = SignalApiException.class)

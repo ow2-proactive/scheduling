@@ -117,7 +117,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public boolean sendSignal(String signalName) throws SignalApiException {
+    public Set<String> sendSignal(String signalName) throws SignalApiException {
         try {
             init();
             if (!isReceived(READY_PREFIX + signalName)) {
@@ -128,7 +128,7 @@ public class SignalApiImpl implements SignalApi {
                                     jobId,
                                     "{k, x -> x.remove('" + READY_PREFIX + signalName + "'); x.add('" + signalName +
                                            "'); x}");
-            return true;
+            return getJobSignals();
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
