@@ -44,6 +44,8 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 
+import com.google.common.collect.Sets;
+
 
 /**
  * JobInfo provides some information about the Job it is linked with.
@@ -138,6 +140,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> visualizationIcons = Collections.emptyMap();
 
+    private Set<Integer> attachedServices = Collections.synchronizedSet(Sets.newLinkedHashSet());
+
     public JobInfoImpl() {
     }
 
@@ -181,6 +185,7 @@ public class JobInfoImpl implements JobInfo {
         this.signals = jobInfo.getSignals();
         this.visualizationConnectionStrings = jobInfo.getVisualizationConnectionStrings();
         this.visualizationIcons = jobInfo.getVisualizationIcons();
+        this.attachedServices = jobInfo.getAttachedServices();
     }
 
     /**
@@ -511,5 +516,14 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public void setVisualizationIcons(Map<String, String> visualizationIcons) {
         this.visualizationIcons = visualizationIcons;
+    }
+
+    @Override
+    public Set<Integer> getAttachedServices() {
+        return attachedServices;
+    }
+
+    public void setAttachedServices(Set<Integer> attachedServices) {
+        this.attachedServices = attachedServices;
     }
 }

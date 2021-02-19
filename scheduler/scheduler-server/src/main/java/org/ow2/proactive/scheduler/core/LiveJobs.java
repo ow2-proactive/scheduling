@@ -927,6 +927,40 @@ class LiveJobs {
         }
     }
 
+    boolean registerService(JobId jobId, int serviceId) throws UnknownJobException {
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            throw new UnknownJobException(jobId);
+        }
+        try {
+            InternalJob job = jobData.job;
+            job.getAttachedServices().add(serviceId);
+            dbManager.updateAttachedServices(job);
+            listener.jobStateUpdated(jobData.job.getOwner(),
+                                     new NotificationData<>(SchedulerEvent.JOB_UPDATED, jobData.job.getJobInfo()));
+            return true;
+        } finally {
+            jobData.unlock();
+        }
+    }
+
+    boolean detachService(JobId jobId, int serviceId) throws UnknownJobException {
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            throw new UnknownJobException(jobId);
+        }
+        try {
+            InternalJob job = jobData.job;
+            job.getAttachedServices().remove(serviceId);
+            dbManager.updateAttachedServices(job);
+            listener.jobStateUpdated(jobData.job.getOwner(),
+                                     new NotificationData<>(SchedulerEvent.JOB_UPDATED, jobData.job.getJobInfo()));
+            return true;
+        } finally {
+            jobData.unlock();
+        }
+    }
+
     TerminationData preemptTask(JobId jobId, String taskName, int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         JobData jobData = lockJob(jobId);

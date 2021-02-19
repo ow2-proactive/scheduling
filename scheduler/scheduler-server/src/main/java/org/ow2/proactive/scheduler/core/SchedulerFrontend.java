@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
@@ -878,6 +879,32 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         logger.info("Request to enable visualization on task " + taskName + " of job " + jobId + " received from " +
                     currentUser);
         schedulingService.enableRemoteVisualization(jobIdObject, taskName, connectionString);
+    }
+
+    @Override
+    @ImmediateService
+    public void registerService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        String currentUser = frontendState.getCurrentUser();
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkPermissions("registerService",
+                                       frontendState.getIdentifiedJob(jobIdObject),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB);
+        logger.info("Request to register service " + serviceId + " on job " + jobId + " received from " + currentUser);
+        schedulingService.registerService(jobIdObject, serviceId);
+    }
+
+    @Override
+    @ImmediateService
+    public void detachService(String jobId, int serviceId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        String currentUser = frontendState.getCurrentUser();
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkPermissions("detachService",
+                                       frontendState.getIdentifiedJob(jobIdObject),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB);
+        logger.info("Request to detach service " + serviceId + " on job " + jobId + " received from " + currentUser);
+        schedulingService.detachService(jobIdObject, serviceId);
     }
 
     /**
