@@ -1931,7 +1931,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
             // Throw an error if: (i) the corresponding ready signal does not exist and (ii) the signal is not a ready signal
             String readyPrefix = SignalApiImpl.READY_PREFIX;
-            if (!signal.startsWith(readyPrefix) && !signals.contains(readyPrefix + signal)) {
+            if (!signals.contains(readyPrefix + signal) && !signal.startsWith(readyPrefix)) {
                 throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signal);
             }
 
