@@ -1929,12 +1929,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                 signals = new HashSet<>();
             }
 
+            // Throw an error if: (i) the corresponding ready signal does not exist and (ii) the signal is not a ready signal
             String readyPrefix = SignalApiImpl.READY_PREFIX;
             if (!signal.startsWith(readyPrefix) && !signals.contains(readyPrefix + signal)) {
                 throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signal);
             }
 
+            // Remove the existing ready signal
+            signals.remove(readyPrefix + signal);
+
+            // Add the signal
             signals.add(signal);
+
             publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, (Serializable) signals);
 
             return (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
