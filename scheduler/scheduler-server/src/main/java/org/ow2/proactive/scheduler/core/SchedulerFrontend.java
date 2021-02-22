@@ -157,6 +157,7 @@ import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
+import org.ow2.proactive.scheduler.synchronization.CompilationException;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -1917,7 +1918,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public Set<String> addJobSignal(String sessionId, String jobId, String signal) {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SignalApiException {
         try {
 
             Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,
@@ -1944,11 +1945,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
             return (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
 
-        } catch (SignalApiException e) {
-            logger.error("Job " + jobId + " is not ready to receive the signal " + signal);
-            return null;
-        } catch (IOException | InvalidChannelException p) {
-            return null;
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (IOException e) {
+            throw new SignalApiException("Could not add signal for the job " + jobId, e);
         }
     }
 }

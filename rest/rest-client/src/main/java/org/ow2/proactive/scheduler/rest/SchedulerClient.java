@@ -125,6 +125,7 @@ import org.ow2.proactive.scheduler.rest.data.TaskStateImpl;
 import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
 import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
@@ -1486,7 +1487,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal)
+            throws SchedulerException, SignalApiException {
         try {
             return restApi().addJobSignal(sessionId, jobId, signal);
         } catch (RestException e) {

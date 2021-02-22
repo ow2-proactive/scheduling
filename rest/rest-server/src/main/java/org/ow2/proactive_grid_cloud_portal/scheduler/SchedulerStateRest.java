@@ -91,6 +91,7 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.web.WebProperties;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
@@ -206,7 +207,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String signal, String jobId) throws RestException {
+    public Set<String> addJobSignal(String sessionId, String signal, String jobId)
+            throws RestException, SignalApiException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
             return s.addJobSignal(sessionId, jobId, signal);
