@@ -886,7 +886,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
         return uischeduler.addJobSignal(sessionId, jobId, signal);
     }
 

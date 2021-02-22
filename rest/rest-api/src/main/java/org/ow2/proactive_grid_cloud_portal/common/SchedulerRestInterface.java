@@ -2200,6 +2200,6 @@ public interface SchedulerRestInterface {
     @Path("job/{jobid}/signals")
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces("application/json")
-    boolean addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
+    Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
             @PathParam("jobid") String jobId) throws RestException;
 }

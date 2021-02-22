@@ -1486,7 +1486,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
         try {
             return restApi().addJobSignal(sessionId, jobId, signal);
         } catch (RestException e) {

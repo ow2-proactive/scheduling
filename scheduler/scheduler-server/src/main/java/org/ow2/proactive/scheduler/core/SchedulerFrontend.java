@@ -154,6 +154,9 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.signal.SignalApi;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
+import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
@@ -1915,20 +1918,32 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public boolean addJobSignal(String sessionId, String jobId, String signal) {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal) {
         try {
 
-            Set<String> signals = (Set) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
+            Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                    SIGNAL_TASK_ID,
+                                                                    signalsChannel,
+                                                                    jobId);
             if (signals == null) {
                 signals = new HashSet<>();
+            }
+
+            String readyPrefix = SignalApiImpl.READY_PREFIX;
+            if (!signal.startsWith(readyPrefix) && !signals.contains(readyPrefix + signal)) {
+                throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signal);
             }
 
             signals.add(signal);
             publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, (Serializable) signals);
 
+            return (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
+
+        } catch (SignalApiException e) {
+            logger.error("Job " + jobId + " is not ready to receive the signal " + signal);
+            return null;
         } catch (IOException | InvalidChannelException p) {
-            return false;
+            return null;
         }
-        return true;
     }
 }

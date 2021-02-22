@@ -809,7 +809,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
         return (_getScheduler()).addJobSignal(sessionId, jobId, signal);
     }
 

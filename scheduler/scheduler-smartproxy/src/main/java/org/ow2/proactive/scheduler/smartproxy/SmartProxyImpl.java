@@ -921,7 +921,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
         return schedulerProxy.addJobSignal(sessionId, jobId, signal);
     }
 }
