@@ -97,6 +97,7 @@ public class SignalApiTest extends ProActiveTestClean {
         synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
                                                            new Object[] { tempFolder.getAbsolutePath() },
                                                            localNode);
+        synchronizationInternal.createChannelIfAbsent(USER, TASK_ID, SIGNALS_CHANNEL, true);
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
         executor = Executors.newFixedThreadPool(2);
     }
