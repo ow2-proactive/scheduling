@@ -1920,7 +1920,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SignalApiException {
         try {
-
             publicStore.putIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, new HashSet<String>());
 
             Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,
@@ -1940,7 +1939,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                          jobId,
                                                          "{ k, x ->x.remove('" + readyPrefix + signal + "'); x.add('" +
                                                                 signal + "'); x}");
-
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException | IOException e) {
