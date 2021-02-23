@@ -154,7 +154,10 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
+import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
+import org.ow2.proactive.scheduler.synchronization.CompilationException;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -1915,20 +1918,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public boolean addJobSignal(String sessionId, String jobId, String signal) {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SignalApiException {
         try {
+            publicStore.putIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, new HashSet<String>());
 
-            Set<String> signals = (Set) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
-            if (signals == null) {
-                signals = new HashSet<>();
+            Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                    SIGNAL_TASK_ID,
+                                                                    signalsChannel,
+                                                                    jobId);
+
+            String readyPrefix = SignalApiImpl.READY_PREFIX;
+            if (!(signals.contains(readyPrefix + signal) || signal.startsWith(readyPrefix))) {
+                throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signal);
             }
 
-            signals.add(signal);
-            publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, (Serializable) signals);
-
-        } catch (IOException | InvalidChannelException p) {
-            return false;
+            // Remove the existing ready signal, add the signal and return the set of signals
+            return (HashSet<String>) publicStore.compute(SIGNAL_ORIGINATOR,
+                                                         SIGNAL_TASK_ID,
+                                                         signalsChannel,
+                                                         jobId,
+                                                         "{ k, x ->x.remove('" + readyPrefix + signal + "'); x.add('" +
+                                                                signal + "'); x}");
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException | IOException e) {
+            throw new SignalApiException("Could not add signal for the job " + jobId, e);
         }
-        return true;
     }
 }

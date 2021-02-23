@@ -97,6 +97,7 @@ public class SignalApiTest extends ProActiveTestClean {
         synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
                                                            new Object[] { tempFolder.getAbsolutePath() },
                                                            localNode);
+        synchronizationInternal.createChannelIfAbsent(USER, TASK_ID, SIGNALS_CHANNEL, true);
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
         executor = Executors.newFixedThreadPool(2);
     }
@@ -132,7 +133,6 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testIsReceived() throws SignalApiException {
         String signal = "test_signal_2";
-        signalApi.readyForSignal(signal);
         signalApi.sendSignal(signal);
         Assert.assertTrue(signalApi.isReceived(signal));
     }
@@ -152,11 +152,9 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test
     public void testSendSignal() throws InvalidChannelException, SignalApiException {
-        String signal = "test_signal_4_1";
+        String signal = "test_signal_4";
 
-        // Send ready for signal then check that when the signal is sent, its associated ready signal is removed
-        signalApi.readyForSignal(signal);
-
+        // Send the signal then check that its associated ready signal is removed
         signalApi.sendSignal(signal);
 
         Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
@@ -174,14 +172,6 @@ public class SignalApiTest extends ProActiveTestClean {
                                                                                    .count());
     }
 
-    @Test(expected = SignalApiException.class)
-    public void testSendSignalWithException() throws SignalApiException {
-        String signal = "test_signal_4_2";
-
-        // Send the signal (without sending ready a priori) then assert a SignalAPIException is thrown
-        signalApi.sendSignal(signal);
-    }
-
     @Test
     public void testSendManySignals() throws InvalidChannelException, SignalApiException {
         String signal1 = "test_signal_5_1";
@@ -193,11 +183,7 @@ public class SignalApiTest extends ProActiveTestClean {
             }
         };
 
-        // Send ready for both signals then check that when the signals are sent, their associated ready signals are removed
-        signalApi.readyForSignal(signal1);
-        signalApi.readyForSignal(signal2);
-
-        // Send signals twice and check that each signal is added only once
+        // Send signals twice and check that each signal is added only once, and their associated ready signals are removed
         signalApi.sendManySignals(signalsToBeSent);
         signalApi.sendManySignals(signalsToBeSent);
 
@@ -215,7 +201,6 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testRemoveSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_6";
-        signalApi.readyForSignal(signal);
         signalApi.sendSignal(signal);
         signalApi.removeSignal(signal);
         Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
@@ -241,7 +226,6 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testGetJobSignals() throws SignalApiException {
         String signal = "test_signal_8";
-        signalApi.readyForSignal(signal);
         signalApi.sendSignal(signal);
         Assert.assertFalse(signalApi.getJobSignals().isEmpty());
     }
@@ -302,7 +286,6 @@ public class SignalApiTest extends ProActiveTestClean {
         Runnable waitForSignalThread = () -> {
             try {
                 TimeUnit.MILLISECONDS.sleep(duration);
-                signalApi.readyForSignal(signal);
                 signalApi.sendSignal(signal);
             } catch (SignalApiException | InterruptedException e) {
             }

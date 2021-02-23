@@ -79,6 +79,7 @@ import org.ow2.proactive.scheduler.rest.ds.LocalDestination;
 import org.ow2.proactive.scheduler.rest.ds.LocalDirSource;
 import org.ow2.proactive.scheduler.rest.ds.RemoteDestination;
 import org.ow2.proactive.scheduler.rest.ds.RemoteSource;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.smartproxy.common.AbstractSmartProxy;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
@@ -809,7 +810,8 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal)
+            throws SchedulerException, SignalApiException {
         return (_getScheduler()).addJobSignal(sessionId, jobId, signal);
     }
 

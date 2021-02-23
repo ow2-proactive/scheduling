@@ -58,6 +58,7 @@ import org.ow2.proactive.scheduler.common.usage.SchedulerUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 
 
 /**
@@ -95,10 +96,11 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param sessionId
      * @param jobId
      * @param signal
-     * @return true if the signal is added to the list of signals used by the considered job
+     * @return the set of job signals including the added signal
      * @throws SchedulerException
      */
-    boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException;
+    Set<String> addJobSignal(String sessionId, String jobId, String signal)
+            throws SchedulerException, SignalApiException;
 
     /**
      * Returns the USER DataSpace URIs associated with the current user

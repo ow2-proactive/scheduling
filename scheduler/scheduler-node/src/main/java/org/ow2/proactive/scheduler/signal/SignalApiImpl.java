@@ -50,7 +50,7 @@ public class SignalApiImpl implements SignalApi {
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
-    protected static final String READY_PREFIX = "ready_";
+    public static final String READY_PREFIX = "ready_";
 
     private SynchronizationWrapper synchronization;
 
@@ -66,8 +66,7 @@ public class SignalApiImpl implements SignalApi {
     private void init() throws SignalApiException {
         if (!isInitialized) {
             try {
-                // Initialize synchronization signals channel
-                synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
+                // Initialize job signals
                 synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new HashSet<String>());
             } catch (IOException | InvalidChannelException e) {
                 throw new SignalApiException("Could not instantiate Signal API for the job " + jobId, e);
@@ -120,9 +119,6 @@ public class SignalApiImpl implements SignalApi {
     public boolean sendSignal(String signalName) throws SignalApiException {
         try {
             init();
-            if (!isReceived(READY_PREFIX + signalName)) {
-                throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signalName);
-            }
             // Remove the ready signal if it already exists, then add the signal if it does not exist
             synchronization.compute(SIGNALS_CHANNEL,
                                     jobId,
