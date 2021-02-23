@@ -1921,6 +1921,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SignalApiException {
         try {
 
+            publicStore.putIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, new HashSet<String>());
+
             Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,
                                                                     SIGNAL_TASK_ID,
                                                                     signalsChannel,
