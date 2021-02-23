@@ -1925,28 +1925,23 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                                     SIGNAL_TASK_ID,
                                                                     signalsChannel,
                                                                     jobId);
-            if (signals == null) {
-                signals = new HashSet<>();
-            }
 
             String readyPrefix = SignalApiImpl.READY_PREFIX;
             if (!(signals.contains(readyPrefix + signal) || signal.startsWith(readyPrefix))) {
                 throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signal);
             }
 
-            // Remove the existing ready signal
-            signals.remove(readyPrefix + signal);
-
-            // Add the signal
-            signals.add(signal);
-
-            publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, (Serializable) signals);
-
-            return signals;
+            // Remove the existing ready signal, add the signal and return the set of signals
+            return (HashSet<String>) publicStore.compute(SIGNAL_ORIGINATOR,
+                                                         SIGNAL_TASK_ID,
+                                                         signalsChannel,
+                                                         jobId,
+                                                         "{ k, x ->x.remove('" + readyPrefix + signal + "'); x.add('" +
+                                                                signal + "'); x}");
 
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
-        } catch (IOException e) {
+        } catch (CompilationException | IOException e) {
             throw new SignalApiException("Could not add signal for the job " + jobId, e);
         }
     }
