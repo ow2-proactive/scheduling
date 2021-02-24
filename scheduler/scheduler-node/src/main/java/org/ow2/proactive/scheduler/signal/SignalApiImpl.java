@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.synchronization.CompilationException;
@@ -77,6 +78,9 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean readyForSignal(String signalName) throws SignalApiException {
+        if (StringUtils.isBlank(signalName)) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
             init();
             // Remove the signal if it already exists, then add the ready signal if it does not exist
@@ -117,6 +121,9 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean sendSignal(String signalName) throws SignalApiException {
+        if (StringUtils.isBlank(signalName)) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
             init();
             // Remove the ready signal if it already exists, then add the signal if it does not exist
@@ -134,6 +141,9 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean sendManySignals(Set<String> signalsSubSet) throws SignalApiException {
+        if (signalsSubSet.contains(null) || signalsSubSet.contains("")) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
             init();
             StringBuilder actions = new StringBuilder();
