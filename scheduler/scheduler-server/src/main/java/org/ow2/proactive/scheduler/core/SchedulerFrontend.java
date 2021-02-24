@@ -72,6 +72,7 @@ import java.util.stream.Collectors;
 import javax.security.auth.Subject;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
@@ -1920,6 +1921,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SignalApiException {
         try {
+            if (StringUtils.isBlank(signal)) {
+                throw new SignalApiException("Empty signals are not allowed");
+            }
+
             publicStore.putIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, new HashSet<String>());
 
             Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,

@@ -130,6 +130,14 @@ public class SignalApiTest extends ProActiveTestClean {
                                                                                            signal));
     }
 
+    @Test(expected = SignalApiException.class)
+    public void testReadyForSignalWithException() throws SignalApiException {
+        String signal = "";
+
+        // Send ready for an empty signal then assert a SignalAPIException is thrown
+        signalApi.readyForSignal(signal);
+    }
+
     @Test
     public void testIsReceived() throws SignalApiException {
         String signal = "test_signal_2";
@@ -172,6 +180,14 @@ public class SignalApiTest extends ProActiveTestClean {
                                                                                    .count());
     }
 
+    @Test(expected = SignalApiException.class)
+    public void testSendSignalWithException() throws SignalApiException {
+        String signal = "";
+
+        // Send an empty signal then assert a SignalAPIException is thrown
+        signalApi.sendSignal(signal);
+    }
+
     @Test
     public void testSendManySignals() throws InvalidChannelException, SignalApiException {
         String signal1 = "test_signal_5_1";
@@ -196,6 +212,19 @@ public class SignalApiTest extends ProActiveTestClean {
                                                               allSignals.stream()
                                                                         .filter(sig -> sig.equals(signal))
                                                                         .count()));
+    }
+
+    @Test(expected = SignalApiException.class)
+    public void testSendManySignalsWithException() throws SignalApiException {
+        Set<String> signalsToBeSent = new HashSet<String>() {
+            {
+                add(null);
+                add("");
+            }
+        };
+
+        // Send empty signals then assert a SignalAPIException is thrown
+        signalApi.sendManySignals(signalsToBeSent);
     }
 
     @Test
