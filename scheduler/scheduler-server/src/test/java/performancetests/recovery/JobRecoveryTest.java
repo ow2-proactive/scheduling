@@ -71,7 +71,7 @@ public class JobRecoveryTest extends PerformanceTestBase {
      */
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 2000 }, { 100, 5000 }, { 500, 30000 } });
+        return Arrays.asList(new Object[][] { { 10, 2500 }, { 100, 6000 }, { 500, 30000 } });
     }
 
     // number of jobs
