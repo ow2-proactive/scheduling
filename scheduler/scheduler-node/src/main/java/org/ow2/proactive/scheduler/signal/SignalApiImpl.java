@@ -78,11 +78,10 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean readyForSignal(String signalName) throws SignalApiException {
+        if (StringUtils.isBlank(signalName)) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
-            if (StringUtils.isBlank(signalName)) {
-                throw new SignalApiException("Empty signals are not allowed");
-            }
-
             init();
             // Remove the signal if it already exists, then add the ready signal if it does not exist
             synchronization.compute(SIGNALS_CHANNEL,
@@ -142,10 +141,10 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean sendManySignals(Set<String> signalsSubSet) throws SignalApiException {
+        if (signalsSubSet.contains(null) || signalsSubSet.contains("")) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
-            if (signalsSubSet.contains(null) || signalsSubSet.contains("")) {
-                throw new SignalApiException("Empty signals are not allowed");
-            }
             init();
             StringBuilder actions = new StringBuilder();
             for (String signal : signalsSubSet) {
