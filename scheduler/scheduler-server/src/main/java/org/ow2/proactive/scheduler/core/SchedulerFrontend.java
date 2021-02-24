@@ -1920,11 +1920,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SignalApiException {
+        if (StringUtils.isBlank(signal)) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
-            if (StringUtils.isBlank(signal)) {
-                throw new SignalApiException("Empty signals are not allowed");
-            }
-
             publicStore.putIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, new HashSet<String>());
 
             Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,
