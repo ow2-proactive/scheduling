@@ -132,7 +132,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test(expected = SignalApiException.class)
     public void testReadyForSignalWithException() throws SignalApiException {
-        String signal = "";
+        String signal = " ";
 
         // Send ready for an empty signal then assert a SignalAPIException is thrown
         signalApi.readyForSignal(signal);
@@ -182,7 +182,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test(expected = SignalApiException.class)
     public void testSendSignalWithException() throws SignalApiException {
-        String signal = "";
+        String signal = " ";
 
         // Send an empty signal then assert a SignalAPIException is thrown
         signalApi.sendSignal(signal);
@@ -218,7 +218,6 @@ public class SignalApiTest extends ProActiveTestClean {
     public void testSendManySignalsWithException() throws SignalApiException {
         Set<String> signalsToBeSent = new HashSet<String>() {
             {
-                add(null);
                 add("");
             }
         };

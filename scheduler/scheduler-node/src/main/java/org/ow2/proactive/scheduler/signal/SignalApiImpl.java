@@ -78,7 +78,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean readyForSignal(String signalName) throws SignalApiException {
-        if (StringUtils.isBlank(signalName)) {
+        if (StringUtils.isBlank(signalName.trim())) {
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
@@ -121,7 +121,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean sendSignal(String signalName) throws SignalApiException {
-        if (StringUtils.isBlank(signalName)) {
+        if (StringUtils.isBlank(signalName.trim())) {
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
@@ -141,7 +141,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean sendManySignals(Set<String> signalsSubSet) throws SignalApiException {
-        if (signalsSubSet.contains(null) || signalsSubSet.contains("")) {
+        if (signalsSubSet.stream().anyMatch(signal -> StringUtils.isBlank(signal.trim()))) {
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
