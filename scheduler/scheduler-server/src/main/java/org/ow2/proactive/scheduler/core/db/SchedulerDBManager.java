@@ -275,14 +275,20 @@ public class SchedulerDBManager {
 
     public List<JobInfo> getJobs(final List<String> jobIds) {
         List<Long> longJobIds = jobIds.stream().map(id -> Long.parseLong(id)).collect(Collectors.toList());
-        return executeReadOnlyTransaction(session -> {
-            Criteria criteria = session.createCriteria(JobData.class);
-            if (!longJobIds.isEmpty()) {
-                criteria.add(Restrictions.in("id", longJobIds));
-            }
-            List<JobData> jobsList = criteria.list();
-            return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
-        });
+        List<JobInfo> jobsList = new ArrayList(longJobIds.size());
+
+        List<List<Long>> jobIdSubSets = Lists.partition(longJobIds, MAX_ITEMS_IN_LIST);
+        for (List<Long> jobIdSubList : jobIdSubSets) {
+            jobsList.addAll(executeReadOnlyTransaction(session -> {
+                Criteria criteria = session.createCriteria(JobData.class);
+                if (!jobIdSubList.isEmpty()) {
+                    criteria.add(Restrictions.in("id", jobIdSubList));
+                }
+                List<JobData> subJobsList = criteria.list();
+                return subJobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
+            }));
+        }
+        return jobsList;
     }
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag, final int offset,

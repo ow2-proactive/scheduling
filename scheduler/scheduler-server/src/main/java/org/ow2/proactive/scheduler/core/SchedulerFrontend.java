@@ -1635,7 +1635,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     public List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException {
         frontendState.checkPermission("getJobs", "You don't have permissions to load jobs");
-        frontendState.checkPermission("getJobs", "You don't have permissions to load jobs");
         return dbManager.getJobs(jobsId);
     }
 
