@@ -97,6 +97,7 @@ public class SignalApiTest extends ProActiveTestClean {
         synchronizationInternal = PAActiveObject.newActive(AOSynchronization.class,
                                                            new Object[] { tempFolder.getAbsolutePath() },
                                                            localNode);
+        synchronizationInternal.createChannelIfAbsent(USER, TASK_ID, SIGNALS_CHANNEL, true);
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
         executor = Executors.newFixedThreadPool(2);
     }
@@ -116,7 +117,6 @@ public class SignalApiTest extends ProActiveTestClean {
     @Test
     public void testReadyForSignal() throws SignalApiException, InvalidChannelException {
         String signal = "test_signal_1";
-        signalApi.sendSignal(signal);
         signalApi.readyForSignal(signal);
 
         Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
@@ -128,6 +128,14 @@ public class SignalApiTest extends ProActiveTestClean {
                                                                  SIGNALS_CHANNEL,
                                                                  JOB_ID.value())).contains(((SignalApiImpl) signalApi).READY_PREFIX +
                                                                                            signal));
+    }
+
+    @Test(expected = SignalApiException.class)
+    public void testReadyForSignalWithException() throws SignalApiException {
+        String signal = " ";
+
+        // Send ready for an empty signal then assert a SignalAPIException is thrown
+        signalApi.readyForSignal(signal);
     }
 
     @Test
@@ -154,11 +162,7 @@ public class SignalApiTest extends ProActiveTestClean {
     public void testSendSignal() throws InvalidChannelException, SignalApiException {
         String signal = "test_signal_4";
 
-        // Send ready for signal then check that when the signal is sent, its associated ready signal is removed
-        signalApi.readyForSignal(signal);
-
-        // Send signal twice then check that it is added only once
-        signalApi.sendSignal(signal);
+        // Send the signal then check that its associated ready signal is removed
         signalApi.sendSignal(signal);
 
         Assert.assertFalse(((HashSet) synchronizationInternal.get(USER,
@@ -176,6 +180,14 @@ public class SignalApiTest extends ProActiveTestClean {
                                                                                    .count());
     }
 
+    @Test(expected = SignalApiException.class)
+    public void testSendSignalWithException() throws SignalApiException {
+        String signal = " ";
+
+        // Send an empty signal then assert a SignalAPIException is thrown
+        signalApi.sendSignal(signal);
+    }
+
     @Test
     public void testSendManySignals() throws InvalidChannelException, SignalApiException {
         String signal1 = "test_signal_5_1";
@@ -187,11 +199,7 @@ public class SignalApiTest extends ProActiveTestClean {
             }
         };
 
-        // Send ready for both signals then check that when the signals are sent, their associated ready signals are removed
-        signalApi.readyForSignal(signal1);
-        signalApi.readyForSignal(signal2);
-
-        // Send signals twice and check that each signal is added only once
+        // Send signals twice and check that each signal is added only once, and their associated ready signals are removed
         signalApi.sendManySignals(signalsToBeSent);
         signalApi.sendManySignals(signalsToBeSent);
 
@@ -204,6 +212,18 @@ public class SignalApiTest extends ProActiveTestClean {
                                                               allSignals.stream()
                                                                         .filter(sig -> sig.equals(signal))
                                                                         .count()));
+    }
+
+    @Test(expected = SignalApiException.class)
+    public void testSendManySignalsWithException() throws SignalApiException {
+        Set<String> signalsToBeSent = new HashSet<String>() {
+            {
+                add("");
+            }
+        };
+
+        // Send empty signals then assert a SignalAPIException is thrown
+        signalApi.sendManySignals(signalsToBeSent);
     }
 
     @Test

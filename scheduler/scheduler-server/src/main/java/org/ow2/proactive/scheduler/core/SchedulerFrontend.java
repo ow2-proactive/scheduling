@@ -72,6 +72,7 @@ import java.util.stream.Collectors;
 import javax.security.auth.Subject;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
@@ -154,7 +155,10 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
+import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
+import org.ow2.proactive.scheduler.synchronization.CompilationException;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -1630,15 +1634,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     public List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException {
-        List<JobInfo> jobsInfoList = new ArrayList<>();
-        for (String jobId : jobsId) {
-            try {
-                jobsInfoList.add(this.getJobInfo(jobId));
-            } catch (UnknownJobException e) {
-                logger.warn("The job with job ID " + jobId + " couldn't be found");
-            }
-        }
-        return jobsInfoList;
+        frontendState.checkPermission("getJobs", "You don't have permissions to load jobs");
+        return dbManager.getJobs(jobsId);
     }
 
     /**
@@ -1915,20 +1912,34 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public boolean addJobSignal(String sessionId, String jobId, String signal) {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SignalApiException {
+        if (StringUtils.isBlank(signal.trim())) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
+            publicStore.putIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, new HashSet<String>());
 
-            Set<String> signals = (Set) publicStore.get(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId);
-            if (signals == null) {
-                signals = new HashSet<>();
+            Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                    SIGNAL_TASK_ID,
+                                                                    signalsChannel,
+                                                                    jobId);
+
+            String readyPrefix = SignalApiImpl.READY_PREFIX;
+            if (!(signals.contains(readyPrefix + signal) || signal.startsWith(readyPrefix))) {
+                throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signal);
             }
 
-            signals.add(signal);
-            publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, (Serializable) signals);
-
-        } catch (IOException | InvalidChannelException p) {
-            return false;
+            // Remove the existing ready signal, add the signal and return the set of signals
+            return (HashSet<String>) publicStore.compute(SIGNAL_ORIGINATOR,
+                                                         SIGNAL_TASK_ID,
+                                                         signalsChannel,
+                                                         jobId,
+                                                         "{ k, x ->x.remove('" + readyPrefix + signal + "'); x.add('" +
+                                                                signal + "'); x}");
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException | IOException e) {
+            throw new SignalApiException("Could not add signal for the job " + jobId, e);
         }
-        return true;
     }
 }

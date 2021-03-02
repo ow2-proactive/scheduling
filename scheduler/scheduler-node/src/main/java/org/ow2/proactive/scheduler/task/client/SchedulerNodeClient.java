@@ -74,6 +74,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
 
@@ -934,7 +935,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean addJobSignal(String sessionId, String jobId, String signal) throws SchedulerException {
+    public Set<String> addJobSignal(String sessionId, String jobId, String signal)
+            throws SchedulerException, SignalApiException {
         renewSession();
         return client.addJobSignal(sessionId, jobId, signal);
     }

@@ -59,6 +59,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -2200,6 +2201,6 @@ public interface SchedulerRestInterface {
     @Path("job/{jobid}/signals")
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces("application/json")
-    boolean addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
-            @PathParam("jobid") String jobId) throws RestException;
+    Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
+            @PathParam("jobid") String jobId) throws RestException, SignalApiException;
 }

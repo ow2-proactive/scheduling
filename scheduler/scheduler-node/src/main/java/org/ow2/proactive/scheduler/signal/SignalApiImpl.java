@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.synchronization.CompilationException;
@@ -50,7 +51,7 @@ public class SignalApiImpl implements SignalApi {
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
-    protected static final String READY_PREFIX = "ready_";
+    public static final String READY_PREFIX = "ready_";
 
     private SynchronizationWrapper synchronization;
 
@@ -66,8 +67,7 @@ public class SignalApiImpl implements SignalApi {
     private void init() throws SignalApiException {
         if (!isInitialized) {
             try {
-                // Initialize synchronization signals channel
-                synchronization.createChannelIfAbsent(SIGNALS_CHANNEL, true);
+                // Initialize job signals
                 synchronization.putIfAbsent(SIGNALS_CHANNEL, jobId, new HashSet<String>());
             } catch (IOException | InvalidChannelException e) {
                 throw new SignalApiException("Could not instantiate Signal API for the job " + jobId, e);
@@ -78,6 +78,9 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean readyForSignal(String signalName) throws SignalApiException {
+        if (StringUtils.isBlank(signalName.trim())) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
             init();
             // Remove the signal if it already exists, then add the ready signal if it does not exist
@@ -108,6 +111,7 @@ public class SignalApiImpl implements SignalApi {
     public String checkForSignals(Set<String> signalsSubSet) throws SignalApiException {
         init();
         HashSet<String> signals = getJobSignals();
+
         if (!signals.isEmpty()) {
             return signalsSubSet.stream().filter(signals::contains).findFirst().orElse(null);
         } else {
@@ -117,6 +121,9 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean sendSignal(String signalName) throws SignalApiException {
+        if (StringUtils.isBlank(signalName.trim())) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
             init();
             // Remove the ready signal if it already exists, then add the signal if it does not exist
@@ -134,6 +141,9 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean sendManySignals(Set<String> signalsSubSet) throws SignalApiException {
+        if (signalsSubSet.stream().anyMatch(signal -> StringUtils.isBlank(signal.trim()))) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
         try {
             init();
             StringBuilder actions = new StringBuilder();
