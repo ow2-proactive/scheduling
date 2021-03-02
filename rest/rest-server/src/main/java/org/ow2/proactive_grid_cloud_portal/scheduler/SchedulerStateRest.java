@@ -1584,7 +1584,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public JobIdData reSubmit(String sessionId, String jobId, PathSegment pathSegment, UriInfo contextInfos)
             throws IOException, RestException {
-        Scheduler scheduler = checkAccess(sessionId, "reSubmit");
+        Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/resubmit");
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
         File tmpJobFile = File.createTempFile("job", "d");
@@ -1608,7 +1608,34 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
         newJobId = workflowSubmitter.submit(tmpJobFile, jobVariables, genericInfos);
+        if (!tmpJobFile.delete()) {
+            logger.warn(tmpJobFile.getAbsolutePath() + " could not be deleted");
+        }
         return mapper.map(newJobId, JobIdData.class);
+    }
+
+    @Override
+    public List<JobIdData> reSubmitAll(String sessionId, List<String> jobsId) throws RestException {
+        Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/resubmit");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+        WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+        List<JobIdData> newJobIds = new ArrayList<>(jobsId.size());
+
+        for (String jobId : jobsId) {
+            try {
+                File tmpJobFile = File.createTempFile("job", "d");
+                String jobContent = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
+                FileUtils.write(tmpJobFile, jobContent, Charset.forName("UTF-8"));
+                JobId newJobId = workflowSubmitter.submit(tmpJobFile, Collections.emptyMap(), Collections.emptyMap());
+                newJobIds.add(mapper.map(newJobId, JobIdData.class));
+                if (!tmpJobFile.delete()) {
+                    logger.warn(tmpJobFile.getAbsolutePath() + " could not be deleted");
+                }
+            } catch (Exception e) {
+                logger.error("Error occurred when resubmitting job " + jobId, e);
+            }
+        }
+        return newJobIds;
     }
 
     @Override
