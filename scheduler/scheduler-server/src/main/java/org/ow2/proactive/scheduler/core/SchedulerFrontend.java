@@ -1597,30 +1597,28 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
          */
-        insertSignals(jobsInfo);
+        insertSignals(jobsInfo.getList());
 
         /**
          * Inject visualization connection strings for running job when available
          */
-        insertVisualization(jobsInfo);
+        insertVisualization(jobsInfo.getList());
 
         return jobsInfo;
     }
 
-    private void insertVisualization(Page<JobInfo> jobsInfo) {
-        jobsInfo.getList()
-                .stream()
+    private void insertVisualization(List<JobInfo> jobsInfo) {
+        jobsInfo.stream()
                 .filter(jobInfo -> jobInfo.isStarted() && jobInfo.getFinishedTime() <= 0)
                 .forEach(jobInfo -> insertVisualization(jobInfo));
     }
 
-    private void insertSignals(Page<JobInfo> jobsInfo) {
+    private void insertSignals(List<JobInfo> jobsInfo) {
         try {
             List<String> jobHavingSignalsIds = new ArrayList<>(publicStore.keySet(SIGNAL_ORIGINATOR,
                                                                                   SIGNAL_TASK_ID,
                                                                                   signalsChannel));
-            jobsInfo.getList()
-                    .stream()
+            jobsInfo.stream()
                     .filter(jobInfo -> jobHavingSignalsIds.contains(jobInfo.getJobId().value()))
                     .forEach(jobInfo -> insertJobSignals(jobInfo));
         } catch (InvalidChannelException e) {
@@ -1635,7 +1633,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     public List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException {
         frontendState.checkPermission("getJobs", "You don't have permissions to load jobs");
-        return dbManager.getJobs(jobsId);
+        List<JobInfo> jobsInfo = dbManager.getJobs(jobsId);
+        /**
+         * Add/inject to each JobInfo the list of signals used by the job, if they exist.
+         */
+        insertSignals(jobsInfo);
+
+        /**
+         * Inject visualization connection strings for running job when available
+         */
+        insertVisualization(jobsInfo);
+        return jobsInfo;
     }
 
     /**
