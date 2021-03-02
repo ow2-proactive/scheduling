@@ -1330,7 +1330,7 @@ public interface SchedulerRestInterface {
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
-     * Submits a job to the scheduler
+     * Re-submit a job to the scheduler
      *
      * @param sessionId
      *            a valid session id
@@ -1347,6 +1347,22 @@ public interface SchedulerRestInterface {
     JobIdData reSubmit(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos)
             throws IOException, RestException;
+
+    /**
+     * Re-submit a list of jobs to the scheduler
+     *
+     * @param sessionId
+     *          a valid session id
+     * @param jobsId
+     *          a list of job ids of already submitted jobs
+     * @return a list of <code>jobid</code> of the newly created jobs. If a job submission fails, it will be discarded with a log message.
+     * @throws RestException thrown when not connected or similar errors.
+     */
+    @POST
+    @Path("jobs/resubmit")
+    @Produces("application/json")
+    List<JobIdData> reSubmitAll(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
+            throws RestException;
 
     /**
      * submit a planned workflow
