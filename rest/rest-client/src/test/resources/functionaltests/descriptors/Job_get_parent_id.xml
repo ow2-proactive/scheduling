@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.11"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd"
+        name="job_get_parent_id"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+    <taskFlow>
+        <task name="NodeClientTask" >
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+import org.ow2.proactive.scheduler.common.job.*
+import org.ow2.proactive.scheduler.common.task.*
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode
+import org.ow2.proactive.scripting.*
+
+try {
+    job = new TaskFlowJob()
+    job.setName("ParentIdJob")
+    task = new ScriptTask()
+    task.setName("ParentIdTask")
+    task.addOutputFiles("outFile.txt", OutputAccessMode.TransferToUserSpace)
+    task.setScript(new TaskScript(new SimpleScript("outFile = new File(\"outFile.txt\"); outFile.write(genericInformation.get(\"PARENT_JOB_ID\"))", "groovy")))
+    job.addTask(task)
+    schedulerapi.connect()
+    jobid = schedulerapi.submit(job)
+    println("job submitted");
+    taskResult = schedulerapi.waitForTask(jobid.toString(), "ParentIdTask", 120000)
+    schedulerapi.pullFile("USERSPACE", "/outFile.txt", localspace + "/outFile.txt")
+    result = new File("outFile.txt").text
+    println result
+
+} catch (Exception e) {
+    e.printStackTrace()
+}
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+
+</job>

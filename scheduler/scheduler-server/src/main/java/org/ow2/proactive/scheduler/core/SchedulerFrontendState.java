@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.PARENT_JOB_ID;
 import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE;
 
 import java.lang.reflect.Method;
@@ -172,8 +173,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     private static final String JOB_SUBMITTED_EVENT_METHOD = "jobSubmittedEvent";
 
     private static final String SCHEDULER_STATE_UPDATED_EVENT_METHOD = "schedulerStateUpdatedEvent";
-
-    public static final String PARENT_JOB_ID = "PARENT_JOB_ID";
 
     /** Scheduler logger */
     private static final Logger logger = Logger.getLogger(SchedulingService.class);

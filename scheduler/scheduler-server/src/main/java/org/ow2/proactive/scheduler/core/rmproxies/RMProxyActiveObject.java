@@ -257,7 +257,7 @@ public class RMProxyActiveObject {
             String schedulerUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
 
             logger.debug("Binding schedulerapi...");
-            SchedulerNodeClient client = new SchedulerNodeClient(decrypter, schedulerUrl);
+            SchedulerNodeClient client = new SchedulerNodeClient(decrypter, schedulerUrl, taskId.getJobId());
             handler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, client);
 
             logger.debug("Binging rmapi...");
