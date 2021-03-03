@@ -837,8 +837,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try {
             URLConnection urlConnection = job.openConnection();
 
-            for (Map.Entry<String, String> requestHeaderEntry : requestHeaderParams.entrySet()) {
-                urlConnection.addRequestProperty(requestHeaderEntry.getKey(), requestHeaderEntry.getValue());
+            if (requestHeaderParams != null) {
+                for (Map.Entry<String, String> requestHeaderEntry : requestHeaderParams.entrySet()) {
+                    urlConnection.addRequestProperty(requestHeaderEntry.getKey(), requestHeaderEntry.getValue());
+                }
             }
             InputStream is = urlConnection.getInputStream();
             jobIdData = restApiClient().submitXml(sid, is, variables, genericInfos);

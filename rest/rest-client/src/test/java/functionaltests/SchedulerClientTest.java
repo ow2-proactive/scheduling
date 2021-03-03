@@ -98,6 +98,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_generic_info.xml");
 
+    private static URL jobDescriptorParentId = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_parent_id.xml");
+
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
@@ -298,6 +300,18 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
         Assert.assertFalse(tres.hadException());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testSchedulerNodeClientParentId() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        // Submit a job with the generic informations map
+        JobId jobId = client.submit(jobDescriptorParentId);
+        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        Assert.assertNotNull(tres);
+        System.out.println(tres.getOutput().getAllLogs(false));
+        Assert.assertFalse(tres.hadException());
+        Assert.assertEquals(jobId.value(), tres.value());
     }
 
     @Test(timeout = MAX_WAIT_TIME)

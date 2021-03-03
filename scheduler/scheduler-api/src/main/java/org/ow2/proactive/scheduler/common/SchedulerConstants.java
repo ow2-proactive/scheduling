@@ -129,6 +129,9 @@ public class SchedulerConstants {
     /** Attribute name in task the generic information indicating that the task requires a node protedcted by token */
     public static final String NODE_ACCESS_TOKEN = "NODE_ACCESS_TOKEN";
 
+    /** Generic information containing the parent job id */
+    public static final String PARENT_JOB_ID = "PARENT_JOB_ID";
+
     /**
      * The variable name to access results from dependent tasks (an array).
      */

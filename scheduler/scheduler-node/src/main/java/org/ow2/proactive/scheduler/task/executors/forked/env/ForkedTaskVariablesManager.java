@@ -173,7 +173,9 @@ public class ForkedTaskVariablesManager implements Serializable {
 
     public SchedulerNodeClient createSchedulerNodeClient(TaskContext container) {
         if (container.getDecrypter() != null && !Strings.isNullOrEmpty(container.getSchedulerRestUrl())) {
-            return new SchedulerNodeClient(container.getDecrypter(), container.getSchedulerRestUrl());
+            return new SchedulerNodeClient(container.getDecrypter(),
+                                           container.getSchedulerRestUrl(),
+                                           container.getTaskId().getJobId());
         }
         return null;
     }

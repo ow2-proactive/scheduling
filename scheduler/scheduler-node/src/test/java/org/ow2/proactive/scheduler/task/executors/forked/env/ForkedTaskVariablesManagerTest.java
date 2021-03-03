@@ -245,6 +245,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
         taskLauncherInitializer.setSchedulerRestUrl("http://localhost:8080/rest");
+        taskLauncherInitializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task", 0L));
 
         Decrypter decrypter = createCredentials(testUser, testPass);
 
@@ -275,6 +276,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
         taskLauncherInitializer.setSchedulerRestUrl("http://localhost:8080/rest");
+        taskLauncherInitializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task", 0L));
 
         Decrypter decrypter = createCredentials(testUser, testPass);
 
