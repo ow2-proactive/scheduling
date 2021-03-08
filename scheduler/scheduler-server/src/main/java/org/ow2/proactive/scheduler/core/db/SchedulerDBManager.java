@@ -259,6 +259,39 @@ public class SchedulerDBManager {
                         case STATE:
                             sortOrder = new GroupByStatusSortOrder(param.getSortOrder(), "status");
                             break;
+                        case SUBMIT_TIME:
+                            sortOrder = configureSortOrder(param, Property.forName("submittedTime"));
+                            break;
+                        case START_TIME:
+                            sortOrder = configureSortOrder(param, Property.forName("startTime"));
+                            break;
+                        case FINISH_TIME:
+                            sortOrder = configureSortOrder(param, Property.forName("finishedTime"));
+                            break;
+                        case IN_ERROR_TIME:
+                            sortOrder = configureSortOrder(param, Property.forName("finishedTime"));
+                            break;
+                        case TOTAL_TASKS:
+                            sortOrder = configureSortOrder(param, Property.forName("totalNumberOfTasks"));
+                            break;
+                        case PENDING_TASKS:
+                            sortOrder = configureSortOrder(param, Property.forName("numberOfPendingTasks"));
+                            break;
+                        case RUNNING_TASKS:
+                            sortOrder = configureSortOrder(param, Property.forName("numberOfRunningTasks"));
+                            break;
+                        case IN_ERROR_TASKS:
+                            sortOrder = configureSortOrder(param, Property.forName("numberOfInErrorTasks"));
+                            break;
+                        case FINISHED_TASKS:
+                            sortOrder = configureSortOrder(param, Property.forName("numberOfFinishedTasks"));
+                            break;
+                        case FAULTY_TASKS:
+                            sortOrder = configureSortOrder(param, Property.forName("numberOfFaultyTasks"));
+                            break;
+                        case FAILED_TASKS:
+                            sortOrder = configureSortOrder(param, Property.forName("numberOfFailedTasks"));
+                            break;
                         default:
                             throw new IllegalArgumentException("Unsupported sort parameter: " + param.getParameter());
                     }

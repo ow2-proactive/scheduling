@@ -104,7 +104,8 @@ public class SchedulerClientExample {
                                                                                        true,
                                                                                        true,
                                                                                        true,
-                                                                                       true);
+                                                                                       true,
+                                                                                       null);
         Map<Long, ArrayList<UserJobData>> map = page.getMap();
         System.out.println(map);
 
