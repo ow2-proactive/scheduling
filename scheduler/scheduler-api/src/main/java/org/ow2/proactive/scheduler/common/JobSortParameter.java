@@ -34,5 +34,16 @@ public enum JobSortParameter {
     STATE,
     OWNER,
     PRIORITY,
-    NAME
+    NAME,
+    SUBMIT_TIME,
+    START_TIME,
+    IN_ERROR_TIME,
+    FINISH_TIME,
+    TOTAL_TASKS,
+    PENDING_TASKS,
+    RUNNING_TASKS,
+    FINISHED_TASKS,
+    FAILED_TASKS,
+    FAULTY_TASKS,
+    IN_ERROR_TASKS
 }
