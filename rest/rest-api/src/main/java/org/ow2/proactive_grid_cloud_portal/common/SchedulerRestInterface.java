@@ -177,6 +177,12 @@ public interface SchedulerRestInterface {
      *            fetch running jobs
      * @param finished
      *            fetch finished jobs
+     * @param sortParams
+     *            string containing sort directives. It must contain a comma separated list of sort parameters.
+     *            A sort parameter can contain ID,STATE,OWNER,PRIORITY,NAME,SUBMIT_TIME,START_TIME,IN_ERROR_TIME,FINISH_TIME,TOTAL_TASKS,
+     *            PENDING_TASKS,RUNNING_TASKS,FINISHED_TASKS,FAILED_TASKS,FAULTY_TASKS,IN_ERROR_TASKS
+     *            Each parameter must end with _d for descending order or _a for ascending.
+     *            Default value is: "STATE_a,ID_d"
      * @return a map containing one entry with the revision id as key and the
      *         list of UserJobData as value.
      */
@@ -189,7 +195,8 @@ public interface SchedulerRestInterface {
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("running") @DefaultValue("true") boolean running,
-            @QueryParam("finished") @DefaultValue("true") boolean finished) throws RestException;
+            @QueryParam("finished") @DefaultValue("true") boolean finished, @QueryParam("sortParams") String sortParams)
+            throws RestException;
 
     /**
      * Returns the revision number of the scheduler state

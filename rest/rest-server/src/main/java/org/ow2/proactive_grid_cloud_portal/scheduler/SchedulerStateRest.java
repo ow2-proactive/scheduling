@@ -111,6 +111,7 @@ import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 
 
 /**
@@ -136,6 +137,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public static final String YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the scheduler, you should log on first";
 
     private static final String VARIABLES_KEY = "variables";
+
+    public static final String ASC_SUFFIX = "_a";
+
+    public static final String DESC_SUFFIX = "_d";
 
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
@@ -168,6 +173,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private HttpServletRequest httpServletRequest;
 
     private final WorkflowVariablesTransformer workflowVariablesTransformer = new WorkflowVariablesTransformer();
+
+    private static List<SortParameter<JobSortParameter>> createJobSortParams(String sortString) {
+        String[] sortParams = sortString.split(",");
+        List<SortParameter<JobSortParameter>> jobSortParamsList = new ArrayList<>(sortParams.length);
+        for (String param : sortParams) {
+            SortOrder order;
+            if (param.endsWith(ASC_SUFFIX)) {
+                order = SortOrder.ASC;
+                param = param.substring(0, param.length() - ASC_SUFFIX.length());
+            } else if (param.endsWith(DESC_SUFFIX)) {
+                order = SortOrder.DESC;
+                param = param.substring(0, param.length() - DESC_SUFFIX.length());
+            } else {
+                throw new IllegalArgumentException("Invalid sort order in " + sortString);
+            }
+            JobSortParameter jobSortParameter = JobSortParameter.valueOf(param);
+            jobSortParamsList.add(new SortParameter<>(jobSortParameter, order));
+        }
+        return jobSortParamsList;
+    }
 
     @Override
     public String getUrl() {
@@ -252,17 +277,29 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
-            boolean myJobs, boolean pending, boolean running, boolean finished) throws RestException {
+            boolean myJobs, boolean pending, boolean running, boolean finished, String sortParams)
+            throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
 
             boolean onlyUserJobs = (myJobs && user != null && user.trim().length() > 0);
+            List<SortParameter<JobSortParameter>> sortParameterList;
+            if (Strings.isNullOrEmpty(sortParams)) {
+                sortParameterList = DEFAULT_JOB_SORT_PARAMS;
+            } else {
+                try {
+                    sortParameterList = createJobSortParams(sortParams);
+                } catch (Exception e) {
+                    logger.warn("Invalid sort parameter string, using default : " + sortParams);
+                    sortParameterList = DEFAULT_JOB_SORT_PARAMS;
+                }
+            }
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
                                            new JobFilterCriteria(onlyUserJobs, pending, running, finished),
-                                           DEFAULT_JOB_SORT_PARAMS);
+                                           sortParameterList);
             List<JobInfo> jobsInfo = page.getList();
             ArrayList<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
             for (JobInfo jobInfo : jobsInfo) {

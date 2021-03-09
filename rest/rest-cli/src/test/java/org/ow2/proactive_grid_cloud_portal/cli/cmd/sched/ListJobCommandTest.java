@@ -93,12 +93,26 @@ public class ListJobCommandTest {
         RestMapPage<Long, ArrayList<UserJobData>> page = new RestMapPage(stateMap, 1);
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
-        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid", index, 10, false, true, true, true))
+        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    index,
+                                                                    10,
+                                                                    false,
+                                                                    true,
+                                                                    true,
+                                                                    true,
+                                                                    null))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid", index, 10, false, true, true, true);
+        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
+                                                                       index,
+                                                                       10,
+                                                                       false,
+                                                                       true,
+                                                                       true,
+                                                                       true,
+                                                                       null);
     }
 
     @Test
@@ -115,12 +129,26 @@ public class ListJobCommandTest {
         RestMapPage<Long, ArrayList<UserJobData>> page = new RestMapPage(stateMap, 1);
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
-        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid", index, 1, false, true, true, true))
+        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    index,
+                                                                    1,
+                                                                    false,
+                                                                    true,
+                                                                    true,
+                                                                    true,
+                                                                    null))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid", index, 1, false, true, true, true);
+        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
+                                                                       index,
+                                                                       1,
+                                                                       false,
+                                                                       true,
+                                                                       true,
+                                                                       true,
+                                                                       null);
 
     }
 
@@ -138,12 +166,26 @@ public class ListJobCommandTest {
         RestMapPage<Long, ArrayList<UserJobData>> page = new RestMapPage(stateMap, 1);
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
-        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid", index, 3, false, true, true, true))
+        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    index,
+                                                                    3,
+                                                                    false,
+                                                                    true,
+                                                                    true,
+                                                                    true,
+                                                                    null))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid", index, 3, false, true, true, true);
+        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
+                                                                       index,
+                                                                       3,
+                                                                       false,
+                                                                       true,
+                                                                       true,
+                                                                       true,
+                                                                       null);
     }
 
     @Test
@@ -160,12 +202,26 @@ public class ListJobCommandTest {
         RestMapPage<Long, ArrayList<UserJobData>> page = new RestMapPage(stateMap, 1);
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
-        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid", index, 10, false, true, true, true))
+        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    index,
+                                                                    10,
+                                                                    false,
+                                                                    true,
+                                                                    true,
+                                                                    true,
+                                                                    null))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid", index, 10, false, true, true, true);
+        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
+                                                                       index,
+                                                                       10,
+                                                                       false,
+                                                                       true,
+                                                                       true,
+                                                                       true,
+                                                                       null);
 
     }
 
@@ -183,12 +239,26 @@ public class ListJobCommandTest {
         RestMapPage<Long, ArrayList<UserJobData>> page = new RestMapPage(stateMap, 1);
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
-        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid", index, 10, false, true, true, true))
+        Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    index,
+                                                                    10,
+                                                                    false,
+                                                                    true,
+                                                                    true,
+                                                                    true,
+                                                                    null))
                .thenReturn(page);
 
         new ListJobCommand().execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid", index, 10, false, true, true, true);
+        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
+                                                                       index,
+                                                                       10,
+                                                                       false,
+                                                                       true,
+                                                                       true,
+                                                                       true,
+                                                                       null);
     }
 
     @Test(expected = IllegalArgumentException.class)
