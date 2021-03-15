@@ -18,7 +18,7 @@
     </context-param>
     <context-param>
         <param-name>resteasy.gzip.max.input</param-name>
-        <param-value>500000000</param-value>
+        <param-value>1000000000</param-value>
     </context-param>
     <context-param>
         <!-- This context parameter is added because of stricter request matching rules introduced in resteasy 3.0.25
