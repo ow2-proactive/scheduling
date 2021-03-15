@@ -38,8 +38,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.Priority;
 import javax.net.ssl.*;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -47,6 +49,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.ReaderInterceptorContext;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -61,10 +64,12 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.core.interception.ServerReaderInterceptorContext;
 import org.jboss.resteasy.plugins.interceptors.encoding.AcceptEncodingGZIPFilter;
 import org.jboss.resteasy.plugins.interceptors.encoding.GZIPDecodingInterceptor;
 import org.jboss.resteasy.plugins.interceptors.encoding.GZIPEncodingInterceptor;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
+import org.jboss.resteasy.resteasy_jaxrs.i18n.LogMessages;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
@@ -138,11 +143,41 @@ public class SchedulerRestClient {
         if (!providerFactory.isRegistered(AcceptEncodingGZIPFilter.class)) {
             providerFactory.registerProvider(AcceptEncodingGZIPFilter.class);
         }
-        if (!providerFactory.isRegistered(GZIPDecodingInterceptor.class)) {
-            providerFactory.registerProvider(GZIPDecodingInterceptor.class);
+        if (!providerFactory.isRegistered(PAGZIPDecodingInterceptor.class)) {
+            providerFactory.registerProvider(PAGZIPDecodingInterceptor.class);
         }
         if (!providerFactory.isRegistered(GZIPEncodingInterceptor.class)) {
             providerFactory.registerProvider(GZIPEncodingInterceptor.class);
+        }
+    }
+
+    @Provider
+    @Priority(Priorities.ENTITY_CODER)
+    // this class is added to override rest easy default implementation which limits the gzip maximum size
+    public static class PAGZIPDecodingInterceptor extends GZIPDecodingInterceptor {
+
+        @Override
+        public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
+            LogMessages.LOGGER.debugf("Interceptor : %s,  Method : aroundReadFrom", getClass().getName());
+            Object encoding = context.getHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
+            if (encoding != null && encoding.toString().equalsIgnoreCase("gzip")) {
+                InputStream old = context.getInputStream();
+                FinishableGZIPInputStream is = new FinishableGZIPInputStream(old,
+                                                                             context instanceof ServerReaderInterceptorContext,
+                                                                             Integer.MAX_VALUE);
+                context.setInputStream(is);
+                try {
+                    return context.proceed();
+                } finally {
+                    // Don't finish() an InputStream - TODO this still will require a garbage collect to finish the stream
+                    // see RESTEASY-554 for more details
+                    if (!context.getType().equals(InputStream.class))
+                        is.finish();
+                    context.setInputStream(old);
+                }
+            } else {
+                return context.proceed();
+            }
         }
     }
 
