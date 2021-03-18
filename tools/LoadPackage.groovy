@@ -168,6 +168,8 @@ class LoadPackage {
             def kind = metadata_map.get("kind")
             def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage") + " (" + SCHEDULER_VERSION + ")", "UTF-8")
             def contentType = metadata_map.get("contentType")
+            def projectName = metadata_map.get("projectName")
+
 
             // For POST queries
             this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.13.jar").absolutePath);
@@ -175,11 +177,15 @@ class LoadPackage {
 
             // POST QUERY
             def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&objectContentType=" + contentType
+            if(projectName != null) {
+                query_push_obj_query = query_push_obj_query + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
+            }
             createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, object_file)
             writeToOutput(" " + object_file.getName() + " created!")
         } else {
             // Retrieve object metadata
             def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage") + " (" + SCHEDULER_VERSION + ")", "UTF-8")
+            def projectName = metadata_map.get("projectName")
 
             // For POST queries
             this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.13.jar").absolutePath);
@@ -187,6 +193,9 @@ class LoadPackage {
 
             // POST QUERY
             def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources/"+ object_name + "/revisions?commitMessage=" + commitMessageEncoded
+            if(projectName != null) {
+                query_push_obj_query = query_push_obj_query + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
+            }
             createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, object_file)
             writeToOutput(" " + object_file.getName() + " updated!")
         }
