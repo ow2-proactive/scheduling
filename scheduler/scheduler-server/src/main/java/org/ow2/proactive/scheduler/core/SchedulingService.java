@@ -740,14 +740,15 @@ public class SchedulingService {
         }
     }
 
-    public boolean registerService(final JobId jobId, final int serviceId) throws UnknownJobException {
+    public boolean registerService(final JobId jobId, final int serviceId, boolean enableActions)
+            throws UnknownJobException {
         try {
             if (status.isUnusable()) {
                 return false;
             }
 
             return infrastructure.getClientOperationsThreadPool().submit(() -> {
-                return jobs.registerService(jobId, serviceId);
+                return jobs.registerService(jobId, serviceId, enableActions);
             }).get();
 
         } catch (ExecutionException e) {

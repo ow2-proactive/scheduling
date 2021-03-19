@@ -77,7 +77,7 @@ public class JobInfoData implements java.io.Serializable {
 
     private Map<String, String> visualizationIcons;
 
-    private Set<Integer> attachedServices;
+    private Map<Integer, Boolean> attachedServices;
 
     public void setToBeRemoved() {
         toBeRemoved = true;
@@ -263,11 +263,11 @@ public class JobInfoData implements java.io.Serializable {
         this.visualizationIcons = visualizationIcons;
     }
 
-    public Set<Integer> getAttachedServices() {
+    public Map<Integer, Boolean> getAttachedServices() {
         return attachedServices;
     }
 
-    public void setAttachedServices(Set<Integer> attachedServices) {
+    public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
     }
 

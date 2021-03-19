@@ -252,10 +252,11 @@ public interface JobInfo extends Serializable {
     void setVisualizationIcons(Map<String, String> visualizationIcons);
 
     /**
-     * Returns a list of attached PCA services IDs
-     * @return a list of pca service id
+     * Returns a map of attached PSA services
+     * {ServiceId, EnableActions}
+     * @return a map of psa service
      */
-    Set<Integer> getAttachedServices();
+    Map<Integer, Boolean> getAttachedServices();
 
     /**
      * Returns the set of signals used by the job

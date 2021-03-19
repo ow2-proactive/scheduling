@@ -927,14 +927,14 @@ class LiveJobs {
         }
     }
 
-    boolean registerService(JobId jobId, int serviceId) throws UnknownJobException {
+    boolean registerService(JobId jobId, int serviceId, boolean enableActions) throws UnknownJobException {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
             throw new UnknownJobException(jobId);
         }
         try {
             InternalJob job = jobData.job;
-            job.getAttachedServices().add(serviceId);
+            job.getAttachedServices().put(serviceId, enableActions);
             dbManager.updateAttachedServices(job);
             listener.jobStateUpdated(jobData.job.getOwner(),
                                      new NotificationData<>(SchedulerEvent.JOB_UPDATED, jobData.job.getJobInfo()));
