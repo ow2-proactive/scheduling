@@ -991,7 +991,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * Register a cloud automation service associated with the given job
      *
      * @param jobId id of the job
-     * @param serviceId id of the cloud automation service to register
+     * @param serviceInstanceid id of the PSA service instance to register
+     * @param enableActions if actions should be enabled on this service from the given job
      * @throws NotConnectedException
      *              if you are not authenticated.
      * @throws PermissionException
@@ -999,14 +1000,14 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *              if the job does not exist.
      */
-    void registerService(String jobId, int serviceId)
+    void registerService(String jobId, int serviceInstanceid, boolean enableActions)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**
      * Detach a cloud automation service previously associated with the given job
      *
      * @param jobId id of the job
-     * @param serviceId id of the cloud automation service to detach
+     * @param serviceInstanceid id of the PSA service to detach
      * @throws NotConnectedException
      *              if you are not authenticated.
      * @throws PermissionException
@@ -1014,7 +1015,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *              if the job does not exist.
      */
-    void detachService(String jobId, int serviceId)
+    void detachService(String jobId, int serviceInstanceid)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**

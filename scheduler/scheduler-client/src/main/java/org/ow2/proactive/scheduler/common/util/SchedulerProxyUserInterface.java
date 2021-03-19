@@ -447,18 +447,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public void registerService(String jobId, int serviceId)
+    public void registerService(String jobId, int serviceInstanceid, boolean enableActions)
             throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
-        uischeduler.registerService(jobId, serviceId);
+        uischeduler.registerService(jobId, serviceInstanceid, enableActions);
     }
 
     @Override
     @ImmediateService
-    public void detachService(String jobId, int serviceId)
+    public void detachService(String jobId, int serviceInstanceid)
             throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
-        uischeduler.detachService(jobId, serviceId);
+        uischeduler.detachService(jobId, serviceInstanceid);
     }
 
     @Override

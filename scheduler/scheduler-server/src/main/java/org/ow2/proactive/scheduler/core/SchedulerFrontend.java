@@ -887,28 +887,30 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public void registerService(String jobId, int serviceId)
+    public void registerService(String jobId, int serviceInstanceid, boolean enableActions)
             throws NotConnectedException, PermissionException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         frontendState.checkPermissions("registerService",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB);
-        logger.info("Request to register service " + serviceId + " on job " + jobId + " received from " + currentUser);
-        schedulingService.registerService(jobIdObject, serviceId);
+        logger.info("Request to register service instance " + serviceInstanceid + " on job " + jobId +
+                    " received from " + currentUser);
+        schedulingService.registerService(jobIdObject, serviceInstanceid, enableActions);
     }
 
     @Override
     @ImmediateService
-    public void detachService(String jobId, int serviceId)
+    public void detachService(String jobId, int serviceInstanceid)
             throws NotConnectedException, PermissionException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         frontendState.checkPermissions("detachService",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB);
-        logger.info("Request to detach service " + serviceId + " on job " + jobId + " received from " + currentUser);
-        schedulingService.detachService(jobIdObject, serviceId);
+        logger.info("Request to detach service instance " + serviceInstanceid + " on job " + jobId + " received from " +
+                    currentUser);
+        schedulingService.detachService(jobIdObject, serviceInstanceid);
     }
 
     /**

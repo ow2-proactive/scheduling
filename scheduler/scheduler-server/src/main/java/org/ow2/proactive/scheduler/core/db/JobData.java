@@ -29,10 +29,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -217,7 +216,7 @@ public class JobData implements Serializable {
 
     private List<JobContent> jobContent = Lists.newArrayList();
 
-    private Set<Integer> attachedServices;
+    private Map<Integer, Boolean> attachedServices;
 
     private long lastUpdatedTime;
 
@@ -247,7 +246,7 @@ public class JobData implements Serializable {
         }
         jobInfo.setGenericInformation(getGenericInformation());
         jobInfo.setVariables(createVariablesStringMap());
-        jobInfo.setAttachedServices(Collections.synchronizedSet(getAttachedServices()));
+        jobInfo.setAttachedServices(getAttachedServices());
         return jobInfo;
     }
 
@@ -336,7 +335,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
         jobRuntimeData.setParentId(job.getParentId());
-        jobRuntimeData.setAttachedServices(new LinkedHashSet<>(job.getAttachedServices()));
+        jobRuntimeData.setAttachedServices(job.getAttachedServices());
 
         return jobRuntimeData;
     }
@@ -699,11 +698,11 @@ public class JobData implements Serializable {
 
     @Column(name = "ATTACHED_SERVICES", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Set<Integer> getAttachedServices() {
+    public Map<Integer, Boolean> getAttachedServices() {
         return attachedServices;
     }
 
-    public void setAttachedServices(Set<Integer> attachedServices) {
+    public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
     }
 

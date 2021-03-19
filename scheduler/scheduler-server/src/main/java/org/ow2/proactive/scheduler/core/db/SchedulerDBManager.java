@@ -1678,7 +1678,7 @@ public class SchedulerDBManager {
             long jobId = jobId(job);
             session.getNamedQuery("updateJobDataAttachedServices")
                    .setParameter("jobId", jobId)
-                   .setParameter("attachedServices", new LinkedHashSet<>(job.getAttachedServices()))
+                   .setParameter("attachedServices", new LinkedHashMap<>(job.getAttachedServices()))
                    .executeUpdate();
             return null;
         });

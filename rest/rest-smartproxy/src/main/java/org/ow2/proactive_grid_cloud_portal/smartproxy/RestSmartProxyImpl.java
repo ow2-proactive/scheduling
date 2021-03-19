@@ -772,15 +772,15 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public void registerService(String jobId, int serviceId)
+    public void registerService(String jobId, int serviceInstanceid, boolean enableActions)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        _getScheduler().registerService(jobId, serviceId);
+        _getScheduler().registerService(jobId, serviceInstanceid, enableActions);
     }
 
     @Override
-    public void detachService(String jobId, int serviceId)
+    public void detachService(String jobId, int serviceInstanceid)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        _getScheduler().detachService(jobId, serviceId);
+        _getScheduler().detachService(jobId, serviceInstanceid);
     }
 
     /**
