@@ -7,7 +7,7 @@
 <variable model="PA:List(lowest,low,normal,high,highest)" name="WV_PRIORITY" value="high"/>
 <variable model="" name="REMOVE_DELAY" value="60d"/>
 <variable name="WV_SCH_ORGID" value="NGR"/>
-<variable name="WV_CONFIG_FILE" value="load_bmw_datafeeds.cfg"/>
+<variable name="WV_CONFIG_FILE" value="load_mini_datafeeds.cfg"/>
 <variable model="PA:List(Agreement,Cancellation,Sales,Service,ServiceAppointment,Teleservice,VSP,Waiver)" name="WV_FILE_TYPE" value="Service"/>
 </variables>
 <description><![CDATA[ Cadence job ]]></description>
