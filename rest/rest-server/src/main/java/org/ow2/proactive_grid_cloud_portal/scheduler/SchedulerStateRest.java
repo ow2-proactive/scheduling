@@ -401,11 +401,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public void registerService(String sessionId, String jobId, int serviceid) throws RestException {
+    public void registerService(String sessionId, String jobId, int serviceInstanceid, boolean enableActions)
+            throws RestException {
         Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + PATH_SERVICES);
         Session ss = sessionStore.get(sessionId);
         try {
-            ss.getScheduler().registerService(jobId, serviceid);
+            ss.getScheduler().registerService(jobId, serviceInstanceid, enableActions);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -416,11 +417,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public void detachService(String sessionId, String jobId, int serviceid) throws RestException {
+    public void detachService(String sessionId, String jobId, int serviceInstanceid) throws RestException {
         Scheduler s = checkAccess(sessionId, "DELETE jobs/" + jobId + PATH_SERVICES);
         Session ss = sessionStore.get(sessionId);
         try {
-            ss.getScheduler().detachService(jobId, serviceid);
+            ss.getScheduler().detachService(jobId, serviceInstanceid);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {

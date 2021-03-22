@@ -146,7 +146,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertNotNull(jobInfo);
         Assert.assertNotNull(jobInfo.getAttachedServices());
         Assert.assertEquals(1, jobInfo.getAttachedServices().size());
-        Assert.assertTrue(jobInfo.getAttachedServices().contains(12));
+        Assert.assertTrue(jobInfo.getAttachedServices().containsKey(12));
     }
 
     @Test(timeout = MAX_WAIT_TIME)

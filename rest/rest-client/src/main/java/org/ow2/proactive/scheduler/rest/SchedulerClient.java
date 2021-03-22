@@ -1321,20 +1321,20 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public void registerService(String jobId, int serviceId)
+    public void registerService(String jobId, int serviceInstanceid, boolean enableActions)
             throws NotConnectedException, PermissionException, UnknownJobException {
         try {
-            restApi().registerService(sid, jobId, serviceId);
+            restApi().registerService(sid, jobId, serviceInstanceid, enableActions);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }
     }
 
     @Override
-    public void detachService(String jobId, int serviceId)
+    public void detachService(String jobId, int serviceInstanceid)
             throws NotConnectedException, PermissionException, UnknownJobException {
         try {
-            restApi().detachService(sid, jobId, serviceId);
+            restApi().detachService(sid, jobId, serviceInstanceid);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }

@@ -153,7 +153,13 @@ public class TestStaxJobFactory {
 
     @Test
     public void testJobWithParsingIssue() throws Exception {
-        factory.createJob(jobWithParsingIssue);
+        Job job = factory.createJob(jobWithParsingIssue);
+        assertEquals("load_bmw_mini_datafeeds.ksh  -f load_mini_datafeeds.cfg  -t Service ",
+                     job.getVariables().get("WV_COMMAND").getValue());
+        assertEquals(" -f load_mini_datafeeds.cfg  -t Service ", job.getVariables().get("WV_ARGS").getValue());
+        assertEquals("process_DP,process_DLR_NGR", job.getGenericInformation().get("REQUIRED_LICENSES"));
+        assertEquals("60d", job.getGenericInformation().get("REMOVE_DELAY"));
+        assertEquals("load_bmw_mini_datafeeds.ksh  -f load_mini_datafeeds.cfg  -t Service   -- BMWLOAD", job.getName());
     }
 
     @Test

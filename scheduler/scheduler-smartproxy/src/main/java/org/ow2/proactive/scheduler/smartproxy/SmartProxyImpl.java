@@ -612,15 +612,15 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public void registerService(String jobId, int serviceId)
+    public void registerService(String jobId, int serviceInstanceid, boolean enableActions)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        schedulerProxy.registerService(jobId, serviceId);
+        schedulerProxy.registerService(jobId, serviceInstanceid, enableActions);
     }
 
     @Override
-    public void detachService(String jobId, int serviceId)
+    public void detachService(String jobId, int serviceInstanceid)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        schedulerProxy.detachService(jobId, serviceId);
+        schedulerProxy.detachService(jobId, serviceInstanceid);
     }
 
     @Override

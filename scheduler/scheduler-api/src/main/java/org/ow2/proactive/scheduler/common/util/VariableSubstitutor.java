@@ -217,11 +217,11 @@ public class VariableSubstitutor {
         substitutor.setVariableSuffixMatcher(new StrMatcher() {
             @Override
             public int isMatch(char[] buffer, int pos, int bufferStart, int bufferEnd) {
-                char aChar = buffer[pos];
                 // end of the buffer is the end of a variable
                 if (pos == bufferEnd) {
                     return 0;
                 }
+                char aChar = buffer[pos];
                 // any character part of a NCName is not an end
                 if (Character.isLetterOrDigit(aChar)) {
                     return -1;

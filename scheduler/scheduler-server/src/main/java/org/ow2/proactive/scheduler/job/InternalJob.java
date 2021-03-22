@@ -1362,7 +1362,7 @@ public abstract class InternalJob extends JobState {
         this.resultMap = resultMap;
     }
 
-    public Set<Integer> getAttachedServices() {
+    public Map<Integer, Boolean> getAttachedServices() {
         return jobInfo.getAttachedServices();
     }
 }

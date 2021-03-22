@@ -99,6 +99,8 @@ public class SchedulerRestClient {
 
     private static SSLContext sslContext;
 
+    private static GZIPDecodingInterceptor gzipDecodingInterceptor = new GZIPDecodingInterceptor(Integer.MAX_VALUE);
+
     public SchedulerRestClient(String restEndpointURL) {
         this(restEndpointURL, null);
     }
@@ -143,41 +145,15 @@ public class SchedulerRestClient {
         if (!providerFactory.isRegistered(AcceptEncodingGZIPFilter.class)) {
             providerFactory.registerProvider(AcceptEncodingGZIPFilter.class);
         }
-        if (!providerFactory.isRegistered(PAGZIPDecodingInterceptor.class)) {
-            providerFactory.registerProvider(PAGZIPDecodingInterceptor.class);
+        // Because of a bad deisgn in rest easy GZIPDecodingInterceptor, the following code ensures :
+        // - To remove the existing default GZIPDecodingInterceptor
+        // - instanciate a GZIPDecodingInterceptor with the appropriate max value
+        if (!providerFactory.isRegistered(gzipDecodingInterceptor)) {
+            providerFactory.getClasses().remove(GZIPDecodingInterceptor.class);
+            providerFactory.registerProviderInstance(gzipDecodingInterceptor);
         }
         if (!providerFactory.isRegistered(GZIPEncodingInterceptor.class)) {
             providerFactory.registerProvider(GZIPEncodingInterceptor.class);
-        }
-    }
-
-    @Provider
-    @Priority(Priorities.ENTITY_CODER)
-    // this class is added to override rest easy default implementation which limits the gzip maximum size
-    public static class PAGZIPDecodingInterceptor extends GZIPDecodingInterceptor {
-
-        @Override
-        public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
-            LogMessages.LOGGER.debugf("Interceptor : %s,  Method : aroundReadFrom", getClass().getName());
-            Object encoding = context.getHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
-            if (encoding != null && encoding.toString().equalsIgnoreCase("gzip")) {
-                InputStream old = context.getInputStream();
-                FinishableGZIPInputStream is = new FinishableGZIPInputStream(old,
-                                                                             context instanceof ServerReaderInterceptorContext,
-                                                                             Integer.MAX_VALUE);
-                context.setInputStream(is);
-                try {
-                    return context.proceed();
-                } finally {
-                    // Don't finish() an InputStream - TODO this still will require a garbage collect to finish the stream
-                    // see RESTEASY-554 for more details
-                    if (!context.getType().equals(InputStream.class))
-                        is.finish();
-                    context.setInputStream(old);
-                }
-            } else {
-                return context.proceed();
-            }
         }
     }
 

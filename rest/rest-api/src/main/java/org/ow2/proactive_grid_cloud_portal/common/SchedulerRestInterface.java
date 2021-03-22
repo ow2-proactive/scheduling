@@ -1991,20 +1991,21 @@ public interface SchedulerRestInterface {
             throws RestException;
 
     /**
-     * Register a cloud automation service associated with a job.<br>
+     * Register a PSA service associated with a job.<br>
      *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            id of the job
-     * @param serviceid
-     *            id of the cloud automation service to register
+     * @param serviceInstanceid
+     *            id of the PSA service instance to register
      */
     @POST
     @Path("jobs/{jobid}/services")
     @Produces("application/json")
     void registerService(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @QueryParam("serviceid") int serviceid) throws RestException;
+            @QueryParam("serviceInstanceid") int serviceInstanceid, @QueryParam("enableActions") boolean enableActions)
+            throws RestException;
 
     /**
      * Detach a cloud automation service previously associated with a job.<br>

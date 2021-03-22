@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.job;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,8 +44,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -140,7 +139,7 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> visualizationIcons = Collections.emptyMap();
 
-    private Set<Integer> attachedServices = Collections.synchronizedSet(Sets.newLinkedHashSet());
+    private Map<Integer, Boolean> attachedServices = new LinkedHashMap();
 
     public JobInfoImpl() {
     }
@@ -519,11 +518,11 @@ public class JobInfoImpl implements JobInfo {
     }
 
     @Override
-    public Set<Integer> getAttachedServices() {
+    public Map<Integer, Boolean> getAttachedServices() {
         return attachedServices;
     }
 
-    public void setAttachedServices(Set<Integer> attachedServices) {
+    public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
     }
 }
