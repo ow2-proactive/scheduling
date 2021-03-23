@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -44,6 +45,7 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -100,10 +102,12 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     private static final String STATUS_RECORD_NAME = "STORE";
 
     /** HashMap storing the in-memory channels */
-    private HashMap<String, Channel> inMemoryChannels;
+    private ConcurrentHashMap<String, Channel> inMemoryChannels;
 
     /** JDBM map storing the persistent channels */
     private PrimaryHashMap<String, Channel> persistedChannels;
+
+    private Map<String, Channel> synchronizedPersistedChannels;
 
     /** Queue used to memorize and handle wait requests to the active object */
     private Queue<TimedOutRequest> waitUntilQueue = new ArrayDeque<>();
@@ -114,7 +118,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     private RecordManager recordManager;
 
-    private boolean isStarted = false;
+    private volatile boolean isStarted = false;
 
     @java.lang.SuppressWarnings("unused")
     public AOSynchronization() {
@@ -125,7 +129,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     public AOSynchronization(String statusFileDirectoryPath) {
         initializeGroovyCompiler();
         initializeStatusFile(statusFileDirectoryPath);
-        inMemoryChannels = new HashMap<>();
+        inMemoryChannels = new ConcurrentHashMap<>();
 
     }
 
@@ -169,6 +173,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
             logger.info("Content of persisted store : " + persistedChannels);
 
             recordManager.commit();
+            synchronizedPersistedChannels = Collections.synchronizedMap(persistedChannels);
             if (!firstAttempt) {
                 logger.info("Loading of job database successful after clean.");
             }
@@ -187,6 +192,17 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         isStarted = true;
     }
 
+    private void waitUntilStarted() {
+        while (!isStarted) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    @ImmediateService
     public boolean isStarted() {
         return isStarted;
     }
@@ -231,8 +247,8 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     private Channel getChannel(String name) throws InvalidChannelException {
         if (inMemoryChannels.containsKey(name)) {
             return inMemoryChannels.get(name);
-        } else if (persistedChannels.containsKey(name)) {
-            return persistedChannels.get(name);
+        } else if (synchronizedPersistedChannels.containsKey(name)) {
+            return synchronizedPersistedChannels.get(name);
         }
         throw new InvalidChannelException("Channel " + name + " does not exist");
     }
@@ -245,7 +261,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
             boolean alreadyExistingChannel = deleteChannel(originator, taskid, name);
             Channel newChannel = new Channel();
             if (isPersistent) {
-                persistedChannels.put(name, newChannel);
+                synchronizedPersistedChannels.put(name, newChannel);
                 logWithContextAndPersist(taskid,
                                          null,
                                          "Created new persistent channel " + QUOTE + name + QUOTE,
@@ -267,8 +283,8 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     @Override
     public boolean deleteChannel(String originator, TaskId taskid, String name) throws IOException {
         try {
-            if (persistedChannels.containsKey(name)) {
-                persistedChannels.remove(name);
+            if (synchronizedPersistedChannels.containsKey(name)) {
+                synchronizedPersistedChannels.remove(name);
                 logWithContextAndPersist(taskid,
                                          null,
                                          "Deleted persistent channel " + QUOTE + name + QUOTE,
@@ -288,14 +304,16 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     }
 
     @Override
+    @ImmediateService
     public boolean channelExists(String originator, TaskId taskid, String name) {
-        return inMemoryChannels.containsKey(name) || persistedChannels.containsKey(name);
+        waitUntilStarted();
+        return inMemoryChannels.containsKey(name) || synchronizedPersistedChannels.containsKey(name);
     }
 
     @Override
     public boolean createChannelIfAbsent(String originator, TaskId taskid, String name, boolean isPersistent)
             throws IOException {
-        if (inMemoryChannels.containsKey(name) || persistedChannels.containsKey(name)) {
+        if (inMemoryChannels.containsKey(name) || synchronizedPersistedChannels.containsKey(name)) {
             return false;
         } else {
             return createChannel(originator, taskid, name, isPersistent);
@@ -308,40 +326,50 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
      * @throws IOException if an error occurs when persisting channel
      */
     private void commitIfNeeded(String channel) throws IOException {
-        if (persistedChannels.containsKey(channel)) {
+        if (synchronizedPersistedChannels.containsKey(channel)) {
             // Record Manager mark as dirty (uncommited) entries which have be modified via a put call
             // Thus, such operation as persistedChannels.get(channel).dosomething() will not be committed
             // by the following trick, we mark the entry as dirty and commit
-            persistedChannels.put(channel, persistedChannels.get(channel));
+            synchronizedPersistedChannels.put(channel, synchronizedPersistedChannels.get(channel));
             recordManager.commit();
         }
     }
 
     @Override
+    @ImmediateService
     public boolean containsKey(String originator, TaskId taskid, String channel, String key)
             throws InvalidChannelException {
+        waitUntilStarted();
         return getChannel(channel).containsKey(key);
     }
 
     @Override
+    @ImmediateService
     public int size(String originator, TaskId taskid, String channel) throws InvalidChannelException {
+        waitUntilStarted();
         return getChannel(channel).size();
     }
 
     @Override
+    @ImmediateService
     public boolean isEmpty(String originator, TaskId taskid, String channel) throws InvalidChannelException {
+        waitUntilStarted();
         return getChannel(channel).isEmpty();
     }
 
     @Override
+    @ImmediateService
     public boolean containsValue(String originator, TaskId taskid, String channel, Serializable value)
             throws InvalidChannelException {
+        waitUntilStarted();
         return getChannel(channel).containsValue(value);
     }
 
     @Override
+    @ImmediateService
     public Serializable get(String originator, TaskId taskid, String channel, String key)
             throws InvalidChannelException {
+        waitUntilStarted();
         return getChannel(channel).get(key);
     }
 
@@ -381,25 +409,33 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     }
 
     @Override
+    @ImmediateService
     public Set<String> keySet(String originator, TaskId taskid, String channel) throws InvalidChannelException {
+        waitUntilStarted();
         return new HashSet(getChannel(channel).keySet());
     }
 
     @Override
+    @ImmediateService
     public Collection<Serializable> values(String originator, TaskId taskid, String channel)
             throws InvalidChannelException {
+        waitUntilStarted();
         return getChannel(channel).values();
     }
 
     @Override
+    @ImmediateService
     public Set<Map.Entry<String, Serializable>> entrySet(String originator, TaskId taskid, String channel)
             throws InvalidChannelException {
+        waitUntilStarted();
         return getChannel(channel).entrySet();
     }
 
     @Override
+    @ImmediateService
     public Serializable getOrDefault(String originator, TaskId taskid, String channel, String key,
             Serializable defaultValue) throws InvalidChannelException {
+        waitUntilStarted();
         return getChannel(channel).getOrDefault(key, defaultValue);
     }
 
@@ -814,26 +850,38 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         Service service = new Service(body);
         while (body.isActive()) {
             try {
-                NewRequestWithWaitTime requestWithWaitTime = waitForNewRequest(service);
-                Request request = requestWithWaitTime.getNewRequest();
-                if (request != null && request.getMethodName().equals("freeze")) {
-                    service.serve(request);
-                    service.blockingServeOldest("resume");
-                } else if (request != null && request.getMethodName().startsWith("wait") &&
-                           !testWaitFunction(service, request)) {
-                    // If the predicate is not met, delay the wait method execution
-                    TimedOutRequest timedOutRequest = new TimedOutRequest(request,
-                                                                          extractWaitRequestTimeoutParameter(request));
-                    logger.trace("New pending wait request : " + timedOutRequest);
-                    waitUntilQueue.add(new TimedOutRequest(request, extractWaitRequestTimeoutParameter(request)));
-                } else if (request != null) {
-                    service.serve(request);
+                List<NewRequestWithWaitTime> requestsWithWaitTime = waitForNewRequests(service);
+                for (NewRequestWithWaitTime requestWithWaitTime : requestsWithWaitTime) {
+                    Request request = requestWithWaitTime.getNewRequest();
+                    if (request != null && request.getMethodName().equals("freeze")) {
+                        service.serve(request);
+                        service.blockingServeOldest("resume");
+                    } else if (request != null && request.getMethodName().startsWith("wait") &&
+                               !testWaitFunction(service, request)) {
+                        // If the predicate is not met, delay the wait method execution
+                        TimedOutRequest timedOutRequest = new TimedOutRequest(request,
+                                                                              extractWaitRequestTimeoutParameter(request));
+                        logger.trace("New pending wait request : " + timedOutRequest);
+                        waitUntilQueue.add(new TimedOutRequest(request, extractWaitRequestTimeoutParameter(request)));
+                    } else if (request != null) {
+                        service.serve(request);
+                    }
                 }
-                unblockWaitMethods(service, requestWithWaitTime.getWaitTime());
+                unblockWaitMethods(service, computeMaxTimeSpentWaiting(requestsWithWaitTime));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    private long computeMaxTimeSpentWaiting(List<NewRequestWithWaitTime> requestsWithWaitTime) {
+        long maxWait = 0;
+        for (NewRequestWithWaitTime requestWithWaitTime : requestsWithWaitTime) {
+            if (requestWithWaitTime.waitTime > maxWait) {
+                maxWait = requestWithWaitTime.waitTime;
+            }
+        }
+        return maxWait;
     }
 
     @Override
@@ -850,6 +898,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         recordManager = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
         persistedChannels = recordManager.hashMap(STATUS_RECORD_NAME);
         recordManager.commit();
+        synchronizedPersistedChannels = Collections.synchronizedMap(persistedChannels);
         isStarted = true;
     }
 
@@ -859,17 +908,20 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
      * @return composite object containing the request and the waited time
      * @throws InterruptedException if the thread is interrupted while waiting for request
      */
-    private NewRequestWithWaitTime waitForNewRequest(Service service) throws InterruptedException {
+    private List<NewRequestWithWaitTime> waitForNewRequests(Service service) throws InterruptedException {
         // we cannot wait more then min(pending_wait_requests_timeouts)
         long maximumTimeToWaitForNewRequests = computeMinimumTimeout();
+        List<NewRequestWithWaitTime> newRequests = new ArrayList<>();
 
-        logger.trace("Waiting for new request with timeout = " + maximumTimeToWaitForNewRequests + " ms");
-        long timeSpentWaiting = System.currentTimeMillis();
-        Request request = service.blockingRemoveOldest(maximumTimeToWaitForNewRequests);
-        timeSpentWaiting = System.currentTimeMillis() - timeSpentWaiting;
-        logger.trace("Time spent waiting for new request: " + timeSpentWaiting + " ms");
-
-        return new NewRequestWithWaitTime(request, timeSpentWaiting);
+        logger.trace("Waiting for new requests with timeout = " + maximumTimeToWaitForNewRequests + " ms");
+        long waitStart = System.currentTimeMillis();
+        do {
+            Request request = service.blockingRemoveOldest(maximumTimeToWaitForNewRequests);
+            long timeSpentWaiting = System.currentTimeMillis() - waitStart;
+            logger.trace("Time spent waiting for new request: " + timeSpentWaiting + " ms");
+            newRequests.add(new NewRequestWithWaitTime(request, timeSpentWaiting));
+        } while (service.hasRequestToServe());
+        return newRequests;
     }
 
     @java.lang.SuppressWarnings({ "squid:S1481", "squid:S1854", "unused", "unchecked" })
@@ -986,7 +1038,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         close();
     }
 
-    public static class Channel extends HashMap<String, Serializable> {
+    public static class Channel extends ConcurrentHashMap<String, Serializable> {
         private static final long serialVersionUID = 1L;
     }
 
