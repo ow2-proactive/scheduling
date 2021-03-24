@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.signal;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -98,8 +99,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean isReceived(String signalName) throws SignalApiException {
-        init();
-        HashSet<String> signals = getJobSignals();
+        Set<String> signals = getJobSignals();
         if (!signals.isEmpty()) {
             return signals.contains(signalName);
         } else {
@@ -109,8 +109,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public String checkForSignals(Set<String> signalsSubSet) throws SignalApiException {
-        init();
-        HashSet<String> signals = getJobSignals();
+        Set<String> signals = getJobSignals();
 
         if (!signals.isEmpty()) {
             return signalsSubSet.stream().filter(signals::contains).findFirst().orElse(null);
@@ -190,11 +189,15 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public HashSet<String> getJobSignals() throws SignalApiException {
+    public Set<String> getJobSignals() throws SignalApiException {
         try {
-            init();
             //noinspection unchecked
-            return (HashSet<String>) synchronization.get(SIGNALS_CHANNEL, jobId);
+            HashSet<String> signals = (HashSet<String>) synchronization.get(SIGNALS_CHANNEL, jobId);
+            if (signals != null) {
+                return signals;
+            }
+            init();
+            return Collections.emptySet();
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         }
