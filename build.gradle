@@ -141,6 +141,8 @@ configure(javaSubprojects) {
     apply plugin: 'jacoco'
     apply plugin: 'net.ossindex.audit'
 
+    apply from: custom("jacoco-scheduling")
+
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
