@@ -758,18 +758,24 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
          * waitUntil is run on its dedicated thread (ImmediateService), it runs its predicate periodically until success
          */
         waitUntilStarted();
-        Channel chosenChannel = getChannel(channel);
-        Serializable value = chosenChannel.get(key);
-        try {
-            while (!evaluateClosure(predicate, BiPredicate.class).test(key, value)) {
-                Thread.sleep(WAIT_STEP);
+        boolean predicateResult = false;
+        do {
+            Channel chosenChannel = getChannel(channel);
+            Serializable value = chosenChannel.get(key);
+            try {
+                predicateResult = evaluateClosure(predicate, BiPredicate.class).test(key, value);
+                if (!predicateResult) {
+                    Thread.sleep(WAIT_STEP);
+                }
+            } catch (CompilationException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new ClosureEvaluationException(EXCEPTION_WHEN_EVALUATING_CLOSURE +
+                                                     StackTraceUtil.getStackTrace(e));
             }
-            return true;
-        } catch (CompilationException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClosureEvaluationException(EXCEPTION_WHEN_EVALUATING_CLOSURE + StackTraceUtil.getStackTrace(e));
-        }
+        } while (!predicateResult);
+
+        return true;
     }
 
     @Override
@@ -781,24 +787,29 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
          * it runs its predicate periodically until success or timeout
          */
         waitUntilStarted();
-        Channel chosenChannel = getChannel(channel);
-        Serializable value = chosenChannel.get(key);
+        boolean predicateResult = false;
         long startTime = System.currentTimeMillis();
-        try {
-            while (!evaluateClosure(predicate, BiPredicate.class).test(key, value)) {
-                if (System.currentTimeMillis() - startTime > timeout) {
-                    throw new TimeoutException("Timeout of " + timeout + " ms expired while waiting for predicate");
+        do {
+            Channel chosenChannel = getChannel(channel);
+            Serializable value = chosenChannel.get(key);
+            try {
+                predicateResult = evaluateClosure(predicate, BiPredicate.class).test(key, value);
+                if (!predicateResult) {
+                    if (System.currentTimeMillis() - startTime > timeout) {
+                        throw new TimeoutException("Timeout of " + timeout + " ms expired while waiting for predicate");
+                    }
+                    Thread.sleep(WAIT_STEP);
                 }
-                Thread.sleep(WAIT_STEP);
+            } catch (CompilationException e) {
+                throw e;
+            } catch (TimeoutException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new ClosureEvaluationException(EXCEPTION_WHEN_EVALUATING_CLOSURE +
+                                                     StackTraceUtil.getStackTrace(e));
             }
-            return true;
-        } catch (CompilationException e) {
-            throw e;
-        } catch (TimeoutException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClosureEvaluationException(EXCEPTION_WHEN_EVALUATING_CLOSURE + StackTraceUtil.getStackTrace(e));
-        }
+        } while (!predicateResult);
+        return true;
     }
 
     @Override
@@ -1044,7 +1055,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     }
 
     /**
-     * Execute the waitUntil function corresponding to the provided request
+     * Execute the waitUntilThen function corresponding to the provided request
      *
      * If an error occurs, serve the request to unblock the caller with the exception attached
      *

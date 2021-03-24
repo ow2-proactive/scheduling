@@ -820,14 +820,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     Set<TaskId> getJobTasks(JobId jobId) {
-        return Lambda.withLock(stateReadLock, () -> {
+        return (Set<TaskId>) Lambda.withLock(stateReadLock, () -> {
+            Set<TaskId> tasks;
             ClientJobState jobState = getClientJobState(jobId);
             if (jobState == null) {
                 return new HashSet<>();
             } else {
                 jobState.readLock();
                 try {
-                    Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
+                    tasks = new HashSet<>(jobState.getTasks().size());
                     for (TaskState task : jobState.getTasks()) {
                         tasks.add(task.getId());
                     }
