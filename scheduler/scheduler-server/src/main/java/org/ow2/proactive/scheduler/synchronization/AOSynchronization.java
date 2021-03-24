@@ -101,6 +101,8 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     /** Schema used inside the JDBM database */
     private static final String STATUS_RECORD_NAME = "STORE";
 
+    private static long WAIT_STEP = 500L;
+
     /** HashMap storing the in-memory channels */
     private ConcurrentHashMap<String, Channel> inMemoryChannels;
 
@@ -731,9 +733,10 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         }
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean waitUntil(String originator, TaskId taskid, String channel, String key, String predicate)
+    /**
+     * Execute a predicate and return its answer
+     */
+    private boolean executeWaitPredicate(String originator, TaskId taskid, String channel, String key, String predicate)
             throws InvalidChannelException, CompilationException {
         Channel chosenChannel = getChannel(channel);
         Serializable value = chosenChannel.get(key);
@@ -747,10 +750,55 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    @ImmediateService
+    public boolean waitUntil(String originator, TaskId taskid, String channel, String key, String predicate)
+            throws InvalidChannelException, CompilationException {
+        /**
+         * waitUntil is run on its dedicated thread (ImmediateService), it runs its predicate periodically until success
+         */
+        waitUntilStarted();
+        Channel chosenChannel = getChannel(channel);
+        Serializable value = chosenChannel.get(key);
+        try {
+            while (!evaluateClosure(predicate, BiPredicate.class).test(key, value)) {
+                Thread.sleep(WAIT_STEP);
+            }
+            return true;
+        } catch (CompilationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ClosureEvaluationException(EXCEPTION_WHEN_EVALUATING_CLOSURE + StackTraceUtil.getStackTrace(e));
+        }
+    }
+
+    @Override
+    @ImmediateService
     public boolean waitUntil(String originator, TaskId taskid, String channel, String key, String predicate,
             long timeout) throws InvalidChannelException, CompilationException, TimeoutException {
-        // timeout is ignored inside the method implementation, it is handled by the runActivity method
-        return waitUntil(originator, taskid, channel, key, predicate);
+        /**
+         * waitUntil with timeout is run on its dedicated thread (ImmediateService).
+         * it runs its predicate periodically until success or timeout
+         */
+        waitUntilStarted();
+        Channel chosenChannel = getChannel(channel);
+        Serializable value = chosenChannel.get(key);
+        long startTime = System.currentTimeMillis();
+        try {
+            while (!evaluateClosure(predicate, BiPredicate.class).test(key, value)) {
+                if (System.currentTimeMillis() - startTime > timeout) {
+                    throw new TimeoutException("Timeout of " + timeout + " ms expired while waiting for predicate");
+                }
+                Thread.sleep(WAIT_STEP);
+            }
+            return true;
+        } catch (CompilationException e) {
+            throw e;
+        } catch (TimeoutException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ClosureEvaluationException(EXCEPTION_WHEN_EVALUATING_CLOSURE + StackTraceUtil.getStackTrace(e));
+        }
     }
 
     @Override
@@ -758,6 +806,10 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     public PredicateActionResult waitUntilThen(String originator, TaskId taskid, String channel, String key,
             String predicate, String thenRemappingFunction)
             throws InvalidChannelException, CompilationException, IOException {
+        /**
+         * as waitUntilThen can operate a change on the channel, it is handled with the ActiveObject request queue (see runActivity)
+         * This it is handled differently from waitUntil
+         */
         PredicateActionResult answer;
         try {
             Channel chosenChannel = getChannel(channel);
@@ -787,7 +839,11 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     public PredicateActionResult waitUntilThen(String originator, TaskId taskid, String channel, String key,
             String predicate, long timeout, String thenRemappingFunction)
             throws InvalidChannelException, CompilationException, IOException, TimeoutException {
-        // timeout is ignored inside the method implementation, it is handled by the runActivity method
+        /**
+         * as waitUntilThen can operate a change on the channel, it is handled with the ActiveObject request queue (see runActivity)
+         * This it is handled differently from waitUntil
+         * timeout is ignored inside the method implementation (it is handled by the runActivity method)
+         */
         return waitUntilThen(originator, taskid, channel, key, predicate, thenRemappingFunction);
     }
 
@@ -856,7 +912,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
                     if (request != null && request.getMethodName().equals("freeze")) {
                         service.serve(request);
                         service.blockingServeOldest("resume");
-                    } else if (request != null && request.getMethodName().startsWith("wait") &&
+                    } else if (request != null && request.getMethodName().startsWith("waitUntilThen") &&
                                !testWaitFunction(service, request)) {
                         // If the predicate is not met, delay the wait method execution
                         TimedOutRequest timedOutRequest = new TimedOutRequest(request,
@@ -1023,7 +1079,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         String channel = (String) request.getParameter(paramIndex++);
         String key = (String) request.getParameter(paramIndex++);
         String predicate = (String) request.getParameter(paramIndex);
-        return this.waitUntil(originator, taskId, channel, key, predicate);
+        return this.executeWaitPredicate(originator, taskId, channel, key, predicate);
     }
 
     @Override
