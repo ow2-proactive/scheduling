@@ -191,6 +191,21 @@ class LiveJobs {
         }
     }
 
+    JobStatus getJobStatus(JobId jobId) {
+        if (!jobs.containsKey(jobId)) {
+            return null;
+        }
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            return null;
+        }
+        try {
+            return jobData.job.getStatus();
+        } finally {
+            jobData.unlock();
+        }
+    }
+
     boolean isTaskAlive(TaskId taskId) {
         JobData jobData = lockJob(taskId.getJobId());
         if (jobData == null) {
@@ -198,6 +213,18 @@ class LiveJobs {
         }
         try {
             return jobData.job.getHMTasks().get(taskId).isTaskAlive();
+        } finally {
+            jobData.unlock();
+        }
+    }
+
+    TaskStatus getTaskStatus(TaskId taskId) {
+        JobData jobData = lockJob(taskId.getJobId());
+        if (jobData == null) {
+            return null;
+        }
+        try {
+            return jobData.job.getHMTasks().get(taskId).getStatus();
         } finally {
             jobData.unlock();
         }

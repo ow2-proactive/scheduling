@@ -53,9 +53,11 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -508,8 +510,16 @@ public class SchedulingService {
         return jobs.isJobAlive(jobId);
     }
 
+    public JobStatus getJobStatus(JobId jobId) {
+        return jobs.getJobStatus(jobId);
+    }
+
     public boolean isTaskAlive(TaskId taskId) {
         return jobs.isTaskAlive(taskId);
+    }
+
+    public TaskStatus getTaskStatus(TaskId taskId) {
+        return jobs.getTaskStatus(taskId);
     }
 
     public void submitJob(InternalJob job) {
