@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -268,4 +269,16 @@ public interface JobInfo extends Serializable {
      * Sets the set of job signals
      */
     void setSignals(Set<String> signals);
+
+    /**
+     * Return the list of tasks names with precious results
+     * @return list of task names
+     */
+    List<String> getPreciousTasks();
+
+    /**
+     * Return true if a non-empty result map is attached to this job
+     * @return non-empty result map test
+     */
+    boolean isResultMapPresent();
 }

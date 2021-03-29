@@ -1362,6 +1362,16 @@ public abstract class InternalJob extends JobState {
         this.resultMap = resultMap;
     }
 
+    public List<String> getPreciousTasks() {
+        List<String> preciousTasks = new ArrayList<>();
+        for (InternalTask task : tasks.values()) {
+            if (task.isPreciousResult()) {
+                preciousTasks.add(task.getName());
+            }
+        }
+        return preciousTasks;
+    }
+
     public Map<Integer, Boolean> getAttachedServices() {
         return jobInfo.getAttachedServices();
     }

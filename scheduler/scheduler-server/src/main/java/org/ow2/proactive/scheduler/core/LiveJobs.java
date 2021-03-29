@@ -512,6 +512,7 @@ class LiveJobs {
         }
         task.setStatus(status);
         job.newWaitingTask();
+        ((JobInfoImpl) job.getJobInfo()).setPreciousTasks(job.getPreciousTasks());
         dbManager.updateAfterTaskFinished(job, task, result);
         listener.taskStateUpdated(job.getOwner(),
                                   new NotificationData<TaskInfo>(SchedulerEvent.TASK_WAITING_FOR_RESTART,
@@ -798,6 +799,7 @@ class LiveJobs {
             // to be done before terminating the task, once terminated it is not
             // running anymore..
             ChangedTasksInfo changesInfo = job.finishInErrorTask(taskId, taskResult, listener);
+            ((JobInfoImpl) job.getJobInfo()).setPreciousTasks(job.getPreciousTasks());
 
             boolean jobFinished = job.isFinished();
 
@@ -1088,6 +1090,7 @@ class LiveJobs {
         //merge task map result to job map result
         job.getResultMap().putAll(result.getResultMap());
         ChangedTasksInfo changesInfo = job.terminateTask(errorOccurred, taskId, listener, result.getAction(), result);
+        ((JobInfoImpl) job.getJobInfo()).setPreciousTasks(job.getPreciousTasks());
 
         boolean jobFinished = job.isFinished();
 

@@ -87,6 +87,10 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<Integer, Boolean> attachedServices;
 
+    private boolean resultMapPresent;
+
+    private List<String> preciousTasks;
+
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
     }
@@ -327,5 +331,23 @@ public class JobInfoImpl implements JobInfo {
 
     public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
+    }
+
+    @Override
+    public boolean isResultMapPresent() {
+        return resultMapPresent;
+    }
+
+    public void setResultMapPresent(boolean resultMapPresent) {
+        this.resultMapPresent = resultMapPresent;
+    }
+
+    @Override
+    public List<String> getPreciousTasks() {
+        return preciousTasks;
+    }
+
+    public void setPreciousTasks(List<String> preciousTasks) {
+        this.preciousTasks = preciousTasks;
     }
 }
