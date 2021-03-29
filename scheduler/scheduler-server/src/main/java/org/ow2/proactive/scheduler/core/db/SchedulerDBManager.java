@@ -95,6 +95,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -1004,6 +1005,7 @@ public class SchedulerDBManager {
         for (JobData jobData : jobsList) {
             InternalJob internalJob = jobData.toInternalJob();
             internalJob.setTasks(toInternalTasks(fullState, internalJob, tasksMap.get(jobData.getId())));
+            ((JobInfoImpl) internalJob.getJobInfo()).setPreciousTasks(internalJob.getPreciousTasks());
 
             jobs.add(internalJob);
         }
@@ -1176,6 +1178,7 @@ public class SchedulerDBManager {
                    .setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                   .setParameter("preciousTasks", jobInfo.getPreciousTasks())
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
@@ -1262,6 +1265,7 @@ public class SchedulerDBManager {
                                .setParameter("lastUpdatedTime", new Date().getTime())
                                .setParameter("resultMap",
                                              ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                               .setParameter("preciousTasks", job.getPreciousTasks())
                                .setParameter("jobId", jobId)
                                .executeUpdate();
 
@@ -1347,6 +1351,7 @@ public class SchedulerDBManager {
                                         .setParameter("lastUpdatedTime", new Date().getTime())
                                         .setParameter("resultMap",
                                                       ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                                        .setParameter("preciousTasks", job.getPreciousTasks())
                                         .setParameter("jobId", jobId)
                                         .executeUpdate();
                     if (result != 0) {
@@ -1623,6 +1628,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                   .setParameter("preciousTasks", job.getPreciousTasks())
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 

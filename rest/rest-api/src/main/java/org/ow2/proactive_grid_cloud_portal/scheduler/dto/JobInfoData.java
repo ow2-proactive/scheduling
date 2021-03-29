@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,6 +79,10 @@ public class JobInfoData implements java.io.Serializable {
     private Map<String, String> visualizationIcons;
 
     private Map<Integer, Boolean> attachedServices;
+
+    private boolean resultMapPresent;
+
+    private List<String> preciousTasks;
 
     public void setToBeRemoved() {
         toBeRemoved = true;
@@ -269,6 +274,22 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
+    }
+
+    public boolean isResultMapPresent() {
+        return resultMapPresent;
+    }
+
+    public void setResultMapPresent(boolean resultMapPresent) {
+        this.resultMapPresent = resultMapPresent;
+    }
+
+    public List<String> getPreciousTasks() {
+        return preciousTasks;
+    }
+
+    public void setPreciousTasks(List<String> preciousTasks) {
+        this.preciousTasks = preciousTasks;
     }
 
     @Override

@@ -112,14 +112,14 @@ import com.google.common.collect.Lists;
                                                                              "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                              "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                              "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap where id = :jobId"),
+                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, " +
                                                                                      "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                                      "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                                      "numberOfRunningTasks = :numberOfRunningTasks, totalNumberOfTasks =:totalNumberOfTasks, " +
                                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap " +
-                                                                                     "where id = :jobId"),
+                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, " +
+                                                                                     "preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskRestarted", query = "update JobData set status = :status, " +
                                                                          "numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                          "numberOfRunningTasks = :numberOfRunningTasks, " +
@@ -155,6 +155,8 @@ public class JobData implements Serializable {
     private Map<String, JobDataVariable> variables;
 
     private Map<String, byte[]> resultMap;
+
+    private List<String> preciousTasks;
 
     private String owner;
 
@@ -247,6 +249,10 @@ public class JobData implements Serializable {
         jobInfo.setGenericInformation(getGenericInformation());
         jobInfo.setVariables(createVariablesStringMap());
         jobInfo.setAttachedServices(getAttachedServices());
+        Map<String, byte[]> resultMap = getResultMap();
+        jobInfo.setResultMapPresent(resultMap != null && resultMap.size() > 0);
+        List<String> pTasks = getPreciousTasks();
+        jobInfo.setPreciousTasks(pTasks);
         return jobInfo;
     }
 
@@ -334,6 +340,7 @@ public class JobData implements Serializable {
         jobRuntimeData.addJobContent(job.getTaskFlowJob());
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
+        jobRuntimeData.setPreciousTasks(job.getPreciousTasks());
         jobRuntimeData.setParentId(job.getParentId());
         jobRuntimeData.setAttachedServices(job.getAttachedServices());
 
@@ -390,6 +397,16 @@ public class JobData implements Serializable {
 
     public void setResultMap(Map<String, byte[]> resultMap) {
         this.resultMap = resultMap;
+    }
+
+    @Column(name = "PRECIOUS_TASKS", length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public List<String> getPreciousTasks() {
+        return preciousTasks;
+    }
+
+    public void setPreciousTasks(List<String> preciousTasks) {
+        this.preciousTasks = preciousTasks;
     }
 
     @Column(name = "MAX_NUMBER_OF_EXEC", updatable = false, nullable = false)

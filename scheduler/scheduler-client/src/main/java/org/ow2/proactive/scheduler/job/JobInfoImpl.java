@@ -141,6 +141,10 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<Integer, Boolean> attachedServices = new LinkedHashMap();
 
+    private boolean resultMapPresent = false;
+
+    private List<String> preciousTasks = new ArrayList<>();
+
     public JobInfoImpl() {
     }
 
@@ -185,6 +189,8 @@ public class JobInfoImpl implements JobInfo {
         this.visualizationConnectionStrings = jobInfo.getVisualizationConnectionStrings();
         this.visualizationIcons = jobInfo.getVisualizationIcons();
         this.attachedServices = jobInfo.getAttachedServices();
+        this.resultMapPresent = jobInfo.isResultMapPresent();
+        this.preciousTasks = jobInfo.getPreciousTasks();
     }
 
     /**
@@ -524,5 +530,22 @@ public class JobInfoImpl implements JobInfo {
 
     public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
+    }
+
+    public boolean isResultMapPresent() {
+        return resultMapPresent;
+    }
+
+    public void setResultMapPresent(boolean resultMapPresent) {
+        this.resultMapPresent = resultMapPresent;
+    }
+
+    @Override
+    public List<String> getPreciousTasks() {
+        return preciousTasks;
+    }
+
+    public void setPreciousTasks(List<String> preciousTasks) {
+        this.preciousTasks = preciousTasks;
     }
 }
