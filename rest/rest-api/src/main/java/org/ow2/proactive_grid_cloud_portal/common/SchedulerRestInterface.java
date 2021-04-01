@@ -157,6 +157,22 @@ public interface SchedulerRestInterface {
             @QueryParam("jobsid") List<String> jobsId) throws RestException;
 
     /**
+     * Returns a list of jobs info corresponding to the given job IDs (in the same order)
+     *
+     * @param jobsId
+     *            the list of id of the jobs to return, in the same order
+     * @param sessionId
+     *            a valid session id
+     * @return a list of UserJobData
+     */
+    @POST
+    @Path("jobsinfolist")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ "application/json", "application/xml" })
+    List<UserJobData> jobsInfoListPost(@HeaderParam("sessionid") String sessionId, List<String> jobsId)
+            throws RestException;
+
+    /**
      * Returns a map containing one entry with the revision id as key and the
      * list of UserJobData as value. each jobs is described using - its id - its
      * owner - the JobInfo class

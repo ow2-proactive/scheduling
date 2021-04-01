@@ -276,6 +276,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public List<UserJobData> jobsInfoListPost(String sessionId, List<String> jobsId) throws RestException {
+        return jobsInfoList(sessionId, jobsId);
+    }
+
+    @Override
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
             boolean myJobs, boolean pending, boolean running, boolean finished, String sortParams)
             throws RestException {

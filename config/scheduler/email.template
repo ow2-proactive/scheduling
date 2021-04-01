@@ -1,6 +1,6 @@
 Dear ProActive User,
 
-This notification is to inform you that the ProActive Job ID: %JOB_ID% is %JOB_STATUS%.
+This notification is to inform you that the ProActive Job "%JOB_NAME%" with ID: %JOB_ID%, submitted by %JOB_OWNER%, is %JOB_STATUS%.
 
 Below, you find more details about the job tasks and their statuses:
 %JOB_TASKS%
