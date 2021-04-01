@@ -141,6 +141,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** List of the scripts paths to execute at scheduler start. Paths are separated by a ';'. */
     SCHEDULER_STARTSCRIPTS_PATHS("pa.scheduler.startscripts.paths", PropertyType.LIST),
 
+    /** Size of parsed workflow cache, used to optimize workflow submission time */
+    SCHEDULER_STAX_JOB_CACHE("pa.scheduler.stax.job.cache", PropertyType.INTEGER, "10000"),
+
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */

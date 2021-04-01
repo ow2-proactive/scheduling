@@ -53,8 +53,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.map.LRUMap;
 import org.apache.log4j.Logger;
-import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
@@ -84,6 +85,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scripting.ForkEnvironmentScript;
@@ -112,6 +114,12 @@ public class StaxJobFactory extends JobFactory {
     private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
     public static final String MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES = "Unable to instanciate job validation factories";
+
+    private static final Map<String, Job> jobCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STAX_JOB_CACHE.getValueAsInt()));
+
+    private static final Map<String, JobCreationException> validationCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STAX_JOB_CACHE.getValueAsInt()));
+
+    private static final JobCreationException EMPTY_EXCEPTION = new JobCreationException("EMPTY");
 
     private enum ScriptType {
         SELECTION,
@@ -218,6 +226,7 @@ public class StaxJobFactory extends JobFactory {
                                             scheduler,
                                             space);
         } catch (JobCreationException jce) {
+            jce.pushTag(XMLTags.JOB.getXMLName());
             throw jce;
         } catch (Exception e) {
             throw new JobCreationException(e);
@@ -249,24 +258,52 @@ public class StaxJobFactory extends JobFactory {
 
     private Job createJobFromInputStream(InputStream jobInputStream, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos, Scheduler scheduler, SchedulerSpaceInterface space)
-            throws JobCreationException, VerifierConfigurationException, IOException, XMLStreamException {
+            throws JobCreationException, IOException, XMLStreamException {
         long t0 = System.currentTimeMillis();
         byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
+        String md5Job = DigestUtils.md5Hex(bytes);
+        String md5Variables = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementVariables));
+        String md5GenericInfo = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementGenericInfos));
+        String md5GlobalVariables = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(getConfiguredGlobalJobVariables()));
+        String md5GlobalGenericInfo = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(getConfiguredGlobalGenericInfo()));
+        String md5 = md5Job + "_" + md5Variables + "_" + md5GenericInfo + "_" + md5GlobalVariables + "_" +
+                     md5GlobalGenericInfo;
         long t1 = System.currentTimeMillis();
-        try (ByteArrayInputStream jobInputStreamForValidation = new ByteArrayInputStream(bytes)) {
-            validate(jobInputStreamForValidation);
+        if (!validationCache.containsKey(md5)) {
+            try {
+
+                try (ByteArrayInputStream jobInputStreamForValidation = new ByteArrayInputStream(bytes)) {
+                    validate(jobInputStreamForValidation);
+                }
+                validationCache.put(md5, EMPTY_EXCEPTION);
+            } catch (JobCreationException e) {
+                validationCache.put(md5, e);
+                throw e;
+            }
+        } else {
+            JobCreationException e = validationCache.get(md5);
+            if (e != EMPTY_EXCEPTION) {
+                throw e;
+            }
         }
         long t2 = System.currentTimeMillis();
-        Map<String, ArrayList<String>> dependencies = new LinkedHashMap<>();
+        long t3;
         Job job;
-        try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
-            XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
-            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies, new String(bytes));
-            xmlsr.close();
-        }
-        long t3 = System.currentTimeMillis();
+        if (!jobCache.containsKey(md5)) {
+            Map<String, ArrayList<String>> dependencies = new LinkedHashMap<>();
+            try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
+                XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
+                job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies, new String(bytes));
+                xmlsr.close();
+            }
+            t3 = System.currentTimeMillis();
 
-        makeDependences(job, dependencies);
+            makeDependences(job, dependencies);
+            jobCache.put(md5, job);
+        } else {
+            job = jobCache.get(md5);
+            t3 = System.currentTimeMillis();
+        }
         long t4 = System.currentTimeMillis();
         validate((TaskFlowJob) job, scheduler, space);
         long t5 = System.currentTimeMillis();
@@ -286,13 +323,13 @@ public class StaxJobFactory extends JobFactory {
     /*
      * Validate the given job descriptor
      */
-    private void validate(InputStream jobInputStream) throws VerifierConfigurationException, JobCreationException {
+    private void validate(InputStream jobInputStream) throws JobCreationException {
         Map<String, JobValidatorService> factories;
         try {
             factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
         } catch (Exception e) {
             logger.error(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
-            throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
+            throw new JobCreationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
         }
 
         try {
@@ -310,12 +347,12 @@ public class StaxJobFactory extends JobFactory {
      * Validate the given job descriptor
      */
     private TaskFlowJob validate(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space)
-            throws VerifierConfigurationException, JobCreationException {
+            throws JobCreationException {
         Map<String, JobValidatorService> factories;
         try {
             factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
         } catch (Exception e) {
-            throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
+            throw new JobCreationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
         }
 
         TaskFlowJob updatedJob = job;

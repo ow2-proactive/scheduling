@@ -28,6 +28,7 @@ package functionaltests;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +74,10 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase {
     protected JobId submitJob(String filename, JobStatus waitForStatus) throws Exception {
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
         WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler, space);
-        JobId id = submitter.submit(jobFile, new HashMap<String, String>(), null);
+        JobId id;
+        try (FileInputStream fileInputStream = new FileInputStream(jobFile)) {
+            id = submitter.submit(fileInputStream, new HashMap<String, String>(), null);
+        }
         waitJobState(id, waitForStatus, 500000);
         return id;
     }

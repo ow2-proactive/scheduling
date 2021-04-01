@@ -26,6 +26,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class WorkflowSubmitter {
      * Submits a workflow to the scheduler (XML or archive).
      * It also creates a job visualization HTML file.
      *
-     * @param workflowFile a workflow file (XML or archive)
+     * @param workflowStream a workflow as input stream
      * @param variables variables to be replaced on submission
      * @param genericInfos generic informations to be replaced on submission
      * @return job ID of the job created for the specified workflow and associated variables.
@@ -78,12 +79,12 @@ public class WorkflowSubmitter {
      * @throws PermissionRestException
      * @throws SubmissionClosedRestException
      */
-    public JobId submit(File workflowFile, Map<String, String> variables, Map<String, String> genericInfos)
+    public JobId submit(InputStream workflowStream, Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedRestException, PermissionRestException, SubmissionClosedRestException,
             JobCreationRestException {
         try {
             long t0 = System.currentTimeMillis();
-            Job job = createJobObject(workflowFile, variables, genericInfos);
+            Job job = createJobObject(workflowStream, variables, genericInfos);
             long t1 = System.currentTimeMillis();
             JobId jobId = scheduler.submit(job);
             long t2 = System.currentTimeMillis();
@@ -116,13 +117,9 @@ public class WorkflowSubmitter {
         }
     }
 
-    private Job createJobObject(File jobFile, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
-            throws JobCreationException {
-        return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(),
-                                                 jobVariables,
-                                                 jobGenericInfos,
-                                                 scheduler,
-                                                 space);
+    private Job createJobObject(InputStream workflowStream, Map<String, String> jobVariables,
+            Map<String, String> jobGenericInfos) throws JobCreationException {
+        return JobFactory.getFactory().createJob(workflowStream, jobVariables, jobGenericInfos, scheduler, space);
     }
 
 }

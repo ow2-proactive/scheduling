@@ -33,7 +33,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 
-class Object2ByteConverter {
+public class Object2ByteConverter {
 
     public static byte[] convertObject2Byte(Object o) throws IOException {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

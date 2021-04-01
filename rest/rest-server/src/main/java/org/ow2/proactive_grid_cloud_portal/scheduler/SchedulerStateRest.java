@@ -1413,32 +1413,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Scheduler scheduler = checkAccess(sessionId, "jobs");
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
-        File tmpWorkflowFile = null;
-        try {
-            String jobXml = downloadWorkflowContent(sessionId, url);
-            tmpWorkflowFile = File.createTempFile("job", "d");
-            JobId jobId;
-            try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
-                IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
+        String jobXml = downloadWorkflowContent(sessionId, url);
+        JobId jobId;
+        try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
 
-                // Get the job submission variables
-                Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+            // Get the job submission variables
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-                // Get the job submission generic infos
-                Map<String, String> genericInfos = null;
-                if (contextInfos != null)
-                    genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
+            // Get the job submission generic infos
+            Map<String, String> genericInfos = null;
+            if (contextInfos != null)
+                genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
-                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
-                jobId = workflowSubmitter.submit(tmpWorkflowFile, jobVariables, genericInfos);
-            }
-
-            return mapper.map(jobId, JobIdData.class);
-        } catch (IOException e) {
-            throw new IOException("Cannot save temporary job file on submission: " + e.getMessage(), e);
-        } finally {
-            FileUtils.deleteQuietly(tmpWorkflowFile);
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+            jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
         }
+
+        return mapper.map(jobId, JobIdData.class);
     }
 
     @Override
@@ -1448,22 +1439,78 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Scheduler scheduler = checkAccess(sessionId, "jobs");
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
-        File tmpWorkflowFile = null;
-        try {
-            String jobXml = downloadWorkflowContent(sessionId, url);
-            tmpWorkflowFile = File.createTempFile("job", "d");
-            JobId jobId;
-            try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
-                IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
+        String jobXml = downloadWorkflowContent(sessionId, url);
+        JobId jobId;
+        try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
 
-                // Get the job submission variables from pathSegment
+            // Get the job submission variables from pathSegment
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            // Get job variables from multipart
+            if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
+                Map<String, String> variablesFromMultipart = multipart.getFormDataPart(VARIABLES_KEY,
+                                                                                       new GenericType<Map<String, String>>() {
+                                                                                       });
+
+                if (jobVariables != null) {
+                    jobVariables.putAll(variablesFromMultipart);
+                } else {
+                    jobVariables = variablesFromMultipart;
+                }
+            }
+
+            // Get the job submission generic infos
+            Map<String, String> genericInfos = null;
+            if (contextInfos != null)
+                genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
+
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+            jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
+        }
+
+        return mapper.map(jobId, JobIdData.class);
+    }
+
+    @Override
+    public JobIdData submit(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart,
+            UriInfo contextInfos) throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
+        Scheduler scheduler = checkAccess(sessionId, "submit");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        try {
+            // In multipart, we can find the "variables" key for job variables, AND/OR ...
+            // ... "job.xml" for a job submitted from the studio OR "file" for a job submitted by job planner
+            // take and remove the "variables" key before
+            Map<String, String> variablesFromMultipart = null;
+            if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
+                variablesFromMultipart = multipart.getFormDataPart(VARIABLES_KEY,
+                                                                   new GenericType<Map<String, String>>() {
+                                                                   });
+                multipart.getFormDataMap().remove(VARIABLES_KEY);
+            }
+
+            // Get job from multipart
+            InputPart part1 = multipart.getFormDataMap().values().iterator().next().get(0);
+
+            String fileType = part1.getMediaType().toString().toLowerCase();
+            if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase()) &&
+                !fileType.contains(MediaType.TEXT_XML.toLowerCase())) {
+                throw new JobCreationRestException("Unknown job descriptor type: " + fileType);
+            }
+
+            JobId jobId;
+
+            // is the name of the browser's input field
+            try (InputStream tmpWorkflowStream = part1.getBody(new GenericType<InputStream>() {
+
+            })) {
+
+                // Get the job submission variables
                 Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-                // Get job variables from multipart
-                if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
-                    Map<String, String> variablesFromMultipart = multipart.getFormDataPart(VARIABLES_KEY,
-                                                                                           new GenericType<Map<String, String>>() {
-                                                                                           });
+                // Add multipart variables to variables
+                if (variablesFromMultipart != null) {
 
                     if (jobVariables != null) {
                         jobVariables.putAll(variablesFromMultipart);
@@ -1478,93 +1525,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
                 WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
-                jobId = workflowSubmitter.submit(tmpWorkflowFile, jobVariables, genericInfos);
+                jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
             }
 
             return mapper.map(jobId, JobIdData.class);
-        } catch (IOException e) {
-            throw new IOException("Cannot save temporary job file on submission: " + e.getMessage(), e);
+
         } finally {
-            FileUtils.deleteQuietly(tmpWorkflowFile);
-        }
-    }
-
-    @Override
-    public JobIdData submit(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart,
-            UriInfo contextInfos) throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
-            SubmissionClosedRestException, IOException {
-        try {
-            Scheduler scheduler = checkAccess(sessionId, "submit");
-            SchedulerSpaceInterface space = getSpaceInterface(sessionId);
-
-            File tmpJobFile = null;
-            try {
-                // In multipart, we can find the "variables" key for job variables, AND/OR ...
-                // ... "job.xml" for a job submitted from the studio OR "file" for a job submitted by job planner
-                // take and remove the "variables" key before
-                Map<String, String> variablesFromMultipart = null;
-                if (multipart.getFormDataMap().containsKey(VARIABLES_KEY)) {
-                    variablesFromMultipart = multipart.getFormDataPart(VARIABLES_KEY,
-                                                                       new GenericType<Map<String, String>>() {
-                                                                       });
-                    multipart.getFormDataMap().remove(VARIABLES_KEY);
-                }
-
-                // Get job from multipart
-                InputPart part1 = multipart.getFormDataMap().values().iterator().next().get(0);
-
-                String fileType = part1.getMediaType().toString().toLowerCase();
-                if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase()) &&
-                    !fileType.contains(MediaType.TEXT_XML.toLowerCase())) {
-                    throw new JobCreationRestException("Unknown job descriptor type: " + fileType);
-                }
-
-                // is the name of the browser's input field
-                InputStream is = part1.getBody(new GenericType<InputStream>() {
-
-                });
-                tmpJobFile = File.createTempFile("job", "d");
-
-                JobId jobId;
-
-                try (OutputStream outputStream = new FileOutputStream(tmpJobFile)) {
-                    IOUtils.copy(is, outputStream);
-
-                    // Get the job submission variables
-                    Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
-
-                    // Add multipart variables to variables
-                    if (variablesFromMultipart != null) {
-
-                        if (jobVariables != null) {
-                            jobVariables.putAll(variablesFromMultipart);
-                        } else {
-                            jobVariables = variablesFromMultipart;
-                        }
-                    }
-
-                    // Get the job submission generic infos
-                    Map<String, String> genericInfos = null;
-                    if (contextInfos != null)
-                        genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
-
-                    WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
-                    jobId = workflowSubmitter.submit(tmpJobFile, jobVariables, genericInfos);
-                }
-
-                return mapper.map(jobId, JobIdData.class);
-
-            } finally {
-                if (tmpJobFile != null) {
-                    // clean the temporary file
-                    FileUtils.deleteQuietly(tmpJobFile);
-                }
-                if (multipart != null) {
-                    multipart.close();
-                }
+            if (multipart != null) {
+                multipart.close();
             }
-        } catch (IOException e) {
-            throw new IOException("I/O Error: " + e.getMessage(), e);
         }
     }
 
@@ -1630,29 +1599,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/resubmit");
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
-        File tmpJobFile = File.createTempFile("job", "d");
-
         JobId newJobId;
-
+        String jobXml;
         try {
-            String jobContent = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
-            FileUtils.write(tmpJobFile, jobContent, Charset.forName("UTF-8"));
+            jobXml = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
-        // Get the job submission variables
-        Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-        // Get the job submission generic infos
-        Map<String, String> genericInfos = null;
-        if (contextInfos != null) {
-            genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
-        }
+        try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+            // Get the job submission variables
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-        WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
-        newJobId = workflowSubmitter.submit(tmpJobFile, jobVariables, genericInfos);
-        if (!tmpJobFile.delete()) {
-            logger.warn(tmpJobFile.getAbsolutePath() + " could not be deleted");
+            // Get the job submission generic infos
+            Map<String, String> genericInfos = null;
+            if (contextInfos != null) {
+                genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
+            }
+
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+            newJobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
         }
         return mapper.map(newJobId, JobIdData.class);
     }
@@ -1665,15 +1631,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         List<JobIdData> newJobIds = new ArrayList<>(jobsId.size());
 
         for (String jobId : jobsId) {
+            String jobXml;
             try {
-                File tmpJobFile = File.createTempFile("job", "d");
-                String jobContent = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
-                FileUtils.write(tmpJobFile, jobContent, Charset.forName("UTF-8"));
-                JobId newJobId = workflowSubmitter.submit(tmpJobFile, Collections.emptyMap(), Collections.emptyMap());
+                jobXml = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
+            } catch (SchedulerException e) {
+                logger.error("Error occurred when resubmitting job " + jobId, e);
+                continue;
+            }
+            try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+
+                JobId newJobId = workflowSubmitter.submit(tmpWorkflowStream,
+                                                          Collections.emptyMap(),
+                                                          Collections.emptyMap());
                 newJobIds.add(mapper.map(newJobId, JobIdData.class));
-                if (!tmpJobFile.delete()) {
-                    logger.warn(tmpJobFile.getAbsolutePath() + " could not be deleted");
-                }
             } catch (Exception e) {
                 logger.error("Error occurred when resubmitting job " + jobId, e);
             }
