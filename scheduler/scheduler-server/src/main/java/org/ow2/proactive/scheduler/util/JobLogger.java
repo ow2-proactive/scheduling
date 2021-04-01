@@ -83,6 +83,12 @@ public class JobLogger {
         MDC.remove(FileAppender.FILE_NAME);
     }
 
+    public void warn(JobId id, String message, Throwable th) {
+        updateMdcWithTaskLogFilename(id);
+        logger.warn(PREFIX + id + " " + message, th);
+        MDC.remove(FileAppender.FILE_NAME);
+    }
+
     public void error(JobId id, String message) {
         updateMdcWithTaskLogFilename(id);
         logger.error(PREFIX + id + " " + message);

@@ -254,10 +254,11 @@ public class JobEmailNotification {
                 }
             } catch (JobEmailNotificationException e) {
                 jlogger.warn(jobState.getId(),
-                             "failed to send email notification to " + e.getEmailTarget() + ": " + e.getMessage());
+                             "failed to send email notification to " + e.getEmailTarget() + ": " + e.getMessage(),
+                             e);
                 logger.trace("Stack trace:", e);
             } catch (Exception e) {
-                jlogger.warn(jobState.getId(), "failed to send email notification: " + e.getMessage());
+                jlogger.warn(jobState.getId(), "failed to send email notification: " + e.getMessage(), e);
                 logger.trace("Stack trace:", e);
             }
         });
@@ -293,6 +294,8 @@ public class JobEmailNotification {
 
     private String getBody() throws IOException {
         String jobID = jobState.getId().value();
+        String jobName = jobState.getName();
+        String jobOwner = jobState.getOwner();
         String status = jobState.getStatus().toString();
         String hostname = "UNKNOWN";
         List<TaskState> tasks = jobState.getTasks();
@@ -309,7 +312,8 @@ public class JobEmailNotification {
         }
 
         final Properties properties = EmailConfiguration.getConfiguration().getProperties();
-        String templatePath = properties.getProperty(EmailConfiguration.TEMPLATE_PATH);
+        String templatePath = properties.getProperty(EmailConfiguration.TEMPLATE_PATH,
+                                                     "config/scheduler/email.template");
         String bodyTemplate = Files.toString(new File(PASchedulerProperties.getAbsolutePath(templatePath)),
                                              Charset.defaultCharset());
 
@@ -318,6 +322,8 @@ public class JobEmailNotification {
         values.put("JOB_STATUS", status);
         values.put("JOB_TASKS", allTaskStatusesString);
         values.put("HOST_NAME", hostname);
+        values.put("JOB_NAME", jobName);
+        values.put("JOB_OWNER", jobOwner);
 
         // use of StrSubstitutor to replace email template parameters by job details
         String emailBody = StrSubstitutor.replace(bodyTemplate, values, "%", "%");
@@ -352,7 +358,9 @@ public class JobEmailNotification {
                 writer.write(allRes);
                 attachLogPath = file.getAbsolutePath();
             } catch (IOException e) {
-                jlogger.warn(jobState.getId(), "Failed to create attachment for email notification: " + e.getMessage());
+                jlogger.warn(jobState.getId(),
+                             "Failed to create attachment for email notification: " + e.getMessage(),
+                             e);
                 logger.warn("Error creating attachment for email notification: " + e.getMessage(), e);
 
             }
