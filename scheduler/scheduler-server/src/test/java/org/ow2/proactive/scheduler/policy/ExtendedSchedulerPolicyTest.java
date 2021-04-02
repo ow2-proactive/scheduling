@@ -140,25 +140,22 @@ public class ExtendedSchedulerPolicyTest extends ProActiveTestClean {
     public void testJobStartLaterOneTaskStartNow() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(later, now, null));
         LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
-        assertTrue(orderedTasks.size() == 1);
-        String startAtValue = startAtValue(first(orderedTasks));
-        assertEquals(now, startAtValue);
+        assertEquals(0, orderedTasks.size());
     }
 
     @Test
     public void testJobStartLaterOneTaskStartNow2() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(later, now, later));
         LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
-        assertTrue(orderedTasks.size() == 1);
-        String startAtValue = startAtValue(first(orderedTasks));
-        assertEquals(now, startAtValue);
+        assertEquals(0, orderedTasks.size());
     }
 
     @Test
     public void testMalformedTaskStartAt() {
-        List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(later, now, "malformed-start-at"));
+        List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(now, now, "malformed-start-at"));
         LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
-        assertTrue(orderedTasks != null && orderedTasks.size() == 2);
+        assertTrue(orderedTasks != null);
+        assertEquals(2, orderedTasks.size());
     }
 
     @Test
