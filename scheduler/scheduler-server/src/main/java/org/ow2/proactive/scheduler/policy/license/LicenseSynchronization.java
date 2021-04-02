@@ -63,8 +63,10 @@ public class LicenseSynchronization {
     /**
      * JDBM maps
      */
+    // < <software0, <jobid2>> <software1, <jobid1, jobid3>> ... >
     private static PrimaryHashMap<String, LinkedBlockingQueue<String>> persistedJobsLicenses = null;
 
+    // < <software0, <taskid0, taskid2>> <software1, <taskid0, taskid1, taskid3>> ... >
     private static PrimaryHashMap<String, LinkedBlockingQueue<String>> persistedTasksLicenses = null;
 
     private static PrimaryHashMap<String, Integer> remainingTokens = null;
@@ -138,6 +140,10 @@ public class LicenseSynchronization {
 
     boolean containsJobId(String license, String jobId) {
         return persistedJobsLicenses.get(license).stream().anyMatch(jid -> jid.equals(jobId));
+    }
+
+    boolean containsTaskId(String license, String taskId) {
+        return persistedTasksLicenses.get(license).stream().anyMatch(tid -> tid.equals(taskId));
     }
 
     void addJobToLicense(String license, String jobId) {

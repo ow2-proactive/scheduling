@@ -53,6 +53,12 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
 
     private static URL JobSimpleNoRunnableTaskLicensePolicy = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_no_runnable_task_license_policy.xml");
 
+    private static URL JobSimpleTaskLicensePolicyInErrorRestart = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_task_license_policy_in_error_restart.xml");
+
+    private static URL JobSimpleJobLicensePolicyInErrorRestart = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_job_license_policy_in_error_restart.xml");
+
+    private static URL JobSimpleJobAndTaskLicensePolicyInErrorRestart = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_job_license_policy_in_error_restart.xml");
+
     @Test
     public void testJobsUseSameLicenseExclusiveExecution() throws Throwable {
 
@@ -227,5 +233,55 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
         assertEquals(JobStatus.PENDING, scheduler.getJobState(jobId0).getStatus());
+    }
+
+    @Test
+    public void testTaskOrJobLicensePolicyInErrorRestartKeepTokenExclusiveExecution() throws Throwable {
+
+        JobId jobId0 = schedulerHelper.submitJob(new File(JobSimpleTaskLicensePolicyInErrorRestart.toURI()).getAbsolutePath(),
+                                                 ImmutableMap.of("LICENSES_TASK", "software_A,software_B"));
+
+        JobId jobId1 = schedulerHelper.submitJob(new File(JobSimpleJobLicensePolicyInErrorRestart.toURI()).getAbsolutePath(),
+                                                 ImmutableMap.of("LICENSES_JOB", "software_A,software_B"));
+
+        log("Waiting for jobs finished");
+        schedulerHelper.waitForEventJobFinished(jobId0);
+        schedulerHelper.waitForEventJobFinished(jobId1);
+
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+        JobState jobState0 = scheduler.getJobState(jobId0);
+        JobState jobState1 = scheduler.getJobState(jobId1);
+
+        boolean jobsExecutedOneByOne = (jobState0.getFinishedTime() < jobState1.getStartTime()) ||
+                                       (jobState1.getFinishedTime() < jobState0.getStartTime());
+        Assert.assertTrue(jobsExecutedOneByOne);
+    }
+
+    @Test
+    public void testTaskAndJobLicensePolicyInErrorRestartKeepTokenExclusiveExecution() throws Throwable {
+
+        JobId jobId0 = schedulerHelper.submitJob(new File(JobSimpleJobAndTaskLicensePolicyInErrorRestart.toURI()).getAbsolutePath(),
+                                                 ImmutableMap.of("LICENSES_JOB",
+                                                                 "software_A,software_B",
+                                                                 "LICENSES_TASK",
+                                                                 "software_A,software_B"));
+
+        JobId jobId1 = schedulerHelper.submitJob(new File(JobSimpleJobAndTaskLicensePolicyInErrorRestart.toURI()).getAbsolutePath(),
+                                                 ImmutableMap.of("LICENSES_JOB",
+                                                                 "software_A,software_B",
+                                                                 "LICENSES_TASK",
+                                                                 "software_A,software_B"));
+
+        log("Waiting for jobs finished");
+        schedulerHelper.waitForEventJobFinished(jobId0);
+        schedulerHelper.waitForEventJobFinished(jobId1);
+
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+        JobState jobState0 = scheduler.getJobState(jobId0);
+        JobState jobState1 = scheduler.getJobState(jobId1);
+
+        boolean jobsExecutedOneByOne = (jobState0.getFinishedTime() < jobState1.getStartTime()) ||
+                                       (jobState1.getFinishedTime() < jobState0.getStartTime());
+        Assert.assertTrue(jobsExecutedOneByOne);
     }
 }
