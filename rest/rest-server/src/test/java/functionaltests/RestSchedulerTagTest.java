@@ -26,6 +26,8 @@
 package functionaltests;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +99,10 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
     private JobId submitJob(String filename) throws Exception {
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
         WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler, space);
-        JobId id = submitter.submit(jobFile, new HashMap<String, String>(), null);
+        JobId id;
+        try (InputStream jobStream = new FileInputStream(jobFile)) {
+            id = submitter.submit(jobStream, new HashMap<String, String>(), null);
+        }
         waitJobState(id, JobStatus.FINISHED, 500000);
         return id;
     }

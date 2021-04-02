@@ -27,6 +27,8 @@ package performancetests.metrics;
 
 import static org.ow2.proactive.utils.Lambda.repeater;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -42,21 +44,23 @@ import performancetests.recovery.PerformanceTestBase;
 
 
 @RunWith(Parameterized.class)
-public class JobSubmissionTest extends PerformanceTestBase {
+public class JobParsingAndSubmissionTest extends PerformanceTestBase {
+
+    private static URL simpleJob = JobParsingAndSubmissionTest.class.getResource("/functionaltests/descriptors/Job_simple.xml");
 
     /**
      * @return number of jobs and limit for average job submission time
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 100, 2000 } });
+        return Arrays.asList(new Object[][] { { 100, 200 } });
     }
 
     private final int jobsNumber;
 
     private final long timeLimit;
 
-    public JobSubmissionTest(int jobsNumber, long timeLimit) {
+    public JobParsingAndSubmissionTest(int jobsNumber, long timeLimit) {
         this.jobsNumber = jobsNumber;
         this.timeLimit = timeLimit;
     }
@@ -70,18 +74,16 @@ public class JobSubmissionTest extends PerformanceTestBase {
                                                RM_CONFIGURATION_START.getPath(),
                                                null);
 
-        TaskFlowJob job = SchedulerEfficiencyMetricsTest.createJob(jobsNumber, 1);
-
         // submit a first job to load factories (not counted in the total time)
-        schedulerHelper.submitJob(job);
+        schedulerHelper.submitJob(new File(simpleJob.toURI()).getAbsolutePath());
 
         long start = System.currentTimeMillis();
 
-        repeater.accept(jobsNumber, () -> schedulerHelper.submitJob(job));
+        repeater.accept(jobsNumber, () -> schedulerHelper.submitJob(new File(simpleJob.toURI()).getAbsolutePath()));
 
         long anActualTime = System.currentTimeMillis() - start;
 
-        LOGGER.info(makeCSVString(JobSubmissionTest.class.getSimpleName(),
+        LOGGER.info(makeCSVString(JobParsingAndSubmissionTest.class.getSimpleName(),
                                   jobsNumber,
                                   timeLimit,
                                   anActualTime,
