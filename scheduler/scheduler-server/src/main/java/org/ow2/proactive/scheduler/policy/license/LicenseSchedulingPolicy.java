@@ -281,10 +281,12 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
         initialize();
 
+        // Filter jobs according to the parent policy
+        List<JobDescriptor> filteredJobDescList = super.filterJobs(jobDescList);
         // Keep only executable jobs according to their required license tokens
-        List<JobDescriptor> filteredJobDescList = jobDescList.stream()
-                                                             .filter(jobDesc -> acquireTokensForJob((JobDescriptorImpl) jobDesc))
-                                                             .collect(Collectors.toList());
+        filteredJobDescList = filteredJobDescList.stream()
+                                                 .filter(jobDesc -> acquireTokensForJob((JobDescriptorImpl) jobDesc))
+                                                 .collect(Collectors.toList());
 
         // Retrieve the ordered tasks from the filtered jobs according to the parent policy
         LinkedList<EligibleTaskDescriptor> orderedTasksDescFromParentPolicy = super.getOrderedTasks(filteredJobDescList);

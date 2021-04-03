@@ -69,7 +69,9 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
         LinkedList<EligibleTaskDescriptor> executionCycleTasks = new LinkedList<>();
         Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
 
-        for (JobDescriptor jobDesc : jobDescList) {
+        List<JobDescriptor> filteredJobs = filterJobs(jobDescList);
+
+        for (JobDescriptor jobDesc : filteredJobs) {
             Collection<TaskDescriptor> tasks = jobDesc.getEligibleTasks();
             Collection<EligibleTaskDescriptor> eligibleTasks = (Collection) tasks;
             for (EligibleTaskDescriptor candidate : eligibleTasks) {
@@ -92,11 +94,11 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                             }
                         }
                     } catch (IllegalArgumentException e) {
-                        logger.error(String.format("An error occurred while processing 'startAt' generic info.%n" +
-                                                   "Task ([job-id:\"%s\", task-id:\"%s\"]) will be scheduled immediately for execution.",
-                                                   jobDesc.getJobId().toString(),
-                                                   candidate.getTaskId().toString()),
-                                     e);
+                        logger.warn(String.format("An error occurred while processing 'startAt' generic info.%n" +
+                                                  "Task ([job-id:\"%s\", task-id:\"%s\"]) will be scheduled immediately for execution.",
+                                                  jobDesc.getJobId().toString(),
+                                                  candidate.getTaskId().toString()),
+                                    e);
                         executionCycleTasks.add(candidate);
                     }
 
@@ -106,10 +108,48 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
         return executionCycleTasks;
     }
 
-    /*
-     * START_AT property defined at task level always has the precedence over the same property
-     * defined job level.
-     */
+    // To consider only non delayed jobs
+    protected List<JobDescriptor> filterJobs(List<JobDescriptor> jobDescList) {
+        Date now = new Date();
+        LinkedList<JobDescriptor> executionCycleJobs = new LinkedList<>();
+        Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
+        for (JobDescriptor candidate : jobDescList) {
+            String startAt = getStartAtValue(candidate);
+            if (startAt == null) {
+                executionCycleJobs.add(candidate);
+            } else {
+                try {
+                    if (now.after(ISO8601DateUtil.toDate(startAt))) {
+                        executionCycleJobs.add(candidate);
+
+                    } else {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(String.format("Job [jobId:\"%s\"] is scheduled to be executed at %s." +
+                                                       " It will not be scheduled for this execution cycle at %s.",
+                                                       candidate.getJobId().toString(),
+                                                       startAt,
+                                                       ISO8601DateUtil.parse(now)));
+                        }
+                    }
+                } catch (IllegalArgumentException e) {
+                    logger.warn(String.format("An error occurred while processing 'startAt' generic info.%n" +
+                                              "Job ([job-id:\"%s\"]) will be scheduled immediately for execution.",
+                                              candidate.getJobId().toString(),
+                                              e));
+                    executionCycleJobs.add(candidate);
+                }
+
+            }
+        }
+        return executionCycleJobs;
+    }
+
+    private String getStartAtValue(JobDescriptor jobDesc) {
+        return ((JobDescriptorImpl) jobDesc).getInternal()
+                                            .getRuntimeGenericInformation()
+                                            .get(GENERIC_INFORMATION_KEY_START_AT);
+    }
+
     private String getStartAtValue(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) {
         String startAt = ((EligibleTaskDescriptorImpl) taskDesc).getInternal()
                                                                 .getRuntimeGenericInformation()
