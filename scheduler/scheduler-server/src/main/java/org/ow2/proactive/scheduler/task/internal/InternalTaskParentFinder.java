@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -51,24 +51,34 @@ public class InternalTaskParentFinder {
     }
 
     /**
-     * 
-     * @param parentTask
-     * @return
+     * Depth-first search of non-skipped parent task ids
+     * NOTE: this algorithm cannot be infinite as the graph cannot have cycles and loop flows are finite when skipped.
+     * @param task task used to originate the search
+     * @return ids of the first non-skipped tasks in the parent tree
      */
-    public Set<TaskId> getFirstNotSkippedParentTaskIds(InternalTask parentTask) {
-        Set<TaskId> parentIds = new HashSet<>();
-        if (parentTask.getStatus() == TaskStatus.SKIPPED) {
-            if (parentTask.getIDependences() != null) {
-                for (InternalTask parentInternalTask : parentTask.getIDependences()) {
+    public Set<TaskId> getFirstNotSkippedParentTaskIds(InternalTask task) {
+        Set<TaskId> parentIds = new LinkedHashSet<>();
+        if (task.getStatus() == TaskStatus.SKIPPED) {
+            if (task.getIDependences() != null) {
+                for (InternalTask parentInternalTask : task.getIDependences()) {
+                    parentIds.addAll(getFirstNotSkippedParentTaskIds(parentInternalTask));
+                }
+            }
+            // if the task is the target of the if or else branch, explore the parent tree
+            if (task.getIfBranch() != null) {
+                parentIds.addAll(getFirstNotSkippedParentTaskIds(task.getIfBranch()));
+            }
+            // if the task is the target of the continuation branch, explore both if and else trees
+            if (task.getJoinedBranches() != null) {
+                for (InternalTask parentInternalTask : task.getJoinedBranches()) {
                     parentIds.addAll(getFirstNotSkippedParentTaskIds(parentInternalTask));
                 }
             }
         } else {
-            parentIds.add(parentTask.getId());
+            parentIds.add(task.getId());
         }
 
         return parentIds;
-
     }
 
 }

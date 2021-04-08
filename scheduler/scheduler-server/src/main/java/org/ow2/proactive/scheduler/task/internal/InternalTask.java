@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1229,19 +1230,25 @@ public abstract class InternalTask extends TaskState {
      * @param schedulingService used to load results from the database
      */
     public synchronized void updateParentTasksResults(SchedulingService schedulingService) {
-        if (internalTasksDependencies != null && parentTasksResults == null) {
-            Set<TaskId> parentIds = new HashSet<>(internalTasksDependencies.size());
-            for (InternalTask parentTask : internalTasksDependencies) {
-                parentIds.addAll(InternalTaskParentFinder.getInstance().getFirstNotSkippedParentTaskIds(parentTask));
+        if (parentTasksResults == null &&
+            (internalTasksDependencies != null || ifBranch != null || joinedBranches != null)) {
+            Set<TaskId> parentIds = new LinkedHashSet<>();
+            parentTasksResults = new LinkedHashMap<>();
+            if (internalTasksDependencies != null) {
+                for (InternalTask parentTask : internalTasksDependencies) {
+                    parentIds.addAll(InternalTaskParentFinder.getInstance()
+                                                             .getFirstNotSkippedParentTaskIds(parentTask));
+                    addParentTaskToResults(parentIds, parentTask);
+                }
             }
-
-            parentTasksResults = new HashMap<>();
-
-            // Load parent task results from memory
-            for (InternalTask parentTask : internalTasksDependencies) {
-                if (parentIds.contains(parentTask.getId()) && parentTask.getTaskResult() != null) {
-                    parentTasksResults.put(parentTask.getId(), parentTask.getTaskResult());
-                    parentIds.remove(parentTask.getId());
+            if (ifBranch != null) {
+                parentIds.add(ifBranch.getId());
+                addParentTaskToResults(parentIds, ifBranch);
+            }
+            if (joinedBranches != null) {
+                for (InternalTask parentTask : joinedBranches) {
+                    parentIds.add(parentTask.getId());
+                    addParentTaskToResults(parentIds, parentTask);
                 }
             }
 
@@ -1256,6 +1263,13 @@ public abstract class InternalTask extends TaskState {
 
                 }
             }
+        }
+    }
+
+    private void addParentTaskToResults(Set<TaskId> parentIds, InternalTask parentTask) {
+        if (parentIds.contains(parentTask.getId()) && parentTask.getTaskResult() != null) {
+            parentTasksResults.put(parentTask.getId(), parentTask.getTaskResult());
+            parentIds.remove(parentTask.getId());
         }
     }
 

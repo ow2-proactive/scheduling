@@ -160,7 +160,9 @@ public class TerminateReplicateTaskHandlerTest extends ProActiveTestClean {
     private Map<TaskId, InternalTask> generateTasksWithBlock() {
         Map<TaskId, InternalTask> tempTasks = Maps.newHashMap();
         InternalTask startTask = generateInternalTask(555L);
+        InternalTask endTask = generateInternalTask(999L);
         startTask.setFlowBlock(FlowBlock.START);
+        startTask.setMatchingBlock(endTask.getName());
         tempTasks.put(startTask.getId(), startTask);
 
         InternalTask internalTask2 = generateInternalTask(666L);
@@ -173,7 +175,6 @@ public class TerminateReplicateTaskHandlerTest extends ProActiveTestClean {
         when(jobDescriptorImpl.getTaskChildrenWithIfBranches(startTask)).thenReturn(Lists.newArrayList(internalTask2,
                                                                                                        internalTask3));
 
-        InternalTask endTask = generateInternalTask(999L);
         tempTasks.put(endTask.getId(), endTask);
         endTask.setFlowBlock(FlowBlock.END);
         when(jobDescriptorImpl.getTaskChildrenWithIfBranches(internalTask2)).thenReturn(Lists.newArrayList(endTask));
@@ -200,7 +201,8 @@ public class TerminateReplicateTaskHandlerTest extends ProActiveTestClean {
                                                   OnTaskError.CANCEL_JOB,
                                                   "description");
         InternalTask internalTask = new InternalScriptTask(job);
-        internalTask.setId(TaskIdImpl.createTaskId(new JobIdImpl(666L, "JobName"), "readableName", id));
+        internalTask.setId(TaskIdImpl.createTaskId(new JobIdImpl(666L, "JobName"), "test-name-" + id, id));
+        internalTask.setName("test-name-" + id);
         internalTask.setStatus(TaskStatus.PENDING);
         return internalTask;
 
