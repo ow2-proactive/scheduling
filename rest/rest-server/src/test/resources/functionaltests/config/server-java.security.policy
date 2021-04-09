@@ -15,7 +15,7 @@
 //
 // Members of "guest" group can get/free nodes and monitor the state submit jobs
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "guests" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "automation-dashboard,workflow-automation";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "automation-dashboard,workflow-execution";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodesList";
@@ -456,7 +456,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Data scientist permissions
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "citizen-ds" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,catalog-portal,workflow-automation,service-automation,job-analytics,job-gantt,notification-portal";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,catalog-portal,workflow-execution,service-automation,job-analytics,job-gantt,notification-portal";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNodeToken";
@@ -545,7 +545,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 };
 
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "expert-ds" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,scheduler,catalog-portal,workflow-automation,service-automation,job-analytics,job-gantt,job-planner-calendar-def,job-planner-calendar-def-workflows,job-planner-execution-planning,job-planner-gantt-chart,notification-portal";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,scheduler,catalog-portal,workflow-execution,service-automation,job-analytics,job-gantt,job-planner-calendar-def,job-planner-calendar-def-workflows,job-planner-execution-planning,job-planner-gantt-chart,notification-portal";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNodeToken";

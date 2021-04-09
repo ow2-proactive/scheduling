@@ -15,7 +15,7 @@
 //
 // Members of "guest" group can get/free nodes and monitor the state submit jobs
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "guests" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "automation-dashboard,workflow-automation";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "automation-dashboard,workflow-execution";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodesList";
@@ -104,7 +104,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNodeTokens";
@@ -222,7 +222,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.registerAvailableNode";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
 
@@ -456,7 +456,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Data scientist permissions
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "citizen-ds" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,catalog-portal,workflow-automation,service-automation,job-analytics,job-gantt,notification-portal";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,catalog-portal,workflow-execution,service-automation,job-analytics,job-gantt,notification-portal";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodesList";
 
@@ -466,7 +466,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.releaseNode";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.releaseNodes";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.listAliveNodeUrls";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getFreeNodesNumber";
@@ -481,9 +481,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.isNodeUser";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNodeTokens";
@@ -517,13 +517,13 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getJobResult";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getTaskResult";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getTaskResultFromIncarnation";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getJobState";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getState";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.addEventListener";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.pauseJob";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.resumeJob";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.killJob";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.changeJobPriority";
@@ -553,7 +553,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 };
 
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "expert-ds" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,scheduler,catalog-portal,workflow-automation,service-automation,job-analytics,job-gantt,job-planner-calendar-def,job-planner-calendar-def-workflows,job-planner-execution-planning,job-planner-gantt-chart,notification-portal";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,scheduler,catalog-portal,workflow-execution,service-automation,job-analytics,job-gantt,job-planner-calendar-def,job-planner-calendar-def-workflows,job-planner-execution-planning,job-planner-gantt-chart,notification-portal";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodesList";
 
@@ -563,7 +563,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.releaseNode";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.releaseNodes";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.listAliveNodeUrls";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getFreeNodesNumber";
@@ -578,9 +578,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.isNodeUser";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
-    
+
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNodeTokens";
@@ -607,7 +607,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "0,1,2,3,4";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
-    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";  
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.submit";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getJobResult";
