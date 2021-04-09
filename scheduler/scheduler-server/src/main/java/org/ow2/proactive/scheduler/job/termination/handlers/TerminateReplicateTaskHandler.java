@@ -217,7 +217,7 @@ public class TerminateReplicateTaskHandler {
     private void skipReplication(InternalTask initiator, ChangedTasksInfo changesInfo, InternalTask internalTask) {
         long finishedTime = initiator.getFinishedTime() + 1;
         if (internalTask.getFlowBlock().equals(FlowBlock.START)) {
-            skipTasksUntilEndBlock(changesInfo, internalTask, finishedTime);
+            skipTasksUntilEndBlock(changesInfo, internalTask, finishedTime, internalTask.getMatchingBlock());
         } else {
             skipTask(changesInfo, internalTask, finishedTime);
         }
@@ -228,11 +228,12 @@ public class TerminateReplicateTaskHandler {
         return internalTaskDependency.getId().equals(initiator.getId()) && !toReplicate.contains(internalTask);
     }
 
-    private void skipTasksUntilEndBlock(ChangedTasksInfo changesInfo, InternalTask blockTaskToSkip, long finishedTime) {
+    private void skipTasksUntilEndBlock(ChangedTasksInfo changesInfo, InternalTask blockTaskToSkip, long finishedTime,
+            String matchingBlock) {
         skipTask(changesInfo, blockTaskToSkip, finishedTime);
-        if (!blockTaskToSkip.getFlowBlock().equals(FlowBlock.END)) {
+        if (!blockTaskToSkip.getFlowBlock().equals(FlowBlock.END) || !matchingBlock.equals(blockTaskToSkip.getName())) {
             for (InternalTask nextBlockTask : getTaskChildren(blockTaskToSkip)) {
-                skipTasksUntilEndBlock(changesInfo, nextBlockTask, finishedTime);
+                skipTasksUntilEndBlock(changesInfo, nextBlockTask, finishedTime, matchingBlock);
             }
         }
     }
