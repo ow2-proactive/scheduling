@@ -433,10 +433,12 @@ public abstract class Script<E> implements Serializable {
 
             return result;
         } catch (javax.script.ScriptException e) {
-            // drop exception cause as it might not be serializable
-            ScriptException scriptException = new ScriptException(e.getMessage());
-            scriptException.setStackTrace(e.getStackTrace());
-            ScriptResult<E> result = new ScriptResult<>(scriptException);
+            // wrap exception cause as it might not be serializable
+            String stack = Throwables.getStackTraceAsString(e);
+            if (e.getMessage() != null) {
+                stack = e.getMessage() + System.lineSeparator() + stack;
+            }
+            ScriptResult<E> result = new ScriptResult<>(new ScriptException(stack));
             captureOutput(engine, outputBuffer, result);
             return result;
         } catch (Throwable t) {
@@ -444,7 +446,7 @@ public abstract class Script<E> implements Serializable {
             if (t.getMessage() != null) {
                 stack = t.getMessage() + System.lineSeparator() + stack;
             }
-            ScriptResult<E> result = new ScriptResult<>(new Exception(stack));
+            ScriptResult<E> result = new ScriptResult<>(new ScriptException(stack));
             captureOutput(engine, outputBuffer, result);
             return result;
         }
