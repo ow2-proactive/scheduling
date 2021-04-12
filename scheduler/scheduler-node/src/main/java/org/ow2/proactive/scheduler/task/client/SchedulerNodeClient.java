@@ -120,7 +120,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
      */
     public void connect(String url) throws Exception {
         CredData userCreds = decrypter.decrypt();
-        client = SchedulerClient.createInstance();
+        if (client == null) {
+            client = SchedulerClient.createInstance();
+        }
+        if (client.isConnected()) {
+            return;
+        }
         client.init(new ConnectionInfo(url, userCreds.getLogin(), userCreds.getPassword(), null, true));
     }
 
