@@ -52,6 +52,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.annotations.GZIP;
@@ -902,7 +903,7 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/{taskname}/result/value")
     @Produces("*/*")
     Serializable valueOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws Throwable;
+            @PathParam("taskname") String taskname) throws RestException;
 
     /**
      * Returns the values of a set of tasks of the job <code>jobId</code>
@@ -925,7 +926,7 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/value")
     @Produces("application/json")
     Map<String, String> valueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable;
+            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws RestException;
 
     /**
      * Returns the metadata of the task result of task <code>taskName</code> of the
@@ -946,7 +947,7 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/{taskname}/result/metadata")
     @Produces("*/*")
     Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable;
+            @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws RestException;
 
     /**
      * Returns the metadata of the task result of task <code>taskName</code> of the
@@ -964,7 +965,7 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/metadata")
     @Produces("application/json")
     Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable;
+            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws RestException;
 
     /**
      * Returns the name of the tasks, which has precious result property set on,
@@ -1011,7 +1012,31 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
     @Produces("*/*")
     byte[] serializedValueOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws Throwable;
+            @PathParam("taskname") String taskname) throws RestException;
+
+    /**
+     * Returns the value of the task result of the task <code>taskName</code> of
+     * the job <code>jobId</code> This method returns the result as a byte stream.
+     * The response may include additional information such as Content-Type and Content-disposition
+     * if the result is associated with the corresponding metadata
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the id of the job
+     * @param taskname
+     *            the name of the task
+     * @param destination
+     *            possible values "file" or "browser". In the first case,
+     *            Content-disposition and attachment may be included in the response. In the second case, only Content-Type may be included.
+     *            Default is browser
+     * @return a response containing the result as a byte stream.
+     */
+    @GET
+    @Path("jobs/{jobid}/tasks/{taskname}/result/download")
+    @Produces("*/*")
+    Response downloadTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @PathParam("taskname") String taskname, @QueryParam("destination") String destination) throws RestException;
 
     /**
      * Returns the values of a set of tasks of the job <code>jobId</code>
@@ -1032,7 +1057,7 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue")
     @Produces("application/json")
     Map<String, byte[]> serializedValueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable;
+            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws RestException;
 
     /**
      * Returns the task result of the task <code>taskName</code> of the job
