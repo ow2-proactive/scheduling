@@ -27,6 +27,9 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_CONTENT_TYPE;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_FILE_EXTENSION;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_FILE_NAME;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -59,7 +62,6 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.websocket.WebSocketEventListenerAdapter;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -157,6 +159,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private static final String PATH_TASKS = "/tasks/";
 
     private static final String PATH_SERVICES = "/services";
+
+    public static final String DESTINATION_BROWSER = "browser";
+
+    public static final String DESTINATION_FILE = "file";
 
     static {
         sortableTaskAttrMap = createSortableTaskAttrMap();
@@ -926,22 +932,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Serializable valueOfTaskResult(String sessionId, String jobId, String taskname) throws Throwable {
+    public Serializable valueOfTaskResult(String sessionId, String jobId, String taskname) throws RestException {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
-        TaskResult taskResult = s.getTaskResult(jobId, taskname);
-        return getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
+        try {
+            TaskResult taskResult = s.getTaskResult(jobId, taskname);
+            return getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
     }
 
     @Override
-    public Map<String, String> valueOfTaskResultByTag(String sessionId, String jobId, String taskTag) throws Throwable {
+    public Map<String, String> valueOfTaskResultByTag(String sessionId, String jobId, String taskTag)
+            throws RestException {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/value");
-        List<TaskResult> taskResults = s.getTaskResultsByTag(jobId, taskTag);
-        Map<String, String> result = new HashMap<>(taskResults.size());
-        for (TaskResult currentTaskResult : taskResults) {
-            result.put(currentTaskResult.getTaskId().getReadableName(),
-                       getTaskResultValueAsStringOrExceptionStackTrace(currentTaskResult));
+        try {
+            List<TaskResult> taskResults = s.getTaskResultsByTag(jobId, taskTag);
+            Map<String, String> result = new HashMap<>(taskResults.size());
+            for (TaskResult currentTaskResult : taskResults) {
+                result.put(currentTaskResult.getTaskId().getReadableName(),
+                           getTaskResultValueAsStringOrExceptionStackTrace(currentTaskResult));
+            }
+            return result;
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
         }
-        return result;
     }
 
     private String getTaskResultValueAsStringOrExceptionStackTrace(TaskResult taskResult) {
@@ -969,24 +984,33 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Map<String, String> metadataOfTaskResult(String sessionId, String jobId, String taskname) throws Throwable {
+    public Map<String, String> metadataOfTaskResult(String sessionId, String jobId, String taskname)
+            throws RestException {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
-        TaskResult taskResult = s.getTaskResult(jobId, taskname);
-        taskResult = PAFuture.getFutureValue(taskResult);
-        return taskResult.getMetadata();
+        try {
+            TaskResult taskResult = s.getTaskResult(jobId, taskname);
+            taskResult = PAFuture.getFutureValue(taskResult);
+            return taskResult.getMetadata();
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
     }
 
     @Override
     public Map<String, Map<String, String>> metadataOfTaskResultByTag(String sessionId, String jobId, String taskTag)
-            throws Throwable {
+            throws RestException {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
-        List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
-        Map<String, Map<String, String>> result = new HashMap<>(trs.size());
-        for (TaskResult currentResult : trs) {
-            TaskResult r = PAFuture.getFutureValue(currentResult);
-            result.put(r.getTaskId().getReadableName(), r.getMetadata());
+        try {
+            List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
+            Map<String, Map<String, String>> result = new HashMap<>(trs.size());
+            for (TaskResult currentResult : trs) {
+                TaskResult r = PAFuture.getFutureValue(currentResult);
+                result.put(r.getTaskId().getReadableName(), r.getMetadata());
+            }
+            return result;
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
         }
-        return result;
     }
 
     @Override
@@ -1005,7 +1029,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public Map<Long, List<String>> getPreciousTaskNames(String sessionId, List<String> jobsId) throws RestException {
-        Map<Long, List<String>> result = new HashMap<>();
         try {
             Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
             return scheduler.getPreciousTaskNames(jobsId);
@@ -1015,24 +1038,91 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public byte[] serializedValueOfTaskResult(String sessionId, String jobId, String taskname) throws Throwable {
+    public byte[] serializedValueOfTaskResult(String sessionId, String jobId, String taskname) throws RestException {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/serializedvalue");
-        TaskResult tr = s.getTaskResult(jobId, taskname);
-        tr = PAFuture.getFutureValue(tr);
-        return tr.getSerializedValue();
+        try {
+            TaskResult tr = s.getTaskResult(jobId, taskname);
+            tr = PAFuture.getFutureValue(tr);
+            return tr.getSerializedValue();
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
+    public Response downloadTaskResult(String sessionId, String jobId, String taskname, String destination)
+            throws RestException {
+
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
+        try {
+            if (destination == null) {
+                destination = DESTINATION_BROWSER;
+            }
+
+            TaskResult tr = s.getTaskResult(jobId, taskname);
+            tr = PAFuture.getFutureValue(tr);
+            byte[] serializedValue;
+            Map<String, String> resultMetadata = tr.getMetadata();
+            if (resultMetadata == null) {
+                resultMetadata = new HashMap<>();
+            }
+
+            if (tr.hadException()) {
+                serializedValue = StackTraceUtil.getStackTrace(tr.getException()).getBytes();
+                resultMetadata.put(METADATA_CONTENT_TYPE, "text/plain");
+            } else if (tr.isRaw()) {
+                serializedValue = tr.getSerializedValue();
+                if (!resultMetadata.containsKey(METADATA_CONTENT_TYPE)) {
+                    resultMetadata.put(METADATA_CONTENT_TYPE, "application/octet-stream");
+                }
+            } else {
+                try {
+                    Serializable resultValue = tr.getValue();
+                    serializedValue = resultValue != null ? resultValue.toString().getBytes() : "null".getBytes();
+                } catch (Throwable t) {
+                    serializedValue = StackTraceUtil.getStackTrace(t).getBytes();
+                }
+                resultMetadata.put(METADATA_CONTENT_TYPE, "text/plain");
+            }
+
+            Response.ResponseBuilder builder = Response.ok().entity(new ByteArrayInputStream(serializedValue));
+
+            if (resultMetadata.containsKey(METADATA_CONTENT_TYPE)) {
+                builder = builder.header(HttpHeaders.CONTENT_TYPE, resultMetadata.get(METADATA_CONTENT_TYPE));
+            }
+            if (DESTINATION_FILE.equals(destination)) {
+                if (resultMetadata.containsKey(METADATA_FILE_NAME)) {
+                    builder = builder.header(HttpHeaders.CONTENT_DISPOSITION,
+                                             "attachment; filename=" + resultMetadata.get(METADATA_FILE_NAME));
+                } else if (resultMetadata.containsKey((METADATA_FILE_EXTENSION))) {
+
+                    builder = builder.header(HttpHeaders.CONTENT_DISPOSITION,
+                                             "attachment; filename=job_" + jobId + "_" + taskname + "_result" +
+                                                                              resultMetadata.get(METADATA_FILE_EXTENSION));
+                }
+            }
+
+            return builder.build();
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
     }
 
     @Override
     public Map<String, byte[]> serializedValueOfTaskResultByTag(String sessionId, String jobId, String taskTag)
-            throws Throwable {
+            throws RestException {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
-        List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
-        Map<String, byte[]> result = new HashMap<>(trs.size());
-        for (TaskResult currentResult : trs) {
-            TaskResult r = PAFuture.getFutureValue(currentResult);
-            result.put(r.getTaskId().getReadableName(), r.getSerializedValue());
+        try {
+            List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
+            Map<String, byte[]> result = new HashMap<>(trs.size());
+            for (TaskResult currentResult : trs) {
+                TaskResult r = PAFuture.getFutureValue(currentResult);
+                result.put(r.getTaskId().getReadableName(), r.getSerializedValue());
+            }
+            return result;
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
         }
-        return result;
     }
 
     @Override
