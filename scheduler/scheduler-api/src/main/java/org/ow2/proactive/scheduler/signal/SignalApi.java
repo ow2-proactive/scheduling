@@ -93,13 +93,12 @@ public interface SignalApi extends Serializable {
     String waitForAny(Set<String> signalsSubSet) throws SignalApiException;
 
     /**
-     * Wait until all the signals (among those of the given {@code signalsSubSet}) are added to the set of job signals
+     * Wait until all the input signals are added to the set of job signals
      *
      * @param signalsSubSet set of the signals to wait for them
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
     void waitForAll(Set<String> signalsSubSet) throws SignalApiException;
-
 
     /**
      * Add the given {@code signal} to the set of job signals
