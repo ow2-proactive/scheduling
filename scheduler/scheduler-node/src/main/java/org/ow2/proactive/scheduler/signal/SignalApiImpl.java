@@ -246,4 +246,22 @@ public class SignalApiImpl implements SignalApi {
             throw new SignalApiException("Could not check signals of the job " + jobId, e);
         }
     }
+
+    @Override
+    public void waitForAll(Set<String> signalsSubSet) throws SignalApiException {
+        init();
+        StringBuilder conditions = new StringBuilder();
+        for (String signal : signalsSubSet) {
+            conditions.append("x.contains('" + signal + "') && ");
+        }
+        String allConditions = conditions.substring(0, conditions.toString().lastIndexOf("&&"));
+
+        try {
+            synchronization.waitUntil(SIGNALS_CHANNEL, jobId, "{k, x -> " + allConditions + " }");
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (CompilationException e) {
+            throw new SignalApiException("Could not check signals of the job " + jobId, e);
+        }
+    }
 }
