@@ -1031,13 +1031,16 @@ public interface SchedulerRestInterface {
      *            possible values "file" or "browser". In the first case,
      *            Content-disposition and attachment may be included in the response. In the second case, only Content-Type may be included.
      *            Default is browser
+     * @param sessionToken
+     *            alternative way to pass the sessionid as a query parameter
      * @return a response containing the result as a byte stream.
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/download")
     @Produces("*/*")
     Response downloadTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname, @QueryParam("destination") String destination) throws RestException;
+            @PathParam("taskname") String taskname, @QueryParam("destination") String destination,
+            @QueryParam("sessionToken") String sessionToken) throws RestException;
 
     /**
      * Returns the values of a set of tasks of the job <code>jobId</code>
