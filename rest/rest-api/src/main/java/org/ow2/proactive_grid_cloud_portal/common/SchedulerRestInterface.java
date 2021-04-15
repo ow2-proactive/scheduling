@@ -75,6 +75,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.WorkflowDescription;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
@@ -1394,6 +1395,22 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     JobIdData reSubmit(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos)
+            throws IOException, RestException;
+
+    /**
+     * Get workflow description from a submitted job
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            job id of the already submitted job
+     * @return description of the job (contains various information, job name, variables, etc)
+     * @throws PermissionRestException if user does not have rights to access job with <code>jobId</code>
+     */
+    @GET
+    @Path("jobs/{jobid}/description")
+    @Produces("application/json")
+    WorkflowDescription getDescription(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws IOException, RestException;
 
     /**

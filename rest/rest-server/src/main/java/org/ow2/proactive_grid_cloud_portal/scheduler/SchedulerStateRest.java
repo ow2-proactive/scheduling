@@ -85,6 +85,7 @@ import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
@@ -163,6 +164,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public static final String DESTINATION_BROWSER = "browser";
 
     public static final String DESTINATION_FILE = "file";
+
+    public static final String BUCKET_NAME_GI = "bucketName";
+
+    public static final String WORKFLOW_ICON_GI = "workflow.icon";
+
+    public static final String DOCUMENTATION_GI = "Documentation";
 
     static {
         sortableTaskAttrMap = createSortableTaskAttrMap();
@@ -1711,6 +1718,35 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             newJobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
         }
         return mapper.map(newJobId, JobIdData.class);
+    }
+
+    @Override
+    public WorkflowDescription getDescription(String sessionId, String jobId) throws IOException, RestException {
+        Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/variables");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        try {
+            String jobXml = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
+            Job job;
+            try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+                job = JobFactory.getFactory().createJob(tmpWorkflowStream, null, null, scheduler, space);
+            }
+            WorkflowDescription workflowDescription = new WorkflowDescription();
+            workflowDescription.setName(job.getName());
+            workflowDescription.setProjectName(job.getProjectName());
+            workflowDescription.setDescription(job.getDescription());
+            workflowDescription.setVariables(job.getVariables());
+            Map<String, String> genericInfo = job.getGenericInformation();
+            workflowDescription.setGenericInformation(genericInfo);
+            if (genericInfo != null) {
+                workflowDescription.setBucketName(genericInfo.get(BUCKET_NAME_GI));
+                workflowDescription.setIcon(genericInfo.get(WORKFLOW_ICON_GI));
+                workflowDescription.setDocumentation(genericInfo.get(DOCUMENTATION_GI));
+            }
+            return workflowDescription;
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
     }
 
     @Override
