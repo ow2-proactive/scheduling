@@ -1057,10 +1057,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Response downloadTaskResult(String sessionId, String jobId, String taskname, String destination)
-            throws RestException {
+    public Response downloadTaskResult(String sessionId, String jobId, String taskname, String destination,
+            String sessionToken) throws RestException {
 
-        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
+        String session = sessionId != null ? sessionId : sessionToken;
+
+        Scheduler s = checkAccess(session, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
         try {
             if (destination == null) {
                 destination = DESTINATION_BROWSER;
