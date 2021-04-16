@@ -508,6 +508,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
             InternalJob currentJob = ((JobDescriptorImpl) jobsMap.get(etd.getJobId())).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
+            internalTask.updateVariables(schedulingService);
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob);
             boolean firstLoop = true;
@@ -519,6 +520,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         ((EligibleTaskDescriptorImpl) etd).addAttempt();
                         currentJob = ((JobDescriptorImpl) jobsMap.get(etd.getJobId())).getInternal();
                         internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
+                        internalTask.updateVariables(schedulingService);
                         neededNodes = internalTask.getNumberOfNodesNeeded();
                     }
                 } else {

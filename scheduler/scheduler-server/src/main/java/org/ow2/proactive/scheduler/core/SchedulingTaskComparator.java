@@ -38,6 +38,8 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.SelectionScript;
 
+import com.google.common.base.Strings;
+
 
 /**
  * SchedulingJobComparator is used to compare jobs for scheduling.
@@ -124,17 +126,18 @@ public class SchedulingTaskComparator {
         //if the parallel environment is specified for any of tasks => not equal
         boolean isParallel = task.isParallel() || tcomp.task.isParallel();
 
-        boolean requireNodeWithTokern = task.getRuntimeGenericInformation()
-                                            .containsKey(SchedulerConstants.NODE_ACCESS_TOKEN) ||
-                                        tcomp.task.getRuntimeGenericInformation()
-                                                  .containsKey(SchedulerConstants.NODE_ACCESS_TOKEN);
+        String tokenA = task.getRuntimeGenericInformation().get(SchedulerConstants.NODE_ACCESS_TOKEN);
+        String tokenB = tcomp.task.getRuntimeGenericInformation().get(SchedulerConstants.NODE_ACCESS_TOKEN);
+
+        boolean sameToken = (Strings.isNullOrEmpty(tokenA) && Strings.isNullOrEmpty(tokenB)) ||
+                            (!Strings.isNullOrEmpty(tokenA) && !Strings.isNullOrEmpty(tokenB) && tokenA.equals(tokenB));
 
         // if topology is specified for any of task => not equal
         // for now topology is allowed only for parallel tasks which is
         // checked before
 
         //add the 6 tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && !isParallel && !requireNodeWithTokern;
+        return sameSsHash && sameNodeEx && sameOwner && !isParallel && sameToken;
     }
 
 }
