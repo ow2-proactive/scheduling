@@ -92,7 +92,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("url")
-    @Produces("text/plain")
+    @Produces(MediaType.TEXT_PLAIN)
     String getUrl();
 
     /**
@@ -105,7 +105,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("login")
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String rmConnect(@FormParam("username") String username, @FormParam("password") String password)
             throws KeyException, LoginException, RMException, RMActiveObjectCreationException, RMNodeException;
 
@@ -119,7 +119,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("disconnect")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void rmDisconnect(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     /**
@@ -140,7 +140,7 @@ public interface RMRestInterface {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String loginWithCredential(@MultipartForm LoginForm multipart) throws RMActiveObjectCreationException,
             RMNodeException, KeyException, IOException, LoginException, RMException;
 
@@ -157,7 +157,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("logins/sessionid/{sessionId}")
-    @Produces("application/json")
+    @Produces(MediaType.TEXT_PLAIN)
     String getLoginFromSessionId(@PathParam("sessionId") String sessionId);
 
     /**
@@ -173,7 +173,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("logins/sessionid/{sessionId}/userdata")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId);
 
     /**
@@ -186,7 +186,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("state")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RMState getState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     /**
@@ -204,7 +204,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("monitoring")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RMStateDelta getRMStateDelta(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter)
             throws NotConnectedException, PermissionRestException;
@@ -219,7 +219,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("monitoring/full")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
@@ -231,7 +231,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("model/hosts")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getModelHosts() throws PermissionRestException;
 
     /**
@@ -242,7 +242,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("model/nodesources")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getModelNodeSources() throws PermissionRestException;
 
     /**
@@ -255,7 +255,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("isactive")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean isActive(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     /**
@@ -269,7 +269,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("node")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String url,
             @FormParam("nodesource") String nodesource) throws NotConnectedException;
 
@@ -285,7 +285,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("node/isavailable")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean nodeIsAvailable(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String url)
             throws NotConnectedException;
 
@@ -299,7 +299,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("nodesource")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<RMNodeSourceEvent> getExistingNodeSources(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
@@ -319,7 +319,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("nodesource")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     NSState defineNodeSource(@HeaderParam("sessionid") String sessionId, //NOSONAR
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
@@ -347,7 +347,7 @@ public interface RMRestInterface {
      */
     @PUT
     @Path("nodesource/edit")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     NSState editNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
@@ -374,7 +374,7 @@ public interface RMRestInterface {
      */
     @PUT
     @Path("nodesource/parameter")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     NSState updateDynamicParameters(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
@@ -391,7 +391,7 @@ public interface RMRestInterface {
     @Deprecated
     @POST
     @Path("nodesource/create")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
@@ -424,7 +424,7 @@ public interface RMRestInterface {
     @Deprecated
     @POST
     @Path("nodesource/create/recovery")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
@@ -445,7 +445,7 @@ public interface RMRestInterface {
      */
     @PUT
     @Path("nodesource/deploy")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     NSState deployNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException, PermissionRestException;
 
@@ -460,7 +460,7 @@ public interface RMRestInterface {
      */
     @PUT
     @Path("nodesource/undeploy")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt)
             throws NotConnectedException, PermissionRestException;
@@ -476,7 +476,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("nodesource/pingfrequency")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
             @FormParam("sourcename") String sourceName) throws NotConnectedException, PermissionRestException;
 
@@ -494,7 +494,7 @@ public interface RMRestInterface {
     @POST
     @Path("nodesource/{sourcename}/nodes")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Set<String> acquireNodes(@HeaderParam("sessionid") String sessionId, @PathParam("sourcename") String sourceName,
             @QueryParam("numbernodes") int numberNodes, @QueryParam("sync") @DefaultValue("false") boolean synchronous,
             @QueryParam("timeout") @DefaultValue("600") long timeout, final String nodeConfigJson)
@@ -509,7 +509,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("node/release")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean releaseNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String url)
             throws RMNodeException, NotConnectedException, PermissionRestException;
 
@@ -523,7 +523,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("node/remove")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean removeNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String nodeUrl,
             @FormParam("preempt") boolean preempt) throws NotConnectedException, PermissionRestException;
 
@@ -537,7 +537,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("nodesource/remove")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean removeNodeSource(@HeaderParam("sessionid") String sessionId, @FormParam("name") String sourceName,
             @FormParam("preempt") boolean preempt) throws NotConnectedException, PermissionRestException;
 
@@ -552,7 +552,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("node/lock")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean lockNodes(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurls") Set<String> nodeUrls)
             throws NotConnectedException, PermissionRestException;
 
@@ -567,7 +567,7 @@ public interface RMRestInterface {
      */
     @POST
     @Path("node/unlock")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean unlockNodes(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurls") Set<String> nodeUrls)
             throws NotConnectedException, PermissionRestException;
 
@@ -583,8 +583,8 @@ public interface RMRestInterface {
      */
     @GET
     @GZIP
-    @Produces("application/json")
     @Path("node/mbean")
+    @Produces(MediaType.APPLICATION_JSON)
     Object getNodeMBeanInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectName, @QueryParam("attrs") List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
@@ -618,8 +618,8 @@ public interface RMRestInterface {
      */
     @GET
     @GZIP
-    @Produces("application/json")
     @Path("node/mbean/history")
+    @Produces(MediaType.APPLICATION_JSON)
     String getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectName, @QueryParam("attrs") List<String> attrs,
             @QueryParam("range") String range)
@@ -655,8 +655,8 @@ public interface RMRestInterface {
      */
     @GET
     @GZIP
-    @Produces("application/json")
     @Path("nodes/mbean/history")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, Map<String, Object>> getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
             @QueryParam("nodesjmxurl") List<String> nodesJmxUrl, @QueryParam("objectname") String objectName,
             @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
@@ -675,8 +675,8 @@ public interface RMRestInterface {
      */
     @GET
     @GZIP
-    @Produces("application/json")
     @Path("node/mbeans")
+    @Produces(MediaType.APPLICATION_JSON)
     Object getNodeMBeansInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectNames, @QueryParam("attrs") List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
@@ -707,8 +707,8 @@ public interface RMRestInterface {
      */
     @GET
     @GZIP
-    @Produces("application/json")
     @Path("node/mbeans/history")
+    @Produces(MediaType.APPLICATION_JSON)
     Object getNodeMBeansHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectNames, @QueryParam("attrs") List<String> attrs,
             @QueryParam("range") String range) throws InstanceNotFoundException, IntrospectionException,
@@ -727,14 +727,14 @@ public interface RMRestInterface {
      */
     @GET
     @Path("shutdown")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean shutdown(@HeaderParam("sessionid") String sessionId,
             @QueryParam("preempt") @DefaultValue("false") boolean preempt)
             throws NotConnectedException, PermissionRestException;
 
     @GET
     @Path("topology")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     TopologyData getTopology(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
@@ -749,7 +749,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("infrastructures")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Collection<PluginDescriptorData> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
@@ -763,7 +763,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("infrastructures/mapping")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
@@ -776,7 +776,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("policies")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Collection<PluginDescriptorData> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
@@ -790,7 +790,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("nodesource/configuration")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     NodeSourceConfiguration getNodeSourceConfiguration(@HeaderParam("sessionid") String sessionId,
             @QueryParam("nodeSourceName") String nodeSourceName) throws NotConnectedException, PermissionRestException;
 
@@ -807,7 +807,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("info/{name}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Object getMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
             @QueryParam("attr") List<String> attrs) throws InstanceNotFoundException, IntrospectionException,
             ReflectionException, IOException, NotConnectedException, PermissionRestException;
@@ -827,7 +827,7 @@ public interface RMRestInterface {
     @POST
     @GZIP
     @Path("info/{name}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void setMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
             @QueryParam("type") String type, @QueryParam("attr") String attr, @QueryParam("value") String value)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
@@ -881,7 +881,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("stathistory")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range,
             @QueryParam("function") String function)
             throws ReflectionException, InterruptedException, IntrospectionException, NotConnectedException,
@@ -894,6 +894,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("version")
+    @Produces(MediaType.TEXT_PLAIN)
     String getVersion();
 
     /**
@@ -909,7 +910,7 @@ public interface RMRestInterface {
     @POST
     @GZIP
     @Path("node/script")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeurl") String nodeUrl, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable;
@@ -927,7 +928,7 @@ public interface RMRestInterface {
     @POST
     @GZIP
     @Path("nodesource/script")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodesource") String nodeSource, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable;
@@ -947,7 +948,7 @@ public interface RMRestInterface {
     @POST
     @GZIP
     @Path("host/script")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     ScriptResult<Object> executeHostScript(@HeaderParam("sessionid") String sessionId, @FormParam("host") String host,
             @FormParam("script") String script, @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
@@ -962,7 +963,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("threaddump")
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getRMThreadDump(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     /**
@@ -976,7 +977,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("node/threaddump")
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getNodeThreadDump(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String nodeUrl)
             throws NotConnectedException;
 
@@ -997,7 +998,7 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Path("nodes/history")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(
             @HeaderParam("sessionid") String sessionId, @HeaderParam("windowStart") long windowStart,
             @HeaderParam("windowEnd") long windowEnd) throws NotConnectedException;
@@ -1011,7 +1012,7 @@ public interface RMRestInterface {
     @POST
     @GZIP
     @Path("node/token")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void addNodeToken(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
             @HeaderParam("token") String token) throws NotConnectedException, RestException;
 
@@ -1024,7 +1025,7 @@ public interface RMRestInterface {
     @DELETE
     @GZIP
     @Path("node/token")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void removeNodeToken(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
             @HeaderParam("token") String token) throws NotConnectedException, RestException;
 
@@ -1037,7 +1038,7 @@ public interface RMRestInterface {
     @POST
     @GZIP
     @Path("node/tokens")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void setNodeTokens(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
             @QueryParam("tokens") List<String> tokens) throws NotConnectedException, RestException;
 
@@ -1048,7 +1049,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("node/tags")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Set<String> getNodeTags(@HeaderParam("sessionid") String sessionId) throws NotConnectedException, RestException;
 
     /**
@@ -1059,7 +1060,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("node/tags/search")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Set<String> getNodeTags(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String url)
             throws NotConnectedException, RestException;
 
@@ -1073,7 +1074,7 @@ public interface RMRestInterface {
      */
     @GET
     @Path("nodes/search")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Set<String> searchNodes(@HeaderParam("sessionid") String sessionId, @QueryParam("tags") List<String> tags,
             @QueryParam("all") @DefaultValue("true") boolean all) throws NotConnectedException, RestException;
 }

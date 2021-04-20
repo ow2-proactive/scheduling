@@ -939,7 +939,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Serializable valueOfTaskResult(String sessionId, String jobId, String taskname) throws RestException {
+    public String valueOfTaskResult(String sessionId, String jobId, String taskname) throws RestException {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
         try {
             TaskResult taskResult = s.getTaskResult(jobId, taskname);

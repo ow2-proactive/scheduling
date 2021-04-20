@@ -59,6 +59,7 @@ public interface CommonRestInterface {
      */
     @POST
     @Path("login")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String login(@FormParam("username") String username, @FormParam("password") String password)
             throws LoginException, SchedulerRestException;
 
@@ -79,6 +80,7 @@ public interface CommonRestInterface {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String loginWithCredential(@MultipartForm LoginForm multipart)
             throws KeyException, LoginException, SchedulerRestException;
 
@@ -102,6 +104,7 @@ public interface CommonRestInterface {
      */
     @GET
     @Path("connected")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
 
     /**
@@ -116,6 +119,7 @@ public interface CommonRestInterface {
      */
     @GET
     @Path("currentuser")
+    @Produces(MediaType.TEXT_PLAIN)
     String currentUser(@HeaderParam("sessionid") String sessionId);
 
     /**
@@ -130,6 +134,7 @@ public interface CommonRestInterface {
      */
     @GET
     @Path("currentuserdata")
+    @Produces(MediaType.APPLICATION_JSON)
     UserData currentUserData(@HeaderParam("sessionid") String sessionId);
 
     /**
@@ -144,6 +149,7 @@ public interface CommonRestInterface {
      */
     @GET
     @Path("permissions/portals")
+    @Produces(MediaType.APPLICATION_JSON)
     List<String> portalsAccesses(@HeaderParam("sessionid") String sessionId,
             @QueryParam("portals") List<String> portals) throws RestException;
 
@@ -159,6 +165,7 @@ public interface CommonRestInterface {
      */
     @GET
     @Path("permissions/portals/{portal}")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean portalAccess(@HeaderParam("sessionid") String sessionId, @PathParam("portal") String portal)
             throws RestException;
 
@@ -171,6 +178,7 @@ public interface CommonRestInterface {
      */
     @GET
     @Path("permissions/notification-service/admin")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean checkSubscriptionAdmin(@HeaderParam("sessionid") String sessionId) throws RestException;
 
     /**
@@ -182,6 +190,7 @@ public interface CommonRestInterface {
      */
     @GET
     @Path("permissions/cloud-automation-service/admin")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean checkPcaAdmin(@HeaderParam("sessionid") String sessionId) throws RestException;
 
 }
