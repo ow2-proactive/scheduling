@@ -37,7 +37,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
@@ -131,6 +133,7 @@ public interface RestDataspace {
      */
     @GET
     @Path("/{dataspace}/{path-name:.*}")
+    @Produces(MediaType.WILDCARD)
     Response retrieve(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("Accept-Encoding") String headerAcceptEncoding, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("comp") String component,

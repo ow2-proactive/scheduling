@@ -27,7 +27,6 @@ package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,7 +97,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("url")
-    @Produces("text/plain")
+    @Produces(MediaType.TEXT_PLAIN)
     String getUrl();
 
     /**
@@ -116,7 +115,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<String> jobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index, @QueryParam("limit") @DefaultValue("-1") int limit)
             throws RestException;
@@ -138,7 +137,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobsinfo")
-    @Produces({ "application/json", "application/xml" })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     RestPage<UserJobData> jobsInfo(@HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index, @QueryParam("limit") @DefaultValue("-1") int limit)
             throws RestException;
@@ -154,7 +153,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobsinfolist")
-    @Produces({ "application/json", "application/xml" })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     List<UserJobData> jobsInfoList(@HeaderParam("sessionid") String sessionId,
             @QueryParam("jobsid") List<String> jobsId) throws RestException;
 
@@ -170,7 +169,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("jobsinfolist")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({ "application/json", "application/xml" })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     List<UserJobData> jobsInfoListPost(@HeaderParam("sessionid") String sessionId, List<String> jobsId)
             throws RestException;
 
@@ -207,7 +206,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("revisionjobsinfo")
-    @Produces({ "application/json", "application/xml" })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(@HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index, @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
@@ -225,7 +224,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("state/revision")
-    @Produces({ "application/json", "application/xml" })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     long schedulerStateRevision(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException;
 
     /**
@@ -238,7 +237,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}")
-    @Produces({ "application/json", "application/xml" })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     JobStateData listJobs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -253,7 +252,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/result")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     JobResultData jobResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -268,7 +267,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/resultmap")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, String> jobResultMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -280,7 +279,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/resultmap")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<Long, Map<String, String>> jobResultMaps(@HeaderParam("sessionid") String sessionId,
             @QueryParam("jobsid") List<String> jobsId) throws RestException;
 
@@ -295,7 +294,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/info")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     JobInfoData jobInfo(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -315,7 +314,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/result/value")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, String> jobResultValue(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -332,7 +331,7 @@ public interface SchedulerRestInterface {
      */
     @DELETE
     @Path("jobs/{jobid}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean removeJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -342,7 +341,7 @@ public interface SchedulerRestInterface {
      */
     @DELETE
     @Path("jobs")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean removeJobs(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
             throws RestException;
 
@@ -358,7 +357,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/log/server")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String jobServerLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -373,7 +372,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/kill")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean killJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) throws RestException;
 
     /**
@@ -384,7 +383,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/kill")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean killJobs(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
             throws RestException;
 
@@ -400,7 +399,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/tasks")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<String> getTasksNames(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -420,7 +419,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/tasks/paginated")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<String> getTasksNamesPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit) throws RestException;
@@ -440,7 +439,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/tasks/tag/{tasktag}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<String> getJobTasksIdsByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -464,7 +463,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/paginated")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<String> getJobTasksIdsByTagPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit)
@@ -502,7 +501,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("tasks")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<String> getTaskIds(@HeaderParam("sessionid") String sessionId,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
@@ -545,7 +544,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("tasks/tag/{tasktag}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<String> getTaskIdsByTag(@HeaderParam("sessionid") String sessionId, @PathParam("tasktag") String taskTag,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
@@ -565,7 +564,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/tasks/tags")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<String> getJobTaskTags(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -583,7 +582,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/tasks/tags/startsWith/{prefix}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<String> getJobTaskTagsPrefix(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("prefix") String prefix) throws RestException;
 
@@ -617,7 +616,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/xml")
-    @Produces("application/xml")
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     String getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -634,7 +633,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<TaskStateData> getJobTaskStates(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws RestException;
 
@@ -649,7 +648,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/taskstates/visualization")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<TaskStateData> getJobTaskStatesWithVisualization(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws RestException;
 
@@ -670,7 +669,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates/paginated")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<TaskStateData> getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit) throws RestException;
@@ -678,7 +677,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates/filtered/paginated")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<TaskStateData> getJobTaskStatesFilteredPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit,
@@ -699,7 +698,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<TaskStateData> getJobTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -723,7 +722,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<TaskStateData> getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("50") int limit)
@@ -732,7 +731,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}/{statusFilter}/paginated")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit, @PathParam("tasktag") String taskTag,
@@ -772,7 +771,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("taskstates")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<TaskStateData> getTaskStates(@HeaderParam("sessionid") String sessionId,
             @QueryParam("from") @DefaultValue("0") long from, @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
@@ -817,7 +816,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("taskstates/tag/{tasktag}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     RestPage<TaskStateData> getTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("tasktag") String taskTag, @QueryParam("from") @DefaultValue("0") long from,
             @QueryParam("to") @DefaultValue("0") long to, @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
@@ -840,7 +839,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/log/full")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     InputStream jobFullLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @QueryParam("sessionid") String session) throws RestException, IOException;
 
@@ -861,7 +860,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/result/log/all")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String jobLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) throws RestException;
 
     /**
@@ -879,7 +878,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     TaskStateData jobTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -902,8 +901,8 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/value")
-    @Produces("*/*")
-    Serializable valueOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
+    String valueOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
     /**
@@ -925,7 +924,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/value")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, String> valueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -946,7 +945,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/metadata")
-    @Produces("*/*")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws RestException;
 
@@ -964,7 +963,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/metadata")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -979,7 +978,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/results/precious/metadata")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<String> getPreciousTaskName(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws RestException;
 
@@ -991,7 +990,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/result/precious/metadata")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
             @QueryParam("jobsid") List<String> jobsId) throws RestException;
 
@@ -1011,7 +1010,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
-    @Produces("*/*")
+    @Produces(MediaType.WILDCARD)
     byte[] serializedValueOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1037,7 +1036,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/download")
-    @Produces("*/*")
+    @Produces(MediaType.WILDCARD)
     Response downloadTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname, @QueryParam("destination") String destination,
             @QueryParam("sessionToken") String sessionToken) throws RestException;
@@ -1059,7 +1058,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, byte[]> serializedValueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1078,7 +1077,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     TaskResultData taskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1097,7 +1096,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<TaskResultData> taskResultByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1118,7 +1117,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String taskLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1138,7 +1137,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/all")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String taskLogByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1159,7 +1158,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String taskLogErr(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1181,7 +1180,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/err")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String taskLogErrByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1202,7 +1201,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String taskLogout(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1224,7 +1223,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/out")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String taskLogoutByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1247,7 +1246,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/full")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     InputStream taskFullLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname, @QueryParam("sessionid") String session)
             throws RestException, IOException;
@@ -1266,7 +1265,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/log/server")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String taskServerLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -1284,7 +1283,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/log/server")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String taskServerLogByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag) throws RestException;
 
@@ -1299,7 +1298,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/pause")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean pauseJob(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId) throws RestException;
@@ -1315,7 +1314,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/restartAllInErrorTasks")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean restartAllInErrorTasks(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId) throws RestException;
@@ -1331,7 +1330,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/resume")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean resumeJob(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId) throws RestException;
@@ -1354,7 +1353,7 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("submitflat")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     JobIdData submitFlat(@HeaderParam("sessionid") String sessionId,
             @FormParam("commandFileContent") String commandFileContent, @FormParam("jobName") String jobName,
             @FormParam("selectionScriptContent") String selectionScriptContent,
@@ -1376,7 +1375,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             MultipartFormDataInput multipart, @Context UriInfo contextInfos) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
@@ -1395,7 +1394,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/{path:resubmit}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     JobIdData reSubmit(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos)
             throws IOException, RestException;
@@ -1412,7 +1411,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/description")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     WorkflowDescription getDescription(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws IOException, RestException;
 
@@ -1428,7 +1427,7 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("jobs/resubmit")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<JobIdData> reSubmitAll(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
             throws RestException;
 
@@ -1443,7 +1442,7 @@ public interface SchedulerRestInterface {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     @Path("{path:plannings}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     String submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             Map<String, String> jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
@@ -1464,7 +1463,7 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("{path:jobs}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
             @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
@@ -1488,7 +1487,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("{path:jobs}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
             @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart, @Context UriInfo contextInfos)
             throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
@@ -1513,7 +1512,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean pushFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,
             @PathParam("filePath") String filePath, MultipartFormDataInput multipart)
             throws IOException, NotConnectedRestException, PermissionRestException;
@@ -1536,7 +1535,7 @@ public interface SchedulerRestInterface {
      **/
     @GET
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON })
     InputStream pullFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,
             @PathParam("filePath") String filePath)
             throws IOException, NotConnectedRestException, PermissionRestException;
@@ -1553,7 +1552,7 @@ public interface SchedulerRestInterface {
      **/
     @DELETE
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean deleteFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,
             @PathParam("filePath") String filePath)
             throws IOException, NotConnectedRestException, PermissionRestException;
@@ -1570,7 +1569,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("disconnect")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void disconnect(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1583,7 +1582,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("pause")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean pauseScheduler(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1596,7 +1595,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("stop")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean stopScheduler(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1609,7 +1608,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("resume")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean resumeScheduler(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1625,6 +1624,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/priority/byname/{name}")
+    @Produces(MediaType.APPLICATION_JSON)
     void schedulerChangeJobPriorityByName(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId, @PathParam("name") String priorityName) throws RestException;
@@ -1641,6 +1641,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/priority/byvalue/{value}")
+    @Produces(MediaType.APPLICATION_JSON)
     void schedulerChangeJobPriorityByValue(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId, @PathParam("value") String priorityValue) throws RestException;
@@ -1654,7 +1655,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("freeze")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean freezeScheduler(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1667,7 +1668,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("status")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     SchedulerStatusData getSchedulerStatus(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1680,7 +1681,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("start")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean startScheduler(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1693,7 +1694,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("kill")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean killScheduler(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1706,7 +1707,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("shutdown")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean shutdownScheduler(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1722,7 +1723,7 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("linkrm")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean linkRm(@HeaderParam("sessionid")
     final String sessionId, @FormParam("rmurl") String rmURL) throws RestException;
 
@@ -1736,7 +1737,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("isconnected")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean isConnected(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException;
 
@@ -1753,7 +1754,7 @@ public interface SchedulerRestInterface {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("login")
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String login(@FormParam("username") String username, @FormParam("password") String password)
             throws LoginException, SchedulerRestException;
 
@@ -1772,7 +1773,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("session")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String loginOrRenewSession(@HeaderParam("sessionid") String sessionId, @FormParam("username") String username,
             @FormParam("password") String password)
             throws SchedulerRestException, LoginException, NotConnectedRestException;
@@ -1794,7 +1795,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("session")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String loginOrRenewSession(@HeaderParam("sessionid") String sessionId, @MultipartForm LoginForm multipart)
             throws KeyException, SchedulerRestException, LoginException, NotConnectedRestException;
 
@@ -1809,7 +1810,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("logins/sessionid/{sessionId}")
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getLoginFromSessionId(@PathParam("sessionId") String sessionId);
 
     /**
@@ -1823,7 +1824,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("logins/sessionid/{sessionId}/userdata")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId);
 
     /**
@@ -1836,7 +1837,7 @@ public interface SchedulerRestInterface {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String loginWithCredential(@MultipartForm LoginForm multipart)
             throws KeyException, LoginException, SchedulerRestException;
 
@@ -1850,18 +1851,18 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("users")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<SchedulerUserData> getUsers(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
     @GET
     @Path("userspace")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<String> userspaceURIs(@HeaderParam("sessionid") String sessionId) throws RestException;
 
     @GET
     @Path("globalspace")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<String> globalspaceURIs(@HeaderParam("sessionid") String sessionId) throws RestException;
 
     /**
@@ -1874,7 +1875,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("userswithjobs")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<SchedulerUserData> getUsersWithJobs(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1887,7 +1888,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("stats")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, String> getStatistics(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
@@ -1907,7 +1908,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("stathistory")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public String getStatHistory(@HeaderParam("sessionid")
     final String sessionId, @QueryParam("function") String function) throws NotConnectedRestException;
 
@@ -1920,7 +1921,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("stats/myaccount")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, String> getStatisticsOnMyAccount(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -1932,7 +1933,7 @@ public interface SchedulerRestInterface {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("createcredential")
-    @Produces("*/*")
+    @Produces(MediaType.WILDCARD)
     byte[] getCreateCredential(@MultipartForm LoginForm multipart) throws LoginException, SchedulerRestException;
 
     /**
@@ -1960,7 +1961,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("usage/myaccount")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<JobUsageData> getUsageOnMyAccount(@HeaderParam("sessionid") String sessionId,
             @QueryParam("startdate") Date startDate, @QueryParam("enddate") Date endDate) throws RestException;
 
@@ -1991,7 +1992,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("usage/account")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     List<JobUsageData> getUsageOnAccount(@HeaderParam("sessionid") String sessionId, @QueryParam("user") String user,
             @QueryParam("startdate") Date startDate, @QueryParam("enddate") Date endDate) throws RestException;
 
@@ -2006,7 +2007,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/livelog")
-    @Produces("application/json")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
             LogForwardingRestException, IOException;
@@ -2020,7 +2021,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/livelog/available")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     int getLiveLogJobAvailable(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException;
 
@@ -2032,7 +2033,7 @@ public interface SchedulerRestInterface {
      */
     @DELETE
     @Path("jobs/{jobid}/livelog")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean deleteLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException;
 
@@ -2046,7 +2047,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/visu")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void enableRemoteVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,
             @PathParam("taskname") String taskname, @QueryParam("connectionString") String connectionString)
             throws RestException;
@@ -2063,7 +2064,7 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("jobs/{jobid}/services")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void registerService(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @QueryParam("serviceInstanceid") int serviceInstanceid, @QueryParam("enableActions") boolean enableActions)
             throws RestException;
@@ -2080,7 +2081,7 @@ public interface SchedulerRestInterface {
      */
     @DELETE
     @Path("jobs/{jobid}/services")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     void detachService(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @QueryParam("serviceid") int serviceid) throws RestException;
 
@@ -2093,7 +2094,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/restart")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean restartTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -2106,7 +2107,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/finishInErrorTask")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean finishInErrorTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -2119,7 +2120,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/restartInErrorTask")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean restartInErrorTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -2134,7 +2135,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/preempt")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean preemptTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -2147,7 +2148,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/kill")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean killTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,
             @PathParam("taskname") String taskname) throws RestException;
 
@@ -2165,7 +2166,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("{path:validate}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     JobValidationData validate(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             MultipartFormDataInput multipart) throws NotConnectedRestException;
 
@@ -2182,7 +2183,7 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("{path:validateurl}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public JobValidationData validateFromUrl(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("link") String url, @PathParam("path") PathSegment pathSegment)
             throws NotConnectedRestException;
@@ -2203,24 +2204,26 @@ public interface SchedulerRestInterface {
     @POST
     @Path("{path:validateurl}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public JobValidationData validateFromUrl(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("link") String url, @PathParam("path") PathSegment pathSegment,
             MultipartFormDataInput multipart) throws NotConnectedRestException;
 
     @POST
     @Path("/credentials/{key}")
+    @Produces(MediaType.APPLICATION_JSON)
     void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") @Encoded String key,
             @FormParam("value") String value) throws RestException;
 
     @DELETE
     @Path("/credentials/{key}")
+    @Produces(MediaType.APPLICATION_JSON)
     void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") @Encoded String key)
             throws RestException;
 
     @GET
     @Path("/credentials/")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Set<String> thirdPartyCredentialsKeySet(@HeaderParam("sessionid") String sessionId) throws RestException;
 
     /**
@@ -2236,7 +2239,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/startat/{startAt}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean changeStartAt(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId, @PathParam("startAt")
@@ -2247,7 +2250,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("configuration/portal")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public Map<Object, Object> getPortalConfiguration(@HeaderParam("sessionid") String sessionId) throws RestException;
 
     /**
@@ -2259,7 +2262,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("properties")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid")
     final String sessionId) throws RestException;
 
@@ -2272,7 +2275,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("job/{jobid}/permission/{method}")
     @Consumes(value = MediaType.APPLICATION_JSON)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     boolean checkJobPermissionMethod(@HeaderParam("sessionid") String sessionId, @PathParam("method") String method,
             @PathParam("jobid") String jobId) throws RestException;
 
@@ -2285,7 +2288,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("job/{jobid}/signals")
     @Consumes(value = MediaType.APPLICATION_JSON)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
             @PathParam("jobid") String jobId) throws RestException, SignalApiException;
 }
