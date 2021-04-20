@@ -26,6 +26,7 @@
 package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.security.KeyException;
+import java.security.PrivateKey;
 
 import javax.security.auth.login.LoginException;
 
@@ -42,6 +43,7 @@ import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive_grid_cloud_portal.dataspace.FileSystem;
 import org.ow2.proactive_grid_cloud_portal.dataspace.SchedulerDataspaceImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
@@ -74,12 +76,24 @@ public class Session {
 
     private FileSystem fs;
 
+    private static PrivateKey corePrivateKey;
+
     public Session(String sessionId, SchedulerRMProxyFactory schedulerRMProxyFactory, Clock clock) {
         this.sessionId = sessionId;
         this.schedulerRMProxyFactory = schedulerRMProxyFactory;
         this.clock = clock;
+        initPrivateKey();
         updateLastAccessedTime();
+    }
 
+    private static synchronized void initPrivateKey() {
+        if (corePrivateKey == null) {
+            try {
+                corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
+            } catch (Exception e) {
+                logger.error("Could not initialize private key", e);
+            }
+        }
     }
 
     private void updateLastAccessedTime() {
@@ -108,6 +122,11 @@ public class Session {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
         this.credentials = credentials;
         setUserName(scheduler.getCurrentUser());
+        try {
+            this.credData = credentials.decrypt(corePrivateKey);
+        } catch (Exception e) {
+            logger.error("Could not decrypt user credentials", e);
+        }
         CredentialsCreator.INSTANCE.saveCredentialsFile(scheduler.getCurrentUser(), credentials.getBase64());
 
     }
@@ -126,6 +145,11 @@ public class Session {
         rm = schedulerRMProxyFactory.connectToRM(credentials);
         this.credentials = credentials;
         setUserName(rm.getCurrentUser().getStringValue());
+        try {
+            this.credData = credentials.decrypt(corePrivateKey);
+        } catch (Exception e) {
+            logger.error("Could not decrypt user credentials", e);
+        }
         CredentialsCreator.INSTANCE.saveCredentialsFile(rm.getCurrentUser().getStringValue(), credentials.getBase64());
 
     }
