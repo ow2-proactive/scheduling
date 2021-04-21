@@ -108,8 +108,10 @@ public class WorkflowSubmitter {
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (SubmissionClosedException e) {
+            logger.warn("Could not submit job", e);
             throw new SubmissionClosedRestException(e);
         } catch (JobCreationException e) {
+            logger.warn("Could not submit job", e);
             throw new JobCreationRestException(e);
         } catch (Exception e) {
             logger.warn("Unexpected error when submitting job", e);
