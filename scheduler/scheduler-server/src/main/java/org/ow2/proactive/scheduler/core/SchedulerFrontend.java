@@ -1316,7 +1316,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     public List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        frontendState.checkPermission("getJobResult", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        frontendState.checkPermissions("getJobResult",
+                                       frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         List<TaskState> taskStates = getJobState(jobId).getTasks()
                                                        .stream()
                                                        .filter(Task::isPreciousResult)
@@ -1341,7 +1343,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) {
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        for (String jobId : jobsId) {
+            frontendState.checkPermissions("getJobResult",
+                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        }
         return dbManager.getJobResultMaps(jobsId);
     }
 

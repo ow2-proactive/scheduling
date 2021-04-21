@@ -907,7 +907,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException {
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
         return schedulerProxy.getJobResultMaps(jobsId);
     }
 

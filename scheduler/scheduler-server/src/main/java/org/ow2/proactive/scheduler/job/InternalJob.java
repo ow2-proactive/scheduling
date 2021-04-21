@@ -1362,10 +1362,12 @@ public abstract class InternalJob extends JobState {
         this.resultMap = resultMap;
     }
 
-    public List<String> getPreciousTasks() {
+    public List<String> getPreciousTasksFinished() {
         List<String> preciousTasks = new ArrayList<>();
         for (InternalTask task : tasks.values()) {
-            if (task.isPreciousResult()) {
+            if (task.isPreciousResult() && (!task.getStatus().isTaskAlive() && task.getStatus() != TaskStatus.SKIPPED ||
+                                            task.getStatus() == TaskStatus.IN_ERROR)) {
+                // Include only precious tasks which can contain a result or an error
                 preciousTasks.add(task.getName());
             }
         }

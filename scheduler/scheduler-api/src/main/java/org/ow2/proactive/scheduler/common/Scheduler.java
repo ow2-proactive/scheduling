@@ -1637,10 +1637,39 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException;
 
+    /**
+     * Return a list of task results which where declared as "preciousResult" for the given job
+     * @param jobId id of the job
+     * @return a list of precious tasks' results
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws UnknownJobException
+     *             if the job does not exist.
+     * @throws PermissionException
+     *             if you can't access to this particular job.
+     */
     List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
-    Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException;
+    /**
+     * Return result maps associated with multiple jobs
+     * @param jobsId list of jobs ids
+     * @return a map containing, for each job, the resultMap associated with that job
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws UnknownJobException
+     *             if one of the jobs in the list does not exist.
+     * @throws PermissionException
+     *             if you can't access one job in the list.
+     */
+    Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, UnknownJobException, PermissionException;
 
+    /**
+     * Return the list of task names declared as precious results
+     * @param jobsId id of the job
+     * @return a list of task names declared as "preciousResult" for the given job
+     * @throws SchedulerException
+     */
     Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws SchedulerException;
 }

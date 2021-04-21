@@ -869,7 +869,8 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException {
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
         return uischeduler.getJobResultMaps(jobsId);
     }
 

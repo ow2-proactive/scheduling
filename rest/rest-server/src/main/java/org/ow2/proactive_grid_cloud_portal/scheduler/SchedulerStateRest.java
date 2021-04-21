@@ -463,11 +463,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public Map<String, String> jobResultMap(String sessionId, String jobId) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/resultmap");
-            JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
-            if (jobResult == null) {
+            Map<Long, Map<String, Serializable>> maps = PAFuture.getFutureValue(s.getJobResultMaps(Collections.singletonList(jobId)));
+            Map<String, Serializable> resultMap = maps.get(Long.valueOf(jobId));
+            if (resultMap == null) {
                 return null;
             } else {
-                return getJobResultMapAsString(jobResult.getResultMap());
+                return getJobResultMapAsString(resultMap);
             }
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
