@@ -756,7 +756,8 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException {
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
         return _getScheduler().getJobResultMaps(jobsId);
     }
 

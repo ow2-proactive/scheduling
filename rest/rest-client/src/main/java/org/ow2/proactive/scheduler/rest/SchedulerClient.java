@@ -1451,9 +1451,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException {
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        Map<Long, Map<String, Serializable>> result = new HashMap<>();
         try {
-            Map<Long, Map<String, Serializable>> result = new HashMap<>();
             Map<Long, Map<String, String>> map = restApi().jobResultMaps(sid, jobsId);
             for (Entry<Long, Map<String, String>> entry : map.entrySet()) {
                 Map<String, Serializable> resultMap = new HashMap<>();
@@ -1463,11 +1464,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
                 result.put(entry.getKey(), resultMap);
             }
-
-            return result;
-        } catch (RestException e) {
-            throw RestException.unwrapRestException(e);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
         }
+        return result;
     }
 
     @Override

@@ -963,7 +963,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException {
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
         renewSession();
         return client.getJobResultMaps(jobsId);
     }

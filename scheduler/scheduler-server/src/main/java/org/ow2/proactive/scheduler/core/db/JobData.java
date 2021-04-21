@@ -27,9 +27,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -340,7 +338,7 @@ public class JobData implements Serializable {
         jobRuntimeData.addJobContent(job.getTaskFlowJob());
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
-        jobRuntimeData.setPreciousTasks(job.getPreciousTasks());
+        jobRuntimeData.setPreciousTasks(job.getPreciousTasksFinished());
         jobRuntimeData.setParentId(job.getParentId());
         jobRuntimeData.setAttachedServices(job.getAttachedServices());
 
