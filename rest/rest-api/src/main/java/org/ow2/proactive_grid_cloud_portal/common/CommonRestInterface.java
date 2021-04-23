@@ -107,6 +107,11 @@ public interface CommonRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
 
+    @POST
+    @Path("token")
+    @Produces(MediaType.TEXT_PLAIN)
+    String generateToken(@HeaderParam("sessionid") String sessionId);
+
     /**
      * Get the login string associated to a session.
      *

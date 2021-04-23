@@ -99,6 +99,11 @@ public class CommonRest implements CommonRestInterface {
     }
 
     @Override
+    public String generateToken(String sessionId) {
+        return TokenStore.getInstance().createToken(sessionId);
+    }
+
+    @Override
     public String currentUser(String sessionId) {
         try {
             return getUserName(sessionId);

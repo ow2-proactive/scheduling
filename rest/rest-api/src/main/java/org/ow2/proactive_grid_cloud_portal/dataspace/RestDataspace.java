@@ -138,7 +138,8 @@ public interface RestDataspace {
             @HeaderParam("Accept-Encoding") String headerAcceptEncoding, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("comp") String component,
             @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes,
-            @QueryParam("encoding") String encoding) throws NotConnectedRestException, PermissionRestException;
+            @QueryParam("encoding") String encoding, @QueryParam("token") String token)
+            throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Delete file(s) from the specified location in the <i>dataspace</i>.
