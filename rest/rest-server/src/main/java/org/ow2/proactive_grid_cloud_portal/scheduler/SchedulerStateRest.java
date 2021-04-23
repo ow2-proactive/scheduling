@@ -860,7 +860,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public InputStream jobFullLogs(String sessionId, String jobId, String session) throws RestException {
+    public Response jobFullLogs(String sessionId, String jobId, String session, String destination)
+            throws RestException {
 
         if (sessionId == null) {
             sessionId = session;
@@ -868,6 +869,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         try {
             Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + "/log/full");
+
+            if (destination == null) {
+                destination = DESTINATION_BROWSER;
+            }
+
+            Response.ResponseBuilder builder;
 
             JobState jobState = scheduler.getJobState(jobId);
 
@@ -885,8 +892,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 }
             }
 
-            // will produce HTTP 204 code if null
-            return streams.isEmpty() ? null : new SequenceInputStream(Collections.enumeration(streams));
+            builder = Response.ok()
+                              .entity(streams.isEmpty() ? IOUtils.toInputStream("",
+                                                                                Charset.forName(PASchedulerProperties.FILE_ENCODING.getValueAsString()))
+                                                        : new SequenceInputStream(Collections.enumeration(streams)));
+
+            if (DESTINATION_FILE.equals(destination)) {
+                builder = builder.header(HttpHeaders.CONTENT_DISPOSITION,
+                                         "attachment; filename=job_" + jobId + "_logs.log");
+            }
+
+            return builder.build();
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
