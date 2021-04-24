@@ -37,6 +37,8 @@ import java.util.Collections;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.jboss.resteasy.client.core.BaseClientResponse;
+import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,9 +107,11 @@ public class SchedulerStateRestJobLogsTest {
         jobState.addTask(new InternalScriptTask(jobState));
         when(mockScheduler.getJobState("123")).thenReturn(jobState);
 
-        InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
+        InputStream fullLogs = (InputStream) restScheduler.jobFullLogs(validSessionId, "123", validSessionId, null)
+                                                          .getEntity();
 
-        assertNull(fullLogs);
+        String logsString = IOUtils.toString(fullLogs);
+        assertEquals("", logsString);
     }
 
     @Test
@@ -125,7 +129,8 @@ public class SchedulerStateRestJobLogsTest {
         when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFolder.getParent()));
         when(mockScheduler.getGlobalSpaceURIs()).thenReturn(Collections.singletonList(logFolder.getParent()));
 
-        InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "0", validSessionId);
+        InputStream fullLogs = (InputStream) restScheduler.jobFullLogs(validSessionId, "0", validSessionId, null)
+                                                          .getEntity();
 
         assertEquals("logs", IOUtils.toString(fullLogs, Charset.defaultCharset()));
     }
@@ -149,7 +154,8 @@ public class SchedulerStateRestJobLogsTest {
         when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFolder.getParent()));
         when(mockScheduler.getGlobalSpaceURIs()).thenReturn(Collections.singletonList(logFolder.getParent()));
 
-        InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
+        InputStream fullLogs = (InputStream) restScheduler.jobFullLogs(validSessionId, "123", validSessionId, null)
+                                                          .getEntity();
 
         assertEquals("1032", IOUtils.toString(fullLogs));
     }
