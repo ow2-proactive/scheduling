@@ -27,7 +27,7 @@ package org.ow2.proactive.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -125,7 +125,7 @@ public class NodeSet extends ArrayList<Node> {
      * @return set of urls
      */
     public Set<String> getAllNodesUrls() {
-        HashSet<String> nodesUrls = new HashSet<>(size() + (extraNodes != null ? extraNodes.size() : 0));
+        Set<String> nodesUrls = new LinkedHashSet<>(size() + (extraNodes != null ? extraNodes.size() : 0));
         addNodesToUrlsSet(nodesUrls, this);
         if (extraNodes != null) {
             addNodesToUrlsSet(nodesUrls, extraNodes);
@@ -133,7 +133,7 @@ public class NodeSet extends ArrayList<Node> {
         return nodesUrls;
     }
 
-    private void addNodesToUrlsSet(HashSet<String> nodesUrls, Collection<Node> nodes) {
+    private void addNodesToUrlsSet(Set<String> nodesUrls, Collection<Node> nodes) {
         for (Node node : nodes) {
             nodesUrls.add(node.getNodeInformation().getURL());
         }

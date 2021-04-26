@@ -68,7 +68,11 @@ public class SchedulerConstants {
     /** Default taskid directory name (used in TaskLauncher) */
     public static final String TASKID_DIR_DEFAULT_NAME = "TASKID";
 
+    /** in a multi-node execution, a list of additional nodes reserved for the task, but not containing "exclusive" nodes i.e. single-host-exclusive topology */
     public static final String MULTI_NODE_TASK_NODESURL_BINDING_NAME = "nodesurl";
+
+    /** in a multi-node execution, a set of all nodes reserved for the task, including the node running the task, additional nodes and also exclusive nodes reserved by the single-host-exclusive topology */
+    public static final String MULTI_NODE_TASK_ALL_NODESURL_BINDING_NAME = "allnodesurl";
 
     public static final String VARIABLES_BINDING_NAME = "variables";
 
