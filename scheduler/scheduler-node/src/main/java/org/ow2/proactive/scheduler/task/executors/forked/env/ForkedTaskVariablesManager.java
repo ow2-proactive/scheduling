@@ -138,6 +138,8 @@ public class ForkedTaskVariablesManager implements Serializable {
 
         scriptHandler.addBinding(SchedulerConstants.MULTI_NODE_TASK_NODESURL_BINDING_NAME,
                                  taskContext.getOtherNodesURLs());
+        scriptHandler.addBinding(SchedulerConstants.MULTI_NODE_TASK_ALL_NODESURL_BINDING_NAME,
+                                 taskContext.getAllNodesURLs());
 
         scriptHandler.addBinding(SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
                                  taskContext.getInitializer().getForkEnvironment());

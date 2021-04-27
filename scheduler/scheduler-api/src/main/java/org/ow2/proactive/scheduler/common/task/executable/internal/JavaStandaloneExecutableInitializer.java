@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -50,6 +51,8 @@ public class JavaStandaloneExecutableInitializer {
     protected Map<String, byte[]> propagatedVariables;
 
     protected List<String> nodes;
+
+    protected Set<String> allNodes;
 
     protected TaskId taskId;
 
@@ -109,6 +112,14 @@ public class JavaStandaloneExecutableInitializer {
 
     public void setNodesURL(List<String> nodes) {
         this.nodes = nodes;
+    }
+
+    public Set<String> getAllNodesURL() {
+        return allNodes;
+    }
+
+    public void setAllNodesURL(Set<String> allNodes) {
+        this.allNodes = allNodes;
     }
 
     public TaskId getTaskId() {

@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
@@ -94,6 +95,13 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
                 execInitializer.setNodesURL(nodesURLs);
             } else {
                 execInitializer.setNodesURL(Collections.<String> emptyList());
+            }
+
+            if (context.getAttribute(SchedulerConstants.MULTI_NODE_TASK_ALL_NODESURL_BINDING_NAME) != null) {
+                Set<String> allNodesURLs = (Set<String>) context.getAttribute(SchedulerConstants.MULTI_NODE_TASK_ALL_NODESURL_BINDING_NAME);
+                execInitializer.setAllNodesURL(allNodesURLs);
+            } else {
+                execInitializer.setAllNodesURL(Collections.<String> emptySet());
             }
 
             javaExecutable.internalInit(execInitializer, context);
