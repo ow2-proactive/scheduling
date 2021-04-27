@@ -31,6 +31,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.script.ScriptContext;
 
@@ -206,6 +207,17 @@ public abstract class JavaExecutable {
      */
     public List<String> getNodesURL() {
         return execInitializer.getNodesURL();
+    }
+
+    /**
+     * Use this method for a multi-node task. It returns the set of all nodes url demanded by the user
+     * while describing the task.<br>
+     * This set contains the node is used to start the task itself, and all other nodes reserved by the resource manager in the multi-node definition.<br>
+     *
+     * @return the set of nodes urls demanded by the user.
+     */
+    public Set<String> getAllNodesURL() {
+        return execInitializer.getAllNodesURL();
     }
 
     /**

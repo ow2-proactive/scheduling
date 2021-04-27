@@ -27,7 +27,9 @@ package org.ow2.proactive.scheduler.task.context;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -46,6 +48,8 @@ import org.ow2.proactive.utils.ClasspathUtils;
 public class TaskContext implements Serializable {
 
     private final List<String> otherNodesURLs;
+
+    private final Set<String> allNodesURLs;
 
     private final List<String> nodesHosts;
 
@@ -89,6 +93,7 @@ public class TaskContext implements Serializable {
         this.executableContainer = executableContainer;
         this.decrypter = decrypter;
         this.nodeInfo = nodeInfo;
+        this.allNodesURLs = new LinkedHashSet<>();
 
         // Added executableContainer != null for now. It is too much work to refactor all of this.
         // This class should not be so overloaded with parameters in the constructor.
@@ -100,11 +105,14 @@ public class TaskContext implements Serializable {
             int nbNodes = executableContainer.getNodes().size();
             otherNodesURLs = new ArrayList<>(nbNodes);
             nodesHosts = new ArrayList<>(nbNodes + 1);
-
             nodesHosts.add(nodeInfo.getCurrentNodeHostName());
+            allNodesURLs.add(nodeInfo.getCurrentNodeUrl());
             for (Node node : executableContainer.getNodes()) {
                 otherNodesURLs.add(node.getNodeInformation().getURL());
                 nodesHosts.add(node.getNodeInformation().getVMInformation().getHostName());
+            }
+            for (String nodeUrl : executableContainer.getNodes().getAllNodesUrls()) {
+                allNodesURLs.add(nodeUrl);
             }
             executableContainer.setNodes(null);
         } else {
@@ -151,6 +159,10 @@ public class TaskContext implements Serializable {
 
     public List<String> getOtherNodesURLs() {
         return otherNodesURLs;
+    }
+
+    public Set<String> getAllNodesURLs() {
+        return allNodesURLs;
     }
 
     public NodeDataSpacesURIs getNodeDataSpaceURIs() {
