@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
+import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
@@ -275,5 +276,36 @@ public class Job2XMLTransformerTest {
         TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 
         assertEquals(visualization, recreatedJob.getVisualization());
+    }
+
+    @Test
+    public void checkSelectionScriptIsValid() throws Exception {
+        File xmlFile = tmpFolder.newFile();
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName("simpleJob");
+        String params[] = { "param1", "param2" };
+        ScriptTask task = new ScriptTask();
+        SimpleScript script = new SimpleScript("\nprint('arguments[0]='+arguments[0])\n", "javascript", params);
+        task.setScript(new TaskScript(script));
+        task.setName("testTask");
+
+        SelectionScript selectionScript = new SelectionScript("test", "groovy",
+                params, false);
+        task.addSelectionScript(selectionScript);
+        job.addTask(task);
+
+        new Job2XMLTransformer().job2xmlFile(job, xmlFile);
+        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
+
+        Assert.assertEquals("param1",
+                ((ScriptTask) recreatedJob.getTask("testTask")).getSelectionScripts().get(0).getParameters()[0].toString());
+        Assert.assertEquals("param2",
+                ((ScriptTask) recreatedJob.getTask("testTask")).getSelectionScripts().get(0).getParameters()[1].toString());
+        Assert.assertEquals(false,
+                ((ScriptTask) recreatedJob.getTask("testTask")).getSelectionScripts().get(0).isDynamic());
+        Assert.assertEquals("groovy",
+                ((ScriptTask) recreatedJob.getTask("testTask")).getSelectionScripts().get(0).getEngineName());
+        Assert.assertEquals("test",
+                ((ScriptTask) recreatedJob.getTask("testTask")).getSelectionScripts().get(0).getScript());
     }
 }
