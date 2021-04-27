@@ -29,21 +29,28 @@ import java.security.KeyException;
 import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.permissions.NotificationAdminPermission;
 import org.ow2.proactive.permissions.PcaAdminPermission;
+import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 
@@ -238,4 +245,92 @@ public class CommonRest implements CommonRestInterface {
         return true;
     }
 
+    @Override
+    public String getLogLevel(String sessionId, String name) throws RestException {
+        Scheduler scheduler = checkAccess(sessionId);
+        try {
+            checkPermission(scheduler.getSubject(),
+                            new RMCoreAllPermission(),
+                            "Resource Manager administrative rights is required");
+            Logger loggerInstance;
+            if (name == null) {
+                loggerInstance = Logger.getRootLogger();
+            } else {
+                loggerInstance = Logger.getLogger(name);
+            }
+            if (loggerInstance == null) {
+                throw new RestException("No logger found with name " + name);
+            }
+            return loggerInstance.getEffectiveLevel().toString();
+
+        } catch (PermissionException e) {
+            throw new PermissionRestException("Resource Manager administrative rights is required");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
+
+    @Override
+    public boolean setLogLevel(String sessionId, String name, String level) throws RestException {
+        Scheduler scheduler = checkAccess(sessionId);
+        boolean levelChanged;
+        try {
+            checkPermission(scheduler.getSubject(),
+                            new RMCoreAllPermission(),
+                            "Resource Manager administrative rights is required");
+            Logger loggerInstance;
+            if (name == null) {
+                loggerInstance = Logger.getRootLogger();
+            } else {
+                loggerInstance = Logger.getLogger(name);
+            }
+            if (loggerInstance == null) {
+                throw new RestException("No logger found with name " + name);
+            }
+            Level levelInstance = Level.toLevel(level, Level.INFO);
+            Level effectiveLevel = loggerInstance.getEffectiveLevel();
+            if (levelInstance.toInt() != effectiveLevel.toInt()) {
+                logger.info("Changing logger " + name + " to " + levelInstance.toString());
+                levelChanged = true;
+            } else {
+                logger.warn("Logger " + name + " is already on level " + levelInstance.toString());
+                levelChanged = false;
+            }
+
+            loggerInstance.setLevel(levelInstance);
+            return levelChanged;
+
+        } catch (PermissionException e) {
+            throw new PermissionRestException("Resource Manager administrative rights is required");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
+
+    @Override
+    public Map<String, String> getCurrentLoggers(String sessionId) throws RestException {
+        Scheduler scheduler = checkAccess(sessionId);
+        try {
+            checkPermission(scheduler.getSubject(),
+                            new RMCoreAllPermission(),
+                            "Resource Manager administrative rights is required");
+            Map<String, String> loggers = new LinkedHashMap<>();
+            Enumeration loggerEnumeration = LogManager.getCurrentLoggers();
+            while (loggerEnumeration.hasMoreElements()) {
+                Object loggerObject = loggerEnumeration.nextElement();
+                if (loggerObject != null && loggerObject instanceof Logger) {
+                    Logger loggerInstance = (Logger) loggerObject;
+                    if (loggerInstance.getName() != null && loggerInstance.getLevel() != null) {
+                        loggers.put(loggerInstance.getName(), loggerInstance.getLevel().toString());
+                    }
+                }
+            }
+            return loggers;
+
+        } catch (PermissionException e) {
+            throw new PermissionRestException("Resource Manager administrative rights is required");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
 }
