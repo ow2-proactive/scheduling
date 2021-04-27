@@ -95,7 +95,8 @@ public enum XMLAttributes {
 
     // NOT USED IN XML FACTORY BUT USED IN XML DESCRIPTION
     PATH("path"),
-    LANGUAGE("language");
+    LANGUAGE("language"),
+    TYPE("type");
 
     private String xmlName;
 
