@@ -30,6 +30,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.io.IOException;
 import java.security.KeyException;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.*;
@@ -108,9 +109,10 @@ public interface CommonRestInterface {
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
 
     @POST
-    @Path("token")
-    @Produces(MediaType.TEXT_PLAIN)
-    String generateToken(@HeaderParam("sessionid") String sessionId);
+    @Path("tokens")
+    @Produces(MediaType.APPLICATION_JSON)
+    Set<String> generateTokens(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("numberTokens") @DefaultValue("1") int numberTokens);
 
     /**
      * Get the login string associated to a session.

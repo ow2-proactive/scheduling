@@ -30,6 +30,9 @@ import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
@@ -99,8 +102,9 @@ public class CommonRest implements CommonRestInterface {
     }
 
     @Override
-    public String generateToken(String sessionId) {
-        return TokenStore.getInstance().createToken(sessionId);
+    public Set<String> generateTokens(String sessionId, int numberTokens) {
+        TokenStore tokenStore = TokenStore.getInstance();
+        return Stream.generate(() -> tokenStore.createToken(sessionId)).limit(numberTokens).collect(Collectors.toSet());
     }
 
     @Override
