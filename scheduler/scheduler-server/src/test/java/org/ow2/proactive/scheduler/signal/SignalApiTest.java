@@ -310,6 +310,34 @@ public class SignalApiTest extends ProActiveTestClean {
         Assert.assertFalse(signalApi.isReceived(signal_2));
     }
 
+    @Test
+    public void testWaitForAll() throws SignalApiException {
+        String signal_1 = "test_signal_11_1";
+        String signal_2 = "test_signal_11_2";
+        Set<String> signals = new HashSet<String>() {
+            {
+                add(signal_1);
+                add(signal_2);
+            }
+        };
+        long durationInMillis = 0;
+
+        //Define a thread that waits for signals' reception
+        Runnable waitForAllSignalThread = () -> {
+            try {
+                signalApi.waitForAll(signals);
+            } catch (Exception e) {
+            }
+        };
+
+        executor.submit(sendSignalRunnable(signal_1, durationInMillis));
+        executor.submit(sendSignalRunnable(signal_2, durationInMillis));
+
+        Awaitility.await().atMost(3000, TimeUnit.MILLISECONDS).until(waitForAllSignalThread);
+
+        Assert.assertTrue(signalApi.isReceived(signal_1) && signalApi.isReceived(signal_2));
+    }
+
     private Runnable sendSignalRunnable(String signal, long duration) {
         Runnable waitForSignalThread = () -> {
             try {

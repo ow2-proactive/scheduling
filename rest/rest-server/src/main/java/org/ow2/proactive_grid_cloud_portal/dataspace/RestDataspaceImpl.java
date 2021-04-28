@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.TokenStore;
 import org.ow2.proactive_grid_cloud_portal.dataspace.util.VFSZipper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
@@ -99,7 +100,8 @@ public class RestDataspaceImpl implements RestDataspace {
             @HeaderParam("Accept-Encoding") String headerAcceptEncoding, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("comp") String component,
             @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes,
-            @QueryParam("encoding") String encoding) throws NotConnectedRestException, PermissionRestException {
+            @QueryParam("encoding") String encoding, @QueryParam("token") String token)
+            throws NotConnectedRestException, PermissionRestException {
         if (encoding == null) {
             encoding = headerAcceptEncoding;
         }
@@ -107,6 +109,12 @@ public class RestDataspaceImpl implements RestDataspace {
                                    pathname,
                                    dataspace.toUpperCase(),
                                    encoding));
+
+        // When the sessionId is not specified in the request header, we will use query parameter token for authentication
+        if (sessionId == null && token != null) {
+            sessionId = TokenStore.getInstance().getSessionId(token);
+        }
+
         Session session = checkSessionValidity(sessionId);
         try {
             checkPathParams(dataspace, pathname);

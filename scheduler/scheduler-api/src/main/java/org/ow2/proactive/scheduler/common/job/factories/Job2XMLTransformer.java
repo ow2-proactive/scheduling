@@ -800,6 +800,12 @@ public class Job2XMLTransformer {
             scriptElement.appendChild(fileE);
 
         } else {
+            if (script instanceof SelectionScript) {
+                setAttribute(scriptElement,
+                             XMLAttributes.TYPE,
+                             ((SelectionScript) script).isDynamic() ? "dynamic" : "static",
+                             true);
+            }
             Element codeE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.SCRIPT_CODE.getXMLName());
             setAttribute(codeE, XMLAttributes.LANGUAGE, script.getEngineName(), true);
             codeE.appendChild(doc.createCDATASection(script.getScript()));
