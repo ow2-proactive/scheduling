@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.*;
@@ -200,4 +201,44 @@ public interface CommonRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     boolean checkPcaAdmin(@HeaderParam("sessionid") String sessionId) throws RestException;
 
+    /**
+     * Get logger level.
+     *
+     * @param sessionId id of a session
+     * @param name logger name
+     * @return logger level
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("logger")
+    @Produces(MediaType.APPLICATION_JSON)
+    String getLogLevel(@HeaderParam("sessionid") String sessionId, @QueryParam("name") String name)
+            throws RestException;
+
+    /**
+     * Change logger level.
+     *
+     * @param sessionId id of a session
+     * @param name logger name
+     * @param level logger level
+     * @return true if the logger level has been changed, false otherwise
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @PUT
+    @Path("logger")
+    @Produces(MediaType.APPLICATION_JSON)
+    boolean setLogLevel(@HeaderParam("sessionid") String sessionId, @QueryParam("name") String name,
+            @QueryParam("level") String level) throws RestException;
+
+    /**
+     * Get the state of current loggers.
+     *
+     * @param sessionId id of a session
+     * @return a map containing current loggers and their level
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("logger/current")
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, String> getCurrentLoggers(@HeaderParam("sessionid") String sessionId) throws RestException;
 }
