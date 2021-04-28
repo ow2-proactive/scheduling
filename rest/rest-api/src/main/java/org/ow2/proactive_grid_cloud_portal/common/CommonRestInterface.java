@@ -237,6 +237,21 @@ public interface CommonRestInterface {
             @QueryParam("level") String level) throws RestException;
 
     /**
+     * Change multiple loggers level.
+     *
+     * @param sessionId id of a session
+     * @param loggersConfiguration map of (logger_name, level)
+     * @return true if any logger level has been changed, false otherwise
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @POST
+    @Path("logger")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    boolean setLogLevelMultiple(@HeaderParam("sessionid") String sessionId, Map<String, String> loggersConfiguration)
+            throws RestException;
+
+    /**
      * Get the state of current loggers.
      *
      * @param sessionId id of a session

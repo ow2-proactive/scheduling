@@ -317,6 +317,49 @@ public class CommonRest implements CommonRestInterface {
     }
 
     @Override
+    public boolean setLogLevelMultiple(String sessionId, Map<String, String> loggersConfiguration)
+            throws RestException {
+        Scheduler scheduler = checkAccess(sessionId);
+        boolean levelChanged = false;
+        try {
+            checkPermission(scheduler.getSubject(),
+                            new RMCoreAllPermission(),
+                            "Resource Manager administrative rights is required");
+            if (loggersConfiguration != null) {
+                for (Map.Entry<String, String> entry : loggersConfiguration.entrySet()) {
+                    Logger loggerInstance;
+                    String name = entry.getKey();
+                    String level = entry.getValue();
+                    if (name == null) {
+                        loggerInstance = Logger.getRootLogger();
+                    } else {
+                        loggerInstance = Logger.getLogger(name);
+                    }
+                    if (loggerInstance == null) {
+                        throw new RestException("No logger found with name " + name);
+                    }
+                    Level levelInstance = Level.toLevel(level, Level.INFO);
+                    Level effectiveLevel = loggerInstance.getEffectiveLevel();
+                    if (levelInstance.toInt() != effectiveLevel.toInt()) {
+                        logger.info("Changing logger " + name + " to " + levelInstance.toString());
+                        levelChanged = true;
+                    } else {
+                        logger.debug("Logger " + name + " is already on level " + levelInstance.toString());
+                    }
+
+                    loggerInstance.setLevel(levelInstance);
+                }
+            }
+            return levelChanged;
+
+        } catch (PermissionException e) {
+            throw new PermissionRestException("Resource Manager administrative rights is required");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
+
+    @Override
     public Map<String, String> getCurrentLoggers(String sessionId) throws RestException {
         Scheduler scheduler = checkAccess(sessionId);
         try {
