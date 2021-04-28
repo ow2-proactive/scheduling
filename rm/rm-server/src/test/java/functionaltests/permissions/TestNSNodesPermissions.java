@@ -31,7 +31,9 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -42,6 +44,8 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.Lambda;
 import org.ow2.proactive.utils.Lambda.RunnableThatThrows;
 import org.ow2.proactive.utils.NodeSet;
+
+import com.google.common.collect.ImmutableList;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
@@ -418,10 +422,20 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
 
         addOneNodeToNodeSource(nsName, node, admin);
 
+        String nodeUrl = node.getNodeInformation().getURL();
         user = rmHelper.getResourceManager(TestUsers.ADMIN);
-        user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+        user.addNodeToken(nodeUrl, "token1");
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        user.addNodeToken(node.getNodeInformation().getURL(), "token2");
+        user.addNodeToken(nodeUrl, "token2");
+        Assert.assertEquals(ImmutableList.of("token1", "token2"), user.getNodeTokens(nodeUrl));
+        Map<String, List<String>> allTokens = user.getAllNodesTokens();
+        Assert.assertTrue(allTokens.containsKey(nodeUrl));
+        Assert.assertEquals(ImmutableList.of("token1", "token2"), allTokens.get(nodeUrl));
+
+        Map<String, List<String>> eligibleNodesTokens = user.getAllNodesTokens();
+        Assert.assertTrue(eligibleNodesTokens.containsKey(nodeUrl));
+        Assert.assertEquals(ImmutableList.of("token1", "token2"), eligibleNodesTokens.get(nodeUrl));
+
         user.removeNodeToken(node.getNodeInformation().getURL(), "token2");
 
         // in this case nsadmin does not have rights to call add token
