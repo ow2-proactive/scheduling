@@ -109,6 +109,12 @@ public interface CommonRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
 
+    /**
+     * Generate tokens which can be used as one-time access session identifiers
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param numberTokens number of tokens to generate
+     * @return a set of one-time access tokens
+     */
     @POST
     @Path("tokens")
     @Produces(MediaType.APPLICATION_JSON)

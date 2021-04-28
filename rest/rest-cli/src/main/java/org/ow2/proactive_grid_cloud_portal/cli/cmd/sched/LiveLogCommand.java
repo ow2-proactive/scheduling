@@ -80,7 +80,7 @@ public class LiveLogCommand extends AbstractJobCommand {
                 SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
                 writeLine(currentContext, "Displaying live log for job %s. Press 'q' to stop.", jobId);
                 while (!terminate) {
-                    String log = scheduler.getLiveLogJob(currentContext.getSessionId(), jobId);
+                    String log = scheduler.getLiveLogJob(currentContext.getSessionId(), jobId, false);
                     if (!Strings.isNullOrEmpty(log)) {
                         writeLine(currentContext, "%s", log.trim());
                     }

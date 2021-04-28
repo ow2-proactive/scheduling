@@ -356,7 +356,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public String getLiveLogJob(String sessionId, String jobId) throws NotConnectedRestException,
+    public String getLiveLogJob(String sessionId, String jobId, boolean allLogs) throws NotConnectedRestException,
             UnknownJobRestException, PermissionRestException, LogForwardingRestException, IOException {
         try {
             Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
@@ -365,12 +365,21 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = scheduler.getJobState(jobId);
             boolean isFinished = jobState != null && jobState.isFinished();
             int availableLinesCount = session.getJobsOutputController().availableLinesCount(jobId);
-
-            if (!isFinished || availableLinesCount > 0) {
-                return session.getJobsOutputController().getNewLogs(jobId);
+            if (allLogs) {
+                if (!isFinished || availableLinesCount > 0) {
+                    return session.getJobsOutputController().getAllLogs(jobId);
+                } else {
+                    session.getJobsOutputController().removeAppender(jobId);
+                    return "";
+                }
             } else {
-                session.getJobsOutputController().removeAppender(jobId);
-                return "";
+
+                if (!isFinished || availableLinesCount > 0) {
+                    return session.getJobsOutputController().getNewLogs(jobId);
+                } else {
+                    session.getJobsOutputController().removeAppender(jobId);
+                    return "";
+                }
             }
 
         } catch (PermissionException e) {

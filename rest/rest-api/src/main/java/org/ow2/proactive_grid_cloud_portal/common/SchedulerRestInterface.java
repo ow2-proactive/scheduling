@@ -2008,16 +2008,19 @@ public interface SchedulerRestInterface {
      * stream currently available logs, call this method several times to get
      * the complete output.
      *
+     * The optional query parameter allLogs allows to fetch all logs from the beginning
+     *
      * @param sessionId a valid session id
      * @param jobId     the id of the job to retrieve
+     * @param allLogs   if true, fetch all logs since the beginning
      */
     @GET
     @GZIP
     @Path("jobs/{jobid}/livelog")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    String getLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
-            LogForwardingRestException, IOException;
+    String getLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @QueryParam("allLogs") @DefaultValue("false") boolean allLogs) throws NotConnectedRestException,
+            UnknownJobRestException, PermissionRestException, LogForwardingRestException, IOException;
 
     /**
      * number of available bytes in the stream or -1 if the stream does not
