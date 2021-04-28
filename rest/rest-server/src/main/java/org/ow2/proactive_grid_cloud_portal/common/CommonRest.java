@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.Map;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
