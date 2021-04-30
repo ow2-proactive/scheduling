@@ -212,8 +212,9 @@ public interface SchedulerRestInterface {
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("running") @DefaultValue("true") boolean running,
-            @QueryParam("finished") @DefaultValue("true") boolean finished, @QueryParam("sortParams") String sortParams)
-            throws RestException;
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("childJobs") @DefaultValue("true") boolean childJobs,
+            @QueryParam("sortParams") String sortParams) throws RestException;
 
     /**
      * Returns the revision number of the scheduler state

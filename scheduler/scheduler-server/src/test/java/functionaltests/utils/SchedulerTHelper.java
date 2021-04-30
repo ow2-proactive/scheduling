@@ -1241,7 +1241,7 @@ public class SchedulerTHelper {
 
     public void cleanJobs() throws Exception {
         Scheduler userInt = getSchedulerInterface();
-        JobFilterCriteria criteria = new JobFilterCriteria(false, true, true, true);
+        JobFilterCriteria criteria = new JobFilterCriteria(false, true, true, true, true);
         List<JobInfo> jobs = userInt.getJobs(0,
                                              1000,
                                              criteria,

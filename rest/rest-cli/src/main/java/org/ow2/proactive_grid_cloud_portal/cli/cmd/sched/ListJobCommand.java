@@ -96,6 +96,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
                                                                                             true,
                                                                                             true,
                                                                                             true,
+                                                                                            true,
                                                                                             null);
         Map<Long, ArrayList<UserJobData>> stateMap = page.getMap();
         List<UserJobData> jobs = stateMap.values().iterator().next();

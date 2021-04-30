@@ -98,6 +98,7 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
                                                                      new JobFilterCriteria(false,
                                                                                            false,
                                                                                            true,
+                                                                                           true,
                                                                                            true),
                                                                      null)
                                                             .getList();
