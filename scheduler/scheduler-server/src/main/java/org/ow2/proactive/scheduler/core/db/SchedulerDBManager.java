@@ -208,7 +208,8 @@ public class SchedulerDBManager {
     }
 
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
-            final boolean running, final boolean finished, final List<SortParameter<JobSortParameter>> sortParameters) {
+            final boolean running, final boolean finished, final boolean childJobs,
+            final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -220,6 +221,7 @@ public class SchedulerDBManager {
                                                              pending,
                                                              running,
                                                              finished,
+                                                             childJobs,
                                                              sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<JobStatus> jobStatuses = params.getStatuses();
@@ -233,6 +235,9 @@ public class SchedulerDBManager {
             }
             if (user != null) {
                 criteria.add(Restrictions.eq("owner", user));
+            }
+            if (!childJobs) {
+                criteria.add(Restrictions.isNull("parentId"));
             }
             boolean allJobs = pending && running && finished;
             if (!allJobs) {
@@ -381,6 +386,10 @@ public class SchedulerDBManager {
 
                 if (hasUser) {
                     queryString.append("and owner = :user ");
+                }
+
+                if (!params.isChildJobs()) {
+                    queryString.append("and parentId = null ");
                 }
 
                 Query query = session.createQuery(queryString.toString());
