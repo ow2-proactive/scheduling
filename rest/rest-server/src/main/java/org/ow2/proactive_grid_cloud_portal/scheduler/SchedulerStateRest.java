@@ -237,7 +237,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         boolean userHasPermission = false;
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
-            userHasPermission = s.checkJobPermissionMethod(sessionId, jobId, method);
+            userHasPermission = s.checkJobPermissionMethod(jobId, method);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
@@ -245,11 +245,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String signal, String jobId)
-            throws RestException, SignalApiException {
+    public Set<String> addJobSignal(String sessionId, String signal, String jobId) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
-            return s.addJobSignal(sessionId, jobId, signal);
+            return s.addJobSignal(jobId, signal);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }

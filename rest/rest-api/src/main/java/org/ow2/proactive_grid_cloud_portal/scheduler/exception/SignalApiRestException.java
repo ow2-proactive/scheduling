@@ -23,25 +23,19 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.signal;
+package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+/**
+ * @author ActiveEon Team
+ * @since 11/05/2021
+ */
+public class SignalApiRestException extends RestException {
 
-
-public class SignalApiException extends SchedulerException {
-
-    public SignalApiException() {
-    }
-
-    public SignalApiException(String message) {
-        super(message);
-    }
-
-    public SignalApiException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public SignalApiException(Throwable cause) {
+    public SignalApiRestException(Throwable cause) {
         super(cause);
+    }
+
+    public SignalApiRestException(String message) {
+        super(message);
     }
 }

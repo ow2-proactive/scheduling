@@ -33,6 +33,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 
 
 public class RestException extends Exception {
@@ -63,6 +64,8 @@ public class RestException extends Exception {
             return new JobCreationRestException(schedulerException);
         } else if (schedulerException instanceof UnknownTaskException) {
             return new UnknownTaskRestException(schedulerException);
+        } else if (schedulerException instanceof SignalApiException) {
+            return new SignalApiRestException(schedulerException);
         }
         return new UnknownJobRestException(schedulerException);
     }
@@ -82,6 +85,8 @@ public class RestException extends Exception {
             return new JobCreationException(restException);
         } else if (restException instanceof UnknownTaskRestException) {
             return new UnknownTaskException(restException);
+        } else if (restException instanceof SignalApiRestException) {
+            return new SignalApiException(restException);
         }
         return new UnknownJobException(restException);
     }

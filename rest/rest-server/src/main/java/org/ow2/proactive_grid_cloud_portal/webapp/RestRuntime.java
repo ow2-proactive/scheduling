@@ -127,6 +127,7 @@ public class RestRuntime {
         dispatcher.registerProvider(ExceptionMappers.UnknownJobRestExceptionExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.UnknownTaskExceptionExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.PermissionExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.SignalApiExceptionExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.ProActiveRuntimeExceptionExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.RuntimeExceptionExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.IllegalArgumentExceptionMapper.class);

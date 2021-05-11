@@ -2280,6 +2280,13 @@ public interface SchedulerRestInterface {
     /**
      * 
      * Check if the user has the permission to execute the method passed as argument
+     *
+     * @param sessionId
+     *            current session
+     * @param jobId
+     *            id of the job
+     * @param method
+     *            method name to check
      * 
      * @return true if the user has the permission to execute the java method
      */
@@ -2294,12 +2301,19 @@ public interface SchedulerRestInterface {
      *
      * Add a signal to the list of signals used by the considered job
      *
-     * @return true if the given signal is added to the list of job signals
+     * @param sessionId
+     *            current session
+     * @param jobId
+     *            id of the job
+     * @param signal
+     *            signal name to add
+     *
+     * @return the set of job signals associated with the given job after the addition
      */
     @POST
     @Path("job/{jobid}/signals")
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
-            @PathParam("jobid") String jobId) throws RestException, SignalApiException;
+            @PathParam("jobid") String jobId) throws RestException;
 }

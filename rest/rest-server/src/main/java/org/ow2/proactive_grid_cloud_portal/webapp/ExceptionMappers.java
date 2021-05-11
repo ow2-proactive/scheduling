@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
@@ -171,6 +172,13 @@ public class ExceptionMappers {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_FORBIDDEN;
+        }
+    }
+
+    public static class SignalApiExceptionExceptionMapper extends BaseExceptionMapper<SignalApiException> {
+        @Override
+        protected int getErrorCode() {
+            return HttpURLConnection.HTTP_INTERNAL_ERROR;
         }
     }
 

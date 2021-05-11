@@ -918,13 +918,13 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException {
-        return schedulerProxy.checkJobPermissionMethod(sessionId, jobId, method);
+    public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
+        return schedulerProxy.checkJobPermissionMethod(jobId, method);
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String jobId, String signal)
-            throws SchedulerException, SignalApiException {
-        return schedulerProxy.addJobSignal(sessionId, jobId, signal);
+    public Set<String> addJobSignal(String jobId, String signal)
+            throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException {
+        return schedulerProxy.addJobSignal(jobId, signal);
     }
 }
