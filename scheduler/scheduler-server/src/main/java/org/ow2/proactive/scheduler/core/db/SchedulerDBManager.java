@@ -57,6 +57,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -208,7 +209,7 @@ public class SchedulerDBManager {
     }
 
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
-            final boolean running, final boolean finished, final boolean childJobs,
+            final boolean running, final boolean finished, final boolean childJobs, String jobName, String projectName,
             final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
@@ -222,6 +223,8 @@ public class SchedulerDBManager {
                                                              running,
                                                              finished,
                                                              childJobs,
+                                                             jobName,
+                                                             projectName,
                                                              sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<JobStatus> jobStatuses = params.getStatuses();
@@ -238,6 +241,12 @@ public class SchedulerDBManager {
             }
             if (!childJobs) {
                 criteria.add(Restrictions.isNull("parentId"));
+            }
+            if (jobName != null) {
+                criteria.add(Restrictions.like("jobName", jobName, MatchMode.START).ignoreCase());
+            }
+            if (projectName != null) {
+                criteria.add(Restrictions.like("projectName", projectName, MatchMode.START).ignoreCase());
             }
             boolean allJobs = pending && running && finished;
             if (!allJobs) {

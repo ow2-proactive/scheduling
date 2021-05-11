@@ -54,12 +54,17 @@ public class DBJobDataParameters {
 
     private final boolean childJobs;
 
+    private final String jobName;
+
+    private final String projectName;
+
     private final List<SortParameter<JobSortParameter>> sortParameters;
 
     private final Set<JobStatus> status;
 
     DBJobDataParameters(int offset, int limit, String user, boolean pending, boolean running, boolean finished,
-            boolean childJobs, List<SortParameter<JobSortParameter>> sortParameters) {
+            boolean childJobs, String jobName, String projectName,
+            List<SortParameter<JobSortParameter>> sortParameters) {
         this.offset = offset;
         this.limit = limit;
         this.user = user;
@@ -67,6 +72,8 @@ public class DBJobDataParameters {
         this.running = running;
         this.finished = finished;
         this.childJobs = childJobs;
+        this.jobName = jobName;
+        this.projectName = projectName;
         this.sortParameters = sortParameters;
 
         Set<JobStatus> newStatus = new HashSet<JobStatus>();
@@ -97,6 +104,14 @@ public class DBJobDataParameters {
 
     public boolean isChildJobs() {
         return childJobs;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public String getProjectName() {
+        return projectName;
     }
 
     public List<SortParameter<JobSortParameter>> getSortParameters() {

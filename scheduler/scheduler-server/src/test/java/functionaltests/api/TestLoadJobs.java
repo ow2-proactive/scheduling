@@ -317,12 +317,17 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished) {
-        return criteria(myJobsOnly, pending, running, finished, true);
+        return criteria(myJobsOnly, pending, running, finished, true, null, null);
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
             boolean childJobs) {
-        return new JobFilterCriteria(myJobsOnly, pending, running, finished, childJobs);
+        return new JobFilterCriteria(myJobsOnly, pending, running, finished, childJobs, null, null);
+    }
+
+    private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
+            boolean childJobs, String jobName, String projectName) {
+        return new JobFilterCriteria(myJobsOnly, pending, running, finished, childJobs, jobName, projectName);
     }
 
 }

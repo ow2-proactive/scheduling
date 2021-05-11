@@ -219,7 +219,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(false, true, true, true, true),
+                                           new JobFilterCriteria(false, true, true, true, true, null, null),
                                            DEFAULT_JOB_SORT_PARAMS);
 
             List<String> ids = new ArrayList<>(page.getList().size());
@@ -262,7 +262,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(false, true, true, true, true),
+                                           new JobFilterCriteria(false, true, true, true, true, null, null),
                                            DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<>(page.getList().size());
             for (JobInfo jobInfo : page.getList()) {
@@ -295,8 +295,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
-            boolean myJobs, boolean pending, boolean running, boolean finished, boolean childJobs, String sortParams)
-            throws RestException {
+            boolean myJobs, boolean pending, boolean running, boolean finished, boolean childJobs, String jobName,
+            String projectName, String sortParams) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
@@ -316,7 +316,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(onlyUserJobs, pending, running, finished, childJobs),
+                                           new JobFilterCriteria(onlyUserJobs,
+                                                                 pending,
+                                                                 running,
+                                                                 finished,
+                                                                 childJobs,
+                                                                 jobName,
+                                                                 projectName),
                                            sortParameterList);
             List<JobInfo> jobsInfo = page.getList();
             ArrayList<UserJobData> jobs = new ArrayList<>(jobsInfo.size());

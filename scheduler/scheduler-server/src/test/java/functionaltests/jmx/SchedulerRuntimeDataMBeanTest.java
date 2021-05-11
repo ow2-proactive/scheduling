@@ -66,7 +66,7 @@ import functionaltests.utils.TestUsers;
  * <p>
  * Test checks that RuntimeDataMBean reports correct tasks number in
  * case if task was restarted after failure.
- * 
+ *
  * @author ProActive team
  *
  */
@@ -99,7 +99,9 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
                                                                                            false,
                                                                                            true,
                                                                                            true,
-                                                                                           true),
+                                                                                           true,
+                                                                                           null,
+                                                                                           null),
                                                                      null)
                                                             .getList();
 
