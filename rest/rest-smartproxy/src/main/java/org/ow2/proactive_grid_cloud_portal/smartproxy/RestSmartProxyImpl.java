@@ -806,14 +806,14 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException {
-        return (_getScheduler()).checkJobPermissionMethod(sessionId, jobId, method);
+    public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
+        return (_getScheduler()).checkJobPermissionMethod(jobId, method);
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String jobId, String signal)
-            throws SchedulerException, SignalApiException {
-        return (_getScheduler()).addJobSignal(sessionId, jobId, signal);
+    public Set<String> addJobSignal(String jobId, String signal)
+            throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException {
+        return (_getScheduler()).addJobSignal(jobId, signal);
     }
 
 }

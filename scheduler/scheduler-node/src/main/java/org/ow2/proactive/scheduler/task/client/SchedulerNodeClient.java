@@ -975,15 +975,15 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException {
+    public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
         renewSession();
-        return client.checkJobPermissionMethod(sessionId, jobId, method);
+        return client.checkJobPermissionMethod(jobId, method);
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String jobId, String signal)
-            throws SchedulerException, SignalApiException {
+    public Set<String> addJobSignal(String jobId, String signal)
+            throws NotConnectedException, SignalApiException, UnknownJobException, PermissionException {
         renewSession();
-        return client.addJobSignal(sessionId, jobId, signal);
+        return client.addJobSignal(jobId, signal);
     }
 }

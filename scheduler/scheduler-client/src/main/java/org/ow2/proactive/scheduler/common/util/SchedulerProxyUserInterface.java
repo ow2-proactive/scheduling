@@ -882,15 +882,15 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException {
-        return uischeduler.checkJobPermissionMethod(sessionId, jobId, method);
+    public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
+        return uischeduler.checkJobPermissionMethod(jobId, method);
     }
 
     @Override
     @ImmediateService
-    public Set<String> addJobSignal(String sessionId, String jobId, String signal)
-            throws SchedulerException, SignalApiException {
-        return uischeduler.addJobSignal(sessionId, jobId, signal);
+    public Set<String> addJobSignal(String jobId, String signal)
+            throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException {
+        return uischeduler.addJobSignal(jobId, signal);
     }
 
     public String getStatHistory(String mbeanName, String range, String[] dataSources, String function) {

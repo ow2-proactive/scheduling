@@ -81,26 +81,33 @@ import org.ow2.proactive.scheduler.signal.SignalApiException;
 public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
-     * Check if the user has the permission to execute the method passed as argument
-     * @param sessionId
-     * @param jobId
-     * @param method
+     * Check if the connected user has the permission to execute the method passed as argument
+     *
+     * @param jobId id of the job
+     * @param method operation to test
      * @return true if the user has the permission to execute the java method
      * @throws NotConnectedException
      * @throws UnknownJobException
      */
-    boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException;
+    boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException;
 
     /**
      * Add the given signal to job signals
-     * @param sessionId
-     * @param jobId
-     * @param signal
+     *
+     * @param jobId id of the job
+     * @param signal signal name
      * @return the set of job signals including the added signal
-     * @throws SchedulerException
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws UnknownJobException
+     *             if the job does not exist.
+     * @throws PermissionException
+     *             if you can't access to this particular job.
+     * @throws SignalApiException
+     *             errors related to the signal api
      */
-    Set<String> addJobSignal(String sessionId, String jobId, String signal)
-            throws SchedulerException, SignalApiException;
+    Set<String> addJobSignal(String jobId, String signal)
+            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException;
 
     /**
      * Returns the USER DataSpace URIs associated with the current user
