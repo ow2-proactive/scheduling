@@ -20,11 +20,9 @@ dependencies {
     compile 'com.sun.xml.bind:jaxb-core:2.2.11'
     compile 'com.sun.xml.bind:jaxb-osgi:2.2.11'
     compile 'javax.xml.bind:jaxb-api:2.2.12'
-    // override hikari version used by hibernate-hikaricp
-    runtime('org.hibernate:hibernate-hikaricp:5.1.0.Final') {
+    // custom hibernate-hikaricp version to use HikariCP 4.0
+    runtime('org.hibernate:hibernate-hikaricp:5.1.0.PA') {
         exclude group: 'org.javassist', module: 'javassist'
-        exclude group: 'com.zaxxer', module: 'HikariCP-java6'
     }
-    runtime 'com.zaxxer:HikariCP:4.0.3'
 
 }
