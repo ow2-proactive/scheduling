@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -122,6 +123,10 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     private volatile boolean isStarted = false;
 
+    private long lastClearCache = 0L;
+
+    public static final int CLEAR_CACHE_PERIOD_HOURS = 1;
+
     @java.lang.SuppressWarnings("unused")
     public AOSynchronization() {
         // ProActive empty no arg constructor
@@ -133,6 +138,18 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         initializeStatusFile(statusFileDirectoryPath);
         inMemoryChannels = new ConcurrentHashMap<>();
 
+    }
+
+    private synchronized void clearGroovyCacheIfNeeded() {
+        if (shell != null &&
+            (System.currentTimeMillis() - lastClearCache > TimeUnit.HOURS.toMillis(CLEAR_CACHE_PERIOD_HOURS))) {
+            try {
+                shell.getClassLoader().clearCache();
+            } catch (Exception e) {
+                logger.warn("Error when clearing groovy class loader cache", e);
+            }
+            lastClearCache = System.currentTimeMillis();
+        }
     }
 
     private void initializeGroovyCompiler() {
@@ -1046,6 +1063,7 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     @SuppressWarnings("unchecked")
     private <T> T evaluateClosure(String closureDefinition, Class<T> type) throws CompilationException {
+        clearGroovyCacheIfNeeded();
         try {
             return (T) shell.evaluate(closureDefinition + " as " + type.getCanonicalName());
         } catch (CompilationFailedException e) {

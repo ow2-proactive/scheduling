@@ -72,6 +72,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 // Members of "user" group can get/free nodes and monitor the state, submit jobs and see jobs of other people
@@ -185,7 +187,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
-
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 
@@ -252,6 +255,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 // Members of "nsadmins" can create/remove node sources (according to their policies)
@@ -328,6 +333,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 // Members of "rmcoreadmins" can call any method of rmcore
@@ -361,6 +368,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 // Members of "scheduleradmins" can call any method of the scheduler
@@ -437,6 +446,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 // Members of "admin" group possess permissions to perform any actions
@@ -448,6 +459,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 // Members of "watchers" group have only a read access to the scheduler and RM state
@@ -468,6 +481,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 // Data scientist permissions
@@ -575,6 +590,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "expert-ds" {
@@ -685,6 +702,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "callAbort";
     permission java.sql.SQLPermission "setSyncFactory";
     permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
 };
 
 //
