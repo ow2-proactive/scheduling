@@ -30,13 +30,14 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.map.LRUMap;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -48,10 +49,10 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
 import groovy.lang.GroovyShell;
@@ -90,6 +91,13 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     private static final String WITH_VALUE = ", with value ";
 
+    // cache storing <md5, closureName> to avoid groovy class memory leak
+    private static final Map<String, String> closureCacheNames = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STAX_JOB_CACHE.getValueAsInt()));
+
+    private static long closureIndex = 0;
+
+    private static final String CLOSURE_NAME_BASE = "AOSynchronization_";
+
     /** Path to jdbm database main file */
     private File statusFile;
 
@@ -123,10 +131,6 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     private volatile boolean isStarted = false;
 
-    private long lastClearCache = 0L;
-
-    public static final int CLEAR_CACHE_PERIOD_HOURS = 1;
-
     @java.lang.SuppressWarnings("unused")
     public AOSynchronization() {
         // ProActive empty no arg constructor
@@ -138,18 +142,6 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         initializeStatusFile(statusFileDirectoryPath);
         inMemoryChannels = new ConcurrentHashMap<>();
 
-    }
-
-    private synchronized void clearGroovyCacheIfNeeded() {
-        if (shell != null &&
-            (System.currentTimeMillis() - lastClearCache > TimeUnit.HOURS.toMillis(CLEAR_CACHE_PERIOD_HOURS))) {
-            try {
-                shell.getClassLoader().clearCache();
-            } catch (Exception e) {
-                logger.warn("Error when clearing groovy class loader cache", e);
-            }
-            lastClearCache = System.currentTimeMillis();
-        }
     }
 
     private void initializeGroovyCompiler() {
@@ -1063,13 +1055,29 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     @SuppressWarnings("unchecked")
     private <T> T evaluateClosure(String closureDefinition, Class<T> type) throws CompilationException {
-        clearGroovyCacheIfNeeded();
         try {
-            return (T) shell.evaluate(closureDefinition + " as " + type.getCanonicalName());
+            String closureName = getClosureName(closureDefinition);
+            return (T) shell.evaluate(closureDefinition + " as " + type.getCanonicalName(), closureName);
         } catch (CompilationFailedException e) {
             // CompilationFailedException contains instances which are not serializable
             throw new CompilationException(StackTraceUtil.getStackTrace(e));
         }
+    }
+
+    /**
+     * In order to prevent memory-leaks in generated groovy classes,
+     * we assign a unique name to each closure definition (based on md5)
+     * The same closure code will return the same name
+     * This also improves performance
+     * @param closureDefinition closure code
+     * @return a unique name for the closure
+     */
+    private synchronized String getClosureName(String closureDefinition) {
+        String md5Closure = DigestUtils.md5Hex(closureDefinition);
+        if (!closureCacheNames.containsKey(md5Closure)) {
+            closureCacheNames.put(md5Closure, CLOSURE_NAME_BASE + closureIndex++);
+        }
+        return closureCacheNames.get(md5Closure);
     }
 
     /**
