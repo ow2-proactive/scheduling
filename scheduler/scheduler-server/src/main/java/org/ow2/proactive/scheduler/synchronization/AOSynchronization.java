@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.synchronization;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
@@ -54,6 +55,8 @@ import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import groovy.lang.GroovyShell;
 import jdbm.PrimaryHashMap;
@@ -1054,10 +1057,17 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T evaluateClosure(String closureDefinition, Class<T> type) throws CompilationException {
+    @VisibleForTesting
+    protected <T> T evaluateClosure(String closureDefinition, Class<T> type) throws CompilationException {
         try {
             String closureName = getClosureName(closureDefinition);
-            return (T) shell.evaluate(closureDefinition + " as " + type.getCanonicalName(), closureName);
+            String fullCode = closureDefinition + " as " + type.getCanonicalName();
+            // We use evaluate(Reader, String) instead of evaluate(String, String) because of a memory leak in groovy
+            // The Reader version cleans loaded classes from org.codehaus.groovy.reflection.ClassInfo
+            // The String version doesn't clean them which leaves references that are never garbage-collected
+            try (StringReader reader = new StringReader(fullCode)) {
+                return (T) shell.evaluate(reader, closureName);
+            }
         } catch (CompilationFailedException e) {
             // CompilationFailedException contains instances which are not serializable
             throw new CompilationException(StackTraceUtil.getStackTrace(e));
