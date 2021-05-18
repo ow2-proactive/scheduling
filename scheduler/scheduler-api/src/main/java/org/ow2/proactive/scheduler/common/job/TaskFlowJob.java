@@ -26,15 +26,21 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.LogFormatter;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -116,6 +122,87 @@ public class TaskFlowJob extends Job {
      */
     public ArrayList<Task> getTasks() {
         return new ArrayList<Task>(tasks.values());
+    }
+
+    /**
+     * Find terminal tasks for this workflow
+     *
+     * Terminal tasks are tasks without children and not targets of a If or Else branch
+     * @return a set of terminal tasks
+     */
+    public Set<Task> findTerminalTasks() {
+
+        Set<Task> ifParents = new HashSet<>();
+        Set<String> ifChildrenTaskNames = new HashSet<>();
+        Set<String> elseChildrenTaskNames = new HashSet<>();
+
+        Set<Task> terminalTasks = new HashSet<>();
+
+        // First iteration, add all tasks as terminal and store IF flow information
+        for (Task task : tasks.values()) {
+            FlowScript flowScript = task.getFlowScript();
+            if (flowScript != null && flowScript.getActionType().equals(FlowActionType.IF.toString())) {
+                ifParents.add(task);
+                if (flowScript.getActionTarget() != null) {
+                    ifChildrenTaskNames.add(flowScript.getActionTarget());
+                }
+                if (flowScript.getActionTargetElse() != null) {
+                    elseChildrenTaskNames.add(flowScript.getActionTargetElse());
+                }
+            }
+            terminalTasks.add(task);
+        }
+
+        for (Task task : tasks.values()) {
+            // for each task, if it has dependencies, dependencies cannot be terminal
+            if (task.getDependencesList() != null) {
+                terminalTasks.removeAll(task.getDependencesList());
+            }
+            // If the task is a root if, it cannot be terminal
+            if (ifParents.contains(task)) {
+                terminalTasks.remove(task);
+            }
+            // if the task is a target of a if branch, all the branch cannot be terminal
+            if (ifChildrenTaskNames.contains(task.getName())) {
+                terminalTasks.removeAll(findSubTree(task));
+            }
+            // if the task is a target of a else branch, all the branch cannot be terminal
+            if (elseChildrenTaskNames.contains(task.getName())) {
+                terminalTasks.removeAll(findSubTree(task));
+            }
+        }
+        // all remaining tasks are terminal
+        return terminalTasks;
+    }
+
+    /**
+     * Find all tasks reachable by the given task
+     */
+    private Set<Task> findSubTree(Task parentTask) {
+        Set<Task> childrenSet = new HashSet<>();
+        addTaskToChildrenSet(childrenSet, parentTask);
+        int lastChildrenSetSize;
+        do {
+            lastChildrenSetSize = childrenSet.size();
+            for (Task task : tasks.values()) {
+                if (task.getDependencesList() != null) {
+                    Set<Task> dependencySet = new HashSet<>(task.getDependencesList());
+                    if (Sets.intersection(dependencySet, childrenSet).size() > 0) {
+                        addTaskToChildrenSet(childrenSet, task);
+                    }
+                }
+            }
+        } while (childrenSet.size() > lastChildrenSetSize);
+        return childrenSet;
+    }
+
+    private void addTaskToChildrenSet(Set<Task> childrenSet, Task task) {
+        childrenSet.add(task);
+        if (task.getFlowScript() != null && task.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
+            childrenSet.add(getTask(task.getFlowScript().getActionTarget()));
+            childrenSet.add(getTask(task.getFlowScript().getActionTargetElse()));
+            childrenSet.add(getTask(task.getFlowScript().getActionContinuation()));
+        }
     }
 
     /**

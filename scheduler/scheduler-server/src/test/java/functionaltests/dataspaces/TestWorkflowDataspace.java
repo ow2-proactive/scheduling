@@ -115,6 +115,7 @@ public class TestWorkflowDataspace extends SchedulerFunctionalTestNoRestart {
         job.addTask(t2);
 
         JobId id = TWorkflowJobs.testJobSubmission(schedulerHelper, job, null);
+        TWorkflowJobs.waitForJobFinished(id, schedulerHelper, job, null);
         Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
         for (int it = 0; it < 3; it++) {

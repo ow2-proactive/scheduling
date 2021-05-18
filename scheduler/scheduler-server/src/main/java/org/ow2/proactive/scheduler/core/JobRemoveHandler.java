@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -35,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -86,42 +84,39 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
             List<InternalJob> jobs = dbManager.loadJobWithTasksIfNotRemoved(jobIds.toArray(new JobId[0]));
 
-            // if the context is not in sync with the database
-            if (jobs.size() != jobIds.size()) {
-                for (JobId jobId : jobIds) {
-                    service.submitTerminationDataHandler(service.getJobs().removeJob(jobId));
-                }
-                allJobsWereRemoved = false;
-            } else {
-                long removedTime = System.currentTimeMillis();
+            List<JobId> dbJobsIds = jobs.stream().map(InternalJob::getId).collect(Collectors.toList());
 
-                for (InternalJob job : jobs) {
-                    // if the job was already finished we just remove it from the context
-                    if (isInFinishedState(job)) {
-                        service.submitTerminationDataHandler(service.getJobs().removeJob(job.getId()));
-                    } else {
-                        service.submitTerminationDataHandler(service.getJobs().killJob(job.getId()));
-                    }
-                    job.setRemovedTime(removedTime);
-                }
+            long removedTime = System.currentTimeMillis();
 
-                boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
-                dbManager.removeJob(jobIds, removedTime, removeFromDb);
+            List<JobId> aliveJobsIds = jobs.stream()
+                                           .filter(job -> !isInFinishedState(job))
+                                           .map(InternalJob::getId)
+                                           .collect(Collectors.toList());
 
-                for (InternalJob job : jobs) {
-                    ServerJobAndTaskLogs.getInstance().remove(job.getId(), job.getOwner(), job.getCredentials());
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Job " + job.getId() + " removed in " + (System.currentTimeMillis() - start) +
-                                    "ms");
-                    }
-                    // send event to front-end
-                    service.getListener()
-                           .jobStateUpdated(job.getOwner(),
-                                            new NotificationData<>(SchedulerEvent.JOB_REMOVE_FINISHED,
-                                                                   new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
-                }
-                allJobsWereRemoved = true;
+            if (aliveJobsIds.size() > 0) {
+                TerminationData terminationData = service.getJobs().killJobs(aliveJobsIds);
+                service.submitTerminationDataHandler(terminationData);
             }
+
+            for (InternalJob job : jobs) {
+                job.setRemovedTime(removedTime);
+            }
+
+            boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
+            dbManager.removeJob(dbJobsIds, removedTime, removeFromDb);
+
+            for (InternalJob job : jobs) {
+                ServerJobAndTaskLogs.getInstance().remove(job.getId(), job.getOwner(), job.getCredentials());
+                if (logger.isInfoEnabled()) {
+                    logger.info("Job " + job.getId() + " removed in " + (System.currentTimeMillis() - start) + "ms");
+                }
+                // send event to front-end
+                service.getListener()
+                       .jobStateUpdated(job.getOwner(),
+                                        new NotificationData<>(SchedulerEvent.JOB_REMOVE_FINISHED,
+                                                               new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+            }
+            allJobsWereRemoved = dbJobsIds.size() == jobIds.size();
 
             service.wakeUpSchedulingThread();
         } catch (Exception e) {

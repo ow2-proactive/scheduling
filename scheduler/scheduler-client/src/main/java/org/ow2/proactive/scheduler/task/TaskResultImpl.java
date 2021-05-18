@@ -119,6 +119,10 @@ public class TaskResultImpl implements TaskResult {
         this.isRaw = isRaw;
     }
 
+    public TaskResultImpl(TaskId id) {
+        this.id = id;
+    }
+
     private TaskResultImpl(TaskId id, TaskLogs output) {
         this.id = id;
         this.output = output;
@@ -269,6 +273,9 @@ public class TaskResultImpl implements TaskResult {
                                                      " : " + e.getMessage(), e);
             }
             throw thrown;
+        } else if (serializedValue == null) {
+            // empty result (for example a skipped task)
+            return null;
         } else {
             try {
                 return this.instanciateValue(this.getTaskClassLoader());

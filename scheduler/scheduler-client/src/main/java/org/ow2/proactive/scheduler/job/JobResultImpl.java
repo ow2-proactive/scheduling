@@ -115,7 +115,9 @@ public class JobResultImpl implements JobResult {
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
         //add to all Results
         allResults.put(taskName, taskResult);
-        resultMap.putAll(taskResult.getResultMap());
+        if (taskResult.getResultMap() != null) {
+            resultMap.putAll(taskResult.getResultMap());
+        }
         //add to precious results if needed
         if (isPrecious) {
             preciousResults.put(taskName, taskResult);

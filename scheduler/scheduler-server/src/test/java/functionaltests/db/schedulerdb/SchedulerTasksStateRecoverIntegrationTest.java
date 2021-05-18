@@ -126,8 +126,10 @@ public class SchedulerTasksStateRecoverIntegrationTest extends BaseSchedulerDBTe
         state = checkRecoveredState(recoverHelper.recover(-1), state().withFinished(expectedJob));
 
         job = state.getFinishedJobs().get(0);
+        Assert.assertEquals(3, job.getJobDescriptor().getEligibleTasks().size());
         task = job.getJobDescriptor().getEligibleTasks().iterator().next();
-        Assert.assertEquals(2, task.getChildren().size());
+        // finished jobs tasks have no dependency information
+        Assert.assertEquals(0, task.getChildren().size());
         Assert.assertEquals(0, task.getParents().size());
     }
 

@@ -61,7 +61,7 @@ public class AOSynchronizationTestLeak extends ProActiveTestClean {
     }
 
     /**
-     * Run a groovy closure many time and check that there is no leak in org.codehaus.groovy.reflection.ClassInfo
+     * Run a groovy closure many times and check that there is no leak in org.codehaus.groovy.reflection.ClassInfo
      * @throws CompilationException
      */
     @Test

@@ -696,6 +696,13 @@ public class FlowScript extends Script<FlowAction> {
     }
 
     @Override
+    public String display() {
+        String nl = System.lineSeparator();
+        return "actionType = " + actionType + " target = " + target + " targetElse = " + targetElse +
+               " targetContinuation = " + targetContinuation + nl + super.display();
+    }
+
+    @Override
     protected void prepareSpecialBindings(Bindings bindings) {
     }
 }

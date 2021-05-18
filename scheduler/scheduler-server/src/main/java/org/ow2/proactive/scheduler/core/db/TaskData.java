@@ -115,13 +115,14 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                 @NamedQuery(name = "findTaskDataById", query = "from TaskData td where td.id = :taskId"),
                 @NamedQuery(name = "getTotalNumberOfHostsUsed", query = "select count(distinct executionHostName) from TaskData task where task.id.jobId = :id"),
                 @NamedQuery(name = "getTotalTasksCount", query = "select count(*) from TaskData task"),
-                @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task " +
-                                                            "left outer join fetch task.dependentTasks " +
-                                                            "left outer join fetch task.variables " +
-                                                            "left outer join fetch task.selectionScripts  " +
-                                                            "left outer join fetch task.dataspaceSelectors  " +
-                                                            "left outer join fetch task.envModifiers  " +
-                                                            "where task.id.jobId in (:ids)"),
+                @NamedQuery(name = "loadJobsTasksFull", query = "from TaskData as task " +
+                                                                "left outer join fetch task.dependentTasks " +
+                                                                "left outer join fetch task.variables " +
+                                                                "left outer join fetch task.selectionScripts  " +
+                                                                "left outer join fetch task.dataspaceSelectors  " +
+                                                                "left outer join fetch task.envModifiers  " +
+                                                                "where task.id.jobId in (:ids)"),
+                @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task " + "where task.id.jobId in (:ids)"),
                 @NamedQuery(name = "readAccountTasks", query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
                                                                "where task.finishedTime > 0 and task.owner = :username"),
                 @NamedQuery(name = "updateTaskData", query = "update TaskData task set task.taskStatus = :taskStatus, " +
@@ -714,15 +715,18 @@ public class TaskData {
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
         internalTask.setMatchingBlock(getMatchingBlock());
-        internalTask.setVariables(variablesToTaskVariables());
+        if (loadFullState) {
+            internalTask.setVariables(variablesToTaskVariables());
+        }
 
         if (hasAliveTaskLauncher() && getExecuterInformationData() != null) {
             internalTask.setExecuterInformation(getExecuterInformationData().toExecuterInformation(loadFullState));
         }
+        if (loadFullState) {
+            ForkEnvironment forkEnv = createForkEnvironment();
 
-        ForkEnvironment forkEnv = createForkEnvironment();
-
-        internalTask.setForkEnvironment(forkEnv);
+            internalTask.setForkEnvironment(forkEnv);
+        }
 
         return internalTask;
     }
