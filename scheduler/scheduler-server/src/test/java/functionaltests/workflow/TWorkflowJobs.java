@@ -28,14 +28,17 @@ package functionaltests.workflow;
 import static functionaltests.utils.SchedulerTHelper.log;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
@@ -155,6 +158,50 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
 
         Assert.assertEquals(jInfo.getJobId(), id);
         Assert.assertEquals(JobStatus.RUNNING, jInfo.getStatus());
+        return id;
+    }
+
+    public static JobId waitForJobFinishedAndCompareDependencies(JobId id, SchedulerTHelper schedulerHelper,
+            Job jobToSubmit, List<String> skip, Map<String, Set<String>> expectedDependences, String sleepTaskName)
+            throws Exception {
+
+        if (jobToSubmit instanceof TaskFlowJob) {
+            for (Task t : ((TaskFlowJob) jobToSubmit).getTasks()) {
+                if (skip != null && skip.contains(t.getName()) || t.getName().equals(sleepTaskName)) {
+                    continue;
+                }
+                TaskInfo ti = schedulerHelper.waitForEventTaskRunning(id, t.getName());
+                Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
+                Assert.assertEquals(TaskStatus.RUNNING, ti.getStatus());
+            }
+            // Once the job is running, we wait for the provided sleep task to be running
+            // The sleep task is a child of all terminal tasks in the original workflow
+            // Once this sleep task is running we can analyse dependencies (before the workflow terminates)
+            schedulerHelper.waitForEventTaskRunning(id, sleepTaskName);
+            JobState js = schedulerHelper.getSchedulerInterface().getJobState(id);
+            // challenge workflow dependencies to what is expected
+            compareDependences(js, expectedDependences);
+
+            for (Task t : ((TaskFlowJob) jobToSubmit).getTasks()) {
+                if (skip != null && skip.contains(t.getName())) {
+                    continue;
+                }
+                TaskInfo ti = schedulerHelper.waitForEventTaskFinished(id, t.getName());
+                Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
+                Assert.assertTrue(TaskStatus.FINISHED.equals(ti.getStatus()));
+            }
+        }
+
+        log("Waiting for job finished");
+        JobInfo jInfo = schedulerHelper.waitForEventJobFinished(id);
+        Assert.assertEquals(JobStatus.FINISHED, jInfo.getStatus());
+
+        log("Job finished");
+        return id;
+    }
+
+    public static JobId waitForJobFinished(JobId id, SchedulerTHelper schedulerHelper, Job jobToSubmit,
+            List<String> skip) throws Exception {
 
         if (jobToSubmit instanceof TaskFlowJob) {
             for (Task t : ((TaskFlowJob) jobToSubmit).getTasks()) {
@@ -176,7 +223,7 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
         }
 
         log("Waiting for job finished");
-        jInfo = schedulerHelper.waitForEventJobFinished(id);
+        JobInfo jInfo = schedulerHelper.waitForEventJobFinished(id);
         Assert.assertEquals(JobStatus.FINISHED, jInfo.getStatus());
 
         log("Job finished");
@@ -206,35 +253,75 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
                 skip.add(er.getKey());
             }
         }
-        Job jobToTest = JobFactory.getFactory().createJob(jobPath);
+        // Create the original TaskFlowJob, parsing the provided xml workflow
+        TaskFlowJob jobToTest = (TaskFlowJob) JobFactory.getFactory().createJob(jobPath);
+
+        // Add a sleep task which will be a child of all terminal tasks of this workflow
+        String sleepTaskName = "TWorkflowJobsSleep";
+
+        JavaTask sleepTask = new JavaTask();
+        sleepTask.setName(sleepTaskName);
+        sleepTask.setExecutableClassName(SleepTask.class.getName());
+        Set<Task> terminalTasks = jobToTest.findTerminalTasks();
+
+        System.out.println("terminalTasks=" + terminalTasks);
+
+        for (Task terminalTask : terminalTasks) {
+            sleepTask.addDependence(terminalTask);
+        }
+        jobToTest.addTask(sleepTask);
+
+        // display the resulting workflow
+        System.out.println(jobToTest.display());
+
+        // submit the workflow
         JobId id = testJobSubmission(schedulerHelper, jobToTest, skip);
+
+        // wait for the job to be finished, we analyse the dependencies when the sleep task is being executed
+        // (as dependencies information are removed once the job is finished)
+        TWorkflowJobs.waitForJobFinishedAndCompareDependencies(id,
+                                                               schedulerHelper,
+                                                               jobToTest,
+                                                               skip,
+                                                               expectedDependences,
+                                                               sleepTaskName);
 
         JobResult res = schedulerHelper.getJobResult(id);
         Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
-        compareResults(jobPath, expectedResults, res);
-
-        JobState js = schedulerHelper.getSchedulerInterface().getJobState(id);
-        compareDependences(js, expectedDependences);
+        compareResults(jobPath, expectedResults, res, sleepTaskName);
 
         schedulerHelper.removeJob(id);
         schedulerHelper.waitForEventJobRemoved(id);
     }
 
-    public void compareResults(String prefix, Map<String, Long> expectedResults, JobResult jobResult) throws Throwable {
+    public static class SleepTask extends JavaExecutable {
+
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            TimeUnit.MINUTES.sleep(1);
+            return "OK";
+        }
+    }
+
+    public void compareResults(String prefix, Map<String, Long> expectedResults, JobResult jobResult,
+            String sleepTaskName) throws Throwable {
         for (Entry<String, TaskResult> result : jobResult.getAllResults().entrySet()) {
             Long expected = expectedResults.get(result.getKey());
 
-            Assert.assertNotNull(prefix + ": Not expecting result for task '" + result.getKey() + "'", expected);
-            Assert.assertTrue("Task " + result.getKey() + " should be skipped, but returned a result", expected >= 0);
-            if (!(result.getValue().value() instanceof Long)) {
-                System.out.println(result.getValue().value() + " " + result.getValue().value().getClass());
+            if (!result.getKey().equals(sleepTaskName)) {
+                Assert.assertNotNull(prefix + ": Not expecting result for task '" + result.getKey() + "'", expected);
+                Assert.assertTrue("Task " + result.getKey() + " should be skipped, but returned a result",
+                                  expected >= 0);
+                if (!(result.getValue().value() instanceof Long)) {
+                    System.out.println(result.getValue().value() + " " + result.getValue().value().getClass());
+                }
+                Assert.assertTrue(prefix + ": Result for task '" + result.getKey() + "' is not an Long",
+                                  result.getValue().value() instanceof Long);
+                Assert.assertEquals(prefix + ": Invalid result for task '" + result.getKey() + "'",
+                                    expected,
+                                    (Long) result.getValue().value());
             }
-            Assert.assertTrue(prefix + ": Result for task '" + result.getKey() + "' is not an Long",
-                              result.getValue().value() instanceof Long);
-            Assert.assertEquals(prefix + ": Invalid result for task '" + result.getKey() + "'",
-                                expected,
-                                (Long) result.getValue().value());
         }
 
         int skipped = 0;
@@ -248,11 +335,12 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
             }
         }
 
+        // as we added the sleep task to the workflow, we add 1 to the expected result size
         Assert.assertEquals("Expected and actual result sets are not identical in " + prefix + " (skipped " + skipped +
-                            "): ", expectedResults.size(), jobResult.getAllResults().size() + skipped);
+                            "): ", expectedResults.size() + 1, jobResult.getAllResults().size() + skipped);
     }
 
-    public void compareDependences(JobState js, Map<String, Set<String>> expectedDependences) {
+    public static void compareDependences(JobState js, Map<String, Set<String>> expectedDependences) {
         for (TaskState ts : js.getTasks()) {
             String taskName = ts.getId().getReadableName();
             if (expectedDependences.containsKey(taskName)) {

@@ -115,6 +115,7 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRes
         ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
 
         JobId id = TWorkflowJobs.testJobSubmission(schedulerHelper, job, null);
+        TWorkflowJobs.waitForJobFinished(id, schedulerHelper, job, null);
         JobResult res = schedulerHelper.getJobResult(id);
         Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
@@ -162,6 +163,7 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRes
         }
 
         JobId id = TWorkflowJobs.testJobSubmission(schedulerHelper, job, null);
+        TWorkflowJobs.waitForJobFinished(id, schedulerHelper, job, null);
         JobResult res = schedulerHelper.getJobResult(id);
         Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
