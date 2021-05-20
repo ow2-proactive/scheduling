@@ -131,12 +131,12 @@ public enum PASchedulerProperties implements PACommonProperties {
 
     /** Maximum number of threads used for the start task action. This property defines the number of blocking resources
      * until the scheduling loop will block as well.*/
-    SCHEDULER_STARTTASK_THREADNUMBER("pa.scheduler.core.starttask.threadnumber", PropertyType.INTEGER, "5"),
+    SCHEDULER_STARTTASK_THREADNUMBER("pa.scheduler.core.starttask.threadnumber", PropertyType.INTEGER, "20"),
 
     /** Maximum number of threads used to send events to clients. This property defines the number of clients
      * than can block at the same time. If this number is reached, every clients won't receive events until
      * a thread unlock. */
-    SCHEDULER_LISTENERS_THREADNUMBER("pa.scheduler.core.listener.threadnumber", PropertyType.INTEGER, "5"),
+    SCHEDULER_LISTENERS_THREADNUMBER("pa.scheduler.core.listener.threadnumber", PropertyType.INTEGER, "20"),
 
     /** List of the scripts paths to execute at scheduler start. Paths are separated by a ';'. */
     SCHEDULER_STARTSCRIPTS_PATHS("pa.scheduler.startscripts.paths", PropertyType.LIST),

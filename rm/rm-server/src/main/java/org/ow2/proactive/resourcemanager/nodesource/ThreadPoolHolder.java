@@ -27,10 +27,13 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.utils.PAExecutors;
 
 
 /**
@@ -43,21 +46,29 @@ public class ThreadPoolHolder {
 
     private ExecutorService[] pools;
 
+    private static final Logger logger = Logger.getLogger(ThreadPoolHolder.class);
+
     /**
      * Instantiates the thread pools.
      */
-    public ThreadPoolHolder(int[] poolSizes) {
-        if (poolSizes == null) {
+    public ThreadPoolHolder(int[] poolSizes, NamedThreadFactory[] threadFactories) {
+        if (poolSizes == null || threadFactories == null) {
             throw new NullPointerException("poolSizes cannot be null");
         }
         if (poolSizes.length == 0) {
             throw new IllegalArgumentException("poolSizes must contain at least one element");
         }
+        if (poolSizes.length != threadFactories.length) {
+            throw new IllegalArgumentException("poolSizes and threadFactories must have the same size");
+        }
 
         this.pools = new ExecutorService[poolSizes.length];
         for (int i = 0; i < poolSizes.length; i++) {
-            pools[i] = Executors.newFixedThreadPool(poolSizes[i],
-                                                    new NamedThreadFactory("Node Source threadpool # " + i));
+            pools[i] = PAExecutors.newCachedBoundedThreadPool(1,
+                                                              poolSizes[i],
+                                                              120L,
+                                                              TimeUnit.SECONDS,
+                                                              threadFactories[i]);
         }
     }
 
@@ -84,6 +95,17 @@ public class ThreadPoolHolder {
         checkPoolNumber(num);
 
         pools[num].execute(task);
+    }
+
+    public synchronized void shutdown(int num) {
+        checkPoolNumber(num);
+        pools[num].shutdown();
+        try {
+            pools[num].awaitTermination(PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsLong() - 10,
+                                        TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.warn("Thread pool termination interrupted");
+        }
     }
 
     private void checkPoolNumber(int num) {

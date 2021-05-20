@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
@@ -40,6 +41,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -133,20 +135,32 @@ public class RMFunctionalTest extends ProActiveTest {
      */
     private void cleanState() throws Exception {
         if (rmHelper.isRMStarted()) {
+            logger.info("Cleaning RM State");
             rmHelper.disconnect(); // force reconnection
             ResourceManager rm = rmHelper.getResourceManager();
-            int nodeNumber = rm.getState().getTotalNodesNumber();
-
             RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
+            List<RMNodeEvent> allNodes = state.getNodeEvents();
             for (RMNodeSourceEvent sourceEvent : state.getNodeSourceEvents()) {
                 String nodeSource = sourceEvent.getSourceName();
                 rm.removeNodeSource(nodeSource, true);
+                for (RMNodeEvent nodeEvent : allNodes) {
+                    if (nodeSource.equals(nodeEvent.getNodeSource())) {
+                        rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, nodeEvent.getNodeUrl());
+                    }
+                }
                 rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nodeSource);
             }
-
-            for (int i = 0; i < nodeNumber; i++) {
-                rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
+            Assert.assertEquals(0, state.getNodeSourceEvents().size());
+            if (state.getNodeEvents().size() > 0) {
+                for (RMNodeEvent remainingNode : state.getNodeEvents()) {
+                    rm.removeNode(remainingNode.getNodeUrl(), true);
+                    rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, remainingNode.getNodeUrl());
+                }
             }
+            state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
+            Assert.assertEquals(0, state.getNodeEvents().size());
+            logger.info("RM State cleaned");
         }
     }
 

@@ -56,6 +56,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.PAExecutors;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
 
 
@@ -91,8 +92,12 @@ public abstract class SelectionManager {
     public SelectionManager(RMCore rmcore) {
         this.topologyNodesFilter = new TopologyNodesFilter();
         this.rmcore = rmcore;
-        this.scriptExecutorThreadPool = Executors.newFixedThreadPool(PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt(),
-                                                                     new NamedThreadFactory("Selection manager threadpool"));
+        this.scriptExecutorThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                               PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt(),
+                                                                               120L,
+                                                                               TimeUnit.SECONDS,
+                                                                               new NamedThreadFactory("Selection manager threadpool"));
+
         this.inProgress = Collections.synchronizedSet(new HashSet<String>());
 
         String policyClassName = PAResourceManagerProperties.RM_SELECTION_POLICY.getValueAsString();

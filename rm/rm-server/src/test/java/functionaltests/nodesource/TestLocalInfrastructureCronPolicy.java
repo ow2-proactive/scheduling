@@ -70,17 +70,17 @@ public class TestLocalInfrastructureCronPolicy extends RMFunctionalTest {
 
         log("Create then remove an empty local node source with cron policy");
         createEmptyNodeSource(EMPTY_NODE_SOURCE_NAME);
-        removeNodeSource(EMPTY_NODE_SOURCE_NAME);
+        removeNodeSource(EMPTY_NODE_SOURCE_NAME, true);
 
         log("Create a local node source with " + NODES_NUMBER + " nodes with cron policy");
         createNodeSource(NODE_SOURCE_NAME);
 
         log("Waiting for the cron policy to remove the nodes");
-        repeater.accept(NODES_NUMBER, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED));
+        this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, NODES_NUMBER);
 
         log("Waiting for the cron policy to add the nodes again");
         RMTHelper.waitForNodesToBeUp(NODES_NUMBER, this.monitorsHandler);
-        removeNodeSource(NODE_SOURCE_NAME);
+        removeNodeSource(NODE_SOURCE_NAME, false);
     }
 
     private void createEmptyNodeSource(String nodeSourceName) throws Exception {
@@ -107,9 +107,13 @@ public class TestLocalInfrastructureCronPolicy extends RMFunctionalTest {
         RMTHelper.waitForNodeSourceCreation(nodeSourceName, NODES_NUMBER, this.monitorsHandler);
     }
 
-    private void removeNodeSource(String sourceName) throws Exception {
+    private void removeNodeSource(String sourceName, boolean empty) throws Exception {
         this.resourceManager.removeNodeSource(sourceName, true);
+        if (!empty) {
+            this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, NODES_NUMBER);
+        }
         this.rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
+
     }
 
 }
