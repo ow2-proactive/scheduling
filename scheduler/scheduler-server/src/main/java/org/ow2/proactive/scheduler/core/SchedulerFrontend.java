@@ -318,22 +318,30 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                                                       PASchedulerProperties.SCHEDULER_CLIENT_POOL_NBTHREAD.getValueAsInt(),
                                                                                       120L,
                                                                                       TimeUnit.SECONDS,
-                                                                                      new NamedThreadFactory("ClientRequestsThreadPool"));
+                                                                                      new NamedThreadFactory("ClientRequestsThreadPool",
+                                                                                                             false,
+                                                                                                             3));
 
             ExecutorService internalThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
                                                                                         PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
                                                                                         120L,
                                                                                         TimeUnit.SECONDS,
-                                                                                        new NamedThreadFactory("InternalOperationsThreadPool"));
+                                                                                        new NamedThreadFactory("InternalOperationsThreadPool",
+                                                                                                               false,
+                                                                                                               7));
 
             ExecutorService taskPingerThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
                                                                                           PASchedulerProperties.SCHEDULER_TASK_PINGER_POOL_NBTHREAD.getValueAsInt(),
                                                                                           120L,
                                                                                           TimeUnit.SECONDS,
-                                                                                          new NamedThreadFactory("TaskPingerThreadPool"));
+                                                                                          new NamedThreadFactory("TaskPingerThreadPool",
+                                                                                                                 false,
+                                                                                                                 2));
 
             ScheduledExecutorService scheduledThreadPool = new ScheduledThreadPoolExecutor(PASchedulerProperties.SCHEDULER_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
-                                                                                           new NamedThreadFactory("SchedulingServiceTimerThread"));
+                                                                                           new NamedThreadFactory("SchedulingServiceTimerThread",
+                                                                                                                  false,
+                                                                                                                  2));
 
             // at this point we must wait the resource manager
             RMConnection.waitAndJoin(rmURL.toString());

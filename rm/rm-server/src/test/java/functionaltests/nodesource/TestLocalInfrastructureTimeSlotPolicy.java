@@ -69,20 +69,20 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
 
         log("Create then remove an empty local node source with time slot policy");
         createEmptyNodeSource(EMPTY_NODE_SOURCE_NAME);
-        removeNodeSource(EMPTY_NODE_SOURCE_NAME);
+        removeNodeSource(EMPTY_NODE_SOURCE_NAME, true);
 
         log("Create a local node source with " + NODES_NUMBER + " nodes with time slot policy");
         createDefaultNodeSource(NODE_SOURCE_NAME);
 
         log("Waiting for the time slot policy to remove the nodes");
-        repeater.accept(NODES_NUMBER, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED));
+        this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, NODES_NUMBER);
 
         log("Waiting for the time slot policy to add the nodes again");
         RMTHelper.waitForNodesToBeUp(NODES_NUMBER, this.monitorsHandler);
 
         log("Waiting for the time slot policy to remove the nodes again");
-        repeater.accept(NODES_NUMBER, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED));
-        removeNodeSource(NODE_SOURCE_NAME);
+        this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, NODES_NUMBER);
+        removeNodeSource(NODE_SOURCE_NAME, true);
     }
 
     private void createEmptyNodeSource(String nodeSourceName) throws Exception {
@@ -109,9 +109,13 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
         RMTHelper.waitForNodeSourceCreation(nodeSourceName, NODES_NUMBER, this.monitorsHandler);
     }
 
-    private void removeNodeSource(String sourceName) throws Exception {
+    private void removeNodeSource(String sourceName, boolean empty) throws Exception {
         this.resourceManager.removeNodeSource(sourceName, true);
+        if (!empty) {
+            this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, NODES_NUMBER);
+        }
         this.rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
+
     }
 
 }

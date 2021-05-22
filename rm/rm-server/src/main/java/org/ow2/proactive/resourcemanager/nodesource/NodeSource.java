@@ -31,9 +31,11 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
@@ -44,6 +46,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -89,7 +92,7 @@ import com.google.common.annotations.VisibleForTesting;
  *
  */
 @ActiveObject
-public class NodeSource implements InitActive, RunActive {
+public class NodeSource implements InitActive, RunActive, EndActive {
 
     private static Logger logger = Logger.getLogger(NodeSource.class);
 
@@ -141,6 +144,8 @@ public class NodeSource implements InitActive, RunActive {
 
     private static ThreadPoolHolder threadPoolHolder;
 
+    private static AtomicInteger nodeSourceCount = new AtomicInteger(0);
+
     private NodeSource stub;
 
     private final Client administrator;
@@ -175,22 +180,6 @@ public class NodeSource implements InitActive, RunActive {
      * Information related to node source that are persisted in database
      */
     private NodeSourceData nodeSourceData;
-
-    static {
-        try {
-            int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
-            if (maxThreads < NUMBER_OF_THREAD_POOLS) {
-                maxThreads = NUMBER_OF_THREAD_POOLS;
-            }
-
-            // executor service initialization
-            NodeSource.threadPoolHolder = new ThreadPoolHolder(new int[] { maxThreads / NUMBER_OF_THREAD_POOLS,
-                                                                           maxThreads / NUMBER_OF_THREAD_POOLS,
-                                                                           maxThreads / NUMBER_OF_THREAD_POOLS });
-        } catch (Exception e) {
-            logger.error("Could not initialize threadPoolHolder", e);
-        }
-    }
 
     /**
      * Creates a new instance of NodeSource.
@@ -251,12 +240,46 @@ public class NodeSource implements InitActive, RunActive {
                                              .orElse(new LinkedHashMap<>());
     }
 
+    private static void initThreadPools() {
+        if (threadPoolHolder == null) {
+            try {
+                int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
+                if (maxThreads < NUMBER_OF_THREAD_POOLS) {
+                    maxThreads = NUMBER_OF_THREAD_POOLS;
+                }
+
+                // executor service initialization
+                NodeSource.threadPoolHolder = new ThreadPoolHolder(new int[] { maxThreads / NUMBER_OF_THREAD_POOLS,
+                                                                               maxThreads / NUMBER_OF_THREAD_POOLS,
+                                                                               maxThreads / NUMBER_OF_THREAD_POOLS },
+                                                                   new NamedThreadFactory[] { new NamedThreadFactory("Node Source threadpool # internal",
+                                                                                                                     false,
+                                                                                                                     7),
+                                                                                              new NamedThreadFactory("Node Source threadpool # external",
+                                                                                                                     false,
+                                                                                                                     2),
+                                                                                              new NamedThreadFactory("Node Source threadpool # pinger",
+                                                                                                                     false,
+                                                                                                                     2) });
+            } catch (Exception e) {
+                logger.fatal("Could not initialize threadPoolHolder", e);
+                throw new IllegalStateException("Could not initialize threadPoolHolder", e);
+            }
+            logger.info("Thread pools started");
+        }
+    }
+
     /**
      * Initialization of node source. Creates and activates a pinger to monitor nodes.
      *
      * @param body active object body
      */
     public void initActivity(Body body) {
+
+        synchronized (nodeSourceCount) {
+            nodeSourceCount.incrementAndGet();
+            initThreadPools();
+        }
 
         this.stub = (NodeSource) PAActiveObject.getStubOnThis();
         this.infrastructureManager.setNodeSource(this);
@@ -629,6 +652,21 @@ public class NodeSource implements InitActive, RunActive {
     public void reconfigure(Object[] updatedInfrastructureParams, Object[] updatedPolicyParams) throws Exception {
         this.infrastructureManager.reconfigure(updatedInfrastructureParams);
         this.activePolicy.reconfigure(updatedPolicyParams);
+    }
+
+    @Override
+    public void endActivity(Body body) {
+        synchronized (nodeSourceCount) {
+            if (nodeSourceCount.decrementAndGet() == 0) {
+                threadPoolHolder.shutdown(PINGER_POOL);
+                logger.info("Pinger Thread Pool terminated");
+                threadPoolHolder.shutdown(EXTERNAL_POOL);
+                logger.info("External Thread Pool terminated");
+                threadPoolHolder.shutdown(INTERNAL_POOL);
+                logger.info("Internal Thread Pool terminated");
+                threadPoolHolder = null;
+            }
+        }
     }
 
     /**

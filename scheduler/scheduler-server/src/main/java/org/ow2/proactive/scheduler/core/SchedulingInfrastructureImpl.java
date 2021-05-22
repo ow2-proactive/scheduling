@@ -58,7 +58,9 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
     private static class HousekeepingScheduledExecutorLazyHolder {
 
         private static final ScheduledExecutorService INSTANCE = Executors.newScheduledThreadPool(PASchedulerProperties.SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
-                                                                                                  new NamedThreadFactory("Housekeeping Thread"));
+                                                                                                  new NamedThreadFactory("Housekeeping Thread",
+                                                                                                                         false,
+                                                                                                                         2));
 
     }
 

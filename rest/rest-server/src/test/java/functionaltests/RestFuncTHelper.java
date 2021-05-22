@@ -106,6 +106,7 @@ public class RestFuncTHelper {
         cmd.add(javaPath);
         cmd.add("-Djava.security.manager");
         cmd.add("-Dresteasy.allowGzip=true");
+        cmd.add("-Dfile.encoding=UTF-8");
         cmd.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + toPath(serverJavaPolicy));
 
         cmd.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + getSchedHome());
