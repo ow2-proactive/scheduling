@@ -219,7 +219,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(false, true, true, true),
+                                           new JobFilterCriteria(false, true, true, true, true),
                                            DEFAULT_JOB_SORT_PARAMS);
 
             List<String> ids = new ArrayList<>(page.getList().size());
@@ -237,7 +237,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         boolean userHasPermission = false;
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
-            userHasPermission = s.checkJobPermissionMethod(sessionId, jobId, method);
+            userHasPermission = s.checkJobPermissionMethod(jobId, method);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
@@ -245,11 +245,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String signal, String jobId)
-            throws RestException, SignalApiException {
+    public Set<String> addJobSignal(String sessionId, String signal, String jobId) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
-            return s.addJobSignal(sessionId, jobId, signal);
+            return s.addJobSignal(jobId, signal);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
@@ -262,7 +261,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(false, true, true, true),
+                                           new JobFilterCriteria(false, true, true, true, true),
                                            DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<>(page.getList().size());
             for (JobInfo jobInfo : page.getList()) {
@@ -295,7 +294,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
-            boolean myJobs, boolean pending, boolean running, boolean finished, String sortParams)
+            boolean myJobs, boolean pending, boolean running, boolean finished, boolean childJobs, String sortParams)
             throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
@@ -316,7 +315,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(onlyUserJobs, pending, running, finished),
+                                           new JobFilterCriteria(onlyUserJobs, pending, running, finished, childJobs),
                                            sortParameterList);
             List<JobInfo> jobsInfo = page.getList();
             ArrayList<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
@@ -356,7 +355,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public String getLiveLogJob(String sessionId, String jobId) throws NotConnectedRestException,
+    public String getLiveLogJob(String sessionId, String jobId, boolean allLogs) throws NotConnectedRestException,
             UnknownJobRestException, PermissionRestException, LogForwardingRestException, IOException {
         try {
             Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
@@ -365,12 +364,21 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = scheduler.getJobState(jobId);
             boolean isFinished = jobState != null && jobState.isFinished();
             int availableLinesCount = session.getJobsOutputController().availableLinesCount(jobId);
-
-            if (!isFinished || availableLinesCount > 0) {
-                return session.getJobsOutputController().getNewLogs(jobId);
+            if (allLogs) {
+                if (!isFinished || availableLinesCount > 0) {
+                    return session.getJobsOutputController().getAllLogs(jobId);
+                } else {
+                    session.getJobsOutputController().removeAppender(jobId);
+                    return "";
+                }
             } else {
-                session.getJobsOutputController().removeAppender(jobId);
-                return "";
+
+                if (!isFinished || availableLinesCount > 0) {
+                    return session.getJobsOutputController().getNewLogs(jobId);
+                } else {
+                    session.getJobsOutputController().removeAppender(jobId);
+                    return "";
+                }
             }
 
         } catch (PermissionException e) {

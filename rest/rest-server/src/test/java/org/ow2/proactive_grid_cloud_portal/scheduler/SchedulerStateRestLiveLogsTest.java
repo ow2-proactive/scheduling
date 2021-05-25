@@ -88,7 +88,7 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
         String firstJobId = "42";
 
-        String firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
+        String firstJobLogs = client.getLiveLogJob(sessionId, firstJobId, false);
 
         Appender appender = verifyListenAndGetAppender("42");
 
@@ -96,16 +96,16 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
         appender.doAppend(createLoggingEvent(firstJobId, "first log"));
 
-        firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
+        firstJobLogs = client.getLiveLogJob(sessionId, firstJobId, false);
         assertThat(firstJobLogs, containsString("first log"));
 
         appender.doAppend(createLoggingEvent(firstJobId, "other log"));
 
-        firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
+        firstJobLogs = client.getLiveLogJob(sessionId, firstJobId, false);
         assertThat(firstJobLogs, not(containsString("first log")));
         assertThat(firstJobLogs, containsString("other log"));
 
-        firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
+        firstJobLogs = client.getLiveLogJob(sessionId, firstJobId, false);
         assertTrue(firstJobLogs.isEmpty());
     }
 
@@ -131,9 +131,9 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
         String firstJobId = "42";
         String secondJobId = "43";
 
-        String firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
+        String firstJobLogs = client.getLiveLogJob(sessionId, firstJobId, false);
         Appender firstAppender = verifyListenAndGetAppender(firstJobId);
-        String secondJobLogs = client.getLiveLogJob(sessionId, secondJobId);
+        String secondJobLogs = client.getLiveLogJob(sessionId, secondJobId, false);
         Appender secondAppender = verifyListenAndGetAppender(secondJobId);
 
         assertTrue(firstJobLogs.isEmpty());
@@ -142,10 +142,10 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
         firstAppender.doAppend(createLoggingEvent(firstJobId, "first job"));
         secondAppender.doAppend(createLoggingEvent(secondJobId, "second job"));
 
-        firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
+        firstJobLogs = client.getLiveLogJob(sessionId, firstJobId, false);
         assertThat(firstJobLogs, containsString("first job"));
 
-        secondJobLogs = client.getLiveLogJob(sessionId, secondJobId);
+        secondJobLogs = client.getLiveLogJob(sessionId, secondJobId, false);
         assertThat(secondJobLogs, containsString("second job"));
     }
 
@@ -156,7 +156,7 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
         assertEquals(-1, client.getLiveLogJobAvailable(sessionId, "42"));
 
-        String logs = client.getLiveLogJob(sessionId, firstJobId);
+        String logs = client.getLiveLogJob(sessionId, firstJobId, false);
 
         Appender appender = verifyListenAndGetAppender("42");
 
@@ -173,20 +173,20 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
         // will be lost
         appender.doAppend(createLoggingEvent(firstJobId, "second log"));
 
-        logs = client.getLiveLogJob(sessionId, firstJobId);
+        logs = client.getLiveLogJob(sessionId, firstJobId, false);
         assertTrue(logs.isEmpty());
 
         appender.doAppend(createLoggingEvent(firstJobId, "other log"));
         appender.doAppend(createLoggingEvent(firstJobId, "more log"));
 
         assertEquals(2, client.getLiveLogJobAvailable(sessionId, "42"));
-        logs = client.getLiveLogJob(sessionId, firstJobId);
+        logs = client.getLiveLogJob(sessionId, firstJobId, false);
         assertThat(logs, not(containsString("first log")));
         assertThat(logs, containsString("other log"));
         assertThat(logs, containsString("more log"));
 
         assertEquals(0, client.getLiveLogJobAvailable(sessionId, "42"));
-        logs = client.getLiveLogJob(sessionId, firstJobId);
+        logs = client.getLiveLogJob(sessionId, firstJobId, false);
         assertTrue(logs.isEmpty());
     }
 

@@ -215,6 +215,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 storeFailedAttempt(username);
             }
             throw new FailedLoginException("Incorrect Username/Password");
+        } else {
+            resetFailedAttempt(username);
         }
 
         subject.getPrincipals().add(new UserNamePrincipal(username));
@@ -225,6 +227,10 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
 
     protected void storeFailedAttempt(String username) {
         failedAttempts.put(username, (new Date()).getTime());
+    }
+
+    protected void resetFailedAttempt(String username) {
+        failedAttempts.removeAll(username);
     }
 
     protected void removeOldFailedAttempts(String username) {

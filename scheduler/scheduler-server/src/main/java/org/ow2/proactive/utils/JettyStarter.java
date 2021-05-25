@@ -407,8 +407,14 @@ public class JettyStarter {
     private WebAppContext createWebAppContext(String contextPath, String[] virtualHost) {
         WebAppContext webApp = new WebAppContext();
         webApp.setParentLoaderPriority(true);
-        // The following setting allows to avoid conflicts between server jackson jars and individual war jackson versions.
-        webApp.addServerClass("com.google.gson.");
+        // The following setting allows to load the given packages inside the web app classloader and not from the system class loader.
+        ensureServerClasses(webApp,
+                            "com.google.gson.",
+                            "org.slf4j.",
+                            "org.apache.log4j.",
+                            "org.springframework.",
+                            "org.apache.commons.logging.",
+                            "com.zaxxer.hikari.");
         if (contextPath.contains("cloud-automation-service")) {
             // Make jetty.util not overridable and not hidden for cloud-automation
             // as jetty websocket is loaded from the system class loader and uses jetty.util
@@ -420,6 +426,13 @@ public class JettyStarter {
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);
         return webApp;
+    }
+
+    private void ensureServerClasses(WebAppContext webApp, String... packages) {
+        for (String apackage : packages) {
+            webApp.prependServerClass(apackage);
+            webApp.prependSystemClass("-" + apackage);
+        }
     }
 
     private boolean isWarFile(File file) {

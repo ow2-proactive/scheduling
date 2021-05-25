@@ -39,6 +39,7 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.threading.ReifiedMethodCall;
+import org.ow2.proactive.utils.PAExecutors;
 
 
 /**
@@ -56,8 +57,11 @@ public class ClientRequestHandler {
     private static final int THREAD_NUMBER = PASchedulerProperties.SCHEDULER_LISTENERS_THREADNUMBER.getValueAsInt();
 
     /** thread pool */
-    private static final ExecutorService threadPoolForNetworkCalls = Executors.newFixedThreadPool(THREAD_NUMBER,
-                                                                                                  new NamedThreadFactory("ClientEventHandlerPool"));
+    private static final ExecutorService threadPoolForNetworkCalls = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                                                            THREAD_NUMBER,
+                                                                                                            120L,
+                                                                                                            TimeUnit.SECONDS,
+                                                                                                            new NamedThreadFactory("ClientEventHandlerPool"));
 
     private static final AtomicInteger requestLeft = new AtomicInteger();
 

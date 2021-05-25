@@ -691,7 +691,13 @@ public class SchedulingService {
 
     void submitTerminationDataHandler(TerminationData terminationData) {
         if (!terminationData.isEmpty()) {
-            getInfrastructure().getInternalOperationsThreadPool().submit(new TerminationDataHandler(terminationData));
+            try {
+                getInfrastructure().getInternalOperationsThreadPool()
+                                   .submit(new TerminationDataHandler(terminationData))
+                                   .get();
+            } catch (Exception e) {
+                logger.warn("Error when executing job or task termination", e);
+            }
         }
     }
 
@@ -1256,7 +1262,7 @@ public class SchedulingService {
                 Credentials credentials = null;
 
                 if (jobs.isJobAlive(jobId)) {
-                    TerminationData terminationData = jobs.removeJob(jobId);
+                    TerminationData terminationData = jobs.killJob(jobId);
                     credentials = terminationData.getCredentials(jobId);
                     submitTerminationDataHandler(terminationData);
                 }

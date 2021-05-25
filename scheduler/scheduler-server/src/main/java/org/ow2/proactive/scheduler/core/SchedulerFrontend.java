@@ -51,6 +51,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SHUTDOWN_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER;
@@ -317,22 +318,30 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                                                       PASchedulerProperties.SCHEDULER_CLIENT_POOL_NBTHREAD.getValueAsInt(),
                                                                                       120L,
                                                                                       TimeUnit.SECONDS,
-                                                                                      new NamedThreadFactory("ClientRequestsThreadPool"));
+                                                                                      new NamedThreadFactory("ClientRequestsThreadPool",
+                                                                                                             false,
+                                                                                                             3));
 
             ExecutorService internalThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
                                                                                         PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
                                                                                         120L,
                                                                                         TimeUnit.SECONDS,
-                                                                                        new NamedThreadFactory("InternalOperationsThreadPool"));
+                                                                                        new NamedThreadFactory("InternalOperationsThreadPool",
+                                                                                                               false,
+                                                                                                               7));
 
             ExecutorService taskPingerThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
                                                                                           PASchedulerProperties.SCHEDULER_TASK_PINGER_POOL_NBTHREAD.getValueAsInt(),
                                                                                           120L,
                                                                                           TimeUnit.SECONDS,
-                                                                                          new NamedThreadFactory("TaskPingerThreadPool"));
+                                                                                          new NamedThreadFactory("TaskPingerThreadPool",
+                                                                                                                 false,
+                                                                                                                 2));
 
             ScheduledExecutorService scheduledThreadPool = new ScheduledThreadPoolExecutor(PASchedulerProperties.SCHEDULER_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
-                                                                                           new NamedThreadFactory("SchedulingServiceTimerThread"));
+                                                                                           new NamedThreadFactory("SchedulingServiceTimerThread",
+                                                                                                                  false,
+                                                                                                                  2));
 
             // at this point we must wait the resource manager
             RMConnection.waitAndJoin(rmURL.toString());
@@ -1603,6 +1612,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.isPending(),
                                                    filterCriteria.isRunning(),
                                                    filterCriteria.isFinished(),
+                                                   filterCriteria.isChildJobs(),
                                                    sortParameters);
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
@@ -1784,14 +1794,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     }
 
     private JobInfo insertVisualization(JobInfo jobInfo) {
-        try {
-            JobInfo jobInfoState = frontendState.getJobState(jobInfo.getJobId()).getJobInfo();
-            jobInfo.setVisualizationConnectionStrings(jobInfoState.getVisualizationConnectionStrings());
-            jobInfo.setVisualizationIcons(jobInfoState.getVisualizationIcons());
-        } catch (PermissionException e) {
-            logger.debug("Could not add visualization info for job " + jobInfo.getJobId(), e);
-        } catch (UnknownJobException | NotConnectedException e1) {
-            logger.warn("Could not add visualization info for job " + jobInfo.getJobId(), e1);
+        String jobid = jobInfo.getJobId().value();
+
+        if (checkJobPermissionMethod(jobid, "enableRemoteVisualization")) {
+            try {
+                JobInfo jobInfoState = frontendState.getJobState(jobInfo.getJobId()).getJobInfo();
+                jobInfo.setVisualizationConnectionStrings(jobInfoState.getVisualizationConnectionStrings());
+                jobInfo.setVisualizationIcons(jobInfoState.getVisualizationIcons());
+            } catch (PermissionException e) {
+                logger.debug("Could not add visualization info for job " + jobInfo.getJobId(), e);
+            } catch (UnknownJobException | NotConnectedException e1) {
+                logger.warn("Could not add visualization info for job " + jobInfo.getJobId(), e1);
+            }
         }
         return jobInfo;
     }
@@ -1800,22 +1814,25 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
         String jobid = jobInfo.getJobId().value();
 
-        try {
+        if (checkJobPermissionMethod(jobid, "addJobSignal")) {
 
-            if (publicStore.containsKey(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobid)) {
+            try {
 
-                Set<String> jobSignals = jobInfo.getSignals();
-                Set<String> signalsToBeAdded = (HashSet) publicStore.get(SIGNAL_ORIGINATOR,
-                                                                         SIGNAL_TASK_ID,
-                                                                         signalsChannel,
-                                                                         jobid);
-                if (signalsToBeAdded != null && !signalsToBeAdded.isEmpty()) {
-                    jobSignals.addAll(signalsToBeAdded);
-                    jobInfo.setSignals(jobSignals);
+                if (publicStore.containsKey(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobid)) {
+
+                    Set<String> jobSignals = jobInfo.getSignals();
+                    Set<String> signalsToBeAdded = (HashSet) publicStore.get(SIGNAL_ORIGINATOR,
+                                                                             SIGNAL_TASK_ID,
+                                                                             signalsChannel,
+                                                                             jobid);
+                    if (signalsToBeAdded != null && !signalsToBeAdded.isEmpty()) {
+                        jobSignals.addAll(signalsToBeAdded);
+                        jobInfo.setSignals(jobSignals);
+                    }
                 }
+            } catch (InvalidChannelException e) {
+                logger.warn("Could not retrieve the signals of the job " + jobid);
             }
-        } catch (InvalidChannelException e) {
-            logger.warn("Could not retrieve the signals of the job " + jobid);
         }
         return jobInfo;
     }
@@ -1870,14 +1887,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
-            throws NotConnectedException, UnknownJobException {
+    public boolean checkJobPermissionMethod(String jobId, String method) {
         try {
             JobId id = JobIdImpl.makeJobId(jobId);
             frontendState.checkPermissions(method,
                                            frontendState.getIdentifiedJob(id),
                                            YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION);
-        } catch (PermissionException p) {
+        } catch (Exception p) {
             return false;
         }
         return true;
@@ -1932,7 +1948,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public Set<String> addJobSignal(String sessionId, String jobId, String signal) throws SignalApiException {
+    public Set<String> addJobSignal(String jobId, String signal)
+            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException {
+
+        String currentUser = frontendState.getCurrentUser();
+        logger.info("Request to send signal " + signal + " on job " + jobId + " received from " + currentUser);
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkPermissions("addJobSignal",
+                                       frontendState.getIdentifiedJob(jobIdObject),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
+
         if (StringUtils.isBlank(signal.trim())) {
             throw new SignalApiException("Empty signals are not allowed");
         }

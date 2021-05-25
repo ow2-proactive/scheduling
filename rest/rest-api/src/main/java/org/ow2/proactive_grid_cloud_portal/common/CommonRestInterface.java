@@ -30,6 +30,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.io.IOException;
 import java.security.KeyException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.*;
@@ -106,6 +108,18 @@ public interface CommonRestInterface {
     @Path("connected")
     @Produces(MediaType.APPLICATION_JSON)
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
+
+    /**
+     * Generate tokens which can be used as one-time access session identifiers
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param numberTokens number of tokens to generate
+     * @return a set of one-time access tokens
+     */
+    @POST
+    @Path("tokens")
+    @Produces(MediaType.APPLICATION_JSON)
+    Set<String> generateTokens(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("numberTokens") @DefaultValue("1") int numberTokens);
 
     /**
      * Get the login string associated to a session.
@@ -193,4 +207,59 @@ public interface CommonRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     boolean checkPcaAdmin(@HeaderParam("sessionid") String sessionId) throws RestException;
 
+    /**
+     * Get logger level.
+     *
+     * @param sessionId id of a session
+     * @param name logger name
+     * @return logger level
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("logger")
+    @Produces(MediaType.APPLICATION_JSON)
+    String getLogLevel(@HeaderParam("sessionid") String sessionId, @QueryParam("name") String name)
+            throws RestException;
+
+    /**
+     * Change logger level.
+     *
+     * @param sessionId id of a session
+     * @param name logger name
+     * @param level logger level
+     * @return true if the logger level has been changed, false otherwise
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @PUT
+    @Path("logger")
+    @Produces(MediaType.APPLICATION_JSON)
+    boolean setLogLevel(@HeaderParam("sessionid") String sessionId, @QueryParam("name") String name,
+            @QueryParam("level") String level) throws RestException;
+
+    /**
+     * Change multiple loggers level.
+     *
+     * @param sessionId id of a session
+     * @param loggersConfiguration map of (logger_name, level)
+     * @return true if any logger level has been changed, false otherwise
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @POST
+    @Path("logger")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    boolean setLogLevelMultiple(@HeaderParam("sessionid") String sessionId, Map<String, String> loggersConfiguration)
+            throws RestException;
+
+    /**
+     * Get the state of current loggers.
+     *
+     * @param sessionId id of a session
+     * @return a map containing current loggers and their level
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("logger/current")
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, String> getCurrentLoggers(@HeaderParam("sessionid") String sessionId) throws RestException;
 }

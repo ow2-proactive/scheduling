@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -3149,6 +3150,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @Override
     public List<String> getNodeTokens(String nodeUrl) throws RMException {
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
@@ -3156,6 +3158,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         } else {
             throw new RMException("Unknown node " + nodeUrl);
         }
+    }
+
+    @Override
+    public Map<String, List<String>> getAllNodesTokens() throws RMException {
+        Map<String, List<String>> allNodesTokens = new LinkedHashMap<>(allNodes.size());
+        for (Map.Entry<String, RMNode> entry : allNodes.entrySet()) {
+            allNodesTokens.put(entry.getKey(), entry.getValue().getNodeTokens());
+        }
+        return allNodesTokens;
+    }
+
+    @Override
+    public Map<String, List<String>> getAllEligibleNodesTokens() throws RMException {
+        Map<String, List<String>> allNodesTokens = new LinkedHashMap<>(eligibleNodes.size());
+        for (RMNode rmNode : eligibleNodes) {
+            allNodesTokens.put(rmNode.getNodeURL(), rmNode.getNodeTokens());
+        }
+        return allNodesTokens;
     }
 
     @Override

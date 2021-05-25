@@ -327,7 +327,6 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             userDN = getLDAPUserDN(username);
         } catch (NamingException e) {
             logger.error("Cannot connect to LDAP server", e);
-            storeFailedAttempt(username);
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
 
@@ -344,6 +343,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             if (logger.isDebugEnabled()) {
                 logger.debug("authentication succeeded, checking group");
             }
+            resetFailedAttempt(username);
 
             if (fallbackGroupMembership) {
                 super.groupMembershipFromFile(username);

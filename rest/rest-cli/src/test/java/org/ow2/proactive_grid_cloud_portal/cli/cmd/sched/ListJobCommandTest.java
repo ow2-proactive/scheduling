@@ -100,6 +100,7 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    true,
                                                                     null))
                .thenReturn(page);
 
@@ -109,6 +110,7 @@ public class ListJobCommandTest {
                                                                        index,
                                                                        10,
                                                                        false,
+                                                                       true,
                                                                        true,
                                                                        true,
                                                                        true,
@@ -136,6 +138,7 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    true,
                                                                     null))
                .thenReturn(page);
 
@@ -145,6 +148,7 @@ public class ListJobCommandTest {
                                                                        index,
                                                                        1,
                                                                        false,
+                                                                       true,
                                                                        true,
                                                                        true,
                                                                        true,
@@ -173,6 +177,7 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    true,
                                                                     null))
                .thenReturn(page);
 
@@ -182,6 +187,7 @@ public class ListJobCommandTest {
                                                                        index,
                                                                        3,
                                                                        false,
+                                                                       true,
                                                                        true,
                                                                        true,
                                                                        true,
@@ -209,6 +215,7 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    true,
                                                                     null))
                .thenReturn(page);
 
@@ -218,6 +225,7 @@ public class ListJobCommandTest {
                                                                        index,
                                                                        10,
                                                                        false,
+                                                                       true,
                                                                        true,
                                                                        true,
                                                                        true,
@@ -246,6 +254,7 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    true,
                                                                     null))
                .thenReturn(page);
 
@@ -255,6 +264,7 @@ public class ListJobCommandTest {
                                                                        index,
                                                                        10,
                                                                        false,
+                                                                       true,
                                                                        true,
                                                                        true,
                                                                        true,

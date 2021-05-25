@@ -208,7 +208,8 @@ public class SchedulerDBManager {
     }
 
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
-            final boolean running, final boolean finished, final List<SortParameter<JobSortParameter>> sortParameters) {
+            final boolean running, final boolean finished, final boolean childJobs,
+            final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -220,6 +221,7 @@ public class SchedulerDBManager {
                                                              pending,
                                                              running,
                                                              finished,
+                                                             childJobs,
                                                              sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<JobStatus> jobStatuses = params.getStatuses();
@@ -233,6 +235,9 @@ public class SchedulerDBManager {
             }
             if (user != null) {
                 criteria.add(Restrictions.eq("owner", user));
+            }
+            if (!childJobs) {
+                criteria.add(Restrictions.isNull("parentId"));
             }
             boolean allJobs = pending && running && finished;
             if (!allJobs) {
@@ -381,6 +386,10 @@ public class SchedulerDBManager {
 
                 if (hasUser) {
                     queryString.append("and owner = :user ");
+                }
+
+                if (!params.isChildJobs()) {
+                    queryString.append("and parentId = null ");
                 }
 
                 Query query = session.createQuery(queryString.toString());
@@ -949,8 +958,8 @@ public class SchedulerDBManager {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Long, List<TaskData>> loadJobsTasks(Session session, List<Long> jobIds) {
-        Query tasksQuery = session.getNamedQuery("loadJobsTasks")
+    private Map<Long, List<TaskData>> loadJobsTasks(Session session, List<Long> jobIds, boolean fullState) {
+        Query tasksQuery = session.getNamedQuery(fullState ? "loadJobsTasksFull" : "loadJobsTasks")
                                   .setParameterList("ids", jobIds)
                                   .setReadOnly(true)
                                   .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
@@ -995,7 +1004,7 @@ public class SchedulerDBManager {
     // Executed in a transaction from the caller
     private void batchLoadJobs(Session session, boolean fullState, Query jobQuery, List<Long> ids,
             Collection<InternalJob> jobs) {
-        Map<Long, List<TaskData>> tasksMap = loadJobsTasks(session, ids);
+        Map<Long, List<TaskData>> tasksMap = loadJobsTasks(session, ids, fullState);
 
         jobQuery.setParameterList("ids", ids);
         List<JobData> jobsList = (List<JobData>) jobQuery.list();
@@ -1009,55 +1018,61 @@ public class SchedulerDBManager {
         }
     }
 
+    private InternalTask toInternalTask(boolean loadFullState, InternalJob internalJob, TaskData taskData)
+            throws InvalidScriptException {
+        InternalTask internalTask = taskData.toInternalTask(internalJob, loadFullState);
+        if (loadFullState) {
+            internalTask.setParallelEnvironment(taskData.getParallelEnvironment());
+            internalTask.setGenericInformation(taskData.getGenericInformation());
+            for (SelectionScriptData scriptData : taskData.getSelectionScripts()) {
+                internalTask.addSelectionScript(scriptData.createSelectionScript());
+            }
+            if (taskData.getCleanScript() != null) {
+                internalTask.setCleaningScript(taskData.getCleanScript().createSimpleScript());
+            }
+            if (taskData.getPreScript() != null) {
+                internalTask.setPreScript(taskData.getPreScript().createSimpleScript());
+            }
+            if (taskData.getPostScript() != null) {
+                internalTask.setPostScript(taskData.getPostScript().createSimpleScript());
+            }
+            if (taskData.getFlowScript() != null) {
+                internalTask.setFlowScript(taskData.getFlowScript().createFlowScript());
+            }
+            for (SelectorData selectorData : taskData.getDataspaceSelectors()) {
+                if (selectorData.isInput()) {
+                    InputSelector selector = selectorData.createInputSelector();
+                    internalTask.addInputFiles(selector.getInputFiles(), selector.getMode());
+                } else {
+                    OutputSelector selector = selectorData.createOutputSelector();
+                    internalTask.addOutputFiles(selector.getOutputFiles(), selector.getMode());
+                }
+            }
+        }
+        return internalTask;
+    }
+
     private Collection<InternalTask> toInternalTasks(boolean loadFullState, InternalJob internalJob,
             List<TaskData> taskRuntimeDataList) {
         Map<DBTaskId, InternalTask> tasks = new HashMap<>(taskRuntimeDataList.size());
 
         try {
             for (TaskData taskData : taskRuntimeDataList) {
-                InternalTask internalTask = taskData.toInternalTask(internalJob, loadFullState);
-                if (loadFullState) {
-                    internalTask.setParallelEnvironment(taskData.getParallelEnvironment());
-                    internalTask.setGenericInformation(taskData.getGenericInformation());
-                    for (SelectionScriptData scriptData : taskData.getSelectionScripts()) {
-                        internalTask.addSelectionScript(scriptData.createSelectionScript());
-                    }
-                    if (taskData.getCleanScript() != null) {
-                        internalTask.setCleaningScript(taskData.getCleanScript().createSimpleScript());
-                    }
-                    if (taskData.getPreScript() != null) {
-                        internalTask.setPreScript(taskData.getPreScript().createSimpleScript());
-                    }
-                    if (taskData.getPostScript() != null) {
-                        internalTask.setPostScript(taskData.getPostScript().createSimpleScript());
-                    }
-                    if (taskData.getFlowScript() != null) {
-                        internalTask.setFlowScript(taskData.getFlowScript().createFlowScript());
-                    }
-                    for (SelectorData selectorData : taskData.getDataspaceSelectors()) {
-                        if (selectorData.isInput()) {
-                            InputSelector selector = selectorData.createInputSelector();
-                            internalTask.addInputFiles(selector.getInputFiles(), selector.getMode());
-                        } else {
-                            OutputSelector selector = selectorData.createOutputSelector();
-                            internalTask.addOutputFiles(selector.getOutputFiles(), selector.getMode());
-                        }
-                    }
-                }
+                InternalTask internalTask = toInternalTask(loadFullState, internalJob, taskData);
                 tasks.put(taskData.getId(), internalTask);
             }
         } catch (InvalidScriptException e) {
             throw new DatabaseManagerException("Failed to initialize loaded script", e);
         }
 
-        for (TaskData taskData : taskRuntimeDataList) {
-            InternalTask internalTask = tasks.get(taskData.getId());
-            if (!taskData.getDependentTasks().isEmpty()) {
-                for (DBTaskId dependent : taskData.getDependentTasks()) {
-                    internalTask.addDependence(tasks.get(dependent));
+        if (loadFullState) {
+            for (TaskData taskData : taskRuntimeDataList) {
+                InternalTask internalTask = tasks.get(taskData.getId());
+                if (!taskData.getDependentTasks().isEmpty()) {
+                    for (DBTaskId dependent : taskData.getDependentTasks()) {
+                        internalTask.addDependence(tasks.get(dependent));
+                    }
                 }
-            }
-            if (loadFullState) {
                 if (taskData.getIfBranch() != null) {
                     internalTask.setIfBranch(tasks.get(taskData.getIfBranch().getId()));
                 }
@@ -1742,8 +1757,10 @@ public class SchedulerDBManager {
                     }
                 }
                 if (taskResult == null) {
-                    throw new DatabaseManagerException("Failed to load result for task " + taskId + " (job: " + jobId +
-                                                       ")");
+                    // a null result indicates a skipped task
+                    TaskResult emptyResult = new TaskResultImpl(taskId);
+                    resultsMap.put(taskId, emptyResult);
+                    jobResult.addTaskResult(taskId.getReadableName(), emptyResult, false);
                 } else {
                     resultsMap.put(taskId, taskResult);
                 }

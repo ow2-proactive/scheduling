@@ -25,7 +25,10 @@
  */
 package org.ow2.proactive.scheduler.signal;
 
-public class SignalApiException extends Exception {
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+
+
+public class SignalApiException extends SchedulerException {
 
     public SignalApiException() {
     }

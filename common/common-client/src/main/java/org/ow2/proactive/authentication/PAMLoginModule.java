@@ -160,6 +160,7 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
         PamReturnValue answer = pam.authenticate(username, password);
         if (answer.equals(PamReturnValue.PAM_SUCCESS)) {
             subject.getPrincipals().add(new UserNamePrincipal(username));
+            resetFailedAttempt(username);
             super.groupMembershipFromFile(username);
             return true;
         } else {

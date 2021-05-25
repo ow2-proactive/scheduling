@@ -23,52 +23,19 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common;
+package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
-import java.io.Serializable;
+/**
+ * @author ActiveEon Team
+ * @since 11/05/2021
+ */
+public class SignalApiRestException extends RestException {
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
-
-@PublicAPI
-public class JobFilterCriteria implements Serializable {
-
-    private final boolean myJobsOnly;
-
-    private final boolean pending;
-
-    private final boolean running;
-
-    private final boolean finished;
-
-    private final boolean childJobs;
-
-    public JobFilterCriteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
-            boolean childJobs) {
-        this.myJobsOnly = myJobsOnly;
-        this.pending = pending;
-        this.running = running;
-        this.finished = finished;
-        this.childJobs = childJobs;
+    public SignalApiRestException(Throwable cause) {
+        super(cause);
     }
 
-    public boolean isMyJobsOnly() {
-        return myJobsOnly;
-    }
-
-    public boolean isPending() {
-        return pending;
-    }
-
-    public boolean isRunning() {
-        return running;
-    }
-
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public boolean isChildJobs() {
-        return childJobs;
+    public SignalApiRestException(String message) {
+        super(message);
     }
 }

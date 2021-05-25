@@ -136,7 +136,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                           terminateNotificationNode);
 
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
-                                                                       new NamedThreadFactory("DoTask_Action"));
+                                                                       new NamedThreadFactory("DoTask_Action",
+                                                                                              true,
+                                                                                              7));
         this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
     }
 

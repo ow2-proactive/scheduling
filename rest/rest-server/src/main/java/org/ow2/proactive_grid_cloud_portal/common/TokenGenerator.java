@@ -23,52 +23,13 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common;
+package org.ow2.proactive_grid_cloud_portal.common;
 
-import java.io.Serializable;
-
-import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.UniqueID;
 
 
-@PublicAPI
-public class JobFilterCriteria implements Serializable {
-
-    private final boolean myJobsOnly;
-
-    private final boolean pending;
-
-    private final boolean running;
-
-    private final boolean finished;
-
-    private final boolean childJobs;
-
-    public JobFilterCriteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
-            boolean childJobs) {
-        this.myJobsOnly = myJobsOnly;
-        this.pending = pending;
-        this.running = running;
-        this.finished = finished;
-        this.childJobs = childJobs;
-    }
-
-    public boolean isMyJobsOnly() {
-        return myJobsOnly;
-    }
-
-    public boolean isPending() {
-        return pending;
-    }
-
-    public boolean isRunning() {
-        return running;
-    }
-
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public boolean isChildJobs() {
-        return childJobs;
+public class TokenGenerator {
+    public static String newToken() {
+        return new UniqueID().toString();
     }
 }

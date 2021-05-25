@@ -34,10 +34,12 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SignalApiRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
@@ -74,6 +76,15 @@ public class ExceptionUtility {
             throw reconstructError(e, UnknownJobException.class);
         } else {
             throwNCEOrPE(e);
+        }
+    }
+
+    public static void throwSAEorUJEOrNCEOrPE(Exception e)
+            throws SignalApiException, UnknownJobException, NotConnectedException, PermissionException {
+        if (e instanceof SignalApiRestException) {
+            throw reconstructError(e, SignalApiException.class);
+        } else {
+            throwUJEOrNCEOrPE(e);
         }
     }
 

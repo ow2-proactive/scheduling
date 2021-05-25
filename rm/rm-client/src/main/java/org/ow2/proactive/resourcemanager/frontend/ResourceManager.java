@@ -577,20 +577,79 @@ public interface ResourceManager {
      */
     boolean areNodesRecoverable(NodeSet nodes);
 
+    /**
+     * Set the amount of nodes currently needed by the resource manager
+     * @param neededNodes number of nodes needed
+     */
     void setNeededNodes(int neededNodes);
 
+    /**
+     * Return the associations of infrastructures and policy
+     * For each infrastructure name, the list of policies which can be associated
+     * @return infrastructure and policies associations
+     */
     Map<String, List<String>> getInfrasToPoliciesMapping();
 
+    /**
+     * Return all node state events for the given period
+     * @param windowStart period start time
+     * @param windowEnd period end time
+     * @return a list of node state events
+     */
     List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd);
 
+    /**
+     * Add a token to the given node
+     * @param nodeUrl url of the node
+     * @param token token to add
+     * @throws RMException
+     */
     void addNodeToken(String nodeUrl, String token) throws RMException;
 
+    /**
+     * Remove a token from the given node
+     * @param nodeUrl url of the node
+     * @param token token to remove
+     * @throws RMException
+     */
     void removeNodeToken(String nodeUrl, String token) throws RMException;
 
+    /**
+     * Overwrite the tokens list associated with the given node
+     * @param nodeUrl url of the node
+     * @param tokens list of tokens
+     * @throws RMException
+     */
     void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException;
 
+    /**
+     * Get the list of tokens associated with the given node
+     * @param nodeUrl url of the node
+     * @return list of tokens
+     * @throws RMException
+     */
     List<String> getNodeTokens(String nodeUrl) throws RMException;
 
+    /**
+     * Get the list of tokens associated with all resource manager nodes
+     * @return nodes / token list association
+     * @throws RMException
+     */
+    Map<String, List<String>> getAllNodesTokens() throws RMException;
+
+    /**
+     * Get the list of tokens associated with all resource manager eligible nodes
+     * @return eligible nodes / token list association
+     * @throws RMException
+     */
+    Map<String, List<String>> getAllEligibleNodesTokens() throws RMException;
+
+    /**
+     * Return the set of tags associated with the given node
+     * @param nodeUrl url of the node
+     * @return set of tags
+     * @throws RMException
+     */
     Set<String> getNodeTags(String nodeUrl) throws RMException;
 
     /**

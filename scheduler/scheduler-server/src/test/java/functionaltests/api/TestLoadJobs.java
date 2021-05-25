@@ -27,6 +27,7 @@ package functionaltests.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.PARENT_JOB_ID;
 
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -124,7 +125,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         List<JobInfo> jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs);
 
-        JobId firstJob = scheduler.submit(createJob(fileLockPath));
+        JobId firstJob = scheduler.submit(createJob(fileLockPath, null));
         schedulerHelper.waitForEventTaskRunning(firstJob, "Test");
 
         jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
@@ -148,8 +149,8 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         assertEquals(TestUsers.DEMO.username, job.getJobOwner());
         assertEquals(JobPriority.NORMAL, job.getPriority());
 
-        JobId secondJob = scheduler.submit(createJob(fileLockPath));
-        JobId thirdJob = scheduler.submit(createJob(fileLockPath));
+        JobId secondJob = scheduler.submit(createJob(fileLockPath, null));
+        JobId thirdJob = scheduler.submit(createJob(fileLockPath, secondJob.value()));
 
         jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs);
@@ -165,6 +166,9 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, firstJob, secondJob, thirdJob);
+
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true, false), SORT_BY_ID_ASC).getList();
+        checkJobs(jobs, firstJob, secondJob);
 
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_DESC).getList();
         checkJobs(jobs, thirdJob, secondJob, firstJob);
@@ -205,7 +209,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
         fileLockPath = fileLock.lock().toString();
 
-        JobId fourthJob = scheduler.submit(createJob(fileLockPath));
+        JobId fourthJob = scheduler.submit(createJob(fileLockPath, null));
         monitorsHandler.waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING, fourthJob, "Test", 30000);
 
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
@@ -255,7 +259,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         state = scheduler.addEventListener(eventReceiver, true, true);
         monitorsHandler.init(state);
 
-        JobId myjob = scheduler.submit(createJob(fileLockPath));
+        JobId myjob = scheduler.submit(createJob(fileLockPath, null));
 
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, myjob);
@@ -282,10 +286,13 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         }
     }
 
-    private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
+    private TaskFlowJob createJob(String communicationObjectUrl, String parentJobId) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
         job.setProjectName(this.getClass().getSimpleName());
+        if (parentJobId != null) {
+            job.addGenericInformation(PARENT_JOB_ID, parentJobId);
+        }
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());
@@ -310,7 +317,12 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished) {
-        return new JobFilterCriteria(myJobsOnly, pending, running, finished);
+        return criteria(myJobsOnly, pending, running, finished, true);
+    }
+
+    private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
+            boolean childJobs) {
+        return new JobFilterCriteria(myJobsOnly, pending, running, finished, childJobs);
     }
 
 }

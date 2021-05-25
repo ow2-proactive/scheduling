@@ -32,6 +32,7 @@ import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwSAEorUJEOrNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
@@ -58,6 +59,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1480,22 +1482,24 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException {
+    public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
         try {
-            return restApi().checkJobPermissionMethod(sessionId, jobId, method);
+            return restApi().checkJobPermissionMethod(sid, jobId, method);
         } catch (RestException e) {
             throw RestException.unwrapRestException(e);
         }
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String jobId, String signal)
-            throws SchedulerException, SignalApiException {
+    public Set<String> addJobSignal(String jobId, String signal)
+            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException {
+        Set<String> result = new HashSet<>();
         try {
-            return restApi().addJobSignal(sessionId, jobId, signal);
-        } catch (RestException e) {
-            throw RestException.unwrapRestException(e);
+            result = restApi().addJobSignal(sid, jobId, signal);
+        } catch (Exception e) {
+            throwSAEorUJEOrNCEOrPE(e);
         }
+        return result;
     }
 
     private org.apache.http.impl.client.HttpClientBuilder getHttpClientBuilder()

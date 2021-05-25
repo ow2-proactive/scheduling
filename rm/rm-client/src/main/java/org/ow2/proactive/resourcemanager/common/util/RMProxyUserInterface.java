@@ -505,6 +505,16 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
+    public Map<String, List<String>> getAllNodesTokens() throws RMException {
+        return target.getAllNodesTokens();
+    }
+
+    @Override
+    public Map<String, List<String>> getAllEligibleNodesTokens() throws RMException {
+        return target.getAllEligibleNodesTokens();
+    }
+
+    @Override
     public Set<String> getNodeTags(String nodeUrl) throws RMException {
         return target.getNodeTags(nodeUrl);
     }

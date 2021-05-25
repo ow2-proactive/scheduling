@@ -212,8 +212,9 @@ public interface SchedulerRestInterface {
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("running") @DefaultValue("true") boolean running,
-            @QueryParam("finished") @DefaultValue("true") boolean finished, @QueryParam("sortParams") String sortParams)
-            throws RestException;
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("childJobs") @DefaultValue("true") boolean childJobs,
+            @QueryParam("sortParams") String sortParams) throws RestException;
 
     /**
      * Returns the revision number of the scheduler state
@@ -2008,16 +2009,19 @@ public interface SchedulerRestInterface {
      * stream currently available logs, call this method several times to get
      * the complete output.
      *
+     * The optional query parameter allLogs allows to fetch all logs from the beginning
+     *
      * @param sessionId a valid session id
      * @param jobId     the id of the job to retrieve
+     * @param allLogs   if true, fetch all logs since the beginning
      */
     @GET
     @GZIP
     @Path("jobs/{jobid}/livelog")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    String getLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
-            LogForwardingRestException, IOException;
+    String getLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @QueryParam("allLogs") @DefaultValue("false") boolean allLogs) throws NotConnectedRestException,
+            UnknownJobRestException, PermissionRestException, LogForwardingRestException, IOException;
 
     /**
      * number of available bytes in the stream or -1 if the stream does not
@@ -2276,6 +2280,13 @@ public interface SchedulerRestInterface {
     /**
      * 
      * Check if the user has the permission to execute the method passed as argument
+     *
+     * @param sessionId
+     *            current session
+     * @param jobId
+     *            id of the job
+     * @param method
+     *            method name to check
      * 
      * @return true if the user has the permission to execute the java method
      */
@@ -2290,12 +2301,19 @@ public interface SchedulerRestInterface {
      *
      * Add a signal to the list of signals used by the considered job
      *
-     * @return true if the given signal is added to the list of job signals
+     * @param sessionId
+     *            current session
+     * @param jobId
+     *            id of the job
+     * @param signal
+     *            signal name to add
+     *
+     * @return the set of job signals associated with the given job after the addition
      */
     @POST
     @Path("job/{jobid}/signals")
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
-            @PathParam("jobid") String jobId) throws RestException, SignalApiException;
+            @PathParam("jobid") String jobId) throws RestException;
 }
