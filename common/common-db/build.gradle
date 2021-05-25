@@ -23,6 +23,8 @@ dependencies {
     // custom hibernate-hikaricp version to use HikariCP 4.0
     runtime('org.hibernate:hibernate-hikaricp:5.1.0.PA') {
         exclude group: 'org.javassist', module: 'javassist'
+        exclude group: 'org.slf4j', module:'slf4j-api'
     }
+    runtime 'org.slf4j:slf4j-api:1.7.16'
 
 }
