@@ -59,6 +59,7 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 import com.google.common.annotations.VisibleForTesting;
 
 import groovy.lang.GroovyShell;
+import groovy.lang.Script;
 import jdbm.PrimaryHashMap;
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
@@ -94,8 +95,8 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
 
     private static final String WITH_VALUE = ", with value ";
 
-    // cache storing <md5, closureName> to avoid groovy class memory leak
-    private static final Map<String, String> closureCacheNames = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STAX_JOB_CACHE.getValueAsInt()));
+    // cache storing <md5, script> to avoid groovy class memory leak
+    private static final Map<String, Script> closureCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STAX_JOB_CACHE.getValueAsInt()));
 
     private static long closureIndex = 0;
 
@@ -1060,14 +1061,9 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     @VisibleForTesting
     protected <T> T evaluateClosure(String closureDefinition, Class<T> type) throws CompilationException {
         try {
-            String closureName = getClosureName(closureDefinition);
             String fullCode = closureDefinition + " as " + type.getCanonicalName();
-            // We use evaluate(Reader, String) instead of evaluate(String, String) because of a memory leak in groovy
-            // The Reader version cleans loaded classes from org.codehaus.groovy.reflection.ClassInfo
-            // The String version doesn't clean them which leaves references that are never garbage-collected
-            try (StringReader reader = new StringReader(fullCode)) {
-                return (T) shell.evaluate(reader, closureName);
-            }
+            Script script = getClosureScript(fullCode);
+            return (T) script.run();
         } catch (CompilationFailedException e) {
             // CompilationFailedException contains instances which are not serializable
             throw new CompilationException(StackTraceUtil.getStackTrace(e));
@@ -1078,16 +1074,20 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
      * In order to prevent memory-leaks in generated groovy classes,
      * we assign a unique name to each closure definition (based on md5)
      * The same closure code will return the same name
-     * This also improves performance
+     * we also parse the script once and keep the generated script in the cache
      * @param closureDefinition closure code
-     * @return a unique name for the closure
+     * @return a script which can be evaluated
      */
-    private synchronized String getClosureName(String closureDefinition) {
+    private synchronized Script getClosureScript(String closureDefinition) {
         String md5Closure = DigestUtils.md5Hex(closureDefinition);
-        if (!closureCacheNames.containsKey(md5Closure)) {
-            closureCacheNames.put(md5Closure, CLOSURE_NAME_BASE + closureIndex++);
+        if (!closureCache.containsKey(md5Closure)) {
+            String newName = CLOSURE_NAME_BASE + closureIndex++;
+
+            Script script = shell.parse(closureDefinition, newName);
+            closureCache.put(md5Closure, script);
+            return script;
         }
-        return closureCacheNames.get(md5Closure);
+        return closureCache.get(md5Closure);
     }
 
     /**
