@@ -66,6 +66,40 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_HTTPS_PORT("web.https.port", PropertyType.INTEGER, "8443"),
 
+    WEB_HTTPS_PROTOCOLS_INCLUDED("web.https.protocols.included", PropertyType.LIST),
+
+    WEB_HTTPS_PROTOCOLS_EXCLUDED("web.https.protocols.excluded", PropertyType.LIST),
+
+    WEB_HTTPS_CYPHERS_INCLUDED_ADD("web.https.cyphers.included.add", PropertyType.LIST),
+
+    WEB_HTTPS_CYPHERS_EXCLUDED_ADD("web.https.cyphers.excluded.add", PropertyType.LIST),
+
+    WEB_HTTPS_RENEGOTIATION_ALLOWED("web.https.renegotiation.allowed", PropertyType.BOOLEAN),
+
+    WEB_HTTPS_SECURE_RANDOM_ALGORITHM("web.https.secure.random.algorithm", PropertyType.STRING),
+
+    WEB_HTTPS_KEY_FACTORY_ALGORITHM("web.https.key.factory.algorithm", PropertyType.STRING),
+
+    WEB_HTTPS_TRUST_FACTORY_ALGORITHM("web.https.trust.factory.algorithm", PropertyType.STRING),
+
+    WEB_HTTPS_MAX_CERT_PATH("web.https.max.cert.path", PropertyType.INTEGER),
+
+    WEB_HTTPS_CERT_ALIAS("web.https.cert.alias", PropertyType.STRING),
+
+    WEB_HTTPS_ENABLE_CRLDP("web.https.enable.crldp", PropertyType.BOOLEAN),
+
+    WEB_HTTPS_CRL_PATH("web.https.crl.path", PropertyType.STRING),
+
+    WEB_HTTPS_ENABLE_OCSP("web.https.enable.ocsp", PropertyType.BOOLEAN),
+
+    WEB_HTTPS_OCSP_RESPONDER_URL("web.https.ocsp.responder.url", PropertyType.STRING),
+
+    WEB_HTTPS_SESSION_CACHING("web.https.session.caching", PropertyType.BOOLEAN),
+
+    WEB_HTTPS_SESSION_CACHE_SIZE("web.https.session.cache.size", PropertyType.INTEGER),
+
+    WEB_HTTPS_SESSION_TIMEOUT("web.https.session.timeout", PropertyType.INTEGER),
+
     WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER, "100"),
 
     WEB_IDLE_TIMEOUT("web.idle_timeout", PropertyType.INTEGER, "60000"),

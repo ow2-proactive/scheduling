@@ -26,9 +26,9 @@
 package org.ow2.proactive.utils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.BindException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
@@ -181,52 +181,7 @@ public class JettyStarter {
         Connector[] connectors;
 
         if (httpsEnabled) {
-            SslContextFactory sslContextFactory = new SslContextFactory();
-
-            String httpsKeystore = WebProperties.WEB_HTTPS_KEYSTORE.getValueAsStringOrNull();
-            String httpsKeystorePassword = WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD.getValueAsStringOrNull();
-
-            checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE.getKey(), httpsKeystore);
-            checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD.getKey(), httpsKeystorePassword);
-
-            sslContextFactory.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(httpsKeystore));
-            sslContextFactory.setKeyStorePassword(httpsKeystorePassword);
-
-            if (WebProperties.WEB_HTTPS_TRUSTSTORE.isSet() && WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.isSet()) {
-                String httpsTrustStore = WebProperties.WEB_HTTPS_TRUSTSTORE.getValueAsString();
-                String httpsTrustStorePassword = WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.getValueAsString();
-                sslContextFactory.setTrustStorePath(httpsTrustStore);
-                sslContextFactory.setTrustStorePassword(httpsTrustStorePassword);
-            }
-
-            HttpConfiguration secureHttpConfiguration = new HttpConfiguration(httpConfiguration);
-            secureHttpConfiguration.addCustomizer(new SecureRequestCustomizer());
-            secureHttpConfiguration.setSecurePort(httpsPort);
-            secureHttpConfiguration.setSecureScheme("https");
-            secureHttpConfiguration.setSendDateHeader(false);
-            secureHttpConfiguration.setSendServerVersion(false);
-
-            // Connector to listen for HTTPS requests
-            ServerConnector httpsConnector = new ServerConnector(server,
-                                                                 new SslConnectionFactory(sslContextFactory,
-                                                                                          HttpVersion.HTTP_1_1.toString()),
-                                                                 new HttpConnectionFactory(secureHttpConfiguration));
-            httpsConnector.setName(HTTPS_CONNECTOR_NAME);
-            httpsConnector.setPort(httpsPort);
-            httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
-
-            if (redirectHttpToHttps) {
-                // The next two settings allow !403 errors to be redirected to HTTPS
-                httpConfiguration.setSecureScheme("https");
-                httpConfiguration.setSecurePort(httpsPort);
-
-                // Connector to listen for HTTP requests that are redirected to HTTPS
-                ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
-
-                connectors = new Connector[] { httpConnector, httpsConnector };
-            } else {
-                connectors = new Connector[] { httpsConnector };
-            }
+            connectors = configureHttps(httpPort, httpsPort, redirectHttpToHttps, server, httpConfiguration);
         } else {
             ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
             httpConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
@@ -236,6 +191,119 @@ public class JettyStarter {
         server.setConnectors(connectors);
 
         return server;
+    }
+
+    private Connector[] configureHttps(int httpPort, int httpsPort, boolean redirectHttpToHttps, Server server,
+            HttpConfiguration httpConfiguration) {
+        Connector[] connectors;
+        SslContextFactory sslContextFactory = new SslContextFactory();
+
+        if (WebProperties.WEB_HTTPS_PROTOCOLS_INCLUDED.isSet()) {
+            sslContextFactory.setIncludeProtocols(WebProperties.WEB_HTTPS_PROTOCOLS_INCLUDED.getValueAsList(",")
+                                                                                            .toArray(new String[0]));
+        }
+        if (WebProperties.WEB_HTTPS_PROTOCOLS_EXCLUDED.isSet()) {
+            sslContextFactory.setExcludeProtocols(WebProperties.WEB_HTTPS_PROTOCOLS_EXCLUDED.getValueAsList(",")
+                                                                                            .toArray(new String[0]));
+        }
+        if (WebProperties.WEB_HTTPS_CYPHERS_INCLUDED_ADD.isSet()) {
+            List<String> includedCyphers = Arrays.asList(sslContextFactory.getIncludeCipherSuites());
+            includedCyphers.addAll(WebProperties.WEB_HTTPS_CYPHERS_INCLUDED_ADD.getValueAsList(","));
+            sslContextFactory.setIncludeCipherSuites(includedCyphers.toArray(new String[0]));
+        }
+        if (WebProperties.WEB_HTTPS_CYPHERS_EXCLUDED_ADD.isSet()) {
+            sslContextFactory.addExcludeCipherSuites(WebProperties.WEB_HTTPS_CYPHERS_EXCLUDED_ADD.getValueAsList(",")
+                                                                                                 .toArray(new String[0]));
+        }
+        if (WebProperties.WEB_HTTPS_RENEGOTIATION_ALLOWED.isSet()) {
+            sslContextFactory.setRenegotiationAllowed(WebProperties.WEB_HTTPS_RENEGOTIATION_ALLOWED.getValueAsBoolean());
+        }
+        if (WebProperties.WEB_HTTPS_SECURE_RANDOM_ALGORITHM.isSet()) {
+            sslContextFactory.setSecureRandomAlgorithm(WebProperties.WEB_HTTPS_SECURE_RANDOM_ALGORITHM.getValueAsString());
+        }
+        if (WebProperties.WEB_HTTPS_KEY_FACTORY_ALGORITHM.isSet()) {
+            sslContextFactory.setSslKeyManagerFactoryAlgorithm(WebProperties.WEB_HTTPS_KEY_FACTORY_ALGORITHM.getValueAsString());
+        }
+        if (WebProperties.WEB_HTTPS_TRUST_FACTORY_ALGORITHM.isSet()) {
+            sslContextFactory.setTrustManagerFactoryAlgorithm(WebProperties.WEB_HTTPS_TRUST_FACTORY_ALGORITHM.getValueAsString());
+        }
+        if (WebProperties.WEB_HTTPS_MAX_CERT_PATH.isSet()) {
+            sslContextFactory.setMaxCertPathLength(WebProperties.WEB_HTTPS_MAX_CERT_PATH.getValueAsInt());
+        }
+        if (WebProperties.WEB_HTTPS_CERT_ALIAS.isSet()) {
+            sslContextFactory.setCertAlias(WebProperties.WEB_HTTPS_CERT_ALIAS.getValueAsString());
+        }
+        if (WebProperties.WEB_HTTPS_ENABLE_CRLDP.isSet()) {
+            sslContextFactory.setEnableCRLDP(WebProperties.WEB_HTTPS_ENABLE_CRLDP.getValueAsBoolean());
+        }
+        if (WebProperties.WEB_HTTPS_CRL_PATH.isSet()) {
+            sslContextFactory.setCrlPath(WebProperties.WEB_HTTPS_CRL_PATH.getValueAsString());
+        }
+        if (WebProperties.WEB_HTTPS_ENABLE_OCSP.isSet()) {
+            sslContextFactory.setEnableOCSP(WebProperties.WEB_HTTPS_ENABLE_OCSP.getValueAsBoolean());
+        }
+        if (WebProperties.WEB_HTTPS_OCSP_RESPONDER_URL.isSet()) {
+            sslContextFactory.setOcspResponderURL(WebProperties.WEB_HTTPS_OCSP_RESPONDER_URL.getValueAsString());
+        }
+        if (WebProperties.WEB_HTTPS_SESSION_CACHING.isSet()) {
+            sslContextFactory.setSessionCachingEnabled(WebProperties.WEB_HTTPS_SESSION_CACHING.getValueAsBoolean());
+        }
+        if (WebProperties.WEB_HTTPS_SESSION_CACHE_SIZE.isSet()) {
+            sslContextFactory.setSslSessionCacheSize(WebProperties.WEB_HTTPS_SESSION_CACHE_SIZE.getValueAsInt());
+        }
+        if (WebProperties.WEB_HTTPS_SESSION_TIMEOUT.isSet()) {
+            sslContextFactory.setSslSessionTimeout(WebProperties.WEB_HTTPS_SESSION_TIMEOUT.getValueAsInt());
+        }
+
+        String httpsKeystore = WebProperties.WEB_HTTPS_KEYSTORE.getValueAsStringOrNull();
+        String httpsKeystorePassword = WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD.getValueAsStringOrNull();
+
+        checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE.getKey(), httpsKeystore);
+        checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD.getKey(), httpsKeystorePassword);
+
+        sslContextFactory.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(httpsKeystore));
+        sslContextFactory.setKeyStorePassword(httpsKeystorePassword);
+
+        if (WebProperties.WEB_HTTPS_TRUSTSTORE.isSet() && WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.isSet()) {
+            String httpsTrustStore = WebProperties.WEB_HTTPS_TRUSTSTORE.getValueAsString();
+            String httpsTrustStorePassword = WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.getValueAsString();
+            sslContextFactory.setTrustStorePath(httpsTrustStore);
+            sslContextFactory.setTrustStorePassword(httpsTrustStorePassword);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(sslContextFactory.dump());
+        }
+
+        HttpConfiguration secureHttpConfiguration = new HttpConfiguration(httpConfiguration);
+        secureHttpConfiguration.addCustomizer(new SecureRequestCustomizer());
+        secureHttpConfiguration.setSecurePort(httpsPort);
+        secureHttpConfiguration.setSecureScheme("https");
+        secureHttpConfiguration.setSendDateHeader(false);
+        secureHttpConfiguration.setSendServerVersion(false);
+
+        // Connector to listen for HTTPS requests
+        ServerConnector httpsConnector = new ServerConnector(server,
+                                                             new SslConnectionFactory(sslContextFactory,
+                                                                                      HttpVersion.HTTP_1_1.toString()),
+                                                             new HttpConnectionFactory(secureHttpConfiguration));
+        httpsConnector.setName(HTTPS_CONNECTOR_NAME);
+        httpsConnector.setPort(httpsPort);
+        httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
+
+        if (redirectHttpToHttps) {
+            // The next two settings allow !403 errors to be redirected to HTTPS
+            httpConfiguration.setSecureScheme("https");
+            httpConfiguration.setSecurePort(httpsPort);
+
+            // Connector to listen for HTTP requests that are redirected to HTTPS
+            ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
+
+            connectors = new Connector[] { httpConnector, httpsConnector };
+        } else {
+            connectors = new Connector[] { httpsConnector };
+        }
+        return connectors;
     }
 
     private void checkPropertyNotNull(String propertyName, String propertyValue) {
