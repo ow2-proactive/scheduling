@@ -1484,7 +1484,16 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
         try {
-            return restApi().checkJobPermissionMethod(sid, jobId, method);
+            return restApi().checkJobPermissionMethod(sid, method, jobId);
+        } catch (RestException e) {
+            throw RestException.unwrapRestException(e);
+        }
+    }
+
+    @Override
+    public List<String> checkJobsPermissionMethod(List<String> jobIds, String method) throws SchedulerException {
+        try {
+            return restApi().checkJobsPermissionMethod(sid, method, jobIds);
         } catch (RestException e) {
             throw RestException.unwrapRestException(e);
         }

@@ -234,14 +234,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public boolean checkJobPermissionMethod(String sessionId, String method, String jobId) throws RestException {
-        boolean userHasPermission = false;
         try {
-            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
-            userHasPermission = s.checkJobPermissionMethod(jobId, method);
+            Scheduler s = checkAccess(sessionId, "/scheduler/job/" + jobId + "/permission");
+            return s.checkJobPermissionMethod(jobId, method);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
-        return userHasPermission;
+    }
+
+    @Override
+    public List<String> checkJobsPermissionMethod(String sessionId, String method, List<String> jobsId)
+            throws RestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/permission");
+            return s.checkJobsPermissionMethod(jobsId, method);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
     }
 
     @Override

@@ -92,6 +92,15 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException;
 
     /**
+     * Check if the connected user has the permission to execute the method passed as argument
+     *
+     * @param jobIds list of jobs ids
+     * @param method operation to test
+     * @return a list of authorized jobs ids for the given method
+     */
+    List<String> checkJobsPermissionMethod(List<String> jobIds, String method) throws SchedulerException;
+
+    /**
      * Add the given signal to job signals
      *
      * @param jobId id of the job

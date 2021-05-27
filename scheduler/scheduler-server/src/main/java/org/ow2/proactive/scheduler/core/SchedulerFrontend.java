@@ -1624,6 +1624,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
          */
         insertVisualization(jobsInfo.getList());
 
+        /**
+         * Remove variables and generic info when the user is not allowed to see these details
+         */
+        filterVariablesAndGenericInfo(jobsInfo.getList());
+
         return jobsInfo;
     }
 
@@ -1646,6 +1651,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }
     }
 
+    private void filterVariablesAndGenericInfo(List<JobInfo> jobsInfo) {
+        jobsInfo.stream().forEach(jobInfo -> filterVariablesAndGenericInfo(jobInfo));
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -1663,6 +1672,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
          * Inject visualization connection strings for running job when available
          */
         insertVisualization(jobsInfo);
+
+        /**
+         * Remove variables and generic info when the user is not allowed to see these details
+         */
+        filterVariablesAndGenericInfo(jobsInfo);
         return jobsInfo;
     }
 
@@ -1790,6 +1804,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         JobInfo jobInfo = getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
         insertJobSignals(jobInfo);
         insertVisualization(jobInfo);
+        filterVariablesAndGenericInfo(jobInfo);
         return jobInfo;
     }
 
@@ -1835,6 +1850,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             }
         }
         return jobInfo;
+    }
+
+    private void filterVariablesAndGenericInfo(JobInfo jobInfo) {
+        String jobid = jobInfo.getJobId().value();
+        if (!checkJobPermissionMethod(jobid, "getJobState")) {
+            if (jobInfo.getVariables() != null) {
+                jobInfo.getVariables().clear();
+            }
+            if (jobInfo.getGenericInformation() != null) {
+                jobInfo.getGenericInformation().clear();
+            }
+        }
     }
 
     /**
@@ -1897,6 +1924,26 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             return false;
         }
         return true;
+    }
+
+    @Override
+    @ImmediateService
+    public List<String> checkJobsPermissionMethod(List<String> jobIds, String method) {
+        List<String> answer = new ArrayList<>();
+        if (jobIds != null) {
+            for (String jobId : jobIds) {
+                try {
+                    JobId id = JobIdImpl.makeJobId(jobId);
+                    frontendState.checkPermissions(method,
+                                                   frontendState.getIdentifiedJob(id),
+                                                   YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION);
+                    answer.add(jobId);
+                } catch (Exception p) {
+                    // not authorized
+                }
+            }
+        }
+        return answer;
     }
 
     @Override

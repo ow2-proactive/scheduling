@@ -923,6 +923,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public List<String> checkJobsPermissionMethod(List<String> jobIds, String method) throws SchedulerException {
+        return schedulerProxy.checkJobsPermissionMethod(jobIds, method);
+    }
+
+    @Override
     public Set<String> addJobSignal(String jobId, String signal)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException {
         return schedulerProxy.addJobSignal(jobId, signal);
