@@ -888,6 +888,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
+    public List<String> checkJobsPermissionMethod(List<String> jobIds, String method) throws SchedulerException {
+        return uischeduler.checkJobsPermissionMethod(jobIds, method);
+    }
+
+    @Override
+    @ImmediateService
     public Set<String> addJobSignal(String jobId, String signal)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException {
         return uischeduler.addJobSignal(jobId, signal);

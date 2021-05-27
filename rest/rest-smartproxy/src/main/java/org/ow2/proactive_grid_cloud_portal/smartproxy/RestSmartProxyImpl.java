@@ -811,6 +811,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public List<String> checkJobsPermissionMethod(List<String> jobIds, String method) throws SchedulerException {
+        return (_getScheduler()).checkJobsPermissionMethod(jobIds, method);
+    }
+
+    @Override
     public Set<String> addJobSignal(String jobId, String signal)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException {
         return (_getScheduler()).addJobSignal(jobId, signal);

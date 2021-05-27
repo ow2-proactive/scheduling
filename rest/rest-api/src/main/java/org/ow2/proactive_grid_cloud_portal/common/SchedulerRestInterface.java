@@ -2299,6 +2299,26 @@ public interface SchedulerRestInterface {
 
     /**
      *
+     * Check if the user has the permission to execute the method passed as argument
+     *
+     * @param sessionId
+     *            current session
+     * @param jobsId
+     *            list of job ids
+     * @param method
+     *            method name to check
+     *
+     * @return a list of authorized jobs ids
+     */
+    @POST
+    @Path("jobs/permission/{method}")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    List<String> checkJobsPermissionMethod(@HeaderParam("sessionid") String sessionId,
+            @PathParam("method") String method, List<String> jobsId) throws RestException;
+
+    /**
+     *
      * Add a signal to the list of signals used by the considered job
      *
      * @param sessionId
