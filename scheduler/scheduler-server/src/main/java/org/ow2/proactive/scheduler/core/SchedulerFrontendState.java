@@ -102,6 +102,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK = "You do not have permission to get the state of this task !";
 
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_STATES = "You do not have permission to get task states !";
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_IDS = "You do not have permission to get task ids !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB = "You do not have permission to get the state of this job !";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB = "You do not have permission to get this job content !";

@@ -31,6 +31,8 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_IDS;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_STATES;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB;
@@ -1771,14 +1773,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
             int offset, int limit) throws NotConnectedException, PermissionException {
         String userName = null;
+        String tmpUserName = frontendState.checkPermission("getTaskIds", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_IDS)
+                                          .getUsername();
         if (mytasks) {
-            userName = frontendState.checkPermission("getTaskIds", "You do not have permission to use frontendState")
-                                    .getUsername();
+            userName = tmpUserName;
         }
         Page<TaskInfo> pTaskInfo = dbManager.getTasks(from, to, taskTag, offset, limit, userName, taskStatuses);
         List<TaskId> lTaskId = new ArrayList<>(pTaskInfo.getList().size());
         for (TaskInfo taskInfo : pTaskInfo.getList()) {
-            lTaskId.add(taskInfo.getTaskId());
+            if (checkJobPermissionMethod(taskInfo.getJobId().value(), "getTaskIds")) {
+                lTaskId.add(taskInfo.getTaskId());
+            }
         }
         return new Page<>(lTaskId, pTaskInfo.getSize());
     }
@@ -1790,12 +1795,27 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, PermissionException {
 
         String userName = null;
+        String tmpUserName = frontendState.checkPermission("getTaskStates",
+                                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_STATES)
+                                          .getUsername();
         if (mytasks) {
-            userName = frontendState.checkPermission("getTaskStates", "You do not have permission to use frontendState")
-                                    .getUsername();
+            userName = tmpUserName;
         }
-        return dbManager.getTaskStates(from, to, taskTag, offset, limit, userName, statusFilter, sortParams);
-
+        Page<TaskState> page = dbManager.getTaskStates(from,
+                                                       to,
+                                                       taskTag,
+                                                       offset,
+                                                       limit,
+                                                       userName,
+                                                       statusFilter,
+                                                       sortParams);
+        for (Iterator<TaskState> it = page.getList().iterator(); it.hasNext();) {
+            TaskState taskState = it.next();
+            if (!checkJobPermissionMethod(taskState.getId().getJobId().value(), "getTaskStates")) {
+                it.remove();
+            }
+        }
+        return page;
     }
 
     @Override
