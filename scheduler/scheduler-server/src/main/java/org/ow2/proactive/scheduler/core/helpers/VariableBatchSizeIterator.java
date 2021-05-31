@@ -51,7 +51,12 @@ public class VariableBatchSizeIterator<T> {
         if (limit < 0) {
             throw new IllegalArgumentException("limit cannot be negative. Given: " + limit);
         }
-        int upperIndexExclusive = Math.min(rawList.size(), offset + limit);
+        int upperIndexExclusive;
+        if (limit == Integer.MAX_VALUE) {
+            upperIndexExclusive = rawList.size();
+        } else {
+            upperIndexExclusive = Math.min(rawList.size(), offset + limit);
+        }
         List<T> subList = rawList.subList(offset, upperIndexExclusive);
         offset = upperIndexExclusive;
         return subList;
