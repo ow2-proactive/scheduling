@@ -491,7 +491,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Data scientist permissions
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "citizen-ds" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "catalog-portal,workflow-execution,job-analytics";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,catalog-portal,workflow-execution,job-analytics";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodesList";
 
