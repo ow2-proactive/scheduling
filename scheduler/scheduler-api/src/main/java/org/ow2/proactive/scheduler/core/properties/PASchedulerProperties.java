@@ -58,8 +58,11 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Scheduler default policy full name. */
     SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PropertyType.STRING, "org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy"),
 
-    /** Defines the maximum number of tasks to be scheduled in each scheduling loop. */
+    /** Defines the maximum number of tasks to be scheduled in each scheduling loop (not used any more). */
     SCHEDULER_POLICY_NBTASKPERLOOP("pa.scheduler.policy.nbtaskperloop", PropertyType.INTEGER, "10"),
+
+    /** If set to true, the scheduling loop will partition the task list according to the amount of free nodes. Enabling it can cause performance issues */
+    SCHEDULER_POLICY_USE_FREE_NODES("pa.scheduler.policy.use.free.nodes", PropertyType.BOOLEAN, "false"),
 
     /** Path of the license properties file. */
     SCHEDULER_LICENSE_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),

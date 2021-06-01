@@ -323,7 +323,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         while (progressiveIterator.hasMoreElements() && !freeResources.isEmpty()) {
 
-            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = new LinkedList<>(progressiveIterator.getNextElements(freeResources.size()));
+            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = new LinkedList<>(progressiveIterator.getNextElements(PASchedulerProperties.SCHEDULER_POLICY_USE_FREE_NODES.getValueAsBoolean() ? freeResources.size()
+                                                                                                                                                                                                        : Integer.MAX_VALUE));
 
             if (logger.isDebugEnabled()) {
                 loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
@@ -364,10 +365,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 while (!taskRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
-                    neededResourcesNumber = getNextcompatibleTasks(jobMap,
-                                                                   taskRetrievedFromPolicy,
-                                                                   freeResources.size(),
-                                                                   tasksToSchedule);
+                    neededResourcesNumber = getNextcompatibleTasks(jobMap, taskRetrievedFromPolicy, tasksToSchedule);
                 }
 
                 schedulingMainLoopTimingLogger.end("getNextcompatibleTasks");
@@ -474,26 +472,25 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     /**
-     * Extract the n first compatible tasks from the first argument list,
-     * and return them according that the extraction is stopped when the maxResource number is reached.<br>
-     * Two tasks are compatible if and only if they have the same list of selection script and
-     * the same list of node exclusion.
+     * Extract the next compatible tasks from the eligible task list,
+     *
+     * Two tasks are compatible according to several criteria such as the same list of selection script,
+     * the same node tokens, or node exclusions.
      * The check of compliance is currently done by the {@link SchedulingTaskComparator} class.<br>
      * This method has two side effects : extracted tasks are removed from the bagOfTasks and put in the toFill list
      *
      * @param bagOfTasks the list of tasks form which to extract tasks
-     * @param maxResource the limit number of resources that the extraction should not exceed
      * @param toFill the list that will contains the task to schedule at the end. This list must not be null but must be empty.<br>
-     * 		  this list will be filled with the n first compatible tasks according that the number of resources needed
-     * 		  by these tasks does not exceed the given max resource number.
+     * 		  this list will be filled with the first compatible tasks
+     *
      * @return the number of nodes needed to start every task present in the 'toFill' argument at the end of the method.
      */
     protected int getNextcompatibleTasks(Map<JobId, JobDescriptor> jobsMap,
-            LinkedList<EligibleTaskDescriptor> bagOfTasks, int maxResource, LinkedList<EligibleTaskDescriptor> toFill) {
+            LinkedList<EligibleTaskDescriptor> bagOfTasks, LinkedList<EligibleTaskDescriptor> toFill) {
         if (toFill == null || bagOfTasks == null) {
             throw new IllegalArgumentException("The two given lists must not be null !");
         }
-        int neededResource = 0;
+        int totalNeededNodes = 0;
         if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
             Iterator<EligibleTaskDescriptor> it = bagOfTasks.iterator();
             EligibleTaskDescriptor etd;
@@ -505,7 +502,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             }
         }
-        if (maxResource > 0 && !bagOfTasks.isEmpty()) {
+        if (!bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
             InternalJob currentJob = ((JobDescriptorImpl) jobsMap.get(etd.getJobId())).getInternal();
@@ -528,28 +525,18 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 } else {
                     firstLoop = false;
                 }
-                if (neededNodes > maxResource) {
-                    //no instruction is important :
-                    //in this case, a multi node task leads the search to be stopped and the
-                    //the current task would be retried on the next step
-                    //we continue to start the maximum number of task in a single scheduling loop.
-                    //this case will focus on starting single node task first if lot of resources are busy.
-                    //(multi-nodes starvation may occurs)
+                //check if the task is compatible with the other previous one
+                if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob))) {
+                    tlogger.debug(internalTask.getId(), "scheduling");
+                    totalNeededNodes += neededNodes;
+                    toFill.add(etd);
                 } else {
-                    //check if the task is compatible with the other previous one
-                    if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob))) {
-                        tlogger.debug(internalTask.getId(), "scheduling");
-                        neededResource += neededNodes;
-                        maxResource -= neededNodes;
-                        toFill.add(etd);
-                    } else {
-                        bagOfTasks.addFirst(etd);
-                        break;
-                    }
+                    bagOfTasks.addFirst(etd);
+                    break;
                 }
-            } while (maxResource > 0 && !bagOfTasks.isEmpty());
+            } while (!bagOfTasks.isEmpty());
         }
-        return neededResource;
+        return totalNeededNodes;
     }
 
     /**
