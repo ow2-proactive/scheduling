@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    name="job_propagate_vars" onTaskError="continueJobExecution" priority="normal">
+    <variables>
+        <variable name="var" value="job-var-value" />
+    </variables>
+    <description>PropagateVariables</description>
+    <taskFlow>
+        <task name="task1" preciousResult="true">
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+variables.put("var","propagated-value")
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="task2" preciousResult="true">
+            <variables>
+                <variable name="task_var" value="task-var-value"/>
+            </variables>
+            <depends>
+                <task ref="task1" />
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+result = variables.get("var")
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

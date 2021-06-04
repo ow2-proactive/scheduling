@@ -867,7 +867,7 @@ public class StaxJobFactory extends JobFactory {
         LinkedHashMap<String, TaskVariable> updatedVariablesMap = new LinkedHashMap<>(variablesMap);
 
         // replacements will include at first variables defined in the job
-        for (TaskVariable variable : updatedVariablesMap.values()) {
+        for (TaskVariable variable : variablesMap.values()) {
             updatedReplacementVariables.put(variable.getName(), variable.getValue());
         }
         if (replacementVariables != null) {
@@ -892,16 +892,9 @@ public class StaxJobFactory extends JobFactory {
                                                           updatedReplacementVariables));
                 }
                 updatedVariablesMap.put(replacementVariableKey, replacedTaskVariable);
-            } else {
-                // if the variable is not defined in the task, create a new non-inherited task variable with an empty model
-                updatedVariablesMap.put(replacementVariableKey,
-                                        new TaskVariable(replacementVariableKey,
-                                                         replace(replacementVariable.getValue(),
-                                                                 updatedReplacementVariables),
-                                                         null,
-                                                         false));
             }
         }
+        // when the replacement variable is not defined as task variable the workflow, we do not add it
         return updatedVariablesMap;
     }
 

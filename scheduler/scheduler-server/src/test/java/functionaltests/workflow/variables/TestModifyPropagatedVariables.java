@@ -31,8 +31,11 @@ import static org.objectweb.proactive.utils.OperatingSystem.unix;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 
@@ -40,6 +43,8 @@ import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 public class TestModifyPropagatedVariables extends SchedulerFunctionalTestNoRestart {
 
     private static URL job_desc = TestModifyPropagatedVariables.class.getResource("/functionaltests/descriptors/Job_modify_propagated_vars.xml");
+
+    private static URL job_desc2 = TestModifyPropagatedVariables.class.getResource("/functionaltests/descriptors/Job_modify_propagated_vars_2.xml");
 
     private static URL job_desc_unix = TestModifyPropagatedVariables.class.getResource("/functionaltests/descriptors/Job_modify_propagated_vars_on_unix.xml");
 
@@ -53,6 +58,15 @@ public class TestModifyPropagatedVariables extends SchedulerFunctionalTestNoRest
             setExecutable(absolutePath(unix_sh));
             schedulerHelper.testJobSubmission(absolutePath(job_desc_unix));
         }
+    }
+
+    @Test
+    public void testModifyPropagatedVariables2() throws Throwable {
+        JobId jobid = schedulerHelper.testJobSubmission(absolutePath(job_desc2));
+        JobResult result = schedulerHelper.getJobResult(jobid);
+        System.out.println(result.getPreciousResults().get("task2").getOutput().getAllLogs());
+        Assert.assertEquals("propagated-value", result.getPreciousResults().get("task2").getValue());
+
     }
 
     private String absolutePath(URL file) throws Exception {

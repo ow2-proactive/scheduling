@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.core.properties.PropertyDecrypter;
 
 
@@ -56,6 +57,8 @@ public class VariablesMap implements Map<String, Serializable>, Serializable {
      * Map containing variables overriden into scripts
      */
     private Map<String, Serializable> scriptMap;
+
+    private static final Logger logger = Logger.getLogger(VariablesMap.class);
 
     /**
      * Constructor
