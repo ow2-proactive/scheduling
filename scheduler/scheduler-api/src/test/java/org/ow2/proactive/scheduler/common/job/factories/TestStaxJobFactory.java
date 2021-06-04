@@ -644,6 +644,8 @@ public class TestStaxJobFactory {
         // task variable is not inherited, has the same name as a job variable, and uses another task variable as default value
         assertEquals("${task_variable2}", unresolvedVariables.get("variable2").getValue());
         assertEquals("task_value1", variables.get("variable2").getValue());
+        // job variable should not appear as task variable
+        assertFalse(variables.containsKey("variable3"));
     }
 
     @Test

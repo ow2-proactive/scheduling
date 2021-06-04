@@ -5,6 +5,7 @@
     <variables>
         <variable name="variable1" value="value1" />
         <variable name="variable2" value="${variable1}" />
+        <variable name="variable3" value="value3" />
     </variables>
     <description>UpdateVariablesTestJob</description>
     <genericInformation>
