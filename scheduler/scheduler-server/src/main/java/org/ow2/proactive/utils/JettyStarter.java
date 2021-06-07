@@ -174,6 +174,10 @@ public class JettyStarter {
 
             server.setHandler(topLevelHandlerList);
 
+            if (logger.isDebugEnabled()) {
+                server.setDumpAfterStart(true);
+            }
+
             String schedulerHost = ProActiveInet.getInstance().getHostname();
             return startServer(server, schedulerHost, restPort, httpProtocol);
         }
@@ -295,10 +299,6 @@ public class JettyStarter {
             String httpsTrustStorePassword = WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.getValueAsString();
             sslContextFactory.setTrustStorePath(httpsTrustStore);
             sslContextFactory.setTrustStorePassword(httpsTrustStorePassword);
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(sslContextFactory.dump());
         }
 
         HttpConfiguration secureHttpConfiguration = new HttpConfiguration(httpConfiguration);
