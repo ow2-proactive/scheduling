@@ -66,13 +66,13 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_HTTPS_PORT("web.https.port", PropertyType.INTEGER, "8443"),
 
-    WEB_HTTPS_PROTOCOLS_INCLUDED("web.https.protocols.included", PropertyType.LIST),
+    WEB_HTTPS_PROTOCOLS_INCLUDED("web.https.protocols.included", PropertyType.LIST, "TLSv1.2,TLSv1.3"),
 
     WEB_HTTPS_PROTOCOLS_EXCLUDED("web.https.protocols.excluded", PropertyType.LIST),
 
     WEB_HTTPS_CYPHERS_INCLUDED_ADD("web.https.cyphers.included.add", PropertyType.LIST),
 
-    WEB_HTTPS_CYPHERS_EXCLUDED_ADD("web.https.cyphers.excluded.add", PropertyType.LIST),
+    WEB_HTTPS_CYPHERS_EXCLUDED_ADD("web.https.cyphers.excluded.add", PropertyType.LIST, "TLS_DHE.*,TLS_EDH.*"),
 
     WEB_HTTPS_RENEGOTIATION_ALLOWED("web.https.renegotiation.allowed", PropertyType.BOOLEAN),
 
