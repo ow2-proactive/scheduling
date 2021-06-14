@@ -59,13 +59,6 @@ public interface Topology extends Serializable {
     boolean onSameHost(Node node, Node node2);
 
     /**
-     * Returns the distance between 2 hosts identified by their inet addresses.
-     *
-     * @return the distance between 2 nodes
-     */
-    Long getDistance(InetAddress hostAddress, InetAddress hostAddress2);
-
-    /**
      * Returns the distance between 2 hosts identified by their domain names.
      *
      * @return the distance between 2 nodes
@@ -74,27 +67,34 @@ public interface Topology extends Serializable {
 
     /**
      * Checks if the information about host is presented in the topology records.
-     * @param hostAddress the address of the host
+     * @param hostName name of the host
      * @return true if the host is known, false otherwise
      */
-    boolean knownHost(InetAddress hostAddress);
+    boolean knownHost(String hostName);
 
     /**
      * Gets the set of hosts handled by resource manager.
      *
      * @return the set of hosts handled by resource manager
      */
-    Set<InetAddress> getHosts();
+    Set<String> getHosts();
+
+    /**
+     * Return the inet address associated with this host
+     * @param hostName
+     * @return associated inetAddress
+     */
+    InetAddress getInetAddress(String hostName);
 
     /**
      * Gets the distances associated to the host.
      * Note that it does not return information about all hosts handled by the resource manager
      * but rather the information about hosts added before the one specified.
      *
-     * @param hostAddress - inet address of the host
+     * @param hostName - name of the host
      * @return distances map to nodes added before this one
      */
-    HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress);
+    HashMap<String, Long> getHostTopology(String hostName);
 
     /**
      * Clustirizes hosts into clusters based on their proximity
