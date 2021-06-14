@@ -154,7 +154,7 @@ public class RMRest implements RMRestInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#loginWithCredential(org.ow2.
      * proactive_grid_cloud_portal.LoginForm)
      */

@@ -75,23 +75,24 @@ public class MatrixBasedTests {
             return distance;
         }
 
-        public Long getDistance(InetAddress hostAddress, InetAddress hostAddress2) {
-            return null;
-        }
-
         public Long getDistance(String hostName, String hostName2) {
             return null;
         }
 
-        public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress) {
+        public HashMap<String, Long> getHostTopology(String hostAddress) {
             return null;
         }
 
-        public Set<InetAddress> getHosts() {
+        public Set<String> getHosts() {
             return null;
         }
 
-        public boolean knownHost(InetAddress hostAddress) {
+        @Override
+        public InetAddress getInetAddress(String hostName) {
+            return null;
+        }
+
+        public boolean knownHost(String hostAddress) {
             return false;
         }
 
