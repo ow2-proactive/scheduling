@@ -42,5 +42,5 @@ public interface Pinger {
      * @param nodes to ping
      * @return distances map to hosts where these nodes are located
      */
-    HashMap<InetAddress, Long> ping(NodeSet nodes);
+    HashMap<String, Long> ping(NodeSet nodes);
 }

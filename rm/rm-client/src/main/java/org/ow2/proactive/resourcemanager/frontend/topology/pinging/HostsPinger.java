@@ -48,17 +48,20 @@ public class HostsPinger implements Pinger {
      * @param nodes to ping
      * @return distances map to hosts where these nodes are located
      */
-    public HashMap<InetAddress, Long> ping(NodeSet nodes) {
-        HashMap<InetAddress, Long> results = new HashMap<>();
+    public HashMap<String, Long> ping(NodeSet nodes) {
+        HashMap<String, Long> results = new HashMap<>();
         for (Node node : nodes) {
             try {
-                InetAddress current = NodeFactory.getDefaultNode().getVMInformation().getInetAddress();
+                Node serverNode = NodeFactory.getDefaultNode();
+                InetAddress current = serverNode.getVMInformation().getInetAddress();
+                String currentHostName = serverNode.getVMInformation().getHostName();
                 InetAddress nodeAddress = node.getVMInformation().getInetAddress();
-                if (current.equals(nodeAddress)) {
+                String nodeHostName = node.getVMInformation().getHostName();
+                if (currentHostName.equals(nodeHostName)) {
                     // nodes on the same host
-                    results.put(nodeAddress, new Long(0));
+                    results.put(nodeHostName, new Long(0));
                 } else {
-                    results.put(nodeAddress, pingHost(nodeAddress));
+                    results.put(nodeHostName, pingHost(nodeAddress));
                 }
             } catch (NodeException e) {
             }

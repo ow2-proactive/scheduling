@@ -718,8 +718,8 @@ public class RMRest implements RMRestInterface {
         ResourceManager rm = checkAccess(sessionId);
         TopologyImpl topology = (TopologyImpl) orThrowRpe(PAFuture.getFutureValue(rm.getTopology()));
         TopologyData topologyData = new TopologyData();
-        Map<String, Map<String, Long>> distances = mapValues(mapKeys(topology.getDistances(), InetAddress::toString),
-                                                             map -> mapKeys(map, InetAddress::toString));
+        Map<String, Map<String, Long>> distances = mapValues(mapKeys(topology.getDistances(), String::toString),
+                                                             map -> mapKeys(map, String::toString));
         topologyData.setDistances(distances);
         topologyData.setHosts(mapValues(topology.getHostsMap(), InetAddress::toString));
         return topologyData;

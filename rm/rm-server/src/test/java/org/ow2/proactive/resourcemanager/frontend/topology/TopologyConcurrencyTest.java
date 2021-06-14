@@ -62,7 +62,7 @@ import org.ow2.proactive.utils.NodeSet;
  * At the end, remove all previously added nodes and verify that
  * the topology manager structure is empty
  */
-public class topologyConcurrencyTest {
+public class TopologyConcurrencyTest {
 
     // number of thread used in this test
     final int nbThreads = 20;
@@ -159,7 +159,7 @@ public class topologyConcurrencyTest {
         }
         System.out.println(manager.getTopology().getHosts());
         // finally verify that the nodes on host structure is empty (null)
-        Assert.assertNull(manager.getNodesOnHost(DummyVMInfo.address));
+        Assert.assertNull(manager.getNodesOnHost(DummyVMInfo.hostname));
     }
 
     public static class DummyVMInfo implements VMInformation {

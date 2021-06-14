@@ -55,7 +55,7 @@ public class TopologyImpl implements Topology, Cloneable {
      * Store here only half of matrix - each host have distances to hosts added before.
      * Assume that they are symmetrical.
      */
-    private HashMap<InetAddress, HashMap<InetAddress, Long>> distances = new HashMap<>();
+    private HashMap<String, HashMap<String, Long>> distances = new HashMap<>();
 
     /**
      * This map is needed to store the dependency between host name and address.
@@ -72,20 +72,20 @@ public class TopologyImpl implements Topology, Cloneable {
      * {@inheritDoc}
      */
     public Long getDistance(Node node, Node node2) {
-        InetAddress host = node.getVMInformation().getInetAddress();
-        InetAddress host2 = node2.getVMInformation().getInetAddress();
+        String host = node.getVMInformation().getHostName();
+        String host2 = node2.getVMInformation().getHostName();
         return getDistance(host, host2);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Long getDistance(InetAddress host, InetAddress host2) {
+    public Long getDistance(String host, String host2) {
         if (host.equals(host2)) {
             return long0;
         } else {
-            HashMap<InetAddress, Long> dhost = distances.get(host);
-            HashMap<InetAddress, Long> dhost2 = distances.get(host2);
+            HashMap<String, Long> dhost = distances.get(host);
+            HashMap<String, Long> dhost2 = distances.get(host2);
             Long dHostToHost2;
             Long dHost2ToHost;
             if (dhost != null && (dHostToHost2 = dhost.get(host2)) != null) {
@@ -100,19 +100,6 @@ public class TopologyImpl implements Topology, Cloneable {
     /**
      * {@inheritDoc}
      */
-    public Long getDistance(String hostName, String hostName2) {
-        InetAddress host = hosts.get(hostName);
-        InetAddress host2 = hosts.get(hostName2);
-
-        if (host != null && host2 != null) {
-            return getDistance(host, host2);
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public boolean onSameHost(Node node, Node node2) {
         return getDistance(node, node2) == 0;
     }
@@ -120,8 +107,13 @@ public class TopologyImpl implements Topology, Cloneable {
     /**
      * {@inheritDoc}
      */
-    public Set<InetAddress> getHosts() {
+    public Set<String> getHosts() {
         return distances.keySet();
+    }
+
+    @Override
+    public InetAddress getInetAddress(String hostName) {
+        return hosts.get(hostName);
     }
 
     public HashMap<String, InetAddress> getHostsMap() {
@@ -136,8 +128,8 @@ public class TopologyImpl implements Topology, Cloneable {
      * @param hostAddress the address of the host
      * @param hostTopology distances to other hosts
      */
-    public void addHostTopology(String hostName, InetAddress hostAddress, HashMap<InetAddress, Long> hostTopology) {
-        distances.put(hostAddress, hostTopology);
+    public void addHostTopology(String hostName, InetAddress hostAddress, HashMap<String, Long> hostTopology) {
+        distances.put(hostName, hostTopology);
         hosts.put(hostName, hostAddress);
     }
 
@@ -147,15 +139,14 @@ public class TopologyImpl implements Topology, Cloneable {
      * another (as it may lead to network call) but rather pass them as parameters.
      *
      * @param hostName name of host to be removed
-     * @param hostAddress host address to be removed
      */
-    public void removeHostTopology(String hostName, InetAddress hostAddress) {
-        distances.remove(hostAddress);
+    public void removeHostTopology(String hostName) {
+        distances.remove(hostName);
         hosts.remove(hostName);
         // removing links to "host"
-        for (InetAddress h : distances.keySet()) {
-            if (distances.get(h).containsKey(hostAddress)) {
-                distances.get(h).remove(hostAddress);
+        for (String h : distances.keySet()) {
+            if (distances.get(h).containsKey(hostName)) {
+                distances.get(h).remove(hostName);
             }
         }
     }
@@ -163,15 +154,15 @@ public class TopologyImpl implements Topology, Cloneable {
     /**
      * {@inheritDoc}
      */
-    public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress) {
-        return distances.get(hostAddress);
+    public HashMap<String, Long> getHostTopology(String hostName) {
+        return distances.get(hostName);
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean knownHost(InetAddress hostAddress) {
-        return distances.containsKey(hostAddress);
+    public boolean knownHost(String hostName) {
+        return distances.containsKey(hostName);
     }
 
     /**
@@ -193,7 +184,7 @@ public class TopologyImpl implements Topology, Cloneable {
         return hac.clusterize(numberOfClusters, hosts.keySet());
     }
 
-    public HashMap<InetAddress, HashMap<InetAddress, Long>> getDistances() {
+    public HashMap<String, HashMap<String, Long>> getDistances() {
         return distances;
     }
 }

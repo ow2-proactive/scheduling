@@ -82,7 +82,7 @@ public class TopologyManager {
     private ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
-    private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<>();
+    private HashMap<String, Set<Node>> nodesOnHost = new HashMap<>();
 
     // class using for pinging
     private Class<? extends Pinger> pingerClass;
@@ -149,39 +149,42 @@ public class TopologyManager {
                 logger.debug("Adding Node " + node.getNodeInformation().getURL() + " to topology");
             }
 
-            InetAddress host = node.getVMInformation().getInetAddress();
+            InetAddress inetAddress = node.getVMInformation().getInetAddress();
 
-            if (topology.knownHost(host)) {
+            String hostName = node.getVMInformation().getHostName();
+
+            if (topology.knownHost(hostName)) {
                 // host topology is already known
                 if (logger.isDebugEnabled()) {
                     logger.debug("The topology information has been already added for node " +
                                  node.getNodeInformation().getURL());
                 }
-                nodesOnHost.get(host).add(node);
+                nodesOnHost.get(hostName).add(node);
                 return;
             }
 
             // unknown host => start pinging process
             NodeSet toPing = new NodeSet();
-            HashMap<InetAddress, Long> hostsTopology = new HashMap<>();
+            HashMap<String, Long> hostsTopology = new HashMap<>();
 
             // adding one node from each host
-            for (InetAddress h : nodesOnHost.keySet()) {
+            for (String host : nodesOnHost.keySet()) {
                 // always have at least one node on each host
-                if (nodesOnHost.get(h) != null && !nodesOnHost.get(h).isEmpty()) {
-                    toPing.add(nodesOnHost.get(h).iterator().next());
-                    hostsTopology.put(h, Long.MAX_VALUE);
+                if (nodesOnHost.get(host) != null && !nodesOnHost.get(host).isEmpty()) {
+                    toPing.add(nodesOnHost.get(host).iterator().next());
+                    hostsTopology.put(host, Long.MAX_VALUE);
                 }
+
             }
 
             if (PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
                 hostsTopology = pingNode(node, toPing);
             }
 
-            topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
+            topology.addHostTopology(node.getVMInformation().getHostName(), inetAddress, hostsTopology);
             Set<Node> nodesList = new LinkedHashSet<>();
             nodesList.add(node);
-            nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
+            nodesOnHost.put(hostName, nodesList);
         } finally {
             rwLock.writeLock().unlock();
         }
@@ -205,16 +208,16 @@ public class TopologyManager {
                 logger.debug("Removing Node " + node.getNodeInformation().getURL() + " from topology");
             }
 
-            InetAddress host = node.getVMInformation().getInetAddress();
-            if (!topology.knownHost(host)) {
+            String hostName = node.getVMInformation().getHostName();
+            if (!topology.knownHost(hostName)) {
                 logger.warn("Topology info does not exist for node " + node.getNodeInformation().getURL());
             } else {
-                Set<Node> nodes = nodesOnHost.get(host);
+                Set<Node> nodes = nodesOnHost.get(hostName);
                 nodes.remove(node);
                 if (nodes.isEmpty()) {
                     // no more nodes on the host
-                    topology.removeHostTopology(node.getVMInformation().getHostName(), host);
-                    nodesOnHost.remove(host);
+                    topology.removeHostTopology(node.getVMInformation().getHostName());
+                    nodesOnHost.remove(hostName);
                 }
             }
         } finally {
@@ -230,21 +233,21 @@ public class TopologyManager {
      * Launches the pinging process from new host. It will ping all other hosts
      * according to the pinger logic.
      */
-    private HashMap<InetAddress, Long> pingNode(Node node, NodeSet nodes) {
+    private HashMap<String, Long> pingNode(Node node, NodeSet nodes) {
 
         try {
             logger.debug("Launching ping process on node " + node.getNodeInformation().getURL());
             long timeStamp = System.currentTimeMillis();
 
             Pinger pinger = PAActiveObject.newActive(pingerClass, null, node);
-            HashMap<InetAddress, Long> result = pinger.ping(nodes);
+            HashMap<String, Long> result = pinger.ping(nodes);
             PAFuture.waitFor(result);
             logger.debug(result.size() + " hosts were pinged from " + node.getNodeInformation().getURL() + " in " +
                          (System.currentTimeMillis() - timeStamp) + " ms");
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Distances are:");
-                for (InetAddress host : result.keySet()) {
+                for (String host : result.keySet()) {
                     logger.debug(result.get(host) + " to " + host);
                 }
             }
@@ -265,11 +268,11 @@ public class TopologyManager {
         return null;
     }
 
-    public Set<Node> getNodesOnHost(InetAddress addr) {
+    public Set<Node> getNodesOnHost(String hostName) {
         try {
             rwLock.readLock().lock();
-            if (nodesOnHost.get(addr) != null) {
-                return new LinkedHashSet<>(nodesOnHost.get(addr));
+            if (nodesOnHost.get(hostName) != null) {
+                return new LinkedHashSet<>(nodesOnHost.get(hostName));
             } else {
                 return null;
             }
@@ -395,7 +398,7 @@ public class TopologyManager {
                 }
 
                 NodeSet result = new NodeSet();
-                for (InetAddress host : nodesOnHost.keySet()) {
+                for (String host : nodesOnHost.keySet()) {
                     if (nodesOnHost.get(host).size() >= number) {
                         // found the host with required capacity
                         // checking that all nodes are free
@@ -439,10 +442,10 @@ public class TopologyManager {
                     return new NodeSet();
                 }
 
-                List<InetAddress> sortedByNodesNumber = new LinkedList<>(nodesOnHost.keySet());
+                List<String> sortedByNodesNumber = new LinkedList<>(nodesOnHost.keySet());
 
-                Collections.sort(sortedByNodesNumber, new Comparator<InetAddress>() {
-                    public int compare(InetAddress host, InetAddress host2) {
+                Collections.sort(sortedByNodesNumber, new Comparator<String>() {
+                    public int compare(String host, String host2) {
                         return nodesOnHost.get(host).size() - nodesOnHost.get(host2).size();
                     }
                 });
@@ -453,8 +456,7 @@ public class TopologyManager {
             }
         }
 
-        private NodeSet selectRecursively(int number, List<InetAddress> hostsSortedByNodesNumber,
-                List<Node> matchedNodes) {
+        private NodeSet selectRecursively(int number, List<String> hostsSortedByNodesNumber, List<Node> matchedNodes) {
 
             if (number <= 0 || matchedNodes.size() == 0) {
                 return new NodeSet();
@@ -464,8 +466,8 @@ public class TopologyManager {
                 number = matchedNodes.size();
             }
 
-            List<InetAddress> busyHosts = new LinkedList<>();
-            for (InetAddress host : hostsSortedByNodesNumber) {
+            List<String> busyHosts = new LinkedList<>();
+            for (String host : hostsSortedByNodesNumber) {
                 Set<Node> nodes = nodesOnHost.get(host);
                 int nbNodes;
                 if (nodes != null && (nbNodes = nodes.size()) >= number) {
@@ -522,9 +524,9 @@ public class TopologyManager {
 
                 // first we need to understand which hosts have busy nodes and filter them out
                 // building a map from matched nodes: host -> "number of matched nodes"
-                HashMap<InetAddress, Integer> matchedHosts = new HashMap<>();
+                HashMap<String, Integer> matchedHosts = new HashMap<>();
                 for (Node matchedNode : matchedNodes) {
-                    InetAddress host = matchedNode.getVMInformation().getInetAddress();
+                    String host = matchedNode.getVMInformation().getHostName();
                     if (matchedHosts.containsKey(host)) {
                         matchedHosts.put(host, matchedHosts.get(host) + 1);
                     } else {
@@ -537,7 +539,7 @@ public class TopologyManager {
                 TreeSet<Host> freeHosts = new TreeSet<>();
                 // if a host in matchedHosts map has the same number of nodes
                 // as in nodesOnHost map it means there no busy nodes on this host
-                for (InetAddress matchedHost : matchedHosts.keySet()) {
+                for (String matchedHost : matchedHosts.keySet()) {
                     if (!nodesOnHost.containsKey(matchedHost)) {
                         // should not be here
                         throw new TopologyException("Inconsitent topology state");
@@ -563,7 +565,7 @@ public class TopologyManager {
             // freeHosts is sorted based on nodes number
             // get the host with nodes number closest to the "number" (but smaller if possible)
             // complexity is log(n)
-            InetAddress closestHost = removeClosest(number, freeHosts);
+            String closestHost = removeClosest(number, freeHosts);
 
             Set<Node> nodes = nodesOnHost.get(closestHost);
             if (nodes.size() > number) {
@@ -576,7 +578,7 @@ public class TopologyManager {
             }
         }
 
-        private InetAddress removeClosest(int target, TreeSet<Host> freeHosts) {
+        private String removeClosest(int target, TreeSet<Host> freeHosts) {
             // search for element with target+1 nodes as the result is strictly less
             SortedSet<Host> headSet = freeHosts.headSet(new Host(null, target + 1));
             Host host = null;
@@ -587,16 +589,16 @@ public class TopologyManager {
                 host = headSet.last();
             }
             freeHosts.remove(host);
-            return host.address;
+            return host.hostName;
         }
 
         private class Host implements Comparable<Host> {
-            private InetAddress address;
+            private String hostName;
 
             private int nodesNumber;
 
-            public Host(InetAddress address, int nodesNumber) {
-                this.address = address;
+            public Host(String hostName, int nodesNumber) {
+                this.hostName = hostName;
                 this.nodesNumber = nodesNumber;
             }
 
@@ -604,7 +606,7 @@ public class TopologyManager {
             public int hashCode() {
                 final int prime = 31;
                 int result = 1;
-                result = prime * result + ((address == null) ? 0 : address.hashCode());
+                result = prime * result + ((hostName == null) ? 0 : hostName.hashCode());
                 return result;
             }
 
@@ -617,10 +619,10 @@ public class TopologyManager {
                 if (!(obj instanceof Host))
                     return false;
                 Host other = (Host) obj;
-                if (address == null) {
-                    if (other.address != null)
+                if (hostName == null) {
+                    if (other.hostName != null)
                         return false;
-                } else if (!address.equals(other.address))
+                } else if (!hostName.equals(other.hostName))
                     return false;
                 return true;
             }
@@ -634,8 +636,8 @@ public class TopologyManager {
                     int nodesDiff = nodesNumber - host.nodesNumber;
                     if (nodesDiff == 0) {
                         // the same node number, use addresses to define what is bigger
-                        String thisAdd = address == null ? "" : address.toString();
-                        String hostAdd = host.address == null ? "" : host.address.toString();
+                        String thisAdd = hostName == null ? "" : hostName.toString();
+                        String hostAdd = host.hostName == null ? "" : host.hostName.toString();
                         return thisAdd.compareTo(hostAdd);
                     }
                     return nodesDiff;
@@ -662,8 +664,8 @@ public class TopologyManager {
                 }
 
                 // create the map of free hosts: nodes_number -> list of hosts
-                HashMap<Integer, List<InetAddress>> hostsMap = new HashMap<>();
-                for (InetAddress host : nodesOnHost.keySet()) {
+                HashMap<Integer, List<String>> hostsMap = new HashMap<>();
+                for (String host : nodesOnHost.keySet()) {
                     boolean busyNode = false;
                     for (Node nodeOnHost : nodesOnHost.get(host)) {
                         // TODO: this is n^2 complexity. Change it as in MultipleHostsExclusiveHandler
@@ -675,7 +677,7 @@ public class TopologyManager {
                     if (!busyNode) {
                         int nodesNumber = nodesOnHost.get(host).size();
                         if (!hostsMap.containsKey(nodesNumber)) {
-                            hostsMap.put(nodesNumber, new LinkedList<InetAddress>());
+                            hostsMap.put(nodesNumber, new LinkedList<String>());
                         }
                         hostsMap.get(nodesNumber).add(host);
                     }
@@ -692,7 +694,7 @@ public class TopologyManager {
 
                 NodeSet result = new NodeSet();
                 for (Integer i : sortedCapacities) {
-                    for (InetAddress host : hostsMap.get(i)) {
+                    for (String host : hostsMap.get(i)) {
                         Set<Node> hostNodes = nodesOnHost.get(host);
                         int nbNodes = hostNodes.size();
                         if (nbNodes > 0) {
