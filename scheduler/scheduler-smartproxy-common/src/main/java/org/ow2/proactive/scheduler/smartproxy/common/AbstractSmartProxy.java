@@ -1143,6 +1143,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
+    public boolean removeJobs(long olderThan) throws NotConnectedException, PermissionException {
+        return getScheduler().removeJobs(olderThan);
+    }
+
+    @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         getScheduler().listenJobLogs(jobId, appenderProvider);

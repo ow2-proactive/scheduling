@@ -230,6 +230,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public boolean removeJobs(long olderThan) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.removeJobs(olderThan);
+    }
+
+    @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
