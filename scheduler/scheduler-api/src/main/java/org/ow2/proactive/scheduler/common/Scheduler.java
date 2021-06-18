@@ -394,6 +394,15 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException;
 
     /**
+     * Remove jobs older than the given epoch time (jobs which were finished earlier)
+     * @param olderThan epoch time to consider
+     * @return true if all jobs with jobIds were removed, otherwise false
+     * @throws NotConnectedException if you are not authenticated
+     * @throws PermissionException if you can't access to at least one of the job
+     */
+    boolean removeJobs(long olderThan) throws NotConnectedException, PermissionException;
+
+    /**
      * Listen for the tasks user logs.
      * <p>
      * A user can only listen to HIS jobs.

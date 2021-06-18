@@ -94,6 +94,7 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "loadInternalJobs", query = "from JobData as job where job.id in (:ids)"),
                 @NamedQuery(name = "loadJobs", query = "select id from JobData where status in (:status)"),
                 @NamedQuery(name = "loadJobsWithPeriod", query = "select id from JobData where status in (:status) and submittedTime >= :minSubmittedTime"),
+                @NamedQuery(name = "loadJobsWithFinishedTime", query = "select id from JobData where finishedTime > 0 and finishedTime <= :maxFinishedTime"),
                 @NamedQuery(name = "loadJobDataIfNotRemoved", query = "from JobData as job where job.id in (:ids)"),
                 @NamedQuery(name = "readAccountJobs", query = "select count(*), sum(finishedTime) - sum(startTime) from JobData" +
                                                               " where owner = :username and finishedTime > 0"),

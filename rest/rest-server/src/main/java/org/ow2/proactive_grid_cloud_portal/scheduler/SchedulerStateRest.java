@@ -565,12 +565,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public boolean removeJobs(String sessionId, List<String> jobsId) throws RestException {
+    public boolean removeJobs(String sessionId, List<String> jobsId, long olderThan) throws RestException {
         try {
             // checking permissions
-            checkAccess(sessionId, "DELETE jobs/");
-            Scheduler s = checkAccess(sessionId, "DELETE jobs/" + (jobsId.isEmpty() ? "" : jobsId.get(0)));
-            return s.removeJobs(jobsId.stream().map(JobIdImpl::makeJobId).collect(Collectors.toList()));
+            Scheduler s = checkAccess(sessionId, "DELETE jobs");
+            if (jobsId != null && !jobsId.isEmpty()) {
+                return s.removeJobs(jobsId.stream().map(JobIdImpl::makeJobId).collect(Collectors.toList()));
+            } else if (olderThan > 0) {
+                return s.removeJobs(olderThan);
+            } else {
+                throw new IllegalArgumentException("Either jobsId or olderThan parameter must be provided");
+            }
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }

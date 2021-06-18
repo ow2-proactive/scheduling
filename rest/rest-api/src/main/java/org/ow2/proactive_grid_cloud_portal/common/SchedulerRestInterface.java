@@ -337,14 +337,19 @@ public interface SchedulerRestInterface {
             throws RestException;
 
     /**
-     * @param jobsId to remove
+     * Delete a list of jobs
+     *
+     * Either jobsId or olderThen parameter can be used to select the list of jobs to remove
+     *
+     * @param jobsId list of jobs id to remove
+     * @param olderThan all jobs finished earlier than the given epoch time will be removed
      * @return true if all jobs with jobIds were removed, otherwise false
      */
     @DELETE
     @Path("jobs")
     @Produces(MediaType.APPLICATION_JSON)
-    boolean removeJobs(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
-            throws RestException;
+    boolean removeJobs(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId,
+            @QueryParam("olderThan") long olderThan) throws RestException;
 
     /**
      * Returns job server logs
