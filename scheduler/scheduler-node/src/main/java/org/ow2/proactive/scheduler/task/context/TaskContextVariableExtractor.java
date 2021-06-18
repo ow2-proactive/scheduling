@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -317,6 +318,13 @@ public class TaskContextVariableExtractor implements Serializable {
         variables.put(SchedulerVars.PA_NODE_NAME.toString(), taskContext.getNodeName());
         variables.put(SchedulerVars.PA_NODE_HOST.toString(), taskContext.getNodeHostName());
         variables.put(SchedulerVars.PA_NODE_SOURCE.toString(), taskContext.getNodeSourceName());
+        if (taskContext.getNodeDataSpaceURIs() != null) {
+            variables.put(SchedulerConstants.DS_SCRATCH_BINDING_NAME,
+                          taskContext.getNodeDataSpaceURIs().getScratchURI());
+            variables.put(SchedulerConstants.DS_CACHE_BINDING_NAME, taskContext.getNodeDataSpaceURIs().getCacheURI());
+            variables.put(SchedulerConstants.DS_GLOBAL_BINDING_NAME, taskContext.getNodeDataSpaceURIs().getGlobalURI());
+            variables.put(SchedulerConstants.DS_USER_BINDING_NAME, taskContext.getNodeDataSpaceURIs().getUserURI());
+        }
 
         return variables;
     }

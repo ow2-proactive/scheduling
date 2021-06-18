@@ -89,7 +89,10 @@ public class ForkedTaskVariablesManager implements Serializable {
 
         scriptHandler.addBinding(SchedulerConstants.RESULT_MAP_BINDING_NAME, resultMap);
         ImmutableMap<String, String> genericInformation = taskContext.getInitializer().getGenericInformation();
-        scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, genericInformation);
+        scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME,
+                                 genericInformation == null || variables == null ? genericInformation
+                                                                                 : VariableSubstitutor.filterAndUpdate(genericInformation,
+                                                                                                                       variables));
 
         scriptHandler.addBinding(SchedulerConstants.RESULTS_VARIABLE, tasksResults(taskContext));
 
