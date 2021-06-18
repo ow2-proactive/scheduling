@@ -926,6 +926,22 @@ public class SchedulerDBManager {
         });
     }
 
+    public List<JobId> getJobsByFinishedTime(long olderThan) {
+        return executeReadOnlyTransaction(session -> {
+            logger.info("Identifying jobs by finished time");
+
+            Query query = session.getNamedQuery("loadJobsWithFinishedTime")
+                                 .setParameter("maxFinishedTime", olderThan)
+                                 .setReadOnly(true);
+
+            List<Long> ids = query.list();
+
+            logger.info(ids.size() + " Jobs found");
+
+            return ids.stream().map(id -> JobIdImpl.makeJobId("" + id)).collect(Collectors.toList());
+        });
+    }
+
     public List<InternalJob> loadJobWithTasksIfNotRemoved(final JobId... jobIds) {
         ArrayList<InternalJob> answer = new ArrayList(jobIds.length);
         List<List<JobId>> jobIdSubSets = Lists.partition(Arrays.asList(jobIds), MAX_ITEMS_IN_LIST);

@@ -632,7 +632,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         boolean isAllJobsRemoved = false;
         try {
             isAllJobsRemoved = restApi().removeJobs(sid,
-                                                    jobIds.stream().map(JobId::value).collect(Collectors.toList()));
+                                                    jobIds.stream().map(JobId::value).collect(Collectors.toList()),
+                                                    0);
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return isAllJobsRemoved;
+    }
+
+    @Override
+    public boolean removeJobs(long olderThan) throws NotConnectedException, PermissionException {
+        boolean isAllJobsRemoved = false;
+        try {
+            isAllJobsRemoved = restApi().removeJobs(sid, null, olderThan);
         } catch (RestException e) {
             throwNCEOrPE(e);
         }

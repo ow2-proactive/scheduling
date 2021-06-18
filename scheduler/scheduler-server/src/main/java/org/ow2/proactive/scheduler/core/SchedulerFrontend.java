@@ -976,18 +976,30 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         if (jobIds.isEmpty()) {
             return false;
         }
+        List<JobId> jobIdsDup = new ArrayList<>(jobIds);
         // checking permission for each of the job
-        for (JobId jobId : jobIds) {
+        for (Iterator<JobId> it = jobIdsDup.iterator(); it.hasNext();) {
+            JobId jobId = it.next();
             try {
                 frontendState.checkPermissions("removeJob",
                                                frontendState.getIdentifiedJob(jobId),
                                                YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
             } catch (UnknownJobException e) {
-                logger.debug(e);
+                logger.warn("Cannot remove job " + jobId, e);
+                it.remove();
+            } catch (PermissionException e) {
+                logger.warn("Cannot remove job " + jobId, e);
+                it.remove();
             }
         }
 
-        return schedulingService.removeJobs(jobIds);
+        return jobIdsDup.size() == jobIds.size() && schedulingService.removeJobs(jobIds);
+    }
+
+    @Override
+    public boolean removeJobs(long olderThan) throws NotConnectedException, PermissionException {
+        List<JobId> jobsId = dbManager.getJobsByFinishedTime(olderThan);
+        return removeJobs(jobsId);
     }
 
     /**

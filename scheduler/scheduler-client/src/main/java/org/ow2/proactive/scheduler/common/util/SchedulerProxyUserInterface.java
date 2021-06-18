@@ -501,6 +501,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
+    public boolean removeJobs(long olderThen) throws NotConnectedException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.removeJobs(olderThen);
+    }
+
+    @Override
+    @ImmediateService
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.resumeJob(jobId);
