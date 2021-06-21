@@ -26,15 +26,22 @@
 package org.ow2.proactive.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.rewrite.handler.RewriteHandler;
+import org.eclipse.jetty.rewrite.handler.Rule;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -116,7 +123,17 @@ public class JettyStarter {
 
             server.setStopAtShutdown(true);
 
-            HandlerList handlerList = new HandlerList();
+            HandlerList topLevelHandlerList = new HandlerList();
+
+            if (httpsEnabled && redirectHttpToHttps) {
+                ContextHandler redirectHandler = new ContextHandler();
+                redirectHandler.setContextPath("/");
+                redirectHandler.setHandler(new SecuredRedirectHandler());
+                redirectHandler.setVirtualHosts(httpVirtualHost);
+                topLevelHandlerList.addHandler(redirectHandler);
+            }
+
+            topLevelHandlerList.addHandler(createSecurityHeadersHandler());
 
             if (WebProperties.JETTY_LOG_FILE.isSet()) {
                 String pathToJettyLogFile = FileStorageSupportFactory.relativeToHomeIfNotAbsolute(WebProperties.JETTY_LOG_FILE.getValueAsString());
@@ -134,20 +151,13 @@ public class JettyStarter {
 
                     RequestLogHandler requestLogHandler = new RequestLogHandler();
                     requestLogHandler.setRequestLog(requestLog);
-                    handlerList.addHandler(requestLogHandler);
+                    topLevelHandlerList.addHandler(requestLogHandler);
                 }
             }
+            HandlerList contextHandlerList = topLevelHandlerList;
 
-            if (httpsEnabled && redirectHttpToHttps) {
-                ContextHandler redirectHandler = new ContextHandler();
-                redirectHandler.setContextPath("/");
-                redirectHandler.setHandler(new SecuredRedirectHandler());
-                redirectHandler.setVirtualHosts(httpVirtualHost);
-                handlerList.addHandler(redirectHandler);
-            }
-
-            addWarsToHandlerList(handlerList, defaultVirtualHost);
-            server.setHandler(handlerList);
+            addWarsToHandlerList(contextHandlerList, defaultVirtualHost);
+            server.setHandler(topLevelHandlerList);
 
             if (logger.isDebugEnabled()) {
                 server.setDumpAfterStart(true);
@@ -305,6 +315,38 @@ public class JettyStarter {
             connectors = new Connector[] { httpsConnector };
         }
         return connectors;
+    }
+
+    private RewriteHandler createSecurityHeadersHandler() {
+        RewriteHandler rewriteHandlerSecurityHeaders = new RewriteHandler();
+
+        rewriteHandlerSecurityHeaders.addRule(new Rule() {
+            @Override
+            public String matchAndApply(String target, HttpServletRequest request, HttpServletResponse response)
+                    throws IOException {
+                if (!WebProperties.WEB_X_FRAME_OPTIONS.getValueAsString().isEmpty()) {
+                    response.setHeader("X-Frame-Options", WebProperties.WEB_X_FRAME_OPTIONS.getValueAsString());
+                }
+                if (!WebProperties.WEB_X_XSS_PROTECTION.getValueAsString().isEmpty()) {
+                    response.setHeader("X-XSS-Protection", WebProperties.WEB_X_XSS_PROTECTION.getValueAsString());
+                }
+                if (!WebProperties.WEB_X_CONTENT_TYPE_OPTIONS.getValueAsString().isEmpty()) {
+                    response.setHeader("X-Content-Type-Options",
+                                       WebProperties.WEB_X_CONTENT_TYPE_OPTIONS.getValueAsString());
+                }
+                if (WebProperties.WEB_HTTPS.getValueAsBoolean() &&
+                    !WebProperties.WEB_STRICT_TRANSPORT_SECURITY.getValueAsString().isEmpty()) {
+                    response.setHeader("Strict-Transport-Security",
+                                       WebProperties.WEB_STRICT_TRANSPORT_SECURITY.getValueAsString());
+                }
+                if (WebProperties.WEB_HTTPS.getValueAsBoolean() && WebProperties.WEB_EXPECT_CT.isSet() &&
+                    !WebProperties.WEB_EXPECT_CT.getValueAsString().isEmpty()) {
+                    response.setHeader("Expect-CT", WebProperties.WEB_EXPECT_CT.getValueAsString());
+                }
+                return null;
+            }
+        });
+        return rewriteHandlerSecurityHeaders;
     }
 
     private void checkPropertyNotNull(String propertyName, String propertyValue) {

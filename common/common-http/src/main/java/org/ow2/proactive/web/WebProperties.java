@@ -108,6 +108,19 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_REDIRECT_HTTP_TO_HTTPS("web.redirect_http_to_https", PropertyType.BOOLEAN, "false"),
 
+    WEB_X_FRAME_OPTIONS("web.x_frame_options", PropertyType.STRING, "SAMEORIGIN"),
+
+    WEB_X_XSS_PROTECTION("web.x_xss_protection", PropertyType.STRING, "1"),
+
+    WEB_X_CONTENT_TYPE_OPTIONS("web.x_content_type_options", PropertyType.STRING, "nosniff"),
+
+    WEB_STRICT_TRANSPORT_SECURITY(
+            "web.strict_transport_security",
+            PropertyType.STRING,
+            "max-age=63072000; includeSubDomains; preload"),
+
+    WEB_EXPECT_CT("web.expect_ct", PropertyType.STRING),
+
     METADATA_CONTENT_TYPE("content.type", PropertyType.STRING),
 
     METADATA_FILE_NAME("file.name", PropertyType.STRING),
