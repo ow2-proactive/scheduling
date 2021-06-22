@@ -195,7 +195,11 @@ public class NodeSourceData implements Serializable {
     }
 
     public void setAdditionalInformation(LinkedHashMap<String, String> additionalInformation) {
-        this.additionalInformation = new LinkedHashMap<>(additionalInformation);
+        if (additionalInformation != null) {
+            this.additionalInformation = new LinkedHashMap<>(additionalInformation);
+        } else {
+            this.additionalInformation = new LinkedHashMap<>();
+        }
     }
 
     @Column(length = Integer.MAX_VALUE)
