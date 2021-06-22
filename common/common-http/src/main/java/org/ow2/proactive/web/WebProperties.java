@@ -122,6 +122,8 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_EXPECT_CT("web.expect_ct", PropertyType.STRING),
 
+    WEB_REFERRER_POLICY("web.referrer_policy", PropertyType.STRING, "strict-origin-when-cross-origin"),
+
     WEB_PCA_PROXY_REWRITE_ENABLED("web.pca.proxy.rewrite.enabled", PropertyType.BOOLEAN, "true"),
 
     WEB_PCA_PROXY_REWRITE_REFERER_CACHE_SIZE("web.pca.proxy.rewrite.referer.cache.size", PropertyType.INTEGER, "10000"),
