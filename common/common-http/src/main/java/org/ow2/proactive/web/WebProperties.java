@@ -121,6 +121,8 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_EXPECT_CT("web.expect_ct", PropertyType.STRING),
 
+    WEB_REFERRER_POLICY("web.referrer_policy", PropertyType.STRING, "strict-origin-when-cross-origin"),
+
     METADATA_CONTENT_TYPE("content.type", PropertyType.STRING),
 
     METADATA_FILE_NAME("file.name", PropertyType.STRING),

@@ -343,6 +343,9 @@ public class JettyStarter {
                     !WebProperties.WEB_EXPECT_CT.getValueAsString().isEmpty()) {
                     response.setHeader("Expect-CT", WebProperties.WEB_EXPECT_CT.getValueAsString());
                 }
+                if (!WebProperties.WEB_REFERRER_POLICY.getValueAsString().isEmpty()) {
+                    response.setHeader("Referrer-Policy", WebProperties.WEB_REFERRER_POLICY.getValueAsString());
+                }
                 return null;
             }
         });
@@ -485,6 +488,7 @@ public class JettyStarter {
         webApp.addServerClass("com.fasterxml.jackson.");
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);
+        webApp.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         return webApp;
     }
 
