@@ -324,27 +324,29 @@ public class JettyStarter {
             @Override
             public String matchAndApply(String target, HttpServletRequest request, HttpServletResponse response)
                     throws IOException {
-                if (!WebProperties.WEB_X_FRAME_OPTIONS.getValueAsString().isEmpty()) {
-                    response.setHeader("X-Frame-Options", WebProperties.WEB_X_FRAME_OPTIONS.getValueAsString());
-                }
-                if (!WebProperties.WEB_X_XSS_PROTECTION.getValueAsString().isEmpty()) {
-                    response.setHeader("X-XSS-Protection", WebProperties.WEB_X_XSS_PROTECTION.getValueAsString());
-                }
-                if (!WebProperties.WEB_X_CONTENT_TYPE_OPTIONS.getValueAsString().isEmpty()) {
-                    response.setHeader("X-Content-Type-Options",
-                                       WebProperties.WEB_X_CONTENT_TYPE_OPTIONS.getValueAsString());
-                }
-                if (WebProperties.WEB_HTTPS.getValueAsBoolean() &&
-                    !WebProperties.WEB_STRICT_TRANSPORT_SECURITY.getValueAsString().isEmpty()) {
-                    response.setHeader("Strict-Transport-Security",
-                                       WebProperties.WEB_STRICT_TRANSPORT_SECURITY.getValueAsString());
-                }
-                if (WebProperties.WEB_HTTPS.getValueAsBoolean() && WebProperties.WEB_EXPECT_CT.isSet() &&
-                    !WebProperties.WEB_EXPECT_CT.getValueAsString().isEmpty()) {
-                    response.setHeader("Expect-CT", WebProperties.WEB_EXPECT_CT.getValueAsString());
-                }
-                if (!WebProperties.WEB_REFERRER_POLICY.getValueAsString().isEmpty()) {
-                    response.setHeader("Referrer-Policy", WebProperties.WEB_REFERRER_POLICY.getValueAsString());
+                if (!target.contains("rm/portal/createnodesource")) {
+                    if (!WebProperties.WEB_X_FRAME_OPTIONS.getValueAsString().isEmpty()) {
+                        response.setHeader("X-Frame-Options", WebProperties.WEB_X_FRAME_OPTIONS.getValueAsString());
+                    }
+                    if (!WebProperties.WEB_X_XSS_PROTECTION.getValueAsString().isEmpty()) {
+                        response.setHeader("X-XSS-Protection", WebProperties.WEB_X_XSS_PROTECTION.getValueAsString());
+                    }
+                    if (!WebProperties.WEB_X_CONTENT_TYPE_OPTIONS.getValueAsString().isEmpty()) {
+                        response.setHeader("X-Content-Type-Options",
+                                           WebProperties.WEB_X_CONTENT_TYPE_OPTIONS.getValueAsString());
+                    }
+                    if (WebProperties.WEB_HTTPS.getValueAsBoolean() &&
+                        !WebProperties.WEB_STRICT_TRANSPORT_SECURITY.getValueAsString().isEmpty()) {
+                        response.setHeader("Strict-Transport-Security",
+                                           WebProperties.WEB_STRICT_TRANSPORT_SECURITY.getValueAsString());
+                    }
+                    if (WebProperties.WEB_HTTPS.getValueAsBoolean() && WebProperties.WEB_EXPECT_CT.isSet() &&
+                        !WebProperties.WEB_EXPECT_CT.getValueAsString().isEmpty()) {
+                        response.setHeader("Expect-CT", WebProperties.WEB_EXPECT_CT.getValueAsString());
+                    }
+                    if (!WebProperties.WEB_REFERRER_POLICY.getValueAsString().isEmpty()) {
+                        response.setHeader("Referrer-Policy", WebProperties.WEB_REFERRER_POLICY.getValueAsString());
+                    }
                 }
                 return null;
             }
