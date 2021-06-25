@@ -110,12 +110,10 @@ public class CredentialsCreator {
         String url = PortalConfiguration.SCHEDULER_URL.getValueAsString();
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
         PublicKey pubKey = auth.getPublicKey();
-        byte[] privateKey = auth.getPrivateKey();
 
         Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(username),
                                                                       CredData.parseDomain(username),
-                                                                      password,
-                                                                      privateKey),
+                                                                      password),
                                                          pubKey);
 
         byte[] credentialBytes = cred.getBase64();
