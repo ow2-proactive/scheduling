@@ -135,6 +135,11 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
             logger.debug("Endpoint found in referer: " + endpointPath);
         }
         if (!matcherRequest.find()) {
+            if (target.startsWith("/automation-dashboard")) {
+                // if the uri requested starts with automation-dashboard, ignore the referrer information
+                // storing this information in the referrer cache would break the automation-dashboard portal
+                return target;
+            }
             // request target does not contain a pca endpoint, we need to add it
             String newTarget = endpointPath + target;
             if (logger.isDebugEnabled()) {

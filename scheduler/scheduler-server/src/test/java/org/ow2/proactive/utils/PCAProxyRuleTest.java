@@ -86,6 +86,13 @@ public class PCAProxyRuleTest {
         runTest(requestPath, HttpMethod.GET, referer, expected, true);
     }
 
+    @Test
+    public void matchAndApplyWithCloudAutomationRefererAndAutomationDashboardQuery() throws IOException {
+        String requestPath = "/automation-dashboard/something";
+        String referer = "http://myserver.com:8080/cloud-automation-service/services/93/endpoints/jupyterlab-endpoint2/lab?clone";
+        runTest(requestPath, HttpMethod.GET, referer, requestPath, false);
+    }
+
     private void runTest(String requestPath, HttpMethod method, String referer, String expectedTarget,
             boolean expectedRedirection) throws IOException {
         PCAProxyRule rule = new PCAProxyRule();
