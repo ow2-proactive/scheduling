@@ -2476,7 +2476,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             key = java.net.URLDecoder.decode(key.trim(), Charsets.UTF_8.displayName());
             Scheduler s = checkAccess(sessionId);
-            s.putThirdPartyCredential(key, value);
+            s.putThirdPartyCredential(key, value == null ? "" : value);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         } catch (Exception e) {
