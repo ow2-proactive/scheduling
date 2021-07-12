@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm.client;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -155,7 +156,7 @@ public class RMRestClient {
                     try {
                         ExceptionToJson json = clientException.getResponse().readEntity(ExceptionToJson.class);
                         // here we take the server side exception and recreate it on the client side
-                        //                        throw rebuildServerSideException(json);
+                        throw rebuildServerSideException(json);
                     } catch (ProcessingException couldNotReadJsonException) {
                         // rethrow server side exception as runtime exception but do not transform it
                         throw clientException;
@@ -166,6 +167,57 @@ public class RMRestClient {
                 }
                 // rethrow real exception as runtime (client side exception)
                 throw new RuntimeException(targetException.getTargetException());
+            }
+        }
+
+        private static Exception rebuildServerSideException(ExceptionToJson json) throws IllegalArgumentException,
+                InstantiationException, IllegalAccessException, InvocationTargetException {
+            Throwable serverException = json.getException();
+            String exceptionClassName = json.getExceptionClass();
+            String errMsg = json.getErrorMessage();
+            if (errMsg == null) {
+                errMsg = "An error has occurred.";
+            }
+
+            if (serverException != null && exceptionClassName != null) {
+                Class<?> exceptionClass = toClass(exceptionClassName);
+                if (exceptionClass != null) {
+                    // wrap the exception serialized in JSON inside an
+                    // instance of
+                    // the server exception class
+                    Constructor<?> constructor = getConstructor(exceptionClass, Throwable.class);
+                    if (constructor != null) {
+                        return (Exception) constructor.newInstance(serverException);
+                    }
+                    constructor = getConstructor(exceptionClass, String.class);
+                    if (constructor != null) {
+                        Exception built = (Exception) constructor.newInstance(errMsg);
+                        built.setStackTrace(serverException.getStackTrace());
+                        return built;
+                    }
+                }
+            }
+
+            Exception built = new Exception(errMsg);
+            if (serverException != null) {
+                built.setStackTrace(serverException.getStackTrace());
+            }
+            return built;
+        }
+
+        private static Class<?> toClass(String className) {
+            try {
+                return Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                return null;
+            }
+        }
+
+        private static Constructor<?> getConstructor(Class<?> clazz, Class<?>... paramTypes) {
+            try {
+                return clazz.getConstructor(paramTypes);
+            } catch (NoSuchMethodException e) {
+                return null;
             }
         }
     }
