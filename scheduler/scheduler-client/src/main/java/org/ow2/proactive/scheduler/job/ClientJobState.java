@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -101,7 +102,7 @@ public class ClientJobState extends JobState {
 
         this.setOnTaskError(jobState.getOnTaskErrorProperty().getValue());
 
-        this.genericInformation = new HashMap<>(jobState.getGenericInformation());
+        this.genericInformation = new LinkedHashMap<>(jobState.getGenericInformation());
 
         List<ClientTaskState> clientTaskStates = new ArrayList<>(taskStates.size());
         for (TaskState ts : taskStates) {

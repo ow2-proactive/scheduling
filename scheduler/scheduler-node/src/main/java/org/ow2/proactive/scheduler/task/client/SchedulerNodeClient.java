@@ -68,6 +68,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -80,6 +81,8 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
+
+import com.google.common.collect.Maps;
 
 
 /**
@@ -98,10 +101,25 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     private JobId parentJobId;
 
-    public SchedulerNodeClient(Decrypter decrypter, String schedulerRestUrl, JobId parentJobId) {
+    private Map<String, String> globalGenericInformation;
+
+    private Map<String, String> globalVariables = new LinkedHashMap<>();
+
+    private Map<String, JobVariable> globalJobVariables = new LinkedHashMap<>();
+
+    public SchedulerNodeClient(Decrypter decrypter, String schedulerRestUrl, JobId parentJobId,
+            Map<String, JobVariable> globalVariables, Map<String, String> globalGenericInformation) {
         SchedulerNodeClient.this.decrypter = decrypter;
         SchedulerNodeClient.this.schedulerRestUrl = schedulerRestUrl;
         SchedulerNodeClient.this.parentJobId = parentJobId;
+        if (globalVariables != null) {
+            SchedulerNodeClient.this.globalVariables = new LinkedHashMap<>(Maps.transformValues(globalVariables,
+                                                                                                JobVariable::getValue));
+            SchedulerNodeClient.this.globalJobVariables = globalVariables;
+        }
+        if (globalGenericInformation != null) {
+            SchedulerNodeClient.this.globalGenericInformation = globalGenericInformation;
+        }
     }
 
     /**
@@ -127,6 +145,30 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
             return;
         }
         client.init(new ConnectionInfo(url, userCreds.getLogin(), userCreds.getPassword(), null, true));
+    }
+
+    private Map<String, String> addGlobalGenericInfoAndParentJobId(Map<String, String> genericInformation) {
+        Map<String, String> newGenericInformation = new LinkedHashMap<>(globalGenericInformation);
+        if (genericInformation != null) {
+            newGenericInformation.putAll(genericInformation);
+        }
+        return addParentJobId(newGenericInformation);
+    }
+
+    private Map<String, String> addGlobalVariables(Map<String, String> variables) {
+        Map<String, String> newVariables = new LinkedHashMap<>(globalVariables);
+        if (variables != null) {
+            newVariables.putAll(variables);
+        }
+        return newVariables;
+    }
+
+    private Map<String, JobVariable> addGlobalJobVariables(Map<String, JobVariable> variables) {
+        Map<String, JobVariable> newVariables = new LinkedHashMap<>(globalJobVariables);
+        if (variables != null) {
+            newVariables.putAll(variables);
+        }
+        return newVariables;
     }
 
     private Map<String, String> addParentJobId(Map<String, String> genericInformation) {
@@ -331,7 +373,9 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     public JobId submit(Job job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        job.setGenericInformation(addParentJobId(job.getGenericInformation()));
+        job.setGenericInformation(addGlobalGenericInfoAndParentJobId(job.getGenericInformation()));
+        job.setGlobalGenericInformation(globalGenericInformation);
+        job.setVariables(addGlobalJobVariables(job.getVariables()));
         return client.submit(job);
     }
 
@@ -340,53 +384,69 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
             throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
             SubmissionClosedException {
         renewSession();
-        return client.reSubmit(currentJobId, jobVariables, addParentJobId(jobGenericInfos));
+        return client.reSubmit(currentJobId,
+                               addGlobalVariables(jobVariables),
+                               addGlobalGenericInfoAndParentJobId(jobGenericInfos));
     }
 
     @Override
     public JobId submit(File job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        return client.submit(job, Collections.emptyMap(), addParentJobId(Collections.emptyMap()));
+        return client.submit(job,
+                             addGlobalVariables(Collections.emptyMap()),
+                             addGlobalGenericInfoAndParentJobId(Collections.emptyMap()));
     }
 
     @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return submit(job, variables, addParentJobId(Collections.emptyMap()));
+        return submit(job, addGlobalVariables(variables), addGlobalGenericInfoAndParentJobId(Collections.emptyMap()));
     }
 
     @Override
     public JobId submit(File job, Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        return client.submit(job, variables, addParentJobId(genericInfos));
+        return client.submit(job, addGlobalVariables(variables), addGlobalGenericInfoAndParentJobId(genericInfos));
     }
 
     @Override
     public JobId submit(URL job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        return client.submit(job, Collections.emptyMap(), addParentJobId(Collections.emptyMap()), null);
+        return client.submit(job,
+                             addGlobalVariables(Collections.emptyMap()),
+                             addGlobalGenericInfoAndParentJobId(Collections.emptyMap()),
+                             null);
     }
 
     @Override
     public JobId submit(URL job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return submit(job, variables, addParentJobId(Collections.emptyMap()), null);
+        return submit(job,
+                      addGlobalVariables(variables),
+                      addGlobalGenericInfoAndParentJobId(Collections.emptyMap()),
+                      null);
     }
 
     @Override
     public JobId submit(Map<String, String> genericInfos, URL job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        return client.submit(job, variables, addParentJobId(genericInfos), null);
+        return client.submit(job,
+                             addGlobalVariables(variables),
+                             addGlobalGenericInfoAndParentJobId(genericInfos),
+                             null);
     }
 
     @Override
     public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return submit(job, variables, addParentJobId(Collections.emptyMap()), headerParams);
+        return submit(job,
+                      addGlobalVariables(variables),
+                      addGlobalGenericInfoAndParentJobId(Collections.emptyMap()),
+                      headerParams);
     }
 
     @Override
@@ -395,7 +455,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         if (client == null)
             throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
-        return this.client.submit(job, variables, addParentJobId(genericInfos), headerParams);
+        return this.client.submit(job,
+                                  addGlobalVariables(variables),
+                                  addGlobalGenericInfoAndParentJobId(genericInfos),
+                                  headerParams);
     }
 
     @Override
@@ -405,8 +468,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         return client.submitFromCatalog(catalogRestURL,
                                         bucketName,
                                         workflowName,
-                                        Collections.emptyMap(),
-                                        addParentJobId(Collections.emptyMap()));
+                                        addGlobalVariables(Collections.emptyMap()),
+                                        addGlobalGenericInfoAndParentJobId(Collections.emptyMap()));
     }
 
     @Override
@@ -416,8 +479,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         return submitFromCatalog(catalogRestURL,
                                  bucketName,
                                  workflowName,
-                                 variables,
-                                 addParentJobId(Collections.emptyMap()));
+                                 addGlobalVariables(variables),
+                                 addGlobalGenericInfoAndParentJobId(Collections.emptyMap()));
     }
 
     @Override
@@ -428,8 +491,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         return client.submitFromCatalog(catalogRestURL,
                                         bucketName,
                                         workflowName,
-                                        variables,
-                                        addParentJobId(genericInfo));
+                                        addGlobalVariables(variables),
+                                        addGlobalGenericInfoAndParentJobId(genericInfo));
     }
 
     @Override
@@ -438,8 +501,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         renewSession();
         return client.submitFromCatalog(catalogRestURL,
                                         calledWorkflow,
-                                        Collections.emptyMap(),
-                                        addParentJobId(Collections.emptyMap()));
+                                        addGlobalVariables(Collections.emptyMap()),
+                                        addGlobalGenericInfoAndParentJobId(Collections.emptyMap()));
     }
 
     @Override
@@ -448,8 +511,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         renewSession();
         return client.submitFromCatalog(catalogRestURL,
                                         calledWorkflow,
-                                        variables,
-                                        addParentJobId(Collections.emptyMap()));
+                                        addGlobalVariables(variables),
+                                        addGlobalGenericInfoAndParentJobId(Collections.emptyMap()));
     }
 
     @Override
@@ -457,7 +520,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
             Map<String, String> genericInfo)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        return client.submitFromCatalog(catalogRestURL, calledWorkflow, variables, addParentJobId(genericInfo));
+        return client.submitFromCatalog(catalogRestURL,
+                                        calledWorkflow,
+                                        addGlobalVariables(variables),
+                                        addGlobalGenericInfoAndParentJobId(genericInfo));
     }
 
     @Override

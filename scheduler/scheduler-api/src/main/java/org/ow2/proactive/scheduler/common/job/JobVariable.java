@@ -29,6 +29,7 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -43,10 +44,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobVariable implements Serializable {
 
+    @XmlAttribute
     private String name;
 
+    @XmlAttribute
     private String value;
 
+    @XmlAttribute
     private String model;
 
     public JobVariable() {

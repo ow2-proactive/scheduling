@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<globalvariables
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:globalvariables:3.12" xsi:schemaLocation="urn:proactive:globalvariables:3.12 http://www.activeeon.com/public_content/schemas/proactive/globalvariables/3.12/globalvariables.xsd">
+        <filter>
+            <select>
+                <!-- Xpath expressions are used to filter workflows affected by global variables.
+                Example: to select workflows belonging to the basic-examples bucket
+                <xpath><![CDATA[/job/genericInformation/info[@name='bucketName' and @value='basic-examples']]]></xpath>
+                -->
+                <xpath><![CDATA[.]]></xpath>
+                <!-- more than one xpath expression can be added. In that case, global variables are applied when all xpath expressions match -->
+            </select>
+            <!-- add global variables or generic information below -->
+            <variables>
+            </variables>
+            <genericInformation>
+            </genericInformation>
+        </filter>
+        <!-- Multiple filters can be added, to apply different set of global variables to different workflows -->
+</globalvariables>

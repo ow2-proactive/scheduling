@@ -67,6 +67,8 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesData;
+import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesParser;
 import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorRegistry;
 import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorService;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
@@ -138,12 +140,6 @@ public class StaxJobFactory extends JobFactory {
     private String relativePathRoot = "./";
 
     private GetJobContentGenerator getJobContentFactory = new GetJobContentGenerator();
-
-    @VisibleForTesting
-    static Map<String, JobVariable> globalVariables = null;
-
-    @VisibleForTesting
-    static Map<String, String> globalGenericInformation = null;
 
     /**
      * Create a new instance of StaxJobFactory.
@@ -264,10 +260,8 @@ public class StaxJobFactory extends JobFactory {
         String md5Job = DigestUtils.md5Hex(bytes);
         String md5Variables = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementVariables));
         String md5GenericInfo = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementGenericInfos));
-        String md5GlobalVariables = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(getConfiguredGlobalJobVariables()));
-        String md5GlobalGenericInfo = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(getConfiguredGlobalGenericInfo()));
-        String md5 = md5Job + "_" + md5Variables + "_" + md5GenericInfo + "_" + md5GlobalVariables + "_" +
-                     md5GlobalGenericInfo;
+        String md5GlobalVariables = GlobalVariablesParser.getInstance().getMD5();
+        String md5 = md5Job + "_" + md5Variables + "_" + md5GenericInfo + "_" + md5GlobalVariables;
         long t1 = System.currentTimeMillis();
         if (!validationCache.containsKey(md5)) {
             try {
@@ -401,6 +395,7 @@ public class StaxJobFactory extends JobFactory {
             throws JobCreationException {
 
         String current = null;
+        GlobalVariablesData globalVariablesData = getConfiguredGlobalVariablesData(jobContent);
         //start parsing
         try {
             int eventType;
@@ -411,10 +406,14 @@ public class StaxJobFactory extends JobFactory {
                     current = cursorRoot.getLocalName();
                     if (XMLTags.JOB.matches(current)) {
                         //first tag of the job.
-                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos, jobContent);
+                        job = createAndFillJob(cursorRoot,
+                                               replacementVariables,
+                                               replacementGenericInfos,
+                                               jobContent,
+                                               globalVariablesData);
                     } else if (XMLTags.TASK.matches(current)) {
                         //once here, the job instance has been created
-                        fillJobWithTasks(cursorRoot, job, dependencies);
+                        fillJobWithTasks(cursorRoot, job, dependencies, globalVariablesData);
                     } else if (XMLTags.METADATA_VISUALIZATION.matches(current) && job != null) {
                         // Add workflow visualization's embedded html
                         job.setVisualization(getJobVisualization(cursorRoot));
@@ -426,6 +425,16 @@ public class StaxJobFactory extends JobFactory {
             if (job != null) {
                 resolveCleaningScripts((TaskFlowJob) job, job.getVariablesAsReplacementMap());
             }
+            Map<String, JobVariable> globalVariables = new LinkedHashMap<>();
+            for (String globalVariable : globalVariablesData.getVariables().keySet()) {
+                globalVariables.put(globalVariable, job.getVariables().get(globalVariable));
+            }
+            job.setGlobalVariables(globalVariables);
+            Map<String, String> globalGenericInfoMap = new LinkedHashMap<>();
+            for (String globalGenericInfo : globalVariablesData.getGenericInformation().keySet()) {
+                globalGenericInfoMap.put(globalGenericInfo, job.getGenericInformation().get(globalGenericInfo));
+            }
+            job.setGlobalGenericInformation(globalGenericInfoMap);
             return job;
         } catch (JobCreationException jce) {
             if (XMLTags.TASK.matches(current)) {
@@ -457,7 +466,8 @@ public class StaxJobFactory extends JobFactory {
      * @throws JobCreationException if an exception occurs during job creation.
      */
     private Job createAndFillJob(XMLStreamReader cursorJob, Map<String, String> submittedJobVariables,
-            Map<String, String> submittedGenericInfos, String jobContent) throws JobCreationException {
+            Map<String, String> submittedGenericInfos, String jobContent, GlobalVariablesData globalVariablesData)
+            throws JobCreationException {
 
         // A temporary job
         Job commonPropertiesHolder = new Job() {
@@ -489,17 +499,24 @@ public class StaxJobFactory extends JobFactory {
 
             // Start by adding to the temporary job, the global variables (with internal references enabled)
             commonPropertiesHolder.getVariables()
-                                  .putAll(replaceVariablesInJobVariablesMap(getConfiguredGlobalJobVariables(),
-                                                                            getConfiguredGlobalJobVariablesAsReplacementMap()));
-            commonPropertiesHolder.addGenericInformations(getResolvedGenericInformations(getConfiguredGlobalGenericInfo(),
+                                  .putAll(replaceVariablesInJobVariablesMap(globalVariablesData.getVariables(),
+                                                                            convertToReplacementMap(globalVariablesData.getVariables())));
+            commonPropertiesHolder.addGenericInformations(getResolvedGenericInformations(globalVariablesData.getGenericInformation(),
                                                                                          commonPropertiesHolder.getVariablesAsReplacementMap()));
             // Then add job submission variables, which will override eventually global variables
             if (submittedJobVariables != null) {
-                commonPropertiesHolder.getVariables()
-                                      .putAll(submittedJobVariables.entrySet()
-                                                                   .stream()
-                                                                   .collect(Collectors.toMap(Map.Entry::getKey,
-                                                                                             this::newJobVariable)));
+                for (String variableName : submittedJobVariables.keySet()) {
+                    if (commonPropertiesHolder.getVariables().containsKey(variableName)) {
+                        commonPropertiesHolder.getVariables()
+                                              .get(variableName)
+                                              .setValue(submittedJobVariables.get(variableName));
+                    } else {
+                        commonPropertiesHolder.getVariables().put(variableName,
+                                                                  new JobVariable(variableName,
+                                                                                  submittedJobVariables.get(variableName),
+                                                                                  null));
+                    }
+                }
                 // enable referencing of global variables by submitted variables
                 commonPropertiesHolder.getVariables()
                                       .putAll(replaceVariablesInJobVariablesMap(commonPropertiesHolder.getVariables(),
@@ -522,7 +539,8 @@ public class StaxJobFactory extends JobFactory {
                         // Add resolved job variables using the job submission variables
                         // the final value of the variable can either be overwritten by a value of the job submission variables map or
                         // use in a pattern such value
-                        Map<String, JobVariable> unresolvedJobVariablesMap = createUnresolvedJobVariables(cursorJob);
+                        Map<String, JobVariable> unresolvedJobVariablesMap = createUnresolvedJobVariables(cursorJob,
+                                                                                                          globalVariablesData);
                         commonPropertiesHolder.getUnresolvedVariables().putAll(unresolvedJobVariablesMap);
                         Map<String, JobVariable> jobVariablesMap = replaceVariablesInJobVariablesMap(unresolvedJobVariablesMap,
                                                                                                      submittedJobVariables);
@@ -531,7 +549,9 @@ public class StaxJobFactory extends JobFactory {
                     } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                         // Resolve the generic infos in the xml with the resolved variables
                         Map<String, String> resolvedJobVariables = commonPropertiesHolder.getVariablesAsReplacementMap();
-                        Map<String, String> unresolvedGenericInformationsDefinedInWorkflow = getUnresolvedGenericInformations(cursorJob);
+                        Map<String, String> unresolvedGenericInformationsDefinedInWorkflow = getUnresolvedGenericInformations(cursorJob,
+                                                                                                                              false,
+                                                                                                                              globalVariablesData);
                         Map<String, String> resolvedGenericInformationsDefinedInWorkflow = getResolvedGenericInformations(unresolvedGenericInformationsDefinedInWorkflow,
                                                                                                                           resolvedJobVariables);
                         // Then add/replace the resolved generic infos in the xml with the ones specified at job submission
@@ -617,56 +637,16 @@ public class StaxJobFactory extends JobFactory {
 
     }
 
-    private static synchronized Map<String, JobVariable> getConfiguredGlobalJobVariables() {
-        if (globalVariables == null) {
-            globalVariables = new LinkedHashMap<>();
-            String path = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.GLOBAL_VARIABLES_CONFIGURATION.getValueAsString());
-            logger.info("Loading global variables from file: " + path);
-            Properties props = new Properties();
-            try (InputStream fis = new FileInputStream(path)) {
-                props.load(fis);
-            } catch (IOException e) {
-                logger.error("Global Variable Configuration file: " + path + " cannot be read.", e);
-                return globalVariables;
-            }
-            Map<String, String> propertyMap = (Map) props;
-            for (Map.Entry<String, String> var : propertyMap.entrySet()) {
-                globalVariables.put(var.getKey(), new JobVariable(var.getKey(), var.getValue()));
-            }
-        }
-        return new LinkedHashMap<>(globalVariables);
+    private static synchronized GlobalVariablesData getConfiguredGlobalVariablesData(String jobContent) {
+        return GlobalVariablesParser.getInstance().getVariablesFor(jobContent);
     }
 
-    private static synchronized Map<String, String> getConfiguredGlobalJobVariablesAsReplacementMap() {
-        if (globalVariables == null) {
-            // initialize the global variable map
-            getConfiguredGlobalJobVariables();
-        }
-        Map<String, String> replacementVariables = new LinkedHashMap<>(globalVariables.size());
-        for (JobVariable variable : globalVariables.values()) {
+    private static Map<String, String> convertToReplacementMap(Map<String, JobVariable> jobVariables) {
+        Map<String, String> replacementVariables = new LinkedHashMap<>(jobVariables.size());
+        for (JobVariable variable : jobVariables.values()) {
             replacementVariables.put(variable.getName(), variable.getValue());
         }
         return replacementVariables;
-    }
-
-    private static synchronized Map<String, String> getConfiguredGlobalGenericInfo() {
-        if (globalGenericInformation == null) {
-            globalGenericInformation = new LinkedHashMap<>();
-            String path = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.GLOBAL_GENERIC_INFO_CONFIGURATION.getValueAsString());
-            logger.info("Loading global generic information from file: " + path);
-            Properties props = new Properties();
-            try (InputStream fis = new FileInputStream(path)) {
-                props.load(fis);
-            } catch (IOException e) {
-                logger.error("Global Generic Info Configuration file: " + path + " cannot be read.", e);
-                return globalGenericInformation;
-            }
-            Map<String, String> propertyMap = (Map) props;
-            for (Map.Entry<String, String> var : propertyMap.entrySet()) {
-                globalGenericInformation.put(var.getKey(), var.getValue());
-            }
-        }
-        return new LinkedHashMap<>(globalGenericInformation);
     }
 
     private void handleJobAttributes(Job commonPropertiesHolder, Map<String, String> delayedJobAttributes)
@@ -722,10 +702,10 @@ public class StaxJobFactory extends JobFactory {
      * @return the map in which the variables were added.
      * @throws JobCreationException
      */
-    private Map<String, JobVariable> createUnresolvedJobVariables(XMLStreamReader cursorVariables)
-            throws JobCreationException {
+    private Map<String, JobVariable> createUnresolvedJobVariables(XMLStreamReader cursorVariables,
+            GlobalVariablesData globalVariablesData) throws JobCreationException {
         // The following initializaion is to enable overridding of global variables by workflow variables
-        Map<String, JobVariable> unresolvedVariablesMap = getConfiguredGlobalJobVariables();
+        Map<String, JobVariable> unresolvedVariablesMap = globalVariablesData.getVariables();
         try {
             int eventType;
             while (cursorVariables.hasNext()) {
@@ -928,10 +908,10 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorInfo the streamReader with the cursor on the 'ELEMENT_COMMON_GENERIC_INFORMATION' tag.
      * @return the list of generic information as a hashMap.
      */
-    private Map<String, String> getUnresolvedGenericInformations(XMLStreamReader cursorInfo)
-            throws JobCreationException {
+    private Map<String, String> getUnresolvedGenericInformations(XMLStreamReader cursorInfo, boolean isTask,
+            GlobalVariablesData globalVariablesData) throws JobCreationException {
         // The following initializaion is to enable overridding of global generic info by workflow gi
-        Map<String, String> infos = getConfiguredGlobalGenericInfo();
+        Map<String, String> infos = isTask ? new LinkedHashMap<>() : globalVariablesData.getGenericInformation();
         try {
             int eventType;
             while (cursorInfo.hasNext()) {
@@ -1074,8 +1054,8 @@ public class StaxJobFactory extends JobFactory {
      *
      * @param cursorTask the streamReader with the cursor on the first 'ELEMENT_TASK' tag.
      */
-    private void fillJobWithTasks(XMLStreamReader cursorTask, Job job, Map<String, ArrayList<String>> dependencies)
-            throws JobCreationException {
+    private void fillJobWithTasks(XMLStreamReader cursorTask, Job job, Map<String, ArrayList<String>> dependencies,
+            GlobalVariablesData globalVariablesData) throws JobCreationException {
         if (job == null) {
             throw new JobCreationException(XMLTags.JOB.getXMLName(), null, null);
         }
@@ -1096,7 +1076,7 @@ public class StaxJobFactory extends JobFactory {
                         case TASKSFLOW:
                             current = XMLTags.TASK;
                             //create new task
-                            t = createTask(cursorTask, job, dependencies);
+                            t = createTask(cursorTask, job, dependencies, globalVariablesData);
                             //add task to the job
                             ((TaskFlowJob) job).addTask(t);
                             break;
@@ -1126,8 +1106,8 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorTask the streamReader with the cursor on the 'ELEMENT_TASK' tag.
      * @return The newly created task that can be any type.
      */
-    private Task createTask(XMLStreamReader cursorTask, Job job, Map<String, ArrayList<String>> dependencies)
-            throws JobCreationException {
+    private Task createTask(XMLStreamReader cursorTask, Job job, Map<String, ArrayList<String>> dependencies,
+            GlobalVariablesData globalVariablesData) throws JobCreationException {
         int i = 0;
         XMLTags currentTag = null;
         String current = null;
@@ -1170,7 +1150,9 @@ public class StaxJobFactory extends JobFactory {
                             if (job.getGenericInformation() != null)
                                 jobVariablesWithGenericInfos.putAll(job.getGenericInformation());
 
-                            Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformations(cursorTask);
+                            Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformations(cursorTask,
+                                                                                                                                 true,
+                                                                                                                                 globalVariablesData);
                             tmpTask.setUnresolvedGenericInformation(unresolvedGenericInformationDefinedInWorkflow);
                             tmpTask.setGenericInformation(getResolvedGenericInformations(unresolvedGenericInformationDefinedInWorkflow,
                                                                                          jobVariablesWithGenericInfos));

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:globalvariables:3.12" xmlns:jd="urn:proactive:globalvariables:3.12">
+  <xs:element name="globalvariables">
+    <xs:annotation>
+      <xs:documentation>a set of global variables, applying to workflows according to filters</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:filter"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="filter">
+    <xs:annotation>
+      <xs:documentation>Definition of a filter for global variables</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="jd:select"/>
+        <xs:element ref="jd:variables"/>
+        <xs:element ref="jd:genericInformation"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="select">
+    <xs:annotation>
+      <xs:documentation>select workflows according to criterias</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:xpath"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="xpath" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>filter workflows based on a xpath expression</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="variables">
+    <xs:annotation>
+      <xs:documentation>Definition of global variables which will be applied to workflows matching the given xpath expression</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="jd:variable"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="variable">
+    <xs:annotation>
+      <xs:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:variableName"/>
+      <xs:attributeGroup ref="jd:variableValue"/>
+      <xs:attribute name="model" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Model definition of the variable</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="variableName">
+    <xs:attribute name="name" use="required" type="xs:NCName">
+      <xs:annotation>
+        <xs:documentation>Name of a variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="variableValue">
+    <xs:attribute name="value" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The patterns ${variable_name} will be replaced by this value</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="variableModel">
+    <xs:attribute name="model" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Model definition of the variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="genericInformation">
+    <xs:annotation>
+      <xs:documentation>Definition of any extra information assigned to the workflow</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="jd:info"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="info">
+    <xs:annotation>
+      <xs:documentation>Extra Information assigned to the workflow</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:infoName"/>
+      <xs:attributeGroup ref="jd:infoValue"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="infoName">
+    <xs:attribute name="name" use="required" type="xs:NCName">
+      <xs:annotation>
+        <xs:documentation>Name of the information variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="infoValue">
+    <xs:attribute name="value" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Value of the information variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>

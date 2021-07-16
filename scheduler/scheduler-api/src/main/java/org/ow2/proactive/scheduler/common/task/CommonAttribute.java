@@ -77,7 +77,7 @@ public abstract class CommonAttribute implements Serializable {
     protected UpdatableProperties<IntegerWrapper> maxNumberOfExecution = new UpdatableProperties<IntegerWrapper>(new IntegerWrapper(1));
 
     /** Common user informations */
-    protected Map<String, String> genericInformation = new HashMap<String, String>();
+    protected Map<String, String> genericInformation = new LinkedHashMap<>();
 
     protected Map<String, String> unresolvedGenericInformation = new LinkedHashMap<>();
 
@@ -198,7 +198,7 @@ public abstract class CommonAttribute implements Serializable {
      */
     public Map<String, String> getGenericInformation() {
         Set<Entry<String, String>> entries = this.genericInformation.entrySet();
-        Map<String, String> result = new HashMap<>(entries.size());
+        Map<String, String> result = new LinkedHashMap<>(entries.size());
         for (Entry<String, String> entry : entries) {
             result.put(entry.getKey(), entry.getValue());
         }
@@ -256,7 +256,7 @@ public abstract class CommonAttribute implements Serializable {
         if (genericInformation != null) {
             this.genericInformation = genericInformation;
         } else {
-            this.genericInformation = new HashMap<>();
+            this.genericInformation = new LinkedHashMap<>();
         }
 
     }
@@ -270,7 +270,7 @@ public abstract class CommonAttribute implements Serializable {
         if (unresolvedGenericInformation != null) {
             this.unresolvedGenericInformation = unresolvedGenericInformation;
         } else {
-            this.unresolvedGenericInformation = new HashMap<>();
+            this.unresolvedGenericInformation = new LinkedHashMap<>();
         }
 
     }

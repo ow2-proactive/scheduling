@@ -103,6 +103,8 @@ public class TaskLauncherInitializer implements Serializable {
 
     private ImmutableMap<String, String> genericInformation;
 
+    private ImmutableMap<String, String> globalGenericInformation;
+
     private boolean authorizedForkEnvironmentScript = true;
 
     /** DataSpaces needed parameter */
@@ -117,6 +119,8 @@ public class TaskLauncherInitializer implements Serializable {
     private ImmutableMap<String, JobVariable> variables;
 
     private ImmutableMap<String, TaskVariable> taskVariables = ImmutableMap.of();
+
+    private ImmutableMap<String, JobVariable> globalVariables;
 
     private int pingPeriod;
 
@@ -321,6 +325,14 @@ public class TaskLauncherInitializer implements Serializable {
         return genericInformation;
     }
 
+    public ImmutableMap<String, String> getGlobalGenericInformation() {
+        return globalGenericInformation;
+    }
+
+    public void setGlobalGenericInformation(Map<String, String> globalGenericInformation) {
+        this.globalGenericInformation = ImmutableMap.copyOf(globalGenericInformation);
+    }
+
     /**
      * @return the preciousLogs
      */
@@ -425,6 +437,14 @@ public class TaskLauncherInitializer implements Serializable {
 
     public ImmutableMap<String, JobVariable> getJobVariables() {
         return this.variables;
+    }
+
+    public ImmutableMap<String, JobVariable> getGlobalVariables() {
+        return globalVariables;
+    }
+
+    public void setGlobalVariables(Map<String, JobVariable> globalVariables) {
+        this.globalVariables = ImmutableMap.copyOf(globalVariables);
     }
 
     public void setTaskVariables(Map<String, TaskVariable> taskVariables) {

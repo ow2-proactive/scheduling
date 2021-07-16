@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar ns="urn:proactive:globalvariables:3.12" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:jd="urn:proactive:globalvariables:3.12" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <ref name="globalvariables"/>
+  </start>
+  <define name="globalvariables">
+    <element name="globalvariables">
+      <doc:documentation>a set of global variables, applying to workflows according to filters</doc:documentation>
+      <oneOrMore>
+        <ref name="filter"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="filter">
+    <element name="filter">
+      <doc:documentation>Definition of a filter for global variables</doc:documentation>
+      <ref name="select"/>
+      <ref name="variables"/>
+      <ref name="genericInformation"/>
+    </element>
+  </define>
+  <define name="select">
+    <element name="select">
+      <doc:documentation>select workflows according to criterias</doc:documentation>
+      <oneOrMore>
+        <ref name="xpath"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="xpath">
+    <element name="xpath">
+      <doc:documentation>filter workflows based on a xpath expression</doc:documentation>
+      <text/>
+    </element>
+  </define>
+  <define name="variables">
+    <element name="variables">
+      <doc:documentation>Definition of global variables which will be applied to workflows matching the given xpath expression</doc:documentation>
+      <zeroOrMore>
+        <ref name="variable"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="variable">
+    <element name="variable">
+      <doc:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</doc:documentation>
+      <ref name="variableName"/>
+      <ref name="variableValue"/>
+      <optional>
+        <ref name="variableModel"/>
+      </optional>
+    </element>
+  </define>
+  <define name="variableName">
+    <attribute name="name">
+      <doc:documentation>Name of a variable</doc:documentation>
+      <data type="NCName"/>
+    </attribute>
+  </define>
+  <define name="variableValue">
+    <attribute name="value">
+      <doc:documentation>The patterns ${variable_name} will be replaced by this value</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="variableModel">
+    <attribute name="model">
+      <doc:documentation>Model definition of the variable</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="genericInformation">
+    <element name="genericInformation">
+      <doc:documentation>Definition of any extra information assigned to the workflow</doc:documentation>
+      <zeroOrMore>
+        <ref name="info"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="info">
+    <element name="info">
+      <doc:documentation>Extra Information assigned to the workflow</doc:documentation>
+      <ref name="infoName"/>
+      <ref name="infoValue"/>
+    </element>
+  </define>
+  <define name="infoName">
+    <attribute name="name">
+      <doc:documentation>Name of the information variable</doc:documentation>
+      <data type="NCName"/>
+    </attribute>
+  </define>
+  <define name="infoValue">
+    <attribute name="value">
+      <doc:documentation>Value of the information variable</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+</grammar>
