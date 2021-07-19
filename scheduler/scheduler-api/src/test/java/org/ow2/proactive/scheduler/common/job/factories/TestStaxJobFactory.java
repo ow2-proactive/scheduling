@@ -46,6 +46,8 @@ import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesParser;
+import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesParserTest;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 
@@ -135,14 +137,16 @@ public class TestStaxJobFactory {
     @Before
     public void setJobFactory() {
         factory = (StaxJobFactory) JobFactory.getFactory(JOB_FACTORY_IMPL);
-        factory.globalVariables = new LinkedHashMap<>();
-        factory.globalGenericInformation = new LinkedHashMap<>();
+        GlobalVariablesParser.setConfigurationPath(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/globalvariables/global_variables_stax_factory.xml")
+                                                                                  .toExternalForm());
+        GlobalVariablesParser.getInstance().reloadFilters();
     }
 
     @After
     public void cleanGlobals() {
-        factory.globalVariables = new LinkedHashMap<>();
-        factory.globalGenericInformation = new LinkedHashMap<>();
+        GlobalVariablesParser.setConfigurationPath(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/globalvariables/global_variables_default.xml")
+                                                                                  .toExternalForm());
+        GlobalVariablesParser.getInstance().reloadFilters();
     }
 
     @Test
@@ -174,6 +178,9 @@ public class TestStaxJobFactory {
 
     @Test
     public void testCreateJobShouldPreserveVariablesOrder() throws Exception {
+        GlobalVariablesParser.setConfigurationPath(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/globalvariables/global_variables_default.xml")
+                                                                                  .toExternalForm());
+        GlobalVariablesParser.getInstance().reloadFilters();
         Job job = factory.createJob(jobDescriptorVariableOrder);
         int index = 1;
         for (String variable : job.getVariables().keySet()) {
@@ -184,8 +191,6 @@ public class TestStaxJobFactory {
 
     @Test
     public void testCreateJobWithNoVariablesShouldReferenceGlobalVariablesAndGenericInfo() throws Exception {
-        factory.globalVariables.put("globalVar", new JobVariable("globalVar", "globalValue"));
-        factory.globalGenericInformation.put("globalGI", "globalGIValue");
         Job testScriptJob = factory.createJob(jobDescriptorNoVariablesUri);
         assertNotNull(testScriptJob.getVariables().get("globalVar"));
         assertEquals("globalValue", testScriptJob.getVariables().get("globalVar").getValue());
@@ -194,8 +199,6 @@ public class TestStaxJobFactory {
 
     @Test
     public void testCreateJobWithVariablesAndGenericInfoShouldReferenceGlobalVariables() throws Exception {
-        factory.globalVariables.put("referenced_global_var",
-                                    new JobVariable("referenced_global_var", "global_var_value"));
         Job testScriptJob = factory.createJob(jobDescriptorWithGlobalVariablesAndGenericInfo);
         assertNotNull(testScriptJob.getVariables().get("job_var_referencing_global_var"));
         assertEquals("global_var_value", testScriptJob.getVariables().get("job_var_referencing_global_var").getValue());
@@ -207,8 +210,6 @@ public class TestStaxJobFactory {
 
     @Test
     public void testCreateJobWithVariablesAndGenericInfoShouldOverrideGlobalVariablesAndGenericInfo() throws Exception {
-        factory.globalVariables.put("global_var", new JobVariable("global_var", "global_var_value"));
-        factory.globalGenericInformation.put("global_gi", "global_gi_value");
         Job testScriptJob = factory.createJob(jobDescriptorWithGlobalVariablesAndGenericInfo);
         assertNotNull(testScriptJob.getVariables().get("global_var"));
         assertEquals("global_var_overridden_by_xml", testScriptJob.getVariables().get("global_var").getValue());
@@ -222,8 +223,6 @@ public class TestStaxJobFactory {
     public void
             testCreateJobWithVariablesAndGenericInfoAndGlobalOnesShouldBeOverriddenBySubmittedVariablesAndGenericInfo()
                     throws Exception {
-        factory.globalVariables.put("global_var", new JobVariable("global_var", "global_var_value"));
-        factory.globalGenericInformation.put("global_gi", "global_gi_value");
         Job testScriptJob = factory.createJob(jobDescriptorWithGlobalVariablesAndGenericInfo,
                                               ImmutableMap.of("global_var", "submitted_var_value"),
                                               ImmutableMap.of("global_gi", "submitted_gi_value"));
@@ -237,8 +236,6 @@ public class TestStaxJobFactory {
 
     @Test
     public void testCreateJobWithSubmittedVariablesAndGenericInfoShouldReferenceGlobalVariables() throws Exception {
-        factory.globalVariables.put("global_var", new JobVariable("global_var", "global_var_value"));
-        factory.globalGenericInformation.put("global_gi", "global_gi_value");
         Job testScriptJob = factory.createJob(jobDescriptorNoVariablesUri,
                                               ImmutableMap.of("submitted_var", "${global_var}"),
                                               ImmutableMap.of("submitted_gi", "${global_var}"));
@@ -253,8 +250,6 @@ public class TestStaxJobFactory {
     @Test
     public void testCreateJobWithSubmittedVariablesAndGenericInfoShouldOverrideGlobalVariablesAndGenericInfo()
             throws Exception {
-        factory.globalVariables.put("global_var", new JobVariable("global_var", "global_var_value"));
-        factory.globalGenericInformation.put("global_gi", "global_gi_value");
         Job testScriptJob = factory.createJob(jobDescriptorNoVariablesUri,
                                               ImmutableMap.of("global_var", "submitted_var_value"),
                                               ImmutableMap.of("global_gi", "submitted_gi_value"));
@@ -469,6 +464,9 @@ public class TestStaxJobFactory {
     @Test
     public void testJobCreationAttributeOrderDefinitionVariableXmlElement()
             throws URISyntaxException, JobCreationException {
+        GlobalVariablesParser.setConfigurationPath(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/globalvariables/global_variables_default.xml")
+                                                                                  .toExternalForm());
+        GlobalVariablesParser.getInstance().reloadFilters();
         Job job = factory.createJob(jobDescriptorAttrDefVariableXmlElement);
         Map<String, JobVariable> jobVariables = job.getVariables();
         assertEquals(2, jobVariables.size());

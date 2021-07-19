@@ -48,6 +48,28 @@ task convertSchemas
     convertSchemas.dependsOn << "convertSchemasRng-$schemaVersion"
 }
 
+task convertSchemasGV
+['3.12', 'dev'].each { schemaVersion ->
+    task("convertSchemasGVXsd-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
+        sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/globalvariables/${schemaVersion}")
+        targetDirectory = sourceDirectory
+        doLast {
+            project.delete project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/globalvariables/${schemaVersion}/xsi.xsd")
+        }
+    }
+    task("convertSchemasGVRng-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
+        sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/globalvariables/${schemaVersion}")
+        targetDirectory = sourceDirectory
+        targetExtension = 'rng'
+        doLast {
+            project.delete project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/globalvariables/${schemaVersion}/xsi.xsd")
+        }
+    }
+    task("convertSchemasGV-$schemaVersion").dependsOn << ["convertSchemasGVXsd-$schemaVersion", "convertSchemasGVRng-$schemaVersion"]
+    convertSchemasGV.dependsOn << "convertSchemasGVXsd-$schemaVersion"
+    convertSchemasGV.dependsOn << "convertSchemasGVRng-$schemaVersion"
+}
+
 task stub(type: StubTask) {
     classes = ['org.ow2.proactive.scheduler.common.Scheduler', 'org.ow2.proactive.scheduler.synchronization.SynchronizationInternal']
 }

@@ -471,12 +471,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     GLOBAL_VARIABLES_CONFIGURATION(
             "pa.scheduler.global.variables.configuration",
             PropertyType.STRING,
-            "config/scheduler/global_variables.properties"),
+            "config/scheduler/global_variables.xml"),
 
-    GLOBAL_GENERIC_INFO_CONFIGURATION(
-            "pa.scheduler.global.generic.info.configuration",
-            PropertyType.STRING,
-            "config/scheduler/global_generic_info.properties"),
+    GLOBAL_VARIABLES_REFRESH("pa.scheduler.global.variables.refresh", PropertyType.INTEGER, "10"),
 
     /* ***************************************************************** */
     /* ***************** EMAIL NOTIFICATION PROPERTIES ***************** */

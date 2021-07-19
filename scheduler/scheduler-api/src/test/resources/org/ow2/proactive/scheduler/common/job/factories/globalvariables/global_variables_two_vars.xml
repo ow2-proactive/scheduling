@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<globalvariables
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:globalvariables:dev" xsi:schemaLocation="urn:proactive:globalvariables:dev http://www.activeeon.com/public_content/schemas/proactive/globalvariables/dev/globalvariables.xsd">
+        <filter>
+            <select>
+                <xpath><![CDATA[.]]></xpath>
+            </select>
+            <variables>
+                <variable name="var1" value="value1" model="model1"/>
+                <variable name="var2" value="value2" model="model2"/>
+            </variables>
+            <genericInformation>
+                <info name="gi1" value="gi_value1" />
+                <info name="gi2" value="gi_value2" />
+            </genericInformation>
+        </filter>
+</globalvariables>

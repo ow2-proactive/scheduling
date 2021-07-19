@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -257,7 +258,11 @@ public class RMProxyActiveObject {
             String schedulerUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
 
             logger.debug("Binding schedulerapi...");
-            SchedulerNodeClient client = new SchedulerNodeClient(decrypter, schedulerUrl, taskId.getJobId());
+            SchedulerNodeClient client = new SchedulerNodeClient(decrypter,
+                                                                 schedulerUrl,
+                                                                 taskId.getJobId(),
+                                                                 Collections.emptyMap(),
+                                                                 Collections.emptyMap());
             handler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, client);
 
             logger.debug("Binging rmapi...");

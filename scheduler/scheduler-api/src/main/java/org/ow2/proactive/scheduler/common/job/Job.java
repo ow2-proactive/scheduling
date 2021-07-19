@@ -115,6 +115,16 @@ public abstract class Job extends CommonAttribute {
     protected Map<String, JobVariable> unresolvedVariables = Collections.synchronizedMap(new LinkedHashMap());
 
     /**
+     * Configured global variables for this job
+     */
+    protected Map<String, JobVariable> globalVariables = Collections.synchronizedMap(new LinkedHashMap());
+
+    /**
+     * Configured global generic information for this job
+     */
+    protected Map<String, String> globalGenericInformation = new LinkedHashMap<>();
+
+    /**
      * represent xml submitted, where variables and genetic info were updated according provided maps
      */
     private String jobContent = null;
@@ -337,6 +347,32 @@ public abstract class Job extends CommonAttribute {
      */
     public Map<String, JobVariable> getUnresolvedVariables() {
         return this.unresolvedVariables;
+    }
+
+    /**
+     * Returns the global variables of this job
+     *
+     * @return global variables map
+     */
+    public Map<String, JobVariable> getGlobalVariables() {
+        return globalVariables;
+    }
+
+    public void setGlobalVariables(Map<String, JobVariable> globalVariables) {
+        this.globalVariables = Collections.synchronizedMap(globalVariables);
+    }
+
+    /**
+     * Returns the global generic information of this job
+     *
+     * @return global generic information map
+     */
+    public Map<String, String> getGlobalGenericInformation() {
+        return globalGenericInformation;
+    }
+
+    public void setGlobalGenericInformation(Map<String, String> globalGenericInformation) {
+        this.globalGenericInformation = globalGenericInformation;
     }
 
     /**

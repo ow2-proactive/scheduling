@@ -1175,6 +1175,7 @@ public abstract class InternalTask extends TaskState {
 
         Map<String, String> gInfo = getRuntimeGenericInformation();
         tli.setGenericInformation(gInfo);
+        tli.setGlobalGenericInformation(internalJob.getGlobalGenericInformation());
 
         ForkEnvironment environment = getForkEnvironment();
         if (environment != null) {
@@ -1189,6 +1190,7 @@ public abstract class InternalTask extends TaskState {
         }
         tli.setPreciousLogs(isPreciousLogs());
         tli.setJobVariables(internalJob.getVariables());
+        tli.setGlobalVariables(internalJob.getGlobalVariables());
         tli.setTaskVariables(getVariables());
 
         tli.setPingPeriod(PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt());
