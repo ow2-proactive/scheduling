@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.common.job.factories;
 
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.util.Map;
 
@@ -75,12 +76,26 @@ public abstract class JobFactory {
      * @return the instance of the jobFactory.
      */
     public static JobFactory getFactory() {
+        return getFactory(true);
+    }
+
+    /**
+     * Try to instantiate the known factories.
+     * Return the created instance of the jobFactory.
+     * As it may instantiate built'in factories, this method rarely fails but a RuntimeException is raised if
+     * no factory can be found.
+     * @param handleGlobalVariables if global variables should be handled by the job factory
+     *
+     * @return the instance of the jobFactory.
+     */
+    public static JobFactory getFactory(boolean handleGlobalVariables) {
         JobFactory factory = null;
         for (String factoryInstance : CURRENT_IMPL) {
             try {
                 ClassLoader cl = JobFactory.class.getClassLoader();
                 Class c = cl.loadClass(factoryInstance);
-                factory = (JobFactory) c.newInstance();
+                Constructor constructor = c.getConstructor(Boolean.TYPE);
+                factory = (JobFactory) constructor.newInstance(handleGlobalVariables);
                 break;
             } catch (ClassNotFoundException e) {
                 logger.warn("Cannot instanciate this factory : " + factoryInstance, e);
@@ -102,14 +117,28 @@ public abstract class JobFactory {
      * @return the instance of the required factory.
      */
     public static JobFactory getFactory(String impl) {
+        return getFactory(true);
+    }
+
+    /**
+     * Try to instantiate the given factory.
+     * Return the created instance of the jobFactory.
+     * If the factory is not found or not created, a runtime exception is raised.
+     * @param handleGlobalVariables if global variables should be handled by the job factory
+     *
+     * @return the instance of the required factory.
+     */
+    public static JobFactory getFactory(String impl, boolean handleGlobalVariables) {
         if (impl == null) {
-            return getFactory();
+            return getFactory(handleGlobalVariables);
         }
 
         JobFactory factory;
 
         try {
-            factory = (JobFactory) Class.forName(impl).newInstance();
+            Class c = Class.forName(impl);
+            Constructor constructor = c.getConstructor(Boolean.TYPE);
+            factory = (JobFactory) constructor.newInstance(handleGlobalVariables);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Cannot instanciate this factory : " + impl, e);
         } catch (Exception e) {

@@ -141,16 +141,19 @@ public class StaxJobFactory extends JobFactory {
 
     private GetJobContentGenerator getJobContentFactory = new GetJobContentGenerator();
 
+    private boolean handleGlobalVariables;
+
     /**
      * Create a new instance of StaxJobFactory.
      */
-    StaxJobFactory() {
+    public StaxJobFactory(boolean handleGlobalVariables) {
         System.setProperty("javax.xml.stream.XMLInputFactory", "com.ctc.wstx.stax.WstxInputFactory");
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty("javax.xml.stream.isCoalescing", Boolean.TRUE);
         xmlInputFactory.setProperty("javax.xml.stream.isReplacingEntityReferences", Boolean.TRUE);
         xmlInputFactory.setProperty("javax.xml.stream.isNamespaceAware", Boolean.TRUE);
         xmlInputFactory.setProperty("javax.xml.stream.supportDTD", Boolean.FALSE);
+        this.handleGlobalVariables = handleGlobalVariables;
     }
 
     @Override
@@ -260,7 +263,10 @@ public class StaxJobFactory extends JobFactory {
         String md5Job = DigestUtils.md5Hex(bytes);
         String md5Variables = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementVariables));
         String md5GenericInfo = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementGenericInfos));
-        String md5GlobalVariables = GlobalVariablesParser.getInstance().getMD5();
+        String md5GlobalVariables = "";
+        if (handleGlobalVariables) {
+            md5GlobalVariables = GlobalVariablesParser.getInstance().getMD5();
+        }
         String md5 = md5Job + "_" + md5Variables + "_" + md5GenericInfo + "_" + md5GlobalVariables;
         long t1 = System.currentTimeMillis();
         if (!validationCache.containsKey(md5)) {
@@ -637,8 +643,12 @@ public class StaxJobFactory extends JobFactory {
 
     }
 
-    private static synchronized GlobalVariablesData getConfiguredGlobalVariablesData(String jobContent) {
-        return GlobalVariablesParser.getInstance().getVariablesFor(jobContent);
+    private synchronized GlobalVariablesData getConfiguredGlobalVariablesData(String jobContent) {
+        if (handleGlobalVariables) {
+            return GlobalVariablesParser.getInstance().getVariablesFor(jobContent);
+        } else {
+            return new GlobalVariablesData();
+        }
     }
 
     private static Map<String, String> convertToReplacementMap(Map<String, JobVariable> jobVariables) {
