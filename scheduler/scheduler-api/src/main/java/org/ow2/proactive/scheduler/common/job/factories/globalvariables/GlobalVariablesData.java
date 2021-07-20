@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.globalvariables;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.job.JobVariable;
@@ -37,9 +37,9 @@ import org.ow2.proactive.scheduler.common.job.JobVariable;
  */
 public class GlobalVariablesData {
 
-    Map<String, JobVariable> variables = new HashMap<>();
+    Map<String, JobVariable> variables = new LinkedHashMap<>();
 
-    Map<String, String> genericInformation = new HashMap<>();
+    Map<String, String> genericInformation = new LinkedHashMap<>();
 
     public GlobalVariablesData() {
 
