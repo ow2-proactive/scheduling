@@ -84,10 +84,9 @@ public class PackageDownloader {
      *         <li>Sub-directories within a github repository</li>
      *         <li>Supports forwarded URLS as in shortened bitly urls, etc </li>
      *     </ul>
-     * @param packageUrl
-     * @return
-     * @throws IOException
-     * @throws URISyntaxException
+     * @param packageUrl url of the package to download
+     * @return path of the temporary folder where the package has been downloaded
+     * @throws CLIException
      */
     public String downloadPackage(String packageUrl) {
         // Get the real URL in case it is a shortened one (via bit.ly, etc)

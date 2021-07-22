@@ -131,9 +131,8 @@ public class FlowScript extends Script<FlowAction> {
      * Copy constructor 
      * 
      * @param fl Source script
-     * @throws InvalidScriptException
      */
-    public FlowScript(FlowScript fl) throws InvalidScriptException {
+    public FlowScript(FlowScript fl) {
         super(fl);
         if (fl.getActionType() != null) {
             this.actionType = new String(fl.getActionType());
@@ -149,11 +148,11 @@ public class FlowScript extends Script<FlowAction> {
         }
     }
 
-    private FlowScript(Script<?> scr) throws InvalidScriptException {
+    private FlowScript(Script<?> scr) {
         super(scr);
     }
 
-    public static FlowScript createContinueFlowScript() throws InvalidScriptException {
+    public static FlowScript createContinueFlowScript() {
         FlowScript fs = new FlowScript(new SimpleScript("", "javascript"));
         fs.setActionType(FlowActionType.CONTINUE);
         return fs;

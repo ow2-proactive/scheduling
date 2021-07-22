@@ -315,7 +315,7 @@ public class RMProxyActiveObject {
      * <p>
      * Check the nodes to release and release the one that have to (clean script has returned)
      * Take care when renaming this method, method name is linked to
-     * {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map, TaskId, Credentials, Synchronization)}
+     * {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map, TaskId, Credentials, Synchronization, SignalApi)}
      */
     @ImmediateService
     public synchronized void cleanCallBack(Future<ScriptResult<?>> future, NodeSet nodes) {

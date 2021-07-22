@@ -190,7 +190,7 @@ public class RMNodeStarter {
     /** to inform that the user supplied a value from the command line for the ping */
     private static boolean PING_DELAY_IN_MS_USER_SUPPLIED = false;
 
-    /** Name of the java property to set the node -> rm ping frequency value */
+    /** Name of the java property to set the node rm ping frequency value */
     public final static String PING_DELAY_PROP_NAME = "proactive.node.ping.delay";
 
     /** The number of attempts to add the local node to the RM before quitting */

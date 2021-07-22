@@ -791,12 +791,14 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 job.setSynchronizationAPI(schedulingService.getSynchronizationAPI());
                 schedulingMainLoopTimingLogger.end("startDataspaceApp");
                 NodeSet nodes = new NodeSet();
+                String sessionid = getRMProxiesManager().getUserRMProxy(job.getOwner(), job.getCredentials())
+                                                        .getSessionid();
                 try {
 
                     // create launcher
                     schedulingMainLoopTimingLogger.start("createLauncher");
 
-                    launcher = task.createLauncher(node);
+                    launcher = task.createLauncher(node, sessionid);
 
                     schedulingMainLoopTimingLogger.end("createLauncher");
 
@@ -847,7 +849,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                        schedulingService,
                                                                        terminateNotification,
                                                                        corePrivateKey,
-                                                                       taskRecoveryData),
+                                                                       taskRecoveryData,
+                                                                       sessionid),
 
                                                  dotaskActionTimeout,
                                                  TimeUnit.MILLISECONDS);

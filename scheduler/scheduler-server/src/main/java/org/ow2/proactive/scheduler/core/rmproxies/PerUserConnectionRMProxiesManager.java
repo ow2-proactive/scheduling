@@ -33,6 +33,11 @@ import java.util.Map;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.util.SchedulerStarter;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 
 
 public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
@@ -40,6 +45,8 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
     private final Map<URI, RMAuthentication> rmAuthentifications = new HashMap<>(2);
 
     private final Map<String, RMProxy> userProxiesMap = new HashMap<>();
+
+    private final Map<String, Session> userSessions = new HashMap<>();
 
     private final RMProxy schedulerRMProxy;
 
@@ -49,6 +56,8 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
 
     private final Object connectionStateLock = new Object();
 
+    private SessionStore sessionStore;
+
     private URI rmURI;
 
     public PerUserConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials)
@@ -56,6 +65,7 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
         super(schedulerProxyCredentials);
         this.rmURI = rmURI;
         schedulerRMProxy = new RMProxy(rmURI, schedulerProxyCredentials);
+        sessionStore = SharedSessionStore.getInstance();
     }
 
     @Override
@@ -88,8 +98,33 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
                 } catch (RMException e) {
                     throw new RMProxyCreationException(e);
                 }
+                createUserSession(user, credentials, proxy);
+            } else {
+                if (!"true".equals(System.getProperty(SchedulerStarter.REST_DISABLED_PROPERTY))) {
+                    // Rest session management works only if the rest server is launched in the same JVM as the scheduler server
+                    try {
+                        userSessions.get(user).renewSession();
+                    } catch (Exception e) {
+                        createUserSession(user, credentials, proxy);
+                    }
+                }
             }
             return proxy;
+        }
+    }
+
+    private void createUserSession(String user, Credentials credentials, RMProxy proxy)
+            throws RMProxyCreationException {
+        try {
+            if (!"true".equals(System.getProperty(SchedulerStarter.REST_DISABLED_PROPERTY))) {
+                // Rest session management works only if the rest server is launched in the same JVM as the scheduler server
+                Session session = sessionStore.create(user);
+                session.connectToRM(credentials);
+                proxy.setSessionid(session.getSessionId());
+                userSessions.put(user, session);
+            }
+        } catch (Exception e) {
+            throw new RMProxyCreationException(e);
         }
     }
 
