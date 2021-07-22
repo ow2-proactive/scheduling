@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.IOException;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -46,6 +47,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTaskParentFinder;
 import org.ow2.proactive.scheduler.task.internal.TaskRecoveryData;
@@ -83,6 +86,10 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final InternalTaskParentFinder internalTaskParentFinder;
 
+    private final String sessionid;
+
+    private ScriptExecutableContainer container = null;
+
     /**
      * Create a new instance of TimedDoTaskAction
      *
@@ -91,7 +98,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      */
     public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            PrivateKey corePrivateKey, TaskRecoveryData taskRecoveryData) {
+            PrivateKey corePrivateKey, TaskRecoveryData taskRecoveryData, String sessionid) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
         this.task = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
@@ -101,6 +108,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         this.corePrivateKey = corePrivateKey;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
         this.taskRecoveryData = taskRecoveryData;
+        this.sessionid = sessionid;
     }
 
     /**
@@ -140,7 +148,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             fillContainer();
 
             // try launch the task
-            launcher.doTask(task.getExecutableContainer(),
+            launcher.doTask(container,
                             params,
                             terminateNotification,
                             taskRecoveryData.getTerminateNotificationNodeURL(),
@@ -152,12 +160,15 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         return null;
     }
 
-    protected void fillContainer() throws KeyException, NoSuchAlgorithmException {
+    protected void fillContainer() throws KeyException, NoSuchAlgorithmException, IOException {
+        container = new ScriptExecutableContainer((ScriptExecutableContainer) task.getExecutableContainer());
         boolean isRunAsMeEnabled = TaskConfiguration.isRunAsMeTask(task);
 
-        task.getExecutableContainer().setRunAsUser(isRunAsMeEnabled);
+        container.setRunAsUser(isRunAsMeEnabled);
 
         createAndSetCredentials();
+        container.getScript().setSessionid(sessionid);
+        container.getScript().fetchUrlIfNeeded();
     }
 
     private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException {
@@ -174,7 +185,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         Credentials nodeEncryptedUserCredentials = Credentials.createCredentials(decryptedUserCredentials,
                                                                                  nodePublicKey);
 
-        task.getExecutableContainer().setCredentials(nodeEncryptedUserCredentials);
+        container.setCredentials(nodeEncryptedUserCredentials);
     }
 
     protected boolean areThirdPartyCredentialsDefined() {

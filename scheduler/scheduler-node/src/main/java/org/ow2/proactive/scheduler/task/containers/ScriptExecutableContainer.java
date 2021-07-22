@@ -42,12 +42,18 @@ import org.ow2.proactive.scripting.TaskScript;
 public class ScriptExecutableContainer extends ExecutableContainer {
 
     /** Arguments of the task as a map */
-    protected final Map<String, ByteArrayWrapper> serializedArguments = new HashMap<>();
+    protected Map<String, ByteArrayWrapper> serializedArguments = new HashMap<>();
 
     private final TaskScript script;
 
     public ScriptExecutableContainer(TaskScript script) {
         this.script = script;
+    }
+
+    public ScriptExecutableContainer(ScriptExecutableContainer container) {
+        super(container);
+        this.script = new TaskScript(container.script);
+        this.serializedArguments = container.serializedArguments;
     }
 
     public Script<Serializable> getScript() {

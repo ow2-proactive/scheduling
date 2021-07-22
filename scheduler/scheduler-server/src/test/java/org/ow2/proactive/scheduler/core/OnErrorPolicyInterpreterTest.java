@@ -265,7 +265,8 @@ public class OnErrorPolicyInterpreterTest extends ProActiveTestClean {
             }
 
             @Override
-            public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
+            public TaskLauncher createLauncher(Node node, String sessionid)
+                    throws ActiveObjectCreationException, NodeException {
                 // TODO Auto-generated method stub
                 return null;
             }

@@ -46,6 +46,16 @@ public abstract class ExecutableContainer implements Serializable {
 
     private boolean runAsUser;
 
+    protected ExecutableContainer() {
+
+    }
+
+    protected ExecutableContainer(ExecutableContainer container) {
+        this.nodes = container.nodes;
+        this.credentials = container.credentials;
+        this.runAsUser = container.runAsUser;
+    }
+
     /**
      * Set the nodes value to the given nodes value
      *
