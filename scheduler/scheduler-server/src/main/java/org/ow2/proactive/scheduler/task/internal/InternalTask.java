@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.task.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -511,7 +512,8 @@ public abstract class InternalTask extends TaskState {
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
      */
-    public abstract TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException;
+    public abstract TaskLauncher createLauncher(Node node, String sessionid)
+            throws ActiveObjectCreationException, NodeException, IOException;
 
     /**
      * Return true if this task can handle parent results arguments in its executable
@@ -1148,7 +1150,7 @@ public abstract class InternalTask extends TaskState {
      *
      * @return the default created task launcher initializer
      */
-    protected TaskLauncherInitializer getDefaultTaskLauncherInitializer() {
+    protected TaskLauncherInitializer getDefaultTaskLauncherInitializer(String sessionid) throws IOException {
         TaskLauncherInitializer tli = new TaskLauncherInitializer();
         tli.setTaskId(getId());
         tli.setJobOwner(internalJob.getJobInfo().getJobOwner());
@@ -1162,9 +1164,22 @@ public abstract class InternalTask extends TaskState {
         tli.setCloudAutomationRestPublicUrl(PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.getValueAsStringOrNull());
         tli.setJobPlannerRestPublicUrl(PASchedulerProperties.JOB_PLANNER_REST_PUBLIC_URL.getValueAsStringOrNull());
         tli.setNotificationServiceRestPublicUrl(PASchedulerProperties.NOTIFICATION_SERVICE_REST_PUBLIC_URL.getValueAsStringOrNull());
-        tli.setPreScript(getPreScript());
-        tli.setPostScript(getPostScript());
-        tli.setControlFlowScript(getFlowScript());
+        if (getPreScript() != null) {
+            tli.setPreScript(getPreScript());
+            tli.getPreScript().setSessionid(sessionid);
+            tli.getPreScript().fetchUrlIfNeeded();
+        }
+        if (getPostScript() != null) {
+            tli.setPostScript(getPostScript());
+            tli.getPostScript().setSessionid(sessionid);
+            tli.getPostScript().fetchUrlIfNeeded();
+        }
+        if (getFlowScript() != null) {
+            tli.setControlFlowScript(getFlowScript());
+            tli.getControlFlowScript().setSessionid(sessionid);
+            tli.getControlFlowScript().fetchUrlIfNeeded();
+        }
+
         tli.setTaskInputFiles(getInputFilesList());
         tli.setTaskOutputFiles(getOutputFilesList());
         tli.setNamingService(internalJob.getTaskDataSpaceApplications()
@@ -1184,7 +1199,11 @@ public abstract class InternalTask extends TaskState {
                 tli.setAuthorizedForkEnvironmentScript(false);
             }
         }
-        tli.setForkEnvironment(getForkEnvironment());
+        tli.setForkEnvironment(environment);
+        if (tli.getForkEnvironment() != null && tli.getForkEnvironment().getEnvScript() != null) {
+            tli.getForkEnvironment().getEnvScript().setSessionid(sessionid);
+        }
+
         if (isWallTimeSet()) {
             tli.setWalltime(getRuntimeWallTime());
         }

@@ -270,21 +270,17 @@ public class InternalJobFactory {
         if (task.getExecutableClassName() != null) {
             HashMap<String, byte[]> args = task.getSerializedArguments();
 
-            try {
-                if (TaskConfiguration.isForkingTask(task)) {
-                    javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
-                                                                                                                          JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
-                                                                                                                          new Serializable[] { args }))),
-                                                            internalJob);
-                    javaTask.setForkEnvironment(task.getForkEnvironment());
-                } else {
-                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
-                                                                                                                    JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
-                                                                                                                    new Serializable[] { args }))),
-                                                      internalJob);
-                }
-            } catch (InvalidScriptException e) {
-                throw new JobCreationException(e);
+            if (TaskConfiguration.isForkingTask(task)) {
+                javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
+                                                                                                                      JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
+                                                                                                                      new Serializable[] { args }))),
+                                                        internalJob);
+                javaTask.setForkEnvironment(task.getForkEnvironment());
+            } else {
+                javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
+                                                                                                                JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
+                                                                                                                new Serializable[] { args }))),
+                                                  internalJob);
             }
         } else {
             String msg = "You must specify your own executable task class to be launched (in every task)!";

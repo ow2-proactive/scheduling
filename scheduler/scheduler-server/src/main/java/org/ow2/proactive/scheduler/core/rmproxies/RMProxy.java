@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.signal.SignalApi;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -64,10 +65,20 @@ public class RMProxy {
 
     private Credentials creds;
 
+    private String sessionid = null;
+
     RMProxy(URI rmURL, Credentials creds) throws RMException, RMProxyCreationException {
         this.rmURL = rmURL;
         this.creds = creds;
         init();
+    }
+
+    public String getSessionid() {
+        return sessionid;
+    }
+
+    public void setSessionid(String sessionid) {
+        this.sessionid = sessionid;
     }
 
     public synchronized void init() throws RMException, RMProxyCreationException {
@@ -120,6 +131,11 @@ public class RMProxy {
     }
 
     public NodeSet getNodes(Criteria criteria) {
+        if (criteria.getScripts() != null) {
+            for (SelectionScript script : criteria.getScripts()) {
+                script.setSessionid(sessionid);
+            }
+        }
         return PAFuture.getFutureValue(proxyActiveObject.getNodes(criteria));
     }
 
@@ -139,6 +155,9 @@ public class RMProxy {
             if (nodeSet.getExtraNodes() == null || nodeSet.getExtraNodes().size() == 0) {
                 throw new IllegalArgumentException("Trying to release empty NodeSet");
             }
+        }
+        if (cleaningScript != null) {
+            cleaningScript.setSessionid(sessionid);
         }
 
         if (proxyActiveObject != null) {

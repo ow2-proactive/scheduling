@@ -103,6 +103,8 @@ public abstract class Script<E> implements Serializable {
 
     private static Boolean lazyFetch = null;
 
+    private String sessionid = null;
+
     /** ProActive needed constructor */
     public Script() {
     }
@@ -111,9 +113,8 @@ public abstract class Script<E> implements Serializable {
      * @param script String representing the script's source code
      * @param engineName String representing the execution engine
      * @param parameters script's execution arguments.
-     * @throws InvalidScriptException if the creation fails.
      */
-    public Script(String script, String engineName, Serializable[] parameters) throws InvalidScriptException {
+    public Script(String script, String engineName, Serializable[] parameters) {
         this.scriptEngineLookupName = engineName;
         this.script = script;
         this.id = script;
@@ -128,10 +129,8 @@ public abstract class Script<E> implements Serializable {
      * @param engineName String representing the execution engine
      * @param parameters script's execution arguments.
      * @param scriptName name of the script
-     * @throws InvalidScriptException if the creation fails.
      */
-    public Script(String script, String engineName, Serializable[] parameters, String scriptName)
-            throws InvalidScriptException {
+    public Script(String script, String engineName, Serializable[] parameters, String scriptName) {
         this.scriptEngineLookupName = engineName;
         this.script = script;
         this.id = script;
@@ -142,9 +141,8 @@ public abstract class Script<E> implements Serializable {
     /** Directly create a script with a string.
      * @param script String representing the script's source code
      * @param engineName String representing the execution engine
-     * @throws InvalidScriptException if the creation fails.
      */
-    public Script(String script, String engineName) throws InvalidScriptException {
+    public Script(String script, String engineName) {
         this(script, engineName, (Serializable[]) null);
     }
 
@@ -152,9 +150,8 @@ public abstract class Script<E> implements Serializable {
      * @param script String representing the script's source code
      * @param engineName String representing the execution engine
      * @param scriptName name of the script
-     * @throws InvalidScriptException if the creation fails.
      */
-    public Script(String script, String engineName, String scriptName) throws InvalidScriptException {
+    public Script(String script, String engineName, String scriptName) {
         this(script, engineName, null, scriptName);
     }
 
@@ -240,9 +237,8 @@ public abstract class Script<E> implements Serializable {
 
     /** Create a script from another script object
      * @param script2 script object source
-     * @throws InvalidScriptException if the creation fails.
      */
-    public Script(Script<?> script2) throws InvalidScriptException {
+    public Script(Script<?> script2) {
         this(script2.getScript(), script2.scriptEngineLookupName, script2.getParameters(), script2.getScriptName());
         this.url = script2.url;
         this.id = script2.id;
@@ -250,12 +246,19 @@ public abstract class Script<E> implements Serializable {
 
     /** Create a script from another script object
      * @param script2 script object source
-     * @throws InvalidScriptException if the creation fails.
      */
-    public Script(Script<?> script2, String scriptName) throws InvalidScriptException {
+    public Script(Script<?> script2, String scriptName) {
         this(script2.script, script2.scriptEngineLookupName, script2.parameters, scriptName);
         this.url = script2.url;
         this.id = script2.id;
+    }
+
+    public String getSessionid() {
+        return sessionid;
+    }
+
+    public void setSessionid(String sessionid) {
+        this.sessionid = sessionid;
     }
 
     protected static boolean isLazyFetch() {
@@ -462,7 +465,7 @@ public abstract class Script<E> implements Serializable {
         result.setOutput(outputBuffer.toString());
     }
 
-    protected void fetchUrlIfNeeded() throws IOException {
+    public void fetchUrlIfNeeded() throws IOException {
         if (script == null && url != null) {
             ScriptContentAndEngineName fetchedInformation = getScriptContentAndEngineName();
             script = fetchedInformation.getScriptContent();
@@ -485,7 +488,7 @@ public abstract class Script<E> implements Serializable {
 
     private ScriptContentAndEngineName fetchScriptUsingHttpDownloader(URL url) throws IOException {
         CommonHttpResourceDownloader.UrlContent content = CommonHttpResourceDownloader.getInstance()
-                                                                                      .getResourceContent(null,
+                                                                                      .getResourceContent(sessionid,
                                                                                                           url.toExternalForm(),
                                                                                                           true);
         String scriptContent = content.getContent();

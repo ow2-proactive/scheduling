@@ -123,8 +123,6 @@ public class ManageUsers {
      * Entry point
      *
      * @param args arguments, try '-h' for help
-     * @throws IOException
-     * @throws ParseException
      * @see org.ow2.proactive.authentication.crypto.Credentials
      */
     public static void main(String[] args) {

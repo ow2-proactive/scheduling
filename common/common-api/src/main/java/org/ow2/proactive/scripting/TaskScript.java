@@ -48,7 +48,7 @@ public class TaskScript extends Script<Serializable> {
      */
     public static final String RESULT_VARIABLE = "result";
 
-    public TaskScript(Script script) throws InvalidScriptException {
+    public TaskScript(Script script) {
         super(script);
     }
 

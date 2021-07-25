@@ -52,9 +52,8 @@ public class SimpleScript extends Script<Object> {
     /** Directly create a script with a string.
      * @param script a String containing script code
      * @param engineName script's engine execution name.
-     * @throws InvalidScriptException if the creation fails.
      */
-    public SimpleScript(String script, String engineName) throws InvalidScriptException {
+    public SimpleScript(String script, String engineName) {
         super(script, engineName);
     }
 
@@ -100,9 +99,8 @@ public class SimpleScript extends Script<Object> {
      * @param script a String containing script code
      * @param engineName script's engine execution name.
      * @param parameters execution parameters
-     * @throws InvalidScriptException if the creation fails.
      */
-    public SimpleScript(String script, String engineName, Serializable[] parameters) throws InvalidScriptException {
+    public SimpleScript(String script, String engineName, Serializable[] parameters) {
         super(script, engineName, parameters);
     }
 
@@ -115,9 +113,8 @@ public class SimpleScript extends Script<Object> {
      * Copy constructor
      * 
      * @param original script to copy
-     * @throws InvalidScriptException 
      */
-    public SimpleScript(Script<?> original) throws InvalidScriptException {
+    public SimpleScript(Script<?> original) {
         super(original);
     }
 

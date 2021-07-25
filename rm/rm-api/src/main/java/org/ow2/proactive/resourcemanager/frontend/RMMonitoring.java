@@ -70,8 +70,6 @@ public interface RMMonitoring {
      * Gets the current snapshot of the resource manager state providing
      * detailed nodes and node source information.
      *
-     * To obtain summary of the resource manager state use {@link ResourceManager}.getState()
-     *
      * @return the current state of the resource manager
      */
     RMInitialState getState();

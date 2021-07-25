@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import java.io.IOException;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -62,10 +64,11 @@ public class InternalForkedScriptTask extends InternalScriptTask {
      * {@inheritDoc}
      */
     @Override
-    public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
+    public TaskLauncher createLauncher(Node node, String sessionid)
+            throws ActiveObjectCreationException, NodeException, IOException {
         logger.info(getTaskInfo().getTaskId(), "creating forked task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
-                                                                        new Object[] { getDefaultTaskLauncherInitializer(),
+                                                                        new Object[] { getDefaultTaskLauncherInitializer(sessionid),
                                                                                        new ProActiveForkedTaskLauncherFactory() },
                                                                         node);
         // wait until the task launcher is active
