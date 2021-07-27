@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.SchedulerHsqldbStarter;
+import org.ow2.proactive.scheduler.util.SchedulerStarter;
 
 
 /**
@@ -79,6 +80,8 @@ public class SchedulerStartForFunctionalTest implements Serializable {
         if (args.length < 3) {
             throw new IllegalArgumentException("Invalid number of parameters, exactly 3 parameters are expected: localNodes schedPropPath rmPropPath");
         }
+
+        System.setProperty(SchedulerStarter.REST_DISABLED_PROPERTY, "true");
 
         if (args.length == 4) {
             createWithExistingRm(args[1], args[3]);
