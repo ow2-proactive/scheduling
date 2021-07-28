@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.NodeInfo;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -228,6 +229,9 @@ public class TaskLauncher implements InitActive {
             dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
 
             TaskExecutor taskExecutor = factory.createTaskExecutor(workingDir);
+
+            initializer.fetchUrlsIfNeeded();
+            ((ScriptExecutableContainer) executableContainer).getScript().fetchUrlIfNeeded();
 
             taskStopwatchForFailures.start();
             taskResult = taskExecutor.execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink());
