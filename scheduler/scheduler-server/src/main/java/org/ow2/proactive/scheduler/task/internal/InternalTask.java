@@ -1167,17 +1167,14 @@ public abstract class InternalTask extends TaskState {
         if (getPreScript() != null) {
             tli.setPreScript(getPreScript());
             tli.getPreScript().setSessionid(sessionid);
-            tli.getPreScript().fetchUrlIfNeeded();
         }
         if (getPostScript() != null) {
             tli.setPostScript(getPostScript());
             tli.getPostScript().setSessionid(sessionid);
-            tli.getPostScript().fetchUrlIfNeeded();
         }
         if (getFlowScript() != null) {
             tli.setControlFlowScript(getFlowScript());
             tli.getControlFlowScript().setSessionid(sessionid);
-            tli.getControlFlowScript().fetchUrlIfNeeded();
         }
 
         tli.setTaskInputFiles(getInputFilesList());

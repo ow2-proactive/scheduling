@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -176,6 +177,21 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public Script<?> getPostScript() {
         return post;
+    }
+
+    public void fetchUrlsIfNeeded() throws IOException {
+        if (forkEnvironment != null && forkEnvironment.getEnvScript() != null) {
+            forkEnvironment.getEnvScript().fetchUrlIfNeeded();
+        }
+        if (pre != null) {
+            pre.fetchUrlIfNeeded();
+        }
+        if (post != null) {
+            post.fetchUrlIfNeeded();
+        }
+        if (flowScript != null) {
+            flowScript.fetchUrlIfNeeded();
+        }
     }
 
     /**
