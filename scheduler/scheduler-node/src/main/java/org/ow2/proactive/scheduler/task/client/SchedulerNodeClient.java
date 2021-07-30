@@ -101,7 +101,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     private JobId parentJobId;
 
-    private Map<String, String> globalGenericInformation;
+    private Map<String, String> globalGenericInformation = new LinkedHashMap<>();
 
     private Map<String, String> globalVariables = new LinkedHashMap<>();
 
