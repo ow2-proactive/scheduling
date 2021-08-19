@@ -667,4 +667,12 @@ public interface ResourceManager {
      * @return nodes urls which contain all or any specified list of tags
      */
     Set<String> getNodesByTags(Set<String> tags, boolean all);
+
+    /**
+     * Check is the user has admin permission for the given nodes or it is a node source provider
+     * @param urls the nodes urls
+     * @return a map containing the node url and true if the user has permission for the node
+     */
+    Map<String, Boolean> checkNodesPermission(Set<String> urls);
+
 }

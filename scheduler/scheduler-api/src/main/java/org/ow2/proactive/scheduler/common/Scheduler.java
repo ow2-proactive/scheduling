@@ -1697,4 +1697,16 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws SchedulerException
      */
     Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws SchedulerException;
+
+    /**
+     * Returns a map containing pairs that represent the job id as key and a map as value containing the method name
+     * and true/false if the user has permission for the jobId and method
+     * @param jobIds a list of job ids
+     * @param methods a list of methods
+     * @return a map containing job ids as key and a map as value representing methods and true/false
+     * @throws NotConnectedException if the user is not authenticated.
+     * @throws UnknownJobException  if the job does not exist.
+     */
+    Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
+            throws NotConnectedException, UnknownJobException;
 }

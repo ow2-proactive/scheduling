@@ -101,6 +101,7 @@ import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.common.dto.PermissionForm;
 import org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
@@ -2768,6 +2769,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
         return schedulerProperties;
 
+    }
+
+    @Override
+    public Map<String, Map<String, Boolean>> checkJobsPermissionMethods(String sessionId, PermissionForm multipart)
+            throws RestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/permission/methods");
+            return s.checkJobsPermissionMethods(multipart.getJobids(), multipart.getMethods());
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
     }
 
 }

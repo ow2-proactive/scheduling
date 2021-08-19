@@ -2066,4 +2066,33 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throw new SignalApiException("Could not add signal for the job " + jobId, e);
         }
     }
+
+    @Override
+    @ImmediateService
+    public Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
+            throws NotConnectedException, UnknownJobException {
+        String currentUser = frontendState.getCurrentUser();
+        if (methods == null || jobIds == null) {
+            return new HashMap<>();
+        }
+
+        Map<String, Map<String, Boolean>> answer = new HashMap<>(jobIds.size());
+        for (String jobId : jobIds) {
+            Map<String, Boolean> methodsPermissions = new HashMap<>(methods.size());
+            for (String method : methods) {
+                boolean hasPermission = true;
+                try {
+                    frontendState.checkPermissions(method,
+                                                   frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                                   SchedulerFrontendState.getErrorMessageForMethodPermission(method));
+                } catch (PermissionException e) {
+                    hasPermission = false;
+                }
+                logger.info("Request permission to " + method + " for " + jobId + " received from " + currentUser);
+                methodsPermissions.put(method, hasPermission);
+            }
+            answer.put(jobId, methodsPermissions);
+        }
+        return answer;
+    }
 }

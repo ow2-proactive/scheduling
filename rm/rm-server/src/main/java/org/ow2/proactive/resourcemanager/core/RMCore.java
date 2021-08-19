@@ -2768,6 +2768,29 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(result);
     }
 
+    public Map<String, Boolean> getMapOnNodeUrlSet(Set<String> nodeUrls, Predicate<RMNode> operation,
+            String operationName) {
+        Map<String, Boolean> result = new HashMap<>();
+
+        for (String url : nodeUrls) {
+            try {
+                RMNode rmnode = getNodeByUrlIncludingDeployingNodes(url);
+
+                if (rmnode == null) {
+                    logger.warn("Cannot " + operationName + ", unknown node: " + url);
+                    result.put(url, false);
+                    continue;
+                }
+                result.put(url, operation.apply(rmnode));
+            } catch (Exception e) {
+                logger.error("Error during " + operationName + " on node " + url, e);
+                result.put(url, false);
+            }
+        }
+
+        return result;
+    }
+
     boolean internalUnlockNode(RMNode rmNode) {
         if (!rmNode.isLocked()) {
             logger.warn("Cannot unlock a node that is not locked: " + rmNode.getNodeURL());
@@ -3261,4 +3284,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new RMException("Unknown node " + nodeUrl);
         }
     }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodesPermission(java.util.Set)
+     */
+    @Override
+    public Map<String, Boolean> checkNodesPermission(Set<String> urls) {
+        return getMapOnNodeUrlSet(urls, this::checkNodesPermissions, "checkNodesPermission");
+    }
+
+    boolean checkNodesPermissions(RMNode rmNode) {
+        try {
+            checkNodeAdminPermission(rmNode, this.caller);
+            return true;
+        } catch (SecurityException e) {
+            // if the caller is not an admin and it is not a node source provider
+            logger.warn("User is not admin and it is not a node source provider ", e);
+            return false;
+        }
+    }
+
 }

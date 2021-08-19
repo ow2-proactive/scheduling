@@ -1077,4 +1077,21 @@ public interface RMRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     Set<String> searchNodes(@HeaderParam("sessionid") String sessionId, @QueryParam("tags") List<String> tags,
             @QueryParam("all") @DefaultValue("true") boolean all) throws NotConnectedException, RestException;
+
+    /**
+     * Check is the user has admin permission for the given nodes or it is a node source provider
+     *
+     * @param sessionId
+     *            current session
+     * @param nodeUrls
+     *            set of node urls to check the permission for
+     * @return a map containing the node url and true if the user has permission for the node
+     */
+    @POST
+    @Path("nodes/permission")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, Boolean> checkNodesPermission(@HeaderParam("sessionid") String sessionId, Set<String> nodeUrls)
+            throws NotConnectedException, PermissionRestException;
+
 }

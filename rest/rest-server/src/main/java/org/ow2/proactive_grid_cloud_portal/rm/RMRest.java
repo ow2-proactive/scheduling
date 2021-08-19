@@ -1136,4 +1136,13 @@ public class RMRest implements RMRestInterface {
             throw new PermissionRestException(e);
         }
     }
+
+    @Override
+    public Map<String, Boolean> checkNodesPermission(String sessionId, Set<String> nodeUrls)
+            throws NotConnectedException, PermissionRestException {
+        ResourceManager rm = checkAccess(sessionId);
+        Map<String, Boolean> map = rm.checkNodesPermission(nodeUrls);
+        return orThrowRpe(map);
+    }
+
 }

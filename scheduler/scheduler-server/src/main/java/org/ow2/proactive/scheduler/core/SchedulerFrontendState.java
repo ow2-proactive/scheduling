@@ -1544,4 +1544,31 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             return credentials;
         }
     }
+
+    public static String getErrorMessageForMethodPermission(String message) {
+        switch (message) {
+            case "pauseJob":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB;
+            case "restartAllInErrorTasks":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB;
+            case "resumeJob":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB;
+            case "changeJobPriority":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB;
+            case "killJob":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB;
+            case "getJobContent":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB;
+            case "removeJob":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB;
+            case "getJobServerLogs":
+                return YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
+            case "getJobState":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB;
+            case "getJobResult":
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
+            default:
+                return null;
+        }
+    }
 }

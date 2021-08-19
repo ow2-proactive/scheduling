@@ -28,12 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.common;
 import java.security.KeyException;
 import java.security.Permission;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,6 +39,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.permissions.NotificationAdminPermission;
 import org.ow2.proactive.permissions.PcaAdminPermission;
 import org.ow2.proactive.permissions.RMCoreAllPermission;
@@ -143,6 +139,28 @@ public class CommonRest implements CommonRestInterface {
                 answer.add(portal);
             } catch (PermissionException e) {
                 // access to portal is disabled, thus the answer will not contain it.
+            } catch (NotConnectedException e) {
+                throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+            }
+        }
+        return answer;
+    }
+
+    @Override
+    public Map<String, Boolean> checkPermissions(String sessionId, List<String> methods) throws RestException {
+        Scheduler scheduler = checkAccess(sessionId);
+        if (methods == null || methods.isEmpty()) {
+            return new HashMap<>();
+        }
+        Map<String, Boolean> answer = new HashMap<>(methods.size());
+        for (String method : methods) {
+            try {
+                checkPermission(scheduler.getSubject(),
+                                new MethodCallPermission(method),
+                                "Access to the method " + method + " is not allowed");
+                answer.put(method, Boolean.TRUE);
+            } catch (PermissionException e) {
+                answer.put(method, Boolean.FALSE);
             } catch (NotConnectedException e) {
                 throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
             }
