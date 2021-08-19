@@ -51,11 +51,11 @@ public class GlobalVariablesData {
     }
 
     public Map<String, JobVariable> getVariables() {
-        return variables;
+        return new LinkedHashMap<>(variables);
     }
 
     public Map<String, String> getGenericInformation() {
-        return genericInformation;
+        return new LinkedHashMap<>(genericInformation);
     }
 
     public void setVariables(Map<String, JobVariable> variables) {
@@ -64,5 +64,10 @@ public class GlobalVariablesData {
 
     public void setGenericInformation(Map<String, String> genericInformation) {
         this.genericInformation = genericInformation;
+    }
+
+    @Override
+    public String toString() {
+        return "GlobalVariablesData{" + "variables=" + variables + ", genericInformation=" + genericInformation + '}';
     }
 }

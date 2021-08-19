@@ -110,9 +110,8 @@ public class ForkEnvironment implements Serializable {
      * Copy constructor.
      * 
      * @param forkEnvironment the object to copy
-     * @throws ExecutableCreationException script copy failed
      */
-    public ForkEnvironment(ForkEnvironment forkEnvironment) throws ExecutableCreationException {
+    public ForkEnvironment(ForkEnvironment forkEnvironment) {
         this();
 
         if (forkEnvironment.javaHome != null) {
@@ -144,11 +143,7 @@ public class ForkEnvironment implements Serializable {
         }
 
         if (forkEnvironment.script != null) {
-            try {
-                this.script = new SimpleScript(forkEnvironment.script);
-            } catch (InvalidScriptException e) {
-                throw new ExecutableCreationException("Failed to copy ForkEnvironment script", e);
-            }
+            this.script = new SimpleScript(forkEnvironment.script);
         }
     }
 
@@ -398,4 +393,44 @@ public class ForkEnvironment implements Serializable {
                (script != null ? script.display() : null) + nl + '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ForkEnvironment that = (ForkEnvironment) o;
+
+        if (isDockerWindowsToLinux != that.isDockerWindowsToLinux)
+            return false;
+        if (javaHome != null ? !javaHome.equals(that.javaHome) : that.javaHome != null)
+            return false;
+        if (workingDir != null ? !workingDir.equals(that.workingDir) : that.workingDir != null)
+            return false;
+        if (systemEnvironment != null ? !systemEnvironment.equals(that.systemEnvironment)
+                                      : that.systemEnvironment != null)
+            return false;
+        if (jvmArguments != null ? !jvmArguments.equals(that.jvmArguments) : that.jvmArguments != null)
+            return false;
+        if (additionalClasspath != null ? !additionalClasspath.equals(that.additionalClasspath)
+                                        : that.additionalClasspath != null)
+            return false;
+        if (script != null ? !script.equals(that.script) : that.script != null)
+            return false;
+        return preJavaCommand != null ? preJavaCommand.equals(that.preJavaCommand) : that.preJavaCommand == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = javaHome != null ? javaHome.hashCode() : 0;
+        result = 31 * result + (workingDir != null ? workingDir.hashCode() : 0);
+        result = 31 * result + (systemEnvironment != null ? systemEnvironment.hashCode() : 0);
+        result = 31 * result + (jvmArguments != null ? jvmArguments.hashCode() : 0);
+        result = 31 * result + (additionalClasspath != null ? additionalClasspath.hashCode() : 0);
+        result = 31 * result + (script != null ? script.hashCode() : 0);
+        result = 31 * result + (preJavaCommand != null ? preJavaCommand.hashCode() : 0);
+        result = 31 * result + (isDockerWindowsToLinux ? 1 : 0);
+        return result;
+    }
 }

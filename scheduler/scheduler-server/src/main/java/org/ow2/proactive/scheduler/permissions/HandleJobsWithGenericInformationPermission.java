@@ -49,7 +49,7 @@ public class HandleJobsWithGenericInformationPermission extends ClientPermission
     /**
      * Construct the permission with specified authorization string.
      *
-     * @param keyValue
+     * @param keysValuesCommaSeparated
      *            string that represents a key value comma separated String. Ex
      *            : "KEY1=VALUE1,KEY2=VALUE2"
      */

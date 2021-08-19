@@ -209,6 +209,13 @@ public class TestStaxJobFactory {
     }
 
     @Test
+    public void testCreateJobWithVariablesAndGenericInfoShouldNotModifyGlobalVariables() throws Exception {
+        Job testScriptJob = factory.createJob(jobDescriptorWithGlobalVariablesAndGenericInfo);
+        Assert.assertFalse(testScriptJob.getGlobalVariables().containsKey("job_var"));
+        Assert.assertFalse(testScriptJob.getGlobalGenericInformation().containsKey("gen_info"));
+    }
+
+    @Test
     public void testCreateJobWithVariablesAndGenericInfoShouldOverrideGlobalVariablesAndGenericInfo() throws Exception {
         Job testScriptJob = factory.createJob(jobDescriptorWithGlobalVariablesAndGenericInfo);
         assertNotNull(testScriptJob.getVariables().get("global_var"));

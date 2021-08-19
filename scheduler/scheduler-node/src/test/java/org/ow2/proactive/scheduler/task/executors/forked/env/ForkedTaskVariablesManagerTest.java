@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.isA;
@@ -551,7 +552,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                                                         resultMetadata);
 
         // Check if element exists
-        assertThat((T) scriptHandlerBindings.get(key), is(entry));
+        assertThat((T) scriptHandlerBindings.get(key), equalTo(entry));
     }
 
     private <T> void validateThatScriptHandlerBindingsInstanceOf(ScriptHandler scriptHandler, TaskContext taskContext,

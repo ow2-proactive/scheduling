@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.signal.SignalApi;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.SimpleScript;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -165,7 +167,7 @@ public class TaskLauncherInitializer implements Serializable {
      * @param pre the pre-script to set
      */
     public void setPreScript(Script<?> pre) {
-        this.pre = pre;
+        this.pre = new SimpleScript(pre);
     }
 
     /**
@@ -177,13 +179,28 @@ public class TaskLauncherInitializer implements Serializable {
         return post;
     }
 
+    public void fetchUrlsIfNeeded() throws IOException {
+        if (forkEnvironment != null && forkEnvironment.getEnvScript() != null) {
+            forkEnvironment.getEnvScript().fetchUrlIfNeeded();
+        }
+        if (pre != null) {
+            pre.fetchUrlIfNeeded();
+        }
+        if (post != null) {
+            post.fetchUrlIfNeeded();
+        }
+        if (flowScript != null) {
+            flowScript.fetchUrlIfNeeded();
+        }
+    }
+
     /**
      * Set the control flow script value to the given flow value
      * 
      * @param flow the control flow script to set
      */
     public void setControlFlowScript(FlowScript flow) {
-        flowScript = flow;
+        flowScript = new FlowScript(flow);
     }
 
     /**
@@ -201,7 +218,7 @@ public class TaskLauncherInitializer implements Serializable {
      * @param post the post-script to set
      */
     public void setPostScript(Script<?> post) {
-        this.post = post;
+        this.post = new SimpleScript(post);
     }
 
     /**
@@ -526,7 +543,11 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     public void setForkEnvironment(ForkEnvironment forkEnvironment) {
-        this.forkEnvironment = forkEnvironment;
+        if (forkEnvironment == null) {
+            this.forkEnvironment = null;
+        } else {
+            this.forkEnvironment = new ForkEnvironment(forkEnvironment);
+        }
     }
 
     public boolean isAuthorizedForkEnvironmentScript() {

@@ -156,7 +156,7 @@ class LoadPackage {
         // OBJECT SECTION /////////////////////////////
 
         // Does the object already exist in the catalog ? -------------
-        def object_name = object.get("name")
+        def object_name = java.net.URLEncoder.encode(object.get("name"), "UTF-8")
         def object_found = bucket_resources_list.find { resource -> resource.name == object_name }
         writeToOutput(" " + object_name + " found? " + (object_found != null))
 

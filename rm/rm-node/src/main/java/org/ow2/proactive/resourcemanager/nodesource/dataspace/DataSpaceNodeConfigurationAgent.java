@@ -250,8 +250,6 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
      * This method must be used by the TaskLauncher at the end of a Task execution, allowing the cleaning timer to run
      * <p>
      * The cleaning timer will be released only when all read locks have been released.
-     *
-     * @throws InterruptedException
      */
     public static void unlockCacheSpaceCleaning() {
         try {

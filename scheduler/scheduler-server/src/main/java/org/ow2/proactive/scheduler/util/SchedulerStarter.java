@@ -139,6 +139,8 @@ public class SchedulerStarter {
 
     private static final String OPTION_STOPPED = "stopped";
 
+    public static final String REST_DISABLED_PROPERTY = "pa.scheduler.rest.disabled";
+
     private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
 
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
@@ -234,6 +236,10 @@ public class SchedulerStarter {
         }
 
         schedulerURL = getSchedulerUrl(commandLine);
+        if (commandLine.hasOption(OPTION_NO_REST)) {
+            System.setProperty(REST_DISABLED_PROPERTY, "true");
+        }
+
         if (!commandLine.hasOption(OPTION_SCHEDULER_URL)) {
             SchedulerAuthenticationInterface schedulerAuthenticationInterface = startScheduler(commandLine, rmURL);
             schedulerURL = schedulerAuthenticationInterface.getHostURL();

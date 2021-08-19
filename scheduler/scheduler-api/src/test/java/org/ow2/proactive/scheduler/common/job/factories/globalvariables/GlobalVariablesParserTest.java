@@ -74,6 +74,12 @@ public class GlobalVariablesParserTest {
         GlobalVariablesParser.getInstance().reloadFilters();
         String md5Second = GlobalVariablesParser.getInstance().getMD5();
         Assert.assertEquals("MD5 should be equals after reload", md5First, md5Second);
+
+        GlobalVariablesData globalData = GlobalVariablesParser.getInstance()
+                                                              .getVariablesFor(IOUtils.toString(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_no_variables.xml"),
+                                                                                                PASchedulerProperties.FILE_ENCODING.getValueAsString()));
+        Assert.assertEquals(0, globalData.getVariables().size());
+        Assert.assertEquals(0, globalData.getGenericInformation().size());
     }
 
     @Test
