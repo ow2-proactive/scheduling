@@ -148,10 +148,10 @@ public class CommonRest implements CommonRestInterface {
 
     @Override
     public Map<String, Boolean> checkPermissions(String sessionId, List<String> methods) throws RestException {
-        Scheduler scheduler = checkAccess(sessionId);
         if (methods == null || methods.isEmpty()) {
-            return new HashMap<>();
+            return Collections.emptyMap();
         }
+        Scheduler scheduler = checkAccess(sessionId);
         Map<String, Boolean> answer = new HashMap<>(methods.size());
         for (String method : methods) {
             try {

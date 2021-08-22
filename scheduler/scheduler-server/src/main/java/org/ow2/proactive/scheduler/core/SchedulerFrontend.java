@@ -2073,7 +2073,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
         if (methods == null || jobIds == null) {
-            return new HashMap<>();
+            return Collections.emptyMap();
         }
 
         Map<String, Map<String, Boolean>> answer = new HashMap<>(jobIds.size());

@@ -27,16 +27,26 @@ package org.ow2.proactive_grid_cloud_portal.common.dto;
 
 import java.util.List;
 
+import javax.ws.rs.FormParam;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
+
 
 /**
  * A class that represent a mean to get jobIds and methods through the rest api.
  * The jobIds list represents the list of job ids to check the permissions for
  * The methods list represents the list of methods to check whether each jobId has permission
  */
+@XmlRootElement
 public class PermissionForm {
 
+    @FormParam("jobids")
+    @PartType("application/json")
     List<String> jobids;
 
+    @FormParam("methods")
+    @PartType("application/json")
     List<String> methods;
 
     public List<String> getJobids() {
