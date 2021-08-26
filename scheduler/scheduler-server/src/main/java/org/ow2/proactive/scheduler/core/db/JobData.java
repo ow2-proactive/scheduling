@@ -766,7 +766,9 @@ public class JobData implements Serializable {
         jobVariable.setModel(jobDataVariable.getModel());
         jobVariable.setValue(jobDataVariable.getValue());
         jobVariable.setName(jobDataVariable.getName());
-
+        jobVariable.setDescription(jobDataVariable.getDescription());
+        jobVariable.setGroup(jobDataVariable.getGroup());
+        jobVariable.setAdvanced(jobDataVariable.getAdvanced());
         return jobVariable;
     }
 }

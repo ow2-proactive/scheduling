@@ -310,14 +310,26 @@ public class Job2XMLTransformer {
         }
         Element variablesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.VARIABLES.getXMLName());
         for (String name : jobVariables.keySet()) {
+            JobVariable variable = jobVariables.get(name);
+            List<Attribute> varAttributes = new ArrayList<>();
+            varAttributes.add(new Attribute(XMLAttributes.VARIABLE_NAME.getXMLName(), name));
+            varAttributes.add(new Attribute(XMLAttributes.VARIABLE_VALUE.getXMLName(), variable.getValue()));
+            varAttributes.add(new Attribute(XMLAttributes.VARIABLE_MODEL.getXMLName(), variable.getModel()));
+            if (variable.getDescription() != null) {
+                varAttributes.add(new Attribute(XMLAttributes.VARIABLE_DESCRIPTION.getXMLName(),
+                                                variable.getDescription()));
+            }
+            if (variable.getGroup() != null) {
+                varAttributes.add(new Attribute(XMLAttributes.VARIABLE_GROUP.getXMLName(), variable.getGroup()));
+            }
+            if (variable.getAdvanced() != null) {
+                varAttributes.add(new Attribute(XMLAttributes.VARIABLE_ADVANCED.getXMLName(),
+                                                String.valueOf(variable.getAdvanced())));
+            }
             Element variableE = createElement(doc,
                                               XMLTags.VARIABLE.getXMLName(),
                                               null,
-                                              new Attribute(XMLAttributes.VARIABLE_NAME.getXMLName(), name),
-                                              new Attribute(XMLAttributes.VARIABLE_VALUE.getXMLName(),
-                                                            jobVariables.get(name).getValue()),
-                                              new Attribute(XMLAttributes.VARIABLE_MODEL.getXMLName(),
-                                                            jobVariables.get(name).getModel()));
+                                              varAttributes.toArray(new Attribute[0]));
             variablesE.appendChild(variableE);
         }
         return variablesE;
@@ -332,17 +344,27 @@ public class Job2XMLTransformer {
         }
         Element variablesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.VARIABLES.getXMLName());
         for (TaskVariable variable : variables.values()) {
+            List<Attribute> varAttributes = new ArrayList<>();
+            varAttributes.add(new Attribute(XMLAttributes.VARIABLE_NAME.getXMLName(), variable.getName()));
+            varAttributes.add(new Attribute(XMLAttributes.VARIABLE_VALUE.getXMLName(), variable.getValue()));
+            varAttributes.add(new Attribute(XMLAttributes.VARIABLE_MODEL.getXMLName(), variable.getModel()));
+            if (variable.getDescription() != null) {
+                varAttributes.add(new Attribute(XMLAttributes.VARIABLE_DESCRIPTION.getXMLName(),
+                                                variable.getDescription()));
+            }
+            if (variable.getGroup() != null) {
+                varAttributes.add(new Attribute(XMLAttributes.VARIABLE_GROUP.getXMLName(), variable.getGroup()));
+            }
+            if (variable.getAdvanced() != null) {
+                varAttributes.add(new Attribute(XMLAttributes.VARIABLE_ADVANCED.getXMLName(),
+                                                String.valueOf(variable.getAdvanced())));
+            }
+            varAttributes.add(new Attribute(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName(),
+                                            String.valueOf(variable.isJobInherited())));
             Element variableE = createElement(doc,
                                               XMLTags.VARIABLE.getXMLName(),
                                               null,
-                                              new Attribute(XMLAttributes.VARIABLE_NAME.getXMLName(),
-                                                            variable.getName()),
-                                              new Attribute(XMLAttributes.VARIABLE_VALUE.getXMLName(),
-                                                            variable.getValue()),
-                                              new Attribute(XMLAttributes.VARIABLE_MODEL.getXMLName(),
-                                                            variable.getModel()),
-                                              new Attribute(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName(),
-                                                            String.valueOf(variable.isJobInherited())));
+                                              varAttributes.toArray(new Attribute[0]));
             variablesE.appendChild(variableE);
         }
         return variablesE;

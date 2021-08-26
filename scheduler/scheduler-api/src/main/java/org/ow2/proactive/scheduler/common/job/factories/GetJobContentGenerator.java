@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.ow2.proactive.core.properties.PropertyDecrypter;
@@ -50,7 +49,7 @@ public class GetJobContentGenerator {
 
     private static final String TAG_WITH_TWO_ATTRIBUTES = "<%s %s=\"%s\" %s=\"%s\" />";
 
-    private static final String TAG_WITH_THREE_ATTRIBUTES = "<%s %s=\"%s\" %s=\"%s\" %s=\"%s\" />";
+    private static final String ATTRIBUTE_FORMAT = " %s=\"%s\"";
 
     /**
      * @param jobContent         xml representation of the submitted job
@@ -236,28 +235,38 @@ public class GetJobContentGenerator {
     }
 
     private String variableContent(JobVariable jobVariable) {
-        if (jobVariable.getModel() != null && !jobVariable.getModel().trim().isEmpty()) {
-            boolean encryptionNeeded = jobVariable.getModel()
-                                                  .trim()
-                                                  .equalsIgnoreCase(ModelValidator.PREFIX + ModelType.HIDDEN.name());
-            return String.format(FOUR_SPACES_INDENT + TAG_WITH_THREE_ATTRIBUTES,
-                                 XMLTags.VARIABLE.getXMLName(),
-                                 XMLAttributes.VARIABLE_NAME,
-                                 jobVariable.getName(),
-                                 XMLAttributes.VARIABLE_VALUE,
-                                 StringEscapeUtils.escapeXml11(encryptionNeeded ? PropertyDecrypter.encryptData(jobVariable.getValue())
-                                                                                : jobVariable.getValue()),
-                                 XMLAttributes.VARIABLE_MODEL,
-                                 jobVariable.getModel());
-        } else {
-            return String.format(FOUR_SPACES_INDENT + TAG_WITH_TWO_ATTRIBUTES,
+        StringBuilder content = new StringBuilder().append(FOUR_SPACES_INDENT);
+        content.append(String.format("<%s", XMLTags.VARIABLE.getXMLName()));
+        content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_NAME, jobVariable.getName()));
 
-                                 XMLTags.VARIABLE.getXMLName(),
-                                 XMLAttributes.VARIABLE_NAME,
-                                 jobVariable.getName(),
-                                 XMLAttributes.VARIABLE_VALUE,
-                                 StringEscapeUtils.escapeXml11(jobVariable.getValue()));
+        String varValue = jobVariable.getValue();
+        boolean encryptionNeeded = jobVariable.getModel() != null &&
+                                   jobVariable.getModel()
+                                              .trim()
+                                              .equalsIgnoreCase(ModelValidator.PREFIX + ModelType.HIDDEN.name());
+        if (encryptionNeeded) {
+            varValue = PropertyDecrypter.encryptData(jobVariable.getValue());
         }
-    }
+        content.append(String.format(ATTRIBUTE_FORMAT,
+                                     XMLAttributes.VARIABLE_VALUE,
+                                     StringEscapeUtils.escapeXml11(varValue)));
 
+        if (jobVariable.getModel() != null && !jobVariable.getModel().trim().isEmpty()) {
+            content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_MODEL, jobVariable.getModel()));
+        }
+        if (jobVariable.getDescription() != null && !jobVariable.getDescription().trim().isEmpty()) {
+            content.append(String.format(ATTRIBUTE_FORMAT,
+                                         XMLAttributes.VARIABLE_DESCRIPTION,
+                                         StringEscapeUtils.escapeXml11(jobVariable.getDescription())));
+        }
+        if (jobVariable.getGroup() != null && !jobVariable.getGroup().trim().isEmpty()) {
+            content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_GROUP, jobVariable.getGroup()));
+        }
+        if (jobVariable.getAdvanced() != null && jobVariable.getAdvanced()) {
+            content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_ADVANCED, "true"));
+        }
+
+        content.append(" />");
+        return content.toString();
+    }
 }

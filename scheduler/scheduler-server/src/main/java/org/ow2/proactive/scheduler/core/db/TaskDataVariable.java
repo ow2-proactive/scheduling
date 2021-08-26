@@ -48,6 +48,12 @@ public class TaskDataVariable {
 
     private String model;
 
+    private String description;
+
+    private String group;
+
+    private Boolean advanced;
+
     private TaskData taskData;
 
     static TaskDataVariable create(String variableName, TaskVariable taskVariable, TaskData taskData) {
@@ -56,6 +62,9 @@ public class TaskDataVariable {
         taskDataVariable.setValue(taskVariable.getValue());
         taskDataVariable.setModel(taskVariable.getModel());
         taskDataVariable.setJobInherited(taskVariable.isJobInherited());
+        taskDataVariable.setDescription(taskVariable.getDescription());
+        taskDataVariable.setGroup(taskVariable.getGroup());
+        taskDataVariable.setAdvanced(taskVariable.getAdvanced());
         taskDataVariable.setTaskData(taskData);
         return taskDataVariable;
     }
@@ -122,4 +131,34 @@ public class TaskDataVariable {
         this.model = model;
     }
 
+    @Column(name = "VARIABLE_DESCRIPTION", length = Integer.MAX_VALUE)
+    @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Column(name = "VARIABLE_GROUP", length = Integer.MAX_VALUE)
+    @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    @Column(name = "VARIABLE_ADVANCED")
+    public Boolean getAdvanced() {
+        return advanced;
+    }
+
+    public void setAdvanced(Boolean advanced) {
+        this.advanced = advanced;
+    }
 }

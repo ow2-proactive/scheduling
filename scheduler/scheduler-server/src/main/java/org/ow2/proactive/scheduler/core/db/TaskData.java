@@ -666,6 +666,9 @@ public class TaskData {
         taskVariable.setModel(taskDataVariable.getModel());
         taskVariable.setValue(taskDataVariable.getValue());
         taskVariable.setName(taskDataVariable.getName());
+        taskVariable.setDescription(taskDataVariable.getDescription());
+        taskVariable.setGroup(taskDataVariable.getGroup());
+        taskVariable.setAdvanced(taskDataVariable.getAdvanced());
 
         return taskVariable;
     }

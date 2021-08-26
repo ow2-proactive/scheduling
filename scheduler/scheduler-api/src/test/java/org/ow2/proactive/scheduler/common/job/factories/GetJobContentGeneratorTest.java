@@ -80,6 +80,22 @@ public class GetJobContentGeneratorTest {
     }
 
     @Test
+    public void testReplaceVarsWithParams() throws IOException {
+
+        URL url = Resources.getResource("org/ow2/proactive/scheduler/common/job/factories/job_with_vars_and_info.xml");
+        String jobContent = Resources.toString(url, Charsets.UTF_8);
+
+        Map<String, JobVariable> vars = new HashMap<>();
+        vars.put("var", new JobVariable("var", "myvalue", "pa:model", "my var description", "varGroup", true));
+        final String newJobContent = generator.replaceVarsAndGenericInfo(jobContent, vars, Collections.emptyMap());
+
+        assertTrue(newJobContent.contains("<variables>"));
+        assertTrue(newJobContent.contains("<variable name=\"var\" value=\"myvalue\" model=\"pa:model\" description=\"my var description\" group=\"varGroup\" advanced=\"true\" />"));
+        assertFalse(newJobContent.contains("<genericInformation>"));
+        assertNotEquals(jobContent, newJobContent);
+    }
+
+    @Test
     public void testReplaceInfo() throws IOException {
 
         URL url = Resources.getResource("org/ow2/proactive/scheduler/common/job/factories/job_with_vars_and_info.xml");
