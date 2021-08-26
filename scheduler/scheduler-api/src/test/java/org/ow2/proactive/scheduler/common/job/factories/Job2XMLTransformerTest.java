@@ -45,12 +45,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.OnTaskError;
-import org.ow2.proactive.scheduler.common.task.ScriptTask;
-import org.ow2.proactive.scheduler.common.task.TaskVariable;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -202,6 +199,30 @@ public class Job2XMLTransformerTest {
     }
 
     @Test
+    public void checkJobVariables() throws Exception {
+        File xmlFile = tmpFolder.newFile();
+        Map<String, JobVariable> variablesMap = new HashMap<>();
+        JobVariable jobVar1 = new JobVariable("name1", "value1", "model1");
+        JobVariable jobVar2 = new JobVariable("name2", "value2", "model2", "description2", "group2", true);
+        variablesMap.put(jobVar1.getName(), jobVar1);
+        variablesMap.put(jobVar2.getName(), jobVar2);
+
+        TaskFlowJob job = new TaskFlowJob();
+        JavaTask defaultTask = new JavaTask();
+        defaultTask.setExecutableClassName("foo.Bar");
+        job.addTask(defaultTask);
+        job.setVariables(variablesMap);
+
+        new Job2XMLTransformer().job2xmlFile(job, xmlFile);
+        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
+
+        Map<String, JobVariable> resVariables = recreatedJob.getVariables();
+        assertEquals(2, resVariables.size());
+        assertEquals(jobVar1, resVariables.get("name1"));
+        assertEquals(jobVar2, resVariables.get("name2"));
+    }
+
+    @Test
     public void checkTaskVariables() throws Exception {
         File xmlFile = tmpFolder.newFile();
         Map<String, TaskVariable> variablesMap = new HashMap<>();
@@ -215,6 +236,9 @@ public class Job2XMLTransformerTest {
         taskVariable2.setValue("value2");
         taskVariable2.setJobInherited(true);
         taskVariable2.setModel("model2");
+        taskVariable2.setDescription("description2");
+        taskVariable2.setGroup("group2");
+        taskVariable2.setAdvanced(false);
         variablesMap.put(taskVariable1.getName(), taskVariable1);
         variablesMap.put(taskVariable2.getName(), taskVariable2);
 
