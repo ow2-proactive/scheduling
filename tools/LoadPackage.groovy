@@ -259,12 +259,9 @@ class LoadPackage {
 
             // Check user group
 
-            if(catalog_map.containsKey("userGroup")){
+            if(catalog_map.containsKey("userGroup") && !catalog_map.get("userGroup").isEmpty()){
                 this.BUCKET_OWNER = "GROUP:"+catalog_map.get("userGroup")
-            } else {
-                this.BUCKET_OWNER = "GROUP:public-objects"
             }
-            logger.info("TEST:: "+ this.BUCKET_OWNER)
 
             def bucket_name = createBucketIfNotExist(bucket)
 
