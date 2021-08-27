@@ -6,9 +6,6 @@ import java.nio.file.StandardCopyOption
 import org.apache.log4j.Logger
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.FileUtils
-import org.apache.http.conn.ssl.*
-import org.apache.http.impl.client.*
-import javax.net.ssl.*
 import java.util.zip.ZipFile
 
 
@@ -17,7 +14,7 @@ class LoadPackage {
 
     private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/admin_user.cred"
     private final String LOAD_PACKAGE_SCRIPT_NAME = "LoadPackage.groovy"
-    private final String BUCKET_OWNER = "GROUP:public-objects"
+    private String BUCKET_OWNER = "GROUP:public-objects"
     private final String TMP_DIR_PREFIX = "package_temp_dir"
 
     private final String GLOBAL_SPACE_PATH
@@ -259,6 +256,15 @@ class LoadPackage {
         buckets_list.each { bucket ->
 
             // BUCKET SECTION /////////////////////////////
+
+            // Check user group
+
+            if(catalog_map.containsKey("userGroup")){
+                this.BUCKET_OWNER = "GROUP:"+catalog_map.get("userGroup")
+            } else {
+                this.BUCKET_OWNER = "GROUP:public-objects"
+            }
+            logger.info("TEST:: "+ this.BUCKET_OWNER)
 
             def bucket_name = createBucketIfNotExist(bucket)
 
