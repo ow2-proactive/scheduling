@@ -17,7 +17,7 @@ class LoadPackage {
 
     private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/admin_user.cred"
     private final String LOAD_PACKAGE_SCRIPT_NAME = "LoadPackage.groovy"
-    private final String BUCKET_OWNER = "GROUP:public-objects"
+    private String BUCKET_OWNER = "GROUP:public-objects"
     private final String TMP_DIR_PREFIX = "package_temp_dir"
 
     private final String GLOBAL_SPACE_PATH
@@ -259,6 +259,12 @@ class LoadPackage {
         buckets_list.each { bucket ->
 
             // BUCKET SECTION /////////////////////////////
+
+            // Check user group
+
+            if(catalog_map.containsKey("userGroup") && !catalog_map.get("userGroup").isEmpty()){
+                this.BUCKET_OWNER = "GROUP:"+catalog_map.get("userGroup")
+            }
 
             def bucket_name = createBucketIfNotExist(bucket)
 
