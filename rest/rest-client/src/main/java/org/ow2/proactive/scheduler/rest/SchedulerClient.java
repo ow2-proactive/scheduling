@@ -28,14 +28,7 @@ package org.ow2.proactive.scheduler.rest;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.statusesToString;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwSAEorUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.*;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
@@ -1580,7 +1573,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
-            throws NotConnectedException {
+            throws UnknownJobException, NotConnectedException {
         Map<String, Map<String, Boolean>> answer = new HashMap<>(jobIds.size());
         try {
             PermissionForm permissionForm = new PermissionForm();
@@ -1588,7 +1581,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             permissionForm.setMethods(methods);
             answer = restApi().checkJobsPermissionMethods(sid, permissionForm);
         } catch (Exception e) {
-            throwNCE(e);
+            throwUJEOrNCE(e);
         }
         return answer;
     }

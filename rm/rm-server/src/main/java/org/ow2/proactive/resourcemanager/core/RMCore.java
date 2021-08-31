@@ -2777,13 +2777,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 RMNode rmnode = getNodeByUrlIncludingDeployingNodes(url);
 
                 if (rmnode == null) {
-                    logger.warn("Cannot " + operationName + ", unknown node: " + url);
+                    logger.warn("Cannot run " + operationName + ", unknown node: " + url);
                     result.put(url, false);
                     continue;
                 }
                 result.put(url, operation.apply(rmnode));
             } catch (Exception e) {
-                logger.error("Error during " + operationName + " on node " + url, e);
+                logger.warn("Error during " + operationName + " on node " + url, e);
                 result.put(url, false);
             }
         }
@@ -3290,10 +3290,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Override
     public Map<String, Boolean> checkNodesPermission(Set<String> urls) {
-        return getMapOnNodeUrlSet(urls, this::checkNodesPermissions, "checkNodesPermission");
+        return getMapOnNodeUrlSet(urls, this::checkNodePermissions, "checkNodesPermission");
     }
 
-    boolean checkNodesPermissions(RMNode rmNode) {
+    boolean checkNodePermissions(RMNode rmNode) {
         try {
             checkNodeAdminPermission(rmNode, this.caller);
             return true;
