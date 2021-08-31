@@ -33,6 +33,7 @@ import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOr
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwSAEorUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
@@ -131,6 +132,7 @@ import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.common.dto.PermissionForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -1574,5 +1576,20 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         } catch (Exception e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
+            throws UnknownJobException, NotConnectedException {
+        Map<String, Map<String, Boolean>> answer = new HashMap<>(jobIds.size());
+        try {
+            PermissionForm permissionForm = new PermissionForm();
+            permissionForm.setJobids(jobIds);
+            permissionForm.setMethods(methods);
+            answer = restApi().checkJobsPermissionMethods(sid, permissionForm);
+        } catch (Exception e) {
+            throwUJEOrNCE(e);
+        }
+        return answer;
     }
 }

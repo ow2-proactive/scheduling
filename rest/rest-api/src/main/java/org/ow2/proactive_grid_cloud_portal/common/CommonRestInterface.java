@@ -262,4 +262,22 @@ public interface CommonRestInterface {
     @Path("logger/current")
     @Produces(MediaType.APPLICATION_JSON)
     Map<String, String> getCurrentLoggers(@HeaderParam("sessionid") String sessionId) throws RestException;
+
+    /**
+     * Check multiple methods permission.
+     *
+     * Test if a user has access to the specified methods.
+     *
+     * @param sessionId id of a session
+     * @param methods a list of methods to check
+     * @throws RestException if an error occurs or the session is invalid
+     * @return a map containing the method and true/false if the user has permission
+     */
+    @POST
+    @Path("permissions/methods")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, Boolean> checkPermissions(@HeaderParam("sessionid") String sessionId, List<String> methods)
+            throws RestException;
+
 }
