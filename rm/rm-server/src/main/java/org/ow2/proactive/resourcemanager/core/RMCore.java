@@ -3286,14 +3286,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodesPermission(java.util.Set)
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodesAdminPermission(java.util.Set)
      */
     @Override
-    public Map<String, Boolean> checkNodesPermission(Set<String> urls) {
-        return getMapOnNodeUrlSet(urls, this::checkNodePermissions, "checkNodesPermission");
+    public Map<String, Boolean> checkNodesAdminPermission(Set<String> urls) {
+        return getMapOnNodeUrlSet(urls, this::checkNodesAdminPermission, "checkNodesAdminPermission");
     }
 
-    boolean checkNodePermissions(RMNode rmNode) {
+    boolean checkNodesAdminPermission(RMNode rmNode) {
         try {
             checkNodeAdminPermission(rmNode, this.caller);
             return true;

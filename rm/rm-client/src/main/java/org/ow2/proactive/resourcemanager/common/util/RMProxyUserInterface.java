@@ -530,10 +530,10 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodesPermission(java.util.Set)
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodesAdminPermission(java.util.Set)
      */
-    public Map<String, Boolean> checkNodesPermission(Set<String> urls) {
-        return this.target.checkNodesPermission(urls);
+    public Map<String, Boolean> checkNodesAdminPermission(Set<String> urls) {
+        return this.target.checkNodesAdminPermission(urls);
     }
 
 }

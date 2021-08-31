@@ -1079,7 +1079,7 @@ public interface RMRestInterface {
             @QueryParam("all") @DefaultValue("true") boolean all) throws NotConnectedException, RestException;
 
     /**
-     * Check is the user has admin permission for the given nodes or it is a node source provider
+     * Check if the user has admin permission for the given nodes or it is a node source provider
      *
      * @param sessionId
      *            current session
@@ -1091,7 +1091,7 @@ public interface RMRestInterface {
     @Path("nodes/permission")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    Map<String, Boolean> checkNodesPermission(@HeaderParam("sessionid") String sessionId, Set<String> nodeUrls)
+    Map<String, Boolean> checkNodesAdminPermission(@HeaderParam("sessionid") String sessionId, Set<String> nodeUrls)
             throws NotConnectedException, PermissionRestException;
 
 }

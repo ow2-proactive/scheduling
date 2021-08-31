@@ -673,6 +673,6 @@ public interface ResourceManager {
      * @param urls the nodes urls
      * @return a map containing the node url and true if the user has permission for the node
      */
-    Map<String, Boolean> checkNodesPermission(Set<String> urls);
+    Map<String, Boolean> checkNodesAdminPermission(Set<String> urls);
 
 }
