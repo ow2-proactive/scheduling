@@ -1284,4 +1284,10 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().getTaskResultsByTag(jobId, taskTag);
     }
+
+    @Override
+    public Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
+            throws NotConnectedException, UnknownJobException {
+        return getScheduler().checkJobsPermissionMethods(jobIds, methods);
+    }
 }
