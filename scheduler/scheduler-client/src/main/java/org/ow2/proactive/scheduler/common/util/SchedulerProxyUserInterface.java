@@ -910,4 +910,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return mbeaninfoviewer.retrieveStats(mbeanName, range, dataSources, function);
     }
 
+    @Override
+    @ImmediateService
+    public Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
+            throws NotConnectedException, UnknownJobException {
+        checkSchedulerConnection();
+        return uischeduler.checkJobsPermissionMethods(jobIds, methods);
+    }
+
 }

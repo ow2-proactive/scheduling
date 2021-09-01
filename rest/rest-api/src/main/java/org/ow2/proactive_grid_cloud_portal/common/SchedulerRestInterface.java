@@ -59,8 +59,8 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
-import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.common.dto.PermissionForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
@@ -2341,4 +2341,23 @@ public interface SchedulerRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
             @PathParam("jobid") String jobId) throws RestException;
+
+    /**
+     *
+     *  Check if the user has the permission to execute the methods passed as argument for each the given job ids
+     *
+     * @param sessionId
+     *            current session
+     * @param multipart
+     *            a form with the jobIds list and methods list as form data
+     *
+     * @return a map containing pairs that represent the job id as key and a map as value containing the method name
+     * and true/false if the user has permission for the jobId and method
+     */
+    @POST
+    @Path("jobs/permission/methods")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, Map<String, Boolean>> checkJobsPermissionMethods(@HeaderParam("sessionid") String sessionId,
+            PermissionForm multipart) throws RestException;
 }

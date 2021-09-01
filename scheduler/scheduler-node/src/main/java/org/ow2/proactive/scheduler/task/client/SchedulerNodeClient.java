@@ -1064,4 +1064,11 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         renewSession();
         return client.addJobSignal(jobId, signal);
     }
+
+    @Override
+    public Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
+            throws NotConnectedException, UnknownJobException {
+        renewSession();
+        return client.checkJobsPermissionMethods(jobIds, methods);
+    }
 }

@@ -79,6 +79,14 @@ public class ExceptionUtility {
         }
     }
 
+    public static void throwUJEOrNCE(Exception e) throws UnknownJobException, NotConnectedException {
+        if (e instanceof UnknownJobRestException) {
+            throw reconstructError(e, UnknownJobException.class);
+        } else {
+            throwNCE(e);
+        }
+    }
+
     public static void throwSAEorUJEOrNCEOrPE(Exception e)
             throws SignalApiException, UnknownJobException, NotConnectedException, PermissionException {
         if (e instanceof SignalApiRestException) {
