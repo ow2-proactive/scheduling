@@ -35,8 +35,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * 
- * 
  * @author The ProActive Team
  * @since ProActive Scheduling 7.24
  */
@@ -123,8 +121,12 @@ public class JobVariable implements Serializable {
         this.group = group;
     }
 
-    public Boolean getAdvanced() {
-        return advanced;
+    public boolean getAdvanced() {
+        if (advanced == null) {
+            return false;
+        } else {
+            return advanced;
+        }
     }
 
     public void setAdvanced(Boolean advanced) {
@@ -150,7 +152,7 @@ public class JobVariable implements Serializable {
             return false;
         if (getGroup() != null ? !getGroup().equals(that.getGroup()) : that.getGroup() != null)
             return false;
-        return getAdvanced() != null ? getAdvanced().equals(that.getAdvanced()) : that.getAdvanced() == null;
+        return getAdvanced() == that.getAdvanced();
     }
 
     @Override
@@ -160,7 +162,7 @@ public class JobVariable implements Serializable {
         result = 31 * result + (getModel() != null ? getModel().hashCode() : 0);
         result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
         result = 31 * result + (getGroup() != null ? getGroup().hashCode() : 0);
-        result = 31 * result + (getAdvanced() != null ? getAdvanced().hashCode() : 0);
+        result = 31 * result + (getAdvanced() ? 1 : 0);
         return result;
     }
 

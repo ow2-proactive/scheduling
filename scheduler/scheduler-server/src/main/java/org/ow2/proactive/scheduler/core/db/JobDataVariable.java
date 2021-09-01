@@ -129,9 +129,7 @@ public class JobDataVariable {
         this.description = description;
     }
 
-    @Column(name = "VARIABLE_GROUP", length = Integer.MAX_VALUE)
-    @Lob
-    @Type(type = "org.hibernate.type.MaterializedClobType")
+    @Column(name = "VARIABLE_GROUP")
     public String getGroup() {
         return group;
     }
