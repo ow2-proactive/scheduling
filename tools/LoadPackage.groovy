@@ -233,7 +233,7 @@ class LoadPackage {
                 def putRes = new BufferedInputStream(putResponse.getEntity().getContent())
                 result = org.apache.commons.io.IOUtils.toString(putRes, "UTF-8")
                 def bucket_name = slurper.parseText(result.toString()).get("name")
-                bis.close();
+                putRes.close();
                 writeToOutput("The user group of " + bucket_name + " is updated!")
             }
             return bucket_found.name
