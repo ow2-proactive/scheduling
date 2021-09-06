@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <globalvariables
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="urn:proactive:globalvariables:3.12" xsi:schemaLocation="urn:proactive:globalvariables:3.12 http://www.activeeon.com/public_content/schemas/proactive/globalvariables/3.12/globalvariables.xsd">
+        xmlns="urn:proactive:globalvariables:3.13" xsi:schemaLocation="urn:proactive:globalvariables:3.13 http://www.activeeon.com/public_content/schemas/proactive/globalvariables/3.13/globalvariables.xsd">
         <filter>
             <select>
                 <!-- Xpath expressions are used to filter workflows affected by global variables.
