@@ -1,5 +1,5 @@
-default namespace = "urn:proactive:globalvariables:dev"
-namespace jd = "urn:proactive:globalvariables:dev"
+default namespace = "urn:proactive:globalvariables:3.13"
+namespace jd = "urn:proactive:globalvariables:3.13"
 namespace xsi = "http://www.w3.org/2001/XMLSchema-instance"
 namespace doc = "http://relaxng.org/ns/compatibility/annotations/1.0"
 start = globalvariables

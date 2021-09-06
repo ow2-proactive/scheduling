@@ -49,7 +49,7 @@ task convertSchemas
 }
 
 task convertSchemasGV
-['3.12', 'dev'].each { schemaVersion ->
+['3.12', '3.13', 'dev'].each { schemaVersion ->
     task("convertSchemasGVXsd-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
         sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/globalvariables/${schemaVersion}")
         targetDirectory = sourceDirectory
