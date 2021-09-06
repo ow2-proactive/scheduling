@@ -222,6 +222,20 @@ class LoadPackage {
 
         // Create a bucket if needed -------------
         if (bucket_found) {
+            if(!this.BUCKET_OWNER.equals("GROUP:public-objects")){
+                writeToOutput("Bucket to update: "+bucket)
+                def update_bucket_query = this.CATALOG_URL + "/buckets/" + bucket + "?owner=" + this.BUCKET_OWNER
+                def put = new org.apache.http.client.methods.HttpPut(update_bucket_query)
+                put.addHeader("sessionId", this.sessionId)
+                put.addHeader("Accept", "application/json")
+                put.addHeader("Content-Type", "application/json")
+                def putResponse = getHttpClientBuilder().build().execute(put)
+                def putRes = new BufferedInputStream(putResponse.getEntity().getContent())
+                result = org.apache.commons.io.IOUtils.toString(putRes, "UTF-8")
+                def bucket_name = slurper.parseText(result.toString()).get("name")
+                putRes.close();
+                writeToOutput("The user group of " + bucket_name + " is updated!")
+            }
             return bucket_found.name
         } else {
             // POST QUERY
