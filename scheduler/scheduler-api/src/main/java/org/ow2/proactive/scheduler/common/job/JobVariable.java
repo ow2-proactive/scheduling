@@ -35,8 +35,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * 
- * 
  * @author The ProActive Team
  * @since ProActive Scheduling 7.24
  */
@@ -53,6 +51,15 @@ public class JobVariable implements Serializable {
     @XmlAttribute
     private String model;
 
+    @XmlAttribute
+    private String description;
+
+    @XmlAttribute
+    private String group;
+
+    @XmlAttribute
+    private Boolean advanced;
+
     public JobVariable() {
         //Empty constructor
     }
@@ -62,9 +69,16 @@ public class JobVariable implements Serializable {
     }
 
     public JobVariable(String name, String value, String model) {
+        this(name, value, model, null, null, null);
+    }
+
+    public JobVariable(String name, String value, String model, String description, String group, Boolean advanced) {
         this.name = name;
         this.value = value;
         this.model = model;
+        this.description = description;
+        this.group = group;
+        this.advanced = advanced;
     }
 
     public String getName() {
@@ -91,56 +105,70 @@ public class JobVariable implements Serializable {
         this.model = model;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null) {
-            return false;
-        }
-        if (getClass() != object.getClass()) {
-            return false;
-        }
+    public String getDescription() {
+        return description;
+    }
 
-        JobVariable jobVariable = (JobVariable) object;
-        if (name == null) {
-            if (jobVariable.name != null) {
-                return false;
-            }
-        } else if (!name.equals(jobVariable.name)) {
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public boolean getAdvanced() {
+        if (advanced == null) {
             return false;
+        } else {
+            return advanced;
         }
-        if (value == null) {
-            if (jobVariable.value != null) {
-                return false;
-            }
-        } else if (!value.equals(jobVariable.value)) {
+    }
+
+    public void setAdvanced(Boolean advanced) {
+        this.advanced = advanced;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
-        if (model == null) {
-            if (jobVariable.model != null) {
-                return false;
-            }
-        } else if (!model.equals(jobVariable.model)) {
+
+        JobVariable that = (JobVariable) o;
+
+        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
             return false;
-        }
-        return true;
+        if (getValue() != null ? !getValue().equals(that.getValue()) : that.getValue() != null)
+            return false;
+        if (getModel() != null ? !getModel().equals(that.getModel()) : that.getModel() != null)
+            return false;
+        if (getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null)
+            return false;
+        if (getGroup() != null ? !getGroup().equals(that.getGroup()) : that.getGroup() != null)
+            return false;
+        return getAdvanced() == that.getAdvanced();
     }
 
     @Override
     public int hashCode() {
-        final int primeNumber = 31;
-        int result = 1;
-        result = primeNumber * result + ((name == null) ? 0 : name.hashCode());
-        result = primeNumber * result + ((value == null) ? 0 : value.hashCode());
-        result = primeNumber * result + ((model == null) ? 0 : model.hashCode());
+        int result = getName() != null ? getName().hashCode() : 0;
+        result = 31 * result + (getValue() != null ? getValue().hashCode() : 0);
+        result = 31 * result + (getModel() != null ? getModel().hashCode() : 0);
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+        result = 31 * result + (getGroup() != null ? getGroup().hashCode() : 0);
+        result = 31 * result + (getAdvanced() ? 1 : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "JobVariable{" + "name='" + name + '\'' + ", value='" + value + '\'' + ", model='" + model + '\'' + '}';
+        return "JobVariable{" + "name='" + name + '\'' + ", value='" + value + '\'' + ", model='" + model + '\'' +
+               ", description='" + description + '\'' + ", group='" + group + '\'' + ", advanced=" + advanced + '}';
     }
-
 }

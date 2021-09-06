@@ -59,6 +59,12 @@ public class TaskVariable extends JobVariable implements Serializable {
         this.jobInherited = isJobInherited;
     }
 
+    public TaskVariable(String name, String value, String model, String description, String group, Boolean advanced,
+            boolean isJobInherited) {
+        super(name, value, model, description, group, advanced);
+        this.jobInherited = isJobInherited;
+    }
+
     public boolean isJobInherited() {
         return jobInherited;
     }
@@ -68,60 +74,30 @@ public class TaskVariable extends JobVariable implements Serializable {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (object == null) {
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
-        if (getClass() != object.getClass()) {
+        if (!super.equals(o))
             return false;
-        }
 
-        TaskVariable taskVariable = (TaskVariable) object;
-        if (jobInherited != taskVariable.isJobInherited()) {
-            return false;
-        }
-        if (getName() == null) {
-            if (taskVariable.getName() != null) {
-                return false;
-            }
-        } else if (!getName().equals(taskVariable.getName())) {
-            return false;
-        }
-        if (getValue() == null) {
-            if (taskVariable.getValue() != null) {
-                return false;
-            }
-        } else if (!getValue().equals(taskVariable.getValue())) {
-            return false;
-        }
-        if (getModel() == null) {
-            if (taskVariable.getModel() != null) {
-                return false;
-            }
-        } else if (!getModel().equals(taskVariable.getModel())) {
-            return false;
-        }
-        return true;
+        TaskVariable that = (TaskVariable) o;
+
+        return isJobInherited() == that.isJobInherited();
     }
 
     @Override
     public int hashCode() {
-        final int primeNumber = 31;
-        int result = 1;
-        result = primeNumber * result + (jobInherited ? 3 : 5);
-        result = primeNumber * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = primeNumber * result + ((getValue() == null) ? 0 : getValue().hashCode());
-        result = primeNumber * result + ((getModel() == null) ? 0 : getModel().hashCode());
+        int result = super.hashCode();
+        result = 31 * result + (isJobInherited() ? 1 : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "TaskVariable{" + "name='" + getName() + '\'' + ", value='" + getValue() + '\'' + ", model='" +
-               getModel() + '\'' + ", jobInherited=" + jobInherited + '}';
+               getModel() + '\'' + ", description='" + getDescription() + '\'' + ", group='" + getGroup() + '\'' +
+               ", advanced=" + getAdvanced() + ", jobInherited=" + jobInherited + '}';
     }
-
 }

@@ -45,8 +45,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -71,7 +69,6 @@ import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVa
 import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesParser;
 import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorRegistry;
 import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorService;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -99,7 +96,6 @@ import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 
@@ -453,15 +449,6 @@ public class StaxJobFactory extends JobFactory {
     }
 
     /**
-     * Convenience method to create a new JobVariable instance from a Map.Entry
-     * @param entry a valid Map.Entry with a variable name and a variable value
-     * @return the new JobVariable
-     */
-    private JobVariable newJobVariable(Map.Entry<String, String> entry) {
-        return new JobVariable(entry.getKey(), entry.getValue(), null);
-    }
-
-    /**
      * Create the real job and fill it with its property. Leave the method at
      * the first tag that define the real type of job.
      *
@@ -728,7 +715,19 @@ public class StaxJobFactory extends JobFactory {
                             String name = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
                             String value = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName());
                             String model = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName());
-                            unresolvedVariablesMap.put(name, new JobVariable(name, value, model));
+                            String description = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_DESCRIPTION.getXMLName());
+                            String group = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_GROUP.getXMLName());
+                            Boolean advanced = null;
+                            if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_ADVANCED.getXMLName())) {
+                                advanced = Boolean.valueOf(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_ADVANCED.getXMLName()));
+                            }
+                            unresolvedVariablesMap.put(name,
+                                                       new JobVariable(name,
+                                                                       value,
+                                                                       model,
+                                                                       description,
+                                                                       group,
+                                                                       advanced));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -777,7 +776,10 @@ public class StaxJobFactory extends JobFactory {
                 JobVariable jobVariable = updatedVariablesMap.get(replacementVariableKey);
                 JobVariable replacedJobVariable = new JobVariable(jobVariable.getName(),
                                                                   jobVariable.getValue(),
-                                                                  jobVariable.getModel());
+                                                                  jobVariable.getModel(),
+                                                                  jobVariable.getDescription(),
+                                                                  jobVariable.getGroup(),
+                                                                  jobVariable.getAdvanced());
                 replacedJobVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
                 if (replacedJobVariable.getModel() != null) {
                     // model of an existing variable can use other variables as pattern replacements
@@ -821,6 +823,11 @@ public class StaxJobFactory extends JobFactory {
                             taskVariable.setName(name);
                             taskVariable.setValue(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
                             taskVariable.setModel(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
+                            taskVariable.setDescription(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_DESCRIPTION.getXMLName()));
+                            taskVariable.setGroup(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_GROUP.getXMLName()));
+                            if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_ADVANCED.getXMLName())) {
+                                taskVariable.setAdvanced(Boolean.valueOf(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_ADVANCED.getXMLName())));
+                            }
                             if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())) {
                                 taskVariable.setJobInherited(Boolean.valueOf(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
                             }
@@ -874,6 +881,9 @@ public class StaxJobFactory extends JobFactory {
                 TaskVariable replacedTaskVariable = new TaskVariable(taskVariable.getName(),
                                                                      taskVariable.getValue(),
                                                                      taskVariable.getModel(),
+                                                                     taskVariable.getDescription(),
+                                                                     taskVariable.getGroup(),
+                                                                     taskVariable.getAdvanced(),
                                                                      taskVariable.isJobInherited());
                 replacedTaskVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
                 if (replacedTaskVariable.getModel() != null) {

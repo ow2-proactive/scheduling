@@ -46,6 +46,12 @@ public class JobDataVariable {
 
     private String model;
 
+    private String description;
+
+    private String group;
+
+    private Boolean advanced;
+
     private JobData jobData;
 
     static JobDataVariable create(String variableName, JobVariable jobVariable, JobData jobData) {
@@ -53,6 +59,9 @@ public class JobDataVariable {
         jobDataVariable.setName(variableName);
         jobDataVariable.setValue(jobVariable.getValue());
         jobDataVariable.setModel(jobVariable.getModel());
+        jobDataVariable.setDescription(jobVariable.getDescription());
+        jobDataVariable.setGroup(jobVariable.getGroup());
+        jobDataVariable.setAdvanced(jobVariable.getAdvanced());
         jobDataVariable.setJobData(jobData);
         return jobDataVariable;
     }
@@ -109,4 +118,32 @@ public class JobDataVariable {
         this.model = model;
     }
 
+    @Column(name = "VARIABLE_DESCRIPTION", length = Integer.MAX_VALUE)
+    @Lob
+    @Type(type = "org.hibernate.type.MaterializedClobType")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Column(name = "VARIABLE_GROUP")
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    @Column(name = "VARIABLE_ADVANCED")
+    public Boolean getAdvanced() {
+        return advanced;
+    }
+
+    public void setAdvanced(Boolean advanced) {
+        this.advanced = advanced;
+    }
 }
