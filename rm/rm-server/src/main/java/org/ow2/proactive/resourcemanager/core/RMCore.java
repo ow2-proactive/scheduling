@@ -75,6 +75,7 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.MethodCallPermission;
+import org.ow2.proactive.permissions.NSAdminPermission;
 import org.ow2.proactive.permissions.NodeUserAllPermission;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.permissions.RMCoreAllPermission;
@@ -946,7 +947,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.debug("Request to remove node " + rmnode);
 
             // checking if the caller is the node administrator
-            checkNodeAdminPermission(rmnode, caller);
+            checkNodeAdminOrProviderPermission(rmnode, caller);
 
             if (!isTriggeredFromShutdownHook && rmnode.isLocked()) {
                 dbManager.createLockEntryOrUpdate(rmnode.getNodeSourceName(),
@@ -1476,6 +1477,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public BooleanWrapper deployNodeSource(String nodeSourceName) {
         logger.info("Deploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
         if (!this.deployedNodeSources.containsKey(nodeSourceName)) {
+            if (this.definedNodeSources.containsKey(nodeSourceName)) {
+                NodeSource nodeSourceToDeploy = this.definedNodeSources.get(nodeSourceName);
+                this.caller.checkPermission(nodeSourceToDeploy.getAdminPermission(),
+                                            this.caller + " is not authorized to deploy " + nodeSourceName,
+                                            new RMCoreAllPermission(),
+                                            new NSAdminPermission());
+            }
             NodeSourceDescriptor nodeSourceDescriptor = this.getDefinedNodeSourceDescriptorOrFail(nodeSourceName);
             this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
             deployNodeSourceOrFail(nodeSourceName, nodeSourceDescriptor);
@@ -1671,8 +1679,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             NodeSource nodeSourceToRemove = this.deployedNodeSources.get(nodeSourceName);
 
             this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
-                                        this.caller + " is not authorized to remove " + nodeSourceName,
-                                        new RMCoreAllPermission());
+                                        this.caller + " is not authorized to undeploy " + nodeSourceName,
+                                        new RMCoreAllPermission(),
+                                        new NSAdminPermission());
 
             nodeSourceToRemove.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
 
@@ -1838,7 +1847,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                caller + " is not authorized to free node " +
                                                                 node.getNodeInformation().getURL(),
                                                new RMCoreAllPermission(),
-                                               new NodeUserAllPermission());
+                                               new NodeUserAllPermission(),
+                                               new NSAdminPermission());
 
                         if (rmnode.isToRemove()) {
                             removeNodeFromCoreAndSource(rmnode, caller);
@@ -2364,7 +2374,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                     this.caller + " is not authorized to remove " + nodeSourceName,
-                                    new RMCoreAllPermission());
+                                    new RMCoreAllPermission(),
+                                    new NSAdminPermission());
 
         this.shutDownNodeSourceIfDeployed(nodeSourceName, preempt);
         this.removeDefinedNodeSource(nodeSourceName, nodeSourceToRemove);
@@ -2667,13 +2678,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * Checks if the client is the node admin.
+     * Checks if the client is the node admin or provider.
      *
      * @param rmnode is a node to be checked
      * @param client is a client to be checked
-     * @return true if the client is an admin, SecurityException otherwise
+     * @return true if the client is an admin or provider, SecurityException otherwise
      */
-    private boolean checkNodeAdminPermission(RMNode rmnode, Client client) {
+    private boolean checkNodeAdminOrProviderPermission(RMNode rmnode, Client client) {
         NodeSource nodeSource = rmnode.getNodeSource();
 
         String errorMessage = client.getName() + " is not authorized to manage node " + rmnode.getNodeURL() + " from " +
@@ -2685,12 +2696,62 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // a node provider
         try {
             // checking if the caller is an administrator
-            client.checkPermission(nodeSource.getAdminPermission(), errorMessage, new RMCoreAllPermission());
+            client.checkPermission(nodeSource.getAdminPermission(),
+                                   errorMessage,
+                                   new RMCoreAllPermission(),
+                                   new NSAdminPermission());
         } catch (SecurityException ex) {
             // the caller is not an administrator, so checking if it is a node source provider
-            client.checkPermission(nodeSource.getProviderPermission(), errorMessage, new RMCoreAllPermission());
+            client.checkPermission(nodeSource.getProviderPermission(),
+                                   errorMessage,
+                                   new RMCoreAllPermission(),
+                                   new NSAdminPermission());
         }
 
+        return true;
+    }
+
+    /**
+     * Checks if the client is the node source admin or provider.
+     *
+     * @param nodeSource is a node source to be checked
+     * @param client is a client to be checked
+     * @return true if the client is an admin or provider, SecurityException otherwise
+     */
+    private boolean checkNodeAdminOrProviderPermission(NodeSource nodeSource, Client client) {
+        String errorMessage = client.getName() + " is not authorized to manage node source " + nodeSource.getName();
+        try {
+            // checking if the caller is an administrator
+            client.checkPermission(nodeSource.getAdminPermission(),
+                                   errorMessage,
+                                   new RMCoreAllPermission(),
+                                   new NSAdminPermission());
+        } catch (SecurityException ex) {
+            // the caller is not an administrator, so checking if it is a node source provider
+            client.checkPermission(nodeSource.getProviderPermission(),
+                                   errorMessage,
+                                   new RMCoreAllPermission(),
+                                   new NSAdminPermission());
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if the client is the node source admin.
+     *
+     * @param nodeSource is a nodeSource to be checked
+     * @param client is a client to be checked
+     * @return true if the client is an admin, SecurityException otherwise
+     */
+    private boolean checkNodeAdminPermission(NodeSource nodeSource, Client client) {
+
+        String errorMessage = client.getName() + " is not authorized to manage node source " + nodeSource.getName();
+        // checking if the caller is an administrator
+        client.checkPermission(nodeSource.getAdminPermission(),
+                               errorMessage,
+                               new RMCoreAllPermission(),
+                               new NSAdminPermission());
         return true;
     }
 
@@ -2716,7 +2777,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         try {
             // can throw a security exception if the lockInitiator is not an admin
-            this.checkNodeAdminPermission(rmNode, lockInitiator);
+            this.checkNodeAdminOrProviderPermission(rmNode, lockInitiator);
             rmNode.lock(lockInitiator);
             this.eligibleNodes.remove(rmNode);
         } catch (SecurityException e) {
@@ -2733,7 +2794,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                              rmNode.getState(),
                                                              lockInitiator.getName()));
-
         return true;
     }
 
@@ -2799,7 +2859,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         try {
             // can throw a security exception if the caller is not an admin
-            this.checkNodeAdminPermission(rmNode, this.caller);
+            this.checkNodeAdminOrProviderPermission(rmNode, this.caller);
             rmNode.unlock(this.caller);
 
             // an eligible node is a node that is free AND not locked
@@ -2848,7 +2908,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             caller.checkPermission(rmnode.getAdminPermission(),
                                    caller + " is not authorized to administrate the node " + rmnode.getNodeURL() +
                                                                 " from " + rmnode.getNodeSource().getName(),
-                                   new RMCoreAllPermission());
+                                   new RMCoreAllPermission(),
+                                   new NSAdminPermission());
         } catch (SecurityException e) {
             // client does not have an access to this node
             logger.debug(e.getMessage());
@@ -3159,7 +3220,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 // current user has the right to add a token to reserve it for further usage
             } else {
                 // if not, check that the request initiator is a node administrator
-                checkNodeAdminPermission(rmNode, caller);
+                checkNodeAdminOrProviderPermission(rmNode, caller);
             }
             rmNode.addToken(token);
 
@@ -3251,7 +3312,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             if (rmNode.isBusy() && rmNode.getOwner() != null && rmNode.getOwner().equals(caller)) {
                 // current user has the right to add a token to reserve it for further usage
             } else {
-                checkNodeAdminPermission(rmNode, caller);
+                checkNodeAdminOrProviderPermission(rmNode, caller);
             }
             rmNode.removeToken(token);
 
@@ -3286,16 +3347,53 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodesAdminPermission(java.util.Set)
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodePermission(String, boolean)
      */
     @Override
-    public Map<String, Boolean> checkNodesAdminPermission(Set<String> urls) {
-        return getMapOnNodeUrlSet(urls, this::checkNodesAdminPermission, "checkNodesAdminPermission");
+    public BooleanWrapper checkNodePermission(String nodeUrl, boolean provider) {
+        RMNode rmnode = this.allNodes.get(nodeUrl);
+        if (rmnode == null) {
+            throw new IllegalArgumentException("Unknown node " + nodeUrl);
+        }
+        NodeSource nodeSource = rmnode.getNodeSource();
+        if (provider) {
+            return new BooleanWrapper(checkNodeSourceProviderPermission(nodeSource));
+        } else {
+            return new BooleanWrapper(checkNodeSourceAdminPermission(nodeSource));
+        }
     }
 
-    boolean checkNodesAdminPermission(RMNode rmNode) {
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodeSourcePermission(String, boolean)
+     */
+    @Override
+    public BooleanWrapper checkNodeSourcePermission(String nodeSourceName, boolean provider) {
+        if (nodeSourceName == null) {
+            return new BooleanWrapper(false);
+        }
+        if (!this.definedNodeSources.containsKey(nodeSourceName)) {
+            throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
+        }
+        NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
+        if (provider) {
+            return new BooleanWrapper(checkNodeSourceProviderPermission(nodeSource));
+        } else {
+            return new BooleanWrapper(checkNodeSourceAdminPermission(nodeSource));
+        }
+    }
+
+    boolean checkNodeSourceAdminPermission(NodeSource nodeSource) {
         try {
-            checkNodeAdminPermission(rmNode, this.caller);
+            checkNodeAdminPermission(nodeSource, this.caller);
+            return true;
+        } catch (SecurityException e) {
+            return false;
+        }
+    }
+
+    boolean checkNodeSourceProviderPermission(NodeSource nodeSource) {
+        try {
+            checkNodeAdminOrProviderPermission(nodeSource, this.caller);
             return true;
         } catch (SecurityException e) {
             // if the caller is not an admin and it is not a node source provider
