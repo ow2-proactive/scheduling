@@ -3356,11 +3356,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Unknown node " + nodeUrl);
         }
         NodeSource nodeSource = rmnode.getNodeSource();
-        if (provider) {
-            return new BooleanWrapper(checkNodeSourceProviderPermission(nodeSource));
-        } else {
-            return new BooleanWrapper(checkNodeSourceAdminPermission(nodeSource));
-        }
+        return provider ? new BooleanWrapper(checkNodeSourceProviderPermission(nodeSource))
+                        : new BooleanWrapper(checkNodeSourceAdminPermission(nodeSource));
     }
 
     /**
@@ -3375,11 +3372,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
         }
         NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
-        if (provider) {
-            return new BooleanWrapper(checkNodeSourceProviderPermission(nodeSource));
-        } else {
-            return new BooleanWrapper(checkNodeSourceAdminPermission(nodeSource));
-        }
+        return provider ? new BooleanWrapper(checkNodeSourceProviderPermission(nodeSource))
+                        : new BooleanWrapper(checkNodeSourceAdminPermission(nodeSource));
     }
 
     boolean checkNodeSourceAdminPermission(NodeSource nodeSource) {
