@@ -46,14 +46,24 @@ public class SchedulerRMProxyFactory {
     public RMProxyUserInterface connectToRM(CredData credData)
             throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
         RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
-        rm.init(PortalConfiguration.RM_URL.getValueAsString(), credData);
+        try {
+            rm.init(PortalConfiguration.RM_URL.getValueAsString(), credData);
+        } catch (RMException | KeyException | LoginException e) {
+            PAActiveObject.terminateActiveObject(rm, true);
+            throw e;
+        }
         return rm;
     }
 
     public RMProxyUserInterface connectToRM(Credentials credentials)
             throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
         RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
-        rm.init(PortalConfiguration.RM_URL.getValueAsString(), credentials);
+        try {
+            rm.init(PortalConfiguration.RM_URL.getValueAsString(), credentials);
+        } catch (RMException | KeyException | LoginException e) {
+            PAActiveObject.terminateActiveObject(rm, true);
+            throw e;
+        }
         return rm;
     }
 
@@ -61,7 +71,12 @@ public class SchedulerRMProxyFactory {
             throws LoginException, SchedulerException, ActiveObjectCreationException, NodeException {
         SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
                                                                          new Object[] {});
-        scheduler.init(PortalConfiguration.SCHEDULER_URL.getValueAsString(), credentials);
+        try {
+            scheduler.init(PortalConfiguration.SCHEDULER_URL.getValueAsString(), credentials);
+        } catch (SchedulerException | LoginException e) {
+            PAActiveObject.terminateActiveObject(scheduler, true);
+            throw e;
+        }
         return scheduler;
     }
 
@@ -69,7 +84,12 @@ public class SchedulerRMProxyFactory {
             throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException {
         SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
                                                                          new Object[] {});
-        scheduler.init(PortalConfiguration.SCHEDULER_URL.getValueAsString(), credData);
+        try {
+            scheduler.init(PortalConfiguration.SCHEDULER_URL.getValueAsString(), credData);
+        } catch (SchedulerException | LoginException e) {
+            PAActiveObject.terminateActiveObject(scheduler, true);
+            throw e;
+        }
         return scheduler;
     }
 
