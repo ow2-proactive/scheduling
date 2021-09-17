@@ -57,6 +57,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -1094,15 +1095,32 @@ public interface RMRestInterface {
      *
      * @param sessionId
      *            current session
-     * @param nodeUrls
-     *            set of node urls to check the permission for
+     * @param nodeUrl
+     *            node url to check the permission for
      * @return a map containing the node url and true if the user has permission for the node
      */
     @POST
     @Path("nodes/permission")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    Map<String, Boolean> checkNodesAdminPermission(@HeaderParam("sessionid") String sessionId, Set<String> nodeUrls)
+    boolean checkNodePermission(@HeaderParam("sessionid") String sessionId, String nodeUrl,
+            @QueryParam("provider") @DefaultValue("false") boolean provider)
             throws NotConnectedException, PermissionRestException;
 
+    /**
+     * Check if the user has permission for the given nodes or it is a node source provider
+     *
+     * @param sessionId
+     *            current session
+     * @param nodeSourceName
+     *            name of the nodeSource to check the permission for
+     * @return a map containing the node url and true if the user has permission for the node
+     */
+    @POST
+    @Path("nodeSource/permission")
+    @Produces(MediaType.APPLICATION_JSON)
+    boolean checkNodeSourcePermission(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("nodeSourceName") String nodeSourceName,
+            @QueryParam("provider") @DefaultValue("false") boolean provider)
+            throws NotConnectedException, PermissionRestException;
 }

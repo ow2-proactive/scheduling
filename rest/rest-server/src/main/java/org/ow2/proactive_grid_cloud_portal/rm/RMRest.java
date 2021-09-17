@@ -69,6 +69,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -1149,11 +1150,17 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public Map<String, Boolean> checkNodesAdminPermission(String sessionId, Set<String> nodeUrls)
+    public boolean checkNodePermission(String sessionId, String nodeUrl, boolean provider)
             throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        Map<String, Boolean> map = rm.checkNodesAdminPermission(nodeUrls);
-        return orThrowRpe(map);
+        return orThrowRpe(rm.checkNodePermission(nodeUrl, provider).getBooleanValue());
+    }
+
+    @Override
+    public boolean checkNodeSourcePermission(String sessionId, String nodeSourceName, boolean provider)
+            throws NotConnectedException, PermissionRestException {
+        ResourceManager rm = checkAccess(sessionId);
+        return orThrowRpe(rm.checkNodeSourcePermission(nodeSourceName, provider).getBooleanValue());
     }
 
 }

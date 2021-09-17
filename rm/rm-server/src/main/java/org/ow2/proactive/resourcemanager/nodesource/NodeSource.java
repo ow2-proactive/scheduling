@@ -50,6 +50,7 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.permissions.NSAdminPermission;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -419,7 +420,8 @@ public class NodeSource implements InitActive, RunActive {
         // if the provider is the administrator of the node source it always has this permission
         provider.checkPermission(providerPermission,
                                  provider + " is not authorized to add node " + nodeUrl + " to " + name,
-                                 new RMCoreAllPermission());
+                                 new RMCoreAllPermission(),
+                                 new NSAdminPermission());
 
         // lookup for a new Node
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();

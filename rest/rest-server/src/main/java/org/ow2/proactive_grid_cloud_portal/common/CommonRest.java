@@ -39,10 +39,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.UserData;
-import org.ow2.proactive.permissions.MethodCallPermission;
-import org.ow2.proactive.permissions.NotificationAdminPermission;
-import org.ow2.proactive.permissions.PcaAdminPermission;
-import org.ow2.proactive.permissions.RMCoreAllPermission;
+import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -340,9 +337,15 @@ public class CommonRest implements CommonRestInterface {
         Scheduler scheduler = checkAccess(sessionId);
         boolean levelChanged = false;
         try {
-            checkPermission(scheduler.getSubject(),
-                            new RMCoreAllPermission(),
-                            "Resource Manager administrative rights is required");
+            try {
+                checkPermission(scheduler.getSubject(),
+                                new RMCoreAllPermission(),
+                                "Resource Manager administrative rights is required");
+            } catch (PermissionException e) {
+                checkPermission(scheduler.getSubject(),
+                                new NSAdminPermission(),
+                                "Resource Manager administrative rights is required");
+            }
             if (loggersConfiguration != null) {
                 for (Map.Entry<String, String> entry : loggersConfiguration.entrySet()) {
                     Logger loggerInstance;
@@ -381,9 +384,15 @@ public class CommonRest implements CommonRestInterface {
     public Map<String, String> getCurrentLoggers(String sessionId) throws RestException {
         Scheduler scheduler = checkAccess(sessionId);
         try {
-            checkPermission(scheduler.getSubject(),
-                            new RMCoreAllPermission(),
-                            "Resource Manager administrative rights is required");
+            try {
+                checkPermission(scheduler.getSubject(),
+                                new RMCoreAllPermission(),
+                                "Resource Manager administrative rights is required");
+            } catch (PermissionException e) {
+                checkPermission(scheduler.getSubject(),
+                                new NSAdminPermission(),
+                                "Resource Manager administrative rights is required");
+            }
             Map<String, String> loggers = new LinkedHashMap<>();
             Enumeration loggerEnumeration = LogManager.getCurrentLoggers();
             while (loggerEnumeration.hasMoreElements()) {
