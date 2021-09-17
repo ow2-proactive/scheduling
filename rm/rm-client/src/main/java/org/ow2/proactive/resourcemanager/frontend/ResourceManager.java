@@ -669,10 +669,19 @@ public interface ResourceManager {
     Set<String> getNodesByTags(Set<String> tags, boolean all);
 
     /**
-     * Check is the user has admin permission for the given nodes or it is a node source provider
-     * @param urls the nodes urls
-     * @return a map containing the node url and true if the user has permission for the node
+     * Check is the user has admin permission for the given node or it is a node source provider
+     * @param nodeUrl the node url
+     * @param provider if false, the method will check if the user is admin, if true, the method will also check if the node is a provider
+     * @return true if the user has permission to access the node, false otherwise
      */
-    Map<String, Boolean> checkNodesAdminPermission(Set<String> urls);
+    BooleanWrapper checkNodePermission(String nodeUrl, boolean provider);
+
+    /**
+     * Check is the user has admin permission for the given node source or it is a node source provider
+     * @param nodeSourceName the node source name
+     * @param provider if false, the method will check if the user is admin, if true, the method will also check if the node is a provider
+     * @return true if the user has permission to access the nodeSource, false otherwise
+     */
+    BooleanWrapper checkNodeSourcePermission(String nodeSourceName, boolean provider);
 
 }
