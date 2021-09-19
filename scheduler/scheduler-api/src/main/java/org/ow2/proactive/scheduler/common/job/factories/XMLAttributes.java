@@ -58,6 +58,7 @@ public enum XMLAttributes {
     VARIABLE_DESCRIPTION("description"),
     VARIABLE_GROUP("group"),
     VARIABLE_ADVANCED("advanced"),
+    VARIABLE_HIDDEN("hidden"),
 
     // TASKS
     TASK_CLASS_NAME("class"),

@@ -262,8 +262,11 @@ public class GetJobContentGenerator {
         if (jobVariable.getGroup() != null && !jobVariable.getGroup().trim().isEmpty()) {
             content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_GROUP, jobVariable.getGroup()));
         }
-        if (jobVariable.getAdvanced()) {
-            content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_ADVANCED, jobVariable.getAdvanced()));
+        if (jobVariable.isAdvanced()) {
+            content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_ADVANCED, jobVariable.isAdvanced()));
+        }
+        if (jobVariable.isHidden()) {
+            content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_HIDDEN, jobVariable.isHidden()));
         }
 
         content.append(" />");

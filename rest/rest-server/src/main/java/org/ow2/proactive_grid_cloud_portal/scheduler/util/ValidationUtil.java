@@ -114,6 +114,18 @@ public class ValidationUtil {
             if (e.getUpdatedModels() != null) {
                 data.setUpdatedModels(e.getUpdatedModels());
             }
+            if (e.getUpdatedDescriptions() != null) {
+                data.setUpdatedDescriptions(e.getUpdatedDescriptions());
+            }
+            if (e.getUpdatedGroups() != null) {
+                data.setUpdatedGroups(e.getUpdatedGroups());
+            }
+            if (e.getUpdatedAdvanced() != null) {
+                data.setUpdatedAdvanced(e.getUpdatedAdvanced());
+            }
+            if (e.getUpdatedHidden() != null) {
+                data.setUpdatedHidden(e.getUpdatedHidden());
+            }
         }
         return data;
 
@@ -122,18 +134,34 @@ public class ValidationUtil {
     private static void fillUpdatedVariables(TaskFlowJob job, JobValidationData data) {
         HashMap<String, String> updatedVariables = new HashMap<>();
         HashMap<String, String> updatedModels = new HashMap<>();
+        HashMap<String, String> updatedDescriptions = new HashMap<>();
+        HashMap<String, String> updatedGroups = new HashMap<>();
+        HashMap<String, Boolean> updatedAdvanced = new HashMap<>();
+        HashMap<String, Boolean> updatedHidden = new HashMap<>();
         for (JobVariable jobVariable : job.getVariables().values()) {
             updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
             updatedModels.put(jobVariable.getName(), jobVariable.getModel());
+            updatedDescriptions.put(jobVariable.getName(), jobVariable.getDescription());
+            updatedGroups.put(jobVariable.getName(), jobVariable.getGroup());
+            updatedAdvanced.put(jobVariable.getName(), jobVariable.isAdvanced());
+            updatedHidden.put(jobVariable.getName(), jobVariable.isHidden());
         }
         for (Task task : job.getTasks()) {
             for (TaskVariable taskVariable : task.getVariables().values()) {
                 updatedVariables.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getValue());
                 updatedModels.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getModel());
+                updatedDescriptions.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getDescription());
+                updatedGroups.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getGroup());
+                updatedAdvanced.put(task.getName() + ":" + taskVariable.getName(), taskVariable.isAdvanced());
+                updatedHidden.put(task.getName() + ":" + taskVariable.getName(), taskVariable.isHidden());
             }
         }
         data.setUpdatedVariables(updatedVariables);
         data.setUpdatedModels(updatedModels);
+        data.setUpdatedDescriptions(updatedDescriptions);
+        data.setUpdatedGroups(updatedGroups);
+        data.setUpdatedAdvanced(updatedAdvanced);
+        data.setUpdatedHidden(updatedHidden);
     }
 
     private static void validateJob(TaskFlowJob job, JobValidationData data) {

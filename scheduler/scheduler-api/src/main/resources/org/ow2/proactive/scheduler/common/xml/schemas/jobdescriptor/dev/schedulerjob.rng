@@ -90,6 +90,9 @@
       <optional>
         <ref name="variableAdvanced"/>
       </optional>
+      <optional>
+        <ref name="variableHidden"/>
+      </optional>
     </element>
   </define>
   <define name="variableName">
@@ -124,7 +127,13 @@
   </define>
   <define name="variableAdvanced">
     <attribute name="advanced">
-      <doc:documentation>It specifies whether the variable is advanced. Advanced variables are hidden by default during the workflow submission.</doc:documentation>
+      <doc:documentation>It specifies whether the variable is advanced. Advanced variables are not shown by default during the workflow submission.</doc:documentation>
+      <data type="boolean"/>
+    </attribute>
+  </define>
+  <define name="variableHidden">
+    <attribute name="hidden">
+      <doc:documentation>It specifies whether the variable is hidden. Hidden variables are always hidden during the workflow submission.</doc:documentation>
       <data type="boolean"/>
     </attribute>
   </define>
@@ -345,6 +354,9 @@
       <optional>
         <ref name="taskVariableAdvanced"/>
       </optional>
+      <optional>
+        <ref name="taskVariableHidden"/>
+      </optional>
     </element>
   </define>
   <define name="taskVariableName">
@@ -386,6 +398,12 @@
   <define name="taskVariableAdvanced">
     <attribute name="advanced">
       <doc:documentation>It specifies whether the variable is advanced. Advanced variables are hidden by default during the workflow submission.</doc:documentation>
+      <data type="boolean"/>
+    </attribute>
+  </define>
+  <define name="taskVariableHidden">
+    <attribute name="hidden">
+      <doc:documentation>It specifies whether the variable is hidden. Hidden variables are always hidden during the workflow submission.</doc:documentation>
       <data type="boolean"/>
     </attribute>
   </define>

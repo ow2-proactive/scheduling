@@ -373,18 +373,34 @@ public class StaxJobFactory extends JobFactory {
     private void fillUpdatedVariables(JobValidationException e, TaskFlowJob job) {
         HashMap<String, String> updatedVariables = new HashMap<>();
         HashMap<String, String> updatedModels = new HashMap<>();
+        HashMap<String, String> updatedDescriptions = new HashMap<>();
+        HashMap<String, String> updatedGroups = new HashMap<>();
+        HashMap<String, Boolean> updatedAdvanced = new HashMap<>();
+        HashMap<String, Boolean> updatedHidden = new HashMap<>();
         for (JobVariable jobVariable : job.getVariables().values()) {
             updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
             updatedModels.put(jobVariable.getName(), jobVariable.getModel());
+            updatedDescriptions.put(jobVariable.getName(), jobVariable.getDescription());
+            updatedGroups.put(jobVariable.getName(), jobVariable.getGroup());
+            updatedAdvanced.put(jobVariable.getName(), jobVariable.isAdvanced());
+            updatedHidden.put(jobVariable.getName(), jobVariable.isHidden());
         }
         for (Task task : job.getTasks()) {
             for (TaskVariable taskVariable : task.getVariables().values()) {
                 updatedVariables.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getValue());
                 updatedModels.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getModel());
+                updatedDescriptions.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getDescription());
+                updatedGroups.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getGroup());
+                updatedAdvanced.put(task.getName() + ":" + taskVariable.getName(), taskVariable.isAdvanced());
+                updatedHidden.put(task.getName() + ":" + taskVariable.getName(), taskVariable.isHidden());
             }
         }
         e.setUpdatedVariables(updatedVariables);
         e.setUpdatedModels(updatedModels);
+        e.setUpdatedDescriptions(updatedDescriptions);
+        e.setUpdatedGroups(updatedGroups);
+        e.setUpdatedAdvanced(updatedAdvanced);
+        e.setUpdatedHidden(updatedHidden);
     }
 
     /**
@@ -717,17 +733,21 @@ public class StaxJobFactory extends JobFactory {
                             String model = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName());
                             String description = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_DESCRIPTION.getXMLName());
                             String group = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_GROUP.getXMLName());
-                            Boolean advanced = null;
+                            boolean advanced = false;
                             if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_ADVANCED.getXMLName())) {
-                                advanced = Boolean.valueOf(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_ADVANCED.getXMLName()));
+                                advanced = Boolean.parseBoolean(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_ADVANCED.getXMLName()));
                             }
-                            unresolvedVariablesMap.put(name,
-                                                       new JobVariable(name,
-                                                                       value,
-                                                                       model,
-                                                                       description,
-                                                                       group,
-                                                                       advanced));
+                            boolean hidden = false;
+                            if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_HIDDEN.getXMLName())) {
+                                hidden = Boolean.parseBoolean(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_HIDDEN.getXMLName()));
+                            }
+                            unresolvedVariablesMap.put(name, new JobVariable(name,
+                                                                             value,
+                                                                             model,
+                                                                             description,
+                                                                             group,
+                                                                             advanced,
+                                                                             hidden));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -779,7 +799,8 @@ public class StaxJobFactory extends JobFactory {
                                                                   jobVariable.getModel(),
                                                                   jobVariable.getDescription(),
                                                                   jobVariable.getGroup(),
-                                                                  jobVariable.getAdvanced());
+                                                                  jobVariable.isAdvanced(),
+                                                                  jobVariable.isHidden());
                 replacedJobVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
                 if (replacedJobVariable.getModel() != null) {
                     // model of an existing variable can use other variables as pattern replacements
@@ -826,7 +847,10 @@ public class StaxJobFactory extends JobFactory {
                             taskVariable.setDescription(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_DESCRIPTION.getXMLName()));
                             taskVariable.setGroup(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_GROUP.getXMLName()));
                             if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_ADVANCED.getXMLName())) {
-                                taskVariable.setAdvanced(Boolean.valueOf(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_ADVANCED.getXMLName())));
+                                taskVariable.setAdvanced(Boolean.parseBoolean(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_ADVANCED.getXMLName())));
+                            }
+                            if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_HIDDEN.getXMLName())) {
+                                taskVariable.setHidden(Boolean.parseBoolean(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_HIDDEN.getXMLName())));
                             }
                             if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())) {
                                 taskVariable.setJobInherited(Boolean.valueOf(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
@@ -883,7 +907,8 @@ public class StaxJobFactory extends JobFactory {
                                                                      taskVariable.getModel(),
                                                                      taskVariable.getDescription(),
                                                                      taskVariable.getGroup(),
-                                                                     taskVariable.getAdvanced(),
+                                                                     taskVariable.isAdvanced(),
+                                                                     taskVariable.isHidden(),
                                                                      taskVariable.isJobInherited());
                 replacedTaskVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
                 if (replacedTaskVariable.getModel() != null) {

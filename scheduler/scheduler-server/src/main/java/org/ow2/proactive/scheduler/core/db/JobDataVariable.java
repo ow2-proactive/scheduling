@@ -52,6 +52,8 @@ public class JobDataVariable {
 
     private Boolean advanced;
 
+    private Boolean hidden;
+
     private JobData jobData;
 
     static JobDataVariable create(String variableName, JobVariable jobVariable, JobData jobData) {
@@ -61,7 +63,8 @@ public class JobDataVariable {
         jobDataVariable.setModel(jobVariable.getModel());
         jobDataVariable.setDescription(jobVariable.getDescription());
         jobDataVariable.setGroup(jobVariable.getGroup());
-        jobDataVariable.setAdvanced(jobVariable.getAdvanced());
+        jobDataVariable.setAdvanced(jobVariable.isAdvanced());
+        jobDataVariable.setHidden(jobVariable.isHidden());
         jobDataVariable.setJobData(jobData);
         return jobDataVariable;
     }
@@ -140,10 +143,27 @@ public class JobDataVariable {
 
     @Column(name = "VARIABLE_ADVANCED")
     public Boolean getAdvanced() {
-        return advanced;
+        if (advanced == null) {
+            return false;
+        } else {
+            return advanced;
+        }
     }
 
     public void setAdvanced(Boolean advanced) {
         this.advanced = advanced;
+    }
+
+    @Column(name = "VARIABLE_HIDDEN")
+    public Boolean getHidden() {
+        if (hidden == null) {
+            return false;
+        } else {
+            return hidden;
+        }
+    }
+
+    public void setHidden(Boolean hidden) {
+        this.hidden = hidden;
     }
 }

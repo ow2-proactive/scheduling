@@ -54,6 +54,8 @@ public class TaskDataVariable {
 
     private Boolean advanced;
 
+    private Boolean hidden;
+
     private TaskData taskData;
 
     static TaskDataVariable create(String variableName, TaskVariable taskVariable, TaskData taskData) {
@@ -64,7 +66,8 @@ public class TaskDataVariable {
         taskDataVariable.setJobInherited(taskVariable.isJobInherited());
         taskDataVariable.setDescription(taskVariable.getDescription());
         taskDataVariable.setGroup(taskVariable.getGroup());
-        taskDataVariable.setAdvanced(taskVariable.getAdvanced());
+        taskDataVariable.setAdvanced(taskVariable.isAdvanced());
+        taskDataVariable.setHidden(taskVariable.isHidden());
         taskDataVariable.setTaskData(taskData);
         return taskDataVariable;
     }
@@ -153,10 +156,27 @@ public class TaskDataVariable {
 
     @Column(name = "VARIABLE_ADVANCED")
     public Boolean getAdvanced() {
-        return advanced;
+        if (advanced == null) {
+            return false;
+        } else {
+            return advanced;
+        }
     }
 
     public void setAdvanced(Boolean advanced) {
         this.advanced = advanced;
+    }
+
+    @Column(name = "VARIABLE_HIDDEN")
+    public Boolean getHidden() {
+        if (hidden == null) {
+            return false;
+        } else {
+            return hidden;
+        }
+    }
+
+    public void setHidden(Boolean hidden) {
+        this.hidden = hidden;
     }
 }

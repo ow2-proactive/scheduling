@@ -58,7 +58,10 @@ public class JobVariable implements Serializable {
     private String group;
 
     @XmlAttribute
-    private Boolean advanced;
+    private boolean advanced;
+
+    @XmlAttribute
+    private boolean hidden;
 
     public JobVariable() {
         //Empty constructor
@@ -69,16 +72,18 @@ public class JobVariable implements Serializable {
     }
 
     public JobVariable(String name, String value, String model) {
-        this(name, value, model, null, null, null);
+        this(name, value, model, null, null, false, false);
     }
 
-    public JobVariable(String name, String value, String model, String description, String group, Boolean advanced) {
+    public JobVariable(String name, String value, String model, String description, String group, boolean advanced,
+            boolean hidden) {
         this.name = name;
         this.value = value;
         this.model = model;
         this.description = description;
         this.group = group;
         this.advanced = advanced;
+        this.hidden = hidden;
     }
 
     public String getName() {
@@ -121,16 +126,20 @@ public class JobVariable implements Serializable {
         this.group = group;
     }
 
-    public boolean getAdvanced() {
-        if (advanced == null) {
-            return false;
-        } else {
-            return advanced;
-        }
+    public boolean isAdvanced() {
+        return advanced;
     }
 
-    public void setAdvanced(Boolean advanced) {
+    public void setAdvanced(boolean advanced) {
         this.advanced = advanced;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 
     @Override
@@ -152,7 +161,7 @@ public class JobVariable implements Serializable {
             return false;
         if (getGroup() != null ? !getGroup().equals(that.getGroup()) : that.getGroup() != null)
             return false;
-        return getAdvanced() == that.getAdvanced();
+        return isAdvanced() == that.isAdvanced() && isHidden() == that.isHidden();
     }
 
     @Override
@@ -162,13 +171,15 @@ public class JobVariable implements Serializable {
         result = 31 * result + (getModel() != null ? getModel().hashCode() : 0);
         result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
         result = 31 * result + (getGroup() != null ? getGroup().hashCode() : 0);
-        result = 31 * result + (getAdvanced() ? 1 : 0);
+        result = 31 * result + (isAdvanced() ? 1 : 0);
+        result = 31 * result + (isHidden() ? 1 : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "JobVariable{" + "name='" + name + '\'' + ", value='" + value + '\'' + ", model='" + model + '\'' +
-               ", description='" + description + '\'' + ", group='" + group + '\'' + ", advanced=" + advanced + '}';
+               ", description='" + description + '\'' + ", group='" + group + '\'' + ", advanced=" + advanced +
+               ", hidden=" + hidden + '}';
     }
 }

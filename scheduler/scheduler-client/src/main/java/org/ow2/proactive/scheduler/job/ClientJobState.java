@@ -103,6 +103,9 @@ public class ClientJobState extends JobState {
         this.setOnTaskError(jobState.getOnTaskErrorProperty().getValue());
 
         this.genericInformation = new LinkedHashMap<>(jobState.getGenericInformation());
+        jobInfo.setDetailedVariables(new LinkedHashMap<>(this.variables));
+        jobInfo.setGenericInformation(this.genericInformation);
+        jobInfo.setVariables(this.getVariablesAsReplacementMap());
 
         List<ClientTaskState> clientTaskStates = new ArrayList<>(taskStates.size());
         for (TaskState ts : taskStates) {

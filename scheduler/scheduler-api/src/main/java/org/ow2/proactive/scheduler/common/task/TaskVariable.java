@@ -59,9 +59,9 @@ public class TaskVariable extends JobVariable implements Serializable {
         this.jobInherited = isJobInherited;
     }
 
-    public TaskVariable(String name, String value, String model, String description, String group, Boolean advanced,
-            boolean isJobInherited) {
-        super(name, value, model, description, group, advanced);
+    public TaskVariable(String name, String value, String model, String description, String group, boolean advanced,
+            boolean hidden, boolean isJobInherited) {
+        super(name, value, model, description, group, advanced, hidden);
         this.jobInherited = isJobInherited;
     }
 
@@ -98,6 +98,6 @@ public class TaskVariable extends JobVariable implements Serializable {
     public String toString() {
         return "TaskVariable{" + "name='" + getName() + '\'' + ", value='" + getValue() + '\'' + ", model='" +
                getModel() + '\'' + ", description='" + getDescription() + '\'' + ", group='" + getGroup() + '\'' +
-               ", advanced=" + getAdvanced() + ", jobInherited=" + jobInherited + '}';
+               ", advanced=" + isAdvanced() + ", hidden=" + isHidden() + ", jobInherited=" + jobInherited + '}';
     }
 }

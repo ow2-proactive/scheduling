@@ -203,7 +203,7 @@ public class Job2XMLTransformerTest {
         File xmlFile = tmpFolder.newFile();
         Map<String, JobVariable> variablesMap = new HashMap<>();
         JobVariable jobVar1 = new JobVariable("name1", "value1", "model1");
-        JobVariable jobVar2 = new JobVariable("name2", "value2", "model2", "description2", "group2", true);
+        JobVariable jobVar2 = new JobVariable("name2", "value2", "model2", "description2", "group2", true, true);
         variablesMap.put(jobVar1.getName(), jobVar1);
         variablesMap.put(jobVar2.getName(), jobVar2);
 

@@ -55,7 +55,7 @@ public class SpelValidatorTest {
 
     @Before
     public void before() {
-        ModelValidatorContext.SpELVariables spELVariables = new ModelValidatorContext.SpELVariables(null, null);
+        ModelValidatorContext.SpELVariables spELVariables = new ModelValidatorContext.SpELVariables(null, null, null);
         context = new StandardEvaluationContext(spELVariables);
         context.setTypeLocator(new RestrictedTypeLocator());
         context.setMethodResolvers(Collections.singletonList(new RestrictedMethodResolver()));
@@ -209,6 +209,46 @@ public class SpelValidatorTest {
     }
 
     @Test
+    public void testSpelHideJobVariable() throws ValidationException, UserException {
+        SpelValidator validator = new SpelValidator("#value == 'MyString'?hideVar('var1'):false");
+        String value = "MyString";
+        ModelValidatorContext context = new ModelValidatorContext(createJob());
+        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertTrue(context.getSpELVariables().getHiddenVariables().get("var1"));
+        Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("var2"));
+    }
+
+    @Test
+    public void testSpelShowJobVariable() throws ValidationException, UserException {
+        SpelValidator validator = new SpelValidator("#value == 'MyString'?showVar('var1'):false");
+        String value = "MyString";
+        ModelValidatorContext context = new ModelValidatorContext(createJob());
+        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertFalse(context.getSpELVariables().getHiddenVariables().get("var1"));
+        Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("var2"));
+    }
+
+    @Test
+    public void testSpelHideJobVariableGroup() throws ValidationException, UserException {
+        SpelValidator validator = new SpelValidator("#value == 'MyString'?hideGroup('group2'):false");
+        String value = "MyString";
+        ModelValidatorContext context = new ModelValidatorContext(createJob());
+        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertTrue(context.getSpELVariables().getHiddenGroups().get("group2"));
+        Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("group1"));
+    }
+
+    @Test
+    public void testSpelShowJobVariableGroup() throws ValidationException, UserException {
+        SpelValidator validator = new SpelValidator("#value == 'MyString'?showGroup('group2'):false");
+        String value = "MyString";
+        ModelValidatorContext context = new ModelValidatorContext(createJob());
+        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertFalse(context.getSpELVariables().getHiddenGroups().get("group2"));
+        Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("group1"));
+    }
+
+    @Test
     public void testSpelKOUpdateJobVariable() throws ValidationException, UserException {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?(variables['var1'] = 'toto1') instanceof T(String):false");
         String value = "MyString123";
@@ -300,6 +340,16 @@ public class SpelValidatorTest {
         Assert.assertEquals("model1", context.getSpELVariables().getModels().get("var1"));
     }
 
+    @Test
+    public void testSpelHideTaskVariable() throws ValidationException, UserException {
+        SpelValidator validator = new SpelValidator("#value == 'MyString'?hideVar('var1'):false");
+        String value = "MyString";
+        ModelValidatorContext context = new ModelValidatorContext(createTask());
+        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertTrue(context.getSpELVariables().getHiddenVariables().get("var1"));
+        Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("var2"));
+    }
+
     @Test(expected = PatternSyntaxException.class)
     @SuppressWarnings("squid:S1848")
     public void testExpressionInvalid() throws ValidationException {
@@ -309,13 +359,13 @@ public class SpelValidatorTest {
     private TaskFlowJob createJob() throws UserException {
         TaskFlowJob job = new TaskFlowJob();
         job.setVariables(ImmutableMap.of("var1",
-                                         new JobVariable("var1", "value1", "model1"),
+                                         new JobVariable("var1", "value1", "model1", "", "group1", false, false),
                                          "var2",
-                                         new JobVariable("var2", "value2", "model2"),
+                                         new JobVariable("var2", "value2", "model2", "", "group1", false, true),
                                          "var3",
-                                         new JobVariable("var3", "", ""),
+                                         new JobVariable("var3", "", "", "", "group2", false, false),
                                          "var4",
-                                         new JobVariable("var4", null, null)));
+                                         new JobVariable("var4", null, null, "", "group2", false, false)));
 
         return job;
     }
@@ -325,13 +375,27 @@ public class SpelValidatorTest {
         Task task = new JavaTask();
 
         task.setVariables(ImmutableMap.of("var1",
-                                          new TaskVariable("var1", "value1", "model1", false),
+                                          new TaskVariable("var1",
+                                                           "value1",
+                                                           "model1",
+                                                           "",
+                                                           "group1",
+                                                           false,
+                                                           false,
+                                                           false),
                                           "var2",
-                                          new TaskVariable("var2", "value2", "model2", false),
+                                          new TaskVariable("var2",
+                                                           "value2",
+                                                           "model2",
+                                                           "",
+                                                           "group1",
+                                                           false,
+                                                           true,
+                                                           false),
                                           "var3",
-                                          new TaskVariable("var3", "", "", false),
+                                          new TaskVariable("var3", "", "", "", "group2", false, false, false),
                                           "var4",
-                                          new TaskVariable("var4", null, null, false)));
+                                          new TaskVariable("var4", null, null, "", "group2", false, false, false)));
 
         task.setName("task1");
 

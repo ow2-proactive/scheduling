@@ -322,9 +322,13 @@ public class Job2XMLTransformer {
             if (variable.getGroup() != null) {
                 varAttributes.add(new Attribute(XMLAttributes.VARIABLE_GROUP.getXMLName(), variable.getGroup()));
             }
-            if (variable.getAdvanced()) {
+            if (variable.isAdvanced()) {
                 varAttributes.add(new Attribute(XMLAttributes.VARIABLE_ADVANCED.getXMLName(),
-                                                String.valueOf(variable.getAdvanced())));
+                                                String.valueOf(variable.isAdvanced())));
+            }
+            if (variable.isHidden()) {
+                varAttributes.add(new Attribute(XMLAttributes.VARIABLE_HIDDEN.getXMLName(),
+                                                String.valueOf(variable.isHidden())));
             }
             Element variableE = createElement(doc,
                                               XMLTags.VARIABLE.getXMLName(),
@@ -355,9 +359,13 @@ public class Job2XMLTransformer {
             if (variable.getGroup() != null) {
                 varAttributes.add(new Attribute(XMLAttributes.VARIABLE_GROUP.getXMLName(), variable.getGroup()));
             }
-            if (variable.getAdvanced()) {
+            if (variable.isAdvanced()) {
                 varAttributes.add(new Attribute(XMLAttributes.VARIABLE_ADVANCED.getXMLName(),
-                                                String.valueOf(variable.getAdvanced())));
+                                                String.valueOf(variable.isAdvanced())));
+            }
+            if (variable.isHidden()) {
+                varAttributes.add(new Attribute(XMLAttributes.VARIABLE_HIDDEN.getXMLName(),
+                                                String.valueOf(variable.isHidden())));
             }
             varAttributes.add(new Attribute(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName(),
                                             String.valueOf(variable.isJobInherited())));

@@ -31,6 +31,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 
 
 public class JobInfoImpl implements JobInfo {
@@ -78,6 +79,8 @@ public class JobInfoImpl implements JobInfo {
     private Map<String, String> genericInformation;
 
     private Map<String, String> variables;
+
+    private Map<String, JobVariable> detailedVariables;
 
     private Set<String> signals;
 
@@ -292,6 +295,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
+    }
+
+    @Override
+    public Map<String, JobVariable> getDetailedVariables() {
+        return detailedVariables;
+    }
+
+    public void setDetailedVariables(Map<String, JobVariable> detailedVariables) {
+        this.detailedVariables = detailedVariables;
     }
 
     @Override

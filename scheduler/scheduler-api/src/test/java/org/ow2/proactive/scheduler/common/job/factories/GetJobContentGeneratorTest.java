@@ -86,11 +86,11 @@ public class GetJobContentGeneratorTest {
         String jobContent = Resources.toString(url, Charsets.UTF_8);
 
         Map<String, JobVariable> vars = new HashMap<>();
-        vars.put("var", new JobVariable("var", "myvalue", "pa:model", "my var description", "varGroup", true));
+        vars.put("var", new JobVariable("var", "myvalue", "pa:model", "my var description", "varGroup", true, true));
         final String newJobContent = generator.replaceVarsAndGenericInfo(jobContent, vars, Collections.emptyMap());
 
         assertTrue(newJobContent.contains("<variables>"));
-        assertTrue(newJobContent.contains("<variable name=\"var\" value=\"myvalue\" model=\"pa:model\" description=\"my var description\" group=\"varGroup\" advanced=\"true\" />"));
+        assertTrue(newJobContent.contains("<variable name=\"var\" value=\"myvalue\" model=\"pa:model\" description=\"my var description\" group=\"varGroup\" advanced=\"true\" hidden=\"true\" />"));
         assertFalse(newJobContent.contains("<genericInformation>"));
         assertNotEquals(jobContent, newJobContent);
     }
