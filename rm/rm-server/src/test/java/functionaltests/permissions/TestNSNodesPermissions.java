@@ -438,16 +438,6 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
 
         user.removeNodeToken(node.getNodeInformation().getURL(), "token2");
 
-        // in this case nsadmin does not have rights to call add token
-        // because he is not node source provider
-        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.NSADMIN)
-                                                  .addNodeToken(finalNode.getNodeInformation().getURL(), "token2"));
-
-        // in this case nsadmin does not have rights to call remove token
-        // because he is not node source provider
-        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.NSADMIN)
-                                                  .removeNodeToken(finalNode.getNodeInformation().getURL(), "token2"));
-
         user = rmHelper.getResourceManager(TestUsers.TEST);
 
         criteria = new Criteria(1);
@@ -462,9 +452,13 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         criteria.setNodeAccessToken("token1");
         getAndReleaseNodes(user, "all good, node and criteria have right token", criteria, 1);
 
+        // in this case user does not have rights to call add token
+        // because he is not node source provider
         checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.USER)
                                                   .addNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
 
+        // in this case user does not have rights to call remove token
+        // because he is not node source provider
         checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.USER)
                                                   .removeNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
         checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.PROVIDER)
@@ -537,10 +531,6 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         node = nodePool.remove(0);
 
         addOneNodeToNodeSource(nsName, node, admin);
-
-        user = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        canComputeOnIt = user.isNodeUser(node.getNodeInformation().getURL()).getBooleanValue();
-        assertFalse("User is not supposed to get this compute node", canComputeOnIt);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
