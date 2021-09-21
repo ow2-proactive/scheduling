@@ -29,13 +29,13 @@ import org.ow2.proactive.policy.ClientsPolicy;
 
 
 /**
- * The RMCoreAllPermission is a permission that implies all other permissions.
+ * The NSAdminPermission is a permission that implies all other permissions.
  * It is an equivalent of java.security.AllPermission and could be granted
  * to the resource manager of scheduler clients. java.security.AllPermission
  * cannot be granted to them.
  * @see ClientsPolicy
  */
-public class RMCoreAllPermission extends ClientPermission {
+public class NSAdminPermission extends ClientPermission {
 
     // This serial version uid is meant to prevent issues when restoring Resource Manager database from a previous version.
     // any addition to this class (new method, field, etc) should imply to change this uid.

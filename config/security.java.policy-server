@@ -8,7 +8,8 @@
 //    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
 //    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.releaseNode";
 //    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.releaseNodes";
-//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 //};
 
 //
@@ -41,7 +42,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
-    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -118,7 +120,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.removeNodeToken";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNodeToken";
-    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -243,7 +246,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
-    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -269,6 +273,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "nsadmins" {
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "rm";
     permission org.ow2.proactive.permissions.PcaAdminPermission;
+    permission org.ow2.proactive.permissions.NSAdminPermission;
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAllNodesTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAllEligibleNodesTokens";
@@ -294,11 +299,14 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.undeployNodeSource";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeSourceConfiguration";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.updateDynamicParameters";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.editNodeSource";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.createNodeSource";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.removeNodeSource";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.nodeSourceUnregister";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNode";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.removeNode";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.lockNodes";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.unlockNodes";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.internalAddNodeToCore";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.internalRegisterConfiguringNode";
@@ -317,6 +325,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.isNodeUser";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getSupportedNodeSourceInfrastructures";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getInfrasToPoliciesMapping";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getSupportedNodeSourcePolicies";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.registerAvailableNode";
@@ -324,7 +333,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
-    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 
 
     // AuthPermission is requires for those who would like to access any mbean
@@ -434,7 +444,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
-    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -488,7 +499,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getStatus";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getTopology";
-    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 
     // API - access to database
     permission java.sql.SQLPermission "setLog";
@@ -536,7 +548,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.removeNodeToken";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNodeToken";
-    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -647,7 +660,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.removeNodeToken";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNodeToken";
-    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodesPermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";

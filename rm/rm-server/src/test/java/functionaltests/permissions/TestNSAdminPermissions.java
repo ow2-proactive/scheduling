@@ -76,11 +76,6 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         ResourceManager providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        try {
-            providerRMAccess.removeNodeSource(nsName, true).getBooleanValue();
-            fail("nsadmin is not the node source owner");
-        } catch (Exception e) {
-        }
 
         adminRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
 
