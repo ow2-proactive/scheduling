@@ -247,6 +247,7 @@ public class JobData implements Serializable {
         }
         jobInfo.setGenericInformation(getGenericInformation());
         jobInfo.setVariables(createVariablesStringMap());
+        jobInfo.setDetailedVariables(createDetailedVariables());
         jobInfo.setAttachedServices(getAttachedServices());
         Map<String, byte[]> resultMap = getResultMap();
         jobInfo.setResultMapPresent(resultMap != null && resultMap.size() > 0);
@@ -262,6 +263,21 @@ public class JobData implements Serializable {
             stringVariablesMap.put(variable.getName(), variable.getValue());
         }
         return stringVariablesMap;
+    }
+
+    private Map<String, JobVariable> createDetailedVariables() {
+        Map<String, JobDataVariable> jobDataVariablesMap = getVariables();
+        Map<String, JobVariable> jobVariablesMap = new HashMap<>(jobDataVariablesMap.size());
+        for (JobDataVariable variable : getVariables().values()) {
+            jobVariablesMap.put(variable.getName(), new JobVariable(variable.getName(),
+                                                                    variable.getValue(),
+                                                                    variable.getModel(),
+                                                                    variable.getDescription(),
+                                                                    variable.getGroup(),
+                                                                    variable.getAdvanced(),
+                                                                    variable.getHidden()));
+        }
+        return jobVariablesMap;
     }
 
     JobInfo toJobInfo() {

@@ -225,6 +225,12 @@ public interface JobInfo extends Serializable {
     Map<String, String> getVariables();
 
     /**
+     * Returns the variables Map with full definition
+     * @return variables Map
+     */
+    Map<String, JobVariable> getDetailedVariables();
+
+    /**
      * Return a map of visualization connection strings
      * key: task name
      * value: connection string

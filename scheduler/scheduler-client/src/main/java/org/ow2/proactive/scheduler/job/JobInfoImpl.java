@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 
@@ -133,6 +134,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> variables;
 
+    private Map<String, JobVariable> detailedVariables;
+
     private Set<String> signals;
 
     private Map<String, String> visualizationConnectionStrings = Collections.emptyMap();
@@ -185,6 +188,8 @@ public class JobInfoImpl implements JobInfo {
         }
         this.genericInformation = jobInfo.getGenericInformation();
         this.variables = jobInfo.getVariables();
+        this.detailedVariables = jobInfo.getDetailedVariables();
+
         this.signals = jobInfo.getSignals();
         this.visualizationConnectionStrings = jobInfo.getVisualizationConnectionStrings();
         this.visualizationIcons = jobInfo.getVisualizationIcons();
@@ -491,6 +496,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
+    }
+
+    @Override
+    public Map<String, JobVariable> getDetailedVariables() {
+        return detailedVariables;
+    }
+
+    public void setDetailedVariables(Map<String, JobVariable> detailedVariables) {
+        this.detailedVariables = detailedVariables;
     }
 
     @Override

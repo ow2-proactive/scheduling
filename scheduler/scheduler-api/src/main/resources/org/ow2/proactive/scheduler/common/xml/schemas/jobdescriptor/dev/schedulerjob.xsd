@@ -116,7 +116,12 @@
           </xs:attribute>
           <xs:attribute name="advanced" type="xs:boolean">
             <xs:annotation>
-              <xs:documentation>It specifies whether the variable is advanced. Advanced variables are hidden by default during the workflow submission.</xs:documentation>
+              <xs:documentation>It specifies whether the variable is advanced. Advanced variables are not shown by default during the workflow submission.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="hidden" type="xs:boolean">
+            <xs:annotation>
+              <xs:documentation>It specifies whether the variable is hidden. Hidden variables are always hidden during the workflow submission.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
         </xs:complexType>
@@ -161,7 +166,14 @@
   <xs:attributeGroup name="variableAdvanced">
     <xs:attribute name="advanced" use="required" type="xs:boolean">
       <xs:annotation>
-        <xs:documentation>It specifies whether the variable is advanced. Advanced variables are hidden by default during the workflow submission.</xs:documentation>
+        <xs:documentation>It specifies whether the variable is advanced. Advanced variables are not shown by default during the workflow submission.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="variableHidden">
+    <xs:attribute name="hidden" use="required" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>It specifies whether the variable is hidden. Hidden variables are always hidden during the workflow submission.</xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
@@ -448,6 +460,11 @@
               <xs:documentation>It specifies whether the variable is advanced. Advanced variables are hidden by default during the workflow submission.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
+          <xs:attribute name="hidden" type="xs:boolean">
+            <xs:annotation>
+              <xs:documentation>It specifies whether the variable is hidden. Hidden variables are always hidden during the workflow submission.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
@@ -498,6 +515,13 @@
     <xs:attribute name="advanced" use="required" type="xs:boolean">
       <xs:annotation>
         <xs:documentation>It specifies whether the variable is advanced. Advanced variables are hidden by default during the workflow submission.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="taskVariableHidden">
+    <xs:attribute name="hidden" use="required" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>It specifies whether the variable is hidden. Hidden variables are always hidden during the workflow submission.</xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>

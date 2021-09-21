@@ -28,7 +28,10 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
@@ -40,6 +43,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.Restrict
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+
+import com.google.common.base.Strings;
 
 
 /**
@@ -66,8 +71,8 @@ public class ModelValidatorContext {
     }
 
     public ModelValidatorContext(Map<String, Serializable> variablesValues, Map<String, String> models,
-            Scheduler scheduler, SchedulerSpaceInterface space) {
-        spELVariables = new SpELVariables(variablesValues, models);
+            Set<String> groupNames, Scheduler scheduler, SchedulerSpaceInterface space) {
+        spELVariables = new SpELVariables(variablesValues, models, groupNames);
         spelContext = new StandardEvaluationContext(spELVariables);
         spelContext.setTypeLocator(new RestrictedTypeLocator());
         spelContext.setMethodResolvers(Collections.singletonList(new RestrictedMethodResolver()));
@@ -77,24 +82,39 @@ public class ModelValidatorContext {
     }
 
     public ModelValidatorContext(Task task, Scheduler scheduler, SchedulerSpaceInterface space) {
-        this(task.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
+        this(task.getVariables().values().stream().collect(LinkedHashMap<String, Serializable>::new,
                                                            (m, v) -> m.put(v.getName(), v.getValue()),
-                                                           HashMap<String, Serializable>::putAll),
-             task.getVariables().values().stream().collect(HashMap<String, String>::new,
+                                                           LinkedHashMap<String, Serializable>::putAll),
+             task.getVariables().values().stream().collect(LinkedHashMap<String, String>::new,
                                                            (m, v) -> m.put(v.getName(), v.getModel()),
-                                                           HashMap<String, String>::putAll),
+                                                           LinkedHashMap<String, String>::putAll),
+             getGroups(task.getVariables()),
              scheduler,
              space);
 
     }
 
+    public static Set<String> getGroups(Map<String, ? extends JobVariable> variables) {
+        Set<String> groups = new LinkedHashSet<>();
+        if (variables != null) {
+            for (JobVariable variable : variables.values()) {
+                String groupName = variable.getGroup();
+                if (!Strings.isNullOrEmpty(groupName)) {
+                    groups.add(groupName);
+                }
+            }
+        }
+        return groups;
+    }
+
     public ModelValidatorContext(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space) {
-        this(job.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
+        this(job.getVariables().values().stream().collect(LinkedHashMap<String, Serializable>::new,
                                                           (m, v) -> m.put(v.getName(), v.getValue()),
-                                                          HashMap<String, Serializable>::putAll),
-             job.getVariables().values().stream().collect(HashMap<String, String>::new,
+                                                          LinkedHashMap<String, Serializable>::putAll),
+             job.getVariables().values().stream().collect(LinkedHashMap<String, String>::new,
                                                           (m, v) -> m.put(v.getName(), v.getModel()),
-                                                          HashMap<String, String>::putAll),
+                                                          LinkedHashMap<String, String>::putAll),
+             getGroups(job.getVariables()),
              scheduler,
              space);
 
@@ -104,8 +124,9 @@ public class ModelValidatorContext {
         this(context, null, null);
     }
 
-    public ModelValidatorContext(Map<String, Serializable> variablesValues, Map<String, String> models) {
-        this(variablesValues, models, null, null);
+    public ModelValidatorContext(Map<String, Serializable> variablesValues, Map<String, String> models,
+            Set<String> groupNames) {
+        this(variablesValues, models, groupNames, null, null);
     }
 
     public ModelValidatorContext(Task task) {
@@ -151,6 +172,17 @@ public class ModelValidatorContext {
         for (JobVariable jobVariable : job.getVariables().values()) {
             jobVariable.setValue(spELVariables.getVariables().get(jobVariable.getName()).toString());
             jobVariable.setModel(spELVariables.getModels().get(jobVariable.getName()));
+            String groupName = jobVariable.getGroup();
+            if (!Strings.isNullOrEmpty(groupName)) {
+                Boolean hiddenGroupStatus = spELVariables.getHiddenGroups().get(groupName);
+                if (hiddenGroupStatus != null) {
+                    jobVariable.setHidden(hiddenGroupStatus);
+                }
+            }
+            Boolean hiddenVariableStatus = spELVariables.getHiddenVariables().get(jobVariable.getName());
+            if (hiddenVariableStatus != null) {
+                jobVariable.setHidden(hiddenVariableStatus);
+            }
         }
     }
 
@@ -161,6 +193,17 @@ public class ModelValidatorContext {
         for (TaskVariable taskVariable : task.getVariables().values()) {
             taskVariable.setValue(spELVariables.getVariables().get(taskVariable.getName()).toString());
             taskVariable.setModel(spELVariables.getModels().get(taskVariable.getName()));
+            String groupName = taskVariable.getGroup();
+            if (!Strings.isNullOrEmpty(groupName)) {
+                Boolean hiddenGroupStatus = spELVariables.getHiddenGroups().get(groupName);
+                if (hiddenGroupStatus != null) {
+                    taskVariable.setHidden(hiddenGroupStatus);
+                }
+            }
+            Boolean hiddenVariableStatus = spELVariables.getHiddenVariables().get(taskVariable.getName());
+            if (hiddenVariableStatus != null) {
+                taskVariable.setHidden(hiddenVariableStatus);
+            }
         }
     }
 
@@ -177,6 +220,16 @@ public class ModelValidatorContext {
         private Map<String, String> models;
 
         /**
+         * Can be used to show/hide variables
+         */
+        private Map<String, Boolean> hiddenVariables;
+
+        /**
+         * Can be used to hide/unhide groups of variables
+         */
+        private Map<String, Boolean> hiddenGroups;
+
+        /**
          * A temporary object which can be used in SPEL expressions
          */
         private Object temp;
@@ -191,10 +244,22 @@ public class ModelValidatorContext {
          */
         private Boolean valid;
 
-        public SpELVariables(Map<String, Serializable> variables, Map<String, String> models) {
+        public SpELVariables(Map<String, Serializable> variables, Map<String, String> models, Set<String> groupsNames) {
             this.variables = variables;
             this.models = models;
-            this.tempMap = new HashMap<>();
+            this.tempMap = new LinkedHashMap<>();
+            this.hiddenVariables = new LinkedHashMap<>();
+            if (variables != null) {
+                for (String variableName : variables.keySet()) {
+                    this.hiddenVariables.put(variableName, null);
+                }
+            }
+            this.hiddenGroups = new LinkedHashMap<>();
+            if (groupsNames != null) {
+                for (String groupName : groupsNames) {
+                    this.hiddenGroups.put(groupName, null);
+                }
+            }
         }
 
         /**
@@ -238,6 +303,14 @@ public class ModelValidatorContext {
             this.models = models;
         }
 
+        public Map<String, Boolean> getHiddenVariables() {
+            return hiddenVariables;
+        }
+
+        public Map<String, Boolean> getHiddenGroups() {
+            return hiddenGroups;
+        }
+
         public Object getTemp() {
             return temp;
         }
@@ -260,6 +333,66 @@ public class ModelValidatorContext {
 
         public void setValid(Boolean valid) {
             this.valid = valid;
+        }
+
+        /**
+         * Hide the given variable.
+         * @param variableName variable to hide
+         * @return true if the variable exists. Returning true allows easy usage of the function in SPEL expressions.
+         * {@code Example: hideVar('var1') && showVar('var2')}
+         */
+        public boolean hideVar(String variableName) {
+            if (hiddenVariables.containsKey(variableName)) {
+                hiddenVariables.put(variableName, true);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Show the given variable.
+         * @param variableName variable to show
+         * @return true if the variable exists. Returning true allows easy usage of the function in SPEL expressions.
+         * {@code Example: showVar('var1') && hideVar('var2')}
+         */
+        public boolean showVar(String variableName) {
+            if (hiddenVariables.containsKey(variableName)) {
+                hiddenVariables.put(variableName, false);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Hide the given group of variables.
+         * @param groupName name of the variable group
+         * @return true if the variable group exists. Returning true allows easy usage of the function in SPEL expressions.
+         * {@code Example: hideGroup('group1') && showGroup('group2')}
+         */
+        public boolean hideGroup(String groupName) {
+            if (hiddenGroups.containsKey(groupName)) {
+                hiddenGroups.put(groupName, true);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Show the given group of variables.
+         * @param groupName name of the variable group
+         * @return true if the variable group exists. Returning true allows easy usage of the function in SPEL expressions.
+         * {@code Example: hideGroup('group1') && showGroup('group2')}
+         */
+        public boolean showGroup(String groupName) {
+            if (hiddenGroups.containsKey(groupName)) {
+                hiddenGroups.put(groupName, false);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

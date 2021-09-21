@@ -627,6 +627,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         SchedulerEventListenerImpl listener = new SchedulerEventListenerImpl();
         client.addEventListener(listener, true, SchedulerEvent.JOB_SUBMITTED, SchedulerEvent.USERS_UPDATE);
         Job job = defaultJob();
+        Map<String, JobVariable> jobVariables = new LinkedHashMap<>();
+        jobVariables.put("MY_VAR",
+                         new JobVariable("MY_VAR",
+                                         "MY_VALUE",
+                                         "PA:NOT_EMPTY_STRING",
+                                         "a test variable",
+                                         "MY_GROUP",
+                                         true,
+                                         true));
+        job.setVariables(jobVariables);
         JobId jobId = client.submit(job);
         JobState submittedJob = listener.getSubmittedJob();
         while (!submittedJob.getId().value().equals(jobId.value())) {
@@ -634,6 +644,10 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
         UserIdentification userIdentification = listener.getLastUserUpdate();
         assertTrue(userIdentification.getLastSubmitTime() != -1);
+        JobInfo jobInfo = client.getJobInfo(jobId.toString());
+        System.out.println("Variables = " + jobInfo.getVariables());
+        Map<String, JobVariable> stateJobVariables = jobInfo.getDetailedVariables();
+        assertEquals(jobVariables, stateJobVariables);
         client.removeEventListener();
 
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));

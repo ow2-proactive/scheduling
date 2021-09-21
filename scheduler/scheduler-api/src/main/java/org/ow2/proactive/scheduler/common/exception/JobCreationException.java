@@ -54,6 +54,14 @@ public class JobCreationException extends SchedulerException {
 
     private Map<String, String> updatedModels = null;
 
+    private Map<String, String> updatedDescriptions = null;
+
+    private Map<String, String> updatedGroups = null;
+
+    private Map<String, Boolean> updatedAdvanced = null;
+
+    private Map<String, Boolean> updatedHidden = null;
+
     /**
      * Create a new instance of JobCreationException using the given message string
      *
@@ -243,4 +251,37 @@ public class JobCreationException extends SchedulerException {
     public void setUpdatedModels(Map<String, String> updatedModels) {
         this.updatedModels = updatedModels;
     }
+
+    public Map<String, String> getUpdatedDescriptions() {
+        return updatedDescriptions;
+    }
+
+    public void setUpdatedDescriptions(Map<String, String> updatedDescriptions) {
+        this.updatedDescriptions = updatedDescriptions;
+    }
+
+    public Map<String, String> getUpdatedGroups() {
+        return updatedGroups;
+    }
+
+    public void setUpdatedGroups(Map<String, String> updatedGroups) {
+        this.updatedGroups = updatedGroups;
+    }
+
+    public Map<String, Boolean> getUpdatedAdvanced() {
+        return updatedAdvanced;
+    }
+
+    public void setUpdatedAdvanced(Map<String, Boolean> updatedAdvanced) {
+        this.updatedAdvanced = updatedAdvanced;
+    }
+
+    public Map<String, Boolean> getUpdatedHidden() {
+        return updatedHidden;
+    }
+
+    public void setUpdatedHidden(Map<String, Boolean> updatedHidden) {
+        this.updatedHidden = updatedHidden;
+    }
+
 }

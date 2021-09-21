@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.ow2.proactive.scheduler.common.job.JobVariable;
+
 
 public class JobInfoData implements java.io.Serializable {
 
@@ -71,6 +73,8 @@ public class JobInfoData implements java.io.Serializable {
     private Map<String, String> genericInformation;
 
     private Map<String, String> variables;
+
+    private Map<String, JobVariable> detailedVariables;
 
     private Set<String> signals;
 
@@ -242,6 +246,14 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
+    }
+
+    public Map<String, JobVariable> getDetailedVariables() {
+        return detailedVariables;
+    }
+
+    public void setDetailedVariables(Map<String, JobVariable> detailedVariables) {
+        this.detailedVariables = detailedVariables;
     }
 
     public Set<String> getSignals() {

@@ -44,6 +44,14 @@ public class JobValidationData {
 
     private Map<String, String> updatedModels;
 
+    private Map<String, String> updatedDescriptions;
+
+    private Map<String, String> updatedGroups;
+
+    private Map<String, Boolean> updatedAdvanced;
+
+    private Map<String, Boolean> updatedHidden;
+
     public JobValidationData() {
     }
 
@@ -93,5 +101,37 @@ public class JobValidationData {
 
     public Map<String, String> getUpdatedModels() {
         return updatedModels;
+    }
+
+    public Map<String, String> getUpdatedDescriptions() {
+        return updatedDescriptions;
+    }
+
+    public void setUpdatedDescriptions(Map<String, String> updatedDescriptions) {
+        this.updatedDescriptions = updatedDescriptions;
+    }
+
+    public Map<String, String> getUpdatedGroups() {
+        return updatedGroups;
+    }
+
+    public void setUpdatedGroups(Map<String, String> updatedGroups) {
+        this.updatedGroups = updatedGroups;
+    }
+
+    public Map<String, Boolean> getUpdatedAdvanced() {
+        return updatedAdvanced;
+    }
+
+    public void setUpdatedAdvanced(Map<String, Boolean> updatedAdvanced) {
+        this.updatedAdvanced = updatedAdvanced;
+    }
+
+    public Map<String, Boolean> getUpdatedHidden() {
+        return updatedHidden;
+    }
+
+    public void setUpdatedHidden(Map<String, Boolean> updatedHidden) {
+        this.updatedHidden = updatedHidden;
     }
 }
