@@ -451,6 +451,11 @@ public class SchedulerTHelper {
         userInt.removeJob(id);
     }
 
+    public void restartAllInErrorTasks(String jobId) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        userInt.restartAllInErrorTasks(jobId);
+    }
+
     /**
      * Creates and submit a job from an XML job descriptor, and check, with assertions,
      * event related to this job submission :
@@ -945,6 +950,42 @@ public class SchedulerTHelper {
                                                               jobId,
                                                               taskName,
                                                               timeout);
+    }
+
+    /**
+     * Wait for a task failed that reaches in-error state.
+     * If corresponding event has been already thrown by scheduler, returns immediately
+     * with TaskInfo object associated to event, otherwise wait for reception
+     * of the corresponding event.
+     *
+     * @param jobId job identifier, for which task belongs.
+     * @param taskName for which event is waited for.
+     * @return TaskInfo event's associated object.
+     */
+    public TaskInfo waitForEventTaskInError(JobId jobId, String taskName) {
+        try {
+            return waitForEventTaskInError(jobId, taskName, 0);
+        } catch (ProActiveTimeoutException e) {
+            //unreachable block, 0 means infinite, no timeout
+            //log sthing ?
+            return null;
+        }
+    }
+
+    /**
+     * Wait for a task failed that reaches in-error state.
+     * If corresponding event has been already thrown by scheduler, returns immediately
+     * with TaskInfo object associated to event, otherwise wait for reception
+     * of the corresponding event.
+     *
+     * @param jobId job identifier, for which task belongs.
+     * @param taskName for which event is waited for.
+     * @param timeout max waiting time in milliseconds.
+     * @return TaskInfo event's associated object.
+     * @throws ProActiveTimeoutException if timeout is reached.
+     */
+    public TaskInfo waitForEventTaskInError(JobId jobId, String taskName, long timeout) {
+        return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_IN_ERROR, jobId, taskName, timeout);
     }
 
     /**
