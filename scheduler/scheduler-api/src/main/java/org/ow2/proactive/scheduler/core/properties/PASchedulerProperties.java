@@ -345,6 +345,11 @@ public enum PASchedulerProperties implements PACommonProperties {
     HSQLDB_LOCATION("pa.hsqldb.location", PropertyType.STRING),
 
     /**
+     * An internal property which is set to true automatically after the rest server is started
+     */
+    JETTY_STARTED("pa.scheduler.rest.started", PropertyType.BOOLEAN),
+
+    /**
      * Scheduler rest url
      * Accessed inside workflows and tasks with the PA_SCHEDULER_REST_URL variable
      */

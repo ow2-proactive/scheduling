@@ -238,6 +238,9 @@ public class SchedulerStarter {
         schedulerURL = getSchedulerUrl(commandLine);
         if (commandLine.hasOption(OPTION_NO_REST)) {
             System.setProperty(REST_DISABLED_PROPERTY, "true");
+            PASchedulerProperties.JETTY_STARTED.updateProperty("true");
+        } else if (PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+            PASchedulerProperties.JETTY_STARTED.updateProperty("false");
         }
 
         if (!commandLine.hasOption(OPTION_SCHEDULER_URL)) {
@@ -252,6 +255,7 @@ public class SchedulerStarter {
             long jettyEndTime = System.nanoTime();
             LOGGER.debug("Jetty started in " +
                          String.valueOf(((double) jettyEndTime - jettyStartTime) / 1_000_000_000) + " seconds");
+            PASchedulerProperties.JETTY_STARTED.updateProperty("true");
         }
 
         addShutdownMessageHook();

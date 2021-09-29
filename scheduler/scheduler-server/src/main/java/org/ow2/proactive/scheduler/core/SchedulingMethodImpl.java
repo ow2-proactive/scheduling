@@ -491,7 +491,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             throw new IllegalArgumentException("The two given lists must not be null !");
         }
         int totalNeededNodes = 0;
-        if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+        if (PASchedulerProperties.JETTY_STARTED.isSet() && !PASchedulerProperties.JETTY_STARTED.getValueAsBoolean()) {
             Iterator<EligibleTaskDescriptor> it = bagOfTasks.iterator();
             EligibleTaskDescriptor etd;
             while (it.hasNext()) {
