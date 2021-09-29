@@ -28,14 +28,29 @@ package functionaltests.job.error;
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.examples.EmptyTask;
 import org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.TestScheduler;
@@ -57,6 +72,10 @@ import functionaltests.utils.TestScheduler;
  * @since ProActive Scheduling 1.0
  */
 public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
+
+    private static final String inerror_groovy_script = "throw new Exception(\"error\")";
+
+    private static final String ok_groovy_script = "println \"OK\"";
 
     @Test
     public void testErrorAndFailure() throws Throwable {
@@ -127,4 +146,76 @@ public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
         assertEquals(jInfo.getJobId(), id);
 
     }
+
+    @Test
+    public void testPauseJobErrorPolicyRestartAllInErrorTasks() throws Throwable {
+        testRestartInError(false, false);
+    }
+
+    @Test
+    public void testPauseJobErrorPolicyRestartInErrorTask() throws Throwable {
+        testRestartInError(true, false);
+    }
+
+    @Test
+    public void testPauseTaskErrorPolicyRestartAllInErrorTasks() throws Throwable {
+        testRestartInError(false, true);
+    }
+
+    @Test
+    public void testPauseTaskErrorPolicyRestartInErrorTask() throws Throwable {
+        testRestartInError(true, true);
+    }
+
+    private void testRestartInError(boolean restartSingleTask, boolean pauseTaskPolicy) throws Throwable {
+        TaskFlowJob submittedJob = new TaskFlowJob();
+        submittedJob.setName(this.getClass().getSimpleName() +
+                             (pauseTaskPolicy ? "_pauseTaskPolicy" : "_pauseJobPolicy"));
+        submittedJob.setDescription("A job testing in-error behavior.");
+        submittedJob.setMaxNumberOfExecution(1);
+        submittedJob.setOnTaskError(pauseTaskPolicy ? OnTaskError.PAUSE_TASK : OnTaskError.PAUSE_JOB);
+
+        File groovyScriptFile = File.createTempFile("inerrorTask", ".groovy");
+        FileUtils.writeStringToFile(groovyScriptFile, inerror_groovy_script, StandardCharsets.UTF_8.toString());
+        ScriptTask taskInError = new ScriptTask();
+        final String errorTaskName = "errorTask";
+        taskInError.setName(errorTaskName);
+        taskInError.setScript(new TaskScript(new SimpleScript(groovyScriptFile.toURI().toURL(),
+                                                              "groovy",
+                                                              new Serializable[0])));
+        JavaTask taskOk = new JavaTask();
+        taskOk.setName("okTask");
+        taskOk.setExecutableClassName(EmptyTask.class.getName());
+        taskOk.addDependence(taskInError);
+        submittedJob.addTask(taskInError);
+        submittedJob.addTask(taskOk);
+
+        JobId id = schedulerHelper.submitJob(submittedJob);
+        log("Job submitted, id " + id.toString());
+        log("Waiting for jobSubmitted Event");
+        Job receivedJob = schedulerHelper.waitForEventJobSubmitted(id);
+        assertEquals(receivedJob.getId(), id);
+        log("Waiting for job running");
+        JobInfo jInfo = schedulerHelper.waitForEventJobRunning(id);
+        assertEquals(jInfo.getJobId(), id);
+        schedulerHelper.waitForEventTaskInError(id, errorTaskName);
+        FileUtils.writeStringToFile(groovyScriptFile, ok_groovy_script, StandardCharsets.UTF_8.toString());
+        if (restartSingleTask) {
+            schedulerHelper.getSchedulerInterface().restartInErrorTask(id.toString(), errorTaskName);
+        } else {
+            schedulerHelper.restartAllInErrorTasks(id.toString());
+        }
+        if (!pauseTaskPolicy) {
+            schedulerHelper.getSchedulerInterface().resumeJob(id);
+        }
+        schedulerHelper.waitForEventTaskFinished(id, errorTaskName);
+        schedulerHelper.waitForEventTaskRunning(id, "okTask");
+        JobInfo jobInfo = schedulerHelper.getSchedulerInterface().getJobInfo(id.toString());
+        Assert.assertTrue(jobInfo.getStatus() == JobStatus.RUNNING || jobInfo.getStatus() == JobStatus.STALLED);
+        schedulerHelper.waitForEventJobFinished(id);
+        jobInfo = schedulerHelper.getSchedulerInterface().getJobInfo(id.toString());
+        Assert.assertEquals(JobStatus.FINISHED, jobInfo.getStatus());
+        groovyScriptFile.delete();
+    }
+
 }

@@ -275,15 +275,18 @@ class LiveJobs {
             InternalJob job = jobData.job;
             for (TaskState taskState : job.getTasks()) {
                 try {
-                    restartInErrorTask(jobId, taskState.getName());
+                    InternalTask task = jobData.job.getTask(taskState.getName());
+                    if (task.getStatus() == TaskStatus.IN_ERROR) {
+                        tlogger.info(task.getId(), "restarting in-error task " + task.getId());
+                        jobData.job.restartInErrorTask(task);
+                    }
                 } catch (UnknownTaskException e) {
                     logger.error("", e);
                     jlogger.error(jobId, "", e);
                     tlogger.error(taskState.getId(), "", e);
                 }
             }
-
-            setJobStatusToInErrorIfNotPaused(job);
+            setJobStatusAfterInErrorTaskRestart(jobData.job);
 
             dbManager.updateJobAndRestartAllInErrorTasks(job);
             updateJobInSchedulerState(job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
@@ -713,13 +716,13 @@ class LiveJobs {
                         task.removeParentTasksResults();
                     } else if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration());
-                        tlogger.info(taskId,
-                                     "Task always contains errors after automatic restart, so it stays in In_Error state");
+                        tlogger.info(taskId, "Task still contains errors after restart, so it stays in InError state");
                         return terminationData;
                     } else if (requiresPauseJobOnError) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration());
                         pauseJob(task.getJobId());
-                        logger.info("Task always contains errors after automatic restart, so Job is always paused on error");
+                        tlogger.info(taskId,
+                                     "Task still contains errors after automatic restart, the Job is configured to pause on error");
                         return terminationData;
                     }
 
@@ -763,10 +766,18 @@ class LiveJobs {
     }
 
     private void setJobStatusToInErrorIfNotPaused(InternalJob job) {
+        // maybe set the job to IN_ERROR state if it's not already in paused state (error policy : OnTaskError.PAUSE_JOB)
         if (!job.getStatus().equals(JobStatus.PAUSED) && job.getNumberOfInErrorTasks() > 0) {
-
             job.setStatus(JobStatus.IN_ERROR);
+        }
+    }
 
+    private void setJobStatusAfterInErrorTaskRestart(InternalJob job) {
+        // Resume the job to RUNNING state, unless some InError tasks remain or the job is in paused state
+        if (!job.getStatus().equals(JobStatus.PAUSED) && job.getNumberOfInErrorTasks() > 0) {
+            job.setStatus(JobStatus.IN_ERROR);
+        } else if (job.getStatus().equals(JobStatus.IN_ERROR) && job.getNumberOfInErrorTasks() == 0) {
+            job.setStatus(JobStatus.RUNNING);
         }
     }
 
@@ -846,8 +857,14 @@ class LiveJobs {
         JobData jobData = lockJob(jobId);
         try {
             InternalTask task = jobData.job.getTask(taskName);
-            tlogger.info(task.getId(), "restarting in-error task " + task.getId());
-            jobData.job.restartInErrorTask(task);
+            if (task.getStatus() == TaskStatus.IN_ERROR) {
+                tlogger.info(task.getId(), "restarting in-error task " + task.getId());
+                jobData.job.restartInErrorTask(task);
+                setJobStatusAfterInErrorTaskRestart(jobData.job);
+
+                dbManager.updateJobAndTaskState(jobData.job, task);
+                updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
+            }
         } finally {
             jobData.unlock();
         }
