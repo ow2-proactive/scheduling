@@ -120,7 +120,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Returns the USER DataSpace URIs associated with the current user
-     * 
+     *
      * @return USER Space URIs (one element for each available protocol)
      * @throws NotConnectedException
      *             if you are not authenticated.
@@ -129,7 +129,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Returns the GLOBAL DataSpace URI available to all users
-     * 
+     *
      * @return GLOBAL Space URIs (one element for each available protocol)
      * @throws NotConnectedException
      *             if you are not authenticated.
@@ -1377,7 +1377,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     /**
      * Test whether or not the user is connected to the ProActive Scheduler.
      * Note that a call to this method DOES NOT renew the connection lease.
-     * 
+     *
      * @return true if the user connected to a Scheduler, false otherwise.
      */
     boolean isConnected();
@@ -1405,7 +1405,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * This method renew the connection lease without other side effect.
-     * 
+     *
      * @throws NotConnectedException
      *             if you are not authenticated.
      */
@@ -1414,13 +1414,13 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     /**
      * Retrieves server logs for a job with the given id. Only the job owner of
      * admin if the scheduler can request these logs.
-     * 
+     *
      * It's a combination of corresponding tasks logs belonging to this job plus
      * some extra job specific information.
-     * 
+     *
      * @param id
      *            of the job for which logs are requested
-     * 
+     *
      * @return job's logs
      * @throws UnknownJobException
      *             if the job does not exist.
@@ -1434,15 +1434,15 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     /**
      * Retrieves server logs for a task with the given id. Only the job owner of
      * admin if the scheduler can request these logs.
-     * 
+     *
      * It's a combination of corresponding tasks logs belonging to this job plus
      * some extra job specific information.
-     * 
+     *
      * @param id
      *            of the job where the task is.
      * @param taskName
      *            the name of the task.
-     * 
+     *
      * @return tasks's logs
      * @throws UnknownJobException
      *             if the job does not exist.
@@ -1533,7 +1533,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Retrieve a tasks names list from the scheduler.
-     * 
+     *
      * @param taskTag
      *            a complete tag to use to filter tasks
      * @param from
@@ -1560,7 +1560,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Retrieve a taskstates list from the scheduler.
-     * 
+     *
      * @param taskTag
      *            a complete tag to use to filter tasks
      * @param from
@@ -1585,7 +1585,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Retrieve a job info by it id.
-     * 
+     *
      * @param jobId
      *            the id of the job we want to fetch info.
      * @return the <code>JobInfo</code> associated to the given id
@@ -1595,7 +1595,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     /**
      * Change the START_AT generic information at job level and reset the
      * scheduledAt at task level
-     * 
+     *
      * @param jobId
      *            id of the job that needs to be updated
      * @param startAt
@@ -1612,8 +1612,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * @return
-     * @throws PermissionException 
-     * @throws NotConnectedException 
+     * @throws PermissionException
+     * @throws NotConnectedException
      */
     Map<Object, Object> getPortalConfiguration() throws SchedulerException;
 
