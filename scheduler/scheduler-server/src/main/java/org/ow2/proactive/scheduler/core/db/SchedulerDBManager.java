@@ -401,12 +401,12 @@ public class SchedulerDBManager {
                     queryString.append("and parentId = null ");
                 }
 
-                if (!params.getJobName().isEmpty()) {
-                    queryString.append("and lower(jobName) like :jobName ");
+                if (params.getJobName() != null && !params.getJobName().isEmpty()) {
+                    queryString.append("and jobName like :jobName ");
                 }
 
-                if (!params.getProjectName().isEmpty()) {
-                    queryString.append("and lower(projectName) like :projectName ");
+                if (params.getProjectName() != null && !params.getProjectName().isEmpty()) {
+                    queryString.append("and projectName like :projectName ");
                 }
 
                 Query query = session.createQuery(queryString.toString());
@@ -414,12 +414,12 @@ public class SchedulerDBManager {
                 if (hasUser) {
                     query.setParameter("user", params.getUser());
                 }
-                if (!params.getJobName().isEmpty()) {
-                    query.setParameter("jobName", params.getJobName().toLowerCase() + '%');
+                if (params.getJobName() != null && !params.getJobName().isEmpty()) {
+                    query.setParameter("jobName", params.getJobName() + '%');
                 }
 
-                if (!params.getProjectName().isEmpty()) {
-                    query.setParameter("projectName", params.getJobName().toLowerCase() + '%');
+                if (params.getProjectName() != null && !params.getProjectName().isEmpty()) {
+                    query.setParameter("projectName", params.getProjectName() + '%');
                 }
 
                 Long count = (Long) query.uniqueResult();
