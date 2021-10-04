@@ -243,10 +243,10 @@ public class SchedulerDBManager {
                 criteria.add(Restrictions.isNull("parentId"));
             }
             if (jobName != null && !jobName.isEmpty()) {
-                criteria.add(Restrictions.like("jobName", jobName, MatchMode.START).ignoreCase());
+                criteria.add(Restrictions.like("jobName", jobName, MatchMode.START));
             }
             if (projectName != null && !projectName.isEmpty()) {
-                criteria.add(Restrictions.like("projectName", projectName, MatchMode.START).ignoreCase());
+                criteria.add(Restrictions.like("projectName", projectName, MatchMode.START));
             }
             boolean allJobs = pending && running && finished;
             if (!allJobs) {
