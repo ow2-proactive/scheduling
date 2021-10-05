@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -477,13 +478,10 @@ public abstract class SelectionManager {
         // creating script executors object to be run in dedicated thread pool
         List<Callable<Node>> scriptExecutors = new LinkedList<>();
         synchronized (inProgress) {
+            cleanupInProgressNodeList();
             if (inProgress.size() > 0) {
-                logger.warn(inProgress.size() + " nodes are in process of script execution");
-                for (String nodeName : inProgress) {
-                    logger.warn(nodeName);
-
-                }
-                logger.warn("Something is wrong on these nodes");
+                logger.info(inProgress.size() + " nodes are in process of script execution");
+                logger.info("Nodes already executing scripts: " + inProgress);
             }
             for (RMNode node : candidates) {
                 if (!inProgress.contains(node.getNodeURL())) {
@@ -518,6 +516,14 @@ public abstract class SelectionManager {
         }
 
         return matched;
+    }
+
+    private void cleanupInProgressNodeList() {
+        List<RMNode> freeNodes = rmcore.getFreeNodes();
+        List<String> freeNodesUrls = freeNodes.stream().map(rmnode -> rmnode.getNodeURL()).collect(Collectors.toList());
+        synchronized (inProgress) {
+            inProgress.removeIf(nodeUrl -> !freeNodesUrls.contains(nodeUrl));
+        }
     }
 
     private boolean isClientNodeUserAllPermission(Client client) {
