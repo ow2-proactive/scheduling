@@ -102,7 +102,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Returns the ids of the current jobs under a list of string.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param index
@@ -124,7 +124,7 @@ public interface SchedulerRestInterface {
      * Returns a subset of the scheduler state, including pending, running,
      * finished jobs (in this particular order). each jobs is described using -
      * its id - its owner - the JobInfo class
-     * 
+     *
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
@@ -177,7 +177,7 @@ public interface SchedulerRestInterface {
      * Returns a map containing one entry with the revision id as key and the
      * list of UserJobData as value. each jobs is described using - its id - its
      * owner - the JobInfo class
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param index
@@ -194,6 +194,14 @@ public interface SchedulerRestInterface {
      *            fetch running jobs
      * @param finished
      *            fetch finished jobs
+     * @param childJobs
+     *             fetch childJobs (submitted by parent job(s))
+     * @param jobName
+     *             Include only jobs with a name that starts with jobName (case in-sensitive)
+     * @param projectName
+     *             Include only jobs with a project name that starts with projectName (case in-sensitive)
+     * @param userName
+     *             Include only jobs with a user name that matches exactly with userName (case in-sensitive)
      * @param sortParams
      *            string containing sort directives. It must contain a comma separated list of sort parameters.
      *            A sort parameter can contain ID,STATE,OWNER,PRIORITY,NAME,SUBMIT_TIME,START_TIME,IN_ERROR_TIME,FINISH_TIME,TOTAL_TASKS,
@@ -214,11 +222,14 @@ public interface SchedulerRestInterface {
             @QueryParam("running") @DefaultValue("true") boolean running,
             @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("childJobs") @DefaultValue("true") boolean childJobs,
-            @QueryParam("sortParams") String sortParams) throws RestException;
+            @QueryParam("jobName") @DefaultValue("") String jobName,
+            @QueryParam("projectName") @DefaultValue("") String projectName,
+            @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("sortParams") String sortParams)
+            throws RestException;
 
     /**
      * Returns the revision number of the scheduler state
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @return the revision of the scheduler state
@@ -230,7 +241,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Returns a JobState of the job identified by the id <code>jobid</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -245,7 +256,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns the job result associated to the job referenced by the id
      * <code>jobid</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return the job result of the corresponding job
@@ -287,7 +298,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns the job info associated to the job referenced by the id
      * <code>jobid</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return the job info of the corresponding job
@@ -306,7 +317,7 @@ public interface SchedulerRestInterface {
      * string 'Unknown value type'. To get the serialized form of a given
      * result, one has to call the following restful service
      * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -321,14 +332,14 @@ public interface SchedulerRestInterface {
 
     /**
      * Delete a job
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            the id of the job to delete
      * @return true if success, false if the job not yet finished (not removed,
      *         kill the job then remove it)
-     * 
+     *
      */
     @DELETE
     @Path("jobs/{jobid}")
@@ -353,7 +364,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Returns job server logs
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -396,7 +407,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -412,7 +423,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code> with pagination
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -433,7 +444,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -452,7 +463,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code> (with pagination)
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @param jobId
@@ -482,7 +493,7 @@ public interface SchedulerRestInterface {
      * parameters are not specified, the following values will be used: [0,
      * DEFAULT_VALUE[ The DEFAULT_VALUE can be set in the scheduler config file
      * as the <code>pa.scheduler.tasks.page.size</code> parameter.
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @param from
@@ -522,7 +533,7 @@ public interface SchedulerRestInterface {
      * parameters are not specified, the following values will be used: [0,
      * DEFAULT_VALUE[ The DEFAULT_VALUE can be set in the scheduler config file
      * as the <code>pa.scheduler.tasks.page.size</code> parameter.
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @param taskTag
@@ -561,7 +572,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns a list of the tags of the tasks belonging to job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -577,7 +588,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns a list of the tags of the tasks belonging to job
      * <code>jobId</code> and filtered by a prefix pattern
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -660,7 +671,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Returns a list of taskState with pagination
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -691,7 +702,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Returns a list of taskState of the tasks filtered by a given tag.
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @param jobId
@@ -711,7 +722,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns a list of taskState of the tasks filtered by a given tag and
      * paginated.
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @param jobId
@@ -751,7 +762,7 @@ public interface SchedulerRestInterface {
      * will be used: [0, DEFAULT_VALUE[ The DEFAULT_VALUE can be set in the
      * scheduler config file as the <code>pa.scheduler.tasks.page.size</code>
      * parameter.
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @param from
@@ -793,7 +804,7 @@ public interface SchedulerRestInterface {
      * will be used: [0, DEFAULT_VALUE[ The DEFAULT_VALUE can be set in the
      * scheduler config file as the <code>pa.scheduler.tasks.page.size</code>
      * parameter.
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @param taskTag
@@ -879,7 +890,7 @@ public interface SchedulerRestInterface {
     /**
      * Return the task state of the task <code>taskname</code> of the job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -902,7 +913,7 @@ public interface SchedulerRestInterface {
      * string 'Unknown value type' </strong>. To get the serialized form of a
      * given result, one has to call the following restful service
      * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -925,7 +936,7 @@ public interface SchedulerRestInterface {
      * by the string 'Unknown value type' </strong>. To get the serialized form
      * of a given result, one has to call the following restful service
      * jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1058,7 +1069,7 @@ public interface SchedulerRestInterface {
      * Returns the values of a set of tasks of the job <code>jobId</code>
      * filtered by a given tag. This method returns the result as a byte array
      * whatever the result is.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1078,7 +1089,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns the task result of the task <code>taskName</code> of the job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1097,7 +1108,7 @@ public interface SchedulerRestInterface {
     /**
      * Returns the task results of the set of task filtered by a given tag and
      * owned by the job <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1266,7 +1277,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Returns task server logs
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1284,7 +1295,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Returns server logs for a set of tasks filtered by a given tag.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1302,7 +1313,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Pauses the job represented by jobid
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1318,7 +1329,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Restart all tasks in error in the job represented by jobid
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1334,7 +1345,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Resumes the job represented by jobid
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1350,7 +1361,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Submit job using flat command file
-     * 
+     *
      * @param sessionId
      *            valid session id
      * @param commandFileContent
@@ -1508,7 +1519,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Pushes a file from the local file system into the given DataSpace
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param spaceName
@@ -1537,7 +1548,7 @@ public interface SchedulerRestInterface {
      * returns as an input stream In the case the path to a directory is given,
      * the input stream returned will be a text stream containing at each line
      * the content of the directory
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param spaceName
@@ -1555,7 +1566,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Deletes a file or recursively delete a directory from the given DataSpace
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param spaceName
@@ -1572,7 +1583,7 @@ public interface SchedulerRestInterface {
 
     /**
      * terminates the session id <code>sessionId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @throws NotConnectedRestException
@@ -1588,7 +1599,7 @@ public interface SchedulerRestInterface {
 
     /**
      * pauses the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
@@ -1601,7 +1612,7 @@ public interface SchedulerRestInterface {
 
     /**
      * stops the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
@@ -1614,7 +1625,7 @@ public interface SchedulerRestInterface {
 
     /**
      * resumes the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
@@ -1627,7 +1638,7 @@ public interface SchedulerRestInterface {
 
     /**
      * changes the priority of a job
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1644,7 +1655,7 @@ public interface SchedulerRestInterface {
 
     /**
      * changes the priority of a job
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1661,7 +1672,7 @@ public interface SchedulerRestInterface {
 
     /**
      * freezes the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
@@ -1674,7 +1685,7 @@ public interface SchedulerRestInterface {
 
     /**
      * returns the status of the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return the scheduler status
@@ -1687,7 +1698,7 @@ public interface SchedulerRestInterface {
 
     /**
      * starts the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
@@ -1700,7 +1711,7 @@ public interface SchedulerRestInterface {
 
     /**
      * kills the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false if not
@@ -1727,7 +1738,7 @@ public interface SchedulerRestInterface {
     /**
      * Reconnect a new Resource Manager to the scheduler. Can be used if the
      * resource manager has crashed.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param rmURL
@@ -1742,7 +1753,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Tests whether or not the user is connected to the ProActive Scheduler
-     * 
+     *
      * @param sessionId
      *            the session to test
      * @return true if the user connected to a Scheduler, false otherwise.
@@ -1757,7 +1768,7 @@ public interface SchedulerRestInterface {
     /**
      * login to the scheduler using an form containing 2 fields (username and
      * password)
-     * 
+     *
      * @param username
      *            username
      * @param password
@@ -1814,10 +1825,10 @@ public interface SchedulerRestInterface {
 
     /**
      * Get the login string associated to the {@code sessionId} if it exists
-     * 
-     * In case that the given sessionId doesn't have an associated login (session id expired, or invalid), 
+     *
+     * In case that the given sessionId doesn't have an associated login (session id expired, or invalid),
      * this endpoint will return an empty string
-     * 
+     *
      * @param sessionId with which the endpoint is going to look for the login value
      * @return the associated login value or an empty string
      */
@@ -1844,7 +1855,7 @@ public interface SchedulerRestInterface {
      * login to the scheduler using a multipart form can be used either by
      * submitting - 2 fields: username and password - a credential file with
      * field name 'credential'
-     * 
+     *
      * @return the session id associated to this new connection
      */
     @POST
@@ -1856,7 +1867,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Users currently connected to the scheduler
-     * 
+     *
      * @param sessionId
      *            the session id associated to this new connection
      * @return list of users
@@ -1880,7 +1891,7 @@ public interface SchedulerRestInterface {
 
     /**
      * Users having jobs in the scheduler
-     * 
+     *
      * @param sessionId
      *            the session id associated to this new connection
      * @return list of users
@@ -1894,7 +1905,7 @@ public interface SchedulerRestInterface {
 
     /**
      * returns statistics about the scheduler
-     * 
+     *
      * @param sessionId
      *            the session id associated to this new connection
      * @return a string containing the statistics
@@ -1927,7 +1938,7 @@ public interface SchedulerRestInterface {
 
     /**
      * returns a string containing some data regarding the user's account
-     * 
+     *
      * @param sessionId
      *            the session id associated to this new connection
      * @return a string containing some data regarding the user's account
@@ -1940,7 +1951,7 @@ public interface SchedulerRestInterface {
 
     /**
      * generates a credential file from user provided credentials
-     * 
+     *
      * @return the credential file generated by the scheduler
      */
     @POST
@@ -1956,7 +1967,7 @@ public interface SchedulerRestInterface {
      * Only the jobs finished between the start date and the end date will be
      * returned: i.e {@code startDate <= job.finishedTime <= endDate}.
      * </p>
-     * 
+     *
      * @param sessionId
      *            a valid session id to identify the caller
      * @param startDate
@@ -1985,7 +1996,7 @@ public interface SchedulerRestInterface {
      * Only the jobs finished between the start date and the end date will be
      * returned: i.e {@code startDate <= job.finishedTime <= endDate}.
      * </p>
-     * 
+     *
      * @param sessionId
      *            a valid session id to identify the caller
      * @param user
@@ -2245,7 +2256,7 @@ public interface SchedulerRestInterface {
     /**
      * Change the START_AT generic information at job level and reset the
      * scheduledAt at task level
-     * 
+     *
      * @param sessionId
      *            current session
      * @param jobId
@@ -2283,7 +2294,7 @@ public interface SchedulerRestInterface {
     final String sessionId) throws RestException;
 
     /**
-     * 
+     *
      * Check if the user has the permission to execute the method passed as argument
      *
      * @param sessionId
@@ -2292,7 +2303,7 @@ public interface SchedulerRestInterface {
      *            id of the job
      * @param method
      *            method name to check
-     * 
+     *
      * @return true if the user has the permission to execute the java method
      */
     @GET

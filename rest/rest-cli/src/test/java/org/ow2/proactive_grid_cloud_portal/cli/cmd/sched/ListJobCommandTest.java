@@ -101,20 +101,16 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    null,
+                                                                    null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
-                                                                       index,
-                                                                       10,
-                                                                       false,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       null);
+        Mockito.verify(schedulerRestInterfaceMock)
+               .revisionAndJobsInfo("sessionid", index, 10, false, true, true, true, true, null, null, null, null);
     }
 
     @Test
@@ -139,20 +135,16 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    null,
+                                                                    null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
-                                                                       index,
-                                                                       1,
-                                                                       false,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       null);
+        Mockito.verify(schedulerRestInterfaceMock)
+               .revisionAndJobsInfo("sessionid", index, 1, false, true, true, true, true, null, null, null, null);
 
     }
 
@@ -178,20 +170,16 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    null,
+                                                                    null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
-                                                                       index,
-                                                                       3,
-                                                                       false,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       null);
+        Mockito.verify(schedulerRestInterfaceMock)
+               .revisionAndJobsInfo("sessionid", index, 3, false, true, true, true, true, null, null, null, null);
     }
 
     @Test
@@ -216,20 +204,16 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    null,
+                                                                    null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
-                                                                       index,
-                                                                       10,
-                                                                       false,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       null);
+        Mockito.verify(schedulerRestInterfaceMock)
+               .revisionAndJobsInfo("sessionid", index, 10, false, true, true, true, true, null, null, null, null);
 
     }
 
@@ -255,20 +239,16 @@ public class ListJobCommandTest {
                                                                     true,
                                                                     true,
                                                                     true,
+                                                                    null,
+                                                                    null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
         new ListJobCommand().execute(currentContextMock);
 
-        Mockito.verify(schedulerRestInterfaceMock).revisionAndJobsInfo("sessionid",
-                                                                       index,
-                                                                       10,
-                                                                       false,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       true,
-                                                                       null);
+        Mockito.verify(schedulerRestInterfaceMock)
+               .revisionAndJobsInfo("sessionid", index, 10, false, true, true, true, true, null, null, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)

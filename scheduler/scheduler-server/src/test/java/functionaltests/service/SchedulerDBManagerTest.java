@@ -243,23 +243,44 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         initExpectedResults("testGetTotalJobsCount-Job", "TEST-TAG");
 
         // default parameters
-        actualJobPage = dbManager.getJobs(0, 0, null, true, true, true, true, null);
+        actualJobPage = dbManager.getJobs(0, 0, null, true, true, true, true, null, null, null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
         // no pagination, no user, no pending, no running, no finished
-        actualJobPage = dbManager.getJobs(0, 0, null, false, false, false, true, null);
+        actualJobPage = dbManager.getJobs(0, 0, null, false, false, false, true, null, null, null);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
         // no pagination, user = "admin", pending, running, finished
-        actualJobPage = dbManager.getJobs(0, 0, "admin", true, true, true, true, null);
+        actualJobPage = dbManager.getJobs(0, 0, "admin", true, true, true, true, null, null, null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
+        // no pagination, user = "admin", pending, running, finished, jobName = "testGetTotalJobsCount-Job"
+        actualJobPage = dbManager.getJobs(0,
+                                          0,
+                                          "admin",
+                                          true,
+                                          true,
+                                          true,
+                                          true,
+                                          "testGetTotalJobsCount-Job",
+                                          null,
+                                          null);
+        assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
+
+        // no pagination, user = "admin", pending, running, finished, jobName = "testGetTotal"
+        actualJobPage = dbManager.getJobs(0, 0, "admin", true, true, true, true, "testGetTotal", null, null);
+        assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
+
+        // no pagination, user = "admin", pending, running, finished, jobName = "invalid_job_name"
+        actualJobPage = dbManager.getJobs(0, 0, "admin", true, true, true, true, "invalid_job_name", null, null);
+        assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
+
         // no pagination, user = "invalid_user", pending, no running, finished
-        actualJobPage = dbManager.getJobs(0, 0, "invalid_user", true, true, true, true, null);
+        actualJobPage = dbManager.getJobs(0, 0, "invalid_user", true, true, true, true, null, null, null);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
         // pagination [0,5[, user = "admin", pending, running, finished
-        actualJobPage = dbManager.getJobs(0, 5, "admin", true, true, true, true, null);
+        actualJobPage = dbManager.getJobs(0, 5, "admin", true, true, true, true, null, null, null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
     }
 
@@ -402,7 +423,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
 
         dbManager.updateJobAndTasksState(job);
 
-        Page<JobInfo> jobs = dbManager.getJobs(0, 10, null, true, true, true, true, null);
+        Page<JobInfo> jobs = dbManager.getJobs(0, 10, null, true, true, true, true, null, null, null);
 
         assertThat(jobs.getSize()).isEqualTo(1);
 

@@ -1615,7 +1615,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
         boolean myJobsOnly = filterCriteria.isMyJobsOnly();
 
-        String user = null;
+        String user = filterCriteria.getUserName();
         if (myJobsOnly) {
             user = ident.getUsername();
         }
@@ -1627,6 +1627,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.isRunning(),
                                                    filterCriteria.isFinished(),
                                                    filterCriteria.isChildJobs(),
+                                                   filterCriteria.getJobName(),
+                                                   filterCriteria.getProjectName(),
                                                    sortParameters);
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
