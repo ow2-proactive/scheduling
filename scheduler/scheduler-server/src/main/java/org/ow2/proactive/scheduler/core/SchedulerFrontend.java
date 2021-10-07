@@ -59,8 +59,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyException;
@@ -73,6 +72,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -243,6 +245,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     private static final String SIGNAL_TASK = "0t0";
 
     private static final TaskId SIGNAL_TASK_ID = TaskIdImpl.makeTaskId(SIGNAL_TASK);
+
+    /**
+     * Attributes used for XSLT transformation of updating job descriptor schema version
+     */
+    private static final String xslFilePath = "stylesheet/schemas.xsl";
+
+    private static final String saxonFactoryClassName = "net.sf.saxon.TransformerFactoryImpl";
 
     /*
      * ######################################################################### ##################
@@ -1913,7 +1922,38 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         frontendState.checkPermissions("getJobContent",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB);
-        return dbManager.loadInitalJobContent(jobId);
+        return updateJobSchemaVersionToLatest(dbManager.loadInitalJobContent(jobId));
+    }
+
+    /**
+     * Use XSLT to change the schema version of the job descriptor to the latest.
+     * Specifically, it's to change "xmlns" and "xsi:schemaLocation" to the "dev" version.
+     * This function is used to fix the potential problem of schema version mismatch between global variables and job descriptor.
+     * Since the schema change is backward compatible, updating the job to the latest version will fix the version mismatch problem.
+     *
+      * @param jobContent the String content of job descriptor (in xml)
+     * @return the updated String content of job descriptor (in xml) which is changed to the latest version
+     */
+    private String updateJobSchemaVersionToLatest(String jobContent) {
+        try {
+            StreamSource xslSource = new StreamSource(this.getClass()
+                                                          .getClassLoader()
+                                                          .getResourceAsStream(xslFilePath));
+
+            StreamSource xmlInput = new StreamSource(new StringReader(jobContent));
+            StringWriter xmlOutput = new StringWriter();
+            Result result = new StreamResult(xmlOutput);
+
+            TransformerFactory factory = TransformerFactory.newInstance(saxonFactoryClassName, null);
+            Transformer transformer = factory.newTransformer(xslSource);
+            transformer.transform(xmlInput, result);
+
+            return xmlOutput.toString();
+        } catch (Exception e) {
+            logger.warn("Error during transforming the job descriptor schema to the latest version, it's kept unchanged.",
+                        e);
+            return jobContent;
+        }
     }
 
     @Override

@@ -55,6 +55,7 @@ dependencies {
 
 
     runtime 'org.hsqldb:hsqldb:2.5.1'
+    runtime 'net.sf.saxon:Saxon-HE:10.5'
 
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
