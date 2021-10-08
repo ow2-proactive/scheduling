@@ -109,7 +109,7 @@ public class TaskKillerTest {
                    is(false));
 
         // Wait 10 seconds for killing timeout to be exceeded
-        waitOrFailTest(10000);
+        waitOrFailTest(12000);
 
         assertThat("Task Killer must have interrupted at least twice after timeout has passed",
                    testThreadToBeInterrupted.isInterruptedMoreThanOnce,
