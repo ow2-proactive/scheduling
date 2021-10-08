@@ -137,10 +137,14 @@ public class NodeSource implements InitActive, RunActive, EndActive {
 
     private boolean toShutdown = false;
 
+    private static int MAX_REMOVED_NODES_HISTORY = 200;
+
     // all nodes except down
     private Map<String, Node> nodes;
 
     private Map<String, Node> downNodes;
+
+    private Map<String, Node> removedNodes;
 
     private static ThreadPoolHolder threadPoolHolder;
 
@@ -220,6 +224,13 @@ public class NodeSource implements InitActive, RunActive, EndActive {
 
         this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
         this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
+        // removedNodes is initialized using a LRU cache, it simply stores a fixed amount of removed nodes. After the maximum capacity is reached, it will replace oldest entries.
+        this.removedNodes = Collections.synchronizedMap(new LinkedHashMap<String, Node>(10, 0.75f, true) {
+            @Override
+            public boolean removeEldestEntry(Map.Entry eldest) {
+                return size() > MAX_REMOVED_NODES_HISTORY;
+            }
+        });
 
         // node source admin permission
         // it's the PrincipalPermission of the user who created the node source
@@ -347,6 +358,9 @@ public class NodeSource implements InitActive, RunActive, EndActive {
         logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
         RMDeployingNode rmDeployingNode = infrastructureManager.internalRegisterAcquiredNode(node);
         nodes.put(nodeUrl, node);
+        if (removedNodes.containsKey(nodeUrl)) {
+            removedNodes.remove(nodeUrl);
+        }
         return rmDeployingNode;
     }
 
@@ -772,6 +786,7 @@ public class NodeSource implements InitActive, RunActive, EndActive {
             logger.error("[" + this.name + "] cannot remove node: " + nodeUrl + " because it is unknown");
             return new BooleanWrapper(false);
         } else {
+            this.removedNodes.put(nodeUrl, node);
             RMCore.topologyManager.removeNode(node);
             try {
                 this.infrastructureManager.internalRemoveNode(node);
@@ -960,9 +975,9 @@ public class NodeSource implements InitActive, RunActive, EndActive {
             return;
         }
 
-        logger.warn("[" + name + "] Detected down node: " + nodeUrl);
         Node downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
+            logger.warn("[" + name + "] Detected down node: " + nodeUrl);
             downNodes.put(nodeUrl, downNode);
             try {
                 RMCore.topologyManager.removeNode(downNode);
@@ -970,7 +985,11 @@ public class NodeSource implements InitActive, RunActive, EndActive {
             } catch (RMException e) {
                 logger.error("Error while removing down node: " + nodeUrl, e);
             }
+        } else if (removedNodes.containsKey(nodeUrl)) {
+            logger.info("[" + name + "] Detected down node has already been removed: " + nodeUrl);
+            // node has been removed, ping detection is ignored
         } else {
+            logger.warn("[" + name + "] Detected down node: " + nodeUrl);
             // the node could not be found in the nodes map so we are trying
             // here to restore the nodes after a recovery of the RM: we have
             // almost no information about the node apart from its name and url
