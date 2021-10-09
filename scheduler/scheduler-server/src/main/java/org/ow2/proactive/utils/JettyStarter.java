@@ -73,6 +73,8 @@ public class JettyStarter {
 
     public static final String HTTPS_CONNECTOR_NAME = "https";
 
+    public static final String DEFAULT_XML_TRANSFORMER = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+
     private static final Logger logger = Logger.getLogger(JettyStarter.class);
 
     /**
@@ -91,6 +93,8 @@ public class JettyStarter {
 
         setSystemPropertyIfNotDefined("rm.url", rmUrl);
         setSystemPropertyIfNotDefined("scheduler.url", schedulerUrl);
+        System.setProperty(CentralPAPropertyRepository.JAVAX_XML_TRANSFORM_TRANSFORMERFACTORY.getName(),
+                           DEFAULT_XML_TRANSFORMER);
 
         if (WebProperties.WEB_DEPLOY.getValueAsBoolean()) {
             logger.info("Starting the web applications...");

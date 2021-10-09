@@ -141,6 +141,8 @@ public class SchedulerStarter {
 
     public static final String REST_DISABLED_PROPERTY = "pa.scheduler.rest.disabled";
 
+    public static final String DEFAULT_XML_TRANSFORMER = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+
     private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
 
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
@@ -167,6 +169,7 @@ public class SchedulerStarter {
         configureSecurityManager();
         configureLogging();
         configureDerby();
+        configureXMLTransformer();
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
@@ -743,6 +746,11 @@ public class SchedulerStarter {
 
     protected static void configureDerby() {
         setPropIfNotAlreadySet("derby.locks.deadlockTimeout", "1");
+    }
+
+    protected static void configureXMLTransformer() {
+        System.setProperty(CentralPAPropertyRepository.JAVAX_XML_TRANSFORM_TRANSFORMERFACTORY.getName(),
+                           DEFAULT_XML_TRANSFORMER);
     }
 
     protected static boolean setPropIfNotAlreadySet(String name, Object value) {
