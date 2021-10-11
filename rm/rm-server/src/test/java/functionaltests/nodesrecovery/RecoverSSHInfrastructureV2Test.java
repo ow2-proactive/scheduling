@@ -43,6 +43,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
+import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
@@ -69,7 +70,6 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     public void setup() throws Exception {
         TestSSHInfrastructureV2.startSSHServer();
         RMTHelper.log("SSH server started");
-        startRmAndCheckInitialState();
     }
 
     @After
@@ -88,6 +88,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
     @Test
     public void testRecoverSSHInfrastructureV2WithAliveNodes() throws Exception {
+        startRmAndCheckInitialState(false);
         // kill only the RM by sending a SIGKILL and leave node processes alive
         RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
         // nodes should be re-taken into account by the restarted RM
@@ -96,10 +97,25 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
     @Test
     public void testRecoverSSHInfrastructureV2WithDownNodes() throws Exception {
+        startRmAndCheckInitialState(false);
         // kill RM and nodes with SIGKILL
         RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
         // nodes should be re-deployed by the restarted RM
         restartRmAndCheckFinalState(0, TestSSHInfrastructureV2.NB_NODES);
+    }
+
+    @Test
+    public void testRecoverSSHInfrastructureV2WithDownNodesRestartPolicy() throws Exception {
+        startRmAndCheckInitialState(true);
+        // kill RM and nodes with SIGKILL
+        RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
+        // nodes should be re-deployed by the restarted RM
+        restartRmAndCheckFinalState(0, TestSSHInfrastructureV2.NB_NODES);
+        RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
+        while (resourceManagerMonitor.getState().getAliveNodes().size() < TestSSHInfrastructureV2.NB_NODES) {
+            Thread.sleep(5000);
+        }
+        RMTHelper.log("Restart down nodes policy redeployed nodes after restart");
     }
 
     private void startRmWithConfig(String configurationFilePath) throws Exception {
@@ -108,7 +124,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         resourceManager = rmHelper.getResourceManager();
     }
 
-    private void startRmAndCheckInitialState() throws Exception {
+    private void startRmAndCheckInitialState(boolean restartDownNodesPolicy) throws Exception {
         // start RM
         startRmWithConfig(START_CONFIG);
         assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isTrue();
@@ -120,7 +136,8 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         resourceManager.createNodeSource(NODE_SOURCE_NAME,
                                          SSHInfrastructureV2.class.getName(),
                                          TestSSHInfrastructureV2.infraParams,
-                                         StaticPolicy.class.getName(),
+                                         restartDownNodesPolicy ? RestartDownNodesPolicy.class.getName()
+                                                                : StaticPolicy.class.getName(),
                                          TestSSHInfrastructureV2.policyParameters,
                                          NODES_RECOVERABLE);
         RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME,
@@ -149,7 +166,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         assertThat(nodeSourceEvent.size()).isEqualTo(1);
         assertThat(nodeSourceEvent.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
 
-        // the nodes should have been recovered too, and should be alive
+        // the nodes should have been recovered too, and should be alive or down
         Set<String> allNodes = resourceManagerMonitor.getState().getAllNodes();
         assertThat(allNodes.size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
         Set<String> nodeSourceNames = new HashSet<>();

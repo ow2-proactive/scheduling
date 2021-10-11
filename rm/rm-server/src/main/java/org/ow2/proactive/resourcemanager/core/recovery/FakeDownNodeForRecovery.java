@@ -27,6 +27,8 @@ package org.ow2.proactive.resourcemanager.core.recovery;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.rmi.dgc.VMID;
 import java.util.Objects;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -55,9 +57,55 @@ public class FakeDownNodeForRecovery implements Node, Serializable {
 
     private String url;
 
-    public FakeDownNodeForRecovery(String name, String url) {
+    private String hostname;
+
+    private VMInformation vmInformation;
+
+    public FakeDownNodeForRecovery(String name, String url, String hostname) {
         this.name = name;
         this.url = url;
+        this.hostname = hostname;
+        this.vmInformation = new VMInformation() {
+            @Override
+            public VMID getVMID() {
+                return null;
+            }
+
+            @Override
+            public InetAddress getInetAddress() {
+                return null;
+            }
+
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public String getHostName() {
+                return FakeDownNodeForRecovery.this.hostname;
+            }
+
+            @Override
+            public String getDescriptorVMName() {
+                return null;
+            }
+
+            @Override
+            public long getCapacity() {
+                return 0;
+            }
+
+            @Override
+            public long getDeploymentId() {
+                return 0;
+            }
+
+            @Override
+            public long getTopologyId() {
+                return 0;
+            }
+        };
     }
 
     @Override
@@ -75,14 +123,14 @@ public class FakeDownNodeForRecovery implements Node, Serializable {
 
             @Override
             public VMInformation getVMInformation() {
-                return null;
+                return vmInformation;
             }
         };
     }
 
     @Override
     public VMInformation getVMInformation() {
-        return null;
+        return vmInformation;
     }
 
     @Override
