@@ -149,8 +149,6 @@ public class TopologyManager {
                 logger.debug("Adding Node " + node.getNodeInformation().getURL() + " to topology");
             }
 
-            InetAddress inetAddress = node.getVMInformation().getInetAddress();
-
             String hostName = node.getVMInformation().getHostName();
 
             if (topology.knownHost(hostName)) {
@@ -162,6 +160,8 @@ public class TopologyManager {
                 nodesOnHost.get(hostName).add(node);
                 return;
             }
+
+            InetAddress inetAddress = node.getVMInformation().getInetAddress();
 
             // unknown host => start pinging process
             NodeSet toPing = new NodeSet();

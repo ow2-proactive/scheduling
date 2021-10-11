@@ -228,7 +228,7 @@ public class NodesRecoveryManager {
             RMNodeData rmNodeData, String nodeUrl, Node node, NodeState previousState) {
         RMNode rmNode = nodeSource.internalAddNodeAfterRecovery(node, rmNodeData);
         this.rmCore.registerAvailableNode(rmNode);
-        if (node != null) {
+        if (!(node instanceof FakeDownNodeForRecovery)) {
             try {
                 RMCore.topologyManager.addNode(rmNode.getNode());
             } catch (Exception e) {
@@ -236,6 +236,7 @@ public class NodesRecoveryManager {
             }
             this.nodesLockRestorationManager.handle(rmNode, rmNodeData.getProvider());
         } else {
+            logger.info("Triggering down node notification for " + nodeUrl);
             this.triggerDownNodeHookIfNecessary(nodeSource, rmNodeData, nodeUrl, previousState);
         }
         this.updateRecoveredNodeStateCounter(nodeStates, rmNode.getState());
@@ -293,7 +294,7 @@ public class NodesRecoveryManager {
         } while (!connected && isPAMR && (System.currentTimeMillis() - initialTime) < Agent.MAXIMUM_RETRY_DELAY_MS);
 
         if (!connected) {
-            node = new FakeDownNodeForRecovery(rmNodeData.getName(), rmNodeData.getNodeUrl());
+            node = new FakeDownNodeForRecovery(rmNodeData.getName(), rmNodeData.getNodeUrl(), rmNodeData.getHostname());
             rmNodeData.setState(NodeState.DOWN);
             if (isPAMR) {
                 logger.error("Node " + nodeUrl + " could not be looked up.");
