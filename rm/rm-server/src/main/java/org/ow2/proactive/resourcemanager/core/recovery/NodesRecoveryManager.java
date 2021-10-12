@@ -236,6 +236,7 @@ public class NodesRecoveryManager {
             }
             this.nodesLockRestorationManager.handle(rmNode, rmNodeData.getProvider());
         } else {
+            this.nodesLockRestorationManager.handle(rmNode, rmNodeData.getProvider());
             logger.info("Triggering down node notification for " + nodeUrl);
             this.triggerDownNodeHookIfNecessary(nodeSource, rmNodeData, nodeUrl, previousState);
         }
