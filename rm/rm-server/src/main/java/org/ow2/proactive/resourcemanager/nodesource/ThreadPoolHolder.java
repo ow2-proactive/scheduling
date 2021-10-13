@@ -97,15 +97,19 @@ public class ThreadPoolHolder {
         pools[num].execute(task);
     }
 
-    public synchronized void shutdown(int num) {
+    public synchronized void shutdown(int num, int totalMaxWaitTime) {
         checkPoolNumber(num);
         pools[num].shutdown();
         try {
-            pools[num].awaitTermination(PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsLong() - 10,
-                                        TimeUnit.SECONDS);
+            pools[num].awaitTermination(totalMaxWaitTime, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.warn("Thread pool termination interrupted");
+            logger.warn("Thread pool " + num + " termination interrupted");
         }
+    }
+
+    public synchronized void shutdownNow(int num) {
+        checkPoolNumber(num);
+        pools[num].shutdownNow();
     }
 
     private void checkPoolNumber(int num) {

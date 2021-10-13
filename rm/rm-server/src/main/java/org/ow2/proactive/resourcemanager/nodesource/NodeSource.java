@@ -92,7 +92,7 @@ import com.google.common.annotations.VisibleForTesting;
  *
  */
 @ActiveObject
-public class NodeSource implements InitActive, RunActive, EndActive {
+public class NodeSource implements InitActive, RunActive {
 
     private static Logger logger = Logger.getLogger(NodeSource.class);
 
@@ -147,8 +147,6 @@ public class NodeSource implements InitActive, RunActive, EndActive {
     private Map<String, Node> removedNodes;
 
     private static ThreadPoolHolder threadPoolHolder;
-
-    private static AtomicInteger nodeSourceCount = new AtomicInteger(0);
 
     private NodeSource stub;
 
@@ -251,7 +249,7 @@ public class NodeSource implements InitActive, RunActive, EndActive {
                                              .orElse(new LinkedHashMap<>());
     }
 
-    private static void initThreadPools() {
+    public static void initThreadPools() {
         if (threadPoolHolder == null) {
             try {
                 int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
@@ -280,17 +278,25 @@ public class NodeSource implements InitActive, RunActive, EndActive {
         }
     }
 
+    public static void shutdownThreadPools() {
+        if (threadPoolHolder != null) {
+            threadPoolHolder.shutdownNow(PINGER_POOL);
+            logger.info("Pinger Thread Pool terminated");
+            threadPoolHolder.shutdown(EXTERNAL_POOL,
+                                      PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt() - 1);
+            logger.info("External Thread Pool terminated");
+            threadPoolHolder.shutdownNow(INTERNAL_POOL);
+            logger.info("Internal Thread Pool terminated");
+            threadPoolHolder = null;
+        }
+    }
+
     /**
      * Initialization of node source. Creates and activates a pinger to monitor nodes.
      *
      * @param body active object body
      */
     public void initActivity(Body body) {
-
-        synchronized (nodeSourceCount) {
-            nodeSourceCount.incrementAndGet();
-            initThreadPools();
-        }
 
         this.stub = (NodeSource) PAActiveObject.getStubOnThis();
         this.infrastructureManager.setNodeSource(this);
@@ -668,21 +674,6 @@ public class NodeSource implements InitActive, RunActive, EndActive {
         this.activePolicy.reconfigure(updatedPolicyParams);
     }
 
-    @Override
-    public void endActivity(Body body) {
-        synchronized (nodeSourceCount) {
-            if (nodeSourceCount.decrementAndGet() == 0) {
-                threadPoolHolder.shutdown(PINGER_POOL);
-                logger.info("Pinger Thread Pool terminated");
-                threadPoolHolder.shutdown(EXTERNAL_POOL);
-                logger.info("External Thread Pool terminated");
-                threadPoolHolder.shutdown(INTERNAL_POOL);
-                logger.info("Internal Thread Pool terminated");
-                threadPoolHolder = null;
-            }
-        }
-    }
-
     /**
      * Looks up the node
      */
@@ -807,8 +798,8 @@ public class NodeSource implements InitActive, RunActive, EndActive {
         if (this.nodes.size() == 0) {
             this.shutdownNodeSourceServices(initiator);
         } else {
-            logger.debug("[" + this.name + "] actual shutdown is skipped, because there are still some nodes " +
-                         this.nodes.size());
+            logger.warn("[" + this.name + "] actual shutdown is skipped, because there are still some alive nodes: " +
+                        this.nodes);
         }
         return new BooleanWrapper(true);
     }
@@ -1036,11 +1027,13 @@ public class NodeSource implements InitActive, RunActive, EndActive {
                     logger.debug("Node " + nodeUrl + " is alive");
                 }
             } catch (Throwable t) {
-                logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
-                try {
-                    stub.detectedPingedDownNode(nodeName, nodeUrl);
-                } catch (Exception e) {
-                    logger.warn("Could not send detectedPingedDownNode message", e);
+                if (!this.toShutdown) {
+                    logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
+                    try {
+                        stub.detectedPingedDownNode(nodeName, nodeUrl);
+                    } catch (Exception e) {
+                        logger.warn("Could not send detectedPingedDownNode message", e);
+                    }
                 }
             }
         });
