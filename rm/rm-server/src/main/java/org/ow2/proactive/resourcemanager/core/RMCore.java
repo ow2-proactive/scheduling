@@ -451,7 +451,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 public void run() {
                     if (!toShutDown) {
                         PAFuture.waitFor(rmcoreStub.shutdown(true),
-                                         PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt() * 1000);
+                                         PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt() * 1000L);
                     }
                 }
             });
@@ -1724,6 +1724,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean() ||
             this.deployedNodeSources.size() == 0) {
+            NodeSource.shutdownThreadPools();
             finalizeShutdown();
         } else {
             this.deployedNodeSources.forEach((nodeSourceName, nodeSource) -> {
@@ -1731,6 +1732,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 nodeSource.shutdown(this.caller);
             });
             waitForAllNodeSourcesToBeShutdown();
+            NodeSource.shutdownThreadPools();
             finalizeShutdown();
         }
         return new BooleanWrapper(true);
@@ -1738,16 +1740,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private void waitForAllNodeSourcesToBeShutdown() {
         boolean atLeastOneAlive = false;
-        int millisBeforeHardShutdown = 0;
+        int secondsBeforeHardShutdown = PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt();
         try {
             do {
-                millisBeforeHardShutdown++;
-                Thread.sleep(100);
+                Thread.sleep(1000);
+                secondsBeforeHardShutdown--;
                 for (Entry<String, NodeSource> entry : this.deployedNodeSources.entrySet()) {
                     atLeastOneAlive = atLeastOneAlive || isNodeSourceAlive(entry);
                 }
-            } while (atLeastOneAlive &&
-                     millisBeforeHardShutdown < PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt() * 10);
+            } while (atLeastOneAlive && secondsBeforeHardShutdown > 0);
         } catch (InterruptedException e) {
             Thread.interrupted();
             logger.warn("", e);
@@ -2685,6 +2686,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return true if the client is an admin or provider, SecurityException otherwise
      */
     private boolean checkNodeAdminOrProviderPermission(RMNode rmnode, Client client) {
+        if (client == localClient) {
+            return true;
+        }
         NodeSource nodeSource = rmnode.getNodeSource();
 
         String errorMessage = client.getName() + " is not authorized to manage node " + rmnode.getNodeURL() + " from " +

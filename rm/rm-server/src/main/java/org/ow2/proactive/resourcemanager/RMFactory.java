@@ -44,6 +44,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.utils.FileUtils;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
@@ -100,6 +101,7 @@ public class RMFactory {
                                                       null,
                                                       null);
             String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
+            NodeSource.initThreadPools();
             rmcore = (RMCore) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                                                        new Object[] { RMCoreName, nodeRM },
                                                        nodeRM);
