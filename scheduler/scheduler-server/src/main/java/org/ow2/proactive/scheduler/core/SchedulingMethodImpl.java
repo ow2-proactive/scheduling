@@ -198,13 +198,15 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     private void updateNeededNodes() {
-        updateNeededNodes(Collections.EMPTY_LIST);
+        updateNeededNodes(0);
     }
 
-    private void updateNeededNodes(Collection<? extends TaskDescriptor> eligibleByPolicyTasks) {
+    private int computeNeededNodes(Collection<? extends TaskDescriptor> eligibleByPolicyTasks) {
         // Needed nodes
-        final int neededNodes = eligibleByPolicyTasks.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
+        return eligibleByPolicyTasks.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
+    }
 
+    private void updateNeededNodes(int neededNodes) {
         // for statistics used in RM portal
         getRMProxiesManager().getRmProxy().setNeededNodes(neededNodes);
 
@@ -232,7 +234,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
 
-                updateNeededNodes(fullListOfTaskRetrievedFromPolicy);
+                updateNeededNodes(computeNeededNodes(fullListOfTaskRetrievedFromPolicy));
                 return 0;
             }
 
@@ -304,160 +306,138 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     private int selectAndStartTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Set<String> freeResources,
-            LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy) {
+            LinkedList<EligibleTaskDescriptor> tasksRetrievedFromPolicy) {
         int numberOfTaskStarted = 0;
 
-        VariableBatchSizeIterator progressiveIterator = new VariableBatchSizeIterator(fullListOfTaskRetrievedFromPolicy);
+        schedulingMainLoopTimingLogger.start("updateVariablesForTasksToSchedule");
 
-        Set<EligibleTaskDescriptor> rest = new HashSet<>(fullListOfTaskRetrievedFromPolicy);
+        int neededNodes = computeNeededNodes(tasksRetrievedFromPolicy);
 
-        while (progressiveIterator.hasMoreElements() && !freeResources.isEmpty()) {
+        if (logger.isDebugEnabled()) {
+            loggingEligibleTasksDetails(tasksRetrievedFromPolicy);
+        }
 
-            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = new LinkedList<>(progressiveIterator.getNextElements(PASchedulerProperties.SCHEDULER_POLICY_USE_FREE_NODES.getValueAsBoolean() ? freeResources.size()
-                                                                                                                                                                                                        : Integer.MAX_VALUE));
+        updateVariablesForTasksToSchedule(tasksRetrievedFromPolicy);
+
+        schedulingMainLoopTimingLogger.end("updateVariablesForTasksToSchedule");
+
+        schedulingMainLoopTimingLogger.start("loadAndInit");
+
+        for (Iterator<EligibleTaskDescriptor> iterator = tasksRetrievedFromPolicy.iterator(); iterator.hasNext();) {
+            EligibleTaskDescriptorImpl taskDescriptor = (EligibleTaskDescriptorImpl) iterator.next();
+            // load and Initialize the executable container
+            InternalTask internalTask = taskDescriptor.getInternal();
+            try {
+                loadAndInit(internalTask);
+            } catch (Exception e) {
+                handleLoadExecutableContainerError(internalTask, iterator, e);
+            }
+        }
+
+        schedulingMainLoopTimingLogger.end("loadAndInit");
+
+        while (!tasksRetrievedFromPolicy.isEmpty() && !freeResources.isEmpty()) {
+
+            //get the next compatible tasks from the whole returned policy tasks
+            LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
+            int neededResourcesNumber = 0;
+
+            schedulingMainLoopTimingLogger.start("getNextcompatibleTasks");
+
+            while (!tasksRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
+                //the loop will search for next compatible task until it find something
+                neededResourcesNumber = getNextcompatibleTasks(jobMap, tasksRetrievedFromPolicy, tasksToSchedule);
+            }
+
+            schedulingMainLoopTimingLogger.end("getNextcompatibleTasks");
 
             if (logger.isDebugEnabled()) {
-                loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
+                logger.debug("tasksToSchedule : " + tasksToSchedule);
             }
 
-            schedulingMainLoopTimingLogger.start("updateVariablesForTasksToSchedule");
-
-            updateVariablesForTasksToSchedule(taskRetrievedFromPolicy);
-
-            schedulingMainLoopTimingLogger.end("updateVariablesForTasksToSchedule");
-
-            schedulingMainLoopTimingLogger.start("loadAndInit");
-
-            for (Iterator<EligibleTaskDescriptor> iterator = taskRetrievedFromPolicy.iterator(); iterator.hasNext();) {
-                EligibleTaskDescriptorImpl taskDescriptor = (EligibleTaskDescriptorImpl) iterator.next();
-                // load and Initialize the executable container
-                InternalTask internalTask = taskDescriptor.getInternal();
-                try {
-                    loadAndInit(internalTask);
-                } catch (Exception e) {
-                    handleLoadExecutableContainerError(internalTask, iterator, e);
-                }
+            logger.debug("required number of nodes : " + neededResourcesNumber);
+            if (neededResourcesNumber == 0 || tasksToSchedule.isEmpty()) {
+                break;
             }
 
-            schedulingMainLoopTimingLogger.end("loadAndInit");
+            schedulingMainLoopTimingLogger.start("getRMNodes");
+            NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule, freeResources);
+            schedulingMainLoopTimingLogger.end("getRMNodes");
 
-            while (!taskRetrievedFromPolicy.isEmpty()) {
+            if (nodeSet != null) {
+                freeResources.removeAll(nodeSet.getAllNodesUrls());
+            }
 
-                if (freeResources.isEmpty()) {
-                    break;
-                }
+            //start selected tasks
+            Node node = null;
+            InternalJob currentJob = null;
+            try {
+                while (nodeSet != null && !nodeSet.isEmpty()) {
+                    EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
+                    currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
+                    InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
 
-                //get the next compatible tasks from the whole returned policy tasks
-                LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
-                int neededResourcesNumber = 0;
+                    if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
+                        //create launcher and try to start the task
+                        node = nodeSet.get(0);
 
-                schedulingMainLoopTimingLogger.start("getNextcompatibleTasks");
+                        schedulingMainLoopTimingLogger.start("createExecution");
 
-                while (!taskRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
-                    //the loop will search for next compatible task until it find something
-                    neededResourcesNumber = getNextcompatibleTasks(jobMap, taskRetrievedFromPolicy, tasksToSchedule);
-                }
-
-                schedulingMainLoopTimingLogger.end("getNextcompatibleTasks");
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("tasksToSchedule : " + tasksToSchedule);
-                }
-
-                logger.debug("required number of nodes : " + neededResourcesNumber);
-                if (neededResourcesNumber == 0 || tasksToSchedule.isEmpty()) {
-                    break;
-                }
-
-                schedulingMainLoopTimingLogger.start("getRMNodes");
-                NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule, freeResources);
-                schedulingMainLoopTimingLogger.end("getRMNodes");
-
-                if (nodeSet != null) {
-                    freeResources.removeAll(nodeSet.getAllNodesUrls());
-                }
-
-                //start selected tasks
-                Node node = null;
-                InternalJob currentJob = null;
-                try {
-                    while (nodeSet != null && !nodeSet.isEmpty()) {
-                        EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                        currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
-                        InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
-
-                        if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
-                            //create launcher and try to start the task
-                            node = nodeSet.get(0);
-
-                            schedulingMainLoopTimingLogger.start("createExecution");
-
-                            if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
-                                rest.remove(taskDescriptor);
-                                numberOfTaskStarted++;
-                            }
-                            schedulingMainLoopTimingLogger.end("createExecution");
-
+                        if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
+                            neededNodes -= taskDescriptor.getNumberOfNodesNeeded();
+                            numberOfTaskStarted++;
                         }
+                        schedulingMainLoopTimingLogger.end("createExecution");
 
-                        //if every task that should be launched have been removed
-                        if (tasksToSchedule.isEmpty()) {
-                            //get back unused nodes to the RManager
-                            if (!nodeSet.isEmpty()) {
-                                schedulingMainLoopTimingLogger.start("releaseNodes");
-                                releaseNodes(currentJob, nodeSet);
-                                freeResources.addAll(nodeSet.getAllNodesUrls());
-                                schedulingMainLoopTimingLogger.end("releaseNodes");
-                            }
-                            //and leave the loop
-                            break;
+                    }
+
+                    //if every task that should be launched have been removed
+                    if (tasksToSchedule.isEmpty()) {
+                        //get back unused nodes to the RManager
+                        if (!nodeSet.isEmpty()) {
+                            schedulingMainLoopTimingLogger.start("releaseNodes");
+                            releaseNodes(currentJob, nodeSet);
+                            freeResources.addAll(nodeSet.getAllNodesUrls());
+                            schedulingMainLoopTimingLogger.end("releaseNodes");
                         }
-                    }
-                } catch (ActiveObjectCreationException e1) {
-                    //Something goes wrong with the active object creation (createLauncher)
-                    logger.warn("An exception occured while creating the task launcher.", e1);
-                    //so try to get back every remaining nodes to the resource manager
-                    try {
-                        releaseNodes(currentJob, nodeSet);
-                        freeResources.addAll(nodeSet.getAllNodesUrls());
-                    } catch (Exception e2) {
-                        logger.info("Unable to get back the nodeSet to the RM", e2);
-                    }
-                    if (--activeObjectCreationRetryTimeNumber == 0) {
+                        //and leave the loop
                         break;
                     }
-                } catch (Exception e1) {
-                    //if we are here, it is that something append while launching the current task.
-                    logger.warn("An exception occured while starting task.", e1);
-                    //so try to get back every remaining nodes to the resource manager
-                    try {
-                        releaseNodes(currentJob, nodeSet);
-                        freeResources.addAll(nodeSet.getAllNodesUrls());
-                    } catch (Exception e2) {
-                        logger.info("Unable to get back the nodeSet to the RM", e2);
-                    }
                 }
-            }
-            if (freeResources.isEmpty()) {
-                break;
-            }
-            if (activeObjectCreationRetryTimeNumber == 0) {
-                break;
+            } catch (ActiveObjectCreationException e1) {
+                //Something goes wrong with the active object creation (createLauncher)
+                logger.warn("An exception occured while creating the task launcher.", e1);
+                //so try to get back every remaining nodes to the resource manager
+                try {
+                    releaseNodes(currentJob, nodeSet);
+                    freeResources.addAll(nodeSet.getAllNodesUrls());
+                } catch (Exception e2) {
+                    logger.info("Unable to get back the nodeSet to the RM", e2);
+                }
+                if (--activeObjectCreationRetryTimeNumber == 0) {
+                    break;
+                }
+            } catch (Exception e1) {
+                //if we are here, it is that something append while launching the current task.
+                logger.warn("An exception occured while starting task.", e1);
+                //so try to get back every remaining nodes to the resource manager
+                try {
+                    releaseNodes(currentJob, nodeSet);
+                    freeResources.addAll(nodeSet.getAllNodesUrls());
+                } catch (Exception e2) {
+                    logger.info("Unable to get back the nodeSet to the RM", e2);
+                }
             }
         }
 
         // number of nodes needed to start all pending tasks
-        updateNeededNodes(rest);
+        updateNeededNodes(neededNodes);
 
         return numberOfTaskStarted;
     }
 
-    private void loggingEligibleTasksDetails(LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy,
-            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy) {
-        logger.debug("full list of eligible tasks: " +
-                     (fullListOfTaskRetrievedFromPolicy.size() < 5 ? fullListOfTaskRetrievedFromPolicy
-                                                                   : fullListOfTaskRetrievedFromPolicy.size()));
-        logger.debug("working list of eligible tasks: " +
+    private void loggingEligibleTasksDetails(LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy) {
+        logger.debug("list of eligible tasks: " +
                      (taskRetrievedFromPolicy.size() < 5 ? taskRetrievedFromPolicy : taskRetrievedFromPolicy.size()));
     }
 
