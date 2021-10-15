@@ -61,6 +61,11 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Defines the maximum number of tasks to be scheduled in each scheduling loop (not used any more). */
     SCHEDULER_POLICY_NBTASKPERLOOP("pa.scheduler.policy.nbtaskperloop", PropertyType.INTEGER, "10"),
 
+    /** If set to true (default), the scheduling loop will deploy tasks on nodes which are free at the beginning of the loop.
+     * This is mandatory in order to respect strict task fifo order or priorities, but it can reduce the task throughput.
+     * Change this setting if a lot a short lived tasks are scheduled per minute and enforce strict fifo priority is not mandatory **/
+    SCHEDULER_POLCY_STRICT_FIFO("pa.scheduler.policy.strict.fifo", PropertyType.BOOLEAN, "true"),
+
     /** Path of the license properties file. */
     SCHEDULER_LICENSE_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),
 
