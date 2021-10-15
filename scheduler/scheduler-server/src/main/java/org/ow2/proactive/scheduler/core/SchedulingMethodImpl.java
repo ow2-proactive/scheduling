@@ -221,7 +221,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             schedulingMainLoopTimingLogger.start("getFreeResources");
             //get rmState and update it in scheduling policy
-            Set<String> freeResources = getFreeResources(currentPolicy);
+            Set<String> freeResources = null;
+            if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
+                freeResources = getFreeResources(currentPolicy);
+            }
 
             schedulingMainLoopTimingLogger.end("getFreeResources");
 
@@ -232,7 +235,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             setPendingStatusesToAllEligibleTasks(fullListOfTaskRetrievedFromPolicy);
 
             //if there is no free resources, stop it right now without starting any task
-            if (freeResources.isEmpty()) {
+            if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean() && freeResources.isEmpty()) {
 
                 updateNeededNodes(computeNeededNodes(fullListOfTaskRetrievedFromPolicy));
                 return 0;
@@ -336,7 +339,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         schedulingMainLoopTimingLogger.end("loadAndInit");
 
-        while (!tasksRetrievedFromPolicy.isEmpty() && !freeResources.isEmpty()) {
+        while (!tasksRetrievedFromPolicy.isEmpty() &&
+               (!PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean() || !freeResources.isEmpty())) {
 
             //get the next compatible tasks from the whole returned policy tasks
             LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
@@ -364,7 +368,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule, freeResources);
             schedulingMainLoopTimingLogger.end("getRMNodes");
 
-            if (nodeSet != null) {
+            if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean() && nodeSet != null) {
                 freeResources.removeAll(nodeSet.getAllNodesUrls());
             }
 
@@ -397,7 +401,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         if (!nodeSet.isEmpty()) {
                             schedulingMainLoopTimingLogger.start("releaseNodes");
                             releaseNodes(currentJob, nodeSet);
-                            freeResources.addAll(nodeSet.getAllNodesUrls());
+                            if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
+                                freeResources.addAll(nodeSet.getAllNodesUrls());
+                            }
                             schedulingMainLoopTimingLogger.end("releaseNodes");
                         }
                         //and leave the loop
@@ -410,7 +416,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //so try to get back every remaining nodes to the resource manager
                 try {
                     releaseNodes(currentJob, nodeSet);
-                    freeResources.addAll(nodeSet.getAllNodesUrls());
+                    if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
+                        freeResources.addAll(nodeSet.getAllNodesUrls());
+                    }
                 } catch (Exception e2) {
                     logger.info("Unable to get back the nodeSet to the RM", e2);
                 }
@@ -423,7 +431,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //so try to get back every remaining nodes to the resource manager
                 try {
                     releaseNodes(currentJob, nodeSet);
-                    freeResources.addAll(nodeSet.getAllNodesUrls());
+                    if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
+                        freeResources.addAll(nodeSet.getAllNodesUrls());
+                    }
                 } catch (Exception e2) {
                     logger.info("Unable to get back the nodeSet to the RM", e2);
                 }
@@ -556,7 +566,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                            internalTask0.getRuntimeVariables()));
                 criteria.setBlackList(internalTask0.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
-                criteria.setAcceptableNodesUrls(freeResources);
+                if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
+                    criteria.setAcceptableNodesUrls(freeResources);
+                }
                 criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0, schedulingService));
                 if (internalTask0.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask0.getRuntimeGenericInformation()
