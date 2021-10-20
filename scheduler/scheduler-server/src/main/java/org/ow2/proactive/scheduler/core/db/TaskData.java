@@ -45,6 +45,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -550,7 +551,7 @@ public class TaskData {
         taskData.setNumberOfExecutionOnFailureLeft(PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
         taskData.setGenericInformation(task.getGenericInformation());
-        HashMap<String, TaskDataVariable> variables = new HashMap<>();
+        HashMap<String, TaskDataVariable> variables = new LinkedHashMap<>();
         for (Map.Entry<String, TaskVariable> entry : task.getVariables().entrySet()) {
             variables.put(entry.getKey(), TaskDataVariable.create(entry.getKey(), entry.getValue(), taskData));
         }
@@ -649,7 +650,7 @@ public class TaskData {
     }
 
     private Map<String, TaskVariable> variablesToTaskVariables() {
-        Map<String, TaskVariable> taskVariables = new HashMap<>();
+        Map<String, TaskVariable> taskVariables = new LinkedHashMap<>();
         for (Map.Entry<String, TaskDataVariable> entry : getVariables().entrySet()) {
             taskVariables.put(entry.getKey(), taskDataVariableToTaskVariable(entry.getValue()));
         }
@@ -762,6 +763,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @OrderBy(value = "id ASC")
     public Map<String, TaskDataVariable> getVariables() {
         return variables;
     }
