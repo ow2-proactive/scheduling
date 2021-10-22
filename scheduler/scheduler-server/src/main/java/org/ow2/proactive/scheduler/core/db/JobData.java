@@ -27,7 +27,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +42,7 @@ import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -258,7 +259,7 @@ public class JobData implements Serializable {
 
     private Map<String, String> createVariablesStringMap() {
         Map<String, JobDataVariable> jobDataVariablesMap = getVariables();
-        Map<String, String> stringVariablesMap = new HashMap<>(jobDataVariablesMap.size());
+        Map<String, String> stringVariablesMap = new LinkedHashMap<>(jobDataVariablesMap.size());
         for (JobDataVariable variable : getVariables().values()) {
             stringVariablesMap.put(variable.getName(), variable.getValue());
         }
@@ -267,7 +268,7 @@ public class JobData implements Serializable {
 
     private Map<String, JobVariable> createDetailedVariables() {
         Map<String, JobDataVariable> jobDataVariablesMap = getVariables();
-        Map<String, JobVariable> jobVariablesMap = new HashMap<>(jobDataVariablesMap.size());
+        Map<String, JobVariable> jobVariablesMap = new LinkedHashMap<>(jobDataVariablesMap.size());
         for (JobDataVariable variable : getVariables().values()) {
             jobVariablesMap.put(variable.getName(), new JobVariable(variable.getName(),
                                                                     variable.getValue(),
@@ -336,7 +337,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
         jobRuntimeData.setUserSpace(job.getUserSpace());
         jobRuntimeData.setGenericInformation(job.getGenericInformation());
-        Map<String, JobDataVariable> variables = new HashMap<>();
+        Map<String, JobDataVariable> variables = new LinkedHashMap<>();
         for (Map.Entry<String, JobVariable> entry : job.getVariables().entrySet()) {
             variables.put(entry.getKey(), JobDataVariable.create(entry.getKey(), entry.getValue(), jobRuntimeData));
         }
@@ -396,6 +397,7 @@ public class JobData implements Serializable {
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "jobData")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @OrderBy(value = "id ASC")
     public Map<String, JobDataVariable> getVariables() {
         return variables;
     }
@@ -766,7 +768,7 @@ public class JobData implements Serializable {
     }
 
     private Map<String, JobVariable> variablesToJobVariables() {
-        Map<String, JobVariable> jobVariables = new HashMap<>();
+        Map<String, JobVariable> jobVariables = new LinkedHashMap<>();
         for (JobDataVariable variable : getVariables().values()) {
             jobVariables.put(variable.getName(), jobDataVariableToTaskVariable(variable));
         }
