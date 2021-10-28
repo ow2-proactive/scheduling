@@ -139,6 +139,9 @@ public interface SynchronizationInternal extends Serializable {
     boolean waitUntil(String originator, TaskId taskid, String channel, String key, String predicate, long timeout)
             throws InvalidChannelException, CompilationException, TimeoutException;
 
+    String waitUntilAny(String originator, TaskId taskid, String channel, Set<String> keys, String predicate)
+            throws InvalidChannelException, CompilationException;
+
     PredicateActionResult waitUntilThen(String originator, TaskId taskid, String channel, String key, String predicate,
             String thenRemappingFunction) throws InvalidChannelException, CompilationException, IOException;
 

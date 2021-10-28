@@ -1067,6 +1067,9 @@ public interface Synchronization extends Serializable {
     boolean waitUntil(String channel, String key, String predicate, long timeout)
             throws InvalidChannelException, CompilationException, TimeoutException;
 
+    String waitUntilAny(String channel, Set<String> keys, String predicate)
+            throws InvalidChannelException, CompilationException;
+
     /**
      * Blocking call waiting for a predicate to be met before executing a remapping function.
      *

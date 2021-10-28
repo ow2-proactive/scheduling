@@ -792,6 +792,47 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    @ImmediateService
+    public String waitUntilAny(String originator, TaskId taskid, String channel, Set<String> keys, String predicate)
+            throws InvalidChannelException, CompilationException {
+        /**
+         * waitUntil is run on its dedicated thread (ImmediateService), it runs its predicate periodically until success
+         */
+        waitUntilStarted();
+        boolean predicateResult = false;
+        String matchingKey = null;
+        do {
+            Channel chosenChannel = getChannel(channel);
+            for (String key : keys) {
+                Serializable value = chosenChannel.get(key);
+                try {
+                    boolean answer = evaluateClosure(predicate, BiPredicate.class).test(key, value);
+                    if (answer) {
+                        matchingKey = key;
+                    }
+                    predicateResult = predicateResult || answer;
+                } catch (CompilationException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new ClosureEvaluationException(EXCEPTION_WHEN_EVALUATING_CLOSURE +
+                                                         StackTraceUtil.getStackTrace(e));
+                }
+            }
+            if (!predicateResult) {
+                try {
+                    Thread.sleep(WAIT_STEP);
+                } catch (InterruptedException e) {
+                    throw new ClosureEvaluationException(EXCEPTION_WHEN_EVALUATING_CLOSURE +
+                                                         StackTraceUtil.getStackTrace(e));
+                }
+            }
+        } while (!predicateResult);
+
+        return matchingKey;
+    }
+
+    @Override
     @ImmediateService
     public boolean waitUntil(String originator, TaskId taskid, String channel, String key, String predicate,
             long timeout) throws InvalidChannelException, CompilationException, TimeoutException {

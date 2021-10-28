@@ -518,7 +518,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     /* ***************** SIGNAL API PROPERTIES ************** */
     /* ***************************************************************** */
     /** name of the channel of workflow signals */
-    SCHEDULER_SIGNALS_CHANNEL("pa.scheduler.signals.channel", PropertyType.STRING, "PA_SIGNALS_CHANNEL"),
+    SCHEDULER_SIGNALS_CHANNEL("pa.scheduler.signals.channel", PropertyType.STRING, "PA_SIGNALS_CHANNEL_"),
 
     /* ***************************************************************** */
     /* ******************* PORTAL DISPLAY PROPERTIES ******************* */

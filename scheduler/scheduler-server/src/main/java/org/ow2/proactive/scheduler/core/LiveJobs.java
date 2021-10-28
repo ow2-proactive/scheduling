@@ -1328,6 +1328,11 @@ class LiveJobs {
                                                                                        SIGNAL_TASK_ID,
                                                                                        PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
                                                                                        jobId.value())) {
+                synchronizationInternal.deleteChannel(SIGNAL_ORIGINATOR,
+                                                      SIGNAL_TASK_ID,
+                                                      PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString() +
+                                                                      jobId.value());
+
                 synchronizationInternal.remove(SIGNAL_ORIGINATOR,
                                                SIGNAL_TASK_ID,
                                                PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
