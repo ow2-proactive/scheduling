@@ -25,11 +25,18 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.http.HttpStatus;
+import org.apache.log4j.Logger;
+import org.ow2.proactive.http.CommonHttpResourceDownloader;
+import org.ow2.proactive.scheduler.common.exception.InternalException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -37,10 +44,17 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
  * @since 11/10/2018
  */
 public class CatalogObjectValidator implements Validator<String> {
+    private static final Logger logger = Logger.getLogger(CatalogObjectValidator.class);
 
     //catalogObjectModelRegexp = bucketName/objectName[/revision]. The revision is a h-code number represented by 13 digit.
 
     public static final String CATALOG_OBJECT_MODEL_REGEXP = "^[^/]+/[^/]+(/[^/][0-9]{12})?$";
+
+    private static final String CATALOG_URL_WITH_REVISION = PASchedulerProperties.CATALOG_REST_URL +
+                                                            "/buckets/%s/resources/%s/revisions/%s";
+
+    private static final String CATALOG_URL_WITHOUT_REVISION = PASchedulerProperties.CATALOG_REST_URL +
+                                                               "/buckets/%s/resources/%s";
 
     public CatalogObjectValidator() {
         /**
@@ -56,6 +70,49 @@ public class CatalogObjectValidator implements Validator<String> {
             throw new ValidationException("Expected value should match regular expression " + pattern.pattern() +
                                           " , received " + parameterValue);
         }
+        if (context == null || context.getSessionId() == null || context.getSessionId().isEmpty()) {
+            // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog).
+            // In this case, we don't have the access of the scheduler global dataspace, so the validity check is passed.
+            logger.debug(String.format("Can't check the validity of the variable value [%s], because missing the access to the catalog",
+                                       parameterValue));
+            return parameterValue;
+        }
+        try {
+            if (!exist(parameterValue, context.getSessionId())) {
+                throw new ValidationException(String.format("Could not find the catalog object [%s].", parameterValue));
+            }
+        } catch (PermissionException e) {
+            throw new ValidationException(String.format("Missing the permission to access the catalog object [%s].",
+                                                        parameterValue));
+        } catch (InternalException | IOException e) {
+            logger.warn(String.format("Can't check the validity of the variable value [%s], because failed to request this catalog object.",
+                                      parameterValue),
+                        e);
+            throw new ValidationException(String.format("Failed to request the catalog object [%s].", parameterValue));
+        }
         return parameterValue;
+    }
+
+    private boolean exist(String catalogObjectValue, String sessionId) throws PermissionException, IOException {
+        String[] splitCatalog = catalogObjectValue.split("/");
+        String url;
+        // catalogObjectValue is already checked (with the regular expression) to have either 2 to 3 parts (bucketName/objectName[/revision]) after split
+        if (splitCatalog.length == 2) {
+            url = String.format(CATALOG_URL_WITHOUT_REVISION, splitCatalog[0], splitCatalog[1]);
+        } else {
+            url = String.format(CATALOG_URL_WITH_REVISION, splitCatalog[0], splitCatalog[1], splitCatalog[2]);
+        }
+        int catalogObjResponseCode = CommonHttpResourceDownloader.getInstance().getResponseCode(sessionId, url, true);
+        switch (catalogObjResponseCode) {
+            case HttpStatus.SC_OK:
+                return true;
+            case HttpStatus.SC_NOT_FOUND:
+                return false;
+            case HttpStatus.SC_UNAUTHORIZED:
+            case HttpStatus.SC_FORBIDDEN:
+                throw new PermissionException("Permission denied to access the catalog object.");
+            default:
+                throw new InternalException("Failed to request the catalog object.");
+        }
     }
 }

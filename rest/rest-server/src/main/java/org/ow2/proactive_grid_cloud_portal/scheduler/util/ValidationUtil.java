@@ -86,17 +86,17 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 public class ValidationUtil {
 
     public static JobValidationData validateJobDescriptor(File jobDescFile, Map<String, String> jobVariables,
-            Scheduler scheduler, SchedulerSpaceInterface space) {
-        return validateJob(jobDescFile.getAbsolutePath(), jobVariables, scheduler, space);
+            Scheduler scheduler, SchedulerSpaceInterface space, String sessionId) {
+        return validateJob(jobDescFile.getAbsolutePath(), jobVariables, scheduler, space, sessionId);
     }
 
     public static JobValidationData validateJob(String jobFilePath, Map<String, String> jobVariables,
-            Scheduler scheduler, SchedulerSpaceInterface space) {
+            Scheduler scheduler, SchedulerSpaceInterface space, String sessionId) {
         JobValidationData data = new JobValidationData();
         Job job = null;
         try {
             JobFactory factory = JobFactory.getFactory();
-            job = factory.createJob(jobFilePath, jobVariables, null, scheduler, space);
+            job = factory.createJob(jobFilePath, jobVariables, null, scheduler, space, sessionId);
 
             if (job instanceof TaskFlowJob) {
                 fillUpdatedVariables((TaskFlowJob) job, data);

@@ -519,15 +519,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
-    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
-            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
-            SubmissionClosedException {
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos,
+            String sessionId) throws NotConnectedException, UnknownJobException, PermissionException,
+            JobCreationException, SubmissionClosedException {
         final String jobContent = getJobContent(currentJobId);
         final Job job = JobFactory.getFactory().createJob(IOUtils.toInputStream(jobContent, Charset.forName("UTF-8")),
                                                           jobVariables,
                                                           jobGenericInfos,
                                                           this,
-                                                          this);
+                                                          this,
+                                                          sessionId);
         return submit(job);
     }
 

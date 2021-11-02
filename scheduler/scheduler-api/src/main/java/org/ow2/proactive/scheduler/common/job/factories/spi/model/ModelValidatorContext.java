@@ -27,7 +27,6 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -58,20 +57,23 @@ public class ModelValidatorContext {
 
     private final SchedulerSpaceInterface space;
 
+    private final String sessionId;
+
     private String variableName;
 
     // container for job and task variables
     private SpELVariables spELVariables;
 
-    public ModelValidatorContext(StandardEvaluationContext context, Scheduler scheduler,
-            SchedulerSpaceInterface space) {
+    public ModelValidatorContext(StandardEvaluationContext context, Scheduler scheduler, SchedulerSpaceInterface space,
+            String sessionId) {
         this.spelContext = context;
         this.scheduler = scheduler;
         this.space = space;
+        this.sessionId = sessionId;
     }
 
     public ModelValidatorContext(Map<String, Serializable> variablesValues, Map<String, String> models,
-            Set<String> groupNames, Scheduler scheduler, SchedulerSpaceInterface space) {
+            Set<String> groupNames, Scheduler scheduler, SchedulerSpaceInterface space, String sessionId) {
         spELVariables = new SpELVariables(variablesValues, models, groupNames);
         spelContext = new StandardEvaluationContext(spELVariables);
         spelContext.setTypeLocator(new RestrictedTypeLocator());
@@ -79,9 +81,10 @@ public class ModelValidatorContext {
         spelContext.addPropertyAccessor(new RestrictedPropertyAccessor());
         this.scheduler = scheduler;
         this.space = space;
+        this.sessionId = sessionId;
     }
 
-    public ModelValidatorContext(Task task, Scheduler scheduler, SchedulerSpaceInterface space) {
+    public ModelValidatorContext(Task task, Scheduler scheduler, SchedulerSpaceInterface space, String sessionId) {
         this(task.getVariables().values().stream().collect(LinkedHashMap<String, Serializable>::new,
                                                            (m, v) -> m.put(v.getName(), v.getValue()),
                                                            LinkedHashMap<String, Serializable>::putAll),
@@ -90,7 +93,8 @@ public class ModelValidatorContext {
                                                            LinkedHashMap<String, String>::putAll),
              getGroups(task.getVariables()),
              scheduler,
-             space);
+             space,
+             sessionId);
 
     }
 
@@ -107,7 +111,8 @@ public class ModelValidatorContext {
         return groups;
     }
 
-    public ModelValidatorContext(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space) {
+    public ModelValidatorContext(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space,
+            String sessionId) {
         this(job.getVariables().values().stream().collect(LinkedHashMap<String, Serializable>::new,
                                                           (m, v) -> m.put(v.getName(), v.getValue()),
                                                           LinkedHashMap<String, Serializable>::putAll),
@@ -116,25 +121,26 @@ public class ModelValidatorContext {
                                                           LinkedHashMap<String, String>::putAll),
              getGroups(job.getVariables()),
              scheduler,
-             space);
+             space,
+             sessionId);
 
     }
 
     public ModelValidatorContext(StandardEvaluationContext context) {
-        this(context, null, null);
+        this(context, null, null, null);
     }
 
     public ModelValidatorContext(Map<String, Serializable> variablesValues, Map<String, String> models,
             Set<String> groupNames) {
-        this(variablesValues, models, groupNames, null, null);
+        this(variablesValues, models, groupNames, null, null, null);
     }
 
     public ModelValidatorContext(Task task) {
-        this(task, null, null);
+        this(task, null, null, null);
     }
 
     public ModelValidatorContext(TaskFlowJob job) {
-        this(job, null, null);
+        this(job, null, null, null);
     }
 
     public StandardEvaluationContext getSpELContext() {
@@ -163,6 +169,10 @@ public class ModelValidatorContext {
 
     public void setVariableName(String variableName) {
         this.variableName = variableName;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 
     /**

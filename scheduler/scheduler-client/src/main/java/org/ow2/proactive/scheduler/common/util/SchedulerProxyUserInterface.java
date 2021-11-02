@@ -271,11 +271,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
-            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
-            SubmissionClosedException {
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos,
+            String sessionId) throws NotConnectedException, UnknownJobException, PermissionException,
+            JobCreationException, SubmissionClosedException {
         checkSchedulerConnection();
-        return uischeduler.reSubmit(currentJobId, jobVariables, jobGenericInfos);
+        return uischeduler.reSubmit(currentJobId, jobVariables, jobGenericInfos, sessionId);
     }
 
     @Override

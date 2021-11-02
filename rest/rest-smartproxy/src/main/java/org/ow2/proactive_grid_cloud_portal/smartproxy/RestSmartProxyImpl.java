@@ -210,10 +210,10 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
-            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
-            SubmissionClosedException {
-        return _getScheduler().reSubmit(currentJobId, jobVariables, jobGenericInfos);
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos,
+            String sessionId) throws NotConnectedException, UnknownJobException, PermissionException,
+            JobCreationException, SubmissionClosedException {
+        return _getScheduler().reSubmit(currentJobId, jobVariables, jobGenericInfos, sessionId);
     }
 
     @Override
