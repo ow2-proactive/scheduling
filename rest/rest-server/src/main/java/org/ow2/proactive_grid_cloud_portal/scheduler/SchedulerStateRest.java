@@ -1570,7 +1570,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if (contextInfos != null)
                 genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
-            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
             jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
         }
 
@@ -1609,7 +1609,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if (contextInfos != null)
                 genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
-            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
             jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
         }
 
@@ -1669,7 +1669,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 if (contextInfos != null)
                     genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
-                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
                 jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
             }
 
@@ -1762,7 +1762,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
             }
 
-            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
             newJobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
         }
         return mapper.map(newJobId, JobIdData.class);
@@ -1777,7 +1777,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             String jobXml = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
             Job job;
             try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
-                job = JobFactory.getFactory().createJob(tmpWorkflowStream, null, null, scheduler, space);
+                job = JobFactory.getFactory().createJob(tmpWorkflowStream, null, null, scheduler, space, sessionId);
             }
             WorkflowDescription workflowDescription = new WorkflowDescription();
             workflowDescription.setName(job.getName());
@@ -1801,7 +1801,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public List<JobIdData> reSubmitAll(String sessionId, List<String> jobsId) throws RestException {
         Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/resubmit");
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
-        WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space);
+        WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
         List<JobIdData> newJobIds = new ArrayList<>(jobsId.size());
 
         for (String jobId : jobsId) {
@@ -2387,7 +2387,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 }
             }
 
-            return ValidationUtil.validateJobDescriptor(tmpFile, jobVariables, scheduler, space);
+            return ValidationUtil.validateJobDescriptor(tmpFile, jobVariables, scheduler, space, sessionId);
         } catch (IOException e) {
             JobValidationData validation = new JobValidationData();
             validation.setErrorMessage("Cannot read from the job validation request.");
@@ -2422,7 +2422,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
             }
 
-            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler, space);
+            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler, space, sessionId);
 
         } catch (JobCreationRestException | IOException e) {
             JobValidationData validation = new JobValidationData();
@@ -2466,7 +2466,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             }
 
-            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler, space);
+            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler, space, sessionId);
 
         } catch (JobCreationRestException | IOException e) {
             JobValidationData validation = new JobValidationData();

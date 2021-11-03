@@ -73,7 +73,7 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase {
 
     protected JobId submitJob(String filename, JobStatus waitForStatus) throws Exception {
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
-        WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler, space);
+        WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler, space, null);
         JobId id;
         try (FileInputStream fileInputStream = new FileInputStream(jobFile)) {
             id = submitter.submit(fileInputStream, new HashMap<String, String>(), null);

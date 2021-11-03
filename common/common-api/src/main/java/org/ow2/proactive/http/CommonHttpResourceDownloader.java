@@ -99,6 +99,21 @@ public class CommonHttpResourceDownloader {
         }
     }
 
+    public int getResponseCode(String sessionId, String url, boolean insecure) throws IOException {
+        CommonHttpClientBuilder builder = new CommonHttpClientBuilder().maxConnections(CONNECTION_POOL_SIZE)
+                                                                       .useSystemProperties()
+                                                                       .insecure(insecure);
+        try (CloseableHttpClient client = builder.build()) {
+            HttpGet request = new HttpGet(url);
+
+            if (sessionId != null) {
+                request.setHeader("sessionid", sessionId);
+            }
+            CloseableHttpResponse response = client.execute(request);
+            return response.getStatusLine().getStatusCode();
+        }
+    }
+
     private CloseableHttpResponse createAndExecuteRequest(String sessionId, String url, CloseableHttpClient client)
             throws IOException {
         HttpGet request = new HttpGet(url);

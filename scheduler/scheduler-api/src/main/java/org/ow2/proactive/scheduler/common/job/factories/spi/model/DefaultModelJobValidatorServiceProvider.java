@@ -54,21 +54,21 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
 
     @Override
     public TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException {
-        return validateJob(job, null, null);
+        return validateJob(job, null, null, null);
     }
 
     @Override
-    public TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space)
-            throws JobValidationException {
+    public TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space,
+            String sessionId) throws JobValidationException {
 
-        ModelValidatorContext context = new ModelValidatorContext(job, scheduler, space);
+        ModelValidatorContext context = new ModelValidatorContext(job, scheduler, space, sessionId);
 
         for (JobVariable jobVariable : job.getVariables().values()) {
             checkVariableFormat(null, jobVariable, context);
             context.updateJobWithContext(job);
         }
         for (Task task : job.getTasks()) {
-            context = new ModelValidatorContext(task, scheduler, space);
+            context = new ModelValidatorContext(task, scheduler, space, sessionId);
             for (TaskVariable taskVariable : task.getVariables().values()) {
                 checkVariableFormat(task, taskVariable, context);
                 context.updateTaskWithContext(task);
