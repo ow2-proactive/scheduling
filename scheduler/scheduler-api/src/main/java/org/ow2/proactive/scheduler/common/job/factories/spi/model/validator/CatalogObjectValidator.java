@@ -79,8 +79,7 @@ public class CatalogObjectValidator implements Validator<String> {
         }
         try {
             if (!exist(parameterValue, context.getSessionId())) {
-                throw new ValidationException(String.format("Catalog object [%s] does not exist or cannot be accessed.",
-                                                            parameterValue));
+                throw new ValidationException(String.format("Catalog object [%s] does not exist.", parameterValue));
             }
         } catch (PermissionException e) {
             throw new ValidationException(String.format("Access to catalog object [%s] is not authorized.",
