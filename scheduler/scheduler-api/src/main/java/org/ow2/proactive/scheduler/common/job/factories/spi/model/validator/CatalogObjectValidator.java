@@ -73,34 +73,39 @@ public class CatalogObjectValidator implements Validator<String> {
         if (context == null || context.getSessionId() == null || context.getSessionId().isEmpty()) {
             // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog).
             // In this case, we don't have the access of the scheduler global dataspace, so the validity check is passed.
-            logger.debug(String.format("Can't check the validity of the variable value [%s], because missing the access to the catalog",
+            logger.debug(String.format("Validity of the variable value [%s] is skipped because access to the catalog is disabled.",
                                        parameterValue));
             return parameterValue;
         }
         try {
             if (!exist(parameterValue, context.getSessionId())) {
-                throw new ValidationException(String.format("Could not find the catalog object [%s].", parameterValue));
+                throw new ValidationException(String.format("Catalog object [%s] does not exist or cannot be accessed.",
+                                                            parameterValue));
             }
         } catch (PermissionException e) {
-            throw new ValidationException(String.format("Missing the permission to access the catalog object [%s].",
+            throw new ValidationException(String.format("Access to catalog object [%s] is not authorized.",
                                                         parameterValue));
         } catch (InternalException | IOException e) {
-            logger.warn(String.format("Can't check the validity of the variable value [%s], because failed to request this catalog object.",
+            logger.warn(String.format("Cannot check the validity of the variable value [%s]: Internal error.",
                                       parameterValue),
                         e);
-            throw new ValidationException(String.format("Failed to request the catalog object [%s].", parameterValue));
+            throw new ValidationException(String.format("Internal error when accessing object [%s], please check the server logs.",
+                                                        parameterValue));
         }
         return parameterValue;
     }
 
-    private boolean exist(String catalogObjectValue, String sessionId) throws PermissionException, IOException {
+    private boolean exist(String catalogObjectValue, String sessionId)
+            throws PermissionException, IOException, ValidationException {
         String[] splitCatalog = catalogObjectValue.split("/");
         String url;
         // catalogObjectValue is already checked (with the regular expression) to have either 2 to 3 parts (bucketName/objectName[/revision]) after split
         if (splitCatalog.length == 2) {
             url = String.format(CATALOG_URL_WITHOUT_REVISION, splitCatalog[0], splitCatalog[1]);
-        } else {
+        } else if (splitCatalog.length == 3) {
             url = String.format(CATALOG_URL_WITH_REVISION, splitCatalog[0], splitCatalog[1], splitCatalog[2]);
+        } else {
+            throw new ValidationException("Expected value should match the format: bucketName/objectName[/revision]");
         }
         int catalogObjResponseCode = CommonHttpResourceDownloader.getInstance().getResponseCode(sessionId, url, true);
         switch (catalogObjResponseCode) {
