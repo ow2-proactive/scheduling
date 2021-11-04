@@ -34,6 +34,7 @@ import functionaltests.nodesource.TestLocalInfrastructureTimeSlotPolicy;
 import functionaltests.nodesource.TestNodeSourceThreadPool;
 import functionaltests.nodesource.TestSSHInfrastructureV2RestartDownNodesPolicy;
 import functionaltests.nodesrecovery.NodesRecoveryPropertyTest;
+import functionaltests.nodesrecovery.RecoverDefaultInfrastructureTest;
 import functionaltests.nodesrecovery.RecoverLocalInfrastructureTest;
 import functionaltests.nodesrecovery.RecoverSSHInfrastructureV2Test;
 import functionaltests.nonblockingcore.NonBlockingCoreTest;
@@ -44,9 +45,10 @@ import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ NonBlockingCoreTest.class, TestNSNodesPermissions.class, SelectionScriptTimeOutTest.class,
                       RecoverLocalInfrastructureTest.class, RecoverSSHInfrastructureV2Test.class,
-                      TestLocalInfrastructureCronPolicy.class, TestLocalInfrastructureTimeSlotPolicy.class,
-                      TestSSHInfrastructureV2RestartDownNodesPolicy.class, NodesRecoveryPropertyTest.class,
-                      NodesHouseKeepingPropertiesTest.class, TestNodeSourceThreadPool.class })
+                      RecoverDefaultInfrastructureTest.class, TestLocalInfrastructureCronPolicy.class,
+                      TestLocalInfrastructureTimeSlotPolicy.class, TestSSHInfrastructureV2RestartDownNodesPolicy.class,
+                      NodesRecoveryPropertyTest.class, NodesHouseKeepingPropertiesTest.class,
+                      TestNodeSourceThreadPool.class })
 
 /**
  * @author ActiveEon Team

@@ -50,20 +50,20 @@ import org.ow2.proactive.utils.NodeSet;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestNode;
 
 
 /**
  * @author ActiveEon Team
  * @since 22/06/17
  */
-public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
+public class RecoverDefaultInfrastructureTest extends RMFunctionalTest {
 
     private static final String START_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-start-clean-db-nodes-recovery-enabled.ini";
 
     private static final String RESTART_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db-nodes-recovery-enabled.ini";
 
-    private static final String NODE_SOURCE_NAME = "LocalNodeSource" +
-                                                   RecoverLocalInfrastructureTest.class.getSimpleName();
+    private static final String NODE_SOURCE_NAME = "Default_" + RecoverDefaultInfrastructureTest.class.getSimpleName();
 
     private static final String TOKEN = "toto";
 
@@ -89,7 +89,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     }
 
     @Test
-    public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
+    public void testRecoverDefaultInfrastructureWithAliveNodes() throws Exception {
 
         this.createNodeSourceAndCheckState();
 
@@ -105,18 +105,6 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     }
 
     @Test
-    public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
-
-        this.createNodeSourceAndCheckState();
-
-        RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
-
-        this.restartRmAndCheckFinalState();
-
-        this.checkNodesStateAfterRecovery(0, NODE_NUMBER);
-    }
-
-    @Test
     public void testRecoverUndeployedNodeSource() throws Exception {
 
         this.defineNodeSourceAndCheckState();
@@ -124,6 +112,17 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         this.restartRmAndCheckFinalState();
 
         this.checkNodesStateAfterRecovery(0, 0);
+    }
+
+    private void getNodesFromRMWithToken() throws Exception {
+        Criteria criteria = new Criteria(NODE_NUMBER);
+        criteria.setNodeAccessToken(TOKEN);
+
+        RMTHelper.log("Acquiring " + NODE_NUMBER + " nodes with token=" + TOKEN);
+        NodeSet nodeSet = this.rmHelper.getResourceManager().getNodes(criteria);
+        Assert.assertEquals(NODE_NUMBER, nodeSet.size());
+        this.rmHelper.getResourceManager().releaseNodes(nodeSet);
+        this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NODE_NUMBER);
     }
 
     private void startRmWithConfig(String configurationFilePath) throws Exception {
@@ -143,10 +142,11 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     }
 
     private void createNodeSourceAndCheckState() throws Exception {
-        this.rmHelper.createNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME,
-                                                           NODE_NUMBER,
-                                                           new Object[] { "tokens=toto", "ME" });
+        this.rmHelper.createDefaultNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME,
+                                                                  new Object[] { NODE_SOURCE_USER_ACCESS_TYPE, "ME" });
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
+
+        testNodes.addAll(this.rmHelper.addNodesToDefaultNodeSource(NODE_SOURCE_NAME, NODE_NUMBER));
 
         List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState()
                                                                                      .getNodeSourceEvents();
@@ -169,17 +169,6 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         assertThat(nodeSourceEventPerNodeSource.get(0)
                                                .getNodeSourceDescription()
                                                .contains(NODE_SOURCE_USER_ACCESS_TYPE));
-    }
-
-    private void getNodesFromRMWithToken() throws Exception {
-        Criteria criteria = new Criteria(NODE_NUMBER);
-        criteria.setNodeAccessToken(TOKEN);
-
-        RMTHelper.log("Acquiring " + NODE_NUMBER + " nodes with token=" + TOKEN);
-        NodeSet nodeSet = this.rmHelper.getResourceManager().getNodes(criteria);
-        Assert.assertEquals(NODE_NUMBER, nodeSet.size());
-        this.rmHelper.getResourceManager().releaseNodes(nodeSet);
-        this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NODE_NUMBER);
     }
 
     private void restartRmAndCheckFinalState() throws Exception {

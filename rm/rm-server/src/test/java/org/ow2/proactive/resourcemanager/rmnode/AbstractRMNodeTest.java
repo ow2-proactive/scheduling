@@ -340,6 +340,11 @@ public class AbstractRMNodeTest {
         }
 
         @Override
+        public void setProtectedByToken(boolean protectedByToken) {
+
+        }
+
+        @Override
         public int compareTo(RMNode o) {
             return 0;
         }

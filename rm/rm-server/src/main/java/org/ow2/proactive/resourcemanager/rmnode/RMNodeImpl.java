@@ -489,6 +489,7 @@ public class RMNodeImpl extends AbstractRMNode {
         return protectedByToken;
     }
 
+    @Override
     public void setProtectedByToken(boolean protectedByToken) {
         this.protectedByToken = protectedByToken;
     }

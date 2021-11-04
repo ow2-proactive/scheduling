@@ -1628,6 +1628,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         NodeSource nodeSource = this.createNodeSourceInstance(nodeSourceDescriptor);
 
         this.definedNodeSources.put(nodeSourceDescriptor.getName(), nodeSource);
+        this.emitNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_DEFINED);
 
         if (nodeSourceDescriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
             NodeSource nodeSourceToDeploy = this.createNodeSourceInstance(nodeSourceDescriptor);
@@ -1657,6 +1658,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                              nodeSourcePolicyStub);
 
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
+            this.emitNodeSourceEvent(nodeSourceStub, RMEventType.NODESOURCE_CREATED);
         } else {
             this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName, "This node source is undeployed");
         }
@@ -2011,7 +2013,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         final List<RMNodeSourceEvent> nodeSourceEvents = new ArrayList<>(this.definedNodeSources.values()
                                                                                                 .stream()
-                                                                                                .map(NodeSource::createNodeSourceEvent)
+                                                                                                .map(ns -> {
+                                                                                                    if (deployedNodeSources.containsKey(ns.getName())) {
+                                                                                                        return PAFuture.getFutureValue(deployedNodeSources.get(ns.getName())
+                                                                                                                                                          .createNodeSourceEvent());
+                                                                                                    } else {
+                                                                                                        return ns.createNodeSourceEvent();
+                                                                                                    }
+                                                                                                })
                                                                                                 .collect(Collectors.toList()));
 
         long eventCounter = 0;

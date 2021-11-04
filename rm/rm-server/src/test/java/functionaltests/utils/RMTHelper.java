@@ -56,6 +56,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -147,7 +148,20 @@ public class RMTHelper {
     }
 
     public void createNodeSourceWithNodesRecoverable(String name, int nodeNumber) throws Exception {
-        createNodeSourceWithNodesRecoverable(name, nodeNumber, getResourceManager(), getMonitorsHandler());
+        createNodeSourceWithNodesRecoverable(name, nodeNumber, null);
+    }
+
+    public void createNodeSourceWithNodesRecoverable(String name, int nodeNumber, Object[] policyParameters)
+            throws Exception {
+        createNodeSourceWithNodesRecoverable(name,
+                                             nodeNumber,
+                                             getResourceManager(),
+                                             getMonitorsHandler(),
+                                             policyParameters);
+    }
+
+    public void createDefaultNodeSourceWithNodesRecoverable(String name, Object[] policyParameters) throws Exception {
+        createDefaultNodeSourceWithNodesRecoverable(name, getResourceManager(), getMonitorsHandler(), policyParameters);
     }
 
     public void createNodeSourceWithInfiniteTimeout(String name, int nodeNumber) throws Exception {
@@ -156,11 +170,11 @@ public class RMTHelper {
 
     public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
             RMMonitorsHandler monitor) throws Exception {
-        createNodeSource(name, nodeNumber, vmOptions, rm, monitor, NODES_NOT_RECOVERABLE);
+        createNodeSource(name, nodeNumber, vmOptions, rm, monitor, NODES_NOT_RECOVERABLE, null);
     }
 
     public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
-            RMMonitorsHandler monitor, boolean nodesRecoverable) throws Exception {
+            RMMonitorsHandler monitor, boolean nodesRecoverable, Object[] policyParameters) throws Exception {
         byte[] creds = setJavaPropertyAndGetCredentials();
         log("Creating a node source " + name);
         rm.createNodeSource(name,
@@ -169,11 +183,26 @@ public class RMTHelper {
                                            vmOptions != null ? setup.listToString(vmOptions)
                                                              : setup.getJvmParameters() },
                             StaticPolicy.class.getName(),
-                            null,
+                            policyParameters,
                             nodesRecoverable);
         rm.setNodeSourcePingFrequency(5000, name);
 
         waitForNodeSourceCreation(name, nodeNumber, monitor);
+    }
+
+    public static void createDefaultInfrastructureNodeSource(String name, ResourceManager rm, RMMonitorsHandler monitor,
+            boolean nodesRecoverable, Object[] policyParameters) throws Exception {
+        byte[] creds = setJavaPropertyAndGetCredentials();
+        log("Creating a node source " + name);
+        rm.createNodeSource(name,
+                            DefaultInfrastructureManager.class.getName(),
+                            new Object[] {},
+                            StaticPolicy.class.getName(),
+                            policyParameters,
+                            nodesRecoverable);
+        rm.setNodeSourcePingFrequency(5000, name);
+
+        waitForNodeSourceCreation(name, 0, monitor);
     }
 
     public void defineNodeSource(String name, int nodeNumber) throws Exception {
@@ -232,12 +261,23 @@ public class RMTHelper {
      */
     public static void createNodeSource(String name, int nodeNumber, ResourceManager rm, RMMonitorsHandler monitor)
             throws Exception {
-        createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor, NODES_NOT_RECOVERABLE);
+        createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor, NODES_NOT_RECOVERABLE, null);
     }
 
     public static void createNodeSourceWithNodesRecoverable(String name, int nodeNumber, ResourceManager rm,
-            RMMonitorsHandler monitor) throws Exception {
-        createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor, NODES_RECOVERABLE);
+            RMMonitorsHandler monitor, Object[] policyParameters) throws Exception {
+        createNodeSource(name,
+                         nodeNumber,
+                         setup.getJvmParametersAsList(),
+                         rm,
+                         monitor,
+                         NODES_RECOVERABLE,
+                         policyParameters);
+    }
+
+    public static void createDefaultNodeSourceWithNodesRecoverable(String name, ResourceManager rm,
+            RMMonitorsHandler monitor, Object[] policyParameters) throws Exception {
+        createDefaultInfrastructureNodeSource(name, rm, monitor, NODES_RECOVERABLE, policyParameters);
     }
 
     public static void createNodeSourceWithInfiniteTimeout(String name, int nodeNumber, ResourceManager rm,
@@ -249,8 +289,22 @@ public class RMTHelper {
         return addNodesToDefaultNodeSource(nodesNumber, new ArrayList<String>());
     }
 
+    public List<TestNode> addNodesToDefaultNodeSource(String nodeSourceName, int nodesNumber) throws Exception {
+        return addNodesToDefaultNodeSource(nodeSourceName, nodesNumber, new ArrayList<String>());
+    }
+
     public List<TestNode> addNodesToDefaultNodeSource(int nodesNumber, List<String> vmOptions) throws Exception {
-        return addNodesToDefaultNodeSource(nodesNumber,
+        return addNodesToDefaultNodeSource(null,
+                                           nodesNumber,
+                                           vmOptions != null ? vmOptions : setup.getJvmParametersAsList(),
+                                           getResourceManager(),
+                                           getMonitorsHandler());
+    }
+
+    public List<TestNode> addNodesToDefaultNodeSource(String nodeSourceName, int nodesNumber, List<String> vmOptions)
+            throws Exception {
+        return addNodesToDefaultNodeSource(nodeSourceName,
+                                           nodesNumber,
                                            vmOptions != null ? vmOptions : setup.getJvmParametersAsList(),
                                            getResourceManager(),
                                            getMonitorsHandler());
@@ -258,15 +312,26 @@ public class RMTHelper {
 
     public static List<TestNode> addNodesToDefaultNodeSource(int nodesNumber, List<String> vmOptions,
             ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
+        return addNodesToDefaultNodeSource(null, nodesNumber, vmOptions, resourceManager, monitor);
+    }
+
+    public static List<TestNode> addNodesToDefaultNodeSource(String nodeSourceName, int nodesNumber,
+            List<String> vmOptions, ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
 
         Map<String, String> map = new HashMap<>();
         map.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
 
         List<TestNode> nodes = createNodes("node", nodesNumber);
         for (int i = 0; i < nodesNumber; i++) {
-            resourceManager.addNode(nodes.get(i).getNode().getNodeInformation().getURL());
+            if (nodeSourceName != null) {
+                resourceManager.addNode(nodes.get(i).getNode().getNodeInformation().getURL(), nodeSourceName);
+            } else {
+                resourceManager.addNode(nodes.get(i).getNode().getNodeInformation().getURL());
+            }
         }
-        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, RMConstants.DEFAULT_STATIC_SOURCE_NAME, monitor);
+        if (nodeSourceName == null) {
+            waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, RMConstants.DEFAULT_STATIC_SOURCE_NAME, monitor);
+        }
         for (int i = 0; i < nodesNumber; i++) {
             waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
         }
@@ -285,12 +350,14 @@ public class RMTHelper {
     }
 
     public static void waitForNodesToBeUp(int nodeNumber, RMMonitorsHandler monitor) {
-        // this sequence of events matches what's happening on the resource manager when a node source is created
-        waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, nodeNumber, monitor);
-        for (int i = 0; i < nodeNumber; i++) {
-            waitForAnyNodeEvent(RMEventType.NODE_REMOVED, monitor);
-            waitForAnyNodeEvent(RMEventType.NODE_ADDED, monitor);
-            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
+        if (nodeNumber > 0) {
+            // this sequence of events matches what's happening on the resource manager when a node source is created
+            waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, nodeNumber, monitor);
+            for (int i = 0; i < nodeNumber; i++) {
+                waitForAnyNodeEvent(RMEventType.NODE_REMOVED, monitor);
+                waitForAnyNodeEvent(RMEventType.NODE_ADDED, monitor);
+                waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
+            }
         }
     }
 
