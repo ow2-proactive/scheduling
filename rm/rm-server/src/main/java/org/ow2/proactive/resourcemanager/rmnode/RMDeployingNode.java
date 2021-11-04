@@ -372,6 +372,11 @@ public final class RMDeployingNode extends AbstractRMNode {
         return false;
     }
 
+    @Override
+    public void setProtectedByToken(boolean protectedByToken) {
+
+    }
+
     public RMDeployingNode updateOnNodeSource() {
         return nodeSource.update(this);
     }

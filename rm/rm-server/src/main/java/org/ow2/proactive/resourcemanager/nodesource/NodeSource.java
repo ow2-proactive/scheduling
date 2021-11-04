@@ -249,6 +249,10 @@ public class NodeSource implements InitActive, RunActive {
                                              .orElse(new LinkedHashMap<>());
     }
 
+    public AccessType getNodeUserAccessType() {
+        return nodeUserAccessType;
+    }
+
     public static void initThreadPools() {
         if (threadPoolHolder == null) {
             try {
