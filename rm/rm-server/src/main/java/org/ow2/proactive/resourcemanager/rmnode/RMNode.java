@@ -352,6 +352,8 @@ public interface RMNode extends Comparable<RMNode> {
      */
     boolean isProtectedByToken();
 
+    void setProtectedByToken(boolean protectedByToken);
+
     void addToken(String token);
 
     void removeToken(String token);
