@@ -178,6 +178,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         RMTHelper.log("Acquiring " + NODE_NUMBER + " nodes with token=" + TOKEN);
         NodeSet nodeSet = this.rmHelper.getResourceManager().getNodes(criteria);
         Assert.assertEquals(NODE_NUMBER, nodeSet.size());
+        this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NODE_NUMBER);
         this.rmHelper.getResourceManager().releaseNodes(nodeSet);
         this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NODE_NUMBER);
     }
