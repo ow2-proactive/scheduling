@@ -27,9 +27,9 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -170,6 +170,27 @@ public class ModelValidatorContext {
      */
     public void updateJobWithContext(TaskFlowJob job) {
         for (JobVariable jobVariable : job.getVariables().values()) {
+            jobVariable.setValue(spELVariables.getVariables().get(jobVariable.getName()).toString());
+            jobVariable.setModel(spELVariables.getModels().get(jobVariable.getName()));
+            String groupName = jobVariable.getGroup();
+            if (!Strings.isNullOrEmpty(groupName)) {
+                Boolean hiddenGroupStatus = spELVariables.getHiddenGroups().get(groupName);
+                if (hiddenGroupStatus != null) {
+                    jobVariable.setHidden(hiddenGroupStatus);
+                }
+            }
+            Boolean hiddenVariableStatus = spELVariables.getHiddenVariables().get(jobVariable.getName());
+            if (hiddenVariableStatus != null) {
+                jobVariable.setHidden(hiddenVariableStatus);
+            }
+        }
+    }
+
+    /**
+     * updates the given job variables with the current context
+     */
+    public void updateJobVariablesWithContext(List<JobVariable> jobVariables) {
+        for (JobVariable jobVariable : jobVariables) {
             jobVariable.setValue(spELVariables.getVariables().get(jobVariable.getName()).toString());
             jobVariable.setModel(spELVariables.getModels().get(jobVariable.getName()));
             String groupName = jobVariable.getGroup();

@@ -70,6 +70,8 @@ public class SignalApiTest extends ProActiveTestClean {
 
     private static SignalApi signalApi;
 
+    public static final String READY_PREFIX = "ready_";
+
     @ClassRule
     public static TemporaryFolder folder = new TemporaryFolder();
 
@@ -123,11 +125,9 @@ public class SignalApiTest extends ProActiveTestClean {
         Assert.assertTrue(((Signal) synchronizationInternal.get(USER,
                                                                 TASK_ID,
                                                                 SIGNALS_CHANNEL + JOB_ID.value(),
-                                                                signalName)).getName().equals(signalName));
-        Assert.assertFalse(((Signal) synchronizationInternal.get(USER,
-                                                                 TASK_ID,
-                                                                 SIGNALS_CHANNEL + JOB_ID.value(),
-                                                                 signalName)).isReceived());
+                                                                READY_PREFIX + signalName)).getName()
+                                                                                           .equals(signalName));
+        Assert.assertNull((synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL + JOB_ID.value(), signalName)));
     }
 
     @Test
@@ -143,15 +143,16 @@ public class SignalApiTest extends ProActiveTestClean {
         Assert.assertTrue(((Signal) synchronizationInternal.get(USER,
                                                                 TASK_ID,
                                                                 SIGNALS_CHANNEL + JOB_ID.value(),
-                                                                signalName)).getName().equals(signalName));
-        Assert.assertFalse(((Signal) synchronizationInternal.get(USER,
-                                                                 TASK_ID,
-                                                                 SIGNALS_CHANNEL + JOB_ID.value(),
-                                                                 signalName)).isReceived());
+                                                                READY_PREFIX + signalName)).getName()
+                                                                                           .equals(signalName));
+        Assert.assertNotNull((synchronizationInternal.get(USER,
+                                                          TASK_ID,
+                                                          SIGNALS_CHANNEL + JOB_ID.value(),
+                                                          READY_PREFIX + signalName)));
         Assert.assertEquals(jobVariables, ((Signal) synchronizationInternal.get(USER,
                                                                                 TASK_ID,
                                                                                 SIGNALS_CHANNEL + JOB_ID.value(),
-                                                                                signalName)).getInputVariables());
+                                                                                READY_PREFIX + signalName)).getInputVariables());
     }
 
     @Test(expected = SignalApiException.class)
@@ -198,11 +199,6 @@ public class SignalApiTest extends ProActiveTestClean {
         // Send the signal then check that its associated ready signal is removed
         signalApi.sendSignal(signalName);
 
-        Assert.assertTrue(((Signal) synchronizationInternal.get(USER,
-                                                                TASK_ID,
-                                                                SIGNALS_CHANNEL + JOB_ID.value(),
-                                                                signalName)).isReceived());
-
         Assert.assertNotNull(synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL + JOB_ID.value(), signalName));
     }
 
@@ -216,10 +212,10 @@ public class SignalApiTest extends ProActiveTestClean {
         // Send the signal then check that its associated ready signal is removed
         signalApi.sendSignal(signalName, parameters);
 
-        Assert.assertTrue(((Signal) synchronizationInternal.get(USER,
-                                                                TASK_ID,
-                                                                SIGNALS_CHANNEL + JOB_ID.value(),
-                                                                signalName)).isReceived());
+        Assert.assertNotNull((synchronizationInternal.get(USER,
+                                                          TASK_ID,
+                                                          SIGNALS_CHANNEL + JOB_ID.value(),
+                                                          signalName)));
 
         Assert.assertEquals(parameters, ((Signal) synchronizationInternal.get(USER,
                                                                               TASK_ID,
@@ -268,8 +264,8 @@ public class SignalApiTest extends ProActiveTestClean {
                                                               TASK_ID,
                                                               SIGNALS_CHANNEL + JOB_ID.value(),
                                                               signalName2);
-        Assert.assertTrue(signal1.isReceived());
-        Assert.assertTrue(signal2.isReceived());
+        Assert.assertNotNull(signal1);
+        Assert.assertNotNull(signal2);
         Assert.assertTrue(signalApi.getJobSignals().size() == 2);
     }
 
@@ -296,9 +292,9 @@ public class SignalApiTest extends ProActiveTestClean {
                                                               TASK_ID,
                                                               SIGNALS_CHANNEL + JOB_ID.value(),
                                                               signalName2);
-        Assert.assertTrue(signal1.isReceived());
+        Assert.assertNotNull(signal1);
         Assert.assertEquals(parameters, signal1.getOutputValues());
-        Assert.assertTrue(signal2.isReceived());
+        Assert.assertNotNull(signal2);
         Assert.assertEquals(parameters, signal2.getOutputValues());
         Assert.assertTrue(signalApi.getJobSignals().size() == 2);
     }
@@ -400,7 +396,7 @@ public class SignalApiTest extends ProActiveTestClean {
         Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("param1", "value1");
         parameters.put("param2", "value2");
-        long durationInMillis = 100;
+        long durationInMillis = 1000;
 
         //Define a thread that waits for the signal reception
         Runnable waitForSignalThread = () -> {
@@ -493,6 +489,7 @@ public class SignalApiTest extends ProActiveTestClean {
                 TimeUnit.MILLISECONDS.sleep(duration);
                 signalApi.sendSignal(signal, parameters);
             } catch (SignalApiException | InterruptedException e) {
+                e.getMessage();
             }
         };
         return waitForSignalThread;

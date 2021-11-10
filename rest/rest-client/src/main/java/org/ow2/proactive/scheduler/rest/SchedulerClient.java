@@ -61,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -110,6 +111,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.Task;
@@ -139,6 +141,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
@@ -1300,6 +1303,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setVariables(jobInfoData.getVariables());
         jobInfoImpl.setDetailedVariables(jobInfoData.getDetailedVariables());
         jobInfoImpl.setSignals(jobInfoData.getSignals());
+        jobInfoImpl.setDetailedSignals(jobInfoData.getDetailedSignals());
         jobInfoImpl.setVisualizationConnectionStrings(jobInfoData.getVisualizationConnectionStrings());
         jobInfoImpl.setVisualizationIcons(jobInfoData.getVisualizationIcons());
         jobInfoImpl.setAttachedServices(jobInfoData.getAttachedServices());
@@ -1515,15 +1519,58 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Set<String> addJobSignal(String jobId, String signal)
+    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> outputVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException {
         Set<String> result = new HashSet<>();
         try {
-            result = restApi().addJobSignal(sid, jobId, signal);
+            result = restApi().addJobSignal(sid, signal, jobId, outputVariables);
         } catch (Exception e) {
             throwSAEorUJEOrNCEOrPE(e);
         }
         return result;
+    }
+
+    @Override
+    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException {
+        List<JobVariable> jobVariables = new LinkedList<>();
+        try {
+            JobValidationData data = restApi().validateJobSignal(sid, signal, jobId, outputVariables);
+            data.getUpdatedVariables().forEach((k, v) -> jobVariables.add(new JobVariable(k, v)));
+            data.getUpdatedAdvanced()
+                .forEach((k, v) -> jobVariables.stream()
+                                               .filter(jobVariable -> jobVariable.getName().equals(k))
+                                               .findFirst()
+                                               .get()
+                                               .setAdvanced(v));
+            data.getUpdatedHidden()
+                .forEach((k, v) -> jobVariables.stream()
+                                               .filter(jobVariable -> jobVariable.getName().equals(k))
+                                               .findFirst()
+                                               .get()
+                                               .setHidden(v));
+            data.getUpdatedDescriptions()
+                .forEach((k, v) -> jobVariables.stream()
+                                               .filter(jobVariable -> jobVariable.getName().equals(k))
+                                               .findFirst()
+                                               .get()
+                                               .setDescription(v));
+            data.getUpdatedGroups()
+                .forEach((k, v) -> jobVariables.stream()
+                                               .filter(jobVariable -> jobVariable.getName().equals(k))
+                                               .findFirst()
+                                               .get()
+                                               .setGroup(v));
+            data.getUpdatedModels()
+                .forEach((k, v) -> jobVariables.stream()
+                                               .filter(jobVariable -> jobVariable.getName().equals(k))
+                                               .findFirst()
+                                               .get()
+                                               .setModel(v));
+        } catch (Exception e) {
+            throwSAEorUJEOrNCEOrPE(e);
+        }
+        return jobVariables;
     }
 
     private org.apache.http.impl.client.HttpClientBuilder getHttpClientBuilder()

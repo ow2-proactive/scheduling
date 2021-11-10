@@ -78,6 +78,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private Set<String> signals;
 
+    private Map<String, Map<String, List<JobVariable>>> detailedSignals;
+
     private Map<String, String> visualizationConnectionStrings;
 
     private Map<String, String> visualizationIcons;
@@ -264,6 +266,14 @@ public class JobInfoData implements java.io.Serializable {
         this.signals = signals;
     }
 
+    public Map<String, Map<String, List<JobVariable>>> getDetailedSignals() {
+        return detailedSignals;
+    }
+
+    public void setDetailedSignals(Map<String, Map<String, List<JobVariable>>> detailedSignals) {
+        this.detailedSignals = detailedSignals;
+    }
+
     public Map<String, String> getVisualizationConnectionStrings() {
         return visualizationConnectionStrings;
     }
@@ -313,8 +323,8 @@ public class JobInfoData implements java.io.Serializable {
                ", numberOfFailedTasks=" + numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks +
                ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
                "', projectName='" + projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" +
-               genericInformation + ", variables=" + variables + ", signals=" + signals + ", attachedServices=" +
-               attachedServices + '}';
+               genericInformation + ", variables=" + variables + ", signals=" + signals + ", detailedSignals=" +
+               detailedSignals + ", attachedServices=" + attachedServices + '}';
     }
 
 }

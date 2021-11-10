@@ -67,6 +67,10 @@ public class JobVariable implements Serializable {
         //Empty constructor
     }
 
+    public JobVariable(String name) {
+        this(name, null, null);
+    }
+
     public JobVariable(String name, String value) {
         this(name, value, null);
     }

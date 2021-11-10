@@ -138,6 +138,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Set<String> signals;
 
+    private Map<String, Map<String, List<JobVariable>>> detailedSignals;
+
     private Map<String, String> visualizationConnectionStrings = Collections.emptyMap();
 
     private Map<String, String> visualizationIcons = Collections.emptyMap();
@@ -191,6 +193,7 @@ public class JobInfoImpl implements JobInfo {
         this.detailedVariables = jobInfo.getDetailedVariables();
 
         this.signals = jobInfo.getSignals();
+        this.detailedSignals = jobInfo.getDetailedSignals();
         this.visualizationConnectionStrings = jobInfo.getVisualizationConnectionStrings();
         this.visualizationIcons = jobInfo.getVisualizationIcons();
         this.attachedServices = jobInfo.getAttachedServices();
@@ -515,6 +518,16 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public void setSignals(Set<String> signals) {
         this.signals = signals;
+    }
+
+    @Override
+    public Map<String, Map<String, List<JobVariable>>> getDetailedSignals() {
+        return (detailedSignals == null) ? new LinkedHashMap<>() : detailedSignals;
+    }
+
+    @Override
+    public void setDetailedSignals(Map<String, Map<String, List<JobVariable>>> detailedSignals) {
+        this.detailedSignals = detailedSignals;
     }
 
     @Override

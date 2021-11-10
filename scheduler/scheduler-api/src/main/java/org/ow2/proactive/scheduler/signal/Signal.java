@@ -33,9 +33,10 @@ import org.ow2.proactive.scheduler.common.job.JobVariable;
 
 
 public class Signal implements Serializable {
-    private String name;
 
-    private boolean received = false;
+    private static final long serialVersionUID = 1L;
+
+    private String name;
 
     private List<JobVariable> inputVariables;
 
@@ -50,10 +51,6 @@ public class Signal implements Serializable {
         return name;
     }
 
-    public boolean isReceived() {
-        return received;
-    }
-
     public List<JobVariable> getInputVariables() {
         return inputVariables;
     }
@@ -64,10 +61,6 @@ public class Signal implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setReceived(boolean received) {
-        this.received = received;
     }
 
     public void setInputVariables(List<JobVariable> inputVariables) {

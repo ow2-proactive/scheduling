@@ -118,6 +118,7 @@ import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
@@ -132,7 +133,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.DefaultModelJobValidatorServiceProvider;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -160,6 +163,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.signal.Signal;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
@@ -448,8 +452,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
         // register this service and give it a name
         PAActiveObject.registerByName(publicStore, SchedulerConstants.SYNCHRONIZATION_DEFAULT_NAME);
-
-        publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, true);
 
         return publicStore;
     }
@@ -1664,16 +1666,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     }
 
     private void insertSignals(List<JobInfo> jobsInfo) {
-        try {
-            List<String> jobHavingSignalsIds = new ArrayList<>(publicStore.keySet(SIGNAL_ORIGINATOR,
-                                                                                  SIGNAL_TASK_ID,
-                                                                                  signalsChannel));
-            jobsInfo.stream()
-                    .filter(jobInfo -> jobHavingSignalsIds.contains(jobInfo.getJobId().value()))
-                    .forEach(jobInfo -> insertJobSignals(jobInfo));
-        } catch (InvalidChannelException e) {
-            logger.warn("Could not acquire the list of jobs having signals. No signals will be included in the returned jobs info");
-        }
+        jobsInfo.stream().filter(jobInfo -> {
+            try {
+                return publicStore.keySet(SIGNAL_ORIGINATOR,
+                                          SIGNAL_TASK_ID,
+                                          signalsChannel + jobInfo.getJobId().value()) != null;
+            } catch (InvalidChannelException e) {
+            }
+            return false;
+        }).forEach(jobInfo -> insertJobSignals(jobInfo));
     }
 
     private void filterVariablesAndGenericInfo(List<JobInfo> jobsInfo) {
@@ -1875,17 +1876,36 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         if (checkJobPermissionMethod(jobid, "addJobSignal")) {
 
             try {
+                if (publicStore.channelExists(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobid)) {
 
-                if (publicStore.containsKey(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobid)) {
+                    Set<Map.Entry<String, Serializable>> signalEntries = publicStore.entrySet(SIGNAL_ORIGINATOR,
+                                                                                              SIGNAL_TASK_ID,
+                                                                                              signalsChannel + jobid);
+                    Set<String> signalsToBeAdded = signalEntries.stream()
+                                                                .map(entry -> entry.getKey())
+                                                                .collect(Collectors.toSet());
+                    List<Signal> signalList = signalEntries.stream()
+                                                           .map(entry -> (Signal) entry.getValue())
+                                                           .collect(Collectors.toList());
+
+                    Map<String, Map<String, List<JobVariable>>> detailedSignalsToBeAdded = new LinkedHashMap<>();
+                    signalList.forEach(signal -> {
+                        Map<String, List<JobVariable>> signalVars = new LinkedHashMap<>();
+                        signalVars.put(signal.getName(), signal.getInputVariables());
+                        detailedSignalsToBeAdded.put(signal.getName(), signalVars);
+                    });
 
                     Set<String> jobSignals = jobInfo.getSignals();
-                    Set<String> signalsToBeAdded = (HashSet) publicStore.get(SIGNAL_ORIGINATOR,
-                                                                             SIGNAL_TASK_ID,
-                                                                             signalsChannel,
-                                                                             jobid);
+                    Map<String, Map<String, List<JobVariable>>> jobDetailedSignals = jobInfo.getDetailedSignals();
+
                     if (signalsToBeAdded != null && !signalsToBeAdded.isEmpty()) {
                         jobSignals.addAll(signalsToBeAdded);
                         jobInfo.setSignals(jobSignals);
+                    }
+
+                    if (detailedSignalsToBeAdded != null && !detailedSignalsToBeAdded.isEmpty()) {
+                        jobDetailedSignals.putAll(detailedSignalsToBeAdded);
+                        jobInfo.setDetailedSignals(jobDetailedSignals);
                     }
                 }
             } catch (InvalidChannelException e) {
@@ -2069,43 +2089,94 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public Set<String> addJobSignal(String jobId, String signal)
-            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException {
+    public Set<String> addJobSignal(String jobId, String signalName, Map<String, String> outputVariables)
+            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
+            JobValidationException {
 
         String currentUser = frontendState.getCurrentUser();
-        logger.info("Request to send signal " + signal + " on job " + jobId + " received from " + currentUser);
+        logger.info("Request to send signalName " + signalName + " on job " + jobId + " received from " + currentUser);
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkPermissions("addJobSignal",
+                                       frontendState.getIdentifiedJob(jobIdObject),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
+        if (StringUtils.isBlank(signalName.trim())) {
+            throw new SignalApiException("Empty signals are not allowed");
+        }
+        try {
+            publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, true);
+
+            Set<String> signals = publicStore.keySet(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId);
+            logger.error("OANA signals addJobSignals " + jobId + " " + signals);
+
+            String readyPrefix = SignalApiImpl.READY_PREFIX;
+            if (!(signals.contains(readyPrefix + signalName) || signalName.startsWith(readyPrefix))) {
+                throw new SignalApiException("Job " + jobId + " is not ready to receive the signalName " + signalName);
+            }
+
+            // Remove the existing ready signalName, add the signalName and return the set of signals
+            Signal readySignal = (Signal) publicStore.get(SIGNAL_ORIGINATOR,
+                                                          SIGNAL_TASK_ID,
+                                                          signalsChannel + jobId,
+                                                          readyPrefix + signalName);
+            DefaultModelJobValidatorServiceProvider validatorServiceProvider = new DefaultModelJobValidatorServiceProvider();
+            Map<String, Serializable> serializableOutputVariables = new LinkedHashMap<>(outputVariables);
+            validatorServiceProvider.validateVariables(readySignal.getInputVariables(),
+                                                       serializableOutputVariables,
+                                                       this,
+                                                       this);
+            readySignal.setOutputValues(outputVariables);
+            publicStore.remove(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, readyPrefix + signalName);
+            publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, signalName, readySignal);
+
+            Set<String> finalSignals = publicStore.keySet(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId);
+            return finalSignals;
+        } catch (InvalidChannelException e) {
+            throw new SignalApiException("Could not read signals channel", e);
+        } catch (IOException e) {
+            throw new SignalApiException("Could not add signalName for the job " + jobId, e);
+        }
+    }
+
+    @Override
+    @ImmediateService
+    public List<JobVariable> validateJobSignal(String jobId, String signalName, Map<String, String> outputVariables)
+            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
+            JobValidationException {
+
+        String currentUser = frontendState.getCurrentUser();
+        logger.debug("Request to validate signal " + signalName + " on job " + jobId + " received from " + currentUser);
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         frontendState.checkPermissions("addJobSignal",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
 
-        if (StringUtils.isBlank(signal.trim())) {
+        String readyPrefix = SignalApiImpl.READY_PREFIX;
+        if (StringUtils.isBlank(signalName.trim())) {
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
-            publicStore.putIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel, jobId, new HashSet<String>());
+            publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, true);
 
-            Set<String> signals = (HashSet<String>) publicStore.get(SIGNAL_ORIGINATOR,
-                                                                    SIGNAL_TASK_ID,
-                                                                    signalsChannel,
-                                                                    jobId);
-
-            String readyPrefix = SignalApiImpl.READY_PREFIX;
-            if (!(signals.contains(readyPrefix + signal) || signal.startsWith(readyPrefix))) {
-                throw new SignalApiException("Job " + jobId + " is not ready to receive the signal " + signal);
+            Signal signal = (Signal) publicStore.get(SIGNAL_ORIGINATOR,
+                                                     SIGNAL_TASK_ID,
+                                                     signalsChannel + jobId,
+                                                     readyPrefix + signalName);
+            if (signal != null) {
+                DefaultModelJobValidatorServiceProvider validatorServiceProvider = new DefaultModelJobValidatorServiceProvider();
+                Map<String, Serializable> serializableOutputVariables = new LinkedHashMap<>();
+                serializableOutputVariables.putAll(outputVariables);
+                validatorServiceProvider.validateVariables(signal.getInputVariables(),
+                                                           serializableOutputVariables,
+                                                           this,
+                                                           this);
+                return signal.getInputVariables();
+            } else {
+                throw new SignalApiException("Signal not found");
             }
-
-            // Remove the existing ready signal, add the signal and return the set of signals
-            return (HashSet<String>) publicStore.compute(SIGNAL_ORIGINATOR,
-                                                         SIGNAL_TASK_ID,
-                                                         signalsChannel,
-                                                         jobId,
-                                                         "{ k, x ->x.remove('" + readyPrefix + signal + "'); x.add('" +
-                                                                signal + "'); x}");
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
-        } catch (CompilationException | IOException e) {
-            throw new SignalApiException("Could not add signal for the job " + jobId, e);
+        } catch (IOException e) {
+            throw new SignalApiException("Could not add signalName for the job " + jobId, e);
         }
     }
 
