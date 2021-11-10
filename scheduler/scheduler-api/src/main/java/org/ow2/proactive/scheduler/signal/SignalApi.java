@@ -92,7 +92,7 @@ public interface SignalApi extends Serializable {
      * @return a map containing the signal name and the output variables of the signal
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
-    Map<String, Map<String, String>> waitFor(String signalName) throws SignalApiException;
+    Map<String, String> waitFor(String signalName) throws SignalApiException;
 
     /**
      * Wait until one signal (among those of the given {@code signalsSubSet}) is added to the set of job signals

@@ -236,14 +236,12 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public Map<String, Map<String, String>> waitFor(String signalName) throws SignalApiException {
+    public Map<String, String> waitFor(String signalName) throws SignalApiException {
         init();
-        Map<String, Map<String, String>> signals = new LinkedHashMap<>();
         try {
             synchronization.waitUntil(SIGNALS_CHANNEL + jobId, signalName, "{k, x -> x != null}");
             Signal signal = (Signal) synchronization.get(SIGNALS_CHANNEL + jobId, signalName);
-            signals.put(signalName, signal.getOutputValues());
-            return signals;
+            return signal.getOutputValues();
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException e) {

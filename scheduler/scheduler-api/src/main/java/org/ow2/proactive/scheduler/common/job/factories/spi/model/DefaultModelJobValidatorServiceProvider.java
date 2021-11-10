@@ -120,7 +120,8 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
                                                                   models,
                                                                   groupNames,
                                                                   scheduler,
-                                                                  space);
+                                                                  space,
+                                                                  null);
         for (JobVariable jobVariable : variableList) {
             checkVariableFormat(null, jobVariable, context);
         }

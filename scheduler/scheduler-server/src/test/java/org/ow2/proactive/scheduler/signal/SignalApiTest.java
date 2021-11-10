@@ -401,12 +401,8 @@ public class SignalApiTest extends ProActiveTestClean {
         //Define a thread that waits for the signal reception
         Runnable waitForSignalThread = () -> {
             try {
-                Map<String, Map<String, String>> signals = signalApi.waitFor(signal);
-                Assert.assertTrue(signals.keySet().contains(signal));
-                signals.entrySet()
-                       .stream()
-                       .parallel()
-                       .forEach(signalPair -> Assert.assertEquals(parameters, signalPair.getValue()));
+                Map<String, String> outputValues = signalApi.waitFor(signal);
+                Assert.assertEquals(parameters, outputValues);
             } catch (Exception e) {
             }
         };
