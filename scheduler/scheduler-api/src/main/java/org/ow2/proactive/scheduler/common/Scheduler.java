@@ -691,9 +691,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException if <code>currentJobId</code> does not correspond to any submitted job
      * @throws PermissionException if user cannot access job with <code>currentJobId</code>
      */
-    JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
-            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
-            SubmissionClosedException;
+    JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos,
+            String sessionId) throws NotConnectedException, UnknownJobException, PermissionException,
+            JobCreationException, SubmissionClosedException;
 
     /**
      * Get the result for the given jobId.<br>

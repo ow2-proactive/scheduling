@@ -98,7 +98,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
 
     private JobId submitJob(String filename) throws Exception {
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
-        WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler, space);
+        WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler, space, null);
         JobId id;
         try (InputStream jobStream = new FileInputStream(jobFile)) {
             id = submitter.submit(jobStream, new HashMap<String, String>(), null);

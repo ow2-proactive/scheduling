@@ -441,7 +441,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                 "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
                                 null);
         JobId jobId = submitJob(job, client);
-        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
+        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap(), null);
 
         String jobContent = client.getJobContent(jobId).replaceAll("\\s+", "");
         String jobContent1 = client.getJobContent(jobId1).replaceAll("\\s+", "");
@@ -458,7 +458,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         JobId jobId = submitJob(job, client);
         Map<String, String> vars = new HashMap<>();
         vars.put("myvar", "myvalue");
-        JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap());
+        JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap(), null);
 
         String jobContent1 = client.getJobContent(jobId1);
 
@@ -477,7 +477,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         JobId jobId = submitJob(job, client);
         Map<String, String> infos = new HashMap<>();
         infos.put("myinfo", "myvalue");
-        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), infos);
+        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), infos, null);
 
         String jobContent1 = client.getJobContent(jobId1);
 
@@ -501,7 +501,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Map<String, String> vars = new HashMap<>();
         vars.put("originalVar", "newValue");
 
-        JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap());
+        JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap(), null);
 
         String jobContent1 = client.getJobContent(jobId1);
 
@@ -528,7 +528,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Map<String, String> info1 = new HashMap<>();
         info1.put("originalVar", "newValue");
 
-        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), info1);
+        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), info1, null);
 
         String jobContent1 = client.getJobContent(jobId1);
 
@@ -553,7 +553,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Map<String, String> vars = new HashMap<>();
         vars.put("newVar", "newValue");
 
-        JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap());
+        JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap(), null);
 
         String jobContent1 = client.getJobContent(jobId1);
 
@@ -581,7 +581,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Map<String, String> info1 = new HashMap<>();
         info1.put("newVar", "newValue");
 
-        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), info1);
+        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), info1, null);
 
         String jobContent1 = client.getJobContent(jobId1);
 

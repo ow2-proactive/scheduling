@@ -715,11 +715,11 @@ class LiveJobs {
                         // remove the parent tasks results if task fails and job is canceled
                         task.removeParentTasksResults();
                     } else if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
-                        suspendTaskOnError(jobData, task, result.getTaskDuration());
+                        suspendTaskOnError(jobData, task, result.getTaskDuration(), result);
                         tlogger.info(taskId, "Task still contains errors after restart, so it stays in InError state");
                         return terminationData;
                     } else if (requiresPauseJobOnError) {
-                        suspendTaskOnError(jobData, task, result.getTaskDuration());
+                        suspendTaskOnError(jobData, task, result.getTaskDuration(), result);
                         pauseJob(task.getJobId());
                         tlogger.info(taskId,
                                      "Task still contains errors after automatic restart, the Job is configured to pause on error");
@@ -750,7 +750,7 @@ class LiveJobs {
         return terminationData;
     }
 
-    private void suspendTaskOnError(JobData jobData, InternalTask task, long taskDuration) {
+    private void suspendTaskOnError(JobData jobData, InternalTask task, long taskDuration, TaskResultImpl result) {
         InternalJob job = jobData.job;
         job.setInErrorTime(System.currentTimeMillis());
         job.setTaskPausedOnError(task);
@@ -758,8 +758,7 @@ class LiveJobs {
         setJobStatusToInErrorIfNotPaused(job);
 
         task.setInErrorTime(task.getStartTime() + taskDuration);
-
-        dbManager.updateJobAndTaskState(job, task);
+        dbManager.updateAfterTaskFinished(job, task, result);
 
         updateTaskPausedOnerrorState(job, task.getId());
         updateJobInSchedulerState(job, SchedulerEvent.JOB_IN_ERROR);
