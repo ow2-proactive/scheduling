@@ -61,9 +61,12 @@ public class WorkflowSubmitter {
 
     private SchedulerSpaceInterface space;
 
-    public WorkflowSubmitter(Scheduler scheduler, SchedulerSpaceInterface space) {
+    private String sessionId;
+
+    public WorkflowSubmitter(Scheduler scheduler, SchedulerSpaceInterface space, String sessionId) {
         this.scheduler = scheduler;
         this.space = space;
+        this.sessionId = sessionId;
     }
 
     /**
@@ -121,7 +124,12 @@ public class WorkflowSubmitter {
 
     private Job createJobObject(InputStream workflowStream, Map<String, String> jobVariables,
             Map<String, String> jobGenericInfos) throws JobCreationException {
-        return JobFactory.getFactory().createJob(workflowStream, jobVariables, jobGenericInfos, scheduler, space);
+        return JobFactory.getFactory().createJob(workflowStream,
+                                                 jobVariables,
+                                                 jobGenericInfos,
+                                                 scheduler,
+                                                 space,
+                                                 sessionId);
     }
 
 }

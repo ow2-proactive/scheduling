@@ -51,11 +51,13 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
+import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManagerFactory;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.PAExecutors;
 
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -227,8 +229,22 @@ public class NodesRecoveryManager {
     private synchronized RMNode addRMNodeToCoreAndSource(NodeSource nodeSource, Map<NodeState, Integer> nodeStates,
             RMNodeData rmNodeData, String nodeUrl, Node node, NodeState previousState) {
         RMNode rmNode = nodeSource.internalAddNodeAfterRecovery(node, rmNodeData);
+        boolean tokenInNodeSource = nodeSource.getNodeUserAccessType().getTokens() != null &&
+                                    nodeSource.getNodeUserAccessType().getTokens().length > 0;
+        boolean tokenInNode = false;
         this.rmCore.registerAvailableNode(rmNode);
         if (!(node instanceof FakeDownNodeForRecovery)) {
+            try {
+                String nodeAccessToken = node.getProperty(RMNodeStarter.NODE_ACCESS_TOKEN);
+                tokenInNode = nodeAccessToken != null && nodeAccessToken.length() > 0;
+
+                if (tokenInNode) {
+                    logger.debug("Node " + node.getNodeInformation().getURL() + " is protected by access token " +
+                                 nodeAccessToken);
+                }
+            } catch (Exception e) {
+                throw new AddingNodesException(e);
+            }
             try {
                 RMCore.topologyManager.addNode(rmNode.getNode());
             } catch (Exception e) {
@@ -240,6 +256,7 @@ public class NodesRecoveryManager {
             logger.info("Triggering down node notification for " + nodeUrl);
             this.triggerDownNodeHookIfNecessary(nodeSource, rmNodeData, nodeUrl, previousState);
         }
+        rmNode.setProtectedByToken(tokenInNode || tokenInNodeSource);
         this.updateRecoveredNodeStateCounter(nodeStates, rmNode.getState());
         return rmNode;
     }

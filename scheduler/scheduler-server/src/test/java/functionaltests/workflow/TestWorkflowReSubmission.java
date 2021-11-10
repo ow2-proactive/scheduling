@@ -50,9 +50,8 @@ public class TestWorkflowReSubmission extends SchedulerFunctionalTestWithRestart
 
         JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
-        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId,
-                                                                        Collections.emptyMap(),
-                                                                        Collections.emptyMap());
+        JobId jobId1 = schedulerHelper.getSchedulerInterface()
+                                      .reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap(), null);
 
         schedulerHelper.waitForEventJobFinished(jobId);
         schedulerHelper.waitForEventJobFinished(jobId1);
@@ -70,7 +69,7 @@ public class TestWorkflowReSubmission extends SchedulerFunctionalTestWithRestart
 
         JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
-        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, null, null);
+        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, null, null, null);
 
         schedulerHelper.waitForEventJobFinished(jobId);
         schedulerHelper.waitForEventJobFinished(jobId1);
@@ -90,7 +89,7 @@ public class TestWorkflowReSubmission extends SchedulerFunctionalTestWithRestart
 
         Map<String, String> vars = new HashMap<>();
         vars.put("x", "50");
-        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, vars, null);
+        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, vars, null, null);
 
         schedulerHelper.waitForEventJobFinished(jobId);
         schedulerHelper.waitForEventJobFinished(jobId1);
@@ -111,7 +110,7 @@ public class TestWorkflowReSubmission extends SchedulerFunctionalTestWithRestart
 
         Map<String, String> info = new HashMap<>();
         info.put("x", "50");
-        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, null, info);
+        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, null, info, null);
 
         schedulerHelper.waitForEventJobFinished(jobId);
         schedulerHelper.waitForEventJobFinished(jobId1);
@@ -132,7 +131,7 @@ public class TestWorkflowReSubmission extends SchedulerFunctionalTestWithRestart
 
         Map<String, String> vars = new HashMap<>();
         vars.put("x", "50");
-        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, vars, vars);
+        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, vars, vars, null);
 
         schedulerHelper.waitForEventJobFinished(jobId);
         schedulerHelper.waitForEventJobFinished(jobId1);

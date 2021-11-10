@@ -430,10 +430,12 @@ public abstract class InternalJob extends JobState {
      *                      triggered by the FlowAction
      * @param action        a Control Flow Action that will potentially create new tasks
      *                      inside the job
+     * @param result        result associated with the task
+     * @param taskIsInError If the task is in in-error state
      * @return the taskDescriptor that has just been terminated.
      */
     public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId, SchedulerStateUpdate frontend,
-            FlowAction action, TaskResultImpl result, boolean taskIsPaused) {
+            FlowAction action, TaskResultImpl result, boolean taskIsInError) {
         final InternalTask descriptor = tasks.get(taskId);
 
         if (!errorOccurred) {
@@ -444,14 +446,13 @@ public abstract class InternalJob extends JobState {
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
         descriptor.setExecutionDuration(result.getTaskDuration());
 
-        if (taskIsPaused) {
+        if (taskIsInError) {
             setNumberOfInErrorTasks(getNumberOfInErrorTasks() - 1);
-        } else {
-            setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         }
+        setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
 
-        if ((getStatus() == JobStatus.RUNNING) && (getNumberOfRunningTasks() == 0) && !taskIsPaused) {
+        if ((getStatus() == JobStatus.RUNNING) && (getNumberOfRunningTasks() == 0) && !taskIsInError) {
             setStatus(JobStatus.STALLED);
         }
 
@@ -536,7 +537,7 @@ public abstract class InternalJob extends JobState {
 
         // terminate this task
         if (!didAction) {
-            getJobDescriptor().terminate(taskId, taskIsPaused);
+            getJobDescriptor().terminate(taskId, taskIsInError);
         }
 
         return changesInfo;

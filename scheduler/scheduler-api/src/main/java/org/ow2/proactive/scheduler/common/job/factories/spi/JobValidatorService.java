@@ -72,10 +72,11 @@ public interface JobValidatorService {
      * @param job job object to validate
      * @param scheduler scheduler instance which can give the access to the third-party credentials
      * @param space SchedulerSpaceInterface instance which can give the access to check data space files
+     * @param sessionId current session for validating jobs with CATALOG_OBJECT variables
      * @return if the validator eventually made some modifications to the job, return a new version
      * @throws JobValidationException if the job is not valid
      */
-    TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space)
+    TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler, SchedulerSpaceInterface space, String sessionId)
             throws JobValidationException;
 
 }

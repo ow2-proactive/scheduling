@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.Charsets;
@@ -73,7 +74,7 @@ import functionaltests.utils.TestScheduler;
  */
 public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
 
-    private static final String inerror_groovy_script = "throw new Exception(\"error\")";
+    private static final String inerror_groovy_script = "println \"some logs\"\nthrow new Exception(\"error\")";
 
     private static final String ok_groovy_script = "println \"OK\"";
 
@@ -199,6 +200,16 @@ public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
         JobInfo jInfo = schedulerHelper.waitForEventJobRunning(id);
         assertEquals(jInfo.getJobId(), id);
         schedulerHelper.waitForEventTaskInError(id, errorTaskName);
+        JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(id);
+        Assert.assertEquals(pauseTaskPolicy ? JobStatus.IN_ERROR : JobStatus.PAUSED, jobState.getStatus());
+        Assert.assertEquals(1, jobState.getNumberOfInErrorTasks());
+        List<TaskResult> taskResults = schedulerHelper.getSchedulerInterface()
+                                                      .getTaskResultAllIncarnations(jInfo.getJobId(), "errorTask");
+        Assert.assertNotNull(taskResults);
+        Assert.assertEquals(1, taskResults.size());
+        String taskLogs = taskResults.get(0).getOutput().getAllLogs();
+        Assert.assertNotNull(taskLogs);
+        Assert.assertTrue(taskLogs.contains("some logs"));
         FileUtils.writeStringToFile(groovyScriptFile, ok_groovy_script, StandardCharsets.UTF_8.toString());
         if (restartSingleTask) {
             schedulerHelper.getSchedulerInterface().restartInErrorTask(id.toString(), errorTaskName);
@@ -215,6 +226,13 @@ public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
         schedulerHelper.waitForEventJobFinished(id);
         jobInfo = schedulerHelper.getSchedulerInterface().getJobInfo(id.toString());
         Assert.assertEquals(JobStatus.FINISHED, jobInfo.getStatus());
+
+        jobState = schedulerHelper.getSchedulerInterface().getJobState(id);
+        Assert.assertEquals(JobStatus.FINISHED, jobState.getStatus());
+        Assert.assertEquals(0, jobState.getNumberOfInErrorTasks());
+        Assert.assertEquals(0, jobState.getNumberOfRunningTasks());
+        Assert.assertEquals(2, jobState.getNumberOfFinishedTasks());
+
         groovyScriptFile.delete();
     }
 

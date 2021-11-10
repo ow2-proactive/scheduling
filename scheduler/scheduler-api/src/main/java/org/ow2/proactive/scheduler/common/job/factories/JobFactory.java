@@ -175,11 +175,12 @@ public abstract class JobFactory {
      * @param genericInfos map of job submission generic infos
      * @param scheduler the Scheduler instance for validating jobs to access third-party credentials
      * @param space the SchedulerSpaceInterface instance for validating jobs to access data spaces files
+     * @param sessionId current session for validating jobs with CATALOG_OBJECT variables
      * @return a Job instance created with the given XML file
      * @throws JobCreationException if an exception occurred during job creation
      */
     public abstract Job createJob(String filePath, Map<String, String> variables, Map<String, String> genericInfos,
-            Scheduler scheduler, SchedulerSpaceInterface space) throws JobCreationException;
+            Scheduler scheduler, SchedulerSpaceInterface space, String sessionId) throws JobCreationException;
 
     /**
      * Creates a job using the given job descriptor.
@@ -211,7 +212,7 @@ public abstract class JobFactory {
             Map<String, String> genericInfos) throws JobCreationException;
 
     public abstract Job createJob(InputStream workflowStream, Map<String, String> variables,
-            Map<String, String> genericInfos, Scheduler scheduler, SchedulerSpaceInterface space)
+            Map<String, String> genericInfos, Scheduler scheduler, SchedulerSpaceInterface space, String sessionId)
             throws JobCreationException;
 
 }
