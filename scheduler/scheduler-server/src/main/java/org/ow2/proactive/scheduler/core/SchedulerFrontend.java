@@ -2107,7 +2107,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, true);
 
             Set<String> signals = publicStore.keySet(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId);
-            logger.error("OANA signals addJobSignals " + jobId + " " + signals);
 
             String readyPrefix = SignalApiImpl.READY_PREFIX;
             if (!(signals.contains(readyPrefix + signalName) || signalName.startsWith(readyPrefix))) {
