@@ -220,7 +220,7 @@ public class SignalApiTest extends ProActiveTestClean {
         Assert.assertEquals(parameters, ((Signal) synchronizationInternal.get(USER,
                                                                               TASK_ID,
                                                                               SIGNALS_CHANNEL + JOB_ID.value(),
-                                                                              signalName)).getOutputValues());
+                                                                              signalName)).getUpdatedVariables());
 
         Assert.assertNotNull(synchronizationInternal.get(USER, TASK_ID, SIGNALS_CHANNEL + JOB_ID.value(), signalName));
     }
@@ -293,9 +293,9 @@ public class SignalApiTest extends ProActiveTestClean {
                                                               SIGNALS_CHANNEL + JOB_ID.value(),
                                                               signalName2);
         Assert.assertNotNull(signal1);
-        Assert.assertEquals(parameters, signal1.getOutputValues());
+        Assert.assertEquals(parameters, signal1.getUpdatedVariables());
         Assert.assertNotNull(signal2);
-        Assert.assertEquals(parameters, signal2.getOutputValues());
+        Assert.assertEquals(parameters, signal2.getUpdatedVariables());
         Assert.assertTrue(signalApi.getJobSignals().size() == 2);
     }
 

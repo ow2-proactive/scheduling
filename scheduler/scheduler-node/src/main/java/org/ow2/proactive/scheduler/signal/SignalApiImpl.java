@@ -136,7 +136,7 @@ public class SignalApiImpl implements SignalApi {
         try {
             init();
             Signal signal = new Signal(signalName, null);
-            signal.setOutputValues(parameters);
+            signal.setUpdatedVariables(parameters);
 
             synchronization.remove(SIGNALS_CHANNEL + jobId, READY_PREFIX + signalName);
             synchronization.put(SIGNALS_CHANNEL + jobId, signalName, signal);
@@ -161,7 +161,7 @@ public class SignalApiImpl implements SignalApi {
                 Signal existingSignal = (Signal) synchronization.get(SIGNALS_CHANNEL + jobId,
                                                                      READY_PREFIX + signalName);
                 Signal signal = existingSignal == null ? new Signal(signalName, null) : existingSignal;
-                signal.setOutputValues(signalParameters.get(signalName));
+                signal.setUpdatedVariables(signalParameters.get(signalName));
                 synchronization.remove(SIGNALS_CHANNEL + jobId, READY_PREFIX + signalName);
                 synchronization.put(SIGNALS_CHANNEL + jobId, signalName, signal);
             }
@@ -241,7 +241,7 @@ public class SignalApiImpl implements SignalApi {
         try {
             synchronization.waitUntil(SIGNALS_CHANNEL + jobId, signalName, "{k, x -> x != null}");
             Signal signal = (Signal) synchronization.get(SIGNALS_CHANNEL + jobId, signalName);
-            return signal.getOutputValues();
+            return signal.getUpdatedVariables();
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException e) {
@@ -270,7 +270,7 @@ public class SignalApiImpl implements SignalApi {
             for (String signalName : signalsSubSet) {
                 synchronization.waitUntil(SIGNALS_CHANNEL + jobId, signalName, "{k, x -> x != null");
                 Signal signal = (Signal) synchronization.get(SIGNALS_CHANNEL + jobId, signalName);
-                signalMap.put(signalName, signal.getOutputValues());
+                signalMap.put(signalName, signal.getUpdatedVariables());
             }
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);

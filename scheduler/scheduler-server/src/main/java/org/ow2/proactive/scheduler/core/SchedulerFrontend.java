@@ -2124,7 +2124,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                        serializableOutputVariables,
                                                        this,
                                                        this);
-            readySignal.setOutputValues(outputVariables);
+            readySignal.setUpdatedVariables(outputVariables);
             publicStore.remove(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, readyPrefix + signalName);
             publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, signalName, readySignal);
 

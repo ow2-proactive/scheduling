@@ -40,7 +40,7 @@ public class Signal implements Serializable {
 
     private List<JobVariable> inputVariables;
 
-    private Map<String, String> outputValues = null;
+    private Map<String, String> updatedVariables = null;
 
     public Signal(String name, List<JobVariable> variables) {
         this.name = name;
@@ -55,8 +55,8 @@ public class Signal implements Serializable {
         return inputVariables;
     }
 
-    public Map<String, String> getOutputValues() {
-        return outputValues;
+    public Map<String, String> getUpdatedVariables() {
+        return updatedVariables;
     }
 
     public void setName(String name) {
@@ -67,7 +67,7 @@ public class Signal implements Serializable {
         this.inputVariables = inputVariables;
     }
 
-    public void setOutputValues(Map<String, String> outputValues) {
-        this.outputValues = outputValues;
+    public void setUpdatedVariables(Map<String, String> updatedVariables) {
+        this.updatedVariables = updatedVariables;
     }
 }
