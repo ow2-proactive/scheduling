@@ -134,6 +134,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                 @NamedQuery(name = "updateTaskDataAfterJobFinished", query = "update TaskData task set task.taskStatus = :taskStatus, " +
                                                                              "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
                                                                              "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
+                                                                             "task.inErrorTime = :inErrorTime, " +
                                                                              "task.finishedTime = :finishedTime, " +
                                                                              "task.executionDuration = :executionDuration " +
                                                                              "where task.id = :taskId"),
