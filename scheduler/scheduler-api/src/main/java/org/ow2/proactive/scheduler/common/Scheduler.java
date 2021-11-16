@@ -107,7 +107,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *
      * @param jobId id of the job
      * @param signal signal name
-     * @param outputVariables the output variables of the signal
+     * @param updatedVariables the updated variables of the signal
      * @return the set of job signals including the added signal
      * @throws NotConnectedException
      *             if you are not authenticated.
@@ -118,18 +118,18 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws SignalApiException
      *             errors related to the signal api
      * @throws SignalApiException
-     *            if the given output values are not compatible with the job input values
+     *            if the given updated variables are not compatible with the job input values
      */
-    Set<String> addJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException;
 
     /**
-     * Validate the given signal's output values
+     * Validate the given signal's updated variables
      *
      * @param jobId id of the job
      * @param signal signal name
-     * @param outputVariables the output variables of the signal
+     * @param updatedVariables the updated variables of the signal
      * @return the list of signal input values
      * @throws NotConnectedException
      *             if you are not authenticated.
@@ -140,9 +140,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws SignalApiException
      *             errors related to the signal api
      * @throws SignalApiException
-     *             if the given output values are not compatible with the job input values
+     *             if the given updated variables are not compatible with the job input values
      */
-    List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException;
 

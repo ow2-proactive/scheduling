@@ -89,7 +89,7 @@ public interface SignalApi extends Serializable {
      * Wait until the given signal is added to the set of job signals
      *
      * @param signalName name of the signal to wait for
-     * @return a map containing the signal name and the output variables of the signal
+     * @return a map containing the signal name and the updated values of the signal
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
     Map<String, String> waitFor(String signalName) throws SignalApiException;
@@ -107,7 +107,7 @@ public interface SignalApi extends Serializable {
      * Wait until all the input signals are added to the set of job signals
      *
      * @param signalsSubSet set of the signals to wait for
-     * @return a map containing the signal name and the output variables of the signal
+     * @return a map containing the signal name and the updated values of the signal
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
     Map<String, Map<String, String>> waitForAll(Set<String> signalsSubSet) throws SignalApiException;
@@ -124,7 +124,7 @@ public interface SignalApi extends Serializable {
      * Add the given {@code signal} to the set of job signals
      *
      * @param signalName name of the signal to be added to job signals
-     * @param parameters the output variables of the signal to be added
+     * @param parameters the updated values of the signal to be added
      * @throws SignalApiException if the corresponding ready signal does not exist, or when an error occurs while sending the signal
      */
     void sendSignal(String signalName, Map<String, String> parameters) throws SignalApiException;
@@ -140,7 +140,7 @@ public interface SignalApi extends Serializable {
     /**
      * Add the given set of signals to job signals
      *
-     * @param signalParameters  a map containing the signal name and the output variables of the signal
+     * @param signalParameters  a map containing the signal name and the updated values of the signal
      * @throws SignalApiException if an error occurred while reading in the signals channel, or when adding the signals to job signals
      */
     void sendManySignals(Map<String, Map<String, String>> signalParameters) throws SignalApiException;

@@ -1519,11 +1519,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException {
         Set<String> result = new HashSet<>();
         try {
-            result = restApi().addJobSignal(sid, signal, jobId, outputVariables);
+            result = restApi().addJobSignal(sid, signal, jobId, updatedVariables);
         } catch (Exception e) {
             throwSAEorUJEOrNCEOrPE(e);
         }
@@ -1531,11 +1531,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException {
         List<JobVariable> jobVariables = new LinkedList<>();
         try {
-            JobValidationData data = restApi().validateJobSignal(sid, signal, jobId, outputVariables);
+            JobValidationData data = restApi().validateJobSignal(sid, signal, jobId, updatedVariables);
             data.getUpdatedVariables().forEach((k, v) -> jobVariables.add(new JobVariable(k, v)));
             data.getUpdatedAdvanced()
                 .forEach((k, v) -> jobVariables.stream()

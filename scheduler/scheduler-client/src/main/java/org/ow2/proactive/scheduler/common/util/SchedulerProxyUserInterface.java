@@ -903,18 +903,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException,
             JobValidationException {
-        return uischeduler.addJobSignal(jobId, signal, outputVariables);
+        return uischeduler.addJobSignal(jobId, signal, updatedVariables);
     }
 
     @Override
     @ImmediateService
-    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException,
             JobValidationException {
-        return uischeduler.validateJobSignal(jobId, signal, outputVariables);
+        return uischeduler.validateJobSignal(jobId, signal, updatedVariables);
     }
 
     public String getStatHistory(String mbeanName, String range, String[] dataSources, String function) {

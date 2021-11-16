@@ -2090,7 +2090,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public Set<String> addJobSignal(String jobId, String signalName, Map<String, String> outputVariables)
+    public Set<String> addJobSignal(String jobId, String signalName, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException {
 
@@ -2119,12 +2119,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                           signalsChannel + jobId,
                                                           readyPrefix + signalName);
             DefaultModelJobValidatorServiceProvider validatorServiceProvider = new DefaultModelJobValidatorServiceProvider();
-            Map<String, Serializable> serializableOutputVariables = new LinkedHashMap<>(outputVariables);
+            Map<String, Serializable> serializableUpdatedVariables = new LinkedHashMap<>(updatedVariables);
             validatorServiceProvider.validateVariables(readySignal.getInputVariables(),
-                                                       serializableOutputVariables,
+                                                       serializableUpdatedVariables,
                                                        this,
                                                        this);
-            readySignal.setUpdatedVariables(outputVariables);
+            readySignal.setUpdatedVariables(updatedVariables);
             publicStore.remove(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, readyPrefix + signalName);
             publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, signalName, readySignal);
 
@@ -2139,7 +2139,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public List<JobVariable> validateJobSignal(String jobId, String signalName, Map<String, String> outputVariables)
+    public List<JobVariable> validateJobSignal(String jobId, String signalName, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException {
 
@@ -2163,10 +2163,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                      readyPrefix + signalName);
             if (signal != null) {
                 DefaultModelJobValidatorServiceProvider validatorServiceProvider = new DefaultModelJobValidatorServiceProvider();
-                Map<String, Serializable> serializableOutputVariables = new LinkedHashMap<>();
-                serializableOutputVariables.putAll(outputVariables);
+                Map<String, Serializable> serializableUpdatedVariables = new LinkedHashMap<>();
+                serializableUpdatedVariables.putAll(updatedVariables);
                 validatorServiceProvider.validateVariables(signal.getInputVariables(),
-                                                           serializableOutputVariables,
+                                                           serializableUpdatedVariables,
                                                            this,
                                                            this);
                 return signal.getInputVariables();

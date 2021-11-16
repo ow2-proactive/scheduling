@@ -1061,19 +1061,19 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws NotConnectedException, SignalApiException, UnknownJobException, PermissionException,
             JobValidationException {
         renewSession();
-        return client.addJobSignal(jobId, signal, outputVariables);
+        return client.addJobSignal(jobId, signal, updatedVariables);
     }
 
     @Override
-    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws NotConnectedException, SignalApiException, UnknownJobException, PermissionException,
             JobValidationException {
         renewSession();
-        return client.validateJobSignal(jobId, signal, outputVariables);
+        return client.validateJobSignal(jobId, signal, updatedVariables);
     }
 
     @Override

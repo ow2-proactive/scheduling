@@ -818,17 +818,17 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException,
             JobValidationException {
-        return (_getScheduler()).addJobSignal(jobId, signal, outputVariables);
+        return (_getScheduler()).addJobSignal(jobId, signal, updatedVariables);
     }
 
     @Override
-    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException,
             JobValidationException {
-        return (_getScheduler()).validateJobSignal(jobId, signal, outputVariables);
+        return (_getScheduler()).validateJobSignal(jobId, signal, updatedVariables);
     }
 
 }

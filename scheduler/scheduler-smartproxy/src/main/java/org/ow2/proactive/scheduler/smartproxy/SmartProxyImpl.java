@@ -930,16 +930,16 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException,
             JobValidationException {
-        return schedulerProxy.addJobSignal(jobId, signal, outputVariables);
+        return schedulerProxy.addJobSignal(jobId, signal, updatedVariables);
     }
 
     @Override
-    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> outputVariables)
+    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException,
             JobValidationException {
-        return schedulerProxy.validateJobSignal(jobId, signal, outputVariables);
+        return schedulerProxy.validateJobSignal(jobId, signal, updatedVariables);
     }
 }
