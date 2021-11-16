@@ -1702,6 +1702,7 @@ public class SchedulerDBManager {
                                .setParameter("numberOfExecutionOnFailureLeft",
                                              taskInfo.getNumberOfExecutionOnFailureLeft())
                                .setParameter("finishedTime", taskInfo.getFinishedTime())
+                               .setParameter("inErrorTime", taskInfo.getInErrorTime())
                                .setParameter("executionDuration", taskInfo.getExecutionDuration())
                                .setParameter("taskId", taskId)
                                .executeUpdate();
