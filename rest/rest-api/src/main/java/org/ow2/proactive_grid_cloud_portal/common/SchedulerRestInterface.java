@@ -2351,7 +2351,27 @@ public interface SchedulerRestInterface {
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
-            @PathParam("jobid") String jobId) throws RestException;
+            @PathParam("jobid") String jobId, Map<String, String> updatedVariables) throws RestException;
+
+    /**
+     *
+     * Validate the signal's output values
+     *
+     * @param sessionId
+     *            current session
+     * @param jobId
+     *            id of the job
+     * @param signal
+     *            signal name to validate
+     *
+     * @return the result of signal validation
+     */
+    @POST
+    @Path("job/{jobid}/signals/validate")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    JobValidationData validateJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
+            @PathParam("jobid") String jobId, Map<String, String> updatedVariables) throws RestException;
 
     /**
      *

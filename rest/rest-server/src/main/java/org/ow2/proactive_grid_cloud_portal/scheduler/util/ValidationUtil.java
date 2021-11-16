@@ -67,6 +67,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -80,10 +81,18 @@ import org.ow2.proactive.scheduler.common.job.factories.FlowError;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 
 
 public class ValidationUtil {
+
+    /**
+     * Attributes used for the signal api
+     */
+    private SynchronizationInternal publicStore;
+
+    private static final String SIGNAL_ORIGINATOR = "scheduler";
 
     public static JobValidationData validateJobDescriptor(File jobDescFile, Map<String, String> jobVariables,
             Scheduler scheduler, SchedulerSpaceInterface space, String sessionId) {
@@ -106,29 +115,33 @@ public class ValidationUtil {
             }
         } catch (JobCreationException e) {
             data.setTaskName(e.getTaskName());
-            data.setErrorMessage(e.getMessage());
-            data.setStackTrace(getStackTrace(e));
-            if (e.getUpdatedVariables() != null) {
-                data.setUpdatedVariables(e.getUpdatedVariables());
-            }
-            if (e.getUpdatedModels() != null) {
-                data.setUpdatedModels(e.getUpdatedModels());
-            }
-            if (e.getUpdatedDescriptions() != null) {
-                data.setUpdatedDescriptions(e.getUpdatedDescriptions());
-            }
-            if (e.getUpdatedGroups() != null) {
-                data.setUpdatedGroups(e.getUpdatedGroups());
-            }
-            if (e.getUpdatedAdvanced() != null) {
-                data.setUpdatedAdvanced(e.getUpdatedAdvanced());
-            }
-            if (e.getUpdatedHidden() != null) {
-                data.setUpdatedHidden(e.getUpdatedHidden());
-            }
+            setJobValidationDataErrorMessage(data, e);
         }
         return data;
 
+    }
+
+    public static void setJobValidationDataErrorMessage(JobValidationData data, JobCreationException e) {
+        data.setErrorMessage(e.getMessage());
+        data.setStackTrace(getStackTrace(e));
+        if (e.getUpdatedVariables() != null) {
+            data.setUpdatedVariables(e.getUpdatedVariables());
+        }
+        if (e.getUpdatedModels() != null) {
+            data.setUpdatedModels(e.getUpdatedModels());
+        }
+        if (e.getUpdatedDescriptions() != null) {
+            data.setUpdatedDescriptions(e.getUpdatedDescriptions());
+        }
+        if (e.getUpdatedGroups() != null) {
+            data.setUpdatedGroups(e.getUpdatedGroups());
+        }
+        if (e.getUpdatedAdvanced() != null) {
+            data.setUpdatedAdvanced(e.getUpdatedAdvanced());
+        }
+        if (e.getUpdatedHidden() != null) {
+            data.setUpdatedHidden(e.getUpdatedHidden());
+        }
     }
 
     private static void fillUpdatedVariables(TaskFlowJob job, JobValidationData data) {
@@ -162,6 +175,30 @@ public class ValidationUtil {
         data.setUpdatedGroups(updatedGroups);
         data.setUpdatedAdvanced(updatedAdvanced);
         data.setUpdatedHidden(updatedHidden);
+    }
+
+    public static void fillUpdatedVariables(List<JobVariable> jobVariables, JobValidationData data) {
+        HashMap<String, String> updatedVariables = new HashMap<>();
+        HashMap<String, String> updatedModels = new HashMap<>();
+        HashMap<String, String> updatedDescriptions = new HashMap<>();
+        HashMap<String, String> updatedGroups = new HashMap<>();
+        HashMap<String, Boolean> updatedAdvanced = new HashMap<>();
+        HashMap<String, Boolean> updatedHidden = new HashMap<>();
+        for (JobVariable jobVariable : jobVariables) {
+            updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
+            updatedModels.put(jobVariable.getName(), jobVariable.getModel());
+            updatedDescriptions.put(jobVariable.getName(), jobVariable.getDescription());
+            updatedGroups.put(jobVariable.getName(), jobVariable.getGroup());
+            updatedAdvanced.put(jobVariable.getName(), jobVariable.isAdvanced());
+            updatedHidden.put(jobVariable.getName(), jobVariable.isHidden());
+        }
+        data.setUpdatedVariables(updatedVariables);
+        data.setUpdatedModels(updatedModels);
+        data.setUpdatedDescriptions(updatedDescriptions);
+        data.setUpdatedGroups(updatedGroups);
+        data.setUpdatedAdvanced(updatedAdvanced);
+        data.setUpdatedHidden(updatedHidden);
+        data.setValid(true);
     }
 
     private static void validateJob(TaskFlowJob job, JobValidationData data) {

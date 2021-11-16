@@ -254,10 +254,30 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Set<String> addJobSignal(String sessionId, String signal, String jobId) throws RestException {
+    public Set<String> addJobSignal(String sessionId, String signal, String jobId, Map<String, String> updatedVariables)
+            throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
-            return s.addJobSignal(jobId, signal);
+            return s.addJobSignal(jobId, signal, updatedVariables);
+        } catch (JobCreationException e) {
+            throw new JobCreationRestException(e);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
+    public JobValidationData validateJobSignal(String sessionId, String signal, String jobId,
+            Map<String, String> updatedVariables) throws RestException {
+        JobValidationData data = new JobValidationData();
+        try {
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
+            List<JobVariable> jobVariables = s.validateJobSignal(jobId, signal, updatedVariables);
+            ValidationUtil.fillUpdatedVariables(jobVariables, data);
+            return data;
+        } catch (JobValidationException e) {
+            ValidationUtil.setJobValidationDataErrorMessage(data, e);
+            return data;
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }

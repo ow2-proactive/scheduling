@@ -150,6 +150,47 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
+    public void testSignals() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/register_service_with_signals.groovy", null, null);
+        //submit job with 'ready signal' and add variables
+        JobId jobId = submitJob(job, client);
+        JobInfo jobInfo;
+        //wait until 'ready_my_signal' signal is sent
+        do {
+            jobInfo = client.getJobInfo(jobId.toString());
+            Assert.assertNotNull(jobInfo);
+            Thread.sleep(1000);
+        } while (!jobInfo.getSignals().contains("ready_my_signal"));
+        Map<String, String> outpuVariables = new HashMap<>();
+        outpuVariables.put("name", "15");
+        // validate the job variables
+        List<JobVariable> jobVariables = client.validateJobSignal(jobId.value(), "my_signal", outpuVariables);
+        // add 'my_signal' signal
+        Set<String> signals = client.addJobSignal(jobId.value(), "my_signal", outpuVariables);
+        // wait until the job is finished
+        client.waitForJob(jobId.toString(), TimeUnit.MINUTES.toMillis(5));
+        Assert.assertFalse(signals.contains("ready_my_signal"));
+        Assert.assertTrue(signals.contains("my_signal"));
+        JobVariable nameJobVariable = jobVariables.stream()
+                                                  .filter(jobVariable -> jobVariable.getName().equals("name"))
+                                                  .findFirst()
+                                                  .get();
+
+        Assert.assertNotNull(nameJobVariable);
+        Assert.assertEquals("15", nameJobVariable.getValue());
+        Assert.assertEquals("PA:Integer", nameJobVariable.getModel());
+        JobVariable secondJobVariable = jobVariables.stream()
+                                                    .filter(jobVariable -> jobVariable.getName().equals("second"))
+                                                    .findFirst()
+                                                    .get();
+
+        Assert.assertNotNull(secondJobVariable);
+        Assert.assertEquals("15", secondJobVariable.getValue());
+        Assert.assertEquals("PA:Integer", secondJobVariable.getModel());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
     public void testDisconnect() throws Exception {
         ISchedulerClient client = clientInstance();
         client.disconnect();

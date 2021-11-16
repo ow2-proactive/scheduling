@@ -321,6 +321,13 @@ public class SynchronizationWrapper implements Synchronization {
     }
 
     @Override
+    public String waitUntilAny(String channel, Set<String> keys, String predicate)
+            throws InvalidChannelException, CompilationException {
+        initInternalAPI();
+        return internalAPI.waitUntilAny(originator, taskId, channel, keys, predicate);
+    }
+
+    @Override
     public PredicateActionResult waitUntilThen(String channel, String key, String predicate,
             String thenRemappingFunction) throws InvalidChannelException, CompilationException, IOException {
         initInternalAPI();

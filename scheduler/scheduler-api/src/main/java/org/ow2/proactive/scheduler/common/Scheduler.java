@@ -37,6 +37,7 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -49,6 +50,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -105,6 +107,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *
      * @param jobId id of the job
      * @param signal signal name
+     * @param updatedVariables the updated variables of the signal
      * @return the set of job signals including the added signal
      * @throws NotConnectedException
      *             if you are not authenticated.
@@ -114,9 +117,34 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if you can't access to this particular job.
      * @throws SignalApiException
      *             errors related to the signal api
+     * @throws SignalApiException
+     *            if the given updated variables are not compatible with the job input values
      */
-    Set<String> addJobSignal(String jobId, String signal)
-            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException;
+    Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
+            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
+            JobValidationException;
+
+    /**
+     * Validate the given signal's updated variables
+     *
+     * @param jobId id of the job
+     * @param signal signal name
+     * @param updatedVariables the updated variables of the signal
+     * @return the list of signal input values
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws UnknownJobException
+     *             if the job does not exist.
+     * @throws PermissionException
+     *             if you can't access to this particular job.
+     * @throws SignalApiException
+     *             errors related to the signal api
+     * @throws SignalApiException
+     *             if the given updated variables are not compatible with the job input values
+     */
+    List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
+            throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
+            JobValidationException;
 
     /**
      * Returns the USER DataSpace URIs associated with the current user

@@ -66,6 +66,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -76,6 +77,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -928,8 +930,16 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Set<String> addJobSignal(String jobId, String signal)
-            throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException {
-        return schedulerProxy.addJobSignal(jobId, signal);
+    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
+            throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException,
+            JobValidationException {
+        return schedulerProxy.addJobSignal(jobId, signal, updatedVariables);
+    }
+
+    @Override
+    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
+            throws UnknownJobException, NotConnectedException, PermissionException, SignalApiException,
+            JobValidationException {
+        return schedulerProxy.validateJobSignal(jobId, signal, updatedVariables);
     }
 }

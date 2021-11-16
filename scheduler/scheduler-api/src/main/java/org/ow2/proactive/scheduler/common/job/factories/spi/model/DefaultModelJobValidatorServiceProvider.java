@@ -26,6 +26,13 @@
 package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.InputStream;
+import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
@@ -36,6 +43,9 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorService;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
+
+import com.google.common.base.Strings;
 
 
 /**
@@ -76,6 +86,46 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
         }
 
         return job;
+    }
+
+    public void validateVariables(List<JobVariable> variableList, Map<String, Serializable> userValues,
+            Scheduler scheduler, SchedulerSpaceInterface space) throws JobValidationException {
+
+        Map<String, String> models = variableList.stream()
+                                                 .collect(Collectors.toMap(e -> e.getName(), e -> e.getModel()));
+        Set<String> groupNames = new LinkedHashSet<>();
+        variableList.forEach(e -> {
+            if (!Strings.isNullOrEmpty(e.getGroup())) {
+                groupNames.add(e.getGroup());
+            }
+        });
+
+        Map<String, Serializable> variableReplacement = new LinkedHashMap<>();
+        Map<String, Serializable> updatedVariables = new LinkedHashMap<>();
+        variableList.forEach(jobVariable -> {
+            if (userValues.containsKey(jobVariable.getName())) {
+                variableReplacement.put(jobVariable.getName(), userValues.get(jobVariable.getName()));
+            } else {
+                variableReplacement.put(jobVariable.getName(), jobVariable.getValue());
+            }
+        });
+        variableList.forEach(jobVariable -> {
+            jobVariable.setValue(userValues.containsKey(jobVariable.getName()) ? VariableSubstitutor.filterAndUpdate((String) userValues.get(jobVariable.getName()),
+                                                                                                                     variableReplacement)
+                                                                               : VariableSubstitutor.filterAndUpdate(jobVariable.getValue(),
+                                                                                                                     variableReplacement));
+            updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
+        });
+        ModelValidatorContext context = new ModelValidatorContext(updatedVariables,
+                                                                  models,
+                                                                  groupNames,
+                                                                  scheduler,
+                                                                  space,
+                                                                  null);
+        for (JobVariable jobVariable : variableList) {
+            checkVariableFormat(null, jobVariable, context);
+        }
+        context.updateJobVariablesWithContext(variableList);
     }
 
     protected void checkVariableFormat(Task task, JobVariable variable, ModelValidatorContext context)

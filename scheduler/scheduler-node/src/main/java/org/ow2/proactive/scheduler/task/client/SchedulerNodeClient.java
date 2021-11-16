@@ -56,6 +56,7 @@ import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -1060,10 +1061,19 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public Set<String> addJobSignal(String jobId, String signal)
-            throws NotConnectedException, SignalApiException, UnknownJobException, PermissionException {
+    public Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
+            throws NotConnectedException, SignalApiException, UnknownJobException, PermissionException,
+            JobValidationException {
         renewSession();
-        return client.addJobSignal(jobId, signal);
+        return client.addJobSignal(jobId, signal, updatedVariables);
+    }
+
+    @Override
+    public List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
+            throws NotConnectedException, SignalApiException, UnknownJobException, PermissionException,
+            JobValidationException {
+        renewSession();
+        return client.validateJobSignal(jobId, signal, updatedVariables);
     }
 
     @Override
