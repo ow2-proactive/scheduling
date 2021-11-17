@@ -875,6 +875,39 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Wait for a job updated event.
+     * If corresponding event has been already thrown by scheduler, returns immediately
+     * with JobInfo object associated to event, otherwise wait for event reception.
+     *
+     * @param id job identifier, for which event is waited for.
+     * @return JobInfo event's associated object.
+     */
+    public JobInfo waitForEventJobUpdated(JobId id) {
+        try {
+            return waitForEventJobUpdated(id, 0);
+        } catch (ProActiveTimeoutException e) {
+            //unreachable block, 0 means infinite, no timeout
+            //log sthing ?
+            return null;
+        }
+    }
+
+    /**
+     * Wait for a job updated event.
+     * If corresponding event has been already thrown by scheduler, returns immediately
+     * with JobInfo object associated to event, otherwise wait for reception
+     * of the corresponding event.
+     *
+     * @param id job identifier, for which event is waited for.
+     * @param timeout max waiting time in milliseconds.
+     * @return JobInfo event's associated object.
+     * @throws ProActiveTimeoutException if timeout is reached.
+     */
+    public JobInfo waitForEventJobUpdated(JobId id, long timeout) {
+        return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_UPDATED, id, timeout);
+    }
+
+    /**
      * Wait for a task passing from pending to running.
      * If corresponding event has been already thrown by scheduler, returns immediately
      * with TaskInfo object associated to event, otherwise wait for reception
@@ -973,6 +1006,26 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Wait for a in-error task to terminate after a call to markAsFinishedAndResume.
+     * If corresponding event has been already thrown by scheduler, returns immediately
+     * with TaskInfo object associated to event, otherwise wait for reception
+     * of the corresponding event.
+     *
+     * @param jobId job identifier, for which task belongs.
+     * @param taskName for which event is waited for.
+     * @return TaskInfo event's associated object.
+     */
+    public TaskInfo waitForEventTaskInErrorToFinished(JobId jobId, String taskName) {
+        try {
+            return waitForEventTaskInErrorToFinished(jobId, taskName, 0);
+        } catch (ProActiveTimeoutException e) {
+            //unreachable block, 0 means infinite, no timeout
+            //log sthing ?
+            return null;
+        }
+    }
+
+    /**
      * Wait for a task failed that reaches in-error state.
      * If corresponding event has been already thrown by scheduler, returns immediately
      * with TaskInfo object associated to event, otherwise wait for reception
@@ -986,6 +1039,25 @@ public class SchedulerTHelper {
      */
     public TaskInfo waitForEventTaskInError(JobId jobId, String taskName, long timeout) {
         return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_IN_ERROR, jobId, taskName, timeout);
+    }
+
+    /**
+     * Wait for a in-error task to terminate after a call to markAsFinishedAndResume.
+     * If corresponding event has been already thrown by scheduler, returns immediately
+     * with TaskInfo object associated to event, otherwise wait for reception
+     * of the corresponding event.
+     *
+     * @param jobId job identifier, for which task belongs.
+     * @param taskName for which event is waited for.
+     * @param timeout max waiting time in milliseconds.
+     * @return TaskInfo event's associated object.
+     * @throws ProActiveTimeoutException if timeout is reached.
+     */
+    public TaskInfo waitForEventTaskInErrorToFinished(JobId jobId, String taskName, long timeout) {
+        return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_IN_ERROR_TO_FINISHED,
+                                                              jobId,
+                                                              taskName,
+                                                              timeout);
     }
 
     /**

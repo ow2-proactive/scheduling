@@ -108,13 +108,13 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterTaskFinished", query = "update JobData set status = :status, " +
-                                                                             "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
+                                                                             "finishedTime = :finishedTime, inErrorTime= :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                              "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                              "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                              "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
                                                                              "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, " +
-                                                                                     "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
+                                                                                     "finishedTime = :finishedTime, inErrorTime = :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                                      "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                                      "numberOfRunningTasks = :numberOfRunningTasks, totalNumberOfTasks =:totalNumberOfTasks, " +
                                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
