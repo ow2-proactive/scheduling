@@ -733,6 +733,7 @@ class LiveJobs {
             } else {
                 //remove the parent tasks results if task finished with no error
                 task.removeParentTasksResults();
+                task.setInErrorTime(-1);
             }
 
             terminateTask(jobData, task, errorOccurred, result, terminationData);
@@ -777,6 +778,9 @@ class LiveJobs {
             job.setStatus(JobStatus.IN_ERROR);
         } else if (job.getStatus().equals(JobStatus.IN_ERROR) && job.getNumberOfInErrorTasks() == 0) {
             job.setStatus(JobStatus.RUNNING);
+            job.setInErrorTime(-1);
+        } else if (job.getNumberOfInErrorTasks() == 0) {
+            job.setInErrorTime(-1);
         }
     }
 
@@ -822,6 +826,13 @@ class LiveJobs {
                 terminationData.addJobToTerminate(job.getId(), job.getGenericInformation(), job.getCredentials());
             }
 
+            task.setInErrorTime(-1);
+            boolean jobUpdated = false;
+            if (job.getNumberOfInErrorTasks() == 0) {
+                job.setInErrorTime(-1);
+                jobUpdated = true;
+            }
+
             // Update database
             if (taskResult.getAction() != null) {
                 dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, taskResult);
@@ -843,6 +854,11 @@ class LiveJobs {
                                          new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                                                                        new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
+                listener.jobUpdatedFullData(job);
+            } else if (jobUpdated) {
+                listener.jobStateUpdated(job.getOwner(),
+                                         new NotificationData<JobInfo>(SchedulerEvent.JOB_UPDATED,
+                                                                       new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
                 listener.jobUpdatedFullData(job);
             }
 

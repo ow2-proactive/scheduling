@@ -150,25 +150,31 @@ public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testPauseJobErrorPolicyRestartAllInErrorTasks() throws Throwable {
-        testRestartInError(false, false);
+        testRestartInError(false, false, false);
     }
 
     @Test
     public void testPauseJobErrorPolicyRestartInErrorTask() throws Throwable {
-        testRestartInError(true, false);
+        testRestartInError(true, false, false);
     }
 
     @Test
     public void testPauseTaskErrorPolicyRestartAllInErrorTasks() throws Throwable {
-        testRestartInError(false, true);
+        testRestartInError(false, true, false);
     }
 
     @Test
     public void testPauseTaskErrorPolicyRestartInErrorTask() throws Throwable {
-        testRestartInError(true, true);
+        testRestartInError(true, true, false);
     }
 
-    private void testRestartInError(boolean restartSingleTask, boolean pauseTaskPolicy) throws Throwable {
+    @Test
+    public void testPauseTaskErrorMarkAsFinishedTask() throws Throwable {
+        testRestartInError(true, true, true);
+    }
+
+    private void testRestartInError(boolean restartSingleTask, boolean pauseTaskPolicy, boolean markAsFinished)
+            throws Throwable {
         TaskFlowJob submittedJob = new TaskFlowJob();
         submittedJob.setName(this.getClass().getSimpleName() +
                              (pauseTaskPolicy ? "_pauseTaskPolicy" : "_pauseJobPolicy"));
@@ -203,6 +209,7 @@ public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
         JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(id);
         Assert.assertEquals(pauseTaskPolicy ? JobStatus.IN_ERROR : JobStatus.PAUSED, jobState.getStatus());
         Assert.assertEquals(1, jobState.getNumberOfInErrorTasks());
+        Assert.assertNotEquals(-1, jobState.getInErrorTime());
         List<TaskResult> taskResults = schedulerHelper.getSchedulerInterface()
                                                       .getTaskResultAllIncarnations(jInfo.getJobId(), "errorTask");
         Assert.assertNotNull(taskResults);
@@ -211,7 +218,9 @@ public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
         Assert.assertNotNull(taskLogs);
         Assert.assertTrue(taskLogs.contains("some logs"));
         FileUtils.writeStringToFile(groovyScriptFile, ok_groovy_script, StandardCharsets.UTF_8.toString());
-        if (restartSingleTask) {
+        if (markAsFinished) {
+            schedulerHelper.getSchedulerInterface().finishInErrorTask(id.toString(), errorTaskName);
+        } else if (restartSingleTask) {
             schedulerHelper.getSchedulerInterface().restartInErrorTask(id.toString(), errorTaskName);
         } else {
             schedulerHelper.restartAllInErrorTasks(id.toString());
@@ -219,7 +228,15 @@ public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
         if (!pauseTaskPolicy) {
             schedulerHelper.getSchedulerInterface().resumeJob(id);
         }
-        schedulerHelper.waitForEventTaskFinished(id, errorTaskName);
+        if (markAsFinished) {
+            schedulerHelper.waitForEventTaskInErrorToFinished(id, errorTaskName);
+            schedulerHelper.waitForEventJobUpdated(id);
+        } else {
+            schedulerHelper.waitForEventTaskFinished(id, errorTaskName);
+        }
+        jobState = schedulerHelper.getSchedulerInterface().getJobState(id);
+        Assert.assertEquals(-1, jobState.getInErrorTime());
+
         schedulerHelper.waitForEventTaskRunning(id, "okTask");
         JobInfo jobInfo = schedulerHelper.getSchedulerInterface().getJobInfo(id.toString());
         Assert.assertTrue(jobInfo.getStatus() == JobStatus.RUNNING || jobInfo.getStatus() == JobStatus.STALLED);
@@ -232,6 +249,7 @@ public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
         Assert.assertEquals(0, jobState.getNumberOfInErrorTasks());
         Assert.assertEquals(0, jobState.getNumberOfRunningTasks());
         Assert.assertEquals(2, jobState.getNumberOfFinishedTasks());
+        Assert.assertEquals(-1, jobState.getInErrorTime());
 
         groovyScriptFile.delete();
     }
