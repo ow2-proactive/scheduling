@@ -2348,10 +2348,32 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("job/{jobid}/signals")
-    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Consumes(value = MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.APPLICATION_JSON)
     Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
-            @PathParam("jobid") String jobId, Map<String, String> updatedVariables) throws RestException;
+            @PathParam("jobid") String jobId) throws RestException;
+
+    /**
+     *
+     * Add a signal to the list of signals used by the considered job
+     *
+     * @param sessionId
+     *            current session
+     * @param jobId
+     *            id of the job
+     * @param signal
+     *            signal name to add
+     * @param updatedVariables
+     *          the update variables of the signal
+     * @return the set of job signals associated with the given job after the addition
+     */
+    @POST
+    @Path("job/{jobid}/signals")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Set<String> addJobSignalWithVariables(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("signal") String signal, @PathParam("jobid") String jobId, Map<String, String> updatedVariables)
+            throws RestException;
 
     /**
      *

@@ -2119,12 +2119,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                           signalsChannel + jobId,
                                                           readyPrefix + signalName);
             DefaultModelJobValidatorServiceProvider validatorServiceProvider = new DefaultModelJobValidatorServiceProvider();
-            Map<String, Serializable> serializableUpdatedVariables = new LinkedHashMap<>(updatedVariables);
-            validatorServiceProvider.validateVariables(readySignal.getInputVariables(),
-                                                       serializableUpdatedVariables,
-                                                       this,
-                                                       this);
-            readySignal.setUpdatedVariables(updatedVariables);
+            if (updatedVariables != null) {
+                Map<String, Serializable> serializableUpdatedVariables = new LinkedHashMap<>(updatedVariables);
+                validatorServiceProvider.validateVariables(readySignal.getInputVariables(),
+                                                           serializableUpdatedVariables,
+                                                           this,
+                                                           this);
+                readySignal.setUpdatedVariables(updatedVariables);
+            }
             publicStore.remove(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, readyPrefix + signalName);
             publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, signalName, readySignal);
 
