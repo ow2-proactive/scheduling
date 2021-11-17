@@ -2333,6 +2333,13 @@ public interface SchedulerRestInterface {
     List<String> checkJobsPermissionMethod(@HeaderParam("sessionid") String sessionId,
             @PathParam("method") String method, List<String> jobsId) throws RestException;
 
+    @POST
+    @Path("job/{jobid}/signals")
+    @Consumes(value = MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.APPLICATION_JSON)
+    Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
+            @PathParam("jobid") String jobId) throws RestException;
+
     /**
      *
      * Add a signal to the list of signals used by the considered job
@@ -2348,10 +2355,11 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("job/{jobid}/signals")
-    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM })
     @Produces(MediaType.APPLICATION_JSON)
-    Set<String> addJobSignal(@HeaderParam("sessionid") String sessionId, @QueryParam("signal") String signal,
-            @PathParam("jobid") String jobId, Map<String, String> updatedVariables) throws RestException;
+    Set<String> addJobSignalWithVariables(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("signal") String signal, @PathParam("jobid") String jobId, Map<String, String> updatedVariables)
+            throws RestException;
 
     /**
      *
