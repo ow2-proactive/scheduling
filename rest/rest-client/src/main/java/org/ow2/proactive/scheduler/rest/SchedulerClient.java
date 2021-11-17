@@ -1523,7 +1523,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException {
         Set<String> result = new HashSet<>();
         try {
-            result = restApi().addJobSignal(sid, signal, jobId, updatedVariables);
+            result = restApi().addJobSignalWithVariables(sid, signal, jobId, updatedVariables);
         } catch (Exception e) {
             throwSAEorUJEOrNCEOrPE(e);
         }
