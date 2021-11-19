@@ -2145,6 +2145,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException {
 
+        if (updatedVariables == null || updatedVariables.isEmpty()) {
+            return null;
+        }
         String currentUser = frontendState.getCurrentUser();
         logger.debug("Request to validate signal " + signalName + " on job " + jobId + " received from " + currentUser);
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
