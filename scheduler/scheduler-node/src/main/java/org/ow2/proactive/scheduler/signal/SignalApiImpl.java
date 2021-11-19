@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -53,6 +54,8 @@ import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
  * @since 24/11/2020
  */
 public class SignalApiImpl implements SignalApi {
+
+    private static final Logger logger = Logger.getLogger(SignalApiImpl.class);
 
     private static final String SIGNALS_CHANNEL = PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString();
 
@@ -87,10 +90,9 @@ public class SignalApiImpl implements SignalApi {
         }
         try {
             init();
+            logger.info("Send ready for signal " + signalName + " to job " + jobId);
             synchronization.remove(SIGNALS_CHANNEL + jobId, signalName);
             synchronization.put(SIGNALS_CHANNEL + jobId, READY_PREFIX + signalName, new Signal(signalName, variables));
-            Set<String> signals = synchronization.keySet(SIGNALS_CHANNEL + jobId);
-
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (IOException e) {
@@ -105,6 +107,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public boolean isReceived(String signalName) throws SignalApiException {
+        logger.info("Check if signal " + signalName + " is received on job " + jobId);
         Set<String> signals = getJobSignals().keySet();
         if (!signals.isEmpty()) {
             return signals.contains(signalName);
@@ -115,6 +118,8 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public Signal checkForSignals(Set<String> signalsSubSet) throws SignalApiException {
+        logger.info("Check if any of the signals " + signalsSubSet + " exist among the set of job signals on job " +
+                    jobId);
         Map<String, Signal> signals = getJobSignals();
         if (!signals.isEmpty()) {
             Map.Entry<String, Signal> signalEntry = signals.entrySet()
@@ -130,6 +135,7 @@ public class SignalApiImpl implements SignalApi {
     }
 
     public void sendSignal(String signalName, Map<String, String> parameters) throws SignalApiException {
+        logger.info("Send signal " + signalName + " on job " + jobId);
         if (StringUtils.isBlank(signalName.trim())) {
             throw new SignalApiException("Empty signals are not allowed");
         }
@@ -152,6 +158,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public void sendManySignals(Map<String, Map<String, String>> signalParameters) throws SignalApiException {
+        logger.info("Send multiple signals " + signalParameters.keySet() + " on job " + jobId);
         if (signalParameters.keySet().stream().anyMatch(signal -> StringUtils.isBlank(signal.trim()))) {
             throw new SignalApiException("Empty signals are not allowed");
         }
@@ -181,6 +188,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public void removeSignal(String signalName) throws SignalApiException {
+        logger.info("Remove signal " + signalName + " from job " + jobId);
         try {
             init();
             synchronization.remove(SIGNALS_CHANNEL + jobId, signalName);
@@ -193,6 +201,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public void removeManySignals(Set<String> signalsSubSet) throws SignalApiException {
+        logger.info("Remove multiple signals " + signalsSubSet + " from job " + jobId);
         try {
             init();
             for (String signal : signalsSubSet) {
@@ -224,6 +233,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public void clearJobSignals() throws SignalApiException {
+        logger.info("Clear signals for job " + jobId);
         try {
             init();
             synchronization.clear(SIGNALS_CHANNEL + jobId);
@@ -237,6 +247,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public Map<String, String> waitFor(String signalName) throws SignalApiException {
+        logger.info("Wait for signal " + signalName + " on job " + jobId);
         init();
         try {
             synchronization.waitUntil(SIGNALS_CHANNEL + jobId, signalName, "{k, x -> x != null}");
@@ -251,6 +262,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public Signal waitForAny(Set<String> signalsSubSet) throws SignalApiException {
+        logger.info("Wait for any signals " + signalsSubSet + " on job " + jobId);
         init();
         try {
             synchronization.waitUntilAny(SIGNALS_CHANNEL + jobId, signalsSubSet, "{k, x -> x != null }");
@@ -264,6 +276,7 @@ public class SignalApiImpl implements SignalApi {
 
     @Override
     public Map<String, Map<String, String>> waitForAll(Set<String> signalsSubSet) throws SignalApiException {
+        logger.info("Wait for all signals " + signalsSubSet + " on job " + jobId);
         init();
         Map<String, Map<String, String>> signalMap = new LinkedHashMap<>();
         try {

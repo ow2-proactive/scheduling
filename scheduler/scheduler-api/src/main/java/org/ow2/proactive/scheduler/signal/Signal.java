@@ -70,4 +70,9 @@ public class Signal implements Serializable {
     public void setUpdatedVariables(Map<String, String> updatedVariables) {
         this.updatedVariables = updatedVariables;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
