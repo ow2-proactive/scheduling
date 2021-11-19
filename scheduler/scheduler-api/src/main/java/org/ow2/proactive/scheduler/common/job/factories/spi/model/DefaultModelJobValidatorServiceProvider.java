@@ -91,7 +91,7 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
     public void validateVariables(List<JobVariable> variableList, Map<String, Serializable> userValues,
             Scheduler scheduler, SchedulerSpaceInterface space) throws JobValidationException {
 
-        if (variableList == null && (userValues != null && !userValues.isEmpty())) {
+        if (variableList == null && userValues != null && !userValues.isEmpty()) {
             return;
         }
         Map<String, String> models = variableList.stream()
