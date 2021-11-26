@@ -106,8 +106,13 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
                 ConfigurableFieldView cf = configurableFields[index];
                 Type ft = cf.getMeta().type();
                 if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
-                    String contents = FileUtility.readFileToString(new File(policyArgs[index]));
-                    queryStringBuilder.add("policyFileParameters", contents);
+                    if ("".equals(policyArgs[index])) {
+                        String contents = "";
+                        queryStringBuilder.add("policyFileParameters", contents);
+                    } else {
+                        String contents = FileUtility.readFileToString(new File(policyArgs[index]));
+                        queryStringBuilder.add("policyFileParameters", contents);
+                    }
                 } else {
                     queryStringBuilder.add("policyParameters", policyArgs[index]);
                 }
