@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BaseParserValidator;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
@@ -141,21 +142,31 @@ public class CatalogObjectValidator implements Validator<String> {
 
     private boolean matchKindAndContentType(CommonHttpResourceDownloader.ResponseContent response,
             String catalogObjectValue) throws IOException, ValidationException {
-        JsonNode jsonNode = new ObjectMapper().readTree(response.getContent());
-        String catalogObjKind = jsonNode.path("kind").asText();
-        String catalogObjContentType = jsonNode.path("content_type").asText();
-        System.out.println("responseKind: " + catalogObjKind);
-        System.out.println("responseContentType: " + catalogObjContentType);
-
-        if (StringUtils.isNotEmpty(expectedKind) && !expectedKind.equals(catalogObjKind)) {
-            throw new ValidationException(String.format("Catalog object [%s] does not match the expected kind [%s].",
-                                                        catalogObjectValue,
-                                                        expectedKind));
+        if (expectedKind.isEmpty() && expectedContentType.isEmpty()) {
+            return true;
         }
-        if (StringUtils.isNotEmpty(expectedContentType) && !expectedContentType.equals(catalogObjContentType)) {
-            throw new ValidationException(String.format("Catalog object [%s] does not match the expected content type [%s].",
-                                                        catalogObjectValue,
-                                                        expectedContentType));
+
+        JsonNode jsonNode = new ObjectMapper().readTree(response.getContent());
+
+        if (StringUtils.isNotEmpty(expectedKind)) {
+            String catalogObjKind = jsonNode.path("kind").asText();
+            System.out.println("responseKind: " + catalogObjKind);
+            String kindPattern = "^" + BaseParserValidator.ignoreCaseRegexp(expectedKind) + ".*$";
+            if (!catalogObjKind.matches(kindPattern)) {
+                throw new ValidationException(String.format("Catalog object [%s] does not match the expected kind [%s].",
+                                                            catalogObjectValue,
+                                                            expectedKind));
+            }
+        }
+        if (StringUtils.isNotEmpty(expectedContentType)) {
+            String catalogObjContentType = jsonNode.path("content_type").asText();
+            System.out.println("responseContentType: " + catalogObjContentType);
+            String contentTypePattern = "^" + BaseParserValidator.ignoreCaseRegexp(expectedContentType) + ".*$";
+            if (!catalogObjContentType.matches(contentTypePattern)) {
+                throw new ValidationException(String.format("Catalog object [%s] does not match the expected content type [%s].",
+                                                            catalogObjectValue,
+                                                            expectedContentType));
+            }
         }
         return true;
     }
