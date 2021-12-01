@@ -560,6 +560,11 @@ public class StaxJobFactory extends JobFactory {
                         commonPropertiesHolder.getUnresolvedVariables().putAll(unresolvedJobVariablesMap);
                         Map<String, JobVariable> jobVariablesMap = replaceVariablesInJobVariablesMap(unresolvedJobVariablesMap,
                                                                                                      submittedJobVariables);
+                        // For each variable present in the workflow, remove first the entry in commonPropertiesHolder before replacing
+                        // this is to ensure preserving the order of variables defined in the workflow
+                        for (String key : jobVariablesMap.keySet()) {
+                            commonPropertiesHolder.getVariables().remove(key);
+                        }
                         commonPropertiesHolder.getVariables().putAll(jobVariablesMap);
 
                     } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {

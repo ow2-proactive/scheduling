@@ -190,6 +190,26 @@ public class TestStaxJobFactory {
     }
 
     @Test
+    public void testCreateJobShouldPreserveVariablesOrderInTheWorkflowWhenReplacementVariablesAreProvided()
+            throws Exception {
+        GlobalVariablesParser.setConfigurationPath(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/globalvariables/global_variables_default.xml")
+                                                                                  .toExternalForm());
+        GlobalVariablesParser.getInstance().reloadFilters();
+        // Add replacement variables in reverse order from the workflow
+        Map<String, String> replacementVariables = new LinkedHashMap<>();
+        for (int i = 6; i > 0; i--) {
+            replacementVariables.put("var_" + i, "value_" + i);
+        }
+        Job job = factory.createJob(jobDescriptorVariableOrder, replacementVariables, null);
+        // Ensure that the final order is the workflow order
+        int index = 1;
+        for (String variable : job.getVariables().keySet()) {
+            assertEquals("var_" + index, variable);
+            index++;
+        }
+    }
+
+    @Test
     public void testCreateJobWithNoVariablesShouldReferenceGlobalVariablesAndGenericInfo() throws Exception {
         Job testScriptJob = factory.createJob(jobDescriptorNoVariablesUri);
         assertNotNull(testScriptJob.getVariables().get("globalVar"));
