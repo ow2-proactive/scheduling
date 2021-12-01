@@ -150,7 +150,7 @@ public class CatalogObjectValidator implements Validator<String> {
 
         if (StringUtils.isNotEmpty(expectedKind)) {
             String catalogObjKind = jsonNode.path("kind").asText();
-            String kindPattern = "^" + BaseParserValidator.ignoreCaseRegexp(expectedKind) + ".*$";
+            String kindPattern = "^.*" + BaseParserValidator.ignoreCaseRegexp(expectedKind) + ".*$";
             if (!catalogObjKind.matches(kindPattern)) {
                 throw new ValidationException(String.format("Catalog object [%s] does not match the expected kind [%s].",
                                                             catalogObjectValue,
@@ -159,7 +159,7 @@ public class CatalogObjectValidator implements Validator<String> {
         }
         if (StringUtils.isNotEmpty(expectedContentType)) {
             String catalogObjContentType = jsonNode.path("content_type").asText();
-            String contentTypePattern = "^" + BaseParserValidator.ignoreCaseRegexp(expectedContentType) + ".*$";
+            String contentTypePattern = "^.*" + BaseParserValidator.ignoreCaseRegexp(expectedContentType) + ".*$";
             if (!catalogObjContentType.matches(contentTypePattern)) {
                 throw new ValidationException(String.format("Catalog object [%s] does not match the expected content type [%s].",
                                                             catalogObjectValue,
