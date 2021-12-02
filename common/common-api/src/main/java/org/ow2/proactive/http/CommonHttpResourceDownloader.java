@@ -32,11 +32,13 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.utils.FileUtils;
 
@@ -99,7 +101,7 @@ public class CommonHttpResourceDownloader {
         }
     }
 
-    public int getResponseCode(String sessionId, String url, boolean insecure) throws IOException {
+    public ResponseContent getResponse(String sessionId, String url, boolean insecure) throws IOException {
         CommonHttpClientBuilder builder = new CommonHttpClientBuilder().maxConnections(CONNECTION_POOL_SIZE)
                                                                        .useSystemProperties()
                                                                        .insecure(insecure);
@@ -109,8 +111,10 @@ public class CommonHttpResourceDownloader {
             if (sessionId != null) {
                 request.setHeader("sessionid", sessionId);
             }
-            CloseableHttpResponse response = client.execute(request);
-            return response.getStatusLine().getStatusCode();
+            HttpResponse response = client.execute(request);
+            String content = EntityUtils.toString(response.getEntity());
+            int code = response.getStatusLine().getStatusCode();
+            return new ResponseContent(content, code);
         }
     }
 
@@ -159,6 +163,25 @@ public class CommonHttpResourceDownloader {
 
         public String getFileName() {
             return fileName;
+        }
+    }
+
+    public static class ResponseContent {
+        private final String content;
+
+        private final int code;
+
+        public ResponseContent(String content, int code) {
+            this.content = content;
+            this.code = code;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public int getCode() {
+            return code;
         }
     }
 }

@@ -43,6 +43,13 @@ import com.google.common.base.Strings;
 
 public abstract class BaseParserValidator<T> implements ParserValidator<T> {
 
+    protected static final String LEFT_PARAM_DELIMITER = "(";
+
+    protected static final String RIGHT_PARAM_DELIMITER = ")";
+
+    protected static final String PARAMETER_REGEXP = "\\" + LEFT_PARAM_DELIMITER + "([^)]*)" + "\\" +
+                                                     RIGHT_PARAM_DELIMITER;
+
     protected String model;
 
     /**

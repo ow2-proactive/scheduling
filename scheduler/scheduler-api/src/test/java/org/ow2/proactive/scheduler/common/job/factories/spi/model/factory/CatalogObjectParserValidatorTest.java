@@ -46,6 +46,38 @@ public class CatalogObjectParserValidatorTest {
                             new CatalogObjectParserValidator(ModelType.CATALOG_OBJECT.name()).parseAndValidate(value));
     }
 
+    @Test
+    public void testCatalogObjectParserValidatorOKWithKindInModel()
+            throws ModelSyntaxException, ValidationException, ConversionException {
+        String validValue = "bucket_1/object10/1539310165443";
+        String model = ModelType.CATALOG_OBJECT.name() + "(Workflow/standard)";
+        Assert.assertEquals(validValue, new CatalogObjectParserValidator(model).parseAndValidate(validValue));
+    }
+
+    @Test
+    public void testCatalogObjectParserValidatorOKWithContentTypeInModel()
+            throws ModelSyntaxException, ValidationException, ConversionException {
+        String validValue = "bucket_1/object10/1539310165443";
+        String model = ModelType.CATALOG_OBJECT.name() + "(,application/xml)";
+        Assert.assertEquals(validValue, new CatalogObjectParserValidator(model).parseAndValidate(validValue));
+    }
+
+    @Test
+    public void testCatalogObjectParserValidatorOKWithKindAndContentTypeInModel()
+            throws ModelSyntaxException, ValidationException, ConversionException {
+        String validValue = "bucket_1/object10/1539310165443";
+        String model = ModelType.CATALOG_OBJECT.name() + "(Workflow/standard,application/xml)";
+        Assert.assertEquals(validValue, new CatalogObjectParserValidator(model).parseAndValidate(validValue));
+    }
+
+    @Test(expected = ModelSyntaxException.class)
+    public void testCatalogObjectParserValidatorKOWithTooManyParametersInModel()
+            throws ModelSyntaxException, ValidationException, ConversionException {
+        String validValue = "bucket_1/object10/1539310165443";
+        String model = ModelType.CATALOG_OBJECT.name() + "(Workflow/standard,application/xml,extraParameter)";
+        Assert.assertEquals(validValue, new CatalogObjectParserValidator(model).parseAndValidate(validValue));
+    }
+
     @Test(expected = ValidationException.class)
     public void testCatalogObjectParserValidatorKO()
             throws ModelSyntaxException, ValidationException, ConversionException {

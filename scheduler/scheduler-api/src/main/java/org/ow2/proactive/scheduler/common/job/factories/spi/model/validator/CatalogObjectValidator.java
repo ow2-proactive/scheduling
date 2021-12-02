@@ -29,13 +29,17 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive.http.CommonHttpResourceDownloader;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BaseParserValidator;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
@@ -56,10 +60,17 @@ public class CatalogObjectValidator implements Validator<String> {
     private static final String CATALOG_URL_WITHOUT_REVISION = PASchedulerProperties.CATALOG_REST_URL +
                                                                "/buckets/%s/resources/%s";
 
+    private final String expectedKind;
+
+    private final String expectedContentType;
+
     public CatalogObjectValidator() {
-        /**
-         * ProActive Empty constructor.
-         */
+        this("", "");
+    }
+
+    public CatalogObjectValidator(String kind, String contentType) {
+        this.expectedKind = kind;
+        this.expectedContentType = contentType;
     }
 
     @Override
@@ -106,8 +117,17 @@ public class CatalogObjectValidator implements Validator<String> {
         } else {
             throw new ValidationException("Expected value should match the format: bucketName/objectName[/revision]");
         }
-        int catalogObjResponseCode = CommonHttpResourceDownloader.getInstance().getResponseCode(sessionId, url, true);
-        switch (catalogObjResponseCode) {
+
+        CommonHttpResourceDownloader.ResponseContent response = CommonHttpResourceDownloader.getInstance()
+                                                                                            .getResponse(sessionId,
+                                                                                                         url,
+                                                                                                         true);
+        return analyseResponseCode(response) && matchKindAndContentType(response, catalogObjectValue);
+    }
+
+    private boolean analyseResponseCode(CommonHttpResourceDownloader.ResponseContent response)
+            throws PermissionException {
+        switch (response.getCode()) {
             case HttpStatus.SC_OK:
                 return true;
             case HttpStatus.SC_NOT_FOUND:
@@ -118,5 +138,34 @@ public class CatalogObjectValidator implements Validator<String> {
             default:
                 throw new InternalException("Failed to request the catalog object.");
         }
+    }
+
+    private boolean matchKindAndContentType(CommonHttpResourceDownloader.ResponseContent response,
+            String catalogObjectValue) throws IOException, ValidationException {
+        if (expectedKind.isEmpty() && expectedContentType.isEmpty()) {
+            return true;
+        }
+
+        JsonNode jsonNode = new ObjectMapper().readTree(response.getContent());
+
+        if (StringUtils.isNotEmpty(expectedKind)) {
+            String catalogObjKind = jsonNode.path("kind").asText();
+            String kindPattern = "^" + BaseParserValidator.ignoreCaseRegexp(expectedKind) + ".*$";
+            if (!catalogObjKind.matches(kindPattern)) {
+                throw new ValidationException(String.format("Catalog object [%s] does not match the expected kind [%s].",
+                                                            catalogObjectValue,
+                                                            expectedKind));
+            }
+        }
+        if (StringUtils.isNotEmpty(expectedContentType)) {
+            String catalogObjContentType = jsonNode.path("content_type").asText();
+            String contentTypePattern = "^" + BaseParserValidator.ignoreCaseRegexp(expectedContentType) + ".*$";
+            if (!catalogObjContentType.matches(contentTypePattern)) {
+                throw new ValidationException(String.format("Catalog object [%s] does not match the expected content type [%s].",
+                                                            catalogObjectValue,
+                                                            expectedContentType));
+            }
+        }
+        return true;
     }
 }

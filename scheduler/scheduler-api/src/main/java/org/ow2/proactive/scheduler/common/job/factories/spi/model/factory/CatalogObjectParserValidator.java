@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
+import java.util.List;
+
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.IdentityConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
@@ -39,8 +41,16 @@ import org.springframework.expression.ParseException;
  */
 public class CatalogObjectParserValidator extends BaseParserValidator<String> {
 
+    // regexp which matches the CATALOG_OBJECT model basic format without parameters, i.e., CATALOG_OBJECT
+    protected static final String CATALOG_BASIC_MODEL_REGEXP = ignoreCaseRegexp("CATALOG_OBJECT");
+
+    // complete regexp which matches the CATALOG_OBJECT model format (with or without parameters)
+    protected static final String CATALOG_COMPLETE_REGEXP = String.format("^%s(%s)?$",
+                                                                          CATALOG_BASIC_MODEL_REGEXP,
+                                                                          PARAMETER_REGEXP);
+
     public CatalogObjectParserValidator(String model) throws ModelSyntaxException {
-        super(model, ModelType.CATALOG_OBJECT);
+        super(model, ModelType.CATALOG_OBJECT, CATALOG_COMPLETE_REGEXP);
     }
 
     @Override
@@ -50,11 +60,37 @@ public class CatalogObjectParserValidator extends BaseParserValidator<String> {
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
+        List<String> parametersGroup = parseAndGetRegexGroups(model, CATALOG_COMPLETE_REGEXP);
+
+        if (parametersGroup.size() == 0) {
+            // model without parameters
+            try {
+                return new CatalogObjectValidator();
+            } catch (ParseException e) {
+                throw new ModelSyntaxException(e.getMessage(), e);
+            }
+        }
+
+        String parametersGroupString = parametersGroup.get(0).trim();
+        String parameters = parametersGroupString.substring(1, parametersGroupString.length() - 1); // remove surrounding brackets
+        String[] splitParameters = parameters.split(",");
+
+        String kind = "";
+        String contentType = "";
+        if (splitParameters.length == 1) {
+            kind = splitParameters[0].trim();
+        } else if (splitParameters.length == 2) {
+            kind = splitParameters[0].trim();
+            contentType = splitParameters[1].trim();
+        } else {
+            throw new ModelSyntaxException(String.format("Illegal parameters format for the model [%s], the model CATALOG_OBJECT can have at most two parameters: kind and content type, split by comma.",
+                                                         model));
+        }
+
         try {
-            return new CatalogObjectValidator();
+            return new CatalogObjectValidator(kind, contentType);
         } catch (ParseException e) {
             throw new ModelSyntaxException(e.getMessage(), e);
         }
     }
-
 }
