@@ -44,7 +44,6 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Mode
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
-import org.springframework.util.CollectionUtils;
 
 import com.google.common.base.Strings;
 
@@ -92,7 +91,7 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
     public void validateVariables(List<JobVariable> variableList, Map<String, Serializable> userValues,
             Scheduler scheduler, SchedulerSpaceInterface space) throws JobValidationException {
 
-        if (CollectionUtils.isEmpty(variableList) || CollectionUtils.isEmpty(userValues)) {
+        if (variableList == null || variableList.isEmpty() || userValues == null || userValues.isEmpty()) {
             return;
         }
         Map<String, String> models = variableList.stream().collect(Collectors.toMap(JobVariable::getName,
