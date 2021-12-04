@@ -226,7 +226,7 @@ public interface RMRestInterface {
     /**
      * List of registered node hosts as variable model.
      *
-     * Returns a task variable model string containing the list of registered hosts in the resource manager
+     * Returns a workflow variable model string containing the list of registered hosts in the resource manager
      * @return a model containing the list of hosts, including an empty name. e.g. PA:LIST(,hostname1,hostname2)
      */
     @GET
@@ -237,13 +237,24 @@ public interface RMRestInterface {
     /**
      * list of node sources as variable model.
      *
-     * Returns a task variable model string containing the list of registered node sources in the resource manager
+     * Returns a workflow variable model string containing the list of registered node sources in the resource manager
      * @return a model containing the list of node sources name, including an empty name and the default node source e.g. PA:LIST(,Default,LocalNodes)
      */
     @GET
     @Path("model/nodesources")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getModelNodeSources() throws PermissionRestException;
+
+    /**
+     * List of registered tokens as variable model.
+     *
+     * Returns a workflow variable model string containing the list of registered tokens in the resource manager
+     * @return a model containing the list of tokens, including an empty name. e.g. PA:LIST(,token1,token2)
+     */
+    @GET
+    @Path("model/tokens")
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
+    String getModelTokens() throws PermissionRestException;
 
     /**
      * Check Resource Manager availability.
