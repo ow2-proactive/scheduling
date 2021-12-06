@@ -276,6 +276,17 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
+    public String getModelTokens() throws PermissionRestException {
+        RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
+        Set<String> tokens = new LinkedHashSet<>();
+        state.getNodesEvents().forEach(event -> tokens.addAll(event.getTokens()));
+        if (tokens.isEmpty()) {
+            return "PA:REGEXP(^$)";
+        }
+        return String.format("PA:LIST(,%s)", String.join(",", tokens));
+    }
+
+    @Override
     public boolean isActive(String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.isActive().getBooleanValue();
