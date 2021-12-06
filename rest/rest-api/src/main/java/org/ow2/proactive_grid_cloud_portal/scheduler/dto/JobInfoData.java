@@ -78,7 +78,7 @@ public class JobInfoData implements java.io.Serializable {
 
     private Set<String> signals;
 
-    private Map<String, Map<String, List<JobVariable>>> detailedSignals;
+    private Map<String, Map<String, JobVariable>> detailedSignals;
 
     private Map<String, String> visualizationConnectionStrings;
 
@@ -266,11 +266,11 @@ public class JobInfoData implements java.io.Serializable {
         this.signals = signals;
     }
 
-    public Map<String, Map<String, List<JobVariable>>> getDetailedSignals() {
+    public Map<String, Map<String, JobVariable>> getDetailedSignals() {
         return detailedSignals;
     }
 
-    public void setDetailedSignals(Map<String, Map<String, List<JobVariable>>> detailedSignals) {
+    public void setDetailedSignals(Map<String, Map<String, JobVariable>> detailedSignals) {
         this.detailedSignals = detailedSignals;
     }
 

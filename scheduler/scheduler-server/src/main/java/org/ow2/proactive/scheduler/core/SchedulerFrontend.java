@@ -167,7 +167,6 @@ import org.ow2.proactive.scheduler.signal.Signal;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.signal.SignalApiImpl;
 import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
-import org.ow2.proactive.scheduler.synchronization.CompilationException;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -1889,15 +1888,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                            .map(entry -> (Signal) entry.getValue())
                                                            .collect(Collectors.toList());
 
-                    Map<String, Map<String, List<JobVariable>>> detailedSignalsToBeAdded = new LinkedHashMap<>();
+                    Map<String, Map<String, JobVariable>> detailedSignalsToBeAdded = new LinkedHashMap<>();
                     signalList.forEach(signal -> {
-                        Map<String, List<JobVariable>> signalVars = new LinkedHashMap<>();
-                        signalVars.put(signal.getName(), signal.getInputVariables());
-                        detailedSignalsToBeAdded.put(signal.getName(), signalVars);
+                        Map<String, JobVariable> variableMap = new LinkedHashMap<>();
+                        if (signal.getInputVariables() != null) {
+                            signal.getInputVariables()
+                                  .forEach(jobVariable -> variableMap.put(jobVariable.getName(), jobVariable));
+                        }
+                        detailedSignalsToBeAdded.put(signal.getName(), variableMap);
                     });
 
                     Set<String> jobSignals = jobInfo.getSignals();
-                    Map<String, Map<String, List<JobVariable>>> jobDetailedSignals = jobInfo.getDetailedSignals();
+                    Map<String, Map<String, JobVariable>> jobDetailedSignals = jobInfo.getDetailedSignals();
 
                     if (signalsToBeAdded != null && !signalsToBeAdded.isEmpty()) {
                         jobSignals.addAll(signalsToBeAdded);
@@ -2118,15 +2120,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                           SIGNAL_TASK_ID,
                                                           signalsChannel + jobId,
                                                           readyPrefix + signalName);
-            DefaultModelJobValidatorServiceProvider validatorServiceProvider = new DefaultModelJobValidatorServiceProvider();
-            if (updatedVariables != null) {
-                Map<String, Serializable> serializableUpdatedVariables = new LinkedHashMap<>(updatedVariables);
-                validatorServiceProvider.validateVariables(readySignal.getInputVariables(),
-                                                           serializableUpdatedVariables,
-                                                           this,
-                                                           this);
-                readySignal.setUpdatedVariables(updatedVariables);
-            }
+            setUpdatedVariables(updatedVariables, readySignal);
             publicStore.remove(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, readyPrefix + signalName);
             publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, signalName, readySignal);
 
@@ -2137,6 +2131,34 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         } catch (IOException e) {
             throw new SignalApiException("Could not add signalName for the job " + jobId, e);
         }
+    }
+
+    private void setUpdatedVariables(Map<String, String> updatedVariables, Signal readySignal)
+            throws JobValidationException {
+        if (updatedVariables != null) {
+            if (validateUpdatedVariables(updatedVariables, readySignal.getInputVariables())) {
+                readySignal.setUpdatedVariables(updatedVariables);
+            }
+        } else {
+            readySignal.setUpdatedVariables(getDefaultUpdatedValues(readySignal.getInputVariables()));
+        }
+    }
+
+    private boolean validateUpdatedVariables(Map<String, String> updatedVariables, List<JobVariable> inputVariables)
+            throws JobValidationException {
+        DefaultModelJobValidatorServiceProvider validatorServiceProvider = new DefaultModelJobValidatorServiceProvider();
+        Map<String, Serializable> serializableUpdatedVariables = new LinkedHashMap<>(updatedVariables);
+        validatorServiceProvider.validateVariables(inputVariables, serializableUpdatedVariables, this, this);
+        return true;
+    }
+
+    private Map<String, String> getDefaultUpdatedValues(List<JobVariable> inputVariables) {
+        Map<String, String> defaultUpdatedValues = new LinkedHashMap<>();
+        if (inputVariables != null) {
+            inputVariables.forEach(inputVariable -> defaultUpdatedValues.put(inputVariable.getName(),
+                                                                             inputVariable.getValue()));
+        }
+        return defaultUpdatedValues;
     }
 
     @Override

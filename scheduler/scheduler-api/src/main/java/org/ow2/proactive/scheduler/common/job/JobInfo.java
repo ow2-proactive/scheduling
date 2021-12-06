@@ -280,12 +280,12 @@ public interface JobInfo extends Serializable {
      * Returns the map of signals and input variables
      * @return signals map
      */
-    Map<String, Map<String, List<JobVariable>>> getDetailedSignals();
+    Map<String, Map<String, JobVariable>> getDetailedSignals();
 
     /**
      * Sets the map of job signals and input variables
      */
-    void setDetailedSignals(Map<String, Map<String, List<JobVariable>>> detailedSignals);
+    void setDetailedSignals(Map<String, Map<String, JobVariable>> detailedSignals);
 
     /**
      * Return the list of tasks names with precious results

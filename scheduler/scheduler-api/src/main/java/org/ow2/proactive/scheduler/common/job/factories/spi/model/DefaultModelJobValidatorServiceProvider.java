@@ -91,11 +91,11 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
     public void validateVariables(List<JobVariable> variableList, Map<String, Serializable> userValues,
             Scheduler scheduler, SchedulerSpaceInterface space) throws JobValidationException {
 
-        if (variableList == null && userValues != null && !userValues.isEmpty()) {
+        if (variableList == null || variableList.isEmpty() || userValues == null || userValues.isEmpty()) {
             return;
         }
-        Map<String, String> models = variableList.stream()
-                                                 .collect(Collectors.toMap(e -> e.getName(), e -> e.getModel()));
+        Map<String, String> models = variableList.stream().collect(Collectors.toMap(JobVariable::getName,
+                                                                                    JobVariable::getModel));
         Set<String> groupNames = new LinkedHashSet<>();
         variableList.forEach(e -> {
             if (!Strings.isNullOrEmpty(e.getGroup())) {
