@@ -102,6 +102,7 @@ public class CheckEligibleTaskDescriptorScript {
         }
 
         return (scriptContent != null) && (scriptContent.contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
+                                           scriptContent.contains(SchedulerConstants.RM_CLIENT_BINDING_NAME) ||
                                            scriptContent.contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
                                            scriptContent.contains(SchedulerConstants.DS_USER_API_BINDING_NAME));
     }
