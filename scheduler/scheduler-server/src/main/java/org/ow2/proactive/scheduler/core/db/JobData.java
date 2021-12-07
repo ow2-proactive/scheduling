@@ -66,6 +66,8 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesData;
+import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesParser;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
@@ -313,6 +315,35 @@ public class JobData implements Serializable {
             internalJob.setResultMap(SerializationUtil.deserializeVariableMap(getResultMap()));
         } catch (IOException | ClassNotFoundException e) {
             logger.error("error when serializing result map variables " + e);
+        }
+        List<JobContent> jobContentList = getJobContent();
+        if (jobContentList != null && jobContentList.size() > 0) {
+            internalJob.setJobContent(jobContentList.get(0).getInitJobContent());
+            if (internalJob.getJobContent() != null) {
+                GlobalVariablesData globalVariablesData = GlobalVariablesParser.getInstance()
+                                                                               .getVariablesFor(internalJob.getJobContent());
+                Map<String, JobVariable> globalVariables = new LinkedHashMap<>();
+                Map<String, JobVariable> configuredGlobalVariables = globalVariablesData.getVariables();
+                for (String variableName : configuredGlobalVariables.keySet()) {
+                    if (internalJob.getVariables().containsKey(variableName)) {
+                        globalVariables.put(variableName, internalJob.getVariables().get(variableName));
+                    } else {
+                        globalVariables.put(variableName, configuredGlobalVariables.get(variableName));
+                    }
+                }
+                internalJob.setGlobalVariables(globalVariables);
+                Map<String, String> globalGenericInfo = new LinkedHashMap<>();
+                Map<String, String> configuredGlobalGenericInfo = globalVariablesData.getGenericInformation();
+                for (String giName : configuredGlobalGenericInfo.keySet()) {
+                    if (internalJob.getGenericInformation().containsKey(giName)) {
+                        globalGenericInfo.put(giName, internalJob.getGenericInformation().get(giName));
+                    } else {
+                        globalGenericInfo.put(giName, configuredGlobalGenericInfo.get(giName));
+                    }
+                }
+                internalJob.setGlobalGenericInformation(globalGenericInfo);
+            }
+
         }
         return internalJob;
     }
