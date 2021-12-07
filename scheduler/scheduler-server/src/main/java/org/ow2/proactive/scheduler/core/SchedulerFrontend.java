@@ -2136,9 +2136,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     private void setUpdatedVariables(Map<String, String> updatedVariables, Signal readySignal)
             throws JobValidationException {
         if (updatedVariables != null) {
-            if (validateUpdatedVariables(updatedVariables, readySignal.getInputVariables())) {
-                readySignal.setUpdatedVariables(updatedVariables);
-            }
+            validateUpdatedVariables(updatedVariables, readySignal.getInputVariables());
+            Map<String, String> validatedUpdatedValues = new LinkedHashMap<>();
+            readySignal.getInputVariables()
+                       .forEach(inputVariable -> validatedUpdatedValues.put(inputVariable.getName(),
+                                                                            inputVariable.getValue()));
+            readySignal.setUpdatedVariables(validatedUpdatedValues);
         } else {
             readySignal.setUpdatedVariables(getDefaultUpdatedValues(readySignal.getInputVariables()));
         }
