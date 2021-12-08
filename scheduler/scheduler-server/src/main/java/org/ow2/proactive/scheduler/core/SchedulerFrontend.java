@@ -247,8 +247,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     private static final String SIGNAL_TASK = "0t0";
 
-    private static final TaskId SIGNAL_TASK_ID = TaskIdImpl.makeTaskId(SIGNAL_TASK);
-
     /**
      * Attributes used for XSLT transformation of updating job descriptor schema version
      */
@@ -1668,8 +1666,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     private void insertSignals(List<JobInfo> jobsInfo) {
         jobsInfo.stream().filter(jobInfo -> {
             try {
+                JobId jobIdObj = JobIdImpl.makeJobId(jobInfo.getJobId().value());
+                TaskId taskId = TaskIdImpl.createTaskId(jobIdObj, "notask", -1);
                 return publicStore.keySet(SIGNAL_ORIGINATOR,
-                                          SIGNAL_TASK_ID,
+                                          taskId,
                                           signalsChannel + jobInfo.getJobId().value()) != null;
             } catch (InvalidChannelException e) {
             }
@@ -1876,10 +1876,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         if (checkJobPermissionMethod(jobid, "addJobSignal")) {
 
             try {
-                if (publicStore.channelExists(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobid)) {
+                JobId jobIdObj = JobIdImpl.makeJobId(jobInfo.getJobId().value());
+                TaskId taskId = TaskIdImpl.createTaskId(jobIdObj, "notask", -1);
+                if (publicStore.channelExists(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobid)) {
 
                     Set<Map.Entry<String, Serializable>> signalEntries = publicStore.entrySet(SIGNAL_ORIGINATOR,
-                                                                                              SIGNAL_TASK_ID,
+                                                                                              taskId,
                                                                                               signalsChannel + jobid);
                     Set<String> signalsToBeAdded = signalEntries.stream()
                                                                 .map(entry -> entry.getKey())
@@ -2106,10 +2108,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
-            publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, true);
+            JobId jobIdObj = JobIdImpl.makeJobId(jobId);
+            TaskId taskId = TaskIdImpl.createTaskId(jobIdObj, "notask", -1);
+            publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId, true);
 
-            Set<String> signals = publicStore.keySet(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId);
-
+            Set<String> signals = publicStore.keySet(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId);
             String readyPrefix = SignalApiImpl.READY_PREFIX;
             if (!(signals.contains(readyPrefix + signalName) || signalName.startsWith(readyPrefix))) {
                 throw new SignalApiException("Job " + jobId + " is not ready to receive the signalName " + signalName);
@@ -2117,14 +2120,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
             // Remove the existing ready signalName, add the signalName and return the set of signals
             Signal readySignal = (Signal) publicStore.get(SIGNAL_ORIGINATOR,
-                                                          SIGNAL_TASK_ID,
+                                                          taskId,
                                                           signalsChannel + jobId,
                                                           readyPrefix + signalName);
             setUpdatedVariables(updatedVariables, readySignal);
-            publicStore.remove(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, readyPrefix + signalName);
-            publicStore.put(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, signalName, readySignal);
+            publicStore.remove(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobIdObj, readyPrefix + signalName);
+            publicStore.put(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobIdObj, signalName, readySignal);
 
-            Set<String> finalSignals = publicStore.keySet(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId);
+            Set<String> finalSignals = publicStore.keySet(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobIdObj);
             return finalSignals;
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
@@ -2185,10 +2188,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
-            publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, SIGNAL_TASK_ID, signalsChannel + jobId, true);
+            JobId jobIdObj = JobIdImpl.makeJobId(jobId);
+            TaskId taskId = TaskIdImpl.createTaskId(jobIdObj, "notask", -1);
+            publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId, true);
 
             Signal signal = (Signal) publicStore.get(SIGNAL_ORIGINATOR,
-                                                     SIGNAL_TASK_ID,
+                                                     taskId,
                                                      signalsChannel + jobId,
                                                      readyPrefix + signalName);
             if (signal != null) {
