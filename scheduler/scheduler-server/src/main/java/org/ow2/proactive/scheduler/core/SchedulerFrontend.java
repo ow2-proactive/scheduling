@@ -1670,7 +1670,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     private void insertSignals(List<JobInfo> jobsInfo) {
         jobsInfo.stream().filter(jobInfo -> {
             try {
-                TaskId taskId = getNoTaskId(jobInfo.getJobId().value());
+                TaskId taskId = createFakeTaskId(jobInfo.getJobId().value());
                 return publicStore.keySet(SIGNAL_ORIGINATOR,
                                           taskId,
                                           signalsChannel + jobInfo.getJobId().value()) != null;
@@ -1680,8 +1680,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }).forEach(jobInfo -> insertJobSignals(jobInfo));
     }
 
-    private TaskId getNoTaskId(String value) {
-        JobId jobIdObj = JobIdImpl.makeJobId(value);
+    private TaskId createFakeTaskId(String jobId) {
+        JobId jobIdObj = JobIdImpl.makeJobId(jobId);
         return TaskIdImpl.createTaskId(jobIdObj, NO_TASK_NAME, NO_TASK_ID);
     }
 
@@ -1884,7 +1884,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         if (checkJobPermissionMethod(jobid, "addJobSignal")) {
 
             try {
-                TaskId taskId = getNoTaskId(jobInfo.getJobId().value());
+                TaskId taskId = createFakeTaskId(jobInfo.getJobId().value());
                 if (publicStore.channelExists(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobid)) {
 
                     Set<Map.Entry<String, Serializable>> signalEntries = publicStore.entrySet(SIGNAL_ORIGINATOR,
@@ -2115,7 +2115,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
-            TaskId taskId = getNoTaskId(jobId);
+            TaskId taskId = createFakeTaskId(jobId);
             publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId, true);
 
             Set<String> signals = publicStore.keySet(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId);
@@ -2194,7 +2194,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
-            TaskId taskId = getNoTaskId(jobId);
+            TaskId taskId = createFakeTaskId(jobId);
             publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId, true);
 
             Signal signal = (Signal) publicStore.get(SIGNAL_ORIGINATOR,
