@@ -200,6 +200,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     private static final Logger logger = Logger.getLogger(SchedulerFrontend.class);
 
+    public static final String NO_TASK_NAME = "notask";
+
+    public static final int NO_TASK_ID = -1;
+
     /**
      * Temporary rmURL at starting process
      */
@@ -1666,8 +1670,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     private void insertSignals(List<JobInfo> jobsInfo) {
         jobsInfo.stream().filter(jobInfo -> {
             try {
-                JobId jobIdObj = JobIdImpl.makeJobId(jobInfo.getJobId().value());
-                TaskId taskId = TaskIdImpl.createTaskId(jobIdObj, "notask", -1);
+                TaskId taskId = getNoTaskId(jobInfo.getJobId().value());
                 return publicStore.keySet(SIGNAL_ORIGINATOR,
                                           taskId,
                                           signalsChannel + jobInfo.getJobId().value()) != null;
@@ -1675,6 +1678,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             }
             return false;
         }).forEach(jobInfo -> insertJobSignals(jobInfo));
+    }
+
+    private TaskId getNoTaskId(String value) {
+        JobId jobIdObj = JobIdImpl.makeJobId(value);
+        return TaskIdImpl.createTaskId(jobIdObj, NO_TASK_NAME, NO_TASK_ID);
     }
 
     private void filterVariablesAndGenericInfo(List<JobInfo> jobsInfo) {
@@ -1876,8 +1884,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         if (checkJobPermissionMethod(jobid, "addJobSignal")) {
 
             try {
-                JobId jobIdObj = JobIdImpl.makeJobId(jobInfo.getJobId().value());
-                TaskId taskId = TaskIdImpl.createTaskId(jobIdObj, "notask", -1);
+                TaskId taskId = getNoTaskId(jobInfo.getJobId().value());
                 if (publicStore.channelExists(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobid)) {
 
                     Set<Map.Entry<String, Serializable>> signalEntries = publicStore.entrySet(SIGNAL_ORIGINATOR,
@@ -2108,8 +2115,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
-            JobId jobIdObj = JobIdImpl.makeJobId(jobId);
-            TaskId taskId = TaskIdImpl.createTaskId(jobIdObj, "notask", -1);
+            TaskId taskId = getNoTaskId(jobId);
             publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId, true);
 
             Set<String> signals = publicStore.keySet(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId);
@@ -2124,10 +2130,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                           signalsChannel + jobId,
                                                           readyPrefix + signalName);
             setUpdatedVariables(updatedVariables, readySignal);
-            publicStore.remove(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobIdObj, readyPrefix + signalName);
-            publicStore.put(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobIdObj, signalName, readySignal);
+            publicStore.remove(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId, readyPrefix + signalName);
+            publicStore.put(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId, signalName, readySignal);
 
-            Set<String> finalSignals = publicStore.keySet(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobIdObj);
+            Set<String> finalSignals = publicStore.keySet(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId);
             return finalSignals;
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
@@ -2188,8 +2194,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throw new SignalApiException("Empty signals are not allowed");
         }
         try {
-            JobId jobIdObj = JobIdImpl.makeJobId(jobId);
-            TaskId taskId = TaskIdImpl.createTaskId(jobIdObj, "notask", -1);
+            TaskId taskId = getNoTaskId(jobId);
             publicStore.createChannelIfAbsent(SIGNAL_ORIGINATOR, taskId, signalsChannel + jobId, true);
 
             Signal signal = (Signal) publicStore.get(SIGNAL_ORIGINATOR,
