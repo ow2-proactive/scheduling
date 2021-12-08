@@ -54,6 +54,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -931,38 +932,71 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
         switch (level.toInt()) {
             case Level.TRACE_INT:
                 if (logger.isTraceEnabled()) {
-                    TaskLogger.getInstance().info(taskId, channelHeader + message);
+                    if (taskId.longValue() < 0) {
+                        JobLogger.getInstance().info(taskId.getJobId(), channelHeader + message);
+                    } else {
+                        TaskLogger.getInstance().info(taskId, channelHeader + message);
+                    }
                 }
                 break;
             case Level.DEBUG_INT:
                 if (logger.isDebugEnabled()) {
-                    TaskLogger.getInstance().info(taskId, channelHeader + message);
+                    if (taskId.longValue() < 0) {
+                        JobLogger.getInstance().info(taskId.getJobId(), channelHeader + message);
+                    } else {
+                        TaskLogger.getInstance().info(taskId, channelHeader + message);
+                    }
                 }
                 break;
             case Level.INFO_INT:
                 if (logger.isInfoEnabled()) {
-                    TaskLogger.getInstance().info(taskId, channelHeader + message);
+                    if (taskId.longValue() < 0) {
+                        JobLogger.getInstance().info(taskId.getJobId(), channelHeader + message);
+                    } else {
+                        TaskLogger.getInstance().info(taskId, channelHeader + message);
+                    }
                 }
                 break;
             case Level.WARN_INT:
                 if (exception != null) {
-                    TaskLogger.getInstance().warn(taskId, channelHeader + message, exception);
+                    if (taskId.longValue() < 0) {
+                        JobLogger.getInstance().warn(taskId.getJobId(), channelHeader + message, exception);
+                    } else {
+                        TaskLogger.getInstance().warn(taskId, channelHeader + message, exception);
+                    }
                 } else {
-                    TaskLogger.getInstance().warn(taskId, channelHeader + message);
+                    if (taskId.longValue() < 0) {
+                        JobLogger.getInstance().warn(taskId.getJobId(), channelHeader + message);
+                    } else {
+                        TaskLogger.getInstance().warn(taskId, channelHeader + message);
+                    }
                 }
                 break;
             case Level.ERROR_INT:
                 if (exception != null) {
-                    TaskLogger.getInstance().error(taskId, channelHeader + message, exception);
+                    if (taskId.longValue() < 0) {
+                        JobLogger.getInstance().error(taskId.getJobId(), channelHeader + message, exception);
+                    } else {
+                        TaskLogger.getInstance().error(taskId, channelHeader + message, exception);
+                    }
                 } else {
-                    TaskLogger.getInstance().error(taskId, channelHeader + message);
+                    if (taskId.longValue() < 0) {
+                        JobLogger.getInstance().error(taskId.getJobId(), channelHeader + message);
+                    } else {
+                        TaskLogger.getInstance().error(taskId, channelHeader + message);
+                    }
                 }
                 break;
             default:
                 // no action
         }
         if (logger.isTraceEnabled() && channel != null) {
-            TaskLogger.getInstance().info(taskId, channelHeader + "New channel content : " + getChannel(channel));
+            if (taskId.longValue() < 0) {
+                JobLogger.getInstance().info(taskId.getJobId(),
+                                             channelHeader + "New channel content : " + getChannel(channel));
+            } else {
+                TaskLogger.getInstance().info(taskId, channelHeader + "New channel content : " + getChannel(channel));
+            }
         }
     }
 
