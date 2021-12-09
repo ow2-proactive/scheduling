@@ -187,9 +187,9 @@ public class SignalApiTest extends ProActiveTestClean {
             }
         };
         signalApi.sendManySignals(signalsToBeChecked);
-        Signal receivedSignal = signalApi.checkForSignals(signalsToBeChecked);
-        Assert.assertTrue((receivedSignal.getName().equals("test_signal_3_1")) ||
-                          receivedSignal.getName().equals("test_signal_3_2"));
+        Map<String, Map<String, String>> receivedSignals = signalApi.checkForSignals(signalsToBeChecked);
+        Assert.assertTrue((receivedSignals.keySet().contains("test_signal_3_1")) ||
+                          receivedSignals.keySet().contains("test_signal_3_2"));
     }
 
     @Test
@@ -468,6 +468,7 @@ public class SignalApiTest extends ProActiveTestClean {
                        .parallel()
                        .forEach(signalPair -> Assert.assertEquals(parameters, signalPair.getValue()));
             } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         };
 

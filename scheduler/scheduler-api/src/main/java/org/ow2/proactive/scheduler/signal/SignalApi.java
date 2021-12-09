@@ -77,13 +77,13 @@ public interface SignalApi extends Serializable {
     boolean isReceived(String signalName) throws SignalApiException;
 
     /**
-     * Check if any of the signals given as input exist among the set of job signals
+     * Check if all of the signals given as input exist among the set of job signals
      *
      * @param signalsSubSet set of the signals to be checked
-     * @return the first signal found in the set of job signals, null if no signals are found
+     * @return the the map of signals names and updatedVariables found in the set of job signals, empty map if no signals are found
      * @throws SignalApiException if an error occurred while reading in the signals channel
      */
-    Signal checkForSignals(Set<String> signalsSubSet) throws SignalApiException;
+    Map<String, Map<String, String>> checkForSignals(Set<String> signalsSubSet) throws SignalApiException;
 
     /**
      * Wait until the given signal is added to the set of job signals

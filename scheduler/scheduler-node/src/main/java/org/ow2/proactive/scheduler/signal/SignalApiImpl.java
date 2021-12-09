@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -117,21 +118,22 @@ public class SignalApiImpl implements SignalApi {
     }
 
     @Override
-    public Signal checkForSignals(Set<String> signalsSubSet) throws SignalApiException {
-        logger.info("Check if any of the signals " + signalsSubSet + " exist among the set of job signals on job " +
+    public Map<String, Map<String, String>> checkForSignals(Set<String> signalsSubSet) throws SignalApiException {
+        logger.info("Check if all of the signals " + signalsSubSet + " exist among the set of job signals on job " +
                     jobId);
+        Map<String, Map<String, String>> signalMap = new LinkedHashMap<>();
         Map<String, Signal> signals = getJobSignals();
         if (!signals.isEmpty()) {
-            Map.Entry<String, Signal> signalEntry = signals.entrySet()
-                                                           .stream()
-                                                           .filter(entry -> signalsSubSet.contains(entry.getKey()))
-                                                           .findFirst()
-                                                           .orElse(null);
-            if (signalEntry != null) {
-                return signalEntry.getValue();
-            }
+            Set<String> signalNames = signals.keySet()
+                                             .stream()
+                                             .distinct()
+                                             .filter(signalsSubSet::contains)
+                                             .collect(Collectors.toSet());
+            signalNames.forEach(signalName -> signalMap.put(signals.get(signalName).getName(),
+                                                            signals.get(signalName).getUpdatedVariables()));
+
         }
-        return null;
+        return signalMap;
     }
 
     public void sendSignal(String signalName, Map<String, String> parameters) throws SignalApiException {
@@ -266,7 +268,16 @@ public class SignalApiImpl implements SignalApi {
         init();
         try {
             synchronization.waitUntilAny(SIGNALS_CHANNEL + jobId, signalsSubSet, "{k, x -> x != null }");
-            return checkForSignals(signalsSubSet);
+            Map<String, Signal> signals = getJobSignals();
+            Map.Entry<String, Signal> signalEntry = signals.entrySet()
+                                                           .stream()
+                                                           .filter(entry -> signalsSubSet.contains(entry.getKey()))
+                                                           .findFirst()
+                                                           .orElse(null);
+            if (signalEntry != null) {
+                return signalEntry.getValue();
+            }
+            return null;
         } catch (InvalidChannelException e) {
             throw new SignalApiException("Could not read signals channel", e);
         } catch (CompilationException e) {
@@ -281,7 +292,7 @@ public class SignalApiImpl implements SignalApi {
         Map<String, Map<String, String>> signalMap = new LinkedHashMap<>();
         try {
             for (String signalName : signalsSubSet) {
-                synchronization.waitUntil(SIGNALS_CHANNEL + jobId, signalName, "{k, x -> x != null");
+                synchronization.waitUntil(SIGNALS_CHANNEL + jobId, signalName, "{k, x -> x != null}");
                 Signal signal = (Signal) synchronization.get(SIGNALS_CHANNEL + jobId, signalName);
                 signalMap.put(signalName, signal.getUpdatedVariables());
             }
