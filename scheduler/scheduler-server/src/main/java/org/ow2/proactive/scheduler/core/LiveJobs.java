@@ -59,8 +59,8 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
-import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
@@ -81,6 +81,10 @@ class LiveJobs {
     private static final TaskLogger tlogger = TaskLogger.getInstance();
 
     private static final TaskResultCreator taskResultCreator = TaskResultCreator.getInstance();
+
+    public static final String NO_TASK_NAME = "notask";
+
+    public static final int NO_TASK_ID = -1;
 
     public static final String TASK_ICON = "task.icon";
 
@@ -1339,25 +1343,24 @@ class LiveJobs {
     private void cleanJobSignals(JobId jobId) {
 
         try {
-            if (synchronizationInternal != null && synchronizationInternal.containsKey(SIGNAL_ORIGINATOR,
-                                                                                       SIGNAL_TASK_ID,
-                                                                                       PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
-                                                                                       jobId.value())) {
-                synchronizationInternal.deleteChannel(SIGNAL_ORIGINATOR,
-                                                      SIGNAL_TASK_ID,
+            TaskId fakeTaskId = createFakeTaskId(jobId.value());
+            if (synchronizationInternal.channelExists(SIGNAL_ORIGINATOR,
+                                                      fakeTaskId,
                                                       PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString() +
-                                                                      jobId.value());
-
-                synchronizationInternal.remove(SIGNAL_ORIGINATOR,
-                                               SIGNAL_TASK_ID,
-                                               PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString(),
-                                               jobId.value());
+                                                                  jobId.value())) {
+                synchronizationInternal.deleteChannel(SIGNAL_ORIGINATOR,
+                                                      fakeTaskId,
+                                                      PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString() +
+                                                                  jobId.value());
             }
-        } catch (InvalidChannelException e) {
-            jlogger.info(jobId, "Signals channel does not exist. No signals are cleared for the job " + jobId);
         } catch (IOException e) {
             jlogger.warn(jobId, "Could not clear the job " + jobId + " from the signals channel");
         }
+    }
+
+    private TaskId createFakeTaskId(String jobId) {
+        JobId jobIdObj = JobIdImpl.makeJobId(jobId);
+        return TaskIdImpl.createTaskId(jobIdObj, NO_TASK_NAME, NO_TASK_ID);
     }
 
     private void updateTasksInSchedulerState(InternalJob job, Set<TaskId> tasksToUpdate) {

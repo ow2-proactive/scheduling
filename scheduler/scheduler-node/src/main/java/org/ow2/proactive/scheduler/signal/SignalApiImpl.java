@@ -281,7 +281,7 @@ public class SignalApiImpl implements SignalApi {
         Map<String, Map<String, String>> signalMap = new LinkedHashMap<>();
         try {
             for (String signalName : signalsSubSet) {
-                synchronization.waitUntil(SIGNALS_CHANNEL + jobId, signalName, "{k, x -> x != null");
+                synchronization.waitUntil(SIGNALS_CHANNEL + jobId, signalName, "{k, x -> x != null}");
                 Signal signal = (Signal) synchronization.get(SIGNALS_CHANNEL + jobId, signalName);
                 signalMap.put(signalName, signal.getUpdatedVariables());
             }

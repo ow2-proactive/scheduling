@@ -468,6 +468,7 @@ public class SignalApiTest extends ProActiveTestClean {
                        .parallel()
                        .forEach(signalPair -> Assert.assertEquals(parameters, signalPair.getValue()));
             } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         };
 
