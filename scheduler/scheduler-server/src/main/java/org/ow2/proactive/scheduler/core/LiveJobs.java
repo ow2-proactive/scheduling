@@ -82,9 +82,9 @@ class LiveJobs {
 
     private static final TaskResultCreator taskResultCreator = TaskResultCreator.getInstance();
 
-    public static final String NO_TASK_NAME = "notask";
+    public static final String FAKE_TASK_NAME = "notask";
 
-    public static final int NO_TASK_ID = -1;
+    public static final int FAKE_TASK_ID = -1;
 
     public static final String TASK_ICON = "task.icon";
 
@@ -1344,10 +1344,10 @@ class LiveJobs {
 
         try {
             TaskId fakeTaskId = createFakeTaskId(jobId.value());
-            if (synchronizationInternal.channelExists(SIGNAL_ORIGINATOR,
-                                                      fakeTaskId,
-                                                      PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString() +
-                                                                  jobId.value())) {
+            if (synchronizationInternal != null && synchronizationInternal.channelExists(SIGNAL_ORIGINATOR,
+                                                                                         fakeTaskId,
+                                                                                         PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString() +
+                                                                                                     jobId.value())) {
                 synchronizationInternal.deleteChannel(SIGNAL_ORIGINATOR,
                                                       fakeTaskId,
                                                       PASchedulerProperties.SCHEDULER_SIGNALS_CHANNEL.getValueAsString() +
@@ -1360,7 +1360,7 @@ class LiveJobs {
 
     private TaskId createFakeTaskId(String jobId) {
         JobId jobIdObj = JobIdImpl.makeJobId(jobId);
-        return TaskIdImpl.createTaskId(jobIdObj, NO_TASK_NAME, NO_TASK_ID);
+        return TaskIdImpl.createTaskId(jobIdObj, FAKE_TASK_NAME, FAKE_TASK_ID);
     }
 
     private void updateTasksInSchedulerState(InternalJob job, Set<TaskId> tasksToUpdate) {
