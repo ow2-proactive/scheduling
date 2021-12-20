@@ -203,9 +203,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     private static final Logger logger = Logger.getLogger(SchedulerFrontend.class);
 
-    public static final String NO_TASK_NAME = "notask";
+    public static final String FAKE_TASK_NAME = "notask";
 
-    public static final int NO_TASK_ID = -1;
+    public static final int FAKE_TASK_ID = -1;
 
     /**
      * Temporary rmURL at starting process
@@ -1685,7 +1685,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     private TaskId createFakeTaskId(String jobId) {
         JobId jobIdObj = JobIdImpl.makeJobId(jobId);
-        return TaskIdImpl.createTaskId(jobIdObj, NO_TASK_NAME, NO_TASK_ID);
+        return TaskIdImpl.createTaskId(jobIdObj, FAKE_TASK_NAME, FAKE_TASK_ID);
     }
 
     private void filterVariablesAndGenericInfo(List<JobInfo> jobsInfo) {
