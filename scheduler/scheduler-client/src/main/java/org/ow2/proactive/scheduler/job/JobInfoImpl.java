@@ -25,13 +25,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -146,7 +140,7 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<Integer, Boolean> attachedServices = new LinkedHashMap();
 
-    private Set<String> externalEndpointUrls = new HashSet<>();
+    private Set<String> externalEndpointUrls = new LinkedHashSet<>();
 
     private boolean resultMapPresent = false;
 

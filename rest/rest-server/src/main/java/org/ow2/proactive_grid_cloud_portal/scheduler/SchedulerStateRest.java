@@ -2816,7 +2816,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public void addExternalEndpointUrl(String sessionId, String jobId, String externalEndpointUrl)
             throws RestException {
-        Scheduler s = checkAccess(sessionId, "/scheduler/job/" + jobId + "/externalendpointurls");
+        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/externalendpointurl");
         Session ss = sessionStore.get(sessionId);
         try {
             ss.getScheduler().addExternalEndpointUrl(jobId, externalEndpointUrl);
@@ -2832,7 +2832,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public void removeExternalEndpointUrl(String sessionId, String jobId, String externalEndpointUrl)
             throws RestException {
-        Scheduler s = checkAccess(sessionId, "delete /scheduler/job/" + jobId + "/externalendpointurls");
+        Scheduler s = checkAccess(sessionId, "delete /scheduler/jobs/" + jobId + "/externalendpointurl");
         Session ss = sessionStore.get(sessionId);
         try {
             ss.getScheduler().removeExternalEndpointUrl(jobId, externalEndpointUrl);

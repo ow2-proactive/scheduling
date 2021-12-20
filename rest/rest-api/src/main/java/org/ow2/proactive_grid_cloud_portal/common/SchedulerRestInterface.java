@@ -2416,7 +2416,8 @@ public interface SchedulerRestInterface {
 
     /**
      *
-     * Add an external endpoint url to the endpoint list of the considered job
+     * Add an external endpoint url to a job. The job must be alive and not terminated,
+     * otherwise an UnknownJobException will be thrown.
      *
      * @param sessionId
      *            current session
@@ -2426,7 +2427,7 @@ public interface SchedulerRestInterface {
      *          the external endpoint url to add to the job endpoint list
      */
     @POST
-    @Path("job/{jobid}/externalendpointurls")
+    @Path("jobs/{jobid}/externalendpointurl")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     void addExternalEndpointUrl(@HeaderParam("sessionid") String sessionId, @PathParam("jobid")
@@ -2434,7 +2435,8 @@ public interface SchedulerRestInterface {
 
     /**
      *
-     * Remove an external endpoint url from the endpoint list of the considered job
+     * Remove an external endpoint url from a job. The job must be alive and not terminated,
+     * otherwise an UnknownJobException will be thrown.
      *
      * @param sessionId
      *            current session
@@ -2444,7 +2446,7 @@ public interface SchedulerRestInterface {
      *          the external endpoint url to remove from the job endpoint list
      */
     @DELETE
-    @Path("job/{jobid}/externalendpointurls")
+    @Path("jobs/{jobid}/externalendpointurl")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     void removeExternalEndpointUrl(@HeaderParam("sessionid") String sessionId, @PathParam("jobid")

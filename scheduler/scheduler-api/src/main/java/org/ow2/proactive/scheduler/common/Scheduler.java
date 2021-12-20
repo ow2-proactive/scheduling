@@ -114,7 +114,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      * @throws SignalApiException
      *             errors related to the signal api
      * @throws SignalApiException
@@ -136,7 +136,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      * @throws SignalApiException
      *             errors related to the signal api
      * @throws SignalApiException
@@ -182,7 +182,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException;
 
@@ -221,7 +221,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      * @throws IllegalArgumentException
      *             if the incarnation argument is lower than 0 or greater than
      *             the number of terminated execution.
@@ -251,7 +251,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      * @throws IllegalArgumentException
      *             if the incarnation argument is lower than 0 or greater than
      *             the number of terminated execution.
@@ -281,7 +281,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      * @throws IllegalArgumentException
      *             if the incarnation argument is lower than 0 or greater than
      *             the number of terminated execution.
@@ -314,7 +314,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job and task.
+     *             if you can't access this particular job and task.
      */
     boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -358,7 +358,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job and task.
+     *             if you can't access this particular job and task.
      */
     boolean restartTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -394,7 +394,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job and task.
+     *             if you can't access this particular job and task.
      */
     boolean preemptTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -409,7 +409,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -445,7 +445,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException;
@@ -464,7 +464,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -482,7 +482,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -498,7 +498,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -515,7 +515,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      * @throws JobAlreadyFinishedException
      *             if you want to change the priority on a finished job.
      */
@@ -673,7 +673,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      * @throws PermissionException
-     *             if you can't access to this particular method.
+     *             if you can't access this particular method.
      * @throws SubmissionClosedException
      *             if the submit action could not be performed.
      * @throws JobCreationException
@@ -715,7 +715,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException;
 
@@ -744,7 +744,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     TaskResult getTaskResult(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -770,7 +770,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException;
@@ -800,7 +800,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException;
@@ -828,7 +828,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     TaskResult getTaskResult(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -864,7 +864,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      * @throws IllegalArgumentException
      *             if the incarnation argument is lower than 0 or greater than
      *             the number of terminated execution.
@@ -889,7 +889,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -909,7 +909,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     void listenJobLogs(String jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException;
@@ -934,7 +934,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -968,7 +968,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job and task.
+     *             if you can't access this particular job and task.
      */
     boolean killTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -1011,7 +1011,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job and task.
+     *             if you can't access this particular job and task.
      */
     boolean restartTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -1031,7 +1031,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *              if you are not authenticated.
      * @throws PermissionException
-     *              if you can't access to this particular job and task.
+     *              if you can't access this particular job and task.
      * @throws UnknownJobException
      *              if the job does not exist.
      * @throws UnknownTaskException
@@ -1049,7 +1049,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *              if you are not authenticated.
      * @throws PermissionException
-     *              if you can't access to this particular job.
+     *              if you can't access this particular job.
      * @throws UnknownJobException
      *              if the job does not exist.
      */
@@ -1064,7 +1064,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *              if you are not authenticated.
      * @throws PermissionException
-     *              if you can't access to this particular job.
+     *              if you can't access this particular job.
      * @throws UnknownJobException
      *              if the job does not exist.
      */
@@ -1099,7 +1099,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *             if this task does not exist in the job.
      * @throws PermissionException
-     *             if you can't access to this particular job and task.
+     *             if you can't access this particular job and task.
      */
     boolean preemptTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -1124,7 +1124,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -1146,7 +1146,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean restartAllInErrorTasks(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -1168,7 +1168,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -1191,7 +1191,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      * @throws JobAlreadyFinishedException
      *             if you want to change the priority on a finished job.
      */
@@ -1217,7 +1217,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -1228,7 +1228,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      * @throws PermissionException
-     *             if you can't access to this particular method.
+     *             if you can't access this particular method.
      */
     SchedulerStatus getStatus() throws NotConnectedException, PermissionException;
 
@@ -1249,7 +1249,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -1271,7 +1271,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     TaskState getTaskState(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
@@ -1291,7 +1291,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      * @throws PermissionException
-     *             if you can't access to this particular method.
+     *             if you can't access this particular method.
      */
     SchedulerState getState() throws NotConnectedException, PermissionException;
 
@@ -1311,7 +1311,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      * @throws PermissionException
-     *             if you can't access to this particular method.
+     *             if you can't access this particular method.
      */
     SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException;
 
@@ -1336,7 +1336,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException;
@@ -1376,7 +1376,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
             SchedulerEvent... events) throws NotConnectedException, PermissionException;
@@ -1388,7 +1388,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      * @throws PermissionException
-     *             if you can't access to this particular method.
+     *             if you can't access this particular method.
      */
     void removeEventListener() throws NotConnectedException, PermissionException;
 
@@ -1398,7 +1398,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      * @throws PermissionException
-     *             if you can't access to this particular method.
+     *             if you can't access this particular method.
      */
     void disconnect() throws NotConnectedException, PermissionException;
 
@@ -1682,7 +1682,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException;;
@@ -1699,7 +1699,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if the job does not exist.
      * @throws PermissionException
-     *             if you can't access to this particular job.
+     *             if you can't access this particular job.
      */
     List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException;
@@ -1739,23 +1739,25 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             throws NotConnectedException, UnknownJobException;
 
     /**
-     * Add an external endpoint url to the endpoint list of the considered job
+     * Add an external endpoint url to a job. The job must be alive and not terminated,
+     * otherwise an UnknownJobException will be thrown
      * @param jobId id of the job
-     * @param externalEndpointUrl the external endpoint url to remove from the job endpoint list
+     * @param externalEndpointUrl the external endpoint url to add to the job endpoint list
      * @throws NotConnectedException if you are not authenticated.
-     * @throws PermissionException if you can't access to this particular job.
-     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access this particular job.
+     * @throws UnknownJobException if the job does not exist or is terminated.
      */
     void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**
-     * Remove an external endpoint url from the endpoint list of the considered job
+     * Remove an external endpoint url from a job. The job must be alive and not terminated,
+     * otherwise an UnknownJobException will be thrown
      * @param jobId id of the job
      * @param externalEndpointUrl the external endpoint url to remove from the job endpoint list
      * @throws NotConnectedException if you are not authenticated.
-     * @throws PermissionException if you can't access to this particular job.
-     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access this particular job.
+     * @throws UnknownJobException if the job does not exist or is terminated.
      */
     void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
             throws NotConnectedException, PermissionException, UnknownJobException;
