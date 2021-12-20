@@ -26,7 +26,8 @@
 package org.ow2.proactive.scheduler.core;
 
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_DETACH_SERVICE_TO_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
@@ -46,7 +47,9 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REGISTER_SERVICE_TO_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB;
@@ -917,7 +920,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         frontendState.checkPermissions("registerService",
                                        frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB);
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_REGISTER_SERVICE_TO_THIS_JOB);
         logger.info("Request to register service instance " + serviceInstanceid + " on job " + jobId +
                     " received from " + currentUser);
         schedulingService.registerService(jobIdObject, serviceInstanceid, enableActions);
@@ -931,7 +934,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         frontendState.checkPermissions("detachService",
                                        frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB);
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_DETACH_SERVICE_TO_THIS_JOB);
         logger.info("Request to detach service instance " + serviceInstanceid + " on job " + jobId + " received from " +
                     currentUser);
         schedulingService.detachService(jobIdObject, serviceInstanceid);
@@ -2245,5 +2248,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             answer.put(jobId, methodsPermissions);
         }
         return answer;
+    }
+
+    @Override
+    @ImmediateService
+    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        String currentUser = frontendState.getCurrentUser();
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkPermissions("addExternalEndpointUrl",
+                                       frontendState.getIdentifiedJob(jobIdObject),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
+        logger.info("Request to add external endpoint url on job " + jobId + " received from " + currentUser);
+        schedulingService.addExternalEndpointUrl(jobIdObject, externalEndpointUrl);
+    }
+
+    @Override
+    @ImmediateService
+    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        String currentUser = frontendState.getCurrentUser();
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkPermissions("removeExternalEndpointUrl",
+                                       frontendState.getIdentifiedJob(jobIdObject),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
+        logger.info("Request to remove external endpoint url on job " + jobId + " received from " + currentUser);
+        schedulingService.removeExternalEndpointUrl(jobIdObject, externalEndpointUrl);
     }
 }

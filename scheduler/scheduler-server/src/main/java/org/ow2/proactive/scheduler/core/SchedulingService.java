@@ -799,6 +799,48 @@ public class SchedulingService {
         }
     }
 
+    public boolean addExternalEndpointUrl(JobId jobId, String externalEndpointUrl) throws UnknownJobException {
+        try {
+            if (status.isUnusable()) {
+                return false;
+            }
+
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                return jobs.addExternalEndpointUrl(jobId, externalEndpointUrl);
+            }).get();
+
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof UnknownJobException) {
+                throw (UnknownJobException) e.getCause();
+            } else {
+                throw launderThrowable(e.getCause());
+            }
+        } catch (Exception e) {
+            throw launderThrowable(e);
+        }
+    }
+
+    public boolean removeExternalEndpointUrl(JobId jobId, String externalEndpointUrl) throws UnknownJobException {
+        try {
+            if (status.isUnusable()) {
+                return false;
+            }
+
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                return jobs.removeExternalEndpointUrl(jobId, externalEndpointUrl);
+            }).get();
+
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof UnknownJobException) {
+                throw (UnknownJobException) e.getCause();
+            } else {
+                throw launderThrowable(e.getCause());
+            }
+        } catch (Exception e) {
+            throw launderThrowable(e);
+        }
+    }
+
     public boolean restartTask(final JobId jobId, final String taskName, final int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         try {

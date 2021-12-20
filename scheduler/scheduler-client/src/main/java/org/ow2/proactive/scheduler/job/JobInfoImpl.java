@@ -25,13 +25,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -146,6 +140,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<Integer, Boolean> attachedServices = new LinkedHashMap();
 
+    private Set<String> externalEndpointUrls = new LinkedHashSet<>();
+
     private boolean resultMapPresent = false;
 
     private List<String> preciousTasks = new ArrayList<>();
@@ -197,6 +193,7 @@ public class JobInfoImpl implements JobInfo {
         this.visualizationConnectionStrings = jobInfo.getVisualizationConnectionStrings();
         this.visualizationIcons = jobInfo.getVisualizationIcons();
         this.attachedServices = jobInfo.getAttachedServices();
+        this.externalEndpointUrls = jobInfo.getExternalEndpointUrls();
         this.resultMapPresent = jobInfo.isResultMapPresent();
         this.preciousTasks = jobInfo.getPreciousTasks();
     }
@@ -557,6 +554,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
+    }
+
+    @Override
+    public Set<String> getExternalEndpointUrls() {
+        return externalEndpointUrls;
+    }
+
+    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+        this.externalEndpointUrls = externalEndpointUrls;
     }
 
     public boolean isResultMapPresent() {

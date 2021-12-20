@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -130,7 +131,8 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "updateJobDataTaskStarted", query = "update JobData set status = :status, " +
                                                                        "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                        "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
-                @NamedQuery(name = "updateJobDataAttachedServices", query = "update JobData set attachedServices = :attachedServices where id = :jobId") })
+                @NamedQuery(name = "updateJobDataAttachedServices", query = "update JobData set attachedServices = :attachedServices where id = :jobId"),
+                @NamedQuery(name = "updateJobDataExternalEndpointUrls", query = "update JobData set externalEndpointUrls = :externalEndpointUrls where id = :jobId") })
 @Table(name = "JOB_DATA", indexes = { @Index(name = "JOB_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
                                       @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
                                       @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
@@ -222,6 +224,8 @@ public class JobData implements Serializable {
 
     private Map<Integer, Boolean> attachedServices;
 
+    private Set<String> externalEndpointUrls;
+
     private long lastUpdatedTime;
 
     JobInfoImpl createJobInfo(JobId jobId) {
@@ -252,6 +256,7 @@ public class JobData implements Serializable {
         jobInfo.setVariables(createVariablesStringMap());
         jobInfo.setDetailedVariables(createDetailedVariables());
         jobInfo.setAttachedServices(getAttachedServices());
+        jobInfo.setExternalEndpointUrls(getExternalEndpointUrls());
         Map<String, byte[]> resultMap = getResultMap();
         jobInfo.setResultMapPresent(resultMap != null && resultMap.size() > 0);
         List<String> pTasks = getPreciousTasks();
@@ -390,6 +395,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setPreciousTasks(job.getPreciousTasksFinished());
         jobRuntimeData.setParentId(job.getParentId());
         jobRuntimeData.setAttachedServices(job.getAttachedServices());
+        jobRuntimeData.setExternalEndpointUrls(job.getExternalEndpointUrls());
 
         return jobRuntimeData;
     }
@@ -769,6 +775,16 @@ public class JobData implements Serializable {
 
     public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
+    }
+
+    @Column(name = "EXTERNAL_ENDPOINT_URLS", length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Set<String> getExternalEndpointUrls() {
+        return externalEndpointUrls;
+    }
+
+    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+        this.externalEndpointUrls = externalEndpointUrls;
     }
 
     public void addJobContent(Job job) {

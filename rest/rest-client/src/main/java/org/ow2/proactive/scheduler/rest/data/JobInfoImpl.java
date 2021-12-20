@@ -92,6 +92,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<Integer, Boolean> attachedServices;
 
+    private Set<String> externalEndpointUrls;
+
     private boolean resultMapPresent;
 
     private List<String> preciousTasks;
@@ -355,6 +357,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
+    }
+
+    @Override
+    public Set<String> getExternalEndpointUrls() {
+        return externalEndpointUrls;
+    }
+
+    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+        this.externalEndpointUrls = externalEndpointUrls;
     }
 
     @Override

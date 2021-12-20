@@ -1378,4 +1378,8 @@ public abstract class InternalJob extends JobState {
     public Map<Integer, Boolean> getAttachedServices() {
         return jobInfo.getAttachedServices();
     }
+
+    public Set<String> getExternalEndpointUrls() {
+        return jobInfo.getExternalEndpointUrls();
+    }
 }

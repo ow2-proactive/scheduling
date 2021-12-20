@@ -32,19 +32,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -1743,6 +1731,17 @@ public class SchedulerDBManager {
             session.getNamedQuery("updateJobDataAttachedServices")
                    .setParameter("jobId", jobId)
                    .setParameter("attachedServices", new LinkedHashMap<>(job.getAttachedServices()))
+                   .executeUpdate();
+            return null;
+        });
+    }
+
+    public void updateExternalEnpointUrls(final InternalJob job) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            long jobId = jobId(job);
+            session.getNamedQuery("updateJobDataExternalEndpointUrls")
+                   .setParameter("jobId", jobId)
+                   .setParameter("externalEndpointUrls", new LinkedHashSet<>(job.getExternalEndpointUrls()))
                    .executeUpdate();
             return null;
         });

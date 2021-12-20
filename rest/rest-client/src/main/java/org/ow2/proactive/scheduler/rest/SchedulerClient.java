@@ -1307,6 +1307,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setVisualizationConnectionStrings(jobInfoData.getVisualizationConnectionStrings());
         jobInfoImpl.setVisualizationIcons(jobInfoData.getVisualizationIcons());
         jobInfoImpl.setAttachedServices(jobInfoData.getAttachedServices());
+        jobInfoImpl.setExternalEndpointUrls(jobInfoData.getExternalEndpointUrls());
         return jobInfoImpl;
     }
 
@@ -1639,5 +1640,25 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throwUJEOrNCE(e);
         }
         return answer;
+    }
+
+    @Override
+    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        try {
+            restApi().addExternalEndpointUrl(sid, jobId, externalEndpointUrl);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+    }
+
+    @Override
+    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        try {
+            restApi().removeExternalEndpointUrl(sid, jobId, externalEndpointUrl);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
     }
 }
