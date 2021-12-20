@@ -146,6 +146,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<Integer, Boolean> attachedServices = new LinkedHashMap();
 
+    private Set<String> externalEndpointUrls = new HashSet<>();
+
     private boolean resultMapPresent = false;
 
     private List<String> preciousTasks = new ArrayList<>();
@@ -197,6 +199,7 @@ public class JobInfoImpl implements JobInfo {
         this.visualizationConnectionStrings = jobInfo.getVisualizationConnectionStrings();
         this.visualizationIcons = jobInfo.getVisualizationIcons();
         this.attachedServices = jobInfo.getAttachedServices();
+        this.externalEndpointUrls = jobInfo.getExternalEndpointUrls();
         this.resultMapPresent = jobInfo.isResultMapPresent();
         this.preciousTasks = jobInfo.getPreciousTasks();
     }
@@ -557,6 +560,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setAttachedServices(Map<Integer, Boolean> attachedServices) {
         this.attachedServices = attachedServices;
+    }
+
+    @Override
+    public Set<String> getExternalEndpointUrls() {
+        return externalEndpointUrls;
+    }
+
+    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+        this.externalEndpointUrls = externalEndpointUrls;
     }
 
     public boolean isResultMapPresent() {

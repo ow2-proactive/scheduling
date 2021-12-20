@@ -88,6 +88,7 @@ public class DataUtility {
         impl.setVisualizationConnectionStrings(d.getVisualizationConnectionStrings());
         impl.setVisualizationIcons(d.getVisualizationIcons());
         impl.setAttachedServices(d.getAttachedServices());
+        impl.setExternalEndpointUrls(d.getExternalEndpointUrls());
         impl.setResultMapPresent(d.isResultMapPresent());
         impl.setPreciousTasks(d.getPreciousTasks());
         return impl;

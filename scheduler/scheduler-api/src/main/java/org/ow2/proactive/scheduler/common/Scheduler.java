@@ -1737,4 +1737,26 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
             throws NotConnectedException, UnknownJobException;
+
+    /**
+     * Add an external endpoint url to the endpoint list of the considered job
+     * @param jobId id of the job
+     * @param externalEndpointUrl the external endpoint url to remove from the job endpoint list
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to this particular job.
+     * @throws UnknownJobException if the job does not exist.
+     */
+    void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
+            throws NotConnectedException, PermissionException, UnknownJobException;
+
+    /**
+     * Remove an external endpoint url from the endpoint list of the considered job
+     * @param jobId id of the job
+     * @param externalEndpointUrl the external endpoint url to remove from the job endpoint list
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to this particular job.
+     * @throws UnknownJobException if the job does not exist.
+     */
+    void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+            throws NotConnectedException, PermissionException, UnknownJobException;
 }

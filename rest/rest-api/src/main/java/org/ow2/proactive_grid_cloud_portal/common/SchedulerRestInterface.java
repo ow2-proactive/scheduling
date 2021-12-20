@@ -2413,4 +2413,41 @@ public interface SchedulerRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     Map<String, Map<String, Boolean>> checkJobsPermissionMethods(@HeaderParam("sessionid") String sessionId,
             PermissionForm multipart) throws RestException;
+
+    /**
+     *
+     * Add an external endpoint url to the endpoint list of the considered job
+     *
+     * @param sessionId
+     *            current session
+     * @param jobId
+     *            id of the job
+     * @param externalEndpointUrl
+     *          the external endpoint url to add to the job endpoint list
+     */
+    @POST
+    @Path("job/{jobid}/externalendpointurls")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    void addExternalEndpointUrl(@HeaderParam("sessionid") String sessionId, @PathParam("jobid")
+    final String jobId, String externalEndpointUrl) throws RestException;
+
+    /**
+     *
+     * Remove an external endpoint url from the endpoint list of the considered job
+     *
+     * @param sessionId
+     *            current session
+     * @param jobId
+     *            id of the job
+     * @param externalEndpointUrl
+     *          the external endpoint url to remove from the job endpoint list
+     */
+    @DELETE
+    @Path("job/{jobid}/externalendpointurls")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    void removeExternalEndpointUrl(@HeaderParam("sessionid") String sessionId, @PathParam("jobid")
+    final String jobId, String externalEndpointUrl) throws RestException;
+
 }

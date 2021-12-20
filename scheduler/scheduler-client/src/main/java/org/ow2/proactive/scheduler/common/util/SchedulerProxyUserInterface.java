@@ -929,4 +929,20 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.checkJobsPermissionMethods(jobIds, methods);
     }
 
+    @Override
+    @ImmediateService
+    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        checkSchedulerConnection();
+        uischeduler.addExternalEndpointUrl(jobId, externalEndpointUrl);
+    }
+
+    @Override
+    @ImmediateService
+    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        checkSchedulerConnection();
+        uischeduler.removeExternalEndpointUrl(jobId, externalEndpointUrl);
+    }
+
 }

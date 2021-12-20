@@ -118,7 +118,13 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK = "You do not have permission to enable visualization on this task !";
 
-    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_ATTACH_SERVICE_TO_THIS_JOB = "You do not have permission to attach service to this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REGISTER_SERVICE_TO_THIS_JOB = "You do not have permission to attach service to this job !";
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_DETACH_SERVICE_TO_THIS_JOB = "You do not have permission to attach service to this job !";
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB = "You do not have permission to attach service to this job !";
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB = "You do not have permission to attach service to this job !";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB = "You do not have permission to send signals to this job !";
 

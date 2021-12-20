@@ -1022,6 +1022,40 @@ class LiveJobs {
         }
     }
 
+    boolean addExternalEndpointUrl(JobId jobId, String externalEndpointUrl) throws UnknownJobException {
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            throw new UnknownJobException(jobId);
+        }
+        try {
+            InternalJob job = jobData.job;
+            job.getExternalEndpointUrls().add(externalEndpointUrl);
+            dbManager.updateExternalEnpointUrls(job);
+            listener.jobStateUpdated(jobData.job.getOwner(),
+                                     new NotificationData<>(SchedulerEvent.JOB_UPDATED, jobData.job.getJobInfo()));
+            return true;
+        } finally {
+            jobData.unlock();
+        }
+    }
+
+    boolean removeExternalEndpointUrl(JobId jobId, String externalEndpointUrl) throws UnknownJobException {
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            throw new UnknownJobException(jobId);
+        }
+        try {
+            InternalJob job = jobData.job;
+            job.getExternalEndpointUrls().remove(externalEndpointUrl);
+            dbManager.updateExternalEnpointUrls(job);
+            listener.jobStateUpdated(jobData.job.getOwner(),
+                                     new NotificationData<>(SchedulerEvent.JOB_UPDATED, jobData.job.getJobInfo()));
+            return true;
+        } finally {
+            jobData.unlock();
+        }
+    }
+
     TerminationData preemptTask(JobId jobId, String taskName, int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         JobData jobData = lockJob(jobId);

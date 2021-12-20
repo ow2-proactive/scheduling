@@ -1748,6 +1748,17 @@ public class SchedulerDBManager {
         });
     }
 
+    public void updateExternalEnpointUrls(final InternalJob job) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            long jobId = jobId(job);
+            session.getNamedQuery("updateJobDataExternalEndpointUrls")
+                   .setParameter("jobId", jobId)
+                   .setParameter("externalEndpointUrls", new HashSet<>(job.getExternalEndpointUrls()))
+                   .executeUpdate();
+            return null;
+        });
+    }
+
     public void jobSetToBeRemoved(final JobId jobId) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
             long id = jobId(jobId);

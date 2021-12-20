@@ -266,6 +266,12 @@ public interface JobInfo extends Serializable {
     Map<Integer, Boolean> getAttachedServices();
 
     /**
+     * Returns a set of external endpoint urls
+     * @return a set of external endpoint urls
+     */
+    Set<String> getExternalEndpointUrls();
+
+    /**
      * Returns the set of signals used by the job
      * @return signals set
      */

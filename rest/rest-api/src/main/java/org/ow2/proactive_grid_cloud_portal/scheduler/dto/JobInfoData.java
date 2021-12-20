@@ -86,6 +86,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private Map<Integer, Boolean> attachedServices;
 
+    private Set<String> externalEndpointUrls;
+
     private boolean resultMapPresent;
 
     private List<String> preciousTasks;
@@ -298,6 +300,14 @@ public class JobInfoData implements java.io.Serializable {
         this.attachedServices = attachedServices;
     }
 
+    public Set<String> getExternalEndpointUrls() {
+        return externalEndpointUrls;
+    }
+
+    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+        this.externalEndpointUrls = externalEndpointUrls;
+    }
+
     public boolean isResultMapPresent() {
         return resultMapPresent;
     }
@@ -316,7 +326,7 @@ public class JobInfoData implements java.io.Serializable {
 
     @Override
     public String toString() {
-        return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
+        return "JobInfoData{ " + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
                submittedTime + ", removedTime=" + removedTime + ", status=" + status + ", jobId=" + jobId +
                ", totalNumberOfTasks=" + totalNumberOfTasks + ", numberOfPendingTasks=" + numberOfPendingTasks +
                ", numberOfRunningTasks=" + numberOfRunningTasks + ", numberOfFinishedTasks=" + numberOfFinishedTasks +
@@ -324,7 +334,8 @@ public class JobInfoData implements java.io.Serializable {
                ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
                "', projectName='" + projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" +
                genericInformation + ", variables=" + variables + ", signals=" + signals + ", detailedSignals=" +
-               detailedSignals + ", attachedServices=" + attachedServices + '}';
+               detailedSignals + ", attachedServices=" + attachedServices + ", externalEndpointUrls={" +
+               String.join(",", externalEndpointUrls) + "} }";
     }
 
 }

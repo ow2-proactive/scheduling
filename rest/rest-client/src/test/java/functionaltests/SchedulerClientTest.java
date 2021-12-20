@@ -150,6 +150,22 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
+    public void testAddAndRemoveExternalEndpointUrl() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/add_and_remove_external_endpoint_urls.groovy",
+                                null,
+                                null);
+        JobId jobId = submitJob(job, client);
+        client.waitForJob(jobId.toString(), TimeUnit.MINUTES.toMillis(5));
+        JobInfo jobInfo = client.getJobInfo(jobId.toString());
+        Assert.assertNotNull(jobInfo);
+        Assert.assertNotNull(jobInfo.getExternalEndpointUrls());
+        Assert.assertEquals(3, jobInfo.getExternalEndpointUrls().size());
+        Assert.assertTrue(jobInfo.getExternalEndpointUrls()
+                                 .containsAll(Arrays.asList("http://ccc.fr", "http://eee.fr", "http://bbb.fr")));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
     public void testSignals() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/register_service_with_signals.groovy", null, null);
