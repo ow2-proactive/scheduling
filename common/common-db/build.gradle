@@ -25,6 +25,6 @@ dependencies {
         exclude group: 'org.javassist', module: 'javassist'
         exclude group: 'org.slf4j', module:'slf4j-api'
     }
-    runtime 'org.slf4j:slf4j-api:1.7.16'
+    runtime 'org.slf4j:slf4j-api:1.7.25'
 
 }
