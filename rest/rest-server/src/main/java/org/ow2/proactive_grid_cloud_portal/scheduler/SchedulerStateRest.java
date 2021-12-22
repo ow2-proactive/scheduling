@@ -1794,6 +1794,27 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public JobValidationData validate(String sessionId, String jobId, PathSegment pathSegment, UriInfo contextInfos)
+            throws IOException, RestException {
+        Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/validate");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        String jobXml;
+        try {
+            jobXml = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+        try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+            // Get the job submission variables
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            return ValidationUtil.validateJob(tmpWorkflowStream, jobVariables, scheduler, space, sessionId);
+        }
+    }
+
+    @Override
     public WorkflowDescription getDescription(String sessionId, String jobId) throws IOException, RestException {
         Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/variables");
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);

@@ -65,6 +65,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.util;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -106,6 +107,28 @@ public class ValidationUtil {
         try {
             JobFactory factory = JobFactory.getFactory();
             job = factory.createJob(jobFilePath, jobVariables, null, scheduler, space, sessionId);
+
+            if (job instanceof TaskFlowJob) {
+                fillUpdatedVariables((TaskFlowJob) job, data);
+                validateJob((TaskFlowJob) job, data);
+            } else {
+                data.setValid(true);
+            }
+        } catch (JobCreationException e) {
+            data.setTaskName(e.getTaskName());
+            setJobValidationDataErrorMessage(data, e);
+        }
+        return data;
+
+    }
+
+    public static JobValidationData validateJob(InputStream jobInputStream, Map<String, String> jobVariables,
+            Scheduler scheduler, SchedulerSpaceInterface space, String sessionId) {
+        JobValidationData data = new JobValidationData();
+        Job job = null;
+        try {
+            JobFactory factory = JobFactory.getFactory();
+            job = factory.createJob(jobInputStream, jobVariables, null, scheduler, space, sessionId);
 
             if (job instanceof TaskFlowJob) {
                 fillUpdatedVariables((TaskFlowJob) job, data);
