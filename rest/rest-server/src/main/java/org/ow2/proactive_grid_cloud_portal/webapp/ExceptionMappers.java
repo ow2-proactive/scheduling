@@ -99,7 +99,7 @@ public class ExceptionMappers {
     public static class JobCreationRestExceptionExceptionMapper extends BaseExceptionMapper<JobCreationRestException> {
         @Override
         protected int getErrorCode() {
-            return HttpURLConnection.HTTP_NOT_FOUND;
+            return HttpURLConnection.HTTP_BAD_REQUEST;
         }
     }
 
@@ -200,7 +200,7 @@ public class ExceptionMappers {
     public static class IllegalArgumentExceptionMapper extends BaseExceptionMapper<IllegalArgumentException> {
         @Override
         protected int getErrorCode() {
-            return HttpURLConnection.HTTP_INTERNAL_ERROR;
+            return HttpURLConnection.HTTP_BAD_REQUEST;
         }
     }
 

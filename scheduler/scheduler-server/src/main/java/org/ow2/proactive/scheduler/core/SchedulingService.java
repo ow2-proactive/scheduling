@@ -799,14 +799,15 @@ public class SchedulingService {
         }
     }
 
-    public boolean addExternalEndpointUrl(JobId jobId, String externalEndpointUrl) throws UnknownJobException {
+    public boolean addExternalEndpointUrl(JobId jobId, String endpointName, String externalEndpointUrl,
+            String endpointIconUri) throws UnknownJobException {
         try {
             if (status.isUnusable()) {
                 return false;
             }
 
             return infrastructure.getClientOperationsThreadPool().submit(() -> {
-                return jobs.addExternalEndpointUrl(jobId, externalEndpointUrl);
+                return jobs.addExternalEndpointUrl(jobId, endpointName, externalEndpointUrl, endpointIconUri);
             }).get();
 
         } catch (ExecutionException e) {
@@ -820,14 +821,14 @@ public class SchedulingService {
         }
     }
 
-    public boolean removeExternalEndpointUrl(JobId jobId, String externalEndpointUrl) throws UnknownJobException {
+    public boolean removeExternalEndpointUrl(JobId jobId, String endpointName) throws UnknownJobException {
         try {
             if (status.isUnusable()) {
                 return false;
             }
 
             return infrastructure.getClientOperationsThreadPool().submit(() -> {
-                return jobs.removeExternalEndpointUrl(jobId, externalEndpointUrl);
+                return jobs.removeExternalEndpointUrl(jobId, endpointName);
             }).get();
 
         } catch (ExecutionException e) {

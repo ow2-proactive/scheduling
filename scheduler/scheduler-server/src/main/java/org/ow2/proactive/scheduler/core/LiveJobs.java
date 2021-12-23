@@ -58,6 +58,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.ClientJobState;
+import org.ow2.proactive.scheduler.job.ExternalEndpoint;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
@@ -1026,14 +1027,16 @@ class LiveJobs {
         }
     }
 
-    boolean addExternalEndpointUrl(JobId jobId, String externalEndpointUrl) throws UnknownJobException {
+    boolean addExternalEndpointUrl(JobId jobId, String endpointName, String externalEndpointUrl, String endpointIconUri)
+            throws UnknownJobException {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
             throw new UnknownJobException(jobId);
         }
         try {
             InternalJob job = jobData.job;
-            job.getExternalEndpointUrls().add(externalEndpointUrl);
+            job.getExternalEndpointUrls().put(endpointName,
+                                              new ExternalEndpoint(endpointName, externalEndpointUrl, endpointIconUri));
             dbManager.updateExternalEnpointUrls(job);
             listener.jobStateUpdated(jobData.job.getOwner(),
                                      new NotificationData<>(SchedulerEvent.JOB_UPDATED, jobData.job.getJobInfo()));
@@ -1043,14 +1046,14 @@ class LiveJobs {
         }
     }
 
-    boolean removeExternalEndpointUrl(JobId jobId, String externalEndpointUrl) throws UnknownJobException {
+    boolean removeExternalEndpointUrl(JobId jobId, String endpointName) throws UnknownJobException {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
             throw new UnknownJobException(jobId);
         }
         try {
             InternalJob job = jobData.job;
-            job.getExternalEndpointUrls().remove(externalEndpointUrl);
+            job.getExternalEndpointUrls().remove(endpointName);
             dbManager.updateExternalEnpointUrls(job);
             listener.jobStateUpdated(jobData.job.getOwner(),
                                      new NotificationData<>(SchedulerEvent.JOB_UPDATED, jobData.job.getJobInfo()));

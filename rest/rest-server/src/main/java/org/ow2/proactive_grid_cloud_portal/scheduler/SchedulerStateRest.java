@@ -2835,12 +2835,18 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public void addExternalEndpointUrl(String sessionId, String jobId, String externalEndpointUrl)
-            throws RestException {
+    public void addExternalEndpointUrl(String sessionId, String jobId, String endpointName, String externalEndpointUrl,
+            String endpointIconUri) throws RestException {
         Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/externalendpointurl");
         Session ss = sessionStore.get(sessionId);
+        if (endpointName == null) {
+            throw new IllegalArgumentException("endpointName cannot be null");
+        }
+        if (externalEndpointUrl == null) {
+            throw new IllegalArgumentException("externalEndpointUrl cannot be null");
+        }
         try {
-            ss.getScheduler().addExternalEndpointUrl(jobId, externalEndpointUrl);
+            ss.getScheduler().addExternalEndpointUrl(jobId, endpointName, externalEndpointUrl, endpointIconUri);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -2851,12 +2857,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public void removeExternalEndpointUrl(String sessionId, String jobId, String externalEndpointUrl)
-            throws RestException {
+    public void removeExternalEndpointUrl(String sessionId, String jobId, String endpointName) throws RestException {
         Scheduler s = checkAccess(sessionId, "delete /scheduler/jobs/" + jobId + "/externalendpointurl");
         Session ss = sessionStore.get(sessionId);
         try {
-            ss.getScheduler().removeExternalEndpointUrl(jobId, externalEndpointUrl);
+            ss.getScheduler().removeExternalEndpointUrl(jobId, endpointName);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {

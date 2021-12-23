@@ -626,15 +626,15 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
-            throws NotConnectedException, PermissionException, UnknownJobException {
-        schedulerProxy.addExternalEndpointUrl(jobId, externalEndpointUrl);
+    public void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl,
+            String endpointIconUri) throws NotConnectedException, PermissionException, UnknownJobException {
+        schedulerProxy.addExternalEndpointUrl(jobId, endpointName, externalEndpointUrl, endpointIconUri);
     }
 
     @Override
-    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+    public void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        schedulerProxy.removeExternalEndpointUrl(jobId, externalEndpointUrl);
+        schedulerProxy.removeExternalEndpointUrl(jobId, endpointName);
     }
 
     @Override

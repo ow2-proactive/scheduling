@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.job.ExternalEndpoint;
 
 
 public class JobInfoData implements java.io.Serializable {
@@ -86,7 +87,7 @@ public class JobInfoData implements java.io.Serializable {
 
     private Map<Integer, Boolean> attachedServices;
 
-    private Set<String> externalEndpointUrls;
+    private Map<String, ExternalEndpoint> externalEndpointUrls;
 
     private boolean resultMapPresent;
 
@@ -300,11 +301,11 @@ public class JobInfoData implements java.io.Serializable {
         this.attachedServices = attachedServices;
     }
 
-    public Set<String> getExternalEndpointUrls() {
+    public Map<String, ExternalEndpoint> getExternalEndpointUrls() {
         return externalEndpointUrls;
     }
 
-    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+    public void setExternalEndpointUrls(Map<String, ExternalEndpoint> externalEndpointUrls) {
         this.externalEndpointUrls = externalEndpointUrls;
     }
 
@@ -334,8 +335,8 @@ public class JobInfoData implements java.io.Serializable {
                ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
                "', projectName='" + projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" +
                genericInformation + ", variables=" + variables + ", signals=" + signals + ", detailedSignals=" +
-               detailedSignals + ", attachedServices=" + attachedServices + ", externalEndpointUrls={" +
-               String.join(",", externalEndpointUrls) + "} }";
+               detailedSignals + ", attachedServices=" + attachedServices + ", externalEndpointUrls=" +
+               externalEndpointUrls + " }";
     }
 
 }

@@ -1643,20 +1643,26 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl,
+            String endpointIconUri) throws NotConnectedException, PermissionException, UnknownJobException {
         try {
-            restApi().addExternalEndpointUrl(sid, jobId, externalEndpointUrl);
+            if (endpointName == null) {
+                throw new IllegalArgumentException("endpointName cannot be null");
+            }
+            if (externalEndpointUrl == null) {
+                throw new IllegalArgumentException("externalEndpointUrl cannot be null");
+            }
+            restApi().addExternalEndpointUrl(sid, jobId, endpointName, externalEndpointUrl, endpointIconUri);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }
     }
 
     @Override
-    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+    public void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException {
         try {
-            restApi().removeExternalEndpointUrl(sid, jobId, externalEndpointUrl);
+            restApi().removeExternalEndpointUrl(sid, jobId, endpointName);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }

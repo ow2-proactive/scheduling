@@ -2442,15 +2442,21 @@ public interface SchedulerRestInterface {
      *            current session
      * @param jobId
      *            id of the job
+     * @param endpointName
+     *          name of the endpoint
      * @param externalEndpointUrl
      *          the external endpoint url to add to the job endpoint list
+     * @param endpointIconUri
+     *          uri of the icon associated with the endpoint. If this parameter is null, the workflow icon will be used.
      */
     @POST
     @Path("jobs/{jobid}/externalendpointurl")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     void addExternalEndpointUrl(@HeaderParam("sessionid") String sessionId, @PathParam("jobid")
-    final String jobId, String externalEndpointUrl) throws RestException;
+    final String jobId, @FormParam("endpointName") String endpointName,
+            @FormParam("externalEndpointUrl") String externalEndpointUrl,
+            @FormParam("endpointIconUri") String endpointIconUri) throws RestException;
 
     /**
      *

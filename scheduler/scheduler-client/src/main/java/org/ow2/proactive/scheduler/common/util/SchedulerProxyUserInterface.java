@@ -931,18 +931,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl,
+            String endpointIconUri) throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
-        uischeduler.addExternalEndpointUrl(jobId, externalEndpointUrl);
+        uischeduler.addExternalEndpointUrl(jobId, endpointName, externalEndpointUrl, endpointIconUri);
     }
 
     @Override
     @ImmediateService
-    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+    public void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
-        uischeduler.removeExternalEndpointUrl(jobId, externalEndpointUrl);
+        uischeduler.removeExternalEndpointUrl(jobId, endpointName);
     }
 
 }

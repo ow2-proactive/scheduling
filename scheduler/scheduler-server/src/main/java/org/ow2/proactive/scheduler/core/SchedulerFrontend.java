@@ -2252,27 +2252,29 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl,
+            String endpointIconUri) throws NotConnectedException, PermissionException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         frontendState.checkPermissions("addExternalEndpointUrl",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
-        logger.info("Request to add external endpoint url on job " + jobId + " received from " + currentUser);
-        schedulingService.addExternalEndpointUrl(jobIdObject, externalEndpointUrl);
+        logger.info("Request to add external endpoint " + endpointName + " on job " + jobId + " received from " +
+                    currentUser);
+        schedulingService.addExternalEndpointUrl(jobIdObject, endpointName, externalEndpointUrl, endpointIconUri);
     }
 
     @Override
     @ImmediateService
-    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+    public void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         frontendState.checkPermissions("removeExternalEndpointUrl",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
-        logger.info("Request to remove external endpoint url on job " + jobId + " received from " + currentUser);
-        schedulingService.removeExternalEndpointUrl(jobIdObject, externalEndpointUrl);
+        logger.info("Request to remove external endpoint " + endpointName + " on job " + jobId + " received from " +
+                    currentUser);
+        schedulingService.removeExternalEndpointUrl(jobIdObject, endpointName);
     }
 }

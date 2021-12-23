@@ -32,6 +32,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.job.ExternalEndpoint;
 
 
 public class JobInfoImpl implements JobInfo {
@@ -92,7 +93,7 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<Integer, Boolean> attachedServices;
 
-    private Set<String> externalEndpointUrls;
+    private Map<String, ExternalEndpoint> externalEndpointUrls;
 
     private boolean resultMapPresent;
 
@@ -360,11 +361,11 @@ public class JobInfoImpl implements JobInfo {
     }
 
     @Override
-    public Set<String> getExternalEndpointUrls() {
+    public Map<String, ExternalEndpoint> getExternalEndpointUrls() {
         return externalEndpointUrls;
     }
 
-    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+    public void setExternalEndpointUrls(Map<String, ExternalEndpoint> externalEndpointUrls) {
         this.externalEndpointUrls = externalEndpointUrls;
     }
 
