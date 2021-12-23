@@ -94,17 +94,25 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
             if (proxy == null) {
                 try {
                     proxy = new RMProxy(rmURI, credentials);
-                    userProxiesMap.put(user, proxy);
                 } catch (RMException e) {
                     throw new RMProxyCreationException(e);
                 }
                 createUserSession(user, credentials, proxy);
+                userProxiesMap.put(user, proxy);
             } else {
                 if (!"true".equals(System.getProperty(SchedulerStarter.REST_DISABLED_PROPERTY))) {
                     // Rest session management works only if the rest server is launched in the same JVM as the scheduler server
-                    try {
-                        userSessions.get(user).renewSession();
-                    } catch (Exception e) {
+                    Session currentSession = userSessions.get(user);
+                    if (sessionStore.exists(currentSession.getSessionId())) {
+                        // current session still referenced in SessionStore, renewing it
+                        try {
+                            currentSession.renewSession();
+                        } catch (NotConnectedException e) {
+                            // current session is not connected to the scheduler, creating a new one
+                            createUserSession(user, credentials, proxy);
+                        }
+                    } else {
+                        // current session has been removed from SessionStore due to inactivity, creating a new one
                         createUserSession(user, credentials, proxy);
                     }
                 }
