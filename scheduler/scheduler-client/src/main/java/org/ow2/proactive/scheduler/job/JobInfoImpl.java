@@ -140,7 +140,7 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<Integer, Boolean> attachedServices = new LinkedHashMap();
 
-    private Set<String> externalEndpointUrls = new LinkedHashSet<>();
+    private Map<String, ExternalEndpoint> externalEndpointUrls = new LinkedHashMap<>();
 
     private boolean resultMapPresent = false;
 
@@ -557,11 +557,11 @@ public class JobInfoImpl implements JobInfo {
     }
 
     @Override
-    public Set<String> getExternalEndpointUrls() {
+    public Map<String, ExternalEndpoint> getExternalEndpointUrls() {
         return externalEndpointUrls;
     }
 
-    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+    public void setExternalEndpointUrls(Map<String, ExternalEndpoint> externalEndpointUrls) {
         this.externalEndpointUrls = externalEndpointUrls;
     }
 

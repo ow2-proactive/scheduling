@@ -1741,7 +1741,7 @@ public class SchedulerDBManager {
             long jobId = jobId(job);
             session.getNamedQuery("updateJobDataExternalEndpointUrls")
                    .setParameter("jobId", jobId)
-                   .setParameter("externalEndpointUrls", new LinkedHashSet<>(job.getExternalEndpointUrls()))
+                   .setParameter("externalEndpointUrls", new LinkedHashMap<>(job.getExternalEndpointUrls()))
                    .executeUpdate();
             return null;
         });

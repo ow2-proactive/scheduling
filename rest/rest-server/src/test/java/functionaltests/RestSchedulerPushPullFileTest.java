@@ -27,6 +27,7 @@ package functionaltests;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -127,7 +128,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
         HttpResponse response = executeUriRequest(reqPullList);
 
-        assertEquals(500, response.getStatusLine().getStatusCode());
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusLine().getStatusCode());
     }
 
     public void testIt(String spaceName, String spacePath, String destPath, boolean encode) throws Exception {

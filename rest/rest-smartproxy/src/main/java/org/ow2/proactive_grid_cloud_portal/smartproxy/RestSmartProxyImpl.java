@@ -832,14 +832,14 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
-            throws NotConnectedException, PermissionException, UnknownJobException {
-        _getScheduler().addExternalEndpointUrl(jobId, externalEndpointUrl);
+    public void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl,
+            String endpointIconUri) throws NotConnectedException, PermissionException, UnknownJobException {
+        _getScheduler().addExternalEndpointUrl(jobId, endpointName, externalEndpointUrl, endpointIconUri);
     }
 
     @Override
-    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+    public void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        _getScheduler().removeExternalEndpointUrl(jobId, externalEndpointUrl);
+        _getScheduler().removeExternalEndpointUrl(jobId, endpointName);
     }
 }

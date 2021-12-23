@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.job.ExternalEndpoint;
 
 
 /**
@@ -269,7 +270,7 @@ public interface JobInfo extends Serializable {
      * Returns a set of external endpoint urls
      * @return a set of external endpoint urls
      */
-    Set<String> getExternalEndpointUrls();
+    Map<String, ExternalEndpoint> getExternalEndpointUrls();
 
     /**
      * Returns the set of signals used by the job

@@ -73,6 +73,7 @@ import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
+import org.ow2.proactive.scheduler.job.ExternalEndpoint;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -224,7 +225,7 @@ public class JobData implements Serializable {
 
     private Map<Integer, Boolean> attachedServices;
 
-    private Set<String> externalEndpointUrls;
+    private Map<String, ExternalEndpoint> externalEndpointUrls;
 
     private long lastUpdatedTime;
 
@@ -779,11 +780,11 @@ public class JobData implements Serializable {
 
     @Column(name = "EXTERNAL_ENDPOINT_URLS", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Set<String> getExternalEndpointUrls() {
+    public Map<String, ExternalEndpoint> getExternalEndpointUrls() {
         return externalEndpointUrls;
     }
 
-    public void setExternalEndpointUrls(Set<String> externalEndpointUrls) {
+    public void setExternalEndpointUrls(Map<String, ExternalEndpoint> externalEndpointUrls) {
         this.externalEndpointUrls = externalEndpointUrls;
     }
 

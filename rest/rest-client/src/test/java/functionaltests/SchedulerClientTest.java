@@ -70,6 +70,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.job.ExternalEndpoint;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
@@ -161,8 +162,13 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertNotNull(jobInfo);
         Assert.assertNotNull(jobInfo.getExternalEndpointUrls());
         Assert.assertEquals(3, jobInfo.getExternalEndpointUrls().size());
-        Assert.assertTrue(jobInfo.getExternalEndpointUrls()
-                                 .containsAll(Arrays.asList("http://ccc.fr", "http://eee.fr", "http://bbb.fr")));
+        Assert.assertEquals(new ExternalEndpoint("ccc", "http://ccc.fr", "icon/ccc"),
+                            jobInfo.getExternalEndpointUrls().get("ccc"));
+        Assert.assertEquals(new ExternalEndpoint("bbb", "http://bbb.fr", "icon/bbb"),
+                            jobInfo.getExternalEndpointUrls().get("bbb"));
+        // the last endpoint has null icon on purpose (to check that it does not cause issues)
+        Assert.assertEquals(new ExternalEndpoint("eee", "http://eee.fr", null),
+                            jobInfo.getExternalEndpointUrls().get("eee"));
     }
 
     @Test(timeout = MAX_WAIT_TIME)

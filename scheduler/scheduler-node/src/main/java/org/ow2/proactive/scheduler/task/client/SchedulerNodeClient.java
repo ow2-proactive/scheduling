@@ -1084,14 +1084,14 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
-            throws NotConnectedException, PermissionException, UnknownJobException {
-        client.addExternalEndpointUrl(jobId, externalEndpointUrl);
+    public void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl,
+            String endpointIconUri) throws NotConnectedException, PermissionException, UnknownJobException {
+        client.addExternalEndpointUrl(jobId, endpointName, externalEndpointUrl, endpointIconUri);
     }
 
     @Override
-    public void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+    public void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        client.removeExternalEndpointUrl(jobId, externalEndpointUrl);
+        client.removeExternalEndpointUrl(jobId, endpointName);
     }
 }

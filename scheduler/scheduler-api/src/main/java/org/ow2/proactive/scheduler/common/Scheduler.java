@@ -1742,23 +1742,25 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * Add an external endpoint url to a job. The job must be alive and not terminated,
      * otherwise an UnknownJobException will be thrown
      * @param jobId id of the job
+     * @param endpointName the name of the endpoint
      * @param externalEndpointUrl the external endpoint url to add to the job endpoint list
+     * @param endpointIconUri uri of the icon associated with the endpoint. If this parameter is null, the workflow icon will be used.
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular job.
      * @throws UnknownJobException if the job does not exist or is terminated.
      */
-    void addExternalEndpointUrl(String jobId, String externalEndpointUrl)
+    void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl, String endpointIconUri)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**
      * Remove an external endpoint url from a job. The job must be alive and not terminated,
      * otherwise an UnknownJobException will be thrown
      * @param jobId id of the job
-     * @param externalEndpointUrl the external endpoint url to remove from the job endpoint list
+     * @param endpointName name of the external endpoint url to remove
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular job.
      * @throws UnknownJobException if the job does not exist or is terminated.
      */
-    void removeExternalEndpointUrl(String jobId, String externalEndpointUrl)
+    void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException;
 }
