@@ -1241,11 +1241,11 @@ public class SchedulingService {
         }
     }
 
-    protected void sleepSchedulingThread() throws InterruptedException {
+    public void sleepSchedulingThread() throws InterruptedException {
         schedulingThread.sleepSchedulingThread();
     }
 
-    protected void wakeUpSchedulingThread() {
+    public void wakeUpSchedulingThread() {
         schedulingThread.wakeUpSchedulingThread();
     }
 

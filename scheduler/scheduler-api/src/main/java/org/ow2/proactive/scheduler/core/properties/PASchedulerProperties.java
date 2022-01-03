@@ -144,6 +144,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Size of parsed workflow cache, used to optimize workflow submission time */
     SCHEDULER_STAX_JOB_CACHE("pa.scheduler.stax.job.cache", PropertyType.INTEGER, "5000"),
 
+    /** size of the cache used to ensure that delayed jobs or tasks are scheduled at the precise date (without skipping seconds) **/
+    SCHEDULER_STARTAT_CACHE("pa.scheduler.startat.cache", PropertyType.INTEGER, "5000"),
+
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */
