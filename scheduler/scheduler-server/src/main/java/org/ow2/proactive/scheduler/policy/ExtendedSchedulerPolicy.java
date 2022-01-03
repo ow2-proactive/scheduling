@@ -30,11 +30,17 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections4.map.LRUMap;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -59,6 +65,13 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
 
     public static final String GENERIC_INFORMATION_KEY_START_AT = "START_AT";
 
+    private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1,
+                                                                                   new NamedThreadFactory("ExtendedSchedulerPolicyExecutor",
+                                                                                                          true,
+                                                                                                          2));
+
+    private final Map<String, Boolean> startAtCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STARTAT_CACHE.getValueAsInt()));
+
     /*
      * Utilize 'startAt' generic info and filter any tasks that should not be scheduled for current
      * execution cycle.
@@ -80,7 +93,8 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                     executionCycleTasks.add(candidate);
                 } else {
                     try {
-                        if (now.after(ISO8601DateUtil.toDate(startAt))) {
+                        Date startAtDate = ISO8601DateUtil.toDate(startAt);
+                        if (now.after(startAtDate)) {
                             executionCycleTasks.add(candidate);
 
                         } else {
@@ -92,6 +106,8 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                                                            startAt,
                                                            ISO8601DateUtil.parse(now)));
                             }
+                            scheduleWakeUp(candidate.getTaskId().toString(), now, startAtDate);
+
                         }
                     } catch (IllegalArgumentException e) {
                         logger.warn(String.format("An error occurred while processing 'startAt' generic info.%n" +
@@ -108,6 +124,16 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
         return executionCycleTasks;
     }
 
+    private void scheduleWakeUp(final String taskOrJobId, Date now, Date startAtDate) {
+        if (!startAtCache.containsKey(taskOrJobId)) {
+            executor.schedule(() -> {
+                startAtCache.remove(taskOrJobId);
+                schedulingService.wakeUpSchedulingThread();
+            }, startAtDate.getTime() - now.getTime(), TimeUnit.MILLISECONDS);
+            startAtCache.put(taskOrJobId, true);
+        }
+    }
+
     // To consider only non delayed jobs
     protected List<JobDescriptor> filterJobs(List<JobDescriptor> jobDescList) {
         Date now = new Date();
@@ -119,9 +145,9 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                 executionCycleJobs.add(candidate);
             } else {
                 try {
-                    if (now.after(ISO8601DateUtil.toDate(startAt))) {
+                    Date startAtDate = ISO8601DateUtil.toDate(startAt);
+                    if (now.after(startAtDate)) {
                         executionCycleJobs.add(candidate);
-
                     } else {
                         if (logger.isTraceEnabled()) {
                             logger.trace(String.format("Job [jobId:\"%s\"] is scheduled to be executed at %s." +
@@ -130,6 +156,7 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                                                        startAt,
                                                        ISO8601DateUtil.parse(now)));
                         }
+                        scheduleWakeUp(candidate.getJobId().toString(), now, startAtDate);
                     }
                 } catch (IllegalArgumentException e) {
                     logger.warn(String.format("An error occurred while processing 'startAt' generic info.%n" +
