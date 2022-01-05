@@ -51,6 +51,8 @@ public class TaskContextVariableExtractor implements Serializable {
 
     private final String ERROR_READING_VARIABLES = "Error reading variables from task context!";
 
+    private final String ERROR_READING_CREDENTIALS = "Error reading third-party-credentials from task context!";
+
     private static final Logger logger = Logger.getLogger(TaskContextVariableExtractor.class);
 
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
@@ -78,7 +80,7 @@ public class TaskContextVariableExtractor implements Serializable {
         try {
             thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
         } catch (Exception e) {
-            logger.error(ERROR_READING_VARIABLES, e);
+            logger.error(ERROR_READING_CREDENTIALS, e);
         }
 
         HashMap<String, Serializable> systemEnvironmentVariables = new HashMap<String, Serializable>(System.getenv());
@@ -86,6 +88,10 @@ public class TaskContextVariableExtractor implements Serializable {
         systemEnvironmentVariables.putAll(thirdPartyCredentials);
 
         return VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(), systemEnvironmentVariables);
+    }
+
+    public Map<String, String> extractThirdPartyCredentials(TaskContext taskContext) {
+        return forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
     }
 
     /**

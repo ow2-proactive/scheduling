@@ -112,10 +112,10 @@ public class ProgressFileReader implements ProgressFileReaderInterface {
 
         try {
             Files.createDirectories(progressFileDir);
-            ForkerUtils.setSharedExecutablePermissions(progressFileDir.toFile());
+            ForkerUtils.getInstance().setSharedExecutablePermissions(progressFileDir.toFile());
             progressFile = progressFileDir.resolve(progressFileName);
             Files.createFile(progressFile);
-            ForkerUtils.setSharedPermissions(progressFile.toFile());
+            ForkerUtils.getInstance().setSharedPermissions(progressFile.toFile());
         } catch (FileAlreadyExistsException e) {
             // ignore file already exists exception
         }

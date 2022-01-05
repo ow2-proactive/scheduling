@@ -120,12 +120,12 @@ public class ProgressFileReaderPoller implements ProgressFileReaderInterface {
         progressFileDir = workingDir.toPath().resolve(PROGRESS_FILE_DIR);
 
         Files.createDirectories(progressFileDir);
-        ForkerUtils.setSharedExecutablePermissions(progressFileDir.toFile());
+        ForkerUtils.getInstance().setSharedExecutablePermissions(progressFileDir.toFile());
         progressFile = progressFileDir.resolve(progressFileName);
         if (!Files.exists(progressFile)) {
             Files.createFile(progressFile);
         }
-        ForkerUtils.setSharedPermissions(progressFile.toFile());
+        ForkerUtils.getInstance().setSharedPermissions(progressFile.toFile());
 
         logger.debug("Progress file '" + progressFile + "' created");
     }
