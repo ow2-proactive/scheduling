@@ -41,6 +41,7 @@ import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -65,6 +66,8 @@ public class TestRunAsMeLinuxKey extends TestRunAsMe {
 
     protected static byte[] key;
 
+    protected static String keyString;
+
     @BeforeClass
     public static void startDedicatedScheduler() throws Exception {
         assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.unix);
@@ -73,6 +76,8 @@ public class TestRunAsMeLinuxKey extends TestRunAsMe {
 
         String keyPath = System.getProperty(RUNASME_KEY_PATH_PROPNAME);
         assumeNotNull(keyPath);
+
+        keyString = IOUtils.toString(new File(keyPath).toURI());
 
         key = IOUtils.toByteArray(new File(keyPath).toURI());
 
@@ -95,6 +100,41 @@ public class TestRunAsMeLinuxKey extends TestRunAsMe {
                                                                   .createJob(new File(jobDescriptor.toURI()).getAbsolutePath()),
                                                         false,
                                                         true);
+
+        for (Map.Entry<String, TaskResult> entry : scheduler.getJobResult(jobid).getAllResults().entrySet()) {
+            if (entry.getKey().contains("RunAsMeTask")) {
+                Assert.assertTrue("RunAsMe task should display in the logs the correct system user",
+                                  entry.getValue().getOutput().getStdoutLogs().contains(username));
+            }
+        }
+    }
+
+    @Test
+    public void testRunAsUser() throws Exception {
+        // connect to the scheduler using the runasme account
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface(username, password, key);
+        Job job = JobFactory.getFactory().createJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        job.addGenericInformation(ForkerUtils.RUNAS_USER_GENERIC_INFO, username);
+        job.addGenericInformation(ForkerUtils.RUNAS_SSH_KEY_GENERIC_INFO, keyString);
+        JobId jobid = schedulerHelper.testJobSubmission(scheduler, job, false, true);
+
+        for (Map.Entry<String, TaskResult> entry : scheduler.getJobResult(jobid).getAllResults().entrySet()) {
+            if (entry.getKey().contains("RunAsMeTask")) {
+                Assert.assertTrue("RunAsMe task should display in the logs the correct system user",
+                                  entry.getValue().getOutput().getStdoutLogs().contains(username));
+            }
+        }
+    }
+
+    @Test
+    public void testRunAsUserCreds() throws Exception {
+        // connect to the scheduler using the runasme account
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface(username, password, key);
+        Job job = JobFactory.getFactory().createJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        job.addGenericInformation(ForkerUtils.RUNAS_USER_GENERIC_INFO, username);
+        job.addGenericInformation(ForkerUtils.RUNAS_SSH_KEY_CRED_GENERIC_INFO, username);
+        scheduler.putThirdPartyCredential(username, keyString);
+        JobId jobid = schedulerHelper.testJobSubmission(scheduler, job, false, true);
 
         for (Map.Entry<String, TaskResult> entry : scheduler.getJobResult(jobid).getAllResults().entrySet()) {
             if (entry.getKey().contains("RunAsMeTask")) {

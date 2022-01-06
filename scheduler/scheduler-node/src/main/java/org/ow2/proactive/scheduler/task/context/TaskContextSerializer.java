@@ -54,7 +54,7 @@ public class TaskContextSerializer implements Serializable {
             objectOutputStream.writeObject(context);
         }
         if (context.isRunAsUser()) {
-            ForkerUtils.setSharedPermissions(file);
+            ForkerUtils.getInstance().setSharedPermissions(file);
         }
         return file;
     }

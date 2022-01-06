@@ -27,11 +27,15 @@ package org.ow2.proactive.scheduler.task.utils;
 
 import java.io.File;
 import java.security.KeyException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.scheduler.task.context.TaskContext;
+
+import com.google.common.base.Strings;
 
 
 /**
@@ -47,6 +51,31 @@ public final class ForkerUtils {
 
     /** System property Key of the fork method */
     public static final String FORK_METHOD_KEY = "pas.launcher.forkas.method";
+
+    // allows to configure the runasme fork method for a workflow task
+    public static final String RUNAS_METHOD_GENERIC_INFO = "RUNAS_METHOD";
+
+    // allows to configure the runasme user for a workflow task
+    public static final String RUNAS_USER_GENERIC_INFO = "RUNAS_USER";
+
+    // allows to configure the runasme user domain for a workflow task. User domain is a Windows feature,
+    // default domain name on Windows is the machine name.
+    public static final String RUNAS_DOMAIN_GENERIC_INFO = "RUNAS_DOMAIN";
+
+    // allows to configure the runasme password for a workflow task (if runasme method is PWD)
+    public static final String RUNAS_PWD_GENERIC_INFO = "RUNAS_PWD";
+
+    // allows to configure the runasme password as third-party credentials for a workflow task (if runasme method is PWD)
+    public static final String RUNAS_PWD_CRED_GENERIC_INFO = "RUNAS_PWD_CRED";
+
+    // allows to configure the runasme ssh key for a workflow task (if runasme method is KEY)
+    public static final String RUNAS_SSH_KEY_GENERIC_INFO = "RUNAS_SSH_KEY";
+
+    // allows to configure the runasme ssh key as third-party credentials for a workflow task (if runasme method is KEY)
+    // note that by default the 3rd-part credential SSH_PRIVATE_KEY can be used to store the current user private key (works if the same key is used across all machines)
+    public static final String RUNAS_SSH_KEY_CRED_GENERIC_INFO = "RUNAS_SSH_KEY_CRED";
+
+    private static ForkerUtils instance = null;
 
     /** System property value of the fork method */
     private static final ForkMethod FORK_METHOD_VALUE;
@@ -68,6 +97,17 @@ public final class ForkerUtils {
             logger.debug("Java Property " + FORK_METHOD_KEY +
                          " is not set or uses invalid value. Fallback to method password");
         }
+    }
+
+    private ForkerUtils() {
+
+    }
+
+    public static ForkerUtils getInstance() {
+        if (instance == null) {
+            instance = new ForkerUtils();
+        }
+        return instance;
     }
 
     public enum ForkMethod {
@@ -95,7 +135,7 @@ public final class ForkerUtils {
      *
      * @return the singleton instance of PAOSProcessBuilderFactory
      */
-    public static PAOSProcessBuilderFactory getOSProcessBuilderFactory(String nativeScriptPath) {
+    public PAOSProcessBuilderFactory getOSProcessBuilderFactory(String nativeScriptPath) {
         if (OSBuilderFactory == null) {
             OSBuilderFactory = new PAOSProcessBuilderFactory(nativeScriptPath);
         }
@@ -111,61 +151,117 @@ public final class ForkerUtils {
      * 	<li><b>if {@value #FORK_METHOD_KEY}=key :</b> return the user using its ssh key</li>
      * </ul>
      *
-     * @param decrypter the decrypter that should be a self decryption one.
+     * @param taskContext the task context.
      * @return the OSUser to be passed to the OSPRocess if node fork method is configured.
      * @throws IllegalAccessException if the node configuration method is not compatible with incoming credentials
      * @throws KeyException decryption failure, malformed data
      * @throws IllegalArgumentException if decrypter is null
      * @throws IllegalAccessException if node fork method is not set
      */
-    public static OSUser checkConfigAndGetUser(Decrypter decrypter) throws IllegalAccessException, KeyException {
+    public OSUser checkConfigAndGetUser(TaskContext taskContext) throws IllegalAccessException, KeyException {
+        Decrypter decrypter = taskContext.getDecrypter();
+        Map<String, String> genericInformation = taskContext.getInitializer().getGenericInformation();
+
         if (decrypter != null) {
             CredData data = decrypter.decrypt();
+            OSUser u;
+            switch (getForkMethod(genericInformation)) {
+                case NONE:
+                    u = new OSUser(getLogin(data, genericInformation));
+                    u.setDomain(getDomain(data, genericInformation));
+                    return u;
+                case PWD:
+                    String password = getPassword(data, genericInformation, data.getThirdPartyCredentials());
+                    if (password == null) {
+                        throw new IllegalAccessException("Password not found in Credentials, cannot fork using password");
+                    }
+                    u = new OSUser(getLogin(data, genericInformation), password);
+                    u.setDomain(getDomain(data, genericInformation));
+                    return u;
+                case KEY:
+                    byte[] key = getKey(data, genericInformation, data.getThirdPartyCredentials());
+                    if (key == null) {
+                        throw new IllegalAccessException("SSH key not found in Credentials, cannot fork using ssh Key");
+                    }
+                    u = new OSUser(getLogin(data, genericInformation), key);
+                    u.setDomain(getDomain(data, genericInformation));
+                    return u;
+                default:
+                    throw new IllegalAccessException("Cannot fork under " + data.getLogin() + ", Property " +
+                                                     FORK_METHOD_KEY + " is not configured.");
+            }
 
-            // TODO: use polymorphism to avoid branches
-            if (ForkMethod.NONE == FORK_METHOD_VALUE) {
-                OSUser u = new OSUser(data.getLogin());
-                if (data.getDomain() != null) {
-                    u.setDomain(data.getDomain());
-                }
-                return u;
-            }
-            if (ForkMethod.PWD == FORK_METHOD_VALUE) {
-                if (data.getPassword() == null) {
-                    throw new IllegalAccessException("Password not found in Credentials, cannot fork using password");
-                }
-                OSUser u = new OSUser(data.getLogin(), data.getPassword());
-                if (data.getDomain() != null) {
-                    u.setDomain(data.getDomain());
-                }
-                return u;
-            }
-            if (ForkMethod.KEY == FORK_METHOD_VALUE) {
-                if (data.getKey() == null) {
-                    throw new IllegalAccessException("SSH key not found in Credentials, cannot fork using ssh Key");
-                }
-                OSUser u = new OSUser(data.getLogin(), data.getKey());
-                if (data.getDomain() != null) {
-                    u.setDomain(data.getDomain());
-                }
-                return u;
-            }
-            throw new IllegalAccessException("Cannot fork under " + data.getLogin() + ", Property " + FORK_METHOD_KEY +
-                                             " is not configured.");
         } else {
-            throw new IllegalArgumentException("Decrypter could not be null");
+            throw new IllegalArgumentException("Decrypter cannot be null");
         }
     }
 
-    public static void setSharedExecutablePermissions(File file) {
+    private ForkMethod getForkMethod(Map<String, String> genericInformation) {
+        if (genericInformation != null && genericInformation.get(RUNAS_METHOD_GENERIC_INFO) != null) {
+            return ForkMethod.valueOf(genericInformation.get(RUNAS_METHOD_GENERIC_INFO));
+        }
+        return FORK_METHOD_VALUE;
+    }
+
+    private String getLogin(CredData data, Map<String, String> genericInformation) {
+        if (genericInformation != null && genericInformation.get(RUNAS_USER_GENERIC_INFO) != null) {
+            return genericInformation.get(RUNAS_USER_GENERIC_INFO);
+        } else {
+            return data.getLogin();
+        }
+    }
+
+    private String getDomain(CredData data, Map<String, String> genericInformation) {
+        if (genericInformation != null && genericInformation.get(RUNAS_DOMAIN_GENERIC_INFO) != null) {
+            return genericInformation.get(RUNAS_DOMAIN_GENERIC_INFO);
+        } else {
+            return data.getDomain();
+        }
+    }
+
+    private String getPassword(CredData data, Map<String, String> genericInformation,
+            Map<String, String> thirdPartyCredentials) throws IllegalAccessException {
+        if (genericInformation != null && genericInformation.get(RUNAS_PWD_GENERIC_INFO) != null) {
+            return genericInformation.get(RUNAS_PWD_GENERIC_INFO);
+        } else if (genericInformation != null && genericInformation.get(RUNAS_PWD_CRED_GENERIC_INFO) != null) {
+            String password = thirdPartyCredentials.get(genericInformation.get(RUNAS_PWD_CRED_GENERIC_INFO));
+            if (password == null) {
+                throw new IllegalAccessException("Password not found in third-party credentials entry " +
+                                                 genericInformation.get(RUNAS_PWD_CRED_GENERIC_INFO) +
+                                                 ". cannot fork using password.");
+            }
+            return password;
+        } else {
+            return data.getPassword();
+        }
+    }
+
+    private byte[] getKey(CredData data, Map<String, String> genericInformation,
+            Map<String, String> thirdPartyCredentials) throws IllegalAccessException {
+        if (genericInformation.get(RUNAS_SSH_KEY_GENERIC_INFO) != null) {
+            return genericInformation.get(RUNAS_SSH_KEY_GENERIC_INFO).getBytes();
+        } else if (genericInformation.get(RUNAS_SSH_KEY_CRED_GENERIC_INFO) != null) {
+            String keyString = thirdPartyCredentials.get(genericInformation.get(RUNAS_SSH_KEY_CRED_GENERIC_INFO));
+            if (Strings.isNullOrEmpty(keyString)) {
+                throw new IllegalAccessException("SSH Key not found in third-Party credentials entry " +
+                                                 genericInformation.get(RUNAS_SSH_KEY_CRED_GENERIC_INFO) +
+                                                 ". cannot fork using ssh key");
+            }
+            return thirdPartyCredentials.get(genericInformation.get(RUNAS_SSH_KEY_CRED_GENERIC_INFO)).getBytes();
+        } else {
+            return data.getKey();
+        }
+    }
+
+    public void setSharedExecutablePermissions(File file) {
         setSharedPermissions(file, true);
     }
 
-    public static void setSharedPermissions(File file) {
+    public void setSharedPermissions(File file) {
         setSharedPermissions(file, false);
     }
 
-    private static void setSharedPermissions(File file, boolean setExecutable) {
+    private void setSharedPermissions(File file, boolean setExecutable) {
         if (!file.setReadable(true, false))
             logger.warn("Failed to set read permission on : " + file);
         if (!file.setWritable(true, false))

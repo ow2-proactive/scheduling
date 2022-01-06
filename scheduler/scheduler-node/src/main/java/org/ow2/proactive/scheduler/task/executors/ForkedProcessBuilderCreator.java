@@ -50,6 +50,12 @@ public class ForkedProcessBuilderCreator implements Serializable {
 
     private final ForkEnvironmentScriptExecutor forkEnvironmentScriptExecutor = new ForkEnvironmentScriptExecutor();
 
+    private final transient ForkerUtils forkerUtils;
+
+    public ForkedProcessBuilderCreator() {
+        forkerUtils = ForkerUtils.getInstance();
+    }
+
     /**
      * Creates a process builder for a given task context.
      *
@@ -121,11 +127,11 @@ public class ForkedProcessBuilderCreator implements Serializable {
         OSProcessBuilder processBuilder;
         if (context.isRunAsUser()) {
             addExecutionPermissionToScripts();
-            ForkerUtils.setSharedExecutablePermissions(workingDir);
-            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath)
-                                        .getBuilder(ForkerUtils.checkConfigAndGetUser(context.getDecrypter()));
+            forkerUtils.setSharedExecutablePermissions(workingDir);
+            processBuilder = forkerUtils.getOSProcessBuilderFactory(nativeScriptPath)
+                                        .getBuilder(forkerUtils.checkConfigAndGetUser(context));
         } else {
-            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
+            processBuilder = forkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
         }
         return processBuilder;
     }

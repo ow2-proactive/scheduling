@@ -164,7 +164,7 @@ public class ForkedTaskVariablesManager implements Serializable {
         return isDockerWindows2Linux ? ForkEnvironment.convertToLinuxPath(uri) : uri;
     }
 
-    public Map<String, String> extractThirdPartyCredentials(TaskContext container) throws Exception {
+    public Map<String, String> extractThirdPartyCredentials(TaskContext container) {
         try {
             Map<String, String> thirdPartyCredentials = new HashMap<>();
             if (container.getDecrypter() != null) {
@@ -172,7 +172,7 @@ public class ForkedTaskVariablesManager implements Serializable {
             }
             return thirdPartyCredentials;
         } catch (Exception e) {
-            throw new Exception("Could read encrypted third party credentials", e);
+            throw new RuntimeException("Could not read encrypted third party credentials", e);
         }
     }
 

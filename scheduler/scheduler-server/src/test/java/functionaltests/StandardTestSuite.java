@@ -247,7 +247,9 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
                       TestSubmitJobWithUnaccessibleDataSpaces.class, TestTaskRestartOnNodeFailure.class,
                       TestTasksCompleteAfterSelectiontimeout.class, TestUnauthorizedScripts.class,
-                      TestVariablesPropagation.class, EDFPolicyTest.class, EDFPolicyExtendedTest.class })
+                      TestVariablesPropagation.class, EDFPolicyTest.class, EDFPolicyExtendedTest.class,
+                      TestRunAsMeLinuxPwd.class, TestRunAsMeLinuxKey.class, TestRunAsMeLinuxNone.class,
+                      TestRunAsMeWindows.class })
 
 /**
  * @author ActiveEon Team
