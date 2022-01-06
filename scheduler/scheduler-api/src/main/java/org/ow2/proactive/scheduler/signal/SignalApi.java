@@ -147,7 +147,7 @@ public interface SignalApi extends Serializable {
 
     /**
      * Remove the given {@code signal} from the set of job signals
-     * In order to remove a signal that was not yet received, the signalsSubSet parameter should contain the "_ready" prefix and the signal name
+     * In order to remove a signal that was not yet received, the signalsSubSet parameter should contain the "ready_" prefix and the signal name
      *
      * @param signal name of the signal to be removed from job signals
      * @throws SignalApiException if an error occurred while reading in the signals channel, or when removing the signal from job signals
@@ -156,7 +156,7 @@ public interface SignalApi extends Serializable {
 
     /**
      * Remove the given set of signals from job signals
-     * In order to remove signals that were not yet received, the signalsSubSet parameter should contain the "_ready" prefix and the signal names
+     * In order to remove signals that were not yet received, the signalsSubSet parameter should contain the "ready_" prefix and the signal names
      *
      * @param signalsSubSet set of the signals to be removed from job signals
      * @throws SignalApiException if an error occurred while reading in the signals channel, or when removing the signals from job signals
