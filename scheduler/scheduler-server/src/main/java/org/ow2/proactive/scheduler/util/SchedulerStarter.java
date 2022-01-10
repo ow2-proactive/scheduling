@@ -239,7 +239,7 @@ public class SchedulerStarter {
         if (commandLine.hasOption(OPTION_NO_REST)) {
             System.setProperty(REST_DISABLED_PROPERTY, "true");
             PASchedulerProperties.JETTY_STARTED.updateProperty("true");
-        } else if (PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+        } else {
             PASchedulerProperties.JETTY_STARTED.updateProperty("false");
         }
 
