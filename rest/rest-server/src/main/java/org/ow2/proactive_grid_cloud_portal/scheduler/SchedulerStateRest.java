@@ -277,6 +277,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         JobValidationData data = new JobValidationData();
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
+            if (updatedVariables == null || updatedVariables.isEmpty()) {
+                data.setValid(true);
+                return data;
+            }
             List<JobVariable> jobVariables = s.validateJobSignal(jobId, signal, updatedVariables);
             ValidationUtil.fillUpdatedVariables(jobVariables, data);
             return data;
