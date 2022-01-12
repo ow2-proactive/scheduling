@@ -302,6 +302,7 @@ public class JobData implements Serializable {
         InternalJob internalJob = new InternalTaskFlowJob();
         internalJob.setCredentials(getCredentials());
         internalJob.setJobInfo(jobInfo);
+        internalJob.setParentId(getParentId());
         internalJob.setGenericInformation(getGenericInformation());
         internalJob.setVariables(variablesToJobVariables());
         internalJob.setProjectName(getProjectName());
