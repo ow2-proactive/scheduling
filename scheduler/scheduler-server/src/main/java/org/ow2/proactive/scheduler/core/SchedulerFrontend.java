@@ -1645,6 +1645,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.isChildJobs(),
                                                    filterCriteria.getJobName(),
                                                    filterCriteria.getProjectName(),
+                                                   filterCriteria.getParentId(),
                                                    sortParameters);
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.

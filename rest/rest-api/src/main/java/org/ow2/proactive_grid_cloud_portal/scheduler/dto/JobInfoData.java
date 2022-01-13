@@ -93,6 +93,10 @@ public class JobInfoData implements java.io.Serializable {
 
     private List<String> preciousTasks;
 
+    private Long parentId = null;
+
+    private int childrenCount = 0;
+
     public void setToBeRemoved() {
         toBeRemoved = true;
     }
@@ -325,18 +329,34 @@ public class JobInfoData implements java.io.Serializable {
         this.preciousTasks = preciousTasks;
     }
 
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public int getChildrenCount() {
+        return childrenCount;
+    }
+
+    public void setChildrenCount(int childrenCount) {
+        this.childrenCount = childrenCount;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{ " + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
                submittedTime + ", removedTime=" + removedTime + ", status=" + status + ", jobId=" + jobId +
-               ", totalNumberOfTasks=" + totalNumberOfTasks + ", numberOfPendingTasks=" + numberOfPendingTasks +
-               ", numberOfRunningTasks=" + numberOfRunningTasks + ", numberOfFinishedTasks=" + numberOfFinishedTasks +
-               ", numberOfFailedTasks=" + numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks +
-               ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
-               "', projectName='" + projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" +
-               genericInformation + ", variables=" + variables + ", signals=" + signals + ", detailedSignals=" +
-               detailedSignals + ", attachedServices=" + attachedServices + ", externalEndpointUrls=" +
-               externalEndpointUrls + " }";
+               ", parentId=" + parentId + ", childrenCount=" + childrenCount + ", totalNumberOfTasks=" +
+               totalNumberOfTasks + ", numberOfPendingTasks=" + numberOfPendingTasks + ", numberOfRunningTasks=" +
+               numberOfRunningTasks + ", numberOfFinishedTasks=" + numberOfFinishedTasks + ", numberOfFailedTasks=" +
+               numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks + ", numberOfInErrorTasks=" +
+               numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner + "', projectName='" +
+               projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" + genericInformation +
+               ", variables=" + variables + ", signals=" + signals + ", detailedSignals=" + detailedSignals +
+               ", attachedServices=" + attachedServices + ", externalEndpointUrls=" + externalEndpointUrls + " }";
     }
 
 }

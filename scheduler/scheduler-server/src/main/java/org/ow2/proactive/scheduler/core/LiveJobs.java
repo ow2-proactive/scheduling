@@ -370,6 +370,29 @@ class LiveJobs {
         ClientJobState clientJobState = new ClientJobState(job);
         jobs.put(job.getId(), new JobData(job));
         listener.jobSubmitted(clientJobState);
+        if (job.getParentId() != null) {
+            // If a job has a parent, it means that the parent job children count has been increased.
+            // accordingly, we need to send a JOB_UPDATED notification of the parent
+            JobId parentJobId = JobIdImpl.makeJobId(job.getParentId().toString());
+            JobData parentJobData = jobs.get(parentJobId);
+            if (parentJobData != null) {
+                // the parent job is alive, we load it from memory
+                InternalJob parentJob = parentJobData.job;
+                ((JobInfoImpl) parentJob.getJobInfo()).setChildrenCount(parentJob.getJobInfo().getChildrenCount() + 1);
+                listener.jobStateUpdated(parentJob.getOwner(),
+                                         new NotificationData<JobInfo>(SchedulerEvent.JOB_UPDATED,
+                                                                       new JobInfoImpl((JobInfoImpl) parentJob.getJobInfo())));
+            } else {
+                // the parent job is terminated, we load it from the db
+                List<InternalJob> internalJobs = dbManager.loadInternalJob(job.getParentId());
+                if (!internalJobs.isEmpty()) {
+                    InternalJob parentJob = internalJobs.get(0);
+                    listener.jobStateUpdated(parentJob.getOwner(),
+                                             new NotificationData<JobInfo>(SchedulerEvent.JOB_UPDATED,
+                                                                           new JobInfoImpl((JobInfoImpl) parentJob.getJobInfo())));
+                }
+            }
+        }
     }
 
     Map<JobId, JobDescriptor> lockJobsToSchedule(boolean isSchedulerPausedOrStopped) {

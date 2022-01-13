@@ -305,4 +305,16 @@ public interface JobInfo extends Serializable {
      * @return non-empty result map test
      */
     boolean isResultMapPresent();
+
+    /**
+     * Return the parent id of the job
+     * @return parent id of the job, or null if the job has no parent
+     */
+    Long getParentId();
+
+    /**
+     * Return the number of children jobs
+     * @return number of children jobs
+     */
+    int getChildrenCount();
 }

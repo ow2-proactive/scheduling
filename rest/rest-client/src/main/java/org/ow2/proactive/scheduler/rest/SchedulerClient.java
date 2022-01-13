@@ -1308,6 +1308,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setVisualizationIcons(jobInfoData.getVisualizationIcons());
         jobInfoImpl.setAttachedServices(jobInfoData.getAttachedServices());
         jobInfoImpl.setExternalEndpointUrls(jobInfoData.getExternalEndpointUrls());
+        jobInfoImpl.setParentId(jobInfoData.getParentId());
+        jobInfoImpl.setChildrenCount(jobInfoData.getChildrenCount());
         return jobInfoImpl;
     }
 

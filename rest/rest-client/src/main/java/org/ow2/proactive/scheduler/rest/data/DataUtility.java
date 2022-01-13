@@ -65,6 +65,8 @@ public class DataUtility {
     public static JobInfo toJobInfo(JobInfoData d) {
         JobInfoImpl impl = new JobInfoImpl();
         impl.setJobId(jobId(d.getJobId()));
+        impl.setParentId(d.getParentId());
+        impl.setChildrenCount(d.getChildrenCount());
         impl.setFinishedTime(d.getFinishedTime());
         impl.setJobOwner(d.getJobOwner());
         impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());

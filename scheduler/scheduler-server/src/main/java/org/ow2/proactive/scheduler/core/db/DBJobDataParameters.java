@@ -58,12 +58,14 @@ public class DBJobDataParameters {
 
     private final String projectName;
 
+    private final Long parentId;
+
     private final List<SortParameter<JobSortParameter>> sortParameters;
 
     private final Set<JobStatus> status;
 
     DBJobDataParameters(int offset, int limit, String user, boolean pending, boolean running, boolean finished,
-            boolean childJobs, String jobName, String projectName,
+            boolean childJobs, String jobName, String projectName, Long parentId,
             List<SortParameter<JobSortParameter>> sortParameters) {
         this.offset = offset;
         this.limit = limit;
@@ -74,6 +76,7 @@ public class DBJobDataParameters {
         this.childJobs = childJobs;
         this.jobName = jobName;
         this.projectName = projectName;
+        this.parentId = parentId;
         this.sortParameters = sortParameters;
 
         Set<JobStatus> newStatus = new HashSet<JobStatus>();
@@ -112,6 +115,10 @@ public class DBJobDataParameters {
 
     public String getProjectName() {
         return projectName;
+    }
+
+    public Long getParentId() {
+        return parentId;
     }
 
     public List<SortParameter<JobSortParameter>> getSortParameters() {

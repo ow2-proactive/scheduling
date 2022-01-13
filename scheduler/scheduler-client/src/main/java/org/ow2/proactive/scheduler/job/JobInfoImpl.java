@@ -146,6 +146,10 @@ public class JobInfoImpl implements JobInfo {
 
     private List<String> preciousTasks = new ArrayList<>();
 
+    private Long parentId = null;
+
+    private int childrenCount = 0;
+
     public JobInfoImpl() {
     }
 
@@ -196,6 +200,8 @@ public class JobInfoImpl implements JobInfo {
         this.externalEndpointUrls = jobInfo.getExternalEndpointUrls();
         this.resultMapPresent = jobInfo.isResultMapPresent();
         this.preciousTasks = jobInfo.getPreciousTasks();
+        this.parentId = jobInfo.getParentId();
+        this.childrenCount = jobInfo.getChildrenCount();
     }
 
     /**
@@ -580,5 +586,23 @@ public class JobInfoImpl implements JobInfo {
 
     public void setPreciousTasks(List<String> preciousTasks) {
         this.preciousTasks = preciousTasks;
+    }
+
+    @Override
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    @Override
+    public int getChildrenCount() {
+        return childrenCount;
+    }
+
+    public void setChildrenCount(int childrenCount) {
+        this.childrenCount = childrenCount;
     }
 }

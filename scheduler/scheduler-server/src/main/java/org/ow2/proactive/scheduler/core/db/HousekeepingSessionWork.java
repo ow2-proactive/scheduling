@@ -69,6 +69,15 @@ public class HousekeepingSessionWork implements SessionWork<Void> {
     }
 
     private void removeFromDb(Session session) {
+        // when removing jobs, compute a list of all parent jobs, and for each parent, decrease the children count. A parent job id can appear several times in this list.
+        for (Long parentId : (List<Long>) session.getNamedQuery("getParentIds")
+                                                 .setParameterList("ids", jobIdList)
+                                                 .list()) {
+            session.getNamedQuery("decreaseJobDataChildrenCount")
+                   .setParameter("jobId", parentId)
+                   .setParameter("lastUpdatedTime", new Date().getTime())
+                   .executeUpdate();
+        }
         session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
                .setParameterList("jobIdList", jobIdList)
                .executeUpdate();
@@ -96,7 +105,17 @@ public class HousekeepingSessionWork implements SessionWork<Void> {
         deleteInconsistentData(session);
     }
 
+    @SuppressWarnings("unchecked")
     private void updateAsRemoved(Session session) {
+        // when removing jobs, compute a list of all parent jobs, and for each parent, decrease the children count. A parent job id can appear several times in this list.
+        for (Long parentId : (List<Long>) session.getNamedQuery("getParentIds")
+                                                 .setParameterList("ids", jobIdList)
+                                                 .list()) {
+            session.getNamedQuery("decreaseJobDataChildrenCount")
+                   .setParameter("jobId", parentId)
+                   .setParameter("lastUpdatedTime", new Date().getTime())
+                   .executeUpdate();
+        }
         session.getNamedQuery("updateJobDataRemovedTimeInBulk")
                .setParameter("removedTime", System.currentTimeMillis())
                .setParameter("lastUpdatedTime", new Date().getTime())
