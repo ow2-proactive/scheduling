@@ -2169,7 +2169,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     private Map<String, String> getDefaultUpdatedValues(List<JobVariable> inputVariables) {
         Map<String, String> defaultUpdatedValues = new LinkedHashMap<>();
-        if (inputVariables != null) {
+        if (inputVariables != null && !inputVariables.isEmpty()) {
             inputVariables.forEach(inputVariable -> defaultUpdatedValues.put(inputVariable.getName(),
                                                                              inputVariable.getValue()));
         }
