@@ -99,6 +99,10 @@ public class JobInfoImpl implements JobInfo {
 
     private List<String> preciousTasks;
 
+    private Long parentId;
+
+    private int childrenCount;
+
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
     }
@@ -385,5 +389,23 @@ public class JobInfoImpl implements JobInfo {
 
     public void setPreciousTasks(List<String> preciousTasks) {
         this.preciousTasks = preciousTasks;
+    }
+
+    @Override
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    @Override
+    public int getChildrenCount() {
+        return childrenCount;
+    }
+
+    public void setChildrenCount(int childrenCount) {
+        this.childrenCount = childrenCount;
     }
 }

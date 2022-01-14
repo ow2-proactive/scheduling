@@ -198,7 +198,7 @@ public class SchedulerDBManager {
 
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
             final boolean running, final boolean finished, final boolean childJobs, String jobName, String projectName,
-            final List<SortParameter<JobSortParameter>> sortParameters) {
+            Long parentId, final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -213,6 +213,7 @@ public class SchedulerDBManager {
                                                              childJobs,
                                                              jobName,
                                                              projectName,
+                                                             parentId,
                                                              sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<JobStatus> jobStatuses = params.getStatuses();
@@ -235,6 +236,9 @@ public class SchedulerDBManager {
             }
             if (projectName != null && !projectName.isEmpty()) {
                 criteria.add(Restrictions.like("projectName", projectName, MatchMode.START));
+            }
+            if (childJobs && parentId != null && parentId > 0L) {
+                criteria.add(Restrictions.eq("parentId", parentId));
             }
             boolean allJobs = pending && running && finished;
             if (!allJobs) {
@@ -397,6 +401,10 @@ public class SchedulerDBManager {
                     queryString.append("and projectName like :projectName ");
                 }
 
+                if (params.isChildJobs() && params.getParentId() != null && params.getParentId() > 0) {
+                    queryString.append("and parentId = :parentId ");
+                }
+
                 Query query = session.createQuery(queryString.toString());
                 query.setParameterList("jobStatus", statuses);
                 if (hasUser) {
@@ -408,6 +416,10 @@ public class SchedulerDBManager {
 
                 if (params.getProjectName() != null && !params.getProjectName().isEmpty()) {
                     query.setParameter("projectName", params.getProjectName() + '%');
+                }
+
+                if (params.isChildJobs() && params.getParentId() != null && params.getParentId() > 0) {
+                    query.setParameter("parentId", params.getParentId());
                 }
 
                 Long count = (Long) query.uniqueResult();
@@ -874,11 +886,22 @@ public class SchedulerDBManager {
         removeJob(Collections.singletonList(jobId), removedTime, removeData);
     }
 
-    public void removeJob(final List<JobId> jobIds, final long removedTime, final boolean removeData) {
+    public Set<String> removeJob(final List<JobId> jobIds, final long removedTime, final boolean removeData) {
+        Set<String> updatedParentIds = new HashSet<>();
         List<List<JobId>> jobIdSubSets = Lists.partition(jobIds, MAX_ITEMS_IN_LIST);
         for (List<JobId> jobIdSubList : jobIdSubSets) {
             executeReadWriteTransaction((SessionWork<Void>) session -> {
                 List<Long> ids = jobIdSubList.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
+
+                for (Long parentId : (List<Long>) session.getNamedQuery("getParentIds")
+                                                         .setParameterList("ids", ids)
+                                                         .list()) {
+                    session.getNamedQuery("decreaseJobDataChildrenCount")
+                           .setParameter("jobId", parentId)
+                           .setParameter("lastUpdatedTime", new Date().getTime())
+                           .executeUpdate();
+                    updatedParentIds.add(parentId.toString());
+                }
 
                 if (removeData) {
                     session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in (:ids)")
@@ -906,6 +929,7 @@ public class SchedulerDBManager {
                 return null;
             });
         }
+        return updatedParentIds;
     }
 
     public List<InternalJob> loadNotFinishedJobs(boolean fullState) {
@@ -1980,6 +2004,13 @@ public class SchedulerDBManager {
             session.save(jobRuntimeData);
 
             job.setId(new JobIdImpl(jobRuntimeData.getId(), job.getName()));
+
+            if (job.getParentId() != null) {
+                session.getNamedQuery("increaseJobDataChildrenCount")
+                       .setParameter("lastUpdatedTime", new Date().getTime())
+                       .setParameter("jobId", job.getParentId())
+                       .executeUpdate();
+            }
 
             ArrayList<InternalTask> iTasks = job.getITasks();
             List<InternalTask> tasksWithNewIds = new ArrayList<>(iTasks.size());

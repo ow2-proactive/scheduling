@@ -86,6 +86,8 @@ import com.google.common.collect.Lists;
 @NamedQueries({ @NamedQuery(name = "setJobForRemoval", query = "update JobData set scheduledTimeForRemoval = :timeForRemoval, toBeRemoved = :toBeRemoved where id = :jobId"),
                 @NamedQuery(name = "deleteJobDataInBulk", query = "delete from JobData where id in (:jobIdList)"),
                 @NamedQuery(name = "checkJobExistence", query = "select id from JobData where id = :id"),
+                @NamedQuery(name = "getChildrenCount", query = "select childrenCount from JobData where id = :id"),
+                @NamedQuery(name = "getParentIds", query = "select parentId from JobData where id in :ids and parentId IS NOT NULL"),
                 @NamedQuery(name = "countJobDataFinished", query = "select count (*) from JobData where status = 3"),
                 @NamedQuery(name = "countJobData", query = "select count (*) from JobData"),
                 @NamedQuery(name = "findUsersWithJobs", query = "select owner, count(owner), max(submittedTime) from JobData group by owner"),
@@ -111,6 +113,8 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "updateJobDataRemovedTimeInBulk", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id in :jobIdList"),
                 @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                @NamedQuery(name = "increaseJobDataChildrenCount", query = "update JobData set childrenCount = childrenCount+1, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                @NamedQuery(name = "decreaseJobDataChildrenCount", query = "update JobData set childrenCount = childrenCount-1, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterTaskFinished", query = "update JobData set status = :status, " +
                                                                              "finishedTime = :finishedTime, inErrorTime= :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                              "numberOfFinishedTasks = :numberOfFinishedTasks, " +
@@ -150,6 +154,8 @@ public class JobData implements Serializable {
     private Long id;
 
     private Long parentId;
+
+    private Integer childrenCount;
 
     private List<TaskData> tasks;
 
@@ -235,6 +241,8 @@ public class JobData implements Serializable {
         jobInfo.setJobOwner(getOwner());
         jobInfo.setProjectName(getProjectName());
         jobInfo.setStatus(getStatus());
+        jobInfo.setParentId(getParentId());
+        jobInfo.setChildrenCount(getChildrenCount());
         jobInfo.setTotalNumberOfTasks(getTotalNumberOfTasks());
         jobInfo.setNumberOfPendingTasks(getNumberOfPendingTasks());
         jobInfo.setNumberOfRunningTasks(getNumberOfRunningTasks());
@@ -431,6 +439,18 @@ public class JobData implements Serializable {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    @Column(name = "CHILDREN_COUNT", nullable = true)
+    public Integer getChildrenCount() {
+        if (childrenCount == null) {
+            return 0;
+        }
+        return childrenCount;
+    }
+
+    public void setChildrenCount(Integer childrenCount) {
+        this.childrenCount = childrenCount;
     }
 
     @Cascade(org.hibernate.annotations.CascadeType.ALL)

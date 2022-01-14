@@ -368,6 +368,7 @@ public class InternalJobFactory {
         jobToSet.setGenericInformation(job.getGenericInformation());
         //special behavior
         jobToSet.setPriority(job.getPriority());
+        jobToSet.setParentId(job.getParentId());
     }
 
     /**

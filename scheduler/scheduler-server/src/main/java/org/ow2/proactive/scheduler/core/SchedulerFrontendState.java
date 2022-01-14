@@ -570,7 +570,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         jlogger.info(job.getId(),
                      "submitted: name '" + job.getName() + "', tasks '" + job.getTotalNumberOfTasks() + "', owner '" +
 
-                                  job.getOwner() + "'");
+                                  job.getOwner() + "'" +
+                                  (job.getParentId() != null ? ", parentJobId '" + job.getParentId() + "'" : ""));
         if (jlogger.isTraceEnabled()) {
             try {
                 jlogger.trace(job.getId(), job.display());

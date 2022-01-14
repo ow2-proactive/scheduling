@@ -202,6 +202,8 @@ public interface SchedulerRestInterface {
      *             Include only jobs with a project name that starts with projectName (case in-sensitive)
      * @param userName
      *             Include only jobs with a user name that matches exactly with userName (case in-sensitive)
+     * @param parentId
+     *             Include only children jobs of the given parent job id. This parameter is ignored if childJobs is set to false
      * @param sortParams
      *            string containing sort directives. It must contain a comma separated list of sort parameters.
      *            A sort parameter can contain ID,STATE,OWNER,PRIORITY,NAME,SUBMIT_TIME,START_TIME,IN_ERROR_TIME,FINISH_TIME,TOTAL_TASKS,
@@ -224,7 +226,8 @@ public interface SchedulerRestInterface {
             @QueryParam("childJobs") @DefaultValue("true") boolean childJobs,
             @QueryParam("jobName") @DefaultValue("") String jobName,
             @QueryParam("projectName") @DefaultValue("") String projectName,
-            @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("sortParams") String sortParams)
+            @QueryParam("userName") @DefaultValue("") String userName,
+            @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams)
             throws RestException;
 
     /**

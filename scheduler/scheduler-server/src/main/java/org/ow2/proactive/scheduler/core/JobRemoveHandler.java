@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -103,7 +105,17 @@ public class JobRemoveHandler implements Callable<Boolean> {
             }
 
             boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
-            dbManager.removeJob(dbJobsIds, removedTime, removeFromDb);
+            Set<String> updatedParentIds = dbManager.removeJob(dbJobsIds, removedTime, removeFromDb);
+            if (!updatedParentIds.isEmpty()) {
+                // If parent jobs' children count have been modified, we need to send a JOB_UPDATED notification
+                List<JobInfo> parentJobsInfo = dbManager.getJobs(updatedParentIds.stream()
+                                                                                 .collect(Collectors.toList()));
+                for (JobInfo parentJobInfo : parentJobsInfo) {
+                    service.getListener()
+                           .jobStateUpdated(parentJobInfo.getJobOwner(),
+                                            new NotificationData<>(SchedulerEvent.JOB_UPDATED, parentJobInfo));
+                }
+            }
 
             for (InternalJob job : jobs) {
                 ServerJobAndTaskLogs.getInstance().remove(job.getId(), job.getOwner(), job.getCredentials());

@@ -49,10 +49,7 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -733,6 +730,46 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // The job generic info must be returned by the task
         TaskResult taskResult = client.getJobResult(jobId).getResult("task1");
         Assert.assertEquals(jobSubmissionGenericInfoValue, taskResult.value());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME * 3)
+    public void testChildrenCount() throws Throwable {
+        ISchedulerClient client = clientInstance();
+
+        // Submit a first job
+        JobId jobIdParent = client.submit(jobDescriptor, anyMap(), anyMap(), anyMap());
+        client.waitForJob(jobIdParent, TimeUnit.SECONDS.toMillis(120));
+
+        // Create a generic info map
+        String jobSubmissionGenericInfoKey = SchedulerConstants.PARENT_JOB_ID;
+        String jobSubmissionGenericInfoValue = "" + jobIdParent.value();
+        Map<String, String> genericInfosMap = Collections.singletonMap(jobSubmissionGenericInfoKey,
+                                                                       jobSubmissionGenericInfoValue);
+        List<JobId> childrenJobs = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            // Submit a job with the generic information map
+            JobId jobId = client.submit(jobDescriptor, anyMap(), genericInfosMap, anyMap());
+            childrenJobs.add(jobId);
+            client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));
+            JobInfo childJobInfo = client.getJobInfo(jobId.value());
+            Assert.assertEquals(new Long(jobIdParent.longValue()), childJobInfo.getParentId());
+        }
+        JobInfo parentJobInfo = client.getJobInfo(jobIdParent.value());
+        Assert.assertEquals(3, parentJobInfo.getChildrenCount());
+
+        // remove a job and check children count again
+        client.removeJob(childrenJobs.remove(0));
+        // As removeJob is asynchronous, we need to sleep a bit
+        Thread.sleep(2000);
+        parentJobInfo = client.getJobInfo(jobIdParent.value());
+        Assert.assertEquals(2, parentJobInfo.getChildrenCount());
+
+        // remove the remaining jobs and check children count again
+        client.removeJobs(childrenJobs);
+        // As removeJob is asynchronous, we need to sleep a bit
+        Thread.sleep(2000);
+        parentJobInfo = client.getJobInfo(jobIdParent.value());
+        Assert.assertEquals(0, parentJobInfo.getChildrenCount());
     }
 
     @Test(timeout = MAX_WAIT_TIME * 2)
