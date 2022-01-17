@@ -6,8 +6,7 @@ buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
 
-    mavenCentral()
-        jcenter()
+        mavenCentral()
 
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
