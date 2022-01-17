@@ -7,8 +7,7 @@ buildscript {
         if (project.hasProperty('local')) {
             mavenLocal()
         }
-    mavenCentral()
-        jcenter()
+        mavenCentral()
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
     }
 }
