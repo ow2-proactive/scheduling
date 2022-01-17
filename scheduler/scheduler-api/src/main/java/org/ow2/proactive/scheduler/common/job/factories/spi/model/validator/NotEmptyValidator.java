@@ -37,7 +37,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class NotEmptyValidator implements Validator<String> {
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         if (StringUtils.isBlank(parameterValue)) {
             throw new ValidationException("Expected value should not be blank.");
         }

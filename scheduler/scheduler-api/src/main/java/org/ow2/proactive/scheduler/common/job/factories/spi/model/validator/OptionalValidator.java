@@ -42,12 +42,13 @@ public class OptionalValidator<T> implements Validator<T> {
     }
 
     @Override
-    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
+    public T validate(T parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         // When the parameter value is not provided, it's validated. Otherwise, use its proper validator
         if (parameterValue == null || StringUtils.isBlank(parameterValue.toString())) {
             return parameterValue;
         } else {
-            return validator.validate(parameterValue, context);
+            return validator.validate(parameterValue, context, isVariableHidden);
         }
     }
 }

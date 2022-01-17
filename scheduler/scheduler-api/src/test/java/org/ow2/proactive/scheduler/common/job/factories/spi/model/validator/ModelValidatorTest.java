@@ -38,14 +38,14 @@ public class ModelValidatorTest {
     public void testModelValidatorNotHandled() throws ValidationException {
         ModelValidator validator = new ModelValidator("Unknown");
         String parameterValue = "Any Value";
-        Assert.assertEquals(parameterValue, validator.validate(parameterValue, null));
+        Assert.assertEquals(parameterValue, validator.validate(parameterValue, null, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testModelValidatorValidPrefixButUnknownType() throws ValidationException {
         ModelValidator validator = new ModelValidator(ModelValidator.PREFIX + "Unknown");
         String parameterValue = "Any Value";
-        validator.validate(parameterValue, null);
+        validator.validate(parameterValue, null, false);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -169,7 +169,7 @@ public class ModelValidatorTest {
         ModelValidator validator = new ModelValidator(ModelValidator.PREFIX + "Unknown" +
                                                       ModelValidator.OPTIONAL_VARIABLE_SUFFIX);
         String parameterValue = "Any Value";
-        validator.validate(parameterValue, null);
+        validator.validate(parameterValue, null, false);
     }
 
     @Test

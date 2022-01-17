@@ -54,7 +54,7 @@ public class EncryptionValidatorTest {
     public void testEncryptedReadOK() throws ValidationException {
         String value = "some_data";
         String encryptedValue = PropertyDecrypter.encryptData(value);
-        Assert.assertEquals(encryptedValue, new EncryptionValidator().validate(encryptedValue, context));
+        Assert.assertEquals(encryptedValue, new EncryptionValidator().validate(encryptedValue, context, false));
     }
 
     @Test(expected = ValidationException.class)
@@ -63,13 +63,13 @@ public class EncryptionValidatorTest {
         String encryptedValue = PropertyDecrypter.ENCRYPTION_PREFIX +
                                 PropertyDecrypter.getDefaultEncryptor().encrypt(value) + "blabla" +
                                 PropertyDecrypter.ENCRYPTION_SUFFIX;
-        new EncryptionValidator().validate(encryptedValue, context);
+        new EncryptionValidator().validate(encryptedValue, context, false);
     }
 
     @Test
     public void testEncryptedWriteOK() throws ValidationException {
         String value = "some_data";
-        String encryptedValue = new EncryptionValidator().validate(value, context);
+        String encryptedValue = new EncryptionValidator().validate(value, context, false);
         // decrypt returned string, which uses ENC(crypted_data) format
         Assert.assertEquals(value, PropertyDecrypter.decryptData(encryptedValue));
 

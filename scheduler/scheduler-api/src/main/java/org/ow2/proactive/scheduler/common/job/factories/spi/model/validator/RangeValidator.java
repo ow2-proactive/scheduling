@@ -52,7 +52,8 @@ public class RangeValidator<T extends Comparable<T>> implements Validator<T> {
     }
 
     @Override
-    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
+    public T validate(T parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         if (!range.contains(parameterValue)) {
             throw new ValidationException("Expected value should be in range " + range.toString() + ", received " +
                                           parameterValue);

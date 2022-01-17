@@ -40,41 +40,41 @@ public class NotEmptyValidatorTest {
     public void testNotEmptyStringOK() throws ValidationException {
         NotEmptyValidator validator = new NotEmptyValidator();
         String value = "string foo";
-        Assert.assertEquals(value, validator.validate(value, null));
+        Assert.assertEquals(value, validator.validate(value, null, false));
     }
 
     @Test
     public void testNotEmptyStringWithSpacesOK() throws ValidationException {
         NotEmptyValidator validator = new NotEmptyValidator();
         String value = " abc ";
-        Assert.assertEquals(value, validator.validate(value, null));
+        Assert.assertEquals(value, validator.validate(value, null, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testEmptyStringDisallowed() throws ValidationException {
         NotEmptyValidator validator = new NotEmptyValidator();
         String value = "";
-        validator.validate(value, null);
+        validator.validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testNullStringDisallowed() throws ValidationException {
         NotEmptyValidator validator = new NotEmptyValidator();
         String value = null;
-        validator.validate(value, null);
+        validator.validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testBlankStringDisallowed() throws ValidationException {
         NotEmptyValidator validator = new NotEmptyValidator();
         String value = "      ";
-        validator.validate(value, null);
+        validator.validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testTabStringDisallowed() throws ValidationException {
         NotEmptyValidator validator = new NotEmptyValidator();
         String value = "\t";
-        validator.validate(value, null);
+        validator.validate(value, null, false);
     }
 }

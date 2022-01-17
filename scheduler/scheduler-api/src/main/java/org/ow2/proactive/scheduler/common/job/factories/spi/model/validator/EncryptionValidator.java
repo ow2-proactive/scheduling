@@ -37,7 +37,8 @@ public class EncryptionValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         if (parameterValue != null && parameterValue.startsWith(PropertyDecrypter.ENCRYPTION_PREFIX)) {
             // validating value already encrypted
             try {

@@ -36,7 +36,8 @@ public class AcceptAllValidator<T> implements Validator<T> {
     }
 
     @Override
-    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
+    public T validate(T parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         // accept all values
         return parameterValue;
     }

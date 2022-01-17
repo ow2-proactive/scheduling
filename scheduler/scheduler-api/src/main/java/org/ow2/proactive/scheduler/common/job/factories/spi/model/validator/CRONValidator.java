@@ -39,7 +39,8 @@ public class CRONValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         try {
             (new Predictor(parameterValue)).nextMatchingDate();
         } catch (InvalidPatternException e) {

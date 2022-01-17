@@ -36,13 +36,13 @@ public class URLValidatorTest {
     public void testThatValidURLIsOK() throws ValidationException {
         URLValidator validator = new URLValidator();
         String value = "http://mysite?myparam=1";
-        Assert.assertEquals(value, validator.validate(value, null));
+        Assert.assertEquals(value, validator.validate(value, null, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatInvalidURLThrowException() throws ValidationException {
         URLValidator validator = new URLValidator();
         String value = "unknown://mysite.com";
-        validator.validate(value, null);
+        validator.validate(value, null, false);
     }
 }

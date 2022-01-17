@@ -39,7 +39,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class URLValidator implements Validator<String> {
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         try {
             return new URL(parameterValue).toString();
         } catch (MalformedURLException e) {

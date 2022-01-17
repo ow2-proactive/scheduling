@@ -44,7 +44,8 @@ public class JSONValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
 
         try {
             final JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(parameterValue);

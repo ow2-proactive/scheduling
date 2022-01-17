@@ -43,9 +43,11 @@ public class CredentialValidator implements Validator<String> {
     private static final Logger logger = Logger.getLogger(CredentialValidator.class);
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
-        if (context == null || context.getScheduler() == null) {
-            // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog).
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
+        if (context == null || context.getScheduler() == null || isVariableHidden) {
+            // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog)
+            // or the variable may be hidden
             // In this case, we don't have the access of the third-party credentials, so the validity check is passed.
             logger.debug(String.format("Can't check the validity of the variable value, because missing the access to the scheduler third-party credentials",
                                        parameterValue));

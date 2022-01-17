@@ -44,7 +44,8 @@ public class SpelValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         try {
             context.getSpELContext().setVariable("value", parameterValue);
             // register true / false functions

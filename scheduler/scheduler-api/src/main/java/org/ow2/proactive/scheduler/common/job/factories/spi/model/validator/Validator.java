@@ -37,8 +37,9 @@ public interface Validator<T> {
      *
      * @param parameterValue the value to check.
      * @param context a context object, if needed by the validator
+     * @param isVariableHidden true is the variable is hidden
      * @return the unmodified parameterValue if validation is successful
      * @throws ValidationException if the parameter value is invalid.
      */
-    T validate(T parameterValue, ModelValidatorContext context) throws ValidationException;
+    T validate(T parameterValue, ModelValidatorContext context, boolean isVariableHidden) throws ValidationException;
 }
