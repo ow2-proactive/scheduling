@@ -44,7 +44,8 @@ public class ListValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         if (!listItems.contains(parameterValue)) {
             throw new ValidationException("Expected value should be one of " + listItems + ", received '" +
                                           parameterValue + "'");

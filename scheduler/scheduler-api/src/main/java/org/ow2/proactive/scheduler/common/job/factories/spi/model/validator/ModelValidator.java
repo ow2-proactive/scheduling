@@ -57,11 +57,12 @@ public class ModelValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         try {
             ParserValidator<?> validator = createParserValidator();
             if (validator != null) {
-                validator.parseAndValidate(parameterValue, context);
+                validator.parseAndValidate(parameterValue, context, isVariableHidden);
             }
             return parameterValue;
         } catch (Exception e) {

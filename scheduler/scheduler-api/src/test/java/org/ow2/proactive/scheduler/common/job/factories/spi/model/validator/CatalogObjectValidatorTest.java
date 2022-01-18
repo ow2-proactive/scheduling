@@ -39,54 +39,54 @@ public class CatalogObjectValidatorTest {
     @Test
     public void testCatalogObjectOKWithoutRevisionNumber() throws ValidationException {
         String value = "bucket_1/object10";
-        Assert.assertEquals(value, new CatalogObjectValidator().validate(value, null));
+        Assert.assertEquals(value, new CatalogObjectValidator().validate(value, null, false));
     }
 
     @Test
     public void testCatalogObjectOKWithRevisionNumber() throws ValidationException {
         String value = "bucket_1/object10/1539310165443";
-        Assert.assertEquals(value, new CatalogObjectValidator().validate(value, null));
+        Assert.assertEquals(value, new CatalogObjectValidator().validate(value, null, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testCatalogObjectWithEmptyValue() throws ValidationException {
         String value = "";
-        new CatalogObjectValidator().validate(value, null);
+        new CatalogObjectValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testCatalogObjectWithInvalidValue1() throws ValidationException {
         String value = " bucket_1/";
-        new CatalogObjectValidator().validate(value, null);
+        new CatalogObjectValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testCatalogObjectWithInvalidValue2() throws ValidationException {
         String value = " bucket_1";
-        new CatalogObjectValidator().validate(value, null);
+        new CatalogObjectValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testCatalogObjectWithShortRevisionNumber() throws ValidationException {
         String value = " bucket_1/object10/123445";
-        new CatalogObjectValidator().validate(value, null);
+        new CatalogObjectValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testCatalogObjectKOWithInvalidRevisionNumber() throws ValidationException {
         String value = " bucket_1/object10/123445ddd";
-        new CatalogObjectValidator().validate(value, null);
+        new CatalogObjectValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testCatalogObjectKOWithNoRevisionNumber() throws ValidationException {
         String value = " bucket_1/object10/";
-        new CatalogObjectValidator().validate(value, null);
+        new CatalogObjectValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testCatalogObjectKOWithLongRevisionNumber() throws ValidationException {
         String value = " bucket_1/object10/153931016544335";
-        new CatalogObjectValidator().validate(value, null);
+        new CatalogObjectValidator().validate(value, null, false);
     }
 }

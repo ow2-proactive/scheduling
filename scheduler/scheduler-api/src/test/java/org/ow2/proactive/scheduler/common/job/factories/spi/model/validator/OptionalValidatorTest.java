@@ -52,109 +52,110 @@ public class OptionalValidatorTest {
     public void testThatOnlyBlankValidatorValidateBlankValue() throws Exception {
         String blank = " ";
         OptionalValidator<String> onlyBlankValidator = new OptionalValidator<>(new DisallowAllValidator());
-        Assert.assertEquals(blank, onlyBlankValidator.validate(blank, null));
+        Assert.assertEquals(blank, onlyBlankValidator.validate(blank, null, false));
     }
 
     @Test
     public void testThatOnlyBlankValidatorValidateEmptyValue() throws Exception {
         String blank = "";
         OptionalValidator<String> onlyBlankValidator = new OptionalValidator<>(new DisallowAllValidator());
-        Assert.assertEquals(blank, onlyBlankValidator.validate(blank, null));
+        Assert.assertEquals(blank, onlyBlankValidator.validate(blank, null, false));
     }
 
     @Test
     public void testThatOnlyBlankValidatorValidateTabValue() throws Exception {
         String blank = "\t";
         OptionalValidator<String> onlyBlankValidator = new OptionalValidator<>(new DisallowAllValidator());
-        Assert.assertEquals(blank, onlyBlankValidator.validate(blank, null));
+        Assert.assertEquals(blank, onlyBlankValidator.validate(blank, null, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatOnlyBlankValidatorThrowExceptionForNotBlankValue() throws Exception {
         String notBlank = " any string ";
         OptionalValidator<String> onlyBlankValidator = new OptionalValidator<>(new DisallowAllValidator());
-        onlyBlankValidator.validate(notBlank, null);
+        onlyBlankValidator.validate(notBlank, null, false);
     }
 
     @Test
     public void testThatOptionalURLValidatorValidateBlankValue() throws Exception {
         String blank = "  ";
         OptionalValidator<String> optionalURLValidator = new OptionalValidator<>(new URLValidator());
-        Assert.assertEquals(blank, optionalURLValidator.validate(blank, null));
+        Assert.assertEquals(blank, optionalURLValidator.validate(blank, null, false));
     }
 
     @Test
     public void testThatOptionalURLValidatorValidateValidURL() throws Exception {
         String validURL = "http://mysite?myparam=1";
         OptionalValidator<String> optionalURLValidator = new OptionalValidator<>(new URLValidator());
-        Assert.assertEquals(validURL, optionalURLValidator.validate(validURL, null));
+        Assert.assertEquals(validURL, optionalURLValidator.validate(validURL, null, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatOptionalURLValidatorThrowExceptionForInvalidURL() throws Exception {
         String invalidURL = "unknown://mysite.com";
         OptionalValidator<String> optionalURLValidator = new OptionalValidator<>(new URLValidator());
-        optionalURLValidator.validate(invalidURL, null);
+        optionalURLValidator.validate(invalidURL, null, false);
     }
 
     @Test
     public void testThatOptionalURIValidatorValidateBlankValue() throws Exception {
         String blank = "  ";
         OptionalValidator<String> optionalURIValidator = new OptionalValidator<>(new URIValidator());
-        Assert.assertEquals(blank, optionalURIValidator.validate(blank, null));
+        Assert.assertEquals(blank, optionalURIValidator.validate(blank, null, false));
     }
 
     @Test
     public void testThatOptionalURIValidatorValidateValidURI() throws Exception {
         String validURI = "c:/toto";
         OptionalValidator<String> optionalURIValidator = new OptionalValidator<>(new URIValidator());
-        Assert.assertEquals(validURI, optionalURIValidator.validate(validURI, null));
+        Assert.assertEquals(validURI, optionalURIValidator.validate(validURI, null, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatOptionalURIValidatorThrowExceptionForInvalidURI() throws Exception {
         String invalidURI = "invalid%uri";
         OptionalValidator<String> optionalURIValidator = new OptionalValidator<>(new URIValidator());
-        optionalURIValidator.validate(invalidURI, null);
+        optionalURIValidator.validate(invalidURI, null, false);
     }
 
     @Test
     public void testThatOptionalGlobalFileValidatorValidateBlankValue() throws Exception {
         String blank = "  ";
         OptionalValidator<String> optionalGlobalFileValidator = new OptionalValidator<>(new GlobalFileValidator());
-        Assert.assertEquals(blank, optionalGlobalFileValidator.validate(blank, null));
+        Assert.assertEquals(blank, optionalGlobalFileValidator.validate(blank, null, false));
     }
 
     @Test
     public void testThatOptionalGlobalFileValidatorValidateExistGlobalFile() throws Exception {
         OptionalValidator<String> optionalGlobalFileValidator = new OptionalValidator<>(new GlobalFileValidator());
         Assert.assertEquals(existGlobalFilePath,
-                            optionalGlobalFileValidator.validate(existGlobalFilePath, mockContext()));
+                            optionalGlobalFileValidator.validate(existGlobalFilePath, mockContext(), false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatOptionalGlobalFileValidatorThrowExceptionForNotExistGlobalFile() throws Exception {
         OptionalValidator<String> optionalGlobalFileValidator = new OptionalValidator<>(new GlobalFileValidator());
-        optionalGlobalFileValidator.validate(notExistGlobalFilePath, mockContext());
+        optionalGlobalFileValidator.validate(notExistGlobalFilePath, mockContext(), false);
     }
 
     @Test
     public void testThatOptionalUserFileValidatorValidateBlankValue() throws Exception {
         String blank = "  ";
         OptionalValidator<String> optionalUserFileValidator = new OptionalValidator<>(new UserFileValidator());
-        Assert.assertEquals(blank, optionalUserFileValidator.validate(blank, null));
+        Assert.assertEquals(blank, optionalUserFileValidator.validate(blank, null, false));
     }
 
     @Test
     public void testThatOptionalUserFileValidatorValidateExistUserFile() throws Exception {
         OptionalValidator<String> optionalUserFileValidator = new OptionalValidator<>(new UserFileValidator());
-        Assert.assertEquals(existUserFilePath, optionalUserFileValidator.validate(existUserFilePath, mockContext()));
+        Assert.assertEquals(existUserFilePath,
+                            optionalUserFileValidator.validate(existUserFilePath, mockContext(), false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatOptionalUserFileValidatorThrowExceptionForNotExistUserFile() throws Exception {
         OptionalValidator<String> optionalUserFileValidator = new OptionalValidator<>(new UserFileValidator());
-        optionalUserFileValidator.validate(notExistUserFilePath, mockContext());
+        optionalUserFileValidator.validate(notExistUserFilePath, mockContext(), false);
     }
 
     public ModelValidatorContext mockContext() throws NotConnectedException, PermissionException {
@@ -170,7 +171,8 @@ public class OptionalValidatorTest {
 
     static class DisallowAllValidator implements Validator<String> {
         @Override
-        public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+        public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+                throws ValidationException {
             throw new ValidationException();
         }
     }

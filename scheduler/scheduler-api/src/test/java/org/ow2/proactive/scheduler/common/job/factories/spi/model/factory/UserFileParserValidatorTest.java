@@ -65,14 +65,14 @@ public class UserFileParserValidatorTest {
     public void testThatValidUserFileIsOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = existUserFilePath;
         UserFileParserValidator parserValidator = new UserFileParserValidator(ModelType.USER_FILE.name());
-        Assert.assertEquals(value, parserValidator.parseAndValidate(value, context));
+        Assert.assertEquals(value, parserValidator.parseAndValidate(value, context, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatInvalidUserFileThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
         UserFileParserValidator parserValidator = new UserFileParserValidator(ModelType.USER_FILE.name());
-        parserValidator.parseAndValidate(notExistUserFilePath, context);
+        parserValidator.parseAndValidate(notExistUserFilePath, context, false);
     }
 
     @Test(expected = ValidationException.class)
@@ -80,7 +80,7 @@ public class UserFileParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         UserFileParserValidator parserValidator = new UserFileParserValidator(ModelType.USER_FILE.name());
-        parserValidator.parseAndValidate(value, context);
+        parserValidator.parseAndValidate(value, context, false);
     }
 
     // when context is not specified, the parserValidator is expected to not check user file existence.
@@ -89,7 +89,7 @@ public class UserFileParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         UserFileParserValidator parserValidator = new UserFileParserValidator(ModelType.USER_FILE.name());
-        Assert.assertEquals(value, parserValidator.parseAndValidate(value, null));
+        Assert.assertEquals(value, parserValidator.parseAndValidate(value, null, false));
     }
 
     @Test(expected = ModelSyntaxException.class)

@@ -39,48 +39,48 @@ public class JSONValidatorTest {
     @Test
     public void testJSONOKSimple() throws ValidationException {
         String value = "{\"type\": \"string\"}";
-        Assert.assertEquals(value, new JSONValidator().validate(value, null));
+        Assert.assertEquals(value, new JSONValidator().validate(value, null, false));
     }
 
     @Test
     public void testJSONOKMultiple() throws ValidationException {
         String value = "{\n" + "  \"type\": \"string\", \n" + "  \"minLength\": 3,\n" + "  \"maxLength\": 7\n" + "}";
-        Assert.assertEquals(value, new JSONValidator().validate(value, null));
+        Assert.assertEquals(value, new JSONValidator().validate(value, null, false));
     }
 
     @Test
     public void testJSONWithEmptyValue() throws ValidationException {
         String value = "{}";
-        new JSONValidator().validate(value, null);
+        new JSONValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue1() throws ValidationException {
         String value = "{\n" + "  type: \"string\", \n" + "}";
-        new JSONValidator().validate(value, null);
+        new JSONValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue2() throws ValidationException {
         String value = "[\n" + "  \"type\": \"string\", \n" + "]";
-        new JSONValidator().validate(value, null);
+        new JSONValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue3() throws ValidationException {
         String value = "{\n" + "    123 : \"Variable1\"\n";
-        new JSONValidator().validate(value, null);
+        new JSONValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue4() throws ValidationException {
         String value = "\"test\" : 123";
-        new JSONValidator().validate(value, null);
+        new JSONValidator().validate(value, null, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue5() throws ValidationException {
         String value = "{\n" + "  \"test\" : 62GE\n" + "}";
-        new JSONValidator().validate(value, null);
+        new JSONValidator().validate(value, null, false);
     }
 }

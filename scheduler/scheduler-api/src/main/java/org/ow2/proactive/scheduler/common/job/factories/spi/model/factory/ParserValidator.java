@@ -48,11 +48,12 @@ public interface ParserValidator<T> {
      *
      * @param parameterValue value to parse and validate
      * @param context a context for this validation
+     * @param isVariableHidden true if the variable is hidden
      * @return a converted value
      * @throws ConversionException if an error occurred during the conversion
      * @throws ValidationException if an error occurred during the validation
      */
-    T parseAndValidate(String parameterValue, ModelValidatorContext context)
+    T parseAndValidate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
             throws ConversionException, ValidationException, ModelSyntaxException;
 
 }

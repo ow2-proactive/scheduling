@@ -36,13 +36,13 @@ public class URIValidatorTest {
     public void testThatValidURIIsOK() throws ValidationException {
         URIValidator validator = new URIValidator();
         String value = "c:/toto";
-        Assert.assertEquals(value, validator.validate(value, null));
+        Assert.assertEquals(value, validator.validate(value, null, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatInvalidURIThrowException() throws ValidationException {
         URIValidator validator = new URIValidator();
         String value = "\\&¨^¨$ù%";
-        validator.validate(value, null);
+        validator.validate(value, null, false);
     }
 }

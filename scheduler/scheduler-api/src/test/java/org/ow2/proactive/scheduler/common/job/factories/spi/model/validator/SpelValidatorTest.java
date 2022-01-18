@@ -68,126 +68,126 @@ public class SpelValidatorTest {
     public void testSpelOK() throws ValidationException {
         SpelValidator validator = new SpelValidator("#value == 'MyString'");
         String value = "MyString";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test
     public void testSpelValidVariableOK() throws ValidationException {
         SpelValidator validator = new SpelValidator("s(valid = true) + s('Hello World')");
         String value = "MyString";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelValidVariableKO() throws ValidationException {
         SpelValidator validator = new SpelValidator("s(valid = false) + s('Hello World')");
         String value = "MyString";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelKO() throws ValidationException {
         SpelValidator validator = new SpelValidator("#value == 'MyString'");
         String value = "MyString123";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test
     public void testSpelUseTrueFunction() throws ValidationException {
         SpelValidator validator = new SpelValidator("t('hello world')");
         String value = "MyString";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelUseFalseFunction() throws ValidationException {
         SpelValidator validator = new SpelValidator("f('bad world')");
         String value = "MyString";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test
     public void testSpelUseTempVariable() throws ValidationException {
         SpelValidator validator = new SpelValidator("t(temp = {1,2,3}) && temp.size() == 3");
         String value = "MyString";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test
     public void testSpelUseTempMap() throws ValidationException {
         SpelValidator validator = new SpelValidator("t(tempMap['a'] = 1) && t(tempMap['b'] = 2) && (tempMap['b'] > tempMap['a'])");
         String value = "MyString";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test
     public void testSpelMathOK() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(java.lang.Math).random() instanceof T(Double)");
         String value = "true";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test
     public void testSpelXmlOK() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(javax.xml.parsers.DocumentBuilderFactory).newInstance().newDocumentBuilder().parse(new org.xml.sax.InputSource(new java.io.StringReader('<employee id=\"101\"><name>toto</name><title>tata</title></employee>'))).getElementsByTagName('name').item(0).getTextContent() instanceof T(String)");
         String value = "toto";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test
     public void testSpelJSONOK() throws ValidationException {
         SpelValidator validator = new SpelValidator("new org.codehaus.jackson.map.ObjectMapper().readTree('{\"var\": \"value\"}').get('var').getTextValue() instanceof T(String)");
         String value = "value";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test
     public void testSpelJSONOK2() throws ValidationException {
         SpelValidator validator = new SpelValidator("new org.json.simple.parser.JSONParser().parse('{\"var\": \"value\"}').get('var').toString() instanceof T(String)");
         String value = "value";
-        Assert.assertEquals(value, validator.validate(value, validatorContext));
+        Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType() throws ValidationException {
         SpelValidator validator = new SpelValidator("new x.y.z.Object().toString() instanceof T(String)");
         String value = "value";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType2() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(java.lang.Runtime).getRuntime().exec('hostname').waitFor() instanceof T(Integer)");
         String value = "MyString123";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType3() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(java.lang.System).getenv('HOME').waitFor() instanceof T(Integer)");
         String value = "MyString123";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType4() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(org.apache.commons.lang3.time.DateUtils).toCalendar('01/01/2000') instanceof T(Date)");
         String value = "true";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedMethod() throws ValidationException {
         SpelValidator validator = new SpelValidator("(new java.lang.String()).getClass().forName('java.lang.Runtime').getDeclaredMethod('getRuntime').invoke(null).exec('hostname').waitFor() instanceof T(Integer)");
         String value = "MyString123";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedAttribute() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(java.lang.String).class.forName('java.lang.Runtime').getDeclaredMethod('getRuntime').invoke(null).exec('hostname').waitFor() instanceof T(Integer)");
         String value = "MyString123";
-        validator.validate(value, validatorContext);
+        validator.validate(value, validatorContext, false);
     }
 
     @Test
@@ -195,7 +195,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?(variables['var1'] = 'toto1') instanceof T(String):false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertEquals("toto1", context.getSpELVariables().getVariables().get("var1"));
     }
 
@@ -204,7 +204,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?(models['var1'] = 'changed_model1') instanceof T(String):false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertEquals("changed_model1", context.getSpELVariables().getModels().get("var1"));
     }
 
@@ -213,7 +213,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?hideVar('var1'):false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertTrue(context.getSpELVariables().getHiddenVariables().get("var1"));
         Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("var2"));
     }
@@ -223,7 +223,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?showVar('var1'):false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertFalse(context.getSpELVariables().getHiddenVariables().get("var1"));
         Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("var2"));
     }
@@ -233,7 +233,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?hideGroup('group2'):false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertTrue(context.getSpELVariables().getHiddenGroups().get("group2"));
         Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("group1"));
     }
@@ -243,7 +243,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?showGroup('group2'):false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertFalse(context.getSpELVariables().getHiddenGroups().get("group2"));
         Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("group1"));
     }
@@ -254,7 +254,7 @@ public class SpelValidatorTest {
         String value = "MyString123";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
         try {
-            validator.validate(value, context);
+            validator.validate(value, context, false);
             Assert.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ValidationException);
@@ -268,7 +268,7 @@ public class SpelValidatorTest {
         String value = "MyString123";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
         try {
-            validator.validate(value, context);
+            validator.validate(value, context, false);
             Assert.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ValidationException);
@@ -281,7 +281,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString' ? (variables['var4'] == null ? (variables['var4'] = 'toto1') instanceof T(String) : true) : false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertEquals("toto1", context.getSpELVariables().getVariables().get("var4"));
     }
 
@@ -290,7 +290,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString' ? (variables['var2'] == null ? (variables['var2'] = 'toto1') instanceof T(String) : true) : false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertEquals("value2", context.getSpELVariables().getVariables().get("var2"));
     }
 
@@ -299,7 +299,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?(variables['var1'] = 'toto1') instanceof T(String) : false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createTask());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertEquals("toto1", context.getSpELVariables().getVariables().get("var1"));
     }
 
@@ -308,7 +308,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?(models['var1'] = 'changed_model1') instanceof T(String) : false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createTask());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertEquals("changed_model1", context.getSpELVariables().getModels().get("var1"));
     }
 
@@ -318,7 +318,7 @@ public class SpelValidatorTest {
         String value = "MyString123";
         ModelValidatorContext context = new ModelValidatorContext(createTask());
         try {
-            validator.validate(value, context);
+            validator.validate(value, context, false);
             Assert.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ValidationException);
@@ -332,7 +332,7 @@ public class SpelValidatorTest {
         String value = "MyString123";
         ModelValidatorContext context = new ModelValidatorContext(createTask());
         try {
-            validator.validate(value, context);
+            validator.validate(value, context, false);
             Assert.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ValidationException);
@@ -345,7 +345,7 @@ public class SpelValidatorTest {
         SpelValidator validator = new SpelValidator("#value == 'MyString'?hideVar('var1'):false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createTask());
-        Assert.assertEquals(value, validator.validate(value, context));
+        Assert.assertEquals(value, validator.validate(value, context, false));
         Assert.assertTrue(context.getSpELVariables().getHiddenVariables().get("var1"));
         Assert.assertNull(context.getSpELVariables().getHiddenVariables().get("var2"));
     }

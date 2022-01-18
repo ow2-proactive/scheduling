@@ -147,7 +147,7 @@ public class OptionalParserValidatorTest {
     public void testThatValidValueIsOK(ModelType type, String model, String value, Object expectedParsedValue)
             throws ModelSyntaxException, ValidationException, ConversionException {
         ParserValidator<String> parserValidator = new OptionalParserValidator<>(model, type);
-        Object parsedValue = parserValidator.parseAndValidate(value, context);
+        Object parsedValue = parserValidator.parseAndValidate(value, context, false);
         Assert.assertEquals(String.format("When parsing the variable (model '%s', value '%s'), get the parsed value '%s' instead of expected '%s'",
                                           type,
                                           value,
@@ -160,7 +160,7 @@ public class OptionalParserValidatorTest {
     public void testThatValidHiddenValueIsOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String model = ModelType.HIDDEN.name() + ModelValidator.OPTIONAL_VARIABLE_SUFFIX;
         ParserValidator<String> parserValidator = new OptionalParserValidator<>(model, ModelType.HIDDEN);
-        String parsedValue = parserValidator.parseAndValidate("pwd", context);
+        String parsedValue = parserValidator.parseAndValidate("pwd", context, false);
         Assert.assertTrue(parsedValue.startsWith("ENC("));
         Assert.assertTrue(parsedValue.endsWith(")"));
     }
@@ -205,7 +205,7 @@ public class OptionalParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = " ";
         ParserValidator<String> parserValidator = new OptionalParserValidator<>(model, type);
-        Assert.assertNull(parserValidator.parseAndValidate(value, context));
+        Assert.assertNull(parserValidator.parseAndValidate(value, context, false));
     }
 
     public void testThatBlankValueIsOK(ModelType type)
@@ -375,7 +375,7 @@ public class OptionalParserValidatorTest {
     public void testThatInvalidValueThrowException(ModelType type, String model, String invalidValue)
             throws ModelSyntaxException, ValidationException, ConversionException {
         ParserValidator<String> parserValidator = new OptionalParserValidator<>(model, type);
-        parserValidator.parseAndValidate(invalidValue, context);
+        parserValidator.parseAndValidate(invalidValue, context, false);
     }
 
     public void testThatInvalidValueThrowException(ModelType type, String invalidValue)

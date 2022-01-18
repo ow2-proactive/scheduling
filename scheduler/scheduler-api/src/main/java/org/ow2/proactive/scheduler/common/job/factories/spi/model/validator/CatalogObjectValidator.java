@@ -74,15 +74,17 @@ public class CatalogObjectValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
+            throws ValidationException {
         Pattern pattern = Pattern.compile(CATALOG_OBJECT_MODEL_REGEXP);
         Matcher matcher = pattern.matcher(parameterValue);
         if (!(parameterValue.matches(CATALOG_OBJECT_MODEL_REGEXP) && matcher.find())) {
             throw new ValidationException("Expected value should match regular expression " + pattern.pattern() +
                                           " , received " + parameterValue);
         }
-        if (context == null || context.getSessionId() == null || context.getSessionId().isEmpty()) {
-            // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog).
+        if (context == null || context.getSessionId() == null || context.getSessionId().isEmpty() || isVariableHidden) {
+            // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog)
+            // or the variable may be hidden.
             // In this case, we don't have the access of the scheduler global dataspace, so the validity check is passed.
             logger.debug(String.format("Validity of the variable value [%s] is skipped because access to the catalog is disabled.",
                                        parameterValue));

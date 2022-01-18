@@ -65,14 +65,14 @@ public class GlobalFileParserValidatorTest {
     public void testThatValidGlobalFileIsOk() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = existGlobalFilePath;
         GlobalFileParserValidator parserValidator = new GlobalFileParserValidator(ModelType.GLOBAL_FILE.name());
-        Assert.assertEquals(value, parserValidator.parseAndValidate(value, context));
+        Assert.assertEquals(value, parserValidator.parseAndValidate(value, context, false));
     }
 
     @Test(expected = ValidationException.class)
     public void testThatInvalidGlobalFileThrowException()
             throws ModelSyntaxException, ValidationException, ConversionException {
         GlobalFileParserValidator parserValidator = new GlobalFileParserValidator(ModelType.GLOBAL_FILE.name());
-        parserValidator.parseAndValidate(notExistGlobalFilePath, context);
+        parserValidator.parseAndValidate(notExistGlobalFilePath, context, false);
     }
 
     @Test(expected = ValidationException.class)
@@ -80,7 +80,7 @@ public class GlobalFileParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         GlobalFileParserValidator parserValidator = new GlobalFileParserValidator(ModelType.GLOBAL_FILE.name());
-        parserValidator.parseAndValidate(value, context);
+        parserValidator.parseAndValidate(value, context, false);
     }
 
     // when context is not specified, the parserValidator is expected to not check global file existence.
@@ -89,7 +89,7 @@ public class GlobalFileParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
         GlobalFileParserValidator parserValidator = new GlobalFileParserValidator(ModelType.GLOBAL_FILE.name());
-        Assert.assertEquals(value, parserValidator.parseAndValidate(value, null));
+        Assert.assertEquals(value, parserValidator.parseAndValidate(value, null, false));
     }
 
     @Test(expected = ModelSyntaxException.class)

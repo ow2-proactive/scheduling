@@ -157,17 +157,18 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
         return groupsFound;
     }
 
+    // Used in tests only
     @Override
     public T parseAndValidate(String parameterValue)
             throws ConversionException, ValidationException, ModelSyntaxException {
-        return parseAndValidate(parameterValue, null);
+        return parseAndValidate(parameterValue, null, false);
     }
 
     @Override
-    public T parseAndValidate(String parameterValue, ModelValidatorContext context)
+    public T parseAndValidate(String parameterValue, ModelValidatorContext context, boolean isVariableHidden)
             throws ConversionException, ValidationException, ModelSyntaxException {
         Converter<T> converter = createConverter(model);
-        return createValidator(model, converter).validate(converter.convert(parameterValue), context);
+        return createValidator(model, converter).validate(converter.convert(parameterValue), context, isVariableHidden);
     }
 
     public static String ignoreCaseRegexp(String matcher) {

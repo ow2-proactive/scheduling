@@ -138,7 +138,7 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
             context.setVariableName(variable.getName());
 
             try {
-                new ModelValidator(model).validate(variable.getValue(), context);
+                new ModelValidator(model).validate(variable.getValue(), context, variable.isHidden());
             } catch (Exception e) {
                 throw new JobValidationException((task != null ? "Task '" + task.getName() + "': " : "") +
                                                  "Variable '" + variable.getName() + "': Model " + variable.getModel() +
