@@ -124,6 +124,15 @@ public final class ForkerUtils {
             return this.value.equalsIgnoreCase(val);
         }
 
+        static ForkMethod find(String value) {
+            for (ForkMethod element : values()) {
+                if (element.matches(value)) {
+                    return element;
+                }
+            }
+            throw new IllegalArgumentException("Cannot find ForkMethod matching '" + value + "'");
+        }
+
         @Override
         public String toString() {
             return value;
@@ -198,7 +207,7 @@ public final class ForkerUtils {
 
     private ForkMethod getForkMethod(Map<String, String> genericInformation) {
         if (genericInformation != null && genericInformation.get(RUNAS_METHOD_GENERIC_INFO) != null) {
-            return ForkMethod.valueOf(genericInformation.get(RUNAS_METHOD_GENERIC_INFO));
+            return ForkMethod.find(genericInformation.get(RUNAS_METHOD_GENERIC_INFO));
         }
         return FORK_METHOD_VALUE;
     }
