@@ -51,10 +51,12 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.nodesource.utils.InitScriptGenerator;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+import org.ow2.proactive.utils.PAProperties;
 
+import com.google.common.base.Joiner;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -81,6 +83,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     public static final int DEFAULT_OUTPUT_BUFFER_LENGTH = 1000;
 
     public static final int DEFAULT_SSH_PORT = 22;
+
+    private transient InitScriptGenerator initScriptGenerator = new InitScriptGenerator();
 
     @Configurable(description = "The port of the ssh server " + DEFAULT_SSH_PORT + " by default", sectionSelector = 2)
     protected int sshPort = DEFAULT_SSH_PORT;
@@ -109,6 +113,9 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     @Configurable(description = "Options for the java command launching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
+    @Configurable(textArea = true, description = "startup script to launch the ProActive nodes (optional)", sectionSelector = 2)
+    protected String startupScript = initScriptGenerator.getDefaultLinuxStartupScript();
+
     private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
 
     /**
@@ -121,10 +128,10 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * <p>
      * Starts a PA runtime on remote host using SSH, register it manually in the
      * nodesource.
-     * 
+     *
      * @param hostTracker The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
-     * @param depNodeURLs list of deploying or lost nodes urls created      
+     * @param depNodeURLs list of deploying or lost nodes urls created
      * @throws RMException
      *             acquisition failed
      */
@@ -173,7 +180,6 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         if (this.javaOptions != null && !this.javaOptions.trim().isEmpty()) {
             sb.add(this.javaOptions.trim());
         }
-        CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
 
         final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() ||
                                                   PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean();
@@ -181,15 +187,10 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             // if we do not want to kill the nodes when the RM exits or
             // restarts, then we should launch the nodes in background and
             // ignore the RM termination signal
-            clb.setDetached();
+            this.javaPath = "nohup " + this.javaPath;
         }
 
-        clb.setJavaPath(this.javaPath);
-        clb.setRmHome(this.schedulingPath);
-        clb.setPaProperties(sb);
         final String nodeName = nodeNameBuilder.generateNodeName(hostTracker);
-        clb.setNodeName(nodeName);
-        clb.setNumberOfNodes(nbNodes);
         // finally, the credential's value
 
         String credString;
@@ -199,24 +200,37 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         } catch (KeyException e) {
             throw new RMException("Could not get base64 credentials", e);
         }
-        clb.setCredentialsValueAndNullOthers(credString);
 
         // add an expected node. every unexpected node will be discarded
         String cmdLine;
         String obfuscatedCmdLine;
-        try {
-            cmdLine = clb.buildCommandLine(true);
-            obfuscatedCmdLine = clb.buildCommandLine(false);
-        } catch (IOException e) {
-            throw new RMException("Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e);
-        }
+
+        cmdLine = initScriptGenerator.fillInAgentScriptProperties(this.startupScript,
+                                                                  getRmUrl(),
+                                                                  this.javaPath,
+                                                                  this.schedulingPath,
+                                                                  PAProperties.getFileEncoding(),
+                                                                  Joiner.on(' ').join(sb),
+                                                                  this.nodeSource.getName(),
+                                                                  nodeName,
+                                                                  nbNodes,
+                                                                  credString);
+        obfuscatedCmdLine = initScriptGenerator.fillInAgentScriptProperties(this.startupScript,
+                                                                            getRmUrl(),
+                                                                            this.javaPath,
+                                                                            this.schedulingPath,
+                                                                            PAProperties.getFileEncoding(),
+                                                                            Joiner.on(' ').join(sb),
+                                                                            this.nodeSource.getName(),
+                                                                            nodeName,
+                                                                            nbNodes,
+                                                                            "[OBFUSCATED_CRED]");
 
         // one escape the command to make it runnable through ssh
         if (cmdLine.contains("\"")) {
             cmdLine = cmdLine.replaceAll("\"", "\\\\\"");
         }
         final String finalCmdLine = cmdLine;
-
         // The final addDeployingNode() method will initiate a timeout that
         // will declare node as lost and set the description of the failure
         // with a simplistic message, since there is no way to override this
@@ -281,7 +295,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             return null; // we know the cause of this
-                                         // interruption just exit
+                            // interruption just exit
                         }
                     }
                     return null; // Victory
@@ -394,6 +408,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         persistedInfraVariables.put(TARGET_OS_OBJ_KEY, configuredTargetOs);
 
         this.javaOptions = parameters[index++].toString();
+
+        this.startupScript = parameters[index].toString();
     }
 
     @Override
