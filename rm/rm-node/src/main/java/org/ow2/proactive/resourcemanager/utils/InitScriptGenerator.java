@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.nodesource.utils;
+package org.ow2.proactive.resourcemanager.utils;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -33,6 +33,8 @@ import lombok.Getter;
 
 
 public class InitScriptGenerator {
+
+    public static final String DETACHED_MODE_PREFIX_PROPERTY = "%detachedModePrefix%";
 
     public static final String JAVA_PATH_PROPERTY = "%javaPath%";
 
@@ -66,13 +68,33 @@ public class InitScriptGenerator {
         }
     }
 
+    /**
+     * Get a template of the default Linux startup script from {@link NSProperties}
+     * @retun a string of the default Linux startup script
+     */
     @Getter
     protected String defaultLinuxStartupScript = nsConfig.getString(NSProperties.LINUX_AGENT_STARTUP_SCRIPT);
 
-    public String fillInAgentScriptProperties(String startupScriptTemplate, String rmUrl, String javaPath,
-            String schedulingPath, String fileEncoding, String javaOptions, String nodeSourceName, String nodeName,
-            int numberOfNodesPerInstance, String credentials) {
+    /**
+     * Fills the properties of the default Linux startup script with variables collected by {@link CommandLineBuilder}.
+     * @param startupScriptTemplate the Linux startup script with commands added by the user in the GUI.
+     * @param javaPath the path to the bin java.
+     * @param schedulingPath the path to the rm home.
+     * @param rmUrl the Url of the RM (pamr://0/ by default).
+     * @param fileEncoding the file encoding (UTF-8 by default).
+     * @param javaOptions the options to be passed to the Java command.
+     * @param nodeName the name of the node.
+     * @param nodeSourceName the name of the node source.
+     * @param credentials the RM credentials or an obfuscated credentials String .
+     * @param detached if set to true, the node agent will ignore the RM termination signal.
+     * @param numberOfNodesPerInstance number of ProActive nodes to start on the instance.
+     * @retun a string of the default Linux startup script
+     */
+    public static String fillInAgentScriptProperties(String startupScriptTemplate, String javaPath,
+            String schedulingPath, String rmUrl, String fileEncoding, String javaOptions, String nodeName,
+            String nodeSourceName, String credentials, boolean detached, int numberOfNodesPerInstance) {
         String startupScript = startupScriptTemplate;
+        startupScript = startupScript.replace(DETACHED_MODE_PREFIX_PROPERTY, detached ? "nohup" : "");
         startupScript = startupScript.replace(JAVA_PATH_PROPERTY, javaPath);
         startupScript = startupScript.replace(SCHEDULING_PATH_PROPERTY, schedulingPath);
         startupScript = startupScript.replace(FILE_ENCODING, fileEncoding);
@@ -86,4 +108,5 @@ public class InitScriptGenerator {
 
         return startupScript;
     }
+
 }

@@ -78,6 +78,8 @@ public final class CommandLineBuilder implements Cloneable {
 
     private OperatingSystem targetOS = OperatingSystem.UNIX;
 
+    private String startupScript;
+
     private boolean detached = false;
 
     /**
@@ -140,6 +142,10 @@ public final class CommandLineBuilder implements Cloneable {
 
     public void setNumberOfNodes(int nbNodes) {
         this.nbNodes = nbNodes;
+    }
+
+    public void setStartupScript(String startupScript) {
+        this.startupScript = startupScript;
     }
 
     /** Call this method to indicate that the command should be run in
@@ -252,8 +258,14 @@ public final class CommandLineBuilder implements Cloneable {
      * @throws java.io.IOException if you supplied a ProActive Configuration file that doesn't exist.
      */
     public String buildCommandLine(boolean displayCredentials) throws IOException {
-        List<String> command = this.buildCommandLineAsList(displayCredentials);
-        return Joiner.on(' ').join(command);
+        if (startupScript != null && !startupScript.isEmpty()) {
+            RMNodeStarter.logger.info("The command is building using the startup script for node source " + sourceName);
+            return buildCommandLineFromScript(displayCredentials);
+        } else {
+            RMNodeStarter.logger.info("The command is building as a list for the node source " + sourceName);
+            List<String> command = this.buildCommandLineAsList(displayCredentials);
+            return Joiner.on(' ').join(command);
+        }
     }
 
     /**
@@ -356,6 +368,29 @@ public final class CommandLineBuilder implements Cloneable {
             command.add("&");
         }
         return command;
+    }
+
+    /**
+     * This function uses the  {@link InitScriptGenerator} to create the command line from a predefined script in {@link NSProperties}
+     * @param displayCredentials if true displays the credentials in the command line if false, obfuscates them
+     * @return The command line as a string.
+     */
+    private String buildCommandLineFromScript(boolean displayCredentials) {
+        String javaOptions = Joiner.on(' ').join(paPropList);
+        String fileEncoding = PAProperties.getFileEncoding();
+        String credValue = displayCredentials ? credentialsValue : OBFUSC;
+        String cmdLine = InitScriptGenerator.fillInAgentScriptProperties(startupScript,
+                                                                         javaPath,
+                                                                         rmHome,
+                                                                         rmURL,
+                                                                         fileEncoding,
+                                                                         javaOptions,
+                                                                         nodeName,
+                                                                         sourceName,
+                                                                         credValue,
+                                                                         detached,
+                                                                         nbNodes);
+        return cmdLine;
     }
 
     @Override
