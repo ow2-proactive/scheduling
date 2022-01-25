@@ -197,7 +197,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         clb.setNodeName(nodeName);
         clb.setNumberOfNodes(nbNodes);
 
-        // set the stratup script retrieved from NodeSource.properties
+        // set the stratup script retrieved from NodeCommandLine.properties
         if (this.startupScript != null && !this.startupScript.isEmpty()) {
             clb.setStartupScript(this.startupScript);
         } else {

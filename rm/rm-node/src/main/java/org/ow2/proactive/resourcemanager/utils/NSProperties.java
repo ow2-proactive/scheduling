@@ -45,13 +45,13 @@ public class NSProperties {
 
     private static final Logger LOGGER = Logger.getLogger(NSProperties.class);
 
-    public static final String PROPERTIES_FILE = "NodeSource.properties";
+    public static final String PROPERTIES_FILE = "NodeCommandLine.properties";
 
     private static final ListDelimiterHandler DELIMITER = new DisabledListDelimiterHandler();
 
-    public static final String LINUX_JAR_STARTUP_SCRIPT = "ns.script.linux.jar.startup.scripts";
+    public static final String LINUX_JAR_STARTUP_SCRIPT = "ns.node.jar.command.line.linux";
 
-    public static final String LINUX_AGENT_STARTUP_SCRIPT = "ns.script.linux.agent.startup.scripts";
+    public static final String LINUX_AGENT_STARTUP_SCRIPT = "ns.node.agent.command.line.linux";
 
     /**
      * loads NodeSource configuration.
