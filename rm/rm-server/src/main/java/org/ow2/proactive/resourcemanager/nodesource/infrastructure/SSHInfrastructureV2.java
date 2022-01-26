@@ -111,8 +111,11 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     @Configurable(description = "Options for the java command launching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
-    @Configurable(textArea = true, description = "startup script to launch the ProActive nodes (optional)", sectionSelector = 2)
-    protected String startupScript = initScriptGenerator.getDefaultLinuxStartupScript();
+    @Configurable(description = "Agent, Jar or NoStartup. Please refer to the manual", sectionSelector = 1)
+    protected String deploymentMode = "NoStartup";
+
+    @Configurable(textArea = true, description = "Startup script that will execute before ProActive node agents", sectionSelector = 2)
+    protected String startupScript = "";
 
     private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
 
@@ -198,12 +201,9 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         clb.setNumberOfNodes(nbNodes);
 
         // set the stratup script retrieved from NodeCommandLine.properties
-        if (this.startupScript != null && !this.startupScript.isEmpty()) {
+        if (!this.deploymentMode.equals("NoStartup")) {
+            clb.setDeploymentMode(deploymentMode);
             clb.setStartupScript(this.startupScript);
-        } else {
-            // in this case CommandlineBuilder will automatically fallback to creating the command as a list
-            // as a result, user's stratup script is disregarded and replaced by a default one
-            logger.error("Unable to correctly retrieve the startupScript for the node source " + nodeSource.getName());
         }
 
         // finally, the credential's value
@@ -345,6 +345,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      *            parameters[10] : Scheduling path on remote machines
      *            parameters[11] : target OS' type (Linux, Windows or Cygwin)
      *            parameters[12] : extra java options
+     *            parameters[13] : deployment mode
+     *            parameters[14] : startupScript
      * @throws IllegalArgumentException
      *             configuration failed
      */
@@ -410,7 +412,19 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
         this.javaOptions = parameters[index++].toString();
 
-        this.startupScript = parameters[index].toString();
+        this.deploymentMode = parameters[index++].toString().trim();
+        if (this.deploymentMode.isEmpty()) {
+            this.deploymentMode = "NoStartup";
+        } else {
+            if (!Arrays.asList("Agent", "Jar", "NoStartup").contains(this.deploymentMode)) {
+                throw new IllegalArgumentException("The value of deployment mode must be Agent, Jar or NoStartup");
+            }
+        }
+        if (this.deploymentMode.equals("NoStartup")) {
+            this.startupScript = "";
+        } else {
+            this.startupScript = parameters[index].toString();
+        }
     }
 
     @Override

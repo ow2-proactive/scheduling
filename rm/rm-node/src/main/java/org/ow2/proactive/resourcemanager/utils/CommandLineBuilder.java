@@ -78,6 +78,8 @@ public final class CommandLineBuilder implements Cloneable {
 
     private OperatingSystem targetOS = OperatingSystem.UNIX;
 
+    private String deploymentMode = "NoStartup";
+
     private String startupScript;
 
     private boolean detached = false;
@@ -142,6 +144,10 @@ public final class CommandLineBuilder implements Cloneable {
 
     public void setNumberOfNodes(int nbNodes) {
         this.nbNodes = nbNodes;
+    }
+
+    public void setDeploymentMode(String deploymentMode) {
+        this.deploymentMode = deploymentMode;
     }
 
     public void setStartupScript(String startupScript) {
@@ -258,7 +264,7 @@ public final class CommandLineBuilder implements Cloneable {
      * @throws java.io.IOException if you supplied a ProActive Configuration file that doesn't exist.
      */
     public String buildCommandLine(boolean displayCredentials) throws IOException {
-        if (startupScript != null && !startupScript.isEmpty()) {
+        if (!deploymentMode.equals("NoStartup")) {
             RMNodeStarter.logger.info("The command is building using the startup script for node source " + sourceName);
             return buildCommandLineFromScript(displayCredentials);
         } else {
@@ -371,7 +377,7 @@ public final class CommandLineBuilder implements Cloneable {
     }
 
     /**
-     * This function uses the  {@link InitScriptGenerator} to create the command line from a predefined script in {@link NSProperties}
+     * This function uses the  {@link InitScriptGenerator} to create the command line from a predefined script in {@link NodeCommandLineProperties}
      * @param displayCredentials if true displays the credentials in the command line if false, obfuscates them
      * @return The command line as a string.
      */
@@ -379,7 +385,8 @@ public final class CommandLineBuilder implements Cloneable {
         String javaOptions = Joiner.on(' ').join(paPropList);
         String fileEncoding = PAProperties.getFileEncoding();
         String credValue = displayCredentials ? credentialsValue : OBFUSC;
-        String cmdLine = InitScriptGenerator.fillInAgentScriptProperties(startupScript,
+        String cmdLine = InitScriptGenerator.fillInAgentScriptProperties(deploymentMode,
+                                                                         startupScript,
                                                                          javaPath,
                                                                          rmHome,
                                                                          rmURL,

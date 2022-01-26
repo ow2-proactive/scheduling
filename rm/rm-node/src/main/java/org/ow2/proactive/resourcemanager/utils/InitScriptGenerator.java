@@ -29,8 +29,6 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 
-import lombok.Getter;
-
 
 public class InitScriptGenerator {
 
@@ -61,23 +59,26 @@ public class InitScriptGenerator {
     static {
         try {
             //load configuration manager with the NodeSource properties file
-            nsConfig = NSProperties.loadConfig();
+            nsConfig = NodeCommandLineProperties.loadConfig();
         } catch (ConfigurationException e) {
             logger.error("Exception when loading NodeSource properties", e);
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Get a template of the default Linux startup script from {@link NSProperties}
-     * @retun a string of the default Linux startup script
+    private static String defaultLinuxAgentCommand = nsConfig.getString(NodeCommandLineProperties.LINUX_AGENT_STARTUP_COMMAND);
+
+    /*
+     * TODO:
+     * Once the command template is ready in the properties file replace LINUX_AGENT_STARTUP_COMMAND
+     * with LINUX_JAR_STARTUP_COMMAND, to be done in the next step
      */
-    @Getter
-    protected String defaultLinuxStartupScript = nsConfig.getString(NSProperties.LINUX_AGENT_STARTUP_SCRIPT);
+    private static String defaultLinuxJarCommand = nsConfig.getString(NodeCommandLineProperties.LINUX_AGENT_STARTUP_COMMAND);
 
     /**
      * Fills the properties of the default Linux startup script with variables collected by {@link CommandLineBuilder}.
-     * @param startupScriptTemplate the Linux startup script with commands added by the user in the GUI.
+     * @param deploymentMode the mode of deployment ("Agent" or "Jar").
+     * @param startupScript the Linux startup script added by the user in the GUI.
      * @param javaPath the path to the bin java.
      * @param schedulingPath the path to the rm home.
      * @param rmUrl the Url of the RM (pamr://0/ by default).
@@ -90,23 +91,27 @@ public class InitScriptGenerator {
      * @param numberOfNodesPerInstance number of ProActive nodes to start on the instance.
      * @retun a string of the default Linux startup script
      */
-    public static String fillInAgentScriptProperties(String startupScriptTemplate, String javaPath,
+    public static String fillInAgentScriptProperties(String deploymentMode, String startupScript, String javaPath,
             String schedulingPath, String rmUrl, String fileEncoding, String javaOptions, String nodeName,
             String nodeSourceName, String credentials, boolean detached, int numberOfNodesPerInstance) {
-        String startupScript = startupScriptTemplate;
-        startupScript = startupScript.replace(DETACHED_MODE_PREFIX_PROPERTY, detached ? "nohup" : "");
-        startupScript = startupScript.replace(JAVA_PATH_PROPERTY, javaPath);
-        startupScript = startupScript.replace(SCHEDULING_PATH_PROPERTY, schedulingPath);
-        startupScript = startupScript.replace(FILE_ENCODING, fileEncoding);
-        startupScript = startupScript.replace(JAVA_OPTIONS_PROPERTY, javaOptions);
-        startupScript = startupScript.replace(NODE_NAME_PROPERTY, nodeName);
-        startupScript = startupScript.replace(RM_URL_PROPERTY, rmUrl);
-        startupScript = startupScript.replace(NODE_SOURCE_NAME_PROPERTY, nodeSourceName);
-        startupScript = startupScript.replace(CREDENTIALS_PROPERTY, credentials);
-        startupScript = startupScript.replace(NUMBER_OF_NODES_PER_INSTANCE_PROPERTY,
-                                              String.valueOf(numberOfNodesPerInstance));
+        /*
+         * TODO:
+         * the variables to be replaced will change according to the mode of deployment, to be done
+         * in the next step
+         */
+        String Command = (deploymentMode.equals("Jar")) ? defaultLinuxJarCommand : defaultLinuxAgentCommand;
+        Command = Command.replace(DETACHED_MODE_PREFIX_PROPERTY, detached ? "nohup" : "");
+        Command = Command.replace(JAVA_PATH_PROPERTY, javaPath);
+        Command = Command.replace(SCHEDULING_PATH_PROPERTY, schedulingPath);
+        Command = Command.replace(FILE_ENCODING, fileEncoding);
+        Command = Command.replace(JAVA_OPTIONS_PROPERTY, javaOptions);
+        Command = Command.replace(NODE_NAME_PROPERTY, nodeName);
+        Command = Command.replace(RM_URL_PROPERTY, rmUrl);
+        Command = Command.replace(NODE_SOURCE_NAME_PROPERTY, nodeSourceName);
+        Command = Command.replace(CREDENTIALS_PROPERTY, credentials);
+        Command = Command.replace(NUMBER_OF_NODES_PER_INSTANCE_PROPERTY, String.valueOf(numberOfNodesPerInstance));
 
-        return startupScript;
+        return (startupScript.isEmpty()) ? Command : startupScript + "\n" + Command;
     }
 
 }

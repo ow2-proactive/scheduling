@@ -38,20 +38,20 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 
 
-public class NSProperties {
+public class NodeCommandLineProperties {
 
-    private NSProperties() {
+    private NodeCommandLineProperties() {
     }
 
-    private static final Logger LOGGER = Logger.getLogger(NSProperties.class);
+    private static final Logger LOGGER = Logger.getLogger(NodeCommandLineProperties.class);
 
     public static final String PROPERTIES_FILE = "NodeCommandLine.properties";
 
     private static final ListDelimiterHandler DELIMITER = new DisabledListDelimiterHandler();
 
-    public static final String LINUX_JAR_STARTUP_SCRIPT = "ns.node.jar.command.line.linux";
+    public static final String LINUX_JAR_STARTUP_COMMAND = "ns.node.jar.command.line.linux";
 
-    public static final String LINUX_AGENT_STARTUP_SCRIPT = "ns.node.agent.command.line.linux";
+    public static final String LINUX_AGENT_STARTUP_COMMAND = "ns.node.agent.command.line.linux";
 
     /**
      * loads NodeSource configuration.
@@ -61,7 +61,9 @@ public class NSProperties {
     public static Configuration loadConfig() throws ConfigurationException {
 
         Configuration config;
-        File propertiesFile = new File(NSProperties.class.getClassLoader().getResource(PROPERTIES_FILE).getFile());
+        File propertiesFile = new File(NodeCommandLineProperties.class.getClassLoader()
+                                                                      .getResource(PROPERTIES_FILE)
+                                                                      .getFile());
         PropertiesBuilderParameters propertyParameters = new Parameters().properties();
         propertyParameters.setFile(propertiesFile);
         propertyParameters.setThrowExceptionOnMissing(true);
