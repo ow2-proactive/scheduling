@@ -135,6 +135,15 @@ public class SchedulerHsqldbStarter {
         }
     }
 
+    public void restart() throws IOException {
+        stop();
+        startIfNeeded();
+    }
+
+    public void prepareForStopping() {
+        hsqldbServer.stopMonitor();
+    }
+
     @VisibleForTesting
     boolean isRunning() {
         return hsqldbServer.isRunning();
