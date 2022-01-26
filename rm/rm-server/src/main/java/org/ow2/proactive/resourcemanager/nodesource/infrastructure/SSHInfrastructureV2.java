@@ -114,7 +114,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     @Configurable(description = "Agent, Jar or NoStartup. Please refer to the manual", sectionSelector = 1)
     protected String deploymentMode = "NoStartup";
 
-    @Configurable(textArea = true, description = "Startup script that will execute before ProActive node agents", sectionSelector = 2)
+    @Configurable(textArea = true, description = "Startup script that will execute before ProActive node agents", sectionSelector = 3)
     protected String startupScript = "";
 
     private static final String TARGET_OS_OBJ_KEY = "targetOSObj";

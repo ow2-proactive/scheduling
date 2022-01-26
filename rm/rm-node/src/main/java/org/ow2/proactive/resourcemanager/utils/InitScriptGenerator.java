@@ -25,9 +25,15 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
+
+import com.google.common.base.Joiner;
 
 
 public class InitScriptGenerator {
@@ -111,7 +117,17 @@ public class InitScriptGenerator {
         Command = Command.replace(CREDENTIALS_PROPERTY, credentials);
         Command = Command.replace(NUMBER_OF_NODES_PER_INSTANCE_PROPERTY, String.valueOf(numberOfNodesPerInstance));
 
+        startupScript = prepareStartupScript(startupScript);
         return (startupScript.isEmpty()) ? Command : startupScript + "\n" + Command;
     }
 
+    private static String prepareStartupScript(String startupScript) {
+        String preparedStartupScript;
+        preparedStartupScript = startupScript.replace("\r\n", "\n");
+        List<String> startupScriptList = Arrays.stream(preparedStartupScript.split("\n"))
+                                               .filter(s -> !s.isEmpty())
+                                               .collect(Collectors.toList());
+        preparedStartupScript = Joiner.on("\n").join(startupScriptList);
+        return preparedStartupScript;
+    }
 }
