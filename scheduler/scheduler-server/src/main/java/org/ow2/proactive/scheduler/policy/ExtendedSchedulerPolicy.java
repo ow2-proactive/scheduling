@@ -65,12 +65,12 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
 
     public static final String GENERIC_INFORMATION_KEY_START_AT = "START_AT";
 
-    private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1,
-                                                                                   new NamedThreadFactory("ExtendedSchedulerPolicyExecutor",
-                                                                                                          true,
-                                                                                                          2));
+    private static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1,
+                                                                                          new NamedThreadFactory("ExtendedSchedulerPolicyExecutor",
+                                                                                                                 true,
+                                                                                                                 2));
 
-    private final Map<String, Boolean> startAtCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STARTAT_CACHE.getValueAsInt()));
+    private static final Map<String, Boolean> startAtCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STARTAT_CACHE.getValueAsInt()));
 
     /*
      * Utilize 'startAt' generic info and filter any tasks that should not be scheduled for current

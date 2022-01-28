@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -39,6 +41,8 @@ public final class SchedulingThread extends Thread {
     private final SchedulingMethod schedulingMethod;
 
     private final SchedulingService service;
+
+    private volatile CountDownLatch latch = null;
 
     public SchedulingThread(SchedulingMethod schedulingMethod, SchedulingService service) {
         super("SchedulingThread");
@@ -68,14 +72,14 @@ public final class SchedulingThread extends Thread {
     }
 
     protected void sleepSchedulingThread() throws InterruptedException {
-        synchronized (this) {
-            this.wait(SCHEDULER_TIME_OUT);
-        }
+        latch = new CountDownLatch(1);
+        latch.await(SCHEDULER_TIME_OUT, TimeUnit.MILLISECONDS);
+        latch = null;
     }
 
     protected void wakeUpSchedulingThread() {
-        synchronized (this) {
-            this.notifyAll();
+        if (latch != null) {
+            latch.countDown();
         }
     }
 
