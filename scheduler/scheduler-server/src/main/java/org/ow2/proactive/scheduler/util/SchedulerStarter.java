@@ -483,6 +483,7 @@ public class SchedulerStarter {
             @Override
             public void run() {
                 LOGGER.info("Shutting down...");
+                hsqldbServer.prepareForStopping();
 
                 if (discoveryService != null) {
                     discoveryService.stop();

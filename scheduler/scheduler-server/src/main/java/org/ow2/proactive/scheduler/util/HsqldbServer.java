@@ -32,11 +32,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.core.properties.PropertyDecrypter;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -97,6 +102,11 @@ public class HsqldbServer extends AbstractIdleService {
     private final HsqlProperties hsqlProperties;
 
     private Server server;
+
+    private ScheduledThreadPoolExecutor monitor = new ScheduledThreadPoolExecutor(1,
+                                                                                  new NamedThreadFactory("HSQLDBMonitor",
+                                                                                                         true,
+                                                                                                         2));
 
     /**
      * Creates a new instance of HSQLDB server.
@@ -227,13 +237,30 @@ public class HsqldbServer extends AbstractIdleService {
     protected void startUp() throws Exception {
         server = new Server();
         server.setProperties(hsqlProperties);
-        server.setErrWriter(null);
-        server.setLogWriter(null);
+        server.setErrWriter(new LoggerWriter(logger, Level.ERROR));
+        server.setLogWriter(new LoggerWriter(logger, Level.INFO));
         server.start();
+        startMonitor();
+    }
+
+    private void startMonitor() {
+        monitor.scheduleAtFixedRate(() -> {
+            try {
+                server.checkRunning(true);
+            } catch (Throwable e) {
+                logger.error("HSQLDB is not running, restarting it", e);
+                server.start();
+            }
+        }, 0, PASchedulerProperties.SCHEDULER_HSQLDB_MONITOR_PERIOD.getValueAsInt(), TimeUnit.SECONDS);
+    }
+
+    public void stopMonitor() {
+        monitor.shutdownNow();
     }
 
     @Override
     protected void shutDown() throws Exception {
+        monitor.shutdownNow();
         server.stop();
     }
 
