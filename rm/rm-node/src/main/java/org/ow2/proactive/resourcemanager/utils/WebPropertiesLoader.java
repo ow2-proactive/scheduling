@@ -25,11 +25,10 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-import org.apache.commons.validator.routines.InetAddressValidator;
+import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.web.WebProperties;
 
@@ -45,6 +44,8 @@ public class WebPropertiesLoader {
     private static final int DEFAULT_JETTY_HTTP_PORT = 8080;
 
     private static final int DEFAULT_JETTY_HTTPS_PORT = 8443;
+
+    private static final Logger logger = Logger.getLogger(WebPropertiesLoader.class);
 
     @Getter
     private String httpProtocol;
@@ -93,6 +94,16 @@ public class WebPropertiesLoader {
             return WebProperties.WEB_HTTPS_PORT.getValueAsInt();
         }
         return DEFAULT_JETTY_HTTPS_PORT;
+    }
+
+    public String generateDefaultRMHostname() {
+        try {
+            // best effort, may not work for all machines
+            return InetAddress.getLocalHost().getCanonicalHostName();
+        } catch (UnknownHostException e) {
+            logger.warn("The hostname is unknown ", e);
+            return "localhost";
+        }
     }
 
 }

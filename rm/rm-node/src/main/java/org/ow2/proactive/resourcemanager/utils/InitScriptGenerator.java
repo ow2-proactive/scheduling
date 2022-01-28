@@ -25,16 +25,12 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.log4j.Logger;
 
 import com.google.common.base.Joiner;
@@ -72,7 +68,7 @@ public class InitScriptGenerator {
 
     private static final String NODE_JAR_URL_PROTOCOL_PROPERTY = "%protocol%";
 
-    private static final String NODE_JAR_URL_HOST_IP_PROPERTY = "%hostIp%";
+    private static final String NODE_JAR_URL_HOST_NAME_PROPERTY = "%hostName%";
 
     private static final String NODE_JAR_URL_PORT_PROPERTY = "%port%";
 
@@ -103,7 +99,7 @@ public class InitScriptGenerator {
 
     /**
      * Get a template of the Standard Linux startup script from {@link NodeCommandLineProperties}
-     * @retun a string of the default Linux startup script
+     * @retun a string of the Standard Linux startup script
      **/
     @Getter
     public static String defaultLinuxStandardCommand = nsConfig.getString(NodeCommandLineProperties.LINUX_Standard_STARTUP_COMMAND);
@@ -126,7 +122,7 @@ public class InitScriptGenerator {
      * @param nodeName the name of the node.
      * @param nodeSourceName the name of the node source.
      * @param credentials the RM credentials or an obfuscated credentials String .
-     * @param detached if set to true, the node agent will ignore the RM termination signal.
+     * @param detached if set to true, the node will ignore the RM termination signal.
      * @param numberOfNodesPerInstance number of ProActive nodes to start on the instance.
      * @retun a string of the default Linux startup script
      */
@@ -157,8 +153,8 @@ public class InitScriptGenerator {
      * @param javaOptions the options to be passed to the Java command.
      * @param nodeName the name of the node.
      * @param nodeSourceName the name of the node source.
-     * @param credentials the RM credentials or an obfuscated credentials String .
-     * @param detached if set to true, the node agent will ignore the RM termination signal.
+     * @param credentials the RM credentials or an obfuscated credentials String.
+     * @param detached if set to true, the node will ignore the RM termination signal.
      * @param numberOfNodesPerInstance number of ProActive nodes to start on the instance.
      * @retun a string of the default Linux startup script
      */
@@ -193,37 +189,14 @@ public class InitScriptGenerator {
 
     public static String createNodeJarUrl() {
         String NodeJarUrl = nsConfig.getString(NodeCommandLineProperties.NODE_JAR_URL_TEMPLATE);
-        String ip = getServerPublicIp();
+        String Hostname = webConfig.generateDefaultRMHostname();
         String protocol = webConfig.getHttpProtocol();
         String port = String.valueOf(webConfig.getRestPort());
         NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_PROTOCOL_PROPERTY, protocol);
-        NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_HOST_IP_PROPERTY, ip);
+        NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_HOST_NAME_PROPERTY, Hostname);
         NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_PORT_PROPERTY, port);
         NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_DIR_PROPERTY, NODE_JAR_DIR);
 
         return NodeJarUrl;
-    }
-
-    private static String getServerPublicIp() {
-        String ip = "localhost";
-        try {
-            URL whatismyip = new URL("http://checkip.amazonaws.com");
-            BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-
-            String ipValue = in.readLine(); //you get the IP as a String
-            if (ipV4Validator(ipValue)) {
-                ip = ipValue;
-            }
-        } catch (Exception e) {
-            logger.warn("unable to get the public IP address of the server", e);
-            return "localhost";
-        }
-
-        return ip;
-    }
-
-    private static boolean ipV4Validator(String ip) {
-        InetAddressValidator validator = InetAddressValidator.getInstance();
-        return validator.isValidInet4Address(ip);
     }
 }
