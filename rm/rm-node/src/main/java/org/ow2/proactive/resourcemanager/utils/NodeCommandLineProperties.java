@@ -49,9 +49,11 @@ public class NodeCommandLineProperties {
 
     private static final ListDelimiterHandler DELIMITER = new DisabledListDelimiterHandler();
 
-    public static final String LINUX_JAR_STARTUP_COMMAND = "ns.node.jar.command.line.linux";
+    public static final String LINUX_NODE_JAR_STARTUP_COMMAND = "ns.node.jar.command.line.linux";
 
-    public static final String LINUX_AGENT_STARTUP_COMMAND = "ns.node.agent.command.line.linux";
+    public static final String LINUX_Standard_STARTUP_COMMAND = "ns.node.standard.command.line.linux";
+
+    public static final String NODE_JAR_URL_TEMPLATE = "ns.server.node.jar.url";
 
     /**
      * loads NodeSource configuration.
