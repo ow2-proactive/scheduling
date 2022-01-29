@@ -60,8 +60,6 @@ public class InitScriptGenerator {
 
     private static final String NUMBER_OF_NODES_PER_INSTANCE_PROPERTY = "%numberOfNodesPerInstance%";
 
-    private static final String JAVA_URL_PROPERTY = "%javaUrl%";
-
     private static final String NODE_JAR_URL_PROPERTY = "%nodeJarUrl%";
 
     private static final String JYTHON_PATH_PROPERTY = "%jythonPath%";
@@ -74,9 +72,7 @@ public class InitScriptGenerator {
 
     private static final String NODE_JAR_URL_DIR_PROPERTY = "%nodeJarDir%";
 
-    private static final String NODE_JAR_DIR = "rest/node.jar";
-
-    private static final String DEFAULT_JAVA_URL = "https://s3.amazonaws.com/ci-materials/Latest_jre/jre-8u281-linux-x64.tar.gz";
+    private static final String NODE_JAR_URL_PATH = "rest/node.jar";
 
     private static final String DEFAULT_JYTHON_PATH = "/tmp/node/lib/jython-standalone-2.7.0.jar/Lib";
 
@@ -163,7 +159,6 @@ public class InitScriptGenerator {
             String javaOptions, String nodeName, String nodeSourceName, String credentials, boolean detached,
             int numberOfNodesPerInstance) {
         startupScript = startupScript.replace(DETACHED_MODE_PREFIX_PROPERTY, detached ? "nohup" : "");
-        startupScript = startupScript.replace(JAVA_URL_PROPERTY, DEFAULT_JAVA_URL);
         startupScript = startupScript.replace(JYTHON_PATH_PROPERTY, DEFAULT_JYTHON_PATH);
         startupScript = startupScript.replace(NODE_JAR_URL_PROPERTY, nodeJarUrl);
         startupScript = startupScript.replace(NODE_SOURCE_NAME_PROPERTY, nodeSourceName);
@@ -195,7 +190,7 @@ public class InitScriptGenerator {
         NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_PROTOCOL_PROPERTY, protocol);
         NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_HOST_NAME_PROPERTY, Hostname);
         NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_PORT_PROPERTY, port);
-        NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_DIR_PROPERTY, NODE_JAR_DIR);
+        NodeJarUrl = NodeJarUrl.replace(NODE_JAR_URL_DIR_PROPERTY, NODE_JAR_URL_PATH);
 
         return NodeJarUrl;
     }
