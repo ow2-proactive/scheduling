@@ -694,6 +694,7 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
         OLD_VERSION=$(compute-version $OLD_PADIR)
         if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
            rm -f  $PA_ROOT/default/addons/*$OLD_VERSION*.jar
+           rm -f  $PA_ROOT/default/addons/*/*$OLD_VERSION*.jar
         fi
     fi
     # display the list of addons in the new installation
