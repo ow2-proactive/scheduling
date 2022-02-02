@@ -136,20 +136,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.common.dto.PermissionForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 import com.google.common.io.Closer;
@@ -169,6 +156,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     private SchedulerEventReceiver schedulerEventReceiver;
 
+    public static final String ASC_SUFFIX = "_a";
+
+    public static final String DESC_SUFFIX = "_d";
+
     private static final Logger logger = Logger.getLogger(SchedulerClient.class);
 
     private SchedulerClient() {
@@ -184,6 +175,29 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return (ISchedulerClient) Proxy.newProxyInstance(ISchedulerClient.class.getClassLoader(),
                                                          new Class[] { ISchedulerClient.class },
                                                          new SessionHandler(client));
+    }
+
+    private static String createJobSortParamsString(List<SortParameter<JobSortParameter>> jobSortParameters) {
+
+        String jobSortParametersAsString = "";
+
+        for (SortParameter<JobSortParameter> jobSortParameter : jobSortParameters) {
+            final JobSortParameter jobParameter = jobSortParameter.getParameter();
+            jobSortParametersAsString += jobParameter.name();
+
+            if (jobSortParameter.getSortOrder().isAscending()) {
+                jobSortParametersAsString += ASC_SUFFIX;
+            } else {
+                jobSortParametersAsString += DESC_SUFFIX;
+            }
+
+            jobSortParametersAsString += ",";
+        }
+
+        return Optional.ofNullable(jobSortParametersAsString)
+                       .filter(str -> str.length() != 0)
+                       .map(str -> str.substring(0, str.length() - 1))
+                       .orElse(jobSortParametersAsString);
     }
 
     @Override
@@ -329,11 +343,26 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria criteria,
-            List<SortParameter<JobSortParameter>> arg3) throws NotConnectedException, PermissionException {
+            List<SortParameter<JobSortParameter>> jobSortParameters) throws NotConnectedException, PermissionException {
         Page<JobInfo> jobInfos = null;
         try {
-            RestPage<UserJobData> userJobDataList = restApi().jobsInfo(sid, index, range);
-            jobInfos = new Page<JobInfo>(toJobInfos(userJobDataList.getList()), userJobDataList.getSize());
+            String sortParams = createJobSortParamsString(jobSortParameters);
+            RestMapPage<Long, ArrayList<UserJobData>> userJobsAllRevisions = restApi().revisionAndJobsInfo(sid,
+                                                                                                           index,
+                                                                                                           range,
+                                                                                                           criteria.isMyJobsOnly(),
+                                                                                                           criteria.isPending(),
+                                                                                                           criteria.isRunning(),
+                                                                                                           criteria.isFinished(),
+                                                                                                           criteria.isChildJobs(),
+                                                                                                           criteria.getJobName(),
+                                                                                                           criteria.getProjectName(),
+                                                                                                           criteria.getUserName(),
+                                                                                                           criteria.getParentId(),
+                                                                                                           sortParams);
+            List<UserJobData> userJobs = userJobsAllRevisions.getMap().values().iterator().next();
+            jobInfos = new Page<JobInfo>(toJobInfos(userJobs), userJobs.size());
+
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
