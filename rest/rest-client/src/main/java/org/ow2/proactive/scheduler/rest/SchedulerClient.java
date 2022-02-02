@@ -177,27 +177,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                          new SessionHandler(client));
     }
 
-    private static String createJobSortParamsString(List<SortParameter<JobSortParameter>> jobSortParameters) {
+    private String createJobSortParamsString(List<SortParameter<JobSortParameter>> jobSortParameters) {
 
-        String jobSortParametersAsString = "";
-
-        for (SortParameter<JobSortParameter> jobSortParameter : jobSortParameters) {
-            final JobSortParameter jobParameter = jobSortParameter.getParameter();
-            jobSortParametersAsString += jobParameter.name();
-
-            if (jobSortParameter.getSortOrder().isAscending()) {
-                jobSortParametersAsString += ASC_SUFFIX;
-            } else {
-                jobSortParametersAsString += DESC_SUFFIX;
-            }
-
-            jobSortParametersAsString += ",";
+        if (jobSortParameters == null) {
+            return "";
         }
-
-        return Optional.ofNullable(jobSortParametersAsString)
-                       .filter(str -> str.length() != 0)
-                       .map(str -> str.substring(0, str.length() - 1))
-                       .orElse(jobSortParametersAsString);
+        return jobSortParameters.stream().map(jobSortParameter -> {
+            String jobParameterName = jobSortParameter.getParameter().name();
+            if (jobSortParameter.getSortOrder().isAscending()) {
+                return jobParameterName + ASC_SUFFIX;
+            } else {
+                return jobParameterName + DESC_SUFFIX;
+            }
+        }).collect(Collectors.joining(","));
     }
 
     @Override
