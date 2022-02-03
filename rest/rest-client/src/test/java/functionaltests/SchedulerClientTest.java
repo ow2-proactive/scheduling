@@ -37,6 +37,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.CoreMatchers;
@@ -52,6 +53,8 @@ import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -325,6 +328,23 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     }
 
+    private boolean removeAllJobs(ISchedulerClient client) throws NotConnectedException, PermissionException {
+        JobFilterCriteria allJobsCriteria = new JobFilterCriteria(false,
+                                                                  true,
+                                                                  true,
+                                                                  true,
+                                                                  true,
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  new Long(-1));
+        List defaultSortOrder = Collections.singletonList(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
+        List<JobInfo> allJobInfos = client.getJobs(0, 1000, allJobsCriteria, defaultSortOrder).getList();
+        List<JobId> allJobIds = allJobInfos.stream().map(x -> x.getJobId()).collect(Collectors.toList());
+
+        return client.removeJobs(allJobIds);
+    }
+
     @Test(timeout = MAX_WAIT_TIME)
     public void testGetJobs() throws Throwable {
         ISchedulerClient client = clientInstance();
@@ -346,6 +366,9 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         job2.setProjectName("myProjectA");
         job3.setProjectName("myProjectB");
         job4.setProjectName("myProjectB");
+
+        // Remove all existing jobs
+        Assert.assertTrue(removeAllJobs(client));
 
         // Submit job2 job3 job4
         JobId job1Id = submitJob(job1, client);
@@ -407,6 +430,9 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertEquals(jobsList3.get(0).getJobId().value(), job3Id.value());
 
         client.killJob(job4Id);
+
+        // Remove all existing jobs
+        Assert.assertTrue(removeAllJobs(client));
     }
 
     private TaskState findTask(String name, Map<TaskId, TaskState> hmTasks) {
