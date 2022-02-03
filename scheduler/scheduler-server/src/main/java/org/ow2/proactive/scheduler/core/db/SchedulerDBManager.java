@@ -2044,32 +2044,32 @@ public class SchedulerDBManager {
         });
     }
 
-    private void replaceSystemVariables(Serializable job) {
-
-        String jobId = job instanceof JobData ? String.valueOf(((JobData)job).getId()) : job instanceof InternalJob ? ((InternalJob)job).getId().toString() : null;
-        String jobName = job instanceof JobData ? ((JobData)job).getJobName() : job instanceof InternalJob ? ((InternalJob)job).getName() : null;
-        String user = job instanceof JobData ? ((JobData)job).getOwner() : job instanceof InternalJob ? ((InternalJob)job).getOwner() : null;
-
+    private void replaceSystemVariables(JobData jobData) {
         Map<String, Serializable> variableReplacement = new LinkedHashMap<>();
-        variableReplacement.put(SchedulerVars.PA_JOB_ID.name(), jobId);
-        variableReplacement.put(SchedulerVars.PA_JOB_NAME.name(), jobName);
-        variableReplacement.put(SchedulerVars.PA_USER.name(), user);
+        variableReplacement.put(SchedulerVars.PA_JOB_ID.name(), jobData.getId());
+        variableReplacement.put(SchedulerVars.PA_JOB_NAME.name(), jobData.getJobName());
+        variableReplacement.put(SchedulerVars.PA_USER.name(), jobData.getOwner());
 
-        if(job instanceof JobData) {
-            ((JobData) job).getVariables().values().forEach(jobVariable ->
-                    variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
-            ((JobData)job).getVariables().values().forEach(runtimeVariable -> {
-                String originalValue = runtimeVariable.getValue();
-                runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
+        jobData.getVariables().values().forEach(jobVariable ->
+                variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
+        jobData.getVariables().values().forEach(runtimeVariable -> {
+               String originalValue = runtimeVariable.getValue();
+               runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
             });
-        } else if(job instanceof InternalJob) {
-            ((InternalJob) job).getVariables().values().forEach(jobVariable ->
-                    variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
-            ((InternalJob)job).getVariables().values().forEach(runtimeVariable -> {
-                String originalValue = runtimeVariable.getValue();
-                runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
-            });
-        }
+    }
+
+    private void replaceSystemVariables(InternalJob internalJob) {
+        Map<String, Serializable> variableReplacement = new LinkedHashMap<>();
+        variableReplacement.put(SchedulerVars.PA_JOB_ID.name(), internalJob.getId());
+        variableReplacement.put(SchedulerVars.PA_JOB_NAME.name(), internalJob.getName());
+        variableReplacement.put(SchedulerVars.PA_USER.name(), internalJob.getOwner());
+
+        internalJob.getVariables().values().forEach(jobVariable ->
+                variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
+        internalJob.getVariables().values().forEach(runtimeVariable -> {
+            String originalValue = runtimeVariable.getValue();
+            runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
+        });
     }
 
     private TaskData getTaskReference(Session session, InternalTask task) {
