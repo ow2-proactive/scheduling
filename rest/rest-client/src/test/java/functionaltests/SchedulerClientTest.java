@@ -37,6 +37,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.CoreMatchers;
@@ -48,8 +49,12 @@ import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -321,6 +326,113 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertArrayEquals(TEST_JOB.getBytes(), (byte[]) tResRaw.value());
         Assert.assertArrayEquals(TEST_JOB.getBytes(), tResRaw.getSerializedValue());
 
+    }
+
+    private boolean removeAllJobs(ISchedulerClient client) throws NotConnectedException, PermissionException {
+        JobFilterCriteria allJobsCriteria = new JobFilterCriteria(false,
+                                                                  true,
+                                                                  true,
+                                                                  true,
+                                                                  true,
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  new Long(-1));
+        List defaultSortOrder = Collections.singletonList(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
+        List<JobInfo> allJobInfos = client.getJobs(0, 1000, allJobsCriteria, defaultSortOrder).getList();
+        List<JobId> allJobIds = allJobInfos.stream().map(x -> x.getJobId()).collect(Collectors.toList());
+
+        return client.removeJobs(allJobIds);
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testGetJobs() throws Throwable {
+        ISchedulerClient client = clientInstance();
+
+        // Define jobs
+        Job job1 = defaultJob();
+        Job job2 = defaultJob();
+        Job job3 = defaultJob();
+        Job job4 = pendingJob();
+
+        // Set job names
+        job1.setName("myJobA");
+        job2.setName("myJobB");
+        job3.setName("myJobB");
+        job4.setName("myJobC");
+
+        // Set project names
+        job1.setProjectName("myProjectA");
+        job2.setProjectName("myProjectA");
+        job3.setProjectName("myProjectB");
+        job4.setProjectName("myProjectB");
+
+        // Remove all existing jobs
+        Assert.assertTrue(removeAllJobs(client));
+
+        // Submit job2 job3 job4
+        JobId job1Id = submitJob(job1, client);
+        JobId job2Id = submitJob(job2, client);
+        JobId job3Id = submitJob(job3, client);
+        JobId job4Id = submitJob(job4, client);
+
+        // Wait for job1, job2 and job3 to finish
+        JobResult job1Result = client.waitForJob(job1Id, TimeUnit.MINUTES.toMillis(3));
+        JobResult job2Result = client.waitForJob(job2Id, TimeUnit.MINUTES.toMillis(3));
+        JobResult job3Result = client.waitForJob(job3Id, TimeUnit.MINUTES.toMillis(3));
+        Assert.assertEquals(JobStatus.FINISHED, job1Result.getJobInfo().getStatus());
+        Assert.assertEquals(JobStatus.FINISHED, job2Result.getJobInfo().getStatus());
+        Assert.assertEquals(JobStatus.FINISHED, job3Result.getJobInfo().getStatus());
+
+        // Test sorts
+        JobFilterCriteria allJobsCriteria = new JobFilterCriteria(false,
+                                                                  true,
+                                                                  true,
+                                                                  true,
+                                                                  true,
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  new Long(-1));
+        SortParameter jobNameDescOrder = new SortParameter<>(JobSortParameter.NAME, SortOrder.DESC);
+        SortParameter jobIdAscOrder = new SortParameter<>(JobSortParameter.ID, SortOrder.ASC);
+        List<SortParameter<JobSortParameter>> sortParameterList1 = new ArrayList<>();
+        sortParameterList1.add(jobNameDescOrder);
+        sortParameterList1.add(jobIdAscOrder);
+        List<JobInfo> jobsList1 = client.getJobs(0, 4, allJobsCriteria, sortParameterList1).getList();
+        Assert.assertEquals(jobsList1.get(0).getJobId().value(), job4Id.value());
+        Assert.assertEquals(jobsList1.get(1).getJobId().value(), job2Id.value());
+        Assert.assertEquals(jobsList1.get(2).getJobId().value(), job3Id.value());
+        Assert.assertEquals(jobsList1.get(3).getJobId().value(), job1Id.value());
+
+        // Test range and limit
+        List<JobInfo> jobsList2 = client.getJobs(2, 2, allJobsCriteria, Collections.singletonList(jobIdAscOrder))
+                                        .getList();
+        Assert.assertEquals(jobsList2.get(0).getJobId().value(), job3Id.value());
+        Assert.assertEquals(jobsList2.get(1).getJobId().value(), job4Id.value());
+
+        // Test filters
+        JobFilterCriteria allJobsFinishedInMyProjectBCriteria = new JobFilterCriteria(false,
+                                                                                      false,
+                                                                                      false,
+                                                                                      true,
+                                                                                      false,
+                                                                                      "",
+                                                                                      "myProjectB",
+                                                                                      "",
+                                                                                      new Long(-1));
+        List<JobInfo> jobsList3 = client.getJobs(0,
+                                                 4,
+                                                 allJobsFinishedInMyProjectBCriteria,
+                                                 Collections.singletonList(jobIdAscOrder))
+                                        .getList();
+        Assert.assertEquals(jobsList3.size(), 1);
+        Assert.assertEquals(jobsList3.get(0).getJobId().value(), job3Id.value());
+
+        client.killJob(job4Id);
+
+        // Remove all existing jobs
+        Assert.assertTrue(removeAllJobs(client));
     }
 
     private TaskState findTask(String name, Map<TaskId, TaskState> hmTasks) {
