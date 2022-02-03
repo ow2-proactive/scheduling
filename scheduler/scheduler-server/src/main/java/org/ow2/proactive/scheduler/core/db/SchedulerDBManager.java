@@ -2050,11 +2050,10 @@ public class SchedulerDBManager {
         variableReplacement.put(SchedulerVars.PA_JOB_NAME.name(), jobData.getJobName());
         variableReplacement.put(SchedulerVars.PA_USER.name(), jobData.getOwner());
 
-        jobData.getVariables().values().forEach(jobVariable ->
-                variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
-        jobData.getVariables().values().forEach(runtimeVariable -> {
-               String originalValue = runtimeVariable.getValue();
-               runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
+        jobData.getVariables().values().forEach(variable -> {
+            variableReplacement.put(variable.getName(), variable.getValue());
+            String originalValue = variable.getValue();
+            variable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
             });
     }
 
@@ -2064,9 +2063,8 @@ public class SchedulerDBManager {
         variableReplacement.put(SchedulerVars.PA_JOB_NAME.name(), internalJob.getName());
         variableReplacement.put(SchedulerVars.PA_USER.name(), internalJob.getOwner());
 
-        internalJob.getVariables().values().forEach(jobVariable ->
-                variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
         internalJob.getVariables().values().forEach(runtimeVariable -> {
+            variableReplacement.put(runtimeVariable.getName(), runtimeVariable.getValue());
             String originalValue = runtimeVariable.getValue();
             runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
         });
