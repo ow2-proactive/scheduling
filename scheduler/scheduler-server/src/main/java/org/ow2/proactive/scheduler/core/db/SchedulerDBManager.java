@@ -75,6 +75,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -85,6 +86,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
@@ -2011,6 +2013,9 @@ public class SchedulerDBManager {
                        .setParameter("jobId", job.getParentId())
                        .executeUpdate();
             }
+            replaceSystemVariables(job);
+            replaceSystemVariables(jobRuntimeData);
+            session.save(jobRuntimeData);
 
             ArrayList<InternalTask> iTasks = job.getITasks();
             List<InternalTask> tasksWithNewIds = new ArrayList<>(iTasks.size());
@@ -2037,6 +2042,36 @@ public class SchedulerDBManager {
 
             return jobRuntimeData;
         });
+    }
+
+    private void replaceSystemVariables(Serializable job) {
+
+        String jobId = job instanceof JobData ? String.valueOf(((JobData)job).getId()) : job instanceof InternalJob ? ((InternalJob)job).getId().toString() : null;
+        String jobName = job instanceof JobData ? ((JobData)job).getJobName() : job instanceof InternalJob ? ((InternalJob)job).getName() : null;
+        String user = job instanceof JobData ? ((JobData)job).getOwner() : job instanceof InternalJob ? ((InternalJob)job).getOwner() : null;
+
+        Map<String, Serializable> variableReplacement = new LinkedHashMap<>();
+        variableReplacement.put(SchedulerVars.PA_JOB_ID.name(), jobId);
+        variableReplacement.put(SchedulerVars.PA_JOB_NAME.name(), jobName);
+        variableReplacement.put(SchedulerVars.PA_USER.name(), user);
+
+        if(job instanceof JobData) {
+            ((JobData) job).getVariables().values().forEach(jobVariable ->
+                    variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
+
+            ((JobData)job).getVariables().values().forEach(runtimeVariable -> {
+                String originalValue = runtimeVariable.getValue();
+                runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
+            });
+        } else if(job instanceof InternalJob) {
+            ((InternalJob) job).getVariables().values().forEach(jobVariable ->
+                    variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
+
+            ((InternalJob)job).getVariables().values().forEach(runtimeVariable -> {
+                String originalValue = runtimeVariable.getValue();
+                runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
+            });
+        }
     }
 
     private TaskData getTaskReference(Session session, InternalTask task) {
