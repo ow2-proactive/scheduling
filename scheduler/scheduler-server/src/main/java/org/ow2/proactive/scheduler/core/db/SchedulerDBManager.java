@@ -2051,7 +2051,6 @@ public class SchedulerDBManager {
         variableReplacement.put(SchedulerVars.PA_USER.name(), jobData.getOwner());
 
         jobData.getVariables().values().forEach(variable -> {
-        //    variableReplacement.put(variable.getName(), variable.getValue());
             String originalValue = variable.getValue();
             variable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
             });
@@ -2064,7 +2063,6 @@ public class SchedulerDBManager {
         variableReplacement.put(SchedulerVars.PA_USER.name(), internalJob.getOwner());
 
         internalJob.getVariables().values().forEach(runtimeVariable -> {
-           // variableReplacement.put(runtimeVariable.getName(), runtimeVariable.getValue());
             String originalValue = runtimeVariable.getValue();
             runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
         });
