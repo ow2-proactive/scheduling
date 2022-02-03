@@ -2058,7 +2058,6 @@ public class SchedulerDBManager {
         if(job instanceof JobData) {
             ((JobData) job).getVariables().values().forEach(jobVariable ->
                     variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
-
             ((JobData)job).getVariables().values().forEach(runtimeVariable -> {
                 String originalValue = runtimeVariable.getValue();
                 runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
@@ -2066,7 +2065,6 @@ public class SchedulerDBManager {
         } else if(job instanceof InternalJob) {
             ((InternalJob) job).getVariables().values().forEach(jobVariable ->
                     variableReplacement.put(jobVariable.getName(), jobVariable.getValue()));
-
             ((InternalJob)job).getVariables().values().forEach(runtimeVariable -> {
                 String originalValue = runtimeVariable.getValue();
                 runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
