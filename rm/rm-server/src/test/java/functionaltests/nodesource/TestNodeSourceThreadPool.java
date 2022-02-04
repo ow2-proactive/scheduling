@@ -178,7 +178,7 @@ public class TestNodeSourceThreadPool extends RMFunctionalTest {
                               new byte[0], // optional ssh options file
                               TestSSHInfrastructureV2.getJavaPath(), //java path on the remote machines
                               PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
-                              OperatingSystem.getOperatingSystem(), "" }; // extra java options
+                              OperatingSystem.getOperatingSystem(), "", "", "", "", "" }; // extra java options and startup script parameters
     }
 
     private byte[] getHostsFileContent() {
