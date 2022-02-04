@@ -75,6 +75,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -85,6 +86,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
@@ -2011,6 +2013,9 @@ public class SchedulerDBManager {
                        .setParameter("jobId", job.getParentId())
                        .executeUpdate();
             }
+            replaceSystemVariables(job);
+            replaceSystemVariables(jobRuntimeData);
+            session.save(jobRuntimeData);
 
             ArrayList<InternalTask> iTasks = job.getITasks();
             List<InternalTask> tasksWithNewIds = new ArrayList<>(iTasks.size());
@@ -2036,6 +2041,30 @@ public class SchedulerDBManager {
             saveTaskDependencies(session, tasks, taskRuntimeDataList);
 
             return jobRuntimeData;
+        });
+    }
+
+    private void replaceSystemVariables(JobData jobData) {
+        Map<String, Serializable> variableReplacement = new LinkedHashMap<>();
+        variableReplacement.put(SchedulerVars.PA_JOB_ID.name(), jobData.getId());
+        variableReplacement.put(SchedulerVars.PA_JOB_NAME.name(), jobData.getJobName());
+        variableReplacement.put(SchedulerVars.PA_USER.name(), jobData.getOwner());
+
+        jobData.getVariables().values().forEach(variable -> {
+            String originalValue = variable.getValue();
+            variable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
+        });
+    }
+
+    private void replaceSystemVariables(InternalJob internalJob) {
+        Map<String, Serializable> variableReplacement = new LinkedHashMap<>();
+        variableReplacement.put(SchedulerVars.PA_JOB_ID.name(), internalJob.getId());
+        variableReplacement.put(SchedulerVars.PA_JOB_NAME.name(), internalJob.getName());
+        variableReplacement.put(SchedulerVars.PA_USER.name(), internalJob.getOwner());
+
+        internalJob.getVariables().values().forEach(runtimeVariable -> {
+            String originalValue = runtimeVariable.getValue();
+            runtimeVariable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
         });
     }
 
