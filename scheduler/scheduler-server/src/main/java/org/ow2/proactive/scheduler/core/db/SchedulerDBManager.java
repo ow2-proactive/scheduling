@@ -2053,7 +2053,7 @@ public class SchedulerDBManager {
         jobData.getVariables().values().forEach(variable -> {
             String originalValue = variable.getValue();
             variable.setValue(VariableSubstitutor.filterAndUpdate(originalValue, variableReplacement));
-            });
+        });
     }
 
     private void replaceSystemVariables(InternalJob internalJob) {
