@@ -187,7 +187,6 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                      PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
                                      OperatingSystem.getOperatingSystem(), "", "", "", "", "" }; // extra java options and startup script parameters
 
-
         policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString(), "20000" };
 
     }
