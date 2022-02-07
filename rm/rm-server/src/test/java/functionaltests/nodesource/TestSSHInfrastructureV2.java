@@ -185,7 +185,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                      new byte[0], // optional ssh options file
                                      javaExePath, //java path on the remote machines
                                      PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
-                                     OperatingSystem.getOperatingSystem(), "", "", "", "", "" }; // extra java options
+                                     OperatingSystem.getOperatingSystem(), "", "", "", "", "" }; // extra java options and startup script parameters
 
         policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString(), "20000" };
 
