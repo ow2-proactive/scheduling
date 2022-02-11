@@ -51,6 +51,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1631,6 +1632,41 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     jobVariables.putAll(variablesFromMultipart);
                 } else {
                     jobVariables = variablesFromMultipart;
+                }
+            }
+
+            // Get the job submission generic infos
+            Map<String, String> genericInfos = null;
+            if (contextInfos != null)
+                genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
+
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
+            jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
+        }
+
+        return mapper.map(jobId, JobIdData.class);
+    }
+
+    @Override
+    public JobIdData submitFromUrl(String sessionId, String url, PathSegment pathSegment, Map<String, String> jsonBody,
+            UriInfo contextInfos) throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
+        Scheduler scheduler = checkAccess(sessionId, "jobs");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        String jobXml = downloadWorkflowContent(sessionId, url);
+        JobId jobId;
+        try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+
+            // Get the job submission variables from pathSegment
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            // Get job variables from json body
+            if (!MapUtils.isEmpty(jsonBody)) {
+                if (jobVariables != null) {
+                    jobVariables.putAll(jsonBody);
+                } else {
+                    jobVariables = jsonBody;
                 }
             }
 

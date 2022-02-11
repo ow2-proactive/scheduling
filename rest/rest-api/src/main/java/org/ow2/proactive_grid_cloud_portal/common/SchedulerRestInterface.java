@@ -1540,6 +1540,31 @@ public interface SchedulerRestInterface {
             SubmissionClosedRestException, IOException;
 
     /**
+     * Submits a workflow to the scheduler from a workflow URL, creating hence a
+     * new job resource.
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param url
+     *            url to the workflow content
+     * @param pathSegment
+     *            variables of the workflow
+     * @param jsonBody
+     *            a json with the variables of the workflow
+     * @param contextInfos
+     *            the context informations (generic parameters,..)
+     * @return the <code>jobid</code> of the newly created job
+     */
+    @POST
+    @Path("{path:jobs}/body")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
+            @PathParam("path") PathSegment pathSegment, Map<String, String> jsonBody, @Context UriInfo contextInfos)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException;
+
+    /**
      * Pushes a file from the local file system into the given DataSpace
      *
      * @param sessionId
