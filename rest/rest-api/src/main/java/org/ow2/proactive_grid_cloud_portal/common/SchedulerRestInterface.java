@@ -1556,7 +1556,7 @@ public interface SchedulerRestInterface {
      * @return the <code>jobid</code> of the newly created job
      */
     @POST
-    @Path("{path:jobs}")
+    @Path("{path:jobs}/body")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
