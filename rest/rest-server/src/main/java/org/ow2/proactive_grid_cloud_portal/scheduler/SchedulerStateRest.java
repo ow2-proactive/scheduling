@@ -1662,7 +1662,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
             // Get job variables from json body
-            if (MapUtils.isEmpty(jsonBody)) {
+            if (!MapUtils.isEmpty(jsonBody)) {
                 if (jobVariables != null) {
                     jobVariables.putAll(jsonBody);
                 } else {
