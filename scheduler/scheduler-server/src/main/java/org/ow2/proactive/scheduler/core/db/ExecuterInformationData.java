@@ -138,7 +138,7 @@ public class ExecuterInformationData implements Serializable {
             // Once the maximum pamr reconnection interval has been reached, no agent id re-attribution should occur,
             // which means the nodes are definitely not reachable
             pamrReconnectionTimeoutSpent = pamrReconnectionTimeoutSpent ||
-                                           (System.currentTimeMillis() - initialTime > Agent.MAXIMUM_RETRY_DELAY_MS);
+                                           (System.currentTimeMillis() - initialTime > 32000);
         } while (!nodeConnected && isPAMR && !pamrReconnectionTimeoutSpent);
 
         if (!nodeConnected || answer == null) {

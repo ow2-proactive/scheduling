@@ -292,7 +292,7 @@ public class NodesRecoveryManager {
                 }
 
             }
-        } while (!connected && isPAMR && (System.currentTimeMillis() - initialTime) < Agent.MAXIMUM_RETRY_DELAY_MS);
+        } while (!connected && isPAMR && (System.currentTimeMillis() - initialTime) < 32000);
 
         if (!connected) {
             node = new FakeDownNodeForRecovery(rmNodeData.getName(), rmNodeData.getNodeUrl(), rmNodeData.getHostname());
