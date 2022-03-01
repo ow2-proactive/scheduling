@@ -42,7 +42,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
  * Basically for each node we store all state transitions and start/end time of each transition.
  */
 @Entity
-@Table(name = "NodeHistory", indexes = { @Index(name = "NODE_HISTORY_END_TIME", columnList = "endTime"),
+@Table(name = "NodeHistory", indexes = { @Index(name = "NODE_HISTORY_START_TIME", columnList = "startTime"),
+                                         @Index(name = "NODE_HISTORY_END_TIME", columnList = "endTime"),
                                          @Index(name = "NODE_HISTORY_NODE_URL", columnList = "nodeUrl"),
                                          @Index(name = "NODE_HISTORY_USER_NAME", columnList = "userName"), })
 public class NodeHistory {

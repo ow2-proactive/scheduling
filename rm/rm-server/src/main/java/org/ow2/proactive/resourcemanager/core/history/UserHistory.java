@@ -42,7 +42,9 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
  * This class represents the users connection history.
  */
 @Entity
-@Table(name = "UserHistory", indexes = { @Index(name = "USER_HISTORY", columnList = "userName") })
+@Table(name = "UserHistory", indexes = { @Index(name = "USER_HISTORY", columnList = "userName"),
+                                         @Index(name = "USER_HISTORY_START_TIME", columnList = "startTime"),
+                                         @Index(name = "USER_HISTORY_END_TIME", columnList = "endTime") })
 public class UserHistory {
 
     public static final Logger logger = Logger.getLogger(UserHistory.class);
