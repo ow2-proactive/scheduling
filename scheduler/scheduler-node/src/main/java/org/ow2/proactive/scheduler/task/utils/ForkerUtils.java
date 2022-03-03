@@ -68,9 +68,6 @@ public final class ForkerUtils {
     // allows to configure the runasme password as third-party credentials for a workflow task (if runasme method is PWD)
     public static final String RUNAS_PWD_CRED_GENERIC_INFO = "RUNAS_PWD_CRED";
 
-    // allows to configure the runasme ssh key for a workflow task (if runasme method is KEY)
-    public static final String RUNAS_SSH_KEY_GENERIC_INFO = "RUNAS_SSH_KEY";
-
     // allows to configure the runasme ssh key as third-party credentials for a workflow task (if runasme method is KEY)
     // note that by default the 3rd-part credential SSH_PRIVATE_KEY can be used to store the current user private key (works if the same key is used across all machines)
     public static final String RUNAS_SSH_KEY_CRED_GENERIC_INFO = "RUNAS_SSH_KEY_CRED";
@@ -247,9 +244,7 @@ public final class ForkerUtils {
 
     private byte[] getKey(CredData data, Map<String, String> genericInformation,
             Map<String, String> thirdPartyCredentials) throws IllegalAccessException {
-        if (genericInformation.get(RUNAS_SSH_KEY_GENERIC_INFO) != null) {
-            return genericInformation.get(RUNAS_SSH_KEY_GENERIC_INFO).getBytes();
-        } else if (genericInformation.get(RUNAS_SSH_KEY_CRED_GENERIC_INFO) != null) {
+        if (genericInformation.get(RUNAS_SSH_KEY_CRED_GENERIC_INFO) != null) {
             String keyString = thirdPartyCredentials.get(genericInformation.get(RUNAS_SSH_KEY_CRED_GENERIC_INFO));
             if (Strings.isNullOrEmpty(keyString)) {
                 throw new IllegalAccessException("SSH Key not found in third-Party credentials entry " +

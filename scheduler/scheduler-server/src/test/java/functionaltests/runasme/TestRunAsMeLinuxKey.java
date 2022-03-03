@@ -110,23 +110,6 @@ public class TestRunAsMeLinuxKey extends TestRunAsMe {
     }
 
     @Test
-    public void testRunAsUser() throws Exception {
-        // connect to the scheduler using the runasme account
-        Scheduler scheduler = schedulerHelper.getSchedulerInterface(username, password, key);
-        Job job = JobFactory.getFactory().createJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-        job.addGenericInformation(ForkerUtils.RUNAS_USER_GENERIC_INFO, username);
-        job.addGenericInformation(ForkerUtils.RUNAS_SSH_KEY_GENERIC_INFO, keyString);
-        JobId jobid = schedulerHelper.testJobSubmission(scheduler, job, false, true);
-
-        for (Map.Entry<String, TaskResult> entry : scheduler.getJobResult(jobid).getAllResults().entrySet()) {
-            if (entry.getKey().contains("RunAsMeTask")) {
-                Assert.assertTrue("RunAsMe task should display in the logs the correct system user",
-                                  entry.getValue().getOutput().getStdoutLogs().contains(username));
-            }
-        }
-    }
-
-    @Test
     public void testRunAsUserCreds() throws Exception {
         // connect to the scheduler using the runasme account
         Scheduler scheduler = schedulerHelper.getSchedulerInterface(username, password, key);
