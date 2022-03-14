@@ -28,6 +28,7 @@ package org.ow2.proactive.utils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +36,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpMethod;
@@ -79,6 +81,8 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
 
     private final LinkedHashMap<String, String> referrerCache;
 
+    private final List<String> excludedPaths;
+
     public PCAProxyRule() {
         _terminating = false;
         _handling = false;
@@ -89,6 +93,7 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
                 return size() > maximumCacheSize;
             }
         };
+        excludedPaths = WebProperties.WEB_PCA_PROXY_REWRITE_EXCLUDED_PATHS.getValueAsList(",");
     }
 
     @Override
@@ -135,9 +140,15 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
             logger.debug("Endpoint found in referer: " + endpointPath);
         }
         if (!matcherRequest.find()) {
-            if (target.startsWith("/automation-dashboard")) {
-                // if the uri requested starts with automation-dashboard, ignore the referrer information
-                // storing this information in the referrer cache would break the automation-dashboard portal
+            final MutableBoolean excluded = new MutableBoolean(false);
+            excludedPaths.forEach(excludedPath -> {
+                if (target.startsWith(excludedPath)) {
+                    excluded.setValue(true);
+                }
+            });
+            if (excluded.booleanValue()) {
+                // if the uri requested starts with any excluded path, ignore the referrer information
+                // storing this information in the referrer cache would break the portals
                 return target;
             }
             // request target does not contain a pca endpoint, we need to add it
