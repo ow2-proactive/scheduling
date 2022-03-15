@@ -67,6 +67,8 @@ public class RMProxy {
 
     private String sessionid = null;
 
+    private String user;
+
     RMProxy(URI rmURL, Credentials creds) throws RMException, RMProxyCreationException {
         this.rmURL = rmURL;
         this.creds = creds;
@@ -79,6 +81,14 @@ public class RMProxy {
 
     public void setSessionid(String sessionid) {
         this.sessionid = sessionid;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public synchronized void init() throws RMException, RMProxyCreationException {
@@ -134,6 +144,7 @@ public class RMProxy {
         if (criteria.getScripts() != null) {
             for (SelectionScript script : criteria.getScripts()) {
                 script.setSessionid(sessionid);
+                script.setOwner(user);
             }
         }
         return PAFuture.getFutureValue(proxyActiveObject.getNodes(criteria));
@@ -158,6 +169,7 @@ public class RMProxy {
         }
         if (cleaningScript != null) {
             cleaningScript.setSessionid(sessionid);
+            cleaningScript.setOwner(user);
         }
 
         if (proxyActiveObject != null) {

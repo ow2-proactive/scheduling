@@ -58,23 +58,31 @@ public class SchedulingTaskComparator {
 
     private InternalJob job;
 
+    private String sessionid;
+
+    private String owner;
+
     /**
      * Create a new instance of SchedulingTaskComparator
      *
      * @param task
+     * @param sessionid
      */
-    public SchedulingTaskComparator(InternalTask task, InternalJob job) {
+    public SchedulingTaskComparator(InternalTask task, InternalJob job, String sessionid) {
         this.task = task;
-
-        if (task.getSelectionScripts() != null) {
-            computeHashForSelectionScripts(task, job);
-        }
         this.job = job;
+        this.sessionid = sessionid;
+        this.owner = job.getOwner();
+        if (task.getSelectionScripts() != null) {
+            computeHashForSelectionScripts();
+        }
     }
 
-    private void computeHashForSelectionScripts(InternalTask task, InternalJob job) {
+    private void computeHashForSelectionScripts() {
         List<SelectionScript> scriptList = SchedulingMethodImpl.resolveScriptVariables(task.getSelectionScripts(),
-                                                                                       task.getRuntimeVariables());
+                                                                                       task.getRuntimeVariables(),
+                                                                                       sessionid,
+                                                                                       owner);
 
         for (SelectionScript script : scriptList) {
             SelectionScript modifiedScript = script;

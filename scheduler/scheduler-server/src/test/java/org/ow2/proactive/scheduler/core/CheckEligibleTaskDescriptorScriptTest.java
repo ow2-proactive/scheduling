@@ -87,7 +87,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertTrue(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertFalse(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertFalse(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertTrue(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -128,7 +128,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertTrue(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -142,7 +142,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertTrue(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -157,7 +157,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertTrue(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -171,7 +171,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertTrue(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -184,7 +184,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertTrue(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -197,7 +197,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        assertFalse(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertFalse(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -205,7 +205,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         fe = null;
         Mockito.when(((EligibleTaskDescriptorImpl) etd).getInternal()).thenReturn(it);
         Mockito.when(it.getForkEnvironment()).thenReturn(fe);
-        assertFalse(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+        assertFalse(new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null));
     }
 
     @Test
@@ -213,7 +213,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         sec = null;
         Mockito.when(((EligibleTaskDescriptorImpl) etd).getInternal()).thenReturn(ist);
         Mockito.when(ist.getExecutableContainer()).thenReturn(sec);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
+        Boolean result = new CheckEligibleTaskDescriptorScript(null).isTaskContainsAPIBinding(etd, null);
         assertFalse(result);
     }
 

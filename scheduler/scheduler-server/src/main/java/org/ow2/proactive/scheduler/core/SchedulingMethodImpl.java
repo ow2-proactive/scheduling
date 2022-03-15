@@ -30,9 +30,7 @@ import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,8 +58,8 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
-import org.ow2.proactive.scheduler.core.helpers.VariableBatchSizeIterator;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.core.rmproxies.PerUserConnectionRMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -77,6 +75,7 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.internal.TaskRecoveryData;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.scheduler.util.SchedulingMainLoopTimingLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
@@ -86,6 +85,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 
 
@@ -124,9 +125,15 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private SchedulingMainLoopTimingLogger schedulingMainLoopTimingLogger;
 
+    // a cache which stores temporarily sessionids to improve performance
+    private static Cache<String, String> sessionidCache = CacheBuilder.newBuilder()
+                                                                      .expireAfterWrite(PASchedulerProperties.SCHEDULER_METHOD_SESSION_CACHE_EXPIRATION.getValueAsInt(),
+                                                                                        TimeUnit.SECONDS)
+                                                                      .build();
+
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
-        this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
+        this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript(this);
         terminateNotification = new TerminateNotification(schedulingService);
         Node terminateNotificationNode = NodeFactory.createLocalNode("taskTerminationNode",
                                                                      true,
@@ -486,7 +493,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             EligibleTaskDescriptor etd;
             while (it.hasNext()) {
                 etd = it.next();
-                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd)) {
+                InternalJob internalJob = ((JobDescriptorImpl) jobsMap.get(etd.getJobId())).getInternal();
+                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd, internalJob)) {
                     //skip task here
                     it.remove();
                 }
@@ -499,7 +507,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             internalTask.updateVariables(schedulingService);
             int neededNodes = internalTask.getNumberOfNodesNeeded();
-            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob);
+            String sessionid = getSessionid(currentJob);
+            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob, sessionid);
             boolean firstLoop = true;
             do {
                 if (!firstLoop) {
@@ -516,7 +525,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     firstLoop = false;
                 }
                 //check if the task is compatible with the other previous one
-                if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob))) {
+                if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob, sessionid))) {
                     tlogger.debug(internalTask.getId(), "scheduling");
                     totalNeededNodes += neededNodes;
                     toFill.add(etd);
@@ -585,8 +594,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setTopology(descriptor);
                 // resolve script variables (if any) in the list of selection
                 // scripts and then set it as the selection criteria.
+                String sessionid = getSessionid(currentJob);
                 criteria.setScripts(resolveScriptVariables(internalTask0.getSelectionScripts(),
-                                                           internalTask0.getRuntimeVariables()));
+                                                           internalTask0.getRuntimeVariables(),
+                                                           sessionid,
+                                                           currentJob.getOwner()));
                 criteria.setBlackList(internalTask0.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
                 if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
@@ -783,8 +795,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 job.setSynchronizationAPI(schedulingService.getSynchronizationAPI());
                 schedulingMainLoopTimingLogger.end("startDataspaceApp");
                 NodeSet nodes = new NodeSet();
-                String sessionid = getRMProxiesManager().getUserRMProxy(job.getOwner(), job.getCredentials())
-                                                        .getSessionid();
+                String sessionid = getSessionid(job);
                 try {
 
                     // create launcher
@@ -889,6 +900,26 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     }
 
+    public synchronized String getSessionid(InternalJob job) {
+        String sessionid = sessionidCache.getIfPresent(job.getOwner());
+        if (sessionid != null) {
+            return sessionid;
+        }
+        try {
+            RMProxiesManager proxiesManager = getRMProxiesManager();
+            sessionid = proxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).getSessionid();
+            if (sessionid != null) {
+                sessionidCache.put(job.getOwner(), sessionid);
+            } else if (!"true".equals(System.getProperty(SchedulerStarter.REST_DISABLED_PROPERTY))) {
+                logger.warn("Unexpected null session id for user " + job.getOwner());
+            }
+            return sessionid;
+        } catch (RMProxyCreationException e) {
+            logger.warn("Error when creating proxy for " + job.getOwner(), e);
+            return null;
+        }
+    }
+
     /**
      * Finalize the start of the task by mark it as started. Also mark the job if it is not already started.
      *
@@ -913,12 +944,16 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * Replace selection script variables with values specified in the map.
      */
     public static List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
-            Map<String, Serializable> variables) {
+            Map<String, Serializable> variables, String sessionid, String owner) {
         List<SelectionScript> output = new LinkedList<>();
         if (selectionScripts == null) {
             return null;
         }
         for (SelectionScript script : selectionScripts) {
+            if (sessionid != null) {
+                script.setSessionid(sessionid);
+                script.setOwner(owner);
+            }
             SelectionScript resolved = SelectionScript.resolvedSelectionScript(script);
             VariableSubstitutor.filterAndUpdate(resolved, variables);
             output.add(resolved);

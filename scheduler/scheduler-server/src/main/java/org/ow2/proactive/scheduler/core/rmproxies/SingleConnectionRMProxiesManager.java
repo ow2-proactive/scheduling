@@ -30,6 +30,11 @@ import java.net.URISyntaxException;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.util.SchedulerStarter;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 
 
 public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
@@ -38,12 +43,17 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
 
     private URI rmURI;
 
+    private SessionStore sessionStore;
+
+    private Session currentSession;
+
     public SingleConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials)
             throws RMException, RMProxyCreationException, URISyntaxException {
         super(schedulerProxyCredentials);
         this.rmURI = rmURI;
 
         rmProxy = new RMProxy(rmURI, schedulerProxyCredentials);
+        sessionStore = SharedSessionStore.getInstance();
     }
 
     @Override
@@ -58,8 +68,30 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
     }
 
     @Override
-    public RMProxy getUserRMProxy(String user, Credentials credentials) {
-        return rmProxy;
+    public RMProxy getUserRMProxy(String user, Credentials credentials) throws RMProxyCreationException {
+        synchronized (rmProxy) {
+            if ("true".equals(System.getProperty(SchedulerStarter.REST_DISABLED_PROPERTY))) {
+                return rmProxy;
+            }
+            if (currentSession == null) {
+                currentSession = createUserSession(user, credentials, rmProxy);
+            } else {
+                if (sessionStore.exists(currentSession.getSessionId())) {
+                    // current session still referenced in SessionStore, renewing it
+                    try {
+                        currentSession.renewSession();
+                    } catch (NotConnectedException e) {
+                        // current session is not connected to the scheduler, creating a new one
+                        currentSession = createUserSession(user, credentials, rmProxy);
+                    }
+                } else {
+                    // current session has been removed from SessionStore due to inactivity, creating a new one
+                    currentSession = createUserSession(user, credentials, rmProxy);
+                }
+            }
+
+            return rmProxy;
+        }
     }
 
     @Override
@@ -75,6 +107,24 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
     @Override
     public RMProxy getRmProxy() {
         return rmProxy;
+    }
+
+    private Session createUserSession(String user, Credentials credentials, RMProxy proxy)
+            throws RMProxyCreationException {
+        try {
+            if (!"true".equals(System.getProperty(SchedulerStarter.REST_DISABLED_PROPERTY))) {
+                // Rest session management works only if the rest server is launched in the same JVM as the scheduler server
+                Session session = sessionStore.create(user);
+                session.connectToRM(credentials);
+                proxy.setSessionid(session.getSessionId());
+                proxy.setUser(user);
+                return session;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            throw new RMProxyCreationException(e);
+        }
     }
 
 }

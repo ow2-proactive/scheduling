@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.core;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scripting.Script;
@@ -39,60 +40,74 @@ import org.ow2.proactive.scripting.Script;
  */
 public class CheckEligibleTaskDescriptorScript {
 
+    private SchedulingMethodImpl schedulingMethod;
+
+    public CheckEligibleTaskDescriptorScript(SchedulingMethodImpl schedulingMethod) {
+        this.schedulingMethod = schedulingMethod;
+    }
+
     /**
      * Check whether or not the task is asking for the api binding
      * @param etd an eligible task descriptor
      * @return true if at least one of the pre script, the post script, the flow script, the environment script or the internal script contains the api binding
      */
 
-    public boolean isTaskContainsAPIBinding(EligibleTaskDescriptor etd) {
-        return isPrePostFlowEnvironmentScriptContainsApiBinding(etd) ||
+    public boolean isTaskContainsAPIBinding(EligibleTaskDescriptor etd, InternalJob job) {
+        return isPrePostFlowEnvironmentScriptContainsApiBinding(etd, job) ||
                ((((EligibleTaskDescriptorImpl) etd).getInternal() instanceof InternalScriptTask) &&
-                (isInternalScriptContainsApiBinding(etd)));
+                (isInternalScriptContainsApiBinding(etd, job)));
 
     }
 
-    private boolean isInternalScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+    private boolean isInternalScriptContainsApiBinding(EligibleTaskDescriptor etd, InternalJob job) {
         return (((EligibleTaskDescriptorImpl) etd).getInternal().getExecutableContainer() != null) &&
                (((EligibleTaskDescriptorImpl) etd).getInternal()
                                                   .getExecutableContainer() instanceof ScriptExecutableContainer) &&
                (((ScriptExecutableContainer) ((EligibleTaskDescriptorImpl) etd).getInternal().getExecutableContainer())
                                                                                                                        .getScript() != null) &&
                isScriptContainsApiBinding(((ScriptExecutableContainer) ((EligibleTaskDescriptorImpl) etd).getInternal()
-                                                                                                         .getExecutableContainer()).getScript());
+                                                                                                         .getExecutableContainer()).getScript(),
+                                          job);
 
     }
 
-    private boolean isPresScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+    private boolean isPresScriptContainsApiBinding(EligibleTaskDescriptor etd, InternalJob job) {
         return (((EligibleTaskDescriptorImpl) etd).getInternal().getPreScript() != null) &&
-               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getPreScript());
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getPreScript(), job);
     }
 
-    private boolean isPostScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+    private boolean isPostScriptContainsApiBinding(EligibleTaskDescriptor etd, InternalJob job) {
         return (((EligibleTaskDescriptorImpl) etd).getInternal().getPostScript() != null) &&
-               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getPostScript());
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getPostScript(), job);
     }
 
-    private boolean isCleanScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+    private boolean isCleanScriptContainsApiBinding(EligibleTaskDescriptor etd, InternalJob job) {
         return (((EligibleTaskDescriptorImpl) etd).getInternal().getCleaningScript() != null) &&
-               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getCleaningScript());
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getCleaningScript(), job);
     }
 
-    private boolean isFlowScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+    private boolean isFlowScriptContainsApiBinding(EligibleTaskDescriptor etd, InternalJob job) {
         return (((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript() != null) &&
-               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript());
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript(), job);
 
     }
 
-    private boolean isEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+    private boolean isEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd, InternalJob job) {
         return (((EligibleTaskDescriptorImpl) etd).getInternal().getForkEnvironment() != null) &&
                (((EligibleTaskDescriptorImpl) etd).getInternal().getForkEnvironment().getEnvScript() != null) &&
                isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal()
                                                                             .getForkEnvironment()
-                                                                            .getEnvScript());
+                                                                            .getEnvScript(),
+                                          job);
     }
 
-    private boolean isScriptContainsApiBinding(Script script) {
+    private boolean isScriptContainsApiBinding(Script script, InternalJob job) {
+
+        if (schedulingMethod != null) {
+            String sessionid = schedulingMethod.getSessionid(job);
+            script.setSessionid(sessionid);
+            script.setOwner(job.getOwner());
+        }
 
         String scriptContent = script.fetchScript();
 
@@ -107,9 +122,9 @@ public class CheckEligibleTaskDescriptorScript {
                                            scriptContent.contains(SchedulerConstants.DS_USER_API_BINDING_NAME));
     }
 
-    private boolean isPrePostFlowEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return isPresScriptContainsApiBinding(etd) || isPostScriptContainsApiBinding(etd) ||
-               isFlowScriptContainsApiBinding(etd) || isEnvironmentScriptContainsApiBinding(etd) ||
-               isCleanScriptContainsApiBinding(etd);
+    private boolean isPrePostFlowEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd, InternalJob job) {
+        return isPresScriptContainsApiBinding(etd, job) || isPostScriptContainsApiBinding(etd, job) ||
+               isFlowScriptContainsApiBinding(etd, job) || isEnvironmentScriptContainsApiBinding(etd, job) ||
+               isCleanScriptContainsApiBinding(etd, job);
     }
 }

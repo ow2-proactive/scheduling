@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -58,6 +59,8 @@ import org.ow2.proactive.utils.BoundedStringWriter;
 import org.ow2.proactive.utils.FileUtils;
 
 import com.google.common.base.Throwables;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 
 /**
@@ -104,6 +107,15 @@ public abstract class Script<E> implements Serializable {
     private static Boolean lazyFetch = null;
 
     private String sessionid = null;
+
+    private String owner = null;
+
+    // a cache which stores temporarily script contents, to avoid eager usage of the catalog service
+    private static Cache<String, Script.ScriptContentAndEngineName> scriptCache = CacheBuilder.newBuilder()
+                                                                                              .expireAfterWrite(Integer.parseInt(System.getProperty("pa.script.cache.expiration",
+                                                                                                                                                    "60")),
+                                                                                                                TimeUnit.SECONDS)
+                                                                                              .build();
 
     /** ProActive needed constructor */
     public Script() {
@@ -259,6 +271,14 @@ public abstract class Script<E> implements Serializable {
 
     public void setSessionid(String sessionid) {
         this.sessionid = sessionid;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     protected static boolean isLazyFetch() {
@@ -477,12 +497,24 @@ public abstract class Script<E> implements Serializable {
     }
 
     private Script.ScriptContentAndEngineName getScriptContentAndEngineName() throws IOException {
-        Script.ScriptContentAndEngineName fetchedInformation;
+        Script.ScriptContentAndEngineName fetchedInformation = null;
+        String key = null;
+        // cache key contains the owner and the script url, as different owners may have different read access rights
+        if (owner != null) {
+            key = owner + "_" + url.toExternalForm();
+        } else {
+            key = url.toExternalForm();
+        }
+        fetchedInformation = scriptCache.getIfPresent(key);
+        if (fetchedInformation != null) {
+            return fetchedInformation;
+        }
         if (url.getProtocol().equals("http") || url.getProtocol().equals("https")) {
             fetchedInformation = fetchScriptUsingHttpDownloader(url);
         } else {
             fetchedInformation = fetchScriptUsingOpenStream(url);
         }
+        scriptCache.put(key, fetchedInformation);
         return fetchedInformation;
     }
 

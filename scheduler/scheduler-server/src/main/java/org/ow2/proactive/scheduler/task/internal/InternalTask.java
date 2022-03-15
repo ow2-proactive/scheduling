@@ -1167,14 +1167,17 @@ public abstract class InternalTask extends TaskState {
         if (getPreScript() != null) {
             tli.setPreScript(getPreScript());
             tli.getPreScript().setSessionid(sessionid);
+            tli.getPreScript().setOwner(internalJob.getOwner());
         }
         if (getPostScript() != null) {
             tli.setPostScript(getPostScript());
             tli.getPostScript().setSessionid(sessionid);
+            tli.getPostScript().setOwner(internalJob.getOwner());
         }
         if (getFlowScript() != null) {
             tli.setControlFlowScript(getFlowScript());
             tli.getControlFlowScript().setSessionid(sessionid);
+            tli.getControlFlowScript().setOwner(internalJob.getOwner());
         }
 
         tli.setTaskInputFiles(getInputFilesList());
@@ -1199,6 +1202,7 @@ public abstract class InternalTask extends TaskState {
         tli.setForkEnvironment(environment);
         if (tli.getForkEnvironment() != null && tli.getForkEnvironment().getEnvScript() != null) {
             tli.getForkEnvironment().getEnvScript().setSessionid(sessionid);
+            tli.getForkEnvironment().getEnvScript().setOwner(internalJob.getOwner());
         }
 
         if (isWallTimeSet()) {

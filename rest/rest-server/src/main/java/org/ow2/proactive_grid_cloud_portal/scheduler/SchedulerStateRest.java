@@ -41,6 +41,7 @@ import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -116,6 +117,8 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 
 /**
@@ -171,6 +174,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public static final String WORKFLOW_ICON_GI = "workflow.icon";
 
     public static final String DOCUMENTATION_GI = "Documentation";
+
+    // a cache which stores temporarily downloaded workflows, to avoid eager usage of the ProActive catalog service
+    private static Cache<String, String> workflowCache = CacheBuilder.newBuilder()
+                                                                     .expireAfterWrite(PASchedulerProperties.SCHEDULER_DOWNLOAD_CACHE_EXPIRATION.getValueAsInt(),
+                                                                                       TimeUnit.SECONDS)
+                                                                     .build();
 
     static {
         sortableTaskAttrMap = createSortableTaskAttrMap();
@@ -1472,6 +1481,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return schedulerProxy;
     }
 
+    private String getUserName(String sessionId) throws NotConnectedRestException {
+        Session session = sessionStore.get(sessionId);
+        return session.getUserName();
+    }
+
     private SchedulerSpaceInterface getSpaceInterface(String sessionId) throws NotConnectedRestException {
 
         renewSession(sessionId);
@@ -2692,16 +2706,30 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     private String downloadWorkflowContent(String sessionId, String workflowUrl)
-            throws JobCreationRestException, IOException {
-        if (StringUtils.isBlank(workflowUrl))
+            throws JobCreationRestException, IOException, NotConnectedRestException {
+        if (StringUtils.isBlank(workflowUrl)) {
             throw new JobCreationRestException("Cannot create workflow without url");
+        }
+        // cache key contains the owner and the workflow url, as different owners may have different read access rights
+        String userName = getUserName(sessionId);
+        String key = userName + "_" + workflowUrl;
+        String cachedWorkflow = workflowCache.getIfPresent(key);
+        if (cachedWorkflow != null) {
+            return cachedWorkflow;
+        }
+        String downloadedWorkflow = null;
         if (workflowUrl.startsWith("http")) {
             HttpResourceDownloader httpResourceDownloader = HttpResourceDownloader.getInstance();
-            return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
+            downloadedWorkflow = httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
         } else {
             URL nonHttpURL = new URL(workflowUrl);
-            return IOUtils.toString(nonHttpURL.openStream(), Charsets.UTF_8);
+            downloadedWorkflow = IOUtils.toString(nonHttpURL.openStream(), Charsets.UTF_8);
         }
+        if (downloadedWorkflow == null) {
+            throw new IOException("Unexpected null content of workflow downloaded from " + workflowUrl);
+        }
+        workflowCache.put(key, downloadedWorkflow);
+        return downloadedWorkflow;
     }
 
     protected static Map<String, String> createSortableTaskAttrMap() {
