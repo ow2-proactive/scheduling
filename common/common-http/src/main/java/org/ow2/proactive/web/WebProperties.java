@@ -101,7 +101,7 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_HTTPS_SESSION_TIMEOUT("web.https.session.timeout", PropertyType.INTEGER),
 
-    WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER, "300"),
+    WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER, "400"),
 
     WEB_IDLE_TIMEOUT("web.idle_timeout", PropertyType.INTEGER, "60000"),
 

@@ -129,6 +129,7 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
                 Session session = sessionStore.create(user);
                 session.connectToRM(credentials);
                 proxy.setSessionid(session.getSessionId());
+                proxy.setUser(user);
                 userSessions.put(user, session);
             }
         } catch (Exception e) {

@@ -232,6 +232,8 @@ public class SelectionScript extends Script<Boolean> {
                 SelectionScript newScript = new SelectionScript(originalScript.url,
                                                                 originalScript.parameters,
                                                                 originalScript.dynamic);
+                newScript.setSessionid(originalScript.getSessionid());
+                newScript.setOwner(originalScript.getOwner());
                 newScript.fetchUrlIfNeeded();
                 return newScript;
             } catch (InvalidScriptException | IOException e) {

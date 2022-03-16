@@ -152,6 +152,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** size of the cache used to ensure that delayed jobs or tasks are scheduled at the precise date (without skipping seconds) **/
     SCHEDULER_STARTAT_CACHE("pa.scheduler.startat.cache", PropertyType.INTEGER, "5000"),
 
+    /** Expiration period in seconds of cache used to download workflows */
+    SCHEDULER_DOWNLOAD_CACHE_EXPIRATION("pa.scheduler.download.cache.expiration", PropertyType.INTEGER, "60"),
+
+    /** Expiration period in seconds of cache used to store session ids */
+    SCHEDULER_METHOD_SESSION_CACHE_EXPIRATION("pa.scheduler.method.session.cache.expiration", PropertyType.INTEGER, "300"),
+
     /** Period of the HSQLDB monitoring thread (in seconds) **/
     SCHEDULER_HSQLDB_MONITOR_PERIOD("pa.scheduler.hsqldb.monitor.period", PropertyType.INTEGER, "10"),
 

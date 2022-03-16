@@ -77,8 +77,9 @@ public class SchedulingTaskComparatorTest extends ProActiveTestClean {
 
     @Test
     public void basicTestEquals() throws Exception {
-        Assert.assertTrue((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                          job2)));
+        Assert.assertTrue((new SchedulingTaskComparator(task1, job1, null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                                job2,
+                                                                                                                null)));
     }
 
     @Test
@@ -87,15 +88,19 @@ public class SchedulingTaskComparatorTest extends ProActiveTestClean {
                .thenReturn(ImmutableList.of(new SelectionScript("selected = true", "javascript")));
         Mockito.when(task2.getSelectionScripts())
                .thenReturn(ImmutableList.of(new SelectionScript("selected = true", "javascript")));
-        Assert.assertTrue((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                          job2)));
+        Assert.assertTrue((new SchedulingTaskComparator(task1, job1, null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                                job2,
+                                                                                                                null)));
 
         Mockito.when(task1.getSelectionScripts())
                .thenReturn(ImmutableList.of(new SelectionScript("selected = true", "javascript")));
         Mockito.when(task2.getSelectionScripts())
                .thenReturn(ImmutableList.of(new SelectionScript("selected = false", "javascript")));
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
     }
 
     @Test
@@ -109,33 +114,49 @@ public class SchedulingTaskComparatorTest extends ProActiveTestClean {
                                                                 "javascript")));
         Mockito.when(task2.getRuntimeVariables()).thenReturn(ImmutableMap.of("PA_JOB", (Serializable) "job2"));
 
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
 
         Mockito.when(task2.getRuntimeVariables()).thenReturn(ImmutableMap.of("PA_JOB", (Serializable) "job1"));
 
-        Assert.assertTrue((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                          job2)));
+        Assert.assertTrue((new SchedulingTaskComparator(task1, job1, null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                                job2,
+                                                                                                                null)));
     }
 
     @Test
     public void testJobOwnerDiffers() throws Exception {
         Mockito.when(job2.getOwner()).thenReturn("notadmin");
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
     }
 
     @Test
     public void testAnyParallel() throws Exception {
         Mockito.when(task1.isParallel()).thenReturn(true);
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
         Mockito.when(task2.isParallel()).thenReturn(true);
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
         Mockito.when(task1.isParallel()).thenReturn(false);
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
     }
 
     @Test
@@ -143,37 +164,48 @@ public class SchedulingTaskComparatorTest extends ProActiveTestClean {
         // no token on both
         Mockito.when(task1.getRuntimeGenericInformation()).thenReturn(new HashMap<>());
         Mockito.when(task2.getRuntimeGenericInformation()).thenReturn(new HashMap<>());
-        Assert.assertTrue((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                          job2)));
+        Assert.assertTrue((new SchedulingTaskComparator(task1, job1, null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                                job2,
+                                                                                                                null)));
 
         // same token on both
         Mockito.when(task1.getRuntimeGenericInformation())
                .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token"));
         Mockito.when(task2.getRuntimeGenericInformation())
                .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token"));
-        Assert.assertTrue((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                          job2)));
+        Assert.assertTrue((new SchedulingTaskComparator(task1, job1, null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                                job2,
+                                                                                                                null)));
 
         // different tokens
         Mockito.when(task1.getRuntimeGenericInformation())
                .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token"));
         Mockito.when(task2.getRuntimeGenericInformation())
                .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token2"));
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
 
         // one token only
         Mockito.when(task1.getRuntimeGenericInformation())
                .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token"));
         Mockito.when(task2.getRuntimeGenericInformation()).thenReturn(new HashMap<>());
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
 
         Mockito.when(task1.getRuntimeGenericInformation()).thenReturn(new HashMap<>());
         Mockito.when(task2.getRuntimeGenericInformation())
                .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token2"));
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
     }
 
 }

@@ -91,6 +91,9 @@ public class LateBindingSelectionScriptTest extends RMFunctionalTest {
             event = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             assertEquals(NodeState.FREE, event.getNodeState());
 
+            // Sleep the default script cache configuration
+            Thread.sleep(Integer.parseInt(System.getProperty("pa.script.cache.expiration", "60")) * 1000L);
+
             log("Test 2 : selection script contains selected = false");
 
             FileUtils.writeStringToFile(selectionScriptFile, "selected = false", Charset.defaultCharset());

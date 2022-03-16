@@ -168,6 +168,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
         createAndSetCredentials();
         container.getScript().setSessionid(sessionid);
+        container.getScript().setOwner(job.getOwner());
     }
 
     private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException {
