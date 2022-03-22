@@ -196,6 +196,7 @@ public final class TestExecRemote extends RMFunctionalTest {
                 }
 
                 String output = res.getOutput();
+                System.out.println("Script output: " + output);
 
                 assertTrue("The script output must contains " + valueToEcho, output.contains(valueToEcho));
             }

@@ -42,6 +42,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BaseParserValidator;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
+import com.google.common.net.UrlEscapers;
+
 
 /**
  * @author ActiveEon Team
@@ -113,9 +115,14 @@ public class CatalogObjectValidator implements Validator<String> {
         String url;
         // catalogObjectValue is already checked (with the regular expression) to have either 2 to 3 parts (bucketName/objectName[/revision]) after split
         if (splitCatalog.length == 2) {
-            url = String.format(CATALOG_URL_WITHOUT_REVISION, splitCatalog[0], splitCatalog[1]);
+            url = String.format(CATALOG_URL_WITHOUT_REVISION,
+                                UrlEscapers.urlPathSegmentEscaper().escape(splitCatalog[0]),
+                                UrlEscapers.urlPathSegmentEscaper().escape(splitCatalog[1]));
         } else if (splitCatalog.length == 3) {
-            url = String.format(CATALOG_URL_WITH_REVISION, splitCatalog[0], splitCatalog[1], splitCatalog[2]);
+            url = String.format(CATALOG_URL_WITH_REVISION,
+                                UrlEscapers.urlPathSegmentEscaper().escape(splitCatalog[0]),
+                                UrlEscapers.urlPathSegmentEscaper().escape(splitCatalog[1]),
+                                UrlEscapers.urlPathSegmentEscaper().escape(splitCatalog[2]));
         } else {
             throw new ValidationException("Expected value should match the format: bucketName/objectName[/revision]");
         }
