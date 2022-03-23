@@ -3245,7 +3245,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                             rmNode.getState(),
                                                             rmNode.getProvider().getName()));
 
-            logger.info("The token '" + token + "' is added to the node " + nodeUrl);
+            logger.info("The token '" + token + "' is added to the node " + nodeUrl + " by " + caller);
 
         } else {
             throw new RMException("Unknown node " + nodeUrl);
@@ -3340,7 +3340,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                             rmNode.getState(),
                                                             rmNode.getProvider().getName()));
 
-            logger.info("The token '" + token + "' is removed from the node " + nodeUrl);
+            logger.info("The token '" + token + "' is removed from the node " + nodeUrl + " by " + caller);
 
         } else {
             throw new RMException("Unknown node " + nodeUrl);
