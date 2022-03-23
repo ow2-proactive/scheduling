@@ -2793,6 +2793,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.checkNodeAdminOrProviderPermission(rmNode, lockInitiator);
             rmNode.lock(lockInitiator);
             this.eligibleNodes.remove(rmNode);
+            logger.info("The node " + rmNode.getNodeURL() + " is locked by " + lockInitiator.getName());
         } catch (SecurityException e) {
             logger.warn("Lock node lockInitiator is not admin", e);
             return false;
@@ -2881,6 +2882,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
 
             updateNode(rmNode);
+            logger.info("The node " + rmNode.getNodeURL() + " is unlocked by " + this.caller.getName());
         } catch (Exception ex) {
             logger.warn("", ex);
             return false;
@@ -3242,6 +3244,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                             rmNode.getState(),
                                                             rmNode.getProvider().getName()));
+
+            logger.info("The token '" + token + "' is added to the node " + nodeUrl);
+
         } else {
             throw new RMException("Unknown node " + nodeUrl);
         }
@@ -3335,6 +3340,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                             rmNode.getState(),
                                                             rmNode.getProvider().getName()));
 
+            logger.info("The token '" + token + "' is removed from the node " + nodeUrl);
+
         } else {
             throw new RMException("Unknown node " + nodeUrl);
         }
@@ -3354,6 +3361,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                             rmNode.getState(),
                                                             rmNode.getProvider().getName()));
+
+            logger.info("The list of tokens of the node " + nodeUrl + "' are updated. The current list of tokens is: " +
+                        tokens);
+
         } else {
             throw new RMException("Unknown node " + nodeUrl);
         }
