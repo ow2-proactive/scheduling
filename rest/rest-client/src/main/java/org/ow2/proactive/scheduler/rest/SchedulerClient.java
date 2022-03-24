@@ -140,6 +140,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 import com.google.common.io.Closer;
+import com.google.common.net.UrlEscapers;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -911,8 +912,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             Map<String, String> variables, Map<String, String> genericInfo)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
 
-        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" + bucketName + "/resources/" + workflowName +
-                                      "/raw");
+        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" +
+                                      UrlEscapers.urlPathSegmentEscaper().escape(bucketName) + "/resources/" +
+                                      UrlEscapers.urlPathSegmentEscaper().escape(workflowName) + "/raw");
         return submitFromCatalog(httpGet, variables, genericInfo);
 
     }
@@ -943,9 +945,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
         Optional<String> revision = getRevisionFromCalledWorkflow(calledWorkflow);
 
-        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" + getBucketFromCalledWorkflow(calledWorkflow) +
-                                      "/resources/" + getNameFromCalledWorkflow(calledWorkflow) +
-                                      revision.map(r -> "/revisions/" + r).orElse("") + "/raw");
+        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" +
+                                      UrlEscapers.urlPathSegmentEscaper()
+                                                 .escape(getBucketFromCalledWorkflow(calledWorkflow)) +
+                                      "/resources/" +
+                                      UrlEscapers.urlPathSegmentEscaper()
+                                                 .escape(getNameFromCalledWorkflow(calledWorkflow)) +
+                                      revision.map(r -> "/revisions/" + UrlEscapers.urlPathSegmentEscaper().escape(r))
+                                              .orElse("") +
+                                      "/raw");
 
         return this.submitFromCatalog(httpGet, variables, genericInfo);
     }
