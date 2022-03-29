@@ -22,6 +22,14 @@ dependencies {
     compile 'org.eclipse.jetty:jetty-rewrite:9.2.29.v20191105'
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.11'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.8.11'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.8.11'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.8.11'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.11'
+    compile 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.11'
+
+
     compile project(':common:common-api')
     compile project(':common:common-client')
     compile project(':common:common-db')
