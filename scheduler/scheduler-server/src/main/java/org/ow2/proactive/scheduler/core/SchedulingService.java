@@ -91,10 +91,15 @@ public class SchedulingService {
     static final long SCHEDULER_AUTO_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY.getValueAsLong() *
                                                          1000;
 
+    static final long SCHEDULER_AUTO_REMOVED_ERROR_JOB_DELAY = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_ERROR_JOB_DELAY.getValueAsLong() *
+                                                               1000;
+
     static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsLong() *
                                                     1000;
 
     static final String GENERIC_INFO_REMOVE_DELAY = "REMOVE_DELAY";
+
+    static final String GENERIC_INFO_REMOVE_DELAY_ON_ERROR = "REMOVE_DELAY_ON_ERROR";
 
     public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED = "SchedulingService::recoverTasksState finished";
 
@@ -1099,7 +1104,7 @@ public class SchedulingService {
         }
     }
 
-    void terminateJobHandling(final JobId jobId, final Map<String, String> jobGenericInfo) {
+    void terminateJobHandling(final JobId jobId, final Map<String, String> jobGenericInfo, boolean isJobWithErrors) {
         try {
             listenJobLogsSupport.cleanLoggers(jobId);
             jlogger.close(jobId);
@@ -1108,14 +1113,10 @@ public class SchedulingService {
             if (SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
                 removeDelay = SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY;
             }
-            if (jobGenericInfo != null && jobGenericInfo.containsKey(GENERIC_INFO_REMOVE_DELAY)) {
-                try {
-                    removeDelay = Tools.parsePeriod(jobGenericInfo.get(GENERIC_INFO_REMOVE_DELAY));
-                } catch (Exception e) {
-                    logger.error("Error when parsing generic information " + GENERIC_INFO_REMOVE_DELAY + " for job " +
-                                 jobId, e);
-                }
+            if (isJobWithErrors && SchedulingService.SCHEDULER_AUTO_REMOVED_ERROR_JOB_DELAY > 0) {
+                removeDelay = SchedulingService.SCHEDULER_AUTO_REMOVED_ERROR_JOB_DELAY;
             }
+            removeDelay = getRemoveDelayFromGenericInfo(jobId, jobGenericInfo, isJobWithErrors, removeDelay);
 
             // auto remove
             if (removeDelay < Long.MAX_VALUE) {
@@ -1126,6 +1127,29 @@ public class SchedulingService {
         } catch (Throwable t) {
             logger.warn("", t);
         }
+    }
+
+    private long getRemoveDelayFromGenericInfo(JobId jobId, Map<String, String> jobGenericInfo, boolean isJobWithErrors,
+            long removeDelay) {
+        if (jobGenericInfo != null) {
+            if (jobGenericInfo.containsKey(GENERIC_INFO_REMOVE_DELAY)) {
+                try {
+                    removeDelay = Tools.parsePeriod(jobGenericInfo.get(GENERIC_INFO_REMOVE_DELAY));
+                } catch (Exception e) {
+                    logger.error("Error when parsing generic information " + GENERIC_INFO_REMOVE_DELAY + " for job " +
+                                 jobId, e);
+                }
+            }
+            if (isJobWithErrors && jobGenericInfo.containsKey(GENERIC_INFO_REMOVE_DELAY_ON_ERROR)) {
+                try {
+                    removeDelay = Tools.parsePeriod(jobGenericInfo.get(GENERIC_INFO_REMOVE_DELAY_ON_ERROR));
+                } catch (Exception e) {
+                    logger.error("Error when parsing generic information " + GENERIC_INFO_REMOVE_DELAY_ON_ERROR +
+                                 " for job " + jobId, e);
+                }
+            }
+        }
+        return removeDelay;
     }
 
     private void recover(RecoveredSchedulerState recoveredState) {
@@ -1150,30 +1174,26 @@ public class SchedulingService {
             for (InternalJob job : recoveredState.getFinishedJobs()) {
                 //re-set job removed delay (if job result has been sent to user)
                 long toWait = Long.MAX_VALUE;
+                boolean isJobWithErrors = LiveJobs.isJobWithErrors(job);
+                long configuredAutoRemove = isJobWithErrors &&
+                                            SCHEDULER_AUTO_REMOVED_ERROR_JOB_DELAY > 0 ? SCHEDULER_AUTO_REMOVED_ERROR_JOB_DELAY
+                                                                                       : (SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0 ? SCHEDULER_AUTO_REMOVED_JOB_DELAY
+                                                                                                                               : Long.MAX_VALUE);
+
                 if (job.isToBeRemoved()) {
-                    toWait = SCHEDULER_REMOVED_JOB_DELAY *
-                             SCHEDULER_AUTO_REMOVED_JOB_DELAY == 0 ? Long.MAX_VALUE
-                                                                   : Math.min(SCHEDULER_REMOVED_JOB_DELAY,
-                                                                              SCHEDULER_AUTO_REMOVED_JOB_DELAY);
+                    toWait = SCHEDULER_REMOVED_JOB_DELAY > 0 ? SCHEDULER_REMOVED_JOB_DELAY : configuredAutoRemove;
                 } else {
-                    if (SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
-                        toWait = SCHEDULER_AUTO_REMOVED_JOB_DELAY;
-                    }
-                    if (job.getGenericInformation() != null &&
-                        job.getGenericInformation().containsKey(GENERIC_INFO_REMOVE_DELAY)) {
-                        try {
-                            toWait = Tools.parsePeriod(job.getGenericInformation().get(GENERIC_INFO_REMOVE_DELAY));
-                        } catch (Exception e) {
-                            logger.error("Error when parsing generic information " + GENERIC_INFO_REMOVE_DELAY +
-                                         " for job " + job.getId(), e);
-                        }
-                    }
+                    toWait = configuredAutoRemove;
+                    toWait = getRemoveDelayFromGenericInfo(job.getId(),
+                                                           job.getGenericInformation(),
+                                                           isJobWithErrors,
+                                                           toWait);
                 }
                 if (toWait < Long.MAX_VALUE) {
-                    long removalDate = System.currentTimeMillis() + toWait;
-                    if (removalDate < job.getScheduledTimeForRemoval()) {
+                    long removalDate = job.getFinishedTime() + toWait;
+                    if (job.getScheduledTimeForRemoval() == 0 || removalDate < job.getScheduledTimeForRemoval()) {
                         scheduleJobRemove(job.getId(), removalDate);
-                        jlogger.debug(job.getId(), "will be removed at " + new Date(removalDate));
+                        jlogger.info(job.getId(), "will be removed at " + new Date(removalDate));
                     }
                 }
             }

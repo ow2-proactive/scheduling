@@ -122,6 +122,8 @@ final class TerminationData {
 
     private final Map<JobId, Credentials> jobsToTerminateCredentials;
 
+    private final Map<JobId, Boolean> jobsWithErrors;
+
     private final Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate;
 
     private final Map<TaskIdWrapper, TaskRestartData> tasksToRestart;
@@ -132,28 +134,41 @@ final class TerminationData {
                                                              Collections.emptyMap(),
                                                              Collections.emptyMap(),
                                                              Collections.emptyMap(),
+                                                             Collections.emptyMap(),
                                                              Collections.emptyMap());
 
     static TerminationData newTerminationData() {
-        return new TerminationData(new HashSet<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+        return new TerminationData(new HashSet<>(),
+                                   new HashMap<>(),
+                                   new HashMap<>(),
+                                   new HashMap<>(),
+                                   new HashMap<>(),
+                                   new HashMap<>());
     }
 
     private TerminationData(Set<JobId> jobsToTerminate, Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate,
             Map<TaskIdWrapper, TaskRestartData> tasksToRestart,
             Map<JobId, Map<String, String>> jobsToTerminateGenericInformation,
-            Map<JobId, Credentials> jobsToTerminateCredentials) {
+            Map<JobId, Credentials> jobsToTerminateCredentials, Map<JobId, Boolean> jobsWithErrors) {
         this.jobsToTerminate = jobsToTerminate;
         this.tasksToTerminate = tasksToTerminate;
         this.jobsToTerminateGenericInformation = jobsToTerminateGenericInformation;
         this.tasksToRestart = tasksToRestart;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
         this.jobsToTerminateCredentials = jobsToTerminateCredentials;
+        this.jobsWithErrors = jobsWithErrors;
     }
 
-    void addJobToTerminate(JobId jobId, Map<String, String> jobGenericInfo, Credentials credentials) {
+    void addJobToTerminate(JobId jobId, Map<String, String> jobGenericInfo, Credentials credentials,
+            boolean isJobWithErrors) {
         jobsToTerminate.add(jobId);
         jobsToTerminateGenericInformation.put(jobId, jobGenericInfo);
         jobsToTerminateCredentials.put(jobId, credentials);
+        if (isJobWithErrors) {
+            jobsWithErrors.put(jobId, true);
+        } else {
+            jobsWithErrors.put(jobId, false);
+        }
     }
 
     public Credentials getCredentials(JobId jobId) {
@@ -198,7 +213,9 @@ final class TerminationData {
 
     private void terminateJobs(final SchedulingService service) {
         for (JobId jobId : jobsToTerminate) {
-            service.terminateJobHandling(jobId, jobsToTerminateGenericInformation.get(jobId));
+            service.terminateJobHandling(jobId,
+                                         jobsToTerminateGenericInformation.get(jobId),
+                                         jobsWithErrors.get(jobId));
         }
     }
 

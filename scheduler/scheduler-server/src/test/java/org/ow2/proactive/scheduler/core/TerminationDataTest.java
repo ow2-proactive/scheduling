@@ -106,7 +106,7 @@ public class TerminationDataTest extends ProActiveTestClean {
     public void testAddJobToTerminate() {
         assertThat(terminationData.isEmpty(), is(true));
         JobId jobId = new JobIdImpl(666, "readableName");
-        terminationData.addJobToTerminate(jobId, null, null);
+        terminationData.addJobToTerminate(jobId, null, null, false);
         assertThat(terminationData.isEmpty(), is(false));
         assertThat(terminationData.jobTerminated(jobId), is(true));
     }
@@ -143,9 +143,9 @@ public class TerminationDataTest extends ProActiveTestClean {
     @Test
     public void testHandleTerminationForJob() throws IOException, ClassNotFoundException {
         JobId jobId = new JobIdImpl(666, "readableName");
-        terminationData.addJobToTerminate(jobId, null, null);
+        terminationData.addJobToTerminate(jobId, null, null, false);
         terminationData.handleTermination(service);
-        Mockito.verify(service, Mockito.times(1)).terminateJobHandling(jobId, null);
+        Mockito.verify(service, Mockito.times(1)).terminateJobHandling(jobId, null, false);
     }
 
     @Test
