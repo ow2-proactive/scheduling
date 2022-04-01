@@ -812,6 +812,16 @@ class LiveJobs {
         }
     }
 
+    public static boolean isJobWithErrors(InternalJob job) {
+        switch (job.getStatus()) {
+            case FAILED:
+            case CANCELED:
+                return true;
+            default:
+                return job.getJobInfo().getNumberOfFailedTasks() > 0 || job.getJobInfo().getNumberOfFaultyTasks() > 0;
+        }
+    }
+
     TerminationData finishInErrorTask(JobId jobId, String taskName) throws UnknownTaskException, UnknownJobException {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
@@ -851,7 +861,10 @@ class LiveJobs {
                 job.terminate();
                 jlogger.debug(job.getId(), "terminated");
                 jobs.remove(job.getId());
-                terminationData.addJobToTerminate(job.getId(), job.getGenericInformation(), job.getCredentials());
+                terminationData.addJobToTerminate(job.getId(),
+                                                  job.getGenericInformation(),
+                                                  job.getCredentials(),
+                                                  isJobWithErrors(job));
             }
 
             task.setInErrorTime(-1);
@@ -1199,7 +1212,10 @@ class LiveJobs {
             cleanJobSignals(job.getId());
 
             jlogger.debug(job.getId(), "terminated");
-            terminationData.addJobToTerminate(job.getId(), job.getGenericInformation(), job.getCredentials());
+            terminationData.addJobToTerminate(job.getId(),
+                                              job.getGenericInformation(),
+                                              job.getCredentials(),
+                                              isJobWithErrors(job));
             jobs.remove(job.getId());
         }
 
@@ -1272,11 +1288,11 @@ class LiveJobs {
                 JobId jobId = jobData.job.getId();
 
                 jobs.remove(jobId);
-                terminationData.addJobToTerminate(jobId,
-                                                  jobData.job.getGenericInformation(),
-                                                  jobData.job.getCredentials());
-
                 InternalJob job = jobData.job;
+                terminationData.addJobToTerminate(jobId,
+                                                  job.getGenericInformation(),
+                                                  job.getCredentials(),
+                                                  isJobWithErrors(job));
 
                 jlogger.info(job.getId(), "ending request");
 
@@ -1338,9 +1354,12 @@ class LiveJobs {
 
         jobs.remove(jobId);
 
-        terminationData.addJobToTerminate(jobId, jobData.job.getGenericInformation(), jobData.job.getCredentials());
-
         InternalJob job = jobData.job;
+
+        terminationData.addJobToTerminate(jobId,
+                                          job.getGenericInformation(),
+                                          job.getCredentials(),
+                                          isJobWithErrors(job));
 
         SchedulerEvent event;
         if (job.getStatus() == JobStatus.PENDING) {

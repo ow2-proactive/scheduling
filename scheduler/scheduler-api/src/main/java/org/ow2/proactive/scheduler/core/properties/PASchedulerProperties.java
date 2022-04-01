@@ -208,8 +208,11 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Delay to wait between getting a job result and removing the job concerned (0 = infinite) */
     SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PropertyType.INTEGER, "0"),
 
-    /** Delay to wait between a job is terminated and removing the it from Scheduler (0 = infinite) */
+    /** Delay to wait after a job is terminated to remove the job from the Scheduler database (0 = infinite) */
     SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY("pa.scheduler.core.automaticremovejobdelay", PropertyType.INTEGER, "0"),
+
+    /** Delay to wait after a job which contains errors is terminated to remove the job from the Scheduler database  (0 = same configuration as automaticremovejobdelay) */
+    SCHEDULER_AUTOMATIC_REMOVED_ERROR_JOB_DELAY("pa.scheduler.core.automaticremove.errorjob.delay", PropertyType.INTEGER, "0"),
 
     /** Cron expression to automatically remove finished jobs */
     SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR("pa.scheduler.core.automaticremovejobcronexpression", PropertyType.STRING, "*/10 * * * *"),
