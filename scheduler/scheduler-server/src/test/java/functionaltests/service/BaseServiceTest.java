@@ -34,6 +34,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.Mockito;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -88,8 +89,12 @@ public class BaseServiceTest extends ProActiveTest {
     void taskStarted(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) throws Exception {
         InternalTask task = ((EligibleTaskDescriptorImpl) taskDesc).getInternal();
         TaskLauncher launcher = Mockito.mock(TaskLauncher.class);
+        Node defaultNode = NodeFactory.getDefaultNode();
         task.setExecuterInformation(new ExecuterInformation(launcher, NodeFactory.getDefaultNode()));
-        service.taskStarted(((JobDescriptorImpl) jobDesc).getInternal(), task, launcher);
+        service.taskStarted(((JobDescriptorImpl) jobDesc).getInternal(),
+                            task,
+                            launcher,
+                            defaultNode.getNodeInformation().getURL());
     }
 
     public static InternalJob createJob(TaskFlowJob job) throws Exception {

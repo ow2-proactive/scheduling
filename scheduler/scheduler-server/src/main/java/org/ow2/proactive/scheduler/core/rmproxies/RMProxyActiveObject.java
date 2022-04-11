@@ -360,7 +360,7 @@ public class RMProxyActiveObject {
     }
 
     @ImmediateService
-    public boolean areNodesRecoverable(NodeSet nodes) {
+    public Map<String, Boolean> areNodesRecoverable(NodeSet nodes) {
         return rm.areNodesRecoverable(nodes);
     }
 

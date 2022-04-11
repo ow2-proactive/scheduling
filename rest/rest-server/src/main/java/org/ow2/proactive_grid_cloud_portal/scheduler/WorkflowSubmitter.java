@@ -26,14 +26,19 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -42,6 +47,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobIdDataAndError;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
@@ -67,6 +73,77 @@ public class WorkflowSubmitter {
         this.scheduler = scheduler;
         this.space = space;
         this.sessionId = sessionId;
+    }
+
+    /**
+     * Submit multiple workflows
+     *
+     * @param workflowsContents list of workflow contents
+     * @param workflowsVariables variables associated with each workflow
+     * @param workflowsGenericInfo generic info associated with each workflow
+     * @return a list of objects containing, for each workflow, a job id or any error occurring during workflow submission
+     * @throws NotConnectedException
+     */
+    public List<JobIdDataAndError> submitJobs(List<String> workflowsContents,
+            List<Map<String, String>> workflowsVariables, List<Map<String, String>> workflowsGenericInfo)
+            throws NotConnectedException {
+        // answer is merged from valid results or errors occurring at this level or lower levels
+        List<JobIdDataAndError> mergedAnswer = new ArrayList<>(workflowsContents.size());
+
+        // list containing errors occurring when parsing workflows
+        // if the parsing is successful, a null entry is added
+        List<JobIdDataAndError> jobIdDataWorkflowParsing = new ArrayList<>(workflowsContents.size());
+        List<Job> jobs = new ArrayList<>(workflowsContents.size());
+        for (int i = 0; i < workflowsContents.size(); i++) {
+            String workflowContent = workflowsContents.get(i);
+            if (workflowContent != null) {
+                Map<String, String> variables = workflowsVariables.get(i);
+                Map<String, String> genericInfos = workflowsGenericInfo.get(i);
+                try (InputStream workflowStream = IOUtils.toInputStream(workflowContent,
+                                                                        Charset.forName(FILE_ENCODING))) {
+
+                    Job job = createJobObject(workflowStream, variables, genericInfos);
+                    jobs.add(job);
+                    jobIdDataWorkflowParsing.add(null);
+                } catch (Exception e) {
+                    jobs.add(null);
+                    jobIdDataWorkflowParsing.add(new JobIdDataAndError(e.getMessage(),
+                                                                       StackTraceUtil.getStackTrace(e)));
+                }
+            } else {
+                jobs.add(null);
+                jobIdDataWorkflowParsing.add(null);
+            }
+        }
+        List<JobIdDataAndError> jobidsReturnedByScheduler = scheduler.submit(jobs);
+
+        for (int i = 0; i < workflowsContents.size(); i++) {
+            if (jobIdDataWorkflowParsing.get(i) != null) {
+                mergedAnswer.add(jobIdDataWorkflowParsing.get(i));
+            } else {
+                mergedAnswer.add(jobidsReturnedByScheduler.get(i));
+            }
+        }
+
+        for (int i = 0; i < workflowsContents.size(); i++) {
+            if (mergedAnswer.get(i) != null) {
+                String visualization = jobs.get(i).getVisualization();
+                File visualizationFile = new File(PortalConfiguration.jobIdToPath("" + mergedAnswer.get(i).getId()) +
+                                                  ".html");
+                try {
+                    Files.deleteIfExists(visualizationFile.toPath());
+                    if (visualization != null && !visualization.isEmpty()) {
+                        FileUtils.write(new File(visualizationFile.getAbsolutePath()),
+                                        jobs.get(i).getVisualization(),
+                                        Charset.forName(FILE_ENCODING));
+                    }
+                } catch (IOException e) {
+                    logger.warn("Error writing visualization file", e);
+                }
+            }
+        }
+
+        return mergedAnswer;
     }
 
     /**

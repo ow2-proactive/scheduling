@@ -41,7 +41,7 @@ import org.apache.log4j.spi.LoggingEvent;
  * to all the tasks files.
  *
  */
-public class MultipleFileAppender extends SynchFileAppender {
+public class MultipleFileAppender extends AsynchFileAppender {
 
     public static final String FILE_NAMES = "filenames";
 
@@ -51,7 +51,7 @@ public class MultipleFileAppender extends SynchFileAppender {
         if (value != null) {
             Collection<String> names = (Collection<String>) value;
             for (String fileName : names) {
-                append(fileName, event);
+                super.append(fileName, event);
             }
         }
     }

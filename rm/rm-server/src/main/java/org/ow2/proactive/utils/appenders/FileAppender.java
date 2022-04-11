@@ -72,10 +72,7 @@ public abstract class FileAppender extends WriterAppender {
         }
         try {
             File file = new File(fileName);
-            if (!file.exists()) {
-                FileUtils.forceMkdirParent(file);
-                FileUtils.touch(file);
-            }
+            FileUtils.forceMkdirParent(file);
 
             appender = new RollingFileAppender(getLayout(), fileName, true);
             appender.setMaxBackupIndex(1);

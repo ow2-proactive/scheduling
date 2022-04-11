@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
+import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
@@ -493,8 +494,8 @@ public class SchedulingService {
     /*
      * Should be called only by scheduling method impl while it holds job lock
      */
-    public void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher) {
-        jobs.taskStarted(job, task, launcher);
+    public void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher, String taskLauncherNodeUrl) {
+        jobs.taskStarted(job, task, launcher, taskLauncherNodeUrl);
     }
 
     /*
@@ -527,9 +528,30 @@ public class SchedulingService {
         return jobs.getTaskStatus(taskId);
     }
 
+    // for tests only
     public void submitJob(InternalJob job) {
         try {
-            infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job)).get();
+            infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job, null, null)).get();
+        } catch (Exception e) {
+            throw handleFutureWaitException(e);
+        }
+    }
+
+    public void submitJob(InternalJob job, SchedulerFrontendState frontendState, UserIdentificationImpl ident) {
+        try {
+            infrastructure.getClientOperationsThreadPool()
+                          .submit(new SubmitHandler(this, job, frontendState, ident))
+                          .get();
+        } catch (Exception e) {
+            throw handleFutureWaitException(e);
+        }
+    }
+
+    public void submitJobs(List<InternalJob> jobs, SchedulerFrontendState frontendState, UserIdentificationImpl ident) {
+        try {
+            infrastructure.getClientOperationsThreadPool()
+                          .submit(new SubmitHandler(this, jobs, frontendState, ident))
+                          .get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }

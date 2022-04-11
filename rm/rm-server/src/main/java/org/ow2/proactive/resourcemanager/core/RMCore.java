@@ -3122,19 +3122,21 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
-    public boolean areNodesRecoverable(NodeSet nodes) {
+    public Map<String, Boolean> areNodesRecoverable(NodeSet nodes) {
+        Map<String, Boolean> answer = new HashMap<>(nodes.size());
         Set<String> nodesURL = nodes.getAllNodesUrls();
 
         for (String nodeURL : nodesURL) {
             RMNode rmNode = allNodes.get(nodeURL);
             if (rmNode == null || !rmNode.getNodeSource().nodesRecoverable()) {
-                logger.debug("RMNode corresponding to URL " + nodeURL + " is not recoverable");
-                return false;
+                logger.trace("RMNode corresponding to URL " + nodeURL + " is not recoverable");
+                answer.put(nodeURL, false);
+            } else {
+                logger.trace("RMNode corresponding to URL " + nodeURL + " is recoverable");
+                answer.put(nodeURL, true);
             }
         }
-
-        logger.debug("All given nodes are recoverable");
-        return true;
+        return answer;
     }
 
     @Override

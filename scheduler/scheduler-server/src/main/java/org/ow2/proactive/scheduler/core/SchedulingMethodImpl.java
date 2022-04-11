@@ -28,14 +28,7 @@ package org.ow2.proactive.scheduler.core;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -61,6 +54,7 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.PerUserConnectionRMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
@@ -84,6 +78,7 @@ import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.TaskIdWrapper;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -389,10 +384,15 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 freeResources.removeAll(nodeSet.getAllNodesUrls());
             }
 
+            Map<String, Boolean> recoverableStatus = getRMProxiesManager().getRmProxy().areNodesRecoverable(nodeSet);
+
             //start selected tasks
             Node node = null;
             InternalJob currentJob = null;
             try {
+                String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
+                                                                    .getNodeInformation()
+                                                                    .getURL();
                 while (nodeSet != null && !nodeSet.isEmpty()) {
                     EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
                     currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
@@ -404,7 +404,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                         schedulingMainLoopTimingLogger.start("createExecution");
 
-                        if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
+                        if (createExecution(nodeSet,
+                                            node,
+                                            currentJob,
+                                            internalTask,
+                                            taskDescriptor,
+                                            recoverableStatus,
+                                            terminateNotificationNodeURL)) {
                             neededNodes -= taskDescriptor.getNumberOfNodesNeeded();
                             numberOfTaskStarted++;
                         }
@@ -620,8 +626,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 schedulingMainLoopTimingLogger.end("setCriteria");
 
                 schedulingMainLoopTimingLogger.start("getNodeSetWithCriteria");
-                nodeSet = getRMProxiesManager().getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials())
-                                               .getNodes(criteria);
+                RMProxy rmProxy = getRMProxiesManager().getUserRMProxy(currentJob.getOwner(),
+                                                                       currentJob.getCredentials());
+                nodeSet = rmProxy.getNodes(criteria);
                 schedulingMainLoopTimingLogger.end("getNodeSetWithCriteria");
             } catch (TopologyDisabledException tde) {
                 jlogger.warn(currentJob.getId(), "will be canceled as the topology is disabled");
@@ -776,7 +783,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      *
      */
     protected boolean createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
-            TaskDescriptor taskDescriptor) throws Exception {
+            TaskDescriptor taskDescriptor, Map<String, Boolean> recoverableStatus, String terminateNotificationNodeURL)
+            throws Exception {
         TaskLauncher launcher = null;
         LiveJobs.JobData jobData = null;
         try {
@@ -796,18 +804,27 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 schedulingMainLoopTimingLogger.end("startDataspaceApp");
                 NodeSet nodes = new NodeSet();
                 String sessionid = getSessionid(job);
+                String taskLauncherNodeUrl = null;
+                Set<String> nodesUrls = new HashSet<>();
                 try {
 
                     // create launcher
                     schedulingMainLoopTimingLogger.start("createLauncher");
 
                     launcher = task.createLauncher(node, sessionid);
+                    try {
+                        taskLauncherNodeUrl = PAActiveObject.getUrl(launcher);
+                    } catch (Exception e) {
+                        logger.warn("TaskLauncher node URL could not be retrieved for task " +
+                                    TaskIdWrapper.wrap(task.getId()), e);
+                    }
 
                     schedulingMainLoopTimingLogger.end("createLauncher");
 
                     activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
-                    nodeSet.remove(0);
+                    Node mainNode = nodeSet.remove(0);
+                    nodesUrls.add(mainNode.getNodeInformation().getURL());
 
                     //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
                     // we will need to update this code once topology will be allowed for single-node task
@@ -815,6 +832,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         nodes = new NodeSet(nodeSet);
                         task.getExecuterInformation().addNodes(nodes);
                         nodeSet.clear();
+                        for (Node parallelNode : nodes) {
+                            nodesUrls.add(parallelNode.getNodeInformation().getURL());
+                        }
                     }
 
                     //set nodes in the executable container
@@ -833,16 +853,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     }
 
                     schedulingMainLoopTimingLogger.start("areNodesRecoverable");
-                    boolean taskRecoverable = getRMProxiesManager().getRmProxy().areNodesRecoverable(nodes);
+                    boolean taskRecoverable = nodesUrls.stream().allMatch(nodeUrl -> recoverableStatus.get(nodeUrl));
                     schedulingMainLoopTimingLogger.end("areNodesRecoverable");
 
-                    schedulingMainLoopTimingLogger.start("terminateNotificationNodeURL");
-                    String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
-                                                                        .getNodeInformation()
-                                                                        .getURL();
                     TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL,
                                                                              taskRecoverable);
-                    schedulingMainLoopTimingLogger.end("terminateNotificationNodeURL");
 
                     schedulingMainLoopTimingLogger.start("submitWithTimeout");
 
@@ -875,7 +890,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     // called a second time for the task that is currently being
                     // started by the TimedDoTaskAction.
                     schedulingMainLoopTimingLogger.start("finalizeStarting");
-                    finalizeStarting(job, task, node, launcher);
+                    finalizeStarting(job, task, node, launcher, taskLauncherNodeUrl);
                     schedulingMainLoopTimingLogger.end("finalizeStarting");
                     return true;
                 } catch (Exception t) {
@@ -928,12 +943,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @param node the node on which the task will be started
      * @param launcher the taskLauncher that has just been launched
      */
-    void finalizeStarting(InternalJob job, InternalTask task, Node node, TaskLauncher launcher) {
+    void finalizeStarting(InternalJob job, InternalTask task, Node node, TaskLauncher launcher,
+            String taskLauncherNodeUrl) {
         tlogger.info(task.getId(),
                      "started on " + node.getNodeInformation().getVMInformation().getHostName() + "(node: " +
                                    node.getNodeInformation().getName() + ")");
 
-        schedulingService.taskStarted(job, task, launcher);
+        schedulingService.taskStarted(job, task, launcher, taskLauncherNodeUrl);
     }
 
     private SchedulerDBManager getDBManager() {

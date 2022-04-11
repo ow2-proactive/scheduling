@@ -71,11 +71,13 @@ import org.jboss.resteasy.plugins.interceptors.encoding.GZIPEncodingInterceptor;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.resteasy_jaxrs.i18n.LogMessages;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.ow2.proactive.scheduler.common.job.JobIdDataAndError;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.WorkflowUrlData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 import com.google.common.collect.Maps;
@@ -125,6 +127,10 @@ public class SchedulerRestClient {
         registerGzipEncoding(providerFactory);
 
         scheduler = createRestProxy(providerFactory, restEndpointURL, httpEngine);
+    }
+
+    public String getRestEndpointURL() {
+        return restEndpointURL;
     }
 
     private void setBlindTrustSSLContext() {
@@ -483,6 +489,51 @@ public class SchedulerRestClient {
                 response.close();
             }
         }
+    }
+
+    public JobIdData submitUrl(String sessionId, String workflowUrl, Map<String, String> variables,
+            Map<String, String> genericInfos) throws Exception {
+        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/jobs/body";
+        ResteasyClient client = buildResteasyClient(providerFactory);
+        ResteasyWebTarget target = client.target(uriTmpl);
+        // Generic infos
+        if (genericInfos != null) {
+            for (String key : genericInfos.keySet()) {
+                target = target.queryParamNoTemplate(key, genericInfos.get(key));
+            }
+        }
+        Response response = target.request()
+                                  .header("sessionid", sessionId)
+                                  .header("link", workflowUrl)
+                                  .post(Entity.entity(variables, MediaType.APPLICATION_JSON));
+        if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new NotConnectedRestException("User not authenticated or session timeout.");
+            } else {
+                throwException(String.format("Job submission failed status code: %d", response.getStatus()), response);
+            }
+        }
+        return response.readEntity(JobIdData.class);
+    }
+
+    public List<JobIdDataAndError> submitMultipleUrl(String sessionId, List<WorkflowUrlData> workflowUrlDataList)
+            throws Exception {
+        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/jobs/body/multi";
+        ResteasyClient client = buildResteasyClient(providerFactory);
+        ResteasyWebTarget target = client.target(uriTmpl);
+        Response response = target.request()
+                                  .header("sessionid", sessionId)
+                                  .post(Entity.entity(workflowUrlDataList, MediaType.APPLICATION_JSON));
+        if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new NotConnectedRestException("User not authenticated or session timeout.");
+            } else {
+                throwException(String.format("Multiple job submissions failed status code: %d", response.getStatus()),
+                               response);
+            }
+        }
+        return response.readEntity(new GenericType<List<JobIdDataAndError>>() {
+        });
     }
 
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType, Map<String, String> variables,

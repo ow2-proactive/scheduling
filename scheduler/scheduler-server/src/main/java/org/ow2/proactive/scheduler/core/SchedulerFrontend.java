@@ -96,6 +96,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
@@ -130,13 +131,7 @@ import org.ow2.proactive.scheduler.common.exception.TaskCouldNotStartException;
 import org.ow2.proactive.scheduler.common.exception.TaskSkippedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.DefaultModelJobValidatorServiceProvider;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
@@ -563,21 +558,83 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             long t2 = System.currentTimeMillis();
             InternalJob job = frontendState.createJob(userJob, ident);
             long t3 = System.currentTimeMillis();
-            schedulingService.submitJob(job);
+            schedulingService.submitJob(job, frontendState, ident);
             long t4 = System.currentTimeMillis();
-            frontendState.jobSubmitted(job, ident);
-            long t5 = System.currentTimeMillis();
             long d1 = t1 - t0;
             long d2 = t2 - t1;
             long d3 = t3 - t2;
             long d4 = t4 - t3;
-            long d5 = t5 - t4;
-            logger.debug(String.format("timer;%d;%d;%d;%d;%d;%d", job.getId().longValue(), d1, d2, d3, d4, d5));
+            logger.debug(String.format("timer;%d;%d;%d;%d;%d", job.getId().longValue(), d1, d2, d3, d4));
             return job.getId();
         } catch (Exception e) {
             logger.warn("Error when submitting job.", e);
             throw e;
         }
+    }
+
+    @Override
+    @ImmediateService
+    public List<JobIdDataAndError> submit(List<Job> jobs) throws NotConnectedException {
+
+        List<JobIdDataAndError> answer = new ArrayList<>(jobs.size());
+        // check if the scheduler is stopped
+        if (!schedulingService.isSubmitPossible()) {
+            String msg = "Scheduler is stopped, cannot submit job";
+            logger.info(msg);
+            SubmissionClosedException exp = new SubmissionClosedException(msg);
+            for (int i = 0; i < jobs.size(); i++) {
+                answer.add(new JobIdDataAndError(msg, StackTraceUtil.getStackTrace(exp)));
+            }
+            return answer;
+        }
+
+        UserIdentificationImpl ident = null;
+        try {
+            ident = frontendState.checkPermission("submit", YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
+        } catch (Exception e) {
+            for (int i = 0; i < jobs.size(); i++) {
+                answer.add(new JobIdDataAndError(e.getMessage(), StackTraceUtil.getStackTrace(e)));
+            }
+            return answer;
+        }
+
+        long t0 = System.currentTimeMillis();
+
+        List<InternalJob> internalJobs = new ArrayList<>(jobs.size());
+
+        for (Job userJob : jobs) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("New job submission requested : " + userJob.getName());
+            }
+            InternalJob job = null;
+            try {
+                if (userJob != null) {
+                    job = frontendState.createJob(userJob, ident);
+                    internalJobs.add(job);
+                } else {
+                    internalJobs.add(null);
+                }
+                answer.add(null);
+
+            } catch (Exception e) {
+                answer.add(new JobIdDataAndError(e.getMessage(), StackTraceUtil.getStackTrace(e)));
+                internalJobs.add(null);
+            }
+        }
+        long t1 = System.currentTimeMillis();
+        schedulingService.submitJobs(internalJobs, frontendState, ident);
+        for (int i = 0; i < jobs.size(); i++) {
+            InternalJob internalJob = internalJobs.get(i);
+            if (internalJob != null) {
+                JobId jobId = internalJob.getId();
+                answer.set(i, new JobIdDataAndError(jobId.longValue(), jobId.getReadableName()));
+            }
+        }
+        long t2 = System.currentTimeMillis();
+        long d1 = t1 - t0;
+        long d2 = t2 - t1;
+        logger.debug(String.format("timer;%d;%d", d1, d2));
+        return answer;
     }
 
     /**

@@ -73,12 +73,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobVariable;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -92,8 +87,6 @@ import org.ow2.proactive.scheduler.smartproxy.common.AbstractSmartProxy;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -539,6 +532,15 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         }
 
         return schedulerProxy.submit(job);
+    }
+
+    @Override
+    public List<JobIdDataAndError> submit(List<Job> jobs) throws NotConnectedException {
+        if (schedulerProxy == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+
+        return schedulerProxy.submit(jobs);
     }
 
     @Override

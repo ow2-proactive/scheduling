@@ -62,7 +62,7 @@ public class TestRestoreWorkflowJobs extends BaseSchedulerDBTest {
         job.start();
         InternalTask mainTask = job.getTask("T");
         startTask(job, mainTask);
-        dbManager.jobTaskStarted(job, mainTask, true);
+        dbManager.jobTaskStarted(job, mainTask, true, null);
 
         TaskResultImpl result = new TaskResultImpl(mainTask.getId(), "ok", null, 0);
         FlowAction action = new FlowAction(FlowActionType.REPLICATE);
@@ -97,7 +97,7 @@ public class TestRestoreWorkflowJobs extends BaseSchedulerDBTest {
         job.start();
         InternalTask mainTask = job.getTask("T");
         startTask(job, mainTask);
-        dbManager.jobTaskStarted(job, mainTask, true);
+        dbManager.jobTaskStarted(job, mainTask, true, null);
 
         TaskResultImpl result = new TaskResultImpl(mainTask.getId(), "ok", null, 0);
         ChangedTasksInfo changesInfo = job.terminateTask(false, mainTask.getId(), null, null, result);

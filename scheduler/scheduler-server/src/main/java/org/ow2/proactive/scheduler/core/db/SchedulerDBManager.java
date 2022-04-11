@@ -1156,7 +1156,8 @@ public class SchedulerDBManager {
         });
     }
 
-    public void jobTaskStarted(final InternalJob job, final InternalTask task, final boolean taskStatusToPending) {
+    public void jobTaskStarted(final InternalJob job, final InternalTask task, final boolean taskStatusToPending,
+            String taskLauncherNodeUrl) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
             long jobId = jobId(job);
 
@@ -1176,7 +1177,8 @@ public class SchedulerDBManager {
             TaskInfo taskInfo = task.getTaskInfo();
 
             ExecuterInformationData executerInfo = new ExecuterInformationData(taskId.getTaskId(),
-                                                                               task.getExecuterInformation());
+                                                                               task.getExecuterInformation(),
+                                                                               taskLauncherNodeUrl);
 
             session.getNamedQuery("updateTaskDataTaskStarted")
                    .setParameter("taskStatus", taskInfo.getStatus())

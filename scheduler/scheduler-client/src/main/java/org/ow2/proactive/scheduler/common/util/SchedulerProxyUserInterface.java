@@ -68,13 +68,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -269,6 +263,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         checkSchedulerConnection();
         return uischeduler.submit(job);
+    }
+
+    @Override
+    public List<JobIdDataAndError> submit(List<Job> jobs) throws NotConnectedException {
+        checkSchedulerConnection();
+        return uischeduler.submit(jobs);
     }
 
     @Override

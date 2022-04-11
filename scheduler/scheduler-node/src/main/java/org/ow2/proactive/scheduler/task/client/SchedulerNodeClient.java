@@ -63,13 +63,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -82,6 +76,7 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.WorkflowUrlData;
 
 import com.google.common.collect.Maps;
 
@@ -381,6 +376,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public List<JobIdDataAndError> submit(List<Job> jobs) throws NotConnectedException {
+        renewSession();
+        return client.submit(jobs);
+    }
+
+    @Override
     public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos,
             String sessionId) throws NotConnectedException, UnknownJobException, PermissionException,
             JobCreationException, SubmissionClosedException {
@@ -526,6 +527,17 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
                                         calledWorkflow,
                                         addGlobalVariables(variables),
                                         addGlobalGenericInfoAndParentJobId(genericInfo));
+    }
+
+    @Override
+    public List<JobIdDataAndError> multipleSubmitFromUrls(List<WorkflowUrlData> workflowUrlDataList)
+            throws NotConnectedException, PermissionException {
+        renewSession();
+        for (WorkflowUrlData urlData : workflowUrlDataList) {
+            urlData.setVariables(addGlobalVariables(urlData.getVariables()));
+            urlData.setGenericInformation(addGlobalGenericInfoAndParentJobId(urlData.getGenericInformation()));
+        }
+        return client.multipleSubmitFromUrls(workflowUrlDataList);
     }
 
     @Override

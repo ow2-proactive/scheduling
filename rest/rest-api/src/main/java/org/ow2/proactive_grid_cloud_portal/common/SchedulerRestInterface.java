@@ -59,22 +59,10 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.job.JobIdDataAndError;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.common.dto.PermissionForm;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.WorkflowDescription;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
@@ -1563,6 +1551,22 @@ public interface SchedulerRestInterface {
             @PathParam("path") PathSegment pathSegment, Map<String, String> jsonBody, @Context UriInfo contextInfos)
             throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
             SubmissionClosedRestException, IOException;
+
+    /**
+     * Submits a list of workflows to the scheduler from a list of workflow URLs
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jsonBody
+     *            a list of workflows. Each element must contain an url, a set of variables and generic information
+     * @return the list of objects containing, for each workflow a <code>jobid</code> if submission was successful, or the error description if an error occurred.
+     */
+    @POST
+    @Path("{path:jobs}/body/multi")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    List<JobIdDataAndError> multipleSubmitFromUrls(@HeaderParam("sessionid") String sessionId,
+            List<WorkflowUrlData> jsonBody) throws NotConnectedRestException;
 
     /**
      * Pushes a file from the local file system into the given DataSpace
