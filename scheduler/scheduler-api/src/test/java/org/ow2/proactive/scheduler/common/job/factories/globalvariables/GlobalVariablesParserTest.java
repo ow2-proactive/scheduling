@@ -83,6 +83,41 @@ public class GlobalVariablesParserTest {
     }
 
     @Test
+    public void testParsePsaConfig() throws IOException {
+        GlobalVariablesParser.setConfigurationPath(GlobalVariablesParserTest.class.getResource("global_variables_one_filter_psa.xml")
+                                                                                  .toExternalForm());
+        GlobalVariablesParser.getInstance().reloadFilters();
+        List<Filter> filters = GlobalVariablesParser.getInstance().getLoadedFilters();
+        Assert.assertEquals(1, filters.size());
+        Assert.assertEquals(1, filters.get(0).getXpath().size());
+        Assert.assertEquals("(/job/genericInformation/info[@name='pca.states' and @value='(VOID,RUNNING)']) or not (/job/genericInformation/info[@name='pca.states'])",
+                            filters.get(0).getXpath().get(0));
+        Assert.assertEquals(2, filters.get(0).getVariables().size());
+        String md5First = GlobalVariablesParser.getInstance().getMD5();
+        GlobalVariablesParser.getInstance().reloadFilters();
+        String md5Second = GlobalVariablesParser.getInstance().getMD5();
+        Assert.assertEquals("MD5 should be equals after reload", md5First, md5Second);
+
+        GlobalVariablesData globalData = GlobalVariablesParser.getInstance()
+                                                              .getVariablesFor(IOUtils.toString(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_no_variables.xml"),
+                                                                                                PASchedulerProperties.FILE_ENCODING.getValueAsString()));
+        Assert.assertEquals(2, globalData.getVariables().size());
+        Assert.assertEquals(0, globalData.getGenericInformation().size());
+
+        globalData = GlobalVariablesParser.getInstance()
+                                          .getVariablesFor(IOUtils.toString(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_no_variables_psa.xml"),
+                                                                            PASchedulerProperties.FILE_ENCODING.getValueAsString()));
+        Assert.assertEquals(2, globalData.getVariables().size());
+        Assert.assertEquals(0, globalData.getGenericInformation().size());
+
+        globalData = GlobalVariablesParser.getInstance()
+                                          .getVariablesFor(IOUtils.toString(GlobalVariablesParserTest.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_no_variables_psa2.xml"),
+                                                                            PASchedulerProperties.FILE_ENCODING.getValueAsString()));
+        Assert.assertEquals(0, globalData.getVariables().size());
+        Assert.assertEquals(0, globalData.getGenericInformation().size());
+    }
+
+    @Test
     public void testParseConfigTwoVars() throws IOException {
         GlobalVariablesParser.setConfigurationPath(GlobalVariablesParserTest.class.getResource("global_variables_two_vars.xml")
                                                                                   .toExternalForm());
