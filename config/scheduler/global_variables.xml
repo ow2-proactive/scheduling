@@ -9,13 +9,22 @@
                 Example: to select workflows belonging to the basic-examples bucket
                 <xpath><![CDATA[/job/genericInformation/info[@name='bucketName' and @value='basic-examples']]]></xpath>
                 -->
-                <!-- <xpath><![CDATA[.]]></xpath> -->
-                <xpath><![CDATA[(/job/genericInformation/info[@name='pca.states' and @value='(VOID,RUNNING)']) or not (/job/genericInformation/info[@name='pca.states'])]]></xpath>
+                <xpath><![CDATA[.]]></xpath>
                 <!-- more than one xpath expression can be added. In that case, global variables are applied when all xpath expressions match -->
             </select>
             <!-- add global variables or generic information below -->
             <variables>
-                <variable name="NATIVE_SCHEDULER" value="" advanced="true" description="Name of the Native Scheduler node source to use when the workflow tasks must be deployed inside a cluster such as SLURM, LSF, etc." group="Resource Management" hidden="false"/>
+            </variables>
+            <genericInformation>
+            </genericInformation>
+        </filter>
+        <!--
+        <filter>
+            <select>
+                <xpath><![CDATA[(/job/genericInformation/info[@name='pca.states' and @value='(VOID,RUNNING)']) or not (/job/genericInformation/info[@name='pca.states'])]]></xpath>
+            </select>
+            <variables>
+                <variable name="NATIVE_SCHEDULER" value="" advanced="true" description="Name of the Native Scheduler node source to use when the workflow tasks must be deployed inside a cluster such as SLURM, LSF, etc." group="Resource Management" hidden="false" model="PA:MODEL_FROM_URL(${PA_SCHEDULER_REST_PUBLIC_URL}/rm/model/nodesources)"/>
                 <variable name="NATIVE_SCHEDULER_PARAMS" value="" advanced="true" description="Parameters given to the native scheduler (SLURM, LSF, etc) while requesting a ProActive node used to deploy the workflow tasks." group="Resource Management" hidden="false"/>
                 <variable name="NODE_ACCESS_TOKEN" value="" advanced="true" description="If not empty, the workflow tasks will be run only on nodes that contains the specified token." group="Resource Management" hidden="false" model="PA:MODEL_FROM_URL(${PA_SCHEDULER_REST_PUBLIC_URL}/rm/model/tokens)"/>
                 <variable name="NODE_SOURCE_NAME" value="" advanced="true" description="If not empty, the workflow tasks will be run only on nodes belonging to the specified node source." group="Resource Management" hidden="false" model="PA:MODEL_FROM_URL(${PA_SCHEDULER_REST_PUBLIC_URL}/rm/model/nodesources)"/>
@@ -39,4 +48,5 @@
                 <info name="NS_BATCH" value="$NATIVE_SCHEDULER_PARAMS"/>
             </genericInformation>
         </filter>
+        -->
 </globalvariables>
