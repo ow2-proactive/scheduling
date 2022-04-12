@@ -33,6 +33,10 @@ import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggingEvent;
 
 
+/**
+ * @deprecated AsynchFileAppender has now an appender cache mechanism
+ */
+@Deprecated
 public class AsynchChachedFileAppender extends AsynchFileAppender {
 
     private static final Logger LOGGER = Logger.getLogger(AsynchChachedFileAppender.class);

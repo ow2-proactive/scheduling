@@ -84,18 +84,12 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
-import org.ow2.proactive.scheduler.common.TaskDescriptor;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -104,15 +98,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.JobVariable;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -297,7 +283,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         JobResult jobResult = null;
         try {
             JobResultData jobResultData = restApi().jobResult(sid, jobId);
-            jobResult = toJobResult(jobResultData);
+            if (jobResultData != null) {
+                jobResult = toJobResult(jobResultData);
+            }
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }
@@ -805,6 +793,21 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public List<JobIdDataAndError> submit(List<Job> jobs) throws NotConnectedException {
+        List<JobIdDataAndError> jobIdDataAndErrors = new ArrayList<>(jobs.size());
+        for (Job job : jobs) {
+            try {
+                InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
+                JobIdData jobIdData = restApiClient().submitXml(sid, is);
+                jobIdDataAndErrors.add(new JobIdDataAndError(jobIdData.getId(), jobIdData.getReadableName()));
+            } catch (Exception e) {
+                jobIdDataAndErrors.add(new JobIdDataAndError(e.getMessage(), StackTraceUtil.getStackTrace(e)));
+            }
+        }
+        return jobIdDataAndErrors;
+    }
+
+    @Override
     public JobId submit(File job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
@@ -912,10 +915,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             Map<String, String> variables, Map<String, String> genericInfo)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
 
-        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" +
-                                      UrlEscapers.urlPathSegmentEscaper().escape(bucketName) + "/resources/" +
-                                      UrlEscapers.urlPathSegmentEscaper().escape(workflowName) + "/raw");
-        return submitFromCatalog(httpGet, variables, genericInfo);
+        String objectUrl = catalogRestURL + "/buckets/" + UrlEscapers.urlPathSegmentEscaper().escape(bucketName) +
+                           "/resources/" + UrlEscapers.urlPathSegmentEscaper().escape(workflowName) + "/raw";
+        return submitFromCatalog(objectUrl, variables, genericInfo);
 
     }
 
@@ -945,17 +947,26 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
         Optional<String> revision = getRevisionFromCalledWorkflow(calledWorkflow);
 
-        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" +
-                                      UrlEscapers.urlPathSegmentEscaper()
-                                                 .escape(getBucketFromCalledWorkflow(calledWorkflow)) +
-                                      "/resources/" +
-                                      UrlEscapers.urlPathSegmentEscaper()
-                                                 .escape(getNameFromCalledWorkflow(calledWorkflow)) +
-                                      revision.map(r -> "/revisions/" + UrlEscapers.urlPathSegmentEscaper().escape(r))
-                                              .orElse("") +
-                                      "/raw");
+        String objectUrl = catalogRestURL + "/buckets/" +
+                           UrlEscapers.urlPathSegmentEscaper().escape(getBucketFromCalledWorkflow(calledWorkflow)) +
+                           "/resources/" +
+                           UrlEscapers.urlPathSegmentEscaper().escape(getNameFromCalledWorkflow(calledWorkflow)) +
+                           revision.map(r -> "/revisions/" + UrlEscapers.urlPathSegmentEscaper().escape(r)).orElse("") +
+                           "/raw";
 
-        return this.submitFromCatalog(httpGet, variables, genericInfo);
+        return this.submitFromCatalog(objectUrl, variables, genericInfo);
+    }
+
+    @Override
+    public List<JobIdDataAndError> multipleSubmitFromUrls(List<WorkflowUrlData> workflowUrlDataList)
+            throws NotConnectedException, PermissionException {
+        List<JobIdDataAndError> answer = null;
+        try {
+            answer = restApiClient().submitMultipleUrl(sid, workflowUrlDataList);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+        return answer;
     }
 
     @Override
@@ -965,7 +976,13 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
-        return !getJobState(jobId).getStatus().isJobAlive();
+        boolean answer = false;
+        try {
+            answer = !getJobInfo(jobId).getStatus().isJobAlive();
+        } catch (SchedulerException e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return answer;
     }
 
     @Override
@@ -980,7 +997,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         timeout += currentTimeMillis();
         while (currentTimeMillis() < timeout) {
             if (isJobFinished(jobId)) {
-                return getJobResult(jobId);
+                JobResult result = getJobResult(jobId);
+                if (result == null) {
+                    throw new IllegalStateException("Result for job " + jobId + " not found");
+                }
+                return result;
             }
             if (currentTimeMillis() + RETRY_INTERVAL < timeout) {
                 sleep(RETRY_INTERVAL);
@@ -1614,16 +1635,13 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return HttpClients.custom().setSSLSocketFactory(sslsf);
     }
 
-    private JobId submitFromCatalog(HttpGet httpGet, Map<String, String> variables, Map<String, String> genericInfos)
+    private JobId submitFromCatalog(String objectUrl, Map<String, String> variables, Map<String, String> genericInfos)
             throws SubmissionClosedException, JobCreationException, NotConnectedException, PermissionException {
         JobIdData jobIdData = null;
 
-        httpGet.addHeader("sessionid", sid);
+        try {
 
-        try (CloseableHttpClient httpclient = getHttpClientBuilder().build();
-                CloseableHttpResponse response = httpclient.execute(httpGet)) {
-
-            jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables, genericInfos);
+            jobIdData = restApiClient().submitUrl(sid, objectUrl, variables, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }

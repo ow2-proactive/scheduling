@@ -195,7 +195,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask(tid.getReadableName()), null);
+        liveJobs.taskStarted(job, job.getTask(tid.getReadableName()), null, null);
     }
 
     @Test(timeout = 60000)
@@ -391,7 +391,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask("task-name"), null);
+        liveJobs.taskStarted(job, job.getTask("task-name"), null, null);
 
         assertThat(internalTask.getMaxNumberOfExecutionOnFailure(), is(5));
         assertThat(internalTask.getTaskInfo().getNumberOfExecutionOnFailureLeft(), is(5));
@@ -425,7 +425,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask("task-name"), null);
+        liveJobs.taskStarted(job, job.getTask("task-name"), null, null);
 
         assertThat(internalTask.getMaxNumberOfExecutionOnFailure(), is(0));
         assertThat(internalTask.getTaskInfo().getNumberOfExecutionOnFailureLeft(), is(0));
@@ -455,7 +455,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask("task-name"), null);
+        liveJobs.taskStarted(job, job.getTask("task-name"), null, null);
         assertThat(liveJobs.canPingTask(liveJobs.getRunningTasks().iterator().next()), is(true));
     }
 
@@ -483,7 +483,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask("task-name"), null);
+        liveJobs.taskStarted(job, job.getTask("task-name"), null, null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception(), null, 330);
 
@@ -521,7 +521,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask("task-name"), null);
+        liveJobs.taskStarted(job, job.getTask("task-name"), null, null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception(), null, 330);
 
@@ -569,7 +569,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask("task-name"), null);
+        liveJobs.taskStarted(job, job.getTask("task-name"), null, null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception());
 
@@ -611,7 +611,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask("task-name"), null);
+        liveJobs.taskStarted(job, job.getTask("task-name"), null, null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception());
         liveJobs.taskTerminatedWithResult(taskId, result);
@@ -648,7 +648,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.lockJobsToSchedule(false);
-        liveJobs.taskStarted(job, job.getTask("task-name"), null);
+        liveJobs.taskStarted(job, job.getTask("task-name"), null, null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception());
         liveJobs.taskTerminatedWithResult(taskId, result);

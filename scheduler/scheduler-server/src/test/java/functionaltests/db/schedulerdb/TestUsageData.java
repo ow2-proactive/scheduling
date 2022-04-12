@@ -125,7 +125,7 @@ public class TestUsageData extends BaseSchedulerDBTest {
 
     protected InternalTask startTask(InternalJob job, InternalTask task) throws Exception {
         super.startTask(job, task);
-        dbManager.jobTaskStarted(job, task, false);
+        dbManager.jobTaskStarted(job, task, false, null);
         return task;
     }
 

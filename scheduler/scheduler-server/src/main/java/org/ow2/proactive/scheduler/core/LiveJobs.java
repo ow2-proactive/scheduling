@@ -583,7 +583,7 @@ class LiveJobs {
         return terminationData;
     }
 
-    void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher) {
+    void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher, String taskLauncherNodeUrl) {
         JobData jobData = checkJobAccess(job.getId());
         if (jobData == null) {
             throw new IllegalStateException("Job " + job.getId() + " does not exist");
@@ -611,7 +611,7 @@ class LiveJobs {
 
         // set the different informations on task
         job.startTask(task);
-        dbManager.jobTaskStarted(job, task, firstTaskStarted);
+        dbManager.jobTaskStarted(job, task, firstTaskStarted, taskLauncherNodeUrl);
 
         listener.taskStateUpdated(job.getOwner(),
                                   new NotificationData<TaskInfo>(SchedulerEvent.TASK_PENDING_TO_RUNNING,

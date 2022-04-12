@@ -31,13 +31,19 @@ import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManage
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
-public class AsynchFileAppender extends FileAppender {
+
+public class AsynchFileAppender extends FileAppender implements RemovalListener<String, RollingFileAppender> {
 
     private static final Logger LOGGER = Logger.getLogger(AsynchFileAppender.class);
 
@@ -50,8 +56,12 @@ public class AsynchFileAppender extends FileAppender {
 
     protected ReentrantReadWriteLock.WriteLock isClosing = preventConcurrentAppendClose.writeLock();
 
+    private Cache<String, RollingFileAppender> appenderCache;
+
     public AsynchFileAppender() {
         super();
+
+        appenderCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).removalListener(this).build();
 
         Thread logEventsProcessor = new Thread(this::logEventProcessor, "logEventsProcessor");
         logEventsProcessor.setDaemon(true);
@@ -76,6 +86,13 @@ public class AsynchFileAppender extends FileAppender {
         try {
             isClosing.lock();
             flush();
+            extractKey().ifPresent(key -> {
+                RollingFileAppender appender = appenderCache.getIfPresent(key);
+                if (appender != null) {
+                    appenderCache.invalidate(key);
+                    appender.close();
+                }
+            });
         } finally {
             isClosing.unlock();
         }
@@ -86,7 +103,7 @@ public class AsynchFileAppender extends FileAppender {
         extractKey().ifPresent(key -> {
             while (queueHasEventByKey(key) && !Thread.currentThread().isInterrupted()) {
                 try {
-                    Thread.sleep(LOG4J_ASYNC_APPENDER_FLUSH_TIMOUT.getValueAsInt());
+                    Thread.sleep(LOG4J_ASYNC_APPENDER_FLUSH_TIMOUT.getValueAsLong());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -119,6 +136,12 @@ public class AsynchFileAppender extends FileAppender {
         }
     }
 
+    @Override
+    public void onRemoval(RemovalNotification<String, RollingFileAppender> notification) {
+        RollingFileAppender appender = notification.getValue();
+        appender.close();
+    }
+
     class ApplicableEvent {
 
         protected String key;
@@ -131,10 +154,15 @@ public class AsynchFileAppender extends FileAppender {
         }
 
         protected void apply() {
-            RollingFileAppender appender = createAppender(key);
+            RollingFileAppender appender = appenderCache.getIfPresent(key);
+            if (appender == null) {
+                appender = createAppender(key);
+                if (appender != null) {
+                    appenderCache.put(key, appender);
+                }
+            }
             if (appender != null && event != null) {
                 appender.append(event);
-                appender.close();
             }
         }
 

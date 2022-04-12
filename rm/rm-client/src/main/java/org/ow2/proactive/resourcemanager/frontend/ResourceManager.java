@@ -573,9 +573,9 @@ public interface ResourceManager {
      * of a crash
      *
      * @param nodes the node set to verify
-     * @return whether all nodes in the node set are recoverable
+     * @return a map containing recoverable status for each node of the node set
      */
-    boolean areNodesRecoverable(NodeSet nodes);
+    Map<String, Boolean> areNodesRecoverable(NodeSet nodes);
 
     /**
      * Set the amount of nodes currently needed by the resource manager

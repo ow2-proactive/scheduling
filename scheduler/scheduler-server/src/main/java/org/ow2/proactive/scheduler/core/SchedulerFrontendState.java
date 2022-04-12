@@ -558,6 +558,25 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
+    private void logJobSubmitted(InternalJob internalJob) {
+        jlogger.info(internalJob.getId(),
+                     "submitted: name '" + internalJob.getName() + "', tasks '" + internalJob.getTotalNumberOfTasks() +
+                                          "', owner '" +
+
+                                          internalJob.getOwner() +
+                                          "'" + (internalJob.getParentId() != null
+                                                                                   ? ", parentJobId '" +
+                                                                                     internalJob.getParentId() + "'"
+                                                                                   : ""));
+        if (jlogger.isTraceEnabled()) {
+            try {
+                jlogger.trace(internalJob.getId(), internalJob.display());
+            } catch (Exception e) {
+                jlogger.error(internalJob.getId(), "Error while displaying the job :", e);
+            }
+        }
+    }
+
     void jobSubmitted(InternalJob job, UserIdentificationImpl ident) {
         // put the job inside the frontend management list
         Lambda.withLock(stateWriteLock,
@@ -567,18 +586,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         ident.addSubmit();
         // send update user event
         usersUpdated(new NotificationData<>(SchedulerEvent.USERS_UPDATE, ident));
-        jlogger.info(job.getId(),
-                     "submitted: name '" + job.getName() + "', tasks '" + job.getTotalNumberOfTasks() + "', owner '" +
+        logJobSubmitted(job);
+        checkRunAsMeConfiguration(job);
+    }
 
-                                  job.getOwner() + "'" +
-                                  (job.getParentId() != null ? ", parentJobId '" + job.getParentId() + "'" : ""));
-        if (jlogger.isTraceEnabled()) {
-            try {
-                jlogger.trace(job.getId(), job.display());
-            } catch (Exception e) {
-                jlogger.error(job.getId(), "Error while displaying the job :", e);
-            }
-        }
+    private void checkRunAsMeConfiguration(InternalJob job) {
         // check whether job property conflicts with the global configuration
         for (Task task : job.getTasks()) {
             if (PASchedulerProperties.TASK_RUNASME.getValueAsBoolean()) {
@@ -736,7 +748,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 ClientJobState clientJobState = getClientJobState(jobId);
                 if (clientJobState != null) {
                     identifiedJob = toIdentifiedJob(clientJobState);
-                    identifiedJob.setFinished(true); // because wherenever there is job in jobsMap, but not in jobs, it is always finished
+                    identifiedJob.setFinished(true); // because whenever there is job in jobsMap, but not in jobs, it is always finished
                 } else {
                     String msg = "The job represented by this ID '" + jobId + "' is unknown !";
                     logger.info(msg);
@@ -1353,7 +1365,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         case JOB_RUNNING_TO_FINISHED:
                             schedulerState.runningToFinished(js);
                             // set this job finished, user can get its result
-                            jobs.remove(notification.getData().getJobId()).setFinished(true);
+                            IdentifiedJob identifiedJob = jobs.remove(notification.getData().getJobId());
+                            if (identifiedJob != null) {
+                                identifiedJob.setFinished(true);
+                            }
+                            logger.info("removed identified job " + notification.getData().getJobId());
                             jobsMap.remove(notification.getData().getJobId());
                             withAttachment = true;
                             break;

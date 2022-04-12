@@ -114,7 +114,7 @@ public class JobLogger {
 
     public void flush(JobId id) {
         updateMdcWithTaskLogFilename(id);
-        logger.debug(PREFIX + id + " closing logger");
+        logger.debug(PREFIX + id + " flushing logger");
         for (Appender appender : (List<Appender>) Collections.list(logger.getAllAppenders())) {
             if (appender instanceof AsynchFileAppender) {
                 ((AsynchFileAppender) appender).flush();

@@ -69,7 +69,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
 
         job.start();
         startTask(job, task1);
-        dbManager.jobTaskStarted(job, task1, true);
+        dbManager.jobTaskStarted(job, task1, true, null);
 
         TaskResultImpl result = new TaskResultImpl(null, new TestResult(1, "res1"), null, 1000);
         terminateTask(job, task1, result);
@@ -94,7 +94,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         InternalTask task2 = job.getTask("task2");
 
         startTask(job, task2);
-        dbManager.jobTaskStarted(job, task2, false);
+        dbManager.jobTaskStarted(job, task2, false, null);
 
         expectedJob = job(job.getId(), JobStatus.STALLED)
                                                          .withFinished(task("task1", TaskStatus.FINISHED)
@@ -108,7 +108,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         task2 = job.getTask("task2");
 
         startTask(job, task2);
-        dbManager.jobTaskStarted(job, task2, false);
+        dbManager.jobTaskStarted(job, task2, false, null);
         terminateTask(job, task2, result);
         dbManager.updateAfterTaskFinished(job, task2, result);
 
@@ -148,9 +148,9 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
 
         job.start();
         startTask(job, task1);
-        dbManager.jobTaskStarted(job, task1, true);
+        dbManager.jobTaskStarted(job, task1, true, null);
         startTask(job, task2);
-        dbManager.jobTaskStarted(job, task2, false);
+        dbManager.jobTaskStarted(job, task2, false, null);
 
         // task 2 finished with error, stop job
         Set<TaskId> ids = job.failed(task2.getId(), JobStatus.CANCELED);

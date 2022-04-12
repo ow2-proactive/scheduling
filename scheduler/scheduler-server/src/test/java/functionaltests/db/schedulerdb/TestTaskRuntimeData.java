@@ -96,7 +96,7 @@ public class TestTaskRuntimeData extends BaseSchedulerDBTest {
         internalJob.start();
         InternalTask task = startTask(internalJob, internalJob.getTask("task1"));
         System.out.println("Job started");
-        dbManager.jobTaskStarted(internalJob, task, true);
+        dbManager.jobTaskStarted(internalJob, task, true, null);
 
         internalJob = loadInternalJob(true, internalJob.getId());
         Assert.assertEquals(TaskStatus.RUNNING, internalJob.getTask("task1").getStatus());

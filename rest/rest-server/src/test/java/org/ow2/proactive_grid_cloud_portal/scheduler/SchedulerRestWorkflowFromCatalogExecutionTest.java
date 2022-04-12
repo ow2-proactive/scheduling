@@ -98,7 +98,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     @Test
     public void testWhenSubmittingConcurrentlyUsingAValidWfContentUrlAllValidJobIdsMustBeRetrieved() throws Exception {
         Integer NRO_THREADS = 100;
-        doAnswer(invocation -> new JobIdImpl(currentJobId++, "job")).when(scheduler).submit(Matchers.any());
+        doAnswer(invocation -> new JobIdImpl(currentJobId++, "job")).when(scheduler).submit(Matchers.any(Job.class));
 
         final AtomicInteger successfullySubmitted = new AtomicInteger(0);
         Runnable runnable = () -> {

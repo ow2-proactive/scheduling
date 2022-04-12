@@ -517,7 +517,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public JobResultData jobResult(String sessionId, String jobId) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/result");
-            return mapper.map(PAFuture.getFutureValue(s.getJobResult(jobId)), JobResultData.class);
+            JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
+            if (jobResult == null) {
+                return null;
+            }
+            return mapper.map(jobResult, JobResultData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
@@ -1694,6 +1698,75 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         return mapper.map(jobId, JobIdData.class);
+    }
+
+    @Override
+    public List<JobIdDataAndError> multipleSubmitFromUrls(String sessionId, List<WorkflowUrlData> jsonBody)
+            throws NotConnectedRestException {
+        Scheduler scheduler = checkAccess(sessionId, "jobs");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        // answer is merged from valid results or errors occurring at this level or lower levels
+        List<JobIdDataAndError> mergedAnswer = new ArrayList<>(jsonBody.size());
+
+        try {
+            // list containing errors occurring when fetching workflows
+            // if the fetch is successful, a null entry is added
+            List<JobIdDataAndError> jobIdDataUrlFetch = new ArrayList<>(jsonBody.size());
+
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
+
+            List<String> workflowContents = new ArrayList<>(jsonBody.size());
+            List<Map<String, String>> workflowsVariables = new ArrayList<>(jsonBody.size());
+            List<Map<String, String>> workflowsGenericInfo = new ArrayList<>(jsonBody.size());
+
+            for (int i = 0; i < jsonBody.size(); i++) {
+                WorkflowUrlData workflowUrlData = jsonBody.get(i);
+                try {
+                    String jobXml = downloadWorkflowContent(sessionId, workflowUrlData.getWorkflowUrl());
+                    workflowContents.add(jobXml);
+                    workflowsVariables.add(workflowUrlData.getVariables());
+                    workflowsGenericInfo.add(workflowUrlData.getGenericInformation());
+                    jobIdDataUrlFetch.add(null);
+                } catch (Exception e) {
+                    JobIdDataAndError jobIdDataAndError = new JobIdDataAndError(e.getMessage(),
+                                                                                StackTraceUtil.getStackTrace(e),
+                                                                                true);
+                    // if an error occurred, the error is stored and a null entry is added into the workflowContents list
+                    workflowContents.add(null);
+                    workflowsVariables.add(null);
+                    workflowsGenericInfo.add(null);
+                    jobIdDataUrlFetch.add(jobIdDataAndError);
+                }
+            }
+
+            List<JobIdDataAndError> jobIdDataWorkflowSubmitter;
+            try {
+                jobIdDataWorkflowSubmitter = workflowSubmitter.submitJobs(workflowContents,
+                                                                          workflowsVariables,
+                                                                          workflowsGenericInfo);
+            } catch (NotConnectedException e) {
+                throw new NotConnectedRestException(e);
+            }
+            for (int i = 0; i < jsonBody.size(); i++) {
+                if (jobIdDataUrlFetch.get(i) != null) {
+                    mergedAnswer.add(jobIdDataUrlFetch.get(i));
+                } else {
+                    mergedAnswer.add(jobIdDataWorkflowSubmitter.get(i));
+                }
+            }
+
+            return mergedAnswer;
+        } catch (Exception e) {
+            logger.error("Unexpected exception during multiple submit", e);
+            for (int i = 0; i < jsonBody.size(); i++) {
+                mergedAnswer = new ArrayList<>(jsonBody.size());
+                JobIdDataAndError jobIdDataAndError = new JobIdDataAndError(e.getMessage(),
+                                                                            StackTraceUtil.getStackTrace(e));
+                mergedAnswer.add(jobIdDataAndError);
+            }
+            return mergedAnswer;
+        }
     }
 
     @Override

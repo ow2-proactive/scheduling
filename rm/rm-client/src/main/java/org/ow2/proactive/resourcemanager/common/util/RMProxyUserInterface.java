@@ -455,7 +455,7 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
-    public boolean areNodesRecoverable(NodeSet nodes) {
+    public Map<String, Boolean> areNodesRecoverable(NodeSet nodes) {
         return target.areNodesRecoverable(nodes);
     }
 
