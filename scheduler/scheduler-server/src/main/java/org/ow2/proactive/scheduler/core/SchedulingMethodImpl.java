@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -52,7 +53,6 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.core.rmproxies.PerUserConnectionRMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
@@ -69,8 +69,8 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.internal.TaskRecoveryData;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
-import org.ow2.proactive.scheduler.util.SchedulingMainLoopTimingLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -118,7 +118,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
-    private SchedulingMainLoopTimingLogger schedulingMainLoopTimingLogger;
+    private MultipleTimingLogger schedulingMainLoopTimingLogger;
 
     // a cache which stores temporarily sessionids to improve performance
     private static Cache<String, String> sessionidCache = CacheBuilder.newBuilder()
@@ -171,7 +171,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of tasks that have been started
      */
     public int schedule() {
-        schedulingMainLoopTimingLogger = new SchedulingMainLoopTimingLogger(logger);
+        schedulingMainLoopTimingLogger = new MultipleTimingLogger("SchedulingMainLoopTiming", logger);
 
         Policy currentPolicy = schedulingService.getPolicy();
         currentPolicy.setSchedulingService(schedulingService);
@@ -196,7 +196,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         int tasksStarted = startTasks(currentPolicy, jobMap, toUnlock);
 
         if (tasksStarted > 0) {
-            schedulingMainLoopTimingLogger.printTimingsINFOLevel();
+            schedulingMainLoopTimingLogger.printTimings(Level.INFO);
         }
 
         return tasksStarted;

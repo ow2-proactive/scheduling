@@ -73,6 +73,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
@@ -531,26 +532,34 @@ public class SchedulingService {
     // for tests only
     public void submitJob(InternalJob job) {
         try {
-            infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job, null, null)).get();
-        } catch (Exception e) {
-            throw handleFutureWaitException(e);
-        }
-    }
-
-    public void submitJob(InternalJob job, SchedulerFrontendState frontendState, UserIdentificationImpl ident) {
-        try {
             infrastructure.getClientOperationsThreadPool()
-                          .submit(new SubmitHandler(this, job, frontendState, ident))
+                          .submit(new SubmitHandler(this,
+                                                    job,
+                                                    null,
+                                                    null,
+                                                    new MultipleTimingLogger("TestTiming", logger)))
                           .get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
     }
 
-    public void submitJobs(List<InternalJob> jobs, SchedulerFrontendState frontendState, UserIdentificationImpl ident) {
+    public void submitJob(InternalJob job, SchedulerFrontendState frontendState, UserIdentificationImpl ident,
+            MultipleTimingLogger timingLogger) {
         try {
             infrastructure.getClientOperationsThreadPool()
-                          .submit(new SubmitHandler(this, jobs, frontendState, ident))
+                          .submit(new SubmitHandler(this, job, frontendState, ident, timingLogger))
+                          .get();
+        } catch (Exception e) {
+            throw handleFutureWaitException(e);
+        }
+    }
+
+    public void submitJobs(List<InternalJob> jobs, SchedulerFrontendState frontendState, UserIdentificationImpl ident,
+            MultipleTimingLogger timingLogger) {
+        try {
+            infrastructure.getClientOperationsThreadPool()
+                          .submit(new SubmitHandler(this, jobs, frontendState, ident, timingLogger))
                           .get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
