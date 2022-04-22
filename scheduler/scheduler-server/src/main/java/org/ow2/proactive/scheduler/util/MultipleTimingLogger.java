@@ -29,20 +29,41 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.google.common.collect.Maps;
 
 
-public class SchedulingMainLoopTimingLogger {
+public class MultipleTimingLogger {
 
     private final LinkedHashMap<String, TimingModel> allTimings;
 
     private final Logger logger;
 
-    public SchedulingMainLoopTimingLogger(Logger logger) {
+    private final String name;
+
+    private final static String nl = System.getProperty("line.separator");
+
+    private final boolean hierarchical;
+
+    public MultipleTimingLogger(String name, Logger logger) {
+        this(name, logger, false);
+    }
+
+    public MultipleTimingLogger(String name, Logger logger, boolean hierarchical) {
         this.logger = logger;
         this.allTimings = Maps.newLinkedHashMap();
+        this.name = name;
+        this.hierarchical = hierarchical;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isHierarchical() {
+        return hierarchical;
     }
 
     public void start(String nameOfTiming) {
@@ -54,14 +75,16 @@ public class SchedulingMainLoopTimingLogger {
         allTimings.getOrDefault(nameOfTiming, new TimingModel()).end();
     }
 
-    public void printTimingsINFOLevel() {
-        List<String> loggingStrings = allTimings.entrySet()
-                                                .stream()
-                                                .map(timing -> timing.getValue().getLoggingString(timing.getKey()))
-                                                .collect(Collectors.toList());
-        if (!loggingStrings.isEmpty()) {
-            logger.info("SchedulingMainLoopTiming::" + System.getProperty("line.separator") +
-                        String.join(System.getProperty("line.separator"), loggingStrings));
+    public void printTimings(Level level) {
+        if (logger.isEnabledFor(level)) {
+            List<String> loggingStrings = allTimings.entrySet()
+                                                    .stream()
+                                                    .map(timing -> timing.getValue().getLoggingString(timing.getKey()))
+                                                    .collect(Collectors.toList());
+            if (!loggingStrings.isEmpty()) {
+                logger.log(level, name + "::" + nl + String.join(nl, loggingStrings));
+
+            }
         }
     }
 

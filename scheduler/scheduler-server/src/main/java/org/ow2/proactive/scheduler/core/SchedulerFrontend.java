@@ -81,6 +81,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
@@ -170,6 +171,7 @@ import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.NodeSet;
@@ -544,27 +546,22 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             if (logger.isDebugEnabled()) {
                 logger.debug("New job submission requested : " + userJob.getName());
             }
-            long t0 = System.currentTimeMillis();
+
             // check if the scheduler is stopped
             if (!schedulingService.isSubmitPossible()) {
                 String msg = "Scheduler is stopped, cannot submit job";
                 logger.info(msg);
                 throw new SubmissionClosedException(msg);
             }
-
-            long t1 = System.currentTimeMillis();
             UserIdentificationImpl ident = frontendState.checkPermission("submit",
                                                                          YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
-            long t2 = System.currentTimeMillis();
+            MultipleTimingLogger timingLogger = new MultipleTimingLogger("SubmitTimer", logger, true);
+            timingLogger.start("createJob");
             InternalJob job = frontendState.createJob(userJob, ident);
-            long t3 = System.currentTimeMillis();
-            schedulingService.submitJob(job, frontendState, ident);
-            long t4 = System.currentTimeMillis();
-            long d1 = t1 - t0;
-            long d2 = t2 - t1;
-            long d3 = t3 - t2;
-            long d4 = t4 - t3;
-            logger.debug(String.format("timer;%d;%d;%d;%d;%d", job.getId().longValue(), d1, d2, d3, d4));
+            timingLogger.end("createJob");
+            timingLogger.start("submitJob");
+            schedulingService.submitJob(job, frontendState, ident, timingLogger);
+            timingLogger.end("submitJob");
             return job.getId();
         } catch (Exception e) {
             logger.warn("Error when submitting job.", e);
@@ -598,7 +595,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             return answer;
         }
 
-        long t0 = System.currentTimeMillis();
+        MultipleTimingLogger timingLogger = new MultipleTimingLogger("SubmitTimer", logger, true);
+
+        timingLogger.start("createJobs");
 
         List<InternalJob> internalJobs = new ArrayList<>(jobs.size());
 
@@ -609,7 +608,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             InternalJob job = null;
             try {
                 if (userJob != null) {
+                    timingLogger.start("createJob");
                     job = frontendState.createJob(userJob, ident);
+                    timingLogger.end("createJob");
                     internalJobs.add(job);
                 } else {
                     internalJobs.add(null);
@@ -621,8 +622,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                 internalJobs.add(null);
             }
         }
-        long t1 = System.currentTimeMillis();
-        schedulingService.submitJobs(internalJobs, frontendState, ident);
+        timingLogger.end("createJobs");
+        timingLogger.start("submitJobs");
+        schedulingService.submitJobs(internalJobs, frontendState, ident, timingLogger);
+
         for (int i = 0; i < jobs.size(); i++) {
             InternalJob internalJob = internalJobs.get(i);
             if (internalJob != null) {
@@ -630,10 +633,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                 answer.set(i, new JobIdDataAndError(jobId.longValue(), jobId.getReadableName()));
             }
         }
-        long t2 = System.currentTimeMillis();
-        long d1 = t1 - t0;
-        long d2 = t2 - t1;
-        logger.debug(String.format("timer;%d;%d", d1, d2));
+        timingLogger.end("submitJobs");
+        timingLogger.printTimings(Level.DEBUG);
         return answer;
     }
 

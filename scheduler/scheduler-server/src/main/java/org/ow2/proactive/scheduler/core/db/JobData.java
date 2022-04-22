@@ -114,6 +114,7 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "increaseJobDataChildrenCount", query = "update JobData set childrenCount = childrenCount+1, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                @NamedQuery(name = "increaseJobDataChildrenCountAmount", query = "update JobData set childrenCount = childrenCount + :amount, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "decreaseJobDataChildrenCount", query = "update JobData set childrenCount = childrenCount-1, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterTaskFinished", query = "update JobData set status = :status, " +
                                                                              "finishedTime = :finishedTime, inErrorTime= :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +

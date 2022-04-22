@@ -27,8 +27,11 @@ package org.ow2.proactive.scheduler.util;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,9 +41,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 
-public class SchedulingMainLoopTimingLoggerTest {
+public class MultipleTimingLoggerTest {
 
-    SchedulingMainLoopTimingLogger schedulingMainLoopTimingLogger;
+    MultipleTimingLogger schedulingMainLoopTimingLogger;
 
     ArgumentCaptor<String> loggingCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -50,14 +53,15 @@ public class SchedulingMainLoopTimingLoggerTest {
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        this.schedulingMainLoopTimingLogger = new SchedulingMainLoopTimingLogger(logger);
+        this.schedulingMainLoopTimingLogger = new MultipleTimingLogger("SchedulingMainLoopTiming", logger);
+        when(logger.isEnabledFor(eq(Level.INFO))).thenReturn(true);
 
     }
 
     @Test
     public void testNoStart() {
         schedulingMainLoopTimingLogger.end("method1");
-        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
+        schedulingMainLoopTimingLogger.printTimings(Level.INFO);
         verify(logger, Mockito.times(0)).debug("");
 
     }
@@ -67,8 +71,8 @@ public class SchedulingMainLoopTimingLoggerTest {
         schedulingMainLoopTimingLogger.start("method1");
         Thread.sleep(100);
         schedulingMainLoopTimingLogger.end("method1");
-        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).info(loggingCaptor.capture());
+        schedulingMainLoopTimingLogger.printTimings(Level.INFO);
+        verify(logger).log(eq(Level.INFO), loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method1");
 
@@ -82,8 +86,8 @@ public class SchedulingMainLoopTimingLoggerTest {
             schedulingMainLoopTimingLogger.end("method1");
         }
 
-        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).info(loggingCaptor.capture());
+        schedulingMainLoopTimingLogger.printTimings(Level.INFO);
+        verify(logger).log(eq(Level.INFO), loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method1");
 
@@ -107,8 +111,8 @@ public class SchedulingMainLoopTimingLoggerTest {
             schedulingMainLoopTimingLogger.end("method_semi_long3");
         }
 
-        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).info(loggingCaptor.capture());
+        schedulingMainLoopTimingLogger.printTimings(Level.INFO);
+        verify(logger).log(eq(Level.INFO), loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method_long_long_long_one1");
 
