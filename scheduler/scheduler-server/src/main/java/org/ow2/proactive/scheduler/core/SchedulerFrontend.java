@@ -1718,7 +1718,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         /**
          * Remove variables and generic info when the user is not allowed to see these details
          */
-        filterVariablesAndGenericInfo(jobsInfo.getList());
+        filterVariablesGenericInfoAndEndpoints(jobsInfo.getList());
 
         return jobsInfo;
     }
@@ -1747,8 +1747,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         return TaskIdImpl.createTaskId(jobIdObj, FAKE_TASK_NAME, FAKE_TASK_ID);
     }
 
-    private void filterVariablesAndGenericInfo(List<JobInfo> jobsInfo) {
-        jobsInfo.stream().forEach(jobInfo -> filterVariablesAndGenericInfo(jobInfo));
+    private void filterVariablesGenericInfoAndEndpoints(List<JobInfo> jobsInfo) {
+        jobsInfo.stream().forEach(jobInfo -> filterVariablesGenericInfoAndEndpoints(jobInfo));
     }
 
     /**
@@ -1772,7 +1772,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         /**
          * Remove variables and generic info when the user is not allowed to see these details
          */
-        filterVariablesAndGenericInfo(jobsInfo);
+        filterVariablesGenericInfoAndEndpoints(jobsInfo);
         return jobsInfo;
     }
 
@@ -1918,7 +1918,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         JobInfo jobInfo = getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
         insertJobSignals(jobInfo);
         insertVisualization(jobInfo);
-        filterVariablesAndGenericInfo(jobInfo);
+        filterVariablesGenericInfoAndEndpoints(jobInfo);
         return jobInfo;
     }
 
@@ -1989,7 +1989,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         return jobInfo;
     }
 
-    private void filterVariablesAndGenericInfo(JobInfo jobInfo) {
+    private void filterVariablesGenericInfoAndEndpoints(JobInfo jobInfo) {
         String jobid = jobInfo.getJobId().value();
         if (!checkJobPermissionMethod(jobid, "getJobState")) {
             if (jobInfo.getVariables() != null) {
@@ -1997,6 +1997,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             }
             if (jobInfo.getGenericInformation() != null) {
                 jobInfo.getGenericInformation().clear();
+            }
+            if (jobInfo.getAttachedServices() != null) {
+                jobInfo.getAttachedServices().clear();
+            }
+            if (jobInfo.getExternalEndpointUrls() != null) {
+                jobInfo.getExternalEndpointUrls().clear();
             }
         }
     }
