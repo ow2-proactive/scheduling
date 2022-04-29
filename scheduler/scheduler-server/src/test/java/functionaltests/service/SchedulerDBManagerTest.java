@@ -384,7 +384,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
             j.setStartTime(100L);
             for (InternalTask t : j.getITasks()) {
                 t.setStartTime(100L);
-                dbManager.jobTaskStarted(j, t, true);
+                dbManager.jobTaskStarted(j, t, true, null);
             }
         }
 

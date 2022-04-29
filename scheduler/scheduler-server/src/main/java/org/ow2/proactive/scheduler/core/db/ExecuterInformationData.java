@@ -66,16 +66,10 @@ public class ExecuterInformationData implements Serializable {
 
     private String hostName;
 
-    public ExecuterInformationData(long taskId, ExecuterInformation executerInformation) {
+    public ExecuterInformationData(long taskId, ExecuterInformation executerInformation, String taskLauncherNodeUrl) {
         this.taskId = taskId;
         if (executerInformation != null) {
-            if (executerInformation.getLauncher() != null) {
-                try {
-                    taskLauncherNodeUrl = PAActiveObject.getUrl(executerInformation.getLauncher());
-                } catch (Exception e) {
-                    logger.warn("TaskLauncher node URL could not be retrieved for task " + taskId);
-                }
-            }
+            this.taskLauncherNodeUrl = taskLauncherNodeUrl;
             nodes = executerInformation.getNodes();
             nodeName = executerInformation.getNodeName();
             hostName = executerInformation.getHostName();

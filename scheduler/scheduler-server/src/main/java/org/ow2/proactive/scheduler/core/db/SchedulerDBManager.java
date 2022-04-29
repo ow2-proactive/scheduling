@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -93,6 +94,7 @@ import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
@@ -1156,7 +1158,8 @@ public class SchedulerDBManager {
         });
     }
 
-    public void jobTaskStarted(final InternalJob job, final InternalTask task, final boolean taskStatusToPending) {
+    public void jobTaskStarted(final InternalJob job, final InternalTask task, final boolean taskStatusToPending,
+            String taskLauncherNodeUrl) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
             long jobId = jobId(job);
 
@@ -1176,7 +1179,8 @@ public class SchedulerDBManager {
             TaskInfo taskInfo = task.getTaskInfo();
 
             ExecuterInformationData executerInfo = new ExecuterInformationData(taskId.getTaskId(),
-                                                                               task.getExecuterInformation());
+                                                                               task.getExecuterInformation(),
+                                                                               taskLauncherNodeUrl);
 
             session.getNamedQuery("updateTaskDataTaskStarted")
                    .setParameter("taskStatus", taskInfo.getStatus())
@@ -2000,22 +2004,37 @@ public class SchedulerDBManager {
                                                     .collect(Collectors.toList());
     }
 
+    // for tests only
     public void newJobSubmitted(final InternalJob job) {
+        newJobSubmitted(job, new MultipleTimingLogger("TestTiming", logger));
+        if (job.getParentId() != null) {
+            increaseJobDataChildrenCount(job.getParentId(), 1);
+        }
+    }
+
+    public void increaseJobDataChildrenCount(Long jobId, int increaseAmount) {
         executeReadWriteTransaction(session -> {
+            return session.getNamedQuery("increaseJobDataChildrenCountAmount")
+                          .setParameter("lastUpdatedTime", new Date().getTime())
+                          .setParameter("jobId", jobId)
+                          .setParameter("amount", increaseAmount)
+                          .executeUpdate();
+        });
+    }
+
+    public void newJobSubmitted(final InternalJob job, final MultipleTimingLogger timingLogger) {
+        executeReadWriteTransaction(session -> {
+            timingLogger.start("createJobData");
             JobData jobRuntimeData = JobData.createJobData(job);
             session.save(jobRuntimeData);
-
             job.setId(new JobIdImpl(jobRuntimeData.getId(), job.getName()));
-
-            if (job.getParentId() != null) {
-                session.getNamedQuery("increaseJobDataChildrenCount")
-                       .setParameter("lastUpdatedTime", new Date().getTime())
-                       .setParameter("jobId", job.getParentId())
-                       .executeUpdate();
-            }
+            timingLogger.end("createJobData");
+            timingLogger.start("replaceSystemVariables");
             replaceSystemVariables(job);
             replaceSystemVariables(jobRuntimeData);
             session.save(jobRuntimeData);
+            timingLogger.end("replaceSystemVariables");
+            timingLogger.start("saveTasks");
 
             ArrayList<InternalTask> iTasks = job.getITasks();
             List<InternalTask> tasksWithNewIds = new ArrayList<>(iTasks.size());
@@ -2036,10 +2055,18 @@ public class SchedulerDBManager {
             List<InternalTask> tasks = job.getITasks();
             List<TaskData> taskRuntimeDataList = new ArrayList<>(tasks.size());
             for (InternalTask task : tasks) {
+                timingLogger.start("saveNewTask");
                 taskRuntimeDataList.add(saveNewTask(session, jobRuntimeData, task));
+                timingLogger.end("saveNewTask");
             }
+            timingLogger.end("saveTasks");
+            timingLogger.start("saveTaskDependencies");
             saveTaskDependencies(session, tasks, taskRuntimeDataList);
+            timingLogger.end("saveTaskDependencies");
 
+            if (!timingLogger.isHierarchical()) {
+                timingLogger.printTimings(Level.DEBUG);
+            }
             return jobRuntimeData;
         });
     }

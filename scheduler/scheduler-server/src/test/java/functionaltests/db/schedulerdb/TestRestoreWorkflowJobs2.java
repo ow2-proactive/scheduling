@@ -54,7 +54,7 @@ public class TestRestoreWorkflowJobs2 extends BaseSchedulerDBTest {
         job.start();
         InternalTask mainTask = job.getTask("A");
         startTask(job, mainTask);
-        dbManager.jobTaskStarted(job, mainTask, true);
+        dbManager.jobTaskStarted(job, mainTask, true, null);
 
         TaskResultImpl result = new TaskResultImpl(mainTask.getId(), "ok", null, 0);
         FlowAction action = new FlowAction(FlowActionType.IF);

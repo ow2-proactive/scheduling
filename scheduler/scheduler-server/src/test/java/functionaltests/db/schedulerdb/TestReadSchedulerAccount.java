@@ -134,7 +134,7 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
         // task1 started
         job1.start();
         startTask(job1, job1.getTask("task1"));
-        dbManager.jobTaskStarted(job1, job1.getTask("task1"), true);
+        dbManager.jobTaskStarted(job1, job1.getTask("task1"), true, null);
         accountData.pendingJobsCount--;
         accountData.runningJobsCount++;
         accountData.pendingTasksCount--;
@@ -156,11 +156,11 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
 
         // task2 and task3 started
         startTask(job1, job1.getTask("task2"));
-        dbManager.jobTaskStarted(job1, job1.getTask("task2"), true);
+        dbManager.jobTaskStarted(job1, job1.getTask("task2"), true, null);
         accountData.pendingTasksCount--;
         accountData.currentTasksCount++;
         startTask(job1, job1.getTask("task3"));
-        dbManager.jobTaskStarted(job1, job1.getTask("task3"), true);
+        dbManager.jobTaskStarted(job1, job1.getTask("task3"), true, null);
         accountData.pendingTasksCount--;
         accountData.currentTasksCount++;
         accountData.runningJobsCount++;

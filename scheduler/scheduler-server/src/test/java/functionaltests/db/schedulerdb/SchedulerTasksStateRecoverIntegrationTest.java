@@ -50,7 +50,7 @@ public class SchedulerTasksStateRecoverIntegrationTest extends BaseSchedulerDBTe
 
         job.start();
         startTask(job, task);
-        dbManager.jobTaskStarted(job, task, true);
+        dbManager.jobTaskStarted(job, task, true, null);
 
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
 
@@ -67,7 +67,7 @@ public class SchedulerTasksStateRecoverIntegrationTest extends BaseSchedulerDBTe
         task = job.getTask("task1");
 
         startTask(job, task);
-        dbManager.jobTaskStarted(job, task, true);
+        dbManager.jobTaskStarted(job, task, true, null);
 
         job.newWaitingTask();
         job.reStartTask(task);

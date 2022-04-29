@@ -101,7 +101,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         job5.start();
         InternalTask taskJob5 = startTask(job5, job5.getITasks().get(0));
-        dbManager.jobTaskStarted(job5, taskJob5, true);
+        dbManager.jobTaskStarted(job5, taskJob5, true, null);
 
         List<JobInfo> jobs;
 
@@ -268,7 +268,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         job = defaultSubmitJob(createJob(null, null, projectName, 1L));
         job.start();
         task = startTask(job, job.getITasks().get(0));
-        dbManager.jobTaskStarted(job, task, true);
+        dbManager.jobTaskStarted(job, task, true, null);
 
         // killed job - 4
         job = defaultSubmitJob(createJob());
@@ -282,7 +282,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         job = defaultSubmitJob(createJob());
         job.start();
         task = startTask(job, job.getITasks().get(0));
-        dbManager.jobTaskStarted(job, task, true);
+        dbManager.jobTaskStarted(job, task, true, null);
         TaskResultImpl result = new TaskResultImpl(null, new TestResult(0, "result"), null, 0);
         job.terminateTask(false, task.getId(), null, null, result);
         job.terminate();

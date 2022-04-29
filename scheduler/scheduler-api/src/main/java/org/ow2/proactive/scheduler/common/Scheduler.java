@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobIdDataAndError;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -681,6 +682,15 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     JobId submit(Job job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit multiple jobs
+     *
+     * @param jobs a list of jobs to submit
+     * @return a list of objects containing, for each job, a job id or any error occurring during job submission
+     * @throws NotConnectedException
+     */
+    List<JobIdDataAndError> submit(List<Job> jobs) throws NotConnectedException;
 
     /**
      *

@@ -203,12 +203,12 @@ public class RMProxy {
         }
     }
 
-    public boolean areNodesRecoverable(NodeSet nodes) {
+    public Map<String, Boolean> areNodesRecoverable(NodeSet nodes) {
         if (proxyActiveObject != null) {
             return proxyActiveObject.areNodesRecoverable(nodes);
         } else {
             logger.warn("Didn't find RM to check whether nodes are recoverable");
-            return false;
+            return null;
         }
     }
 

@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -82,6 +83,9 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.utils.ObjectByteConverter;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import it.sauronsoftware.cron4j.Predictor;
 
@@ -167,6 +171,10 @@ public abstract class InternalJob extends JobState {
 
     @XmlTransient
     private static PrivateKey corePrivateKey;
+
+    private static Cache<String, UserCredentials> credentialsCache = CacheBuilder.newBuilder()
+                                                                                 .expireAfterWrite(5, TimeUnit.MINUTES)
+                                                                                 .build();
 
     /**
      * Hibernate default constructor
@@ -340,7 +348,10 @@ public abstract class InternalJob extends JobState {
     }
 
     private UserCredentials getUserCredentials() {
-        UserCredentials userCredentials = null;
+        UserCredentials userCredentials = credentialsCache.getIfPresent(getOwner());
+        if (userCredentials != null) {
+            return userCredentials;
+        }
         try {
             CredData decryptedUserCredentials = credentials.decrypt(corePrivateKey);
             if (PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.isSet() &&
@@ -351,6 +362,7 @@ public abstract class InternalJob extends JobState {
                                                   decryptedUserCredentials.getPassword(),
                                                   decryptedUserCredentials.getDomain(),
                                                   decryptedUserCredentials.getKey());
+            credentialsCache.put(getOwner(), userCredentials);
         } catch (Exception e) {
             LOGGER.error("Could not decrypt user credentials", e);
         }

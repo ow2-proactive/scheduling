@@ -42,8 +42,10 @@ import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobIdDataAndError;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.WorkflowUrlData;
 
 
 /**
@@ -381,6 +383,17 @@ public interface ISchedulerClient extends Scheduler {
     JobId submitFromCatalog(String catalogRestURL, String calledWorkflow, Map<String, String> variables,
             Map<String, String> genericInfo)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a list of jobs to the scheduler from a list of catalogRestURL, variables and generic information.
+     *
+     * @param workflowUrlDataList list of objects containing workflow submission data
+     * @return a list of job ids of the submitted jobs and errors when jobs could not be submitted
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    List<JobIdDataAndError> multipleSubmitFromUrls(List<WorkflowUrlData> workflowUrlDataList)
+            throws NotConnectedException, PermissionException;
 
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the

@@ -25,30 +25,97 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
+import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
+
+import com.google.common.collect.Lists;
 
 
 class SubmitHandler implements Runnable {
 
     static final Logger logger = Logger.getLogger(SchedulingService.class);
 
-    private final InternalJob job;
+    private final List<InternalJob> jobs;
 
     private final SchedulingService service;
 
-    SubmitHandler(SchedulingService service, InternalJob job) {
+    private final SchedulerFrontendState frontendState;
+
+    private final UserIdentificationImpl ident;
+
+    private final MultipleTimingLogger timingLogger;
+
+    SubmitHandler(SchedulingService service, InternalJob job, SchedulerFrontendState frontendState,
+            UserIdentificationImpl ident, MultipleTimingLogger timingLogger) {
         this.service = service;
-        this.job = job;
+        this.jobs = Lists.newArrayList(job);
+        this.frontendState = frontendState;
+        this.ident = ident;
+        this.timingLogger = timingLogger;
+    }
+
+    SubmitHandler(SchedulingService service, List<InternalJob> jobs, SchedulerFrontendState frontendState,
+            UserIdentificationImpl ident, MultipleTimingLogger timingLogger) {
+        this.service = service;
+        this.jobs = jobs;
+        this.frontendState = frontendState;
+        this.ident = ident;
+        this.timingLogger = timingLogger;
     }
 
     @Override
     public void run() {
         if (logger.isDebugEnabled()) {
-            logger.debug("Submitting a new job '" + job.getName() + "'");
+            if (jobs.size() == 1) {
+                if (jobs.get(0) != null) {
+                    logger.debug("Submitting a new job '" + jobs.get(0).getName() + "'");
+                }
+            } else {
+                logger.debug("Submitting new jobs: " + jobs.stream()
+                                                           .filter(job -> job != null)
+                                                           .map(job -> job.getName())
+                                                           .collect(Collectors.joining(",")));
+            }
         }
 
-        service.getJobs().jobSubmitted(job);
+        Map<Long, MutableInt> childrenCountIncrease = new LinkedHashMap<>();
+        for (InternalJob job : jobs) {
+            if (job != null) {
+                service.getJobs().jobSubmitted(job, timingLogger);
+                Long parentId = job.getParentId();
+                if (parentId != null) {
+                    if (childrenCountIncrease.containsKey(parentId)) {
+                        childrenCountIncrease.get(parentId).add(1);
+                    } else {
+                        childrenCountIncrease.put(parentId, new MutableInt(1));
+                    }
+                }
+            }
+        }
+        timingLogger.start("increaseJobDataChildrenCount");
+        for (Map.Entry<Long, MutableInt> entry : childrenCountIncrease.entrySet()) {
+            service.getJobs().increaseJobDataChildrenCount(entry.getKey(), entry.getValue().getValue());
+        }
+        timingLogger.end("increaseJobDataChildrenCount");
+
+        timingLogger.start("frontendStateJobSubmitted");
+        for (InternalJob job : jobs) {
+            if (job != null) {
+                if (frontendState != null) {
+                    frontendState.jobSubmitted(job, ident);
+                }
+            }
+        }
+        timingLogger.end("frontendStateJobSubmitted");
 
         service.wakeUpSchedulingThread();
     }

@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -69,6 +70,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.TaskIdWrapper;
 
@@ -364,34 +366,49 @@ class LiveJobs {
     }
 
     void jobSubmitted(InternalJob job) {
-        job.prepareTasks();
-        job.submitAction();
-        dbManager.newJobSubmitted(job);
-        ClientJobState clientJobState = new ClientJobState(job);
-        jobs.put(job.getId(), new JobData(job));
-        listener.jobSubmitted(clientJobState);
-        if (job.getParentId() != null) {
-            // If a job has a parent, it means that the parent job children count has been increased.
-            // accordingly, we need to send a JOB_UPDATED notification of the parent
-            JobId parentJobId = JobIdImpl.makeJobId(job.getParentId().toString());
-            JobData parentJobData = jobs.get(parentJobId);
-            if (parentJobData != null) {
-                // the parent job is alive, we load it from memory
-                InternalJob parentJob = parentJobData.job;
-                ((JobInfoImpl) parentJob.getJobInfo()).setChildrenCount(parentJob.getJobInfo().getChildrenCount() + 1);
+        jobSubmitted(job, new MultipleTimingLogger("TestTiming", logger));
+    }
+
+    void increaseJobDataChildrenCount(Long jobId, int increaseAmount) {
+        dbManager.increaseJobDataChildrenCount(jobId, increaseAmount);
+        // If a job has a parent, it means that the parent job children count has been increased.
+        // accordingly, we need to send a JOB_UPDATED notification of the parent
+        JobId parentJobId = JobIdImpl.makeJobId(jobId.toString());
+        JobData parentJobData = jobs.get(parentJobId);
+        if (parentJobData != null) {
+            // the parent job is alive, we load it from memory
+            InternalJob parentJob = parentJobData.job;
+            ((JobInfoImpl) parentJob.getJobInfo()).setChildrenCount(parentJob.getJobInfo().getChildrenCount() + 1);
+            listener.jobStateUpdated(parentJob.getOwner(),
+                                     new NotificationData<JobInfo>(SchedulerEvent.JOB_UPDATED,
+                                                                   new JobInfoImpl((JobInfoImpl) parentJob.getJobInfo())));
+        } else {
+            // the parent job is terminated, we load it from the db
+            List<InternalJob> internalJobs = dbManager.loadInternalJob(jobId);
+            if (!internalJobs.isEmpty()) {
+                InternalJob parentJob = internalJobs.get(0);
                 listener.jobStateUpdated(parentJob.getOwner(),
                                          new NotificationData<JobInfo>(SchedulerEvent.JOB_UPDATED,
                                                                        new JobInfoImpl((JobInfoImpl) parentJob.getJobInfo())));
-            } else {
-                // the parent job is terminated, we load it from the db
-                List<InternalJob> internalJobs = dbManager.loadInternalJob(job.getParentId());
-                if (!internalJobs.isEmpty()) {
-                    InternalJob parentJob = internalJobs.get(0);
-                    listener.jobStateUpdated(parentJob.getOwner(),
-                                             new NotificationData<JobInfo>(SchedulerEvent.JOB_UPDATED,
-                                                                           new JobInfoImpl((JobInfoImpl) parentJob.getJobInfo())));
-                }
             }
+        }
+    }
+
+    void jobSubmitted(InternalJob job, MultipleTimingLogger timingLogger) {
+        timingLogger.start("prepareTasks");
+        job.prepareTasks();
+        job.submitAction();
+        timingLogger.end("prepareTasks");
+        timingLogger.start("dbNewJobSubmitted");
+        dbManager.newJobSubmitted(job, timingLogger);
+        timingLogger.end("dbNewJobSubmitted");
+        timingLogger.start("listenerJobSubmitted");
+        ClientJobState clientJobState = new ClientJobState(job);
+        jobs.put(job.getId(), new JobData(job));
+        listener.jobSubmitted(clientJobState);
+        timingLogger.end("listenerJobSubmitted");
+        if (!timingLogger.isHierarchical()) {
+            timingLogger.printTimings(Level.DEBUG);
         }
     }
 
@@ -583,7 +600,7 @@ class LiveJobs {
         return terminationData;
     }
 
-    void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher) {
+    void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher, String taskLauncherNodeUrl) {
         JobData jobData = checkJobAccess(job.getId());
         if (jobData == null) {
             throw new IllegalStateException("Job " + job.getId() + " does not exist");
@@ -611,7 +628,7 @@ class LiveJobs {
 
         // set the different informations on task
         job.startTask(task);
-        dbManager.jobTaskStarted(job, task, firstTaskStarted);
+        dbManager.jobTaskStarted(job, task, firstTaskStarted, taskLauncherNodeUrl);
 
         listener.taskStateUpdated(job.getOwner(),
                                   new NotificationData<TaskInfo>(SchedulerEvent.TASK_PENDING_TO_RUNNING,

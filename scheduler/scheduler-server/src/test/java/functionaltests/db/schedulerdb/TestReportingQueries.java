@@ -90,7 +90,7 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
         // job1: task1 started
         job1.start();
         startTask(job1, job1.getTask("task1"));
-        dbManager.jobTaskStarted(job1, job1.getTask("task1"), true);
+        dbManager.jobTaskStarted(job1, job1.getTask("task1"), true, null);
         checkNumberOfHosts(job1, 1);
 
         checkJobPendingTime(job1);
@@ -109,7 +109,7 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
         // job2: task1 started
         job2.start();
         startTask(job2, job2.getTask("task1"));
-        dbManager.jobTaskStarted(job2, job2.getTask("task1"), true);
+        dbManager.jobTaskStarted(job2, job2.getTask("task1"), true, null);
 
         checkMeanPendingTime(job1, job2);
         checkMeanTaskRunningTime(job2);
@@ -117,9 +117,9 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
 
         // job1: task2 and task3 started
         startTask(job1, job1.getTask("task2"));
-        dbManager.jobTaskStarted(job1, job1.getTask("task2"), false);
+        dbManager.jobTaskStarted(job1, job1.getTask("task2"), false, null);
         startTask(job1, job1.getTask("task3"));
-        dbManager.jobTaskStarted(job1, job1.getTask("task3"), false);
+        dbManager.jobTaskStarted(job1, job1.getTask("task3"), false, null);
 
         checkMeanTaskPendingTime(job1);
         checkMeanTaskRunningTime(job1);
