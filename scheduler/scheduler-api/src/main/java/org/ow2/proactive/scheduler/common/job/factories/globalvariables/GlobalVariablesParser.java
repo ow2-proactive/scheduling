@@ -43,6 +43,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -136,9 +137,15 @@ public class GlobalVariablesParser {
             for (Filter filter : loadedFilters) {
                 boolean allMatch = true;
                 for (String xpathExpression : filter.getXpath()) {
-                    NodeList nodeList = (NodeList) xPath.compile(xpathExpression).evaluate(xmlDocument,
-                                                                                           XPathConstants.NODESET);
-                    allMatch = allMatch && (nodeList.getLength() > 0);
+                    boolean valid = false;
+                    try {
+                        NodeList nodeList = (NodeList) xPath.compile(xpathExpression).evaluate(xmlDocument,
+                                                                                               XPathConstants.NODESET);
+                        valid = nodeList.getLength() > 0;
+                    } catch (XPathExpressionException e) {
+                        valid = (Boolean) xPath.compile(xpathExpression).evaluate(xmlDocument, XPathConstants.BOOLEAN);
+                    }
+                    allMatch = allMatch && valid;
                 }
                 if (allMatch) {
                     for (JobVariable variable : filter.getVariables()) {
