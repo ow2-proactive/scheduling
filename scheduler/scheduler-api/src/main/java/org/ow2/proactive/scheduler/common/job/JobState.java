@@ -440,6 +440,13 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     public abstract String getOwner();
 
     /**
+     * To get the owner of the job.
+     *
+     * @return the owner of the job.
+     */
+    public abstract String getTenant();
+
+    /**
      * Get the toBeRemoved property.
      * If this method returns true, this job is about to be removed from scheduler.
      *

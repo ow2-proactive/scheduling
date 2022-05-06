@@ -56,6 +56,7 @@ import javax.security.auth.login.LoginException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.core.properties.PASharedProperties;
 
@@ -139,11 +140,14 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     /** user password used to bind to LDAP (if authentication method is different from none) */
     private String BIND_PASSWD = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_PASSWD);
 
-    /**fall back property, check user/password and group in files if user in not found in LDAP */
+    /** fall back property, check user/password and group in files if user in not found in LDAP */
     private boolean fallbackUserAuth = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.FALLBACK_USER_AUTH));
 
-    /**group fall back property, check user group membership group file if user in not found in corresponding LDAP group*/
+    /** group fall back property, check user group membership group file if user in not found in corresponding LDAP group*/
     private boolean fallbackGroupMembership = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.FALLBACK_GROUP_MEMBERSHIP));
+
+    /** tenant fall back property, check user tenant membership using tenant file if user is not found in LDAP or if tenant LDAP attribute is not defined */
+    private boolean fallbackTenantMembership = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.FALLBACK_TENANT_MEMBERSHIP));
 
     /** authentication status */
     private boolean succeeded = false;
@@ -164,6 +168,11 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         } else if (fallbackGroupMembership) {
             checkGroupFile();
             logger.debug("Using Group file for fall back group membership at: " + groupFile);
+        }
+
+        if (fallbackTenantMembership) {
+            checkTenantFile();
+            logger.debug("Using Tenant file for fall back tenant membership at: " + tenantFile);
         }
 
         //initialize system properties for SSL/TLS connection
@@ -347,6 +356,9 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
 
             if (fallbackGroupMembership) {
                 super.groupMembershipFromFile(username);
+            }
+            if (fallbackTenantMembership) {
+                super.tenantMembershipFromFile(username);
             }
         } else {
             // authentication failed
@@ -573,6 +585,14 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                         logger.debug("User " + username + " has LDAP entry " + userDN);
                     }
                     subject.getPrincipals().add(new UserNamePrincipal(username));
+
+                    if (ldapProperties.getProperty(LDAPProperties.LDAP_TENANT_ATTR) != null) {
+                        Attribute tenantAttr = result.getAttributes()
+                                                     .get(ldapProperties.getProperty(LDAPProperties.LDAP_TENANT_ATTR));
+                        if (tenantAttr != null && tenantAttr.get() != null && !tenantAttr.get().toString().isEmpty()) {
+                            subject.getPrincipals().add(new TenantPrincipal(tenantAttr.get().toString()));
+                        }
+                    }
 
                     // looking for the user groups
                     String groupFilter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_GROUP_FILTER),

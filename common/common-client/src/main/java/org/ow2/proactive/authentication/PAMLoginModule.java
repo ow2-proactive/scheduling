@@ -162,6 +162,7 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
             subject.getPrincipals().add(new UserNamePrincipal(username));
             resetFailedAttempt(username);
             super.groupMembershipFromFile(username);
+            super.tenantMembershipFromFile(username);
             return true;
         } else {
             logger.info("PAM authentication failed for user " + username + ": " + answer);

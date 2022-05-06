@@ -38,6 +38,8 @@ public class JobStateData {
 
     private String owner;
 
+    private String tenant;
+
     private JobInfoData jobInfo;
 
     private String projectName;
@@ -68,6 +70,14 @@ public class JobStateData {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public JobInfoData getJobInfo() {
@@ -109,8 +119,8 @@ public class JobStateData {
     @Override
     public String toString() {
         return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" + owner +
-               '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" + tasks +
-               ", genericInformation=" + genericInformation + '}';
+               '\'' + ", tenant='" + tenant + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' +
+               ", tasks=" + tasks + ", genericInformation=" + genericInformation + '}';
     }
 
 }

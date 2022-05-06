@@ -95,6 +95,7 @@ public class PrincipalPermission extends ClientPermission {
         Set<IdentityPrincipal> includedGroupNamePrincipals = new HashSet<>();
         Set<IdentityPrincipal> excludedUserNamePrincipals = new HashSet<>();
         Set<IdentityPrincipal> excludedGroupNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> tenantsPrincipals = new HashSet<>();
         Set<IdentityPrincipal> tokenPrincipals = new HashSet<>();
         for (IdentityPrincipal instance : permissionToRespect.principals) {
             if (instance instanceof ExcludedIdentityPrincipal && instance instanceof UserNamePrincipal) {
@@ -105,6 +106,8 @@ public class PrincipalPermission extends ClientPermission {
                 includedUserNamePrincipals.add(instance);
             } else if (instance instanceof GroupNamePrincipal) {
                 includedGroupNamePrincipals.add(instance);
+            } else if (instance instanceof TenantPrincipal) {
+                tenantsPrincipals.add(instance);
             } else if (instance instanceof TokenPrincipal) {
                 tokenPrincipals.add(instance);
             }
@@ -113,23 +116,27 @@ public class PrincipalPermission extends ClientPermission {
         // Separate included/excluded principals in this
         Set<IdentityPrincipal> includedThisUserNamePrincipals = new HashSet<>();
         Set<IdentityPrincipal> includedThisGroupNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> thisTenantsPrincipals = new HashSet<>();
         Set<IdentityPrincipal> thisTokenPrincipals = new HashSet<>();
         for (IdentityPrincipal instance : this.principals) {
             if (instance instanceof UserNamePrincipal) {
                 includedThisUserNamePrincipals.add(instance);
             } else if (instance instanceof GroupNamePrincipal) {
                 includedThisGroupNamePrincipals.add(instance);
+            } else if (instance instanceof TenantPrincipal) {
+                thisTenantsPrincipals.add(instance);
             } else if (instance instanceof TokenPrincipal) {
                 thisTokenPrincipals.add(instance);
             }
         }
 
-        boolean userAuthorized, groupAuthorized, tokenAuthorized;
+        boolean userAuthorized, groupAuthorized, tokenAuthorized, tenantAuthorized;
         if (nbExcludedPrincipals == 0) {
             // To access to a resource , a principal (this) must be present
             // in the included principal list of the resource permission
             userAuthorized = includedUserNamePrincipals.containsAll(includedThisUserNamePrincipals);
             groupAuthorized = includedGroupNamePrincipals.containsAll(includedThisGroupNamePrincipals);
+            tenantAuthorized = tenantsPrincipals.containsAll(thisTenantsPrincipals);
             tokenAuthorized = tokenPrincipals.containsAll(thisTokenPrincipals);
 
         } else if (nbExcludedPrincipals == nbPrincipals) {
@@ -137,13 +144,14 @@ public class PrincipalPermission extends ClientPermission {
             // in the excluded principal list of the resource permission
             userAuthorized = !excludedUserNamePrincipals.stream().anyMatch(includedThisUserNamePrincipals::contains);
             groupAuthorized = !excludedGroupNamePrincipals.stream().anyMatch(includedThisGroupNamePrincipals::contains);
+            tenantAuthorized = true;
             tokenAuthorized = true;
         } else {
             // Not supposed to find mixed included/excluded principals in permission
             return false;
         }
         // Authorization must be given at user, group and token level
-        return userAuthorized && groupAuthorized && tokenAuthorized;
+        return userAuthorized && groupAuthorized && tokenAuthorized && tenantAuthorized;
     }
 
     @Override

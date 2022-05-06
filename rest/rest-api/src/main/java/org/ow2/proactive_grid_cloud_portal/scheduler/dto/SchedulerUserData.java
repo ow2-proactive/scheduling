@@ -36,6 +36,8 @@ public class SchedulerUserData {
 
     private Set<String> groups;
 
+    private String tenant;
+
     private String username;
 
     private long connectionTime;
@@ -59,6 +61,10 @@ public class SchedulerUserData {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getTenant() {
+        return tenant;
     }
 
     public long getConnectionTime() {
@@ -85,6 +91,10 @@ public class SchedulerUserData {
         this.username = username;
     }
 
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
+
     public void setConnectionTime(long connectionTime) {
         this.connectionTime = connectionTime;
     }
@@ -107,8 +117,8 @@ public class SchedulerUserData {
 
     @Override
     public String toString() {
-        return "SchedulerUserData{" + "hostName='" + hostName + '\'' + ", username='" + username + '\'' +
-               ", connectionTime=" + connectionTime + ", lastSubmitTime=" + lastSubmitTime + ", submitNumber=" +
-               submitNumber + '}';
+        return "SchedulerUserData{" + "hostName='" + hostName + '\'' + ", username='" + username + '\'' + ", groups='" +
+               groups + "\'" + ", tenant='" + tenant + "\'" + ", connectionTime=" + connectionTime +
+               ", lastSubmitTime=" + lastSubmitTime + ", submitNumber=" + submitNumber + '}';
     }
 }

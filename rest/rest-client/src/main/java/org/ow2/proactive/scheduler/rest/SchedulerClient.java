@@ -339,6 +339,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                            criteria.getJobName(),
                                                                                                            criteria.getProjectName(),
                                                                                                            criteria.getUserName(),
+                                                                                                           criteria.getTenant(),
                                                                                                            criteria.getParentId(),
                                                                                                            sortParams);
             List<UserJobData> userJobs = userJobsAllRevisions.getMap().values().iterator().next();
@@ -1333,6 +1334,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         JobId newJobId = JobIdImpl.makeJobId(jobId);
         jobInfoImpl.setJobId(newJobId);
         jobInfoImpl.setJobOwner(jobInfoData.getJobOwner());
+        jobInfoImpl.setTenant(jobInfoData.getTenant());
         jobInfoImpl.setProjectName(jobInfoData.getProjectName());
         jobInfoImpl.setFinishedTime(jobInfoData.getFinishedTime());
         jobInfoImpl.setRemovedTime(jobInfoData.getRemovedTime());

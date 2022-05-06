@@ -66,6 +66,8 @@ public class ClientJobState extends JobState {
 
     private String owner;
 
+    private String tenant;
+
     private JobType type;
 
     private Map<TaskId, TaskState> tasks;
@@ -86,6 +88,7 @@ public class ClientJobState extends JobState {
         // converting internal job into a light job descriptor
         jobInfo = (JobInfoImpl) jobState.getJobInfo();
         owner = jobState.getOwner();
+        tenant = jobState.getTenant();
         type = jobState.getType();
 
         this.name = jobState.getName();
@@ -202,6 +205,11 @@ public class ClientJobState extends JobState {
     @Override
     public String getOwner() {
         return owner;
+    }
+
+    @Override
+    public String getTenant() {
+        return tenant;
     }
 
     @Override

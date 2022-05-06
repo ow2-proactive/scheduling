@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 
@@ -131,6 +132,15 @@ public class Client implements Serializable {
             answer.add(principal.getName());
         }
         return answer;
+    }
+
+    public String getTenant() {
+        Set<TenantPrincipal> tenantPrincipals = subject.getPrincipals(TenantPrincipal.class);
+        if (tenantPrincipals != null && tenantPrincipals.size() > 0) {
+            return tenantPrincipals.iterator().next().getName();
+        } else {
+            return null;
+        }
     }
 
     /**

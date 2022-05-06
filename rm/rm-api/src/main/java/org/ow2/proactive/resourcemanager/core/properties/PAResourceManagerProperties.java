@@ -138,6 +138,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Resource Manager group file name */
     RM_GROUP_FILE("pa.rm.defaultgroupfilename", PropertyType.STRING, "config/authentication/group.cfg"),
 
+    /** Resource Manager tenant file name */
+    RM_TENANT_FILE("pa.rm.defaulttenantfilename", PropertyType.STRING, "config/authentication/tenant.cfg"),
+
     /** Name of the JMX MBean for the RM */
     RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PropertyType.STRING, "JMXRMAgent"),
 

@@ -70,11 +70,11 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
     protected NodeSource nodeSource;
 
     // Users who can get nodes for computations from this node source
-    @Configurable(description = "ME|users=name1,name2;groups=group1,group2;tokens=t1,t2|ALL", sectionSelector = 1)
+    @Configurable(description = "ME|users=name1,name2;groups=group1,group2;tenants=tenant1,tenant2;tokens=t1,t2|ALL", sectionSelector = 1)
     private AccessType userAccessType = AccessType.ALL;
 
     // Users who can add/remove nodes to/from this node source
-    @Configurable(description = "ME|users=name1,name2;groups=group1,group2|ALL", sectionSelector = 1)
+    @Configurable(description = "ME|users=name1,name2;groups=group1,group2;tenants=tenant1,tenant2|ALL", sectionSelector = 1)
     private AccessType providerAccessType = AccessType.ME;
 
     private Map<String, String> meta = new HashMap<>();

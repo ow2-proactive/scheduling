@@ -67,6 +67,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private String jobOwner;
 
+    private String tenant;
+
     private String projectName;
 
     private boolean toBeRemoved = false;
@@ -175,6 +177,14 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setJobOwner(String jobOwner) {
         this.jobOwner = jobOwner;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public String getProjectName() {

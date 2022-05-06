@@ -79,6 +79,12 @@ public class LDAPProperties {
     /** the attribute in the group entry that matches the jaas' group name */
     public static final String LDAP_GROUPNAME_ATTR = "pa.ldap.group.name.attr";
 
+    /**
+     * the attribute in the user entry that defines the tenant
+     * If not defined, no tenant will be associated with the user, or tenant will be defined using the fallback method
+     **/
+    public static final String LDAP_TENANT_ATTR = "pa.ldap.tenant.attr";
+
     /** authentication method used to connect to LDAP : none, simple or a SASL method */
     public static final String LDAP_AUTHENTICATION_METHOD = "pa.ldap.authentication.method";
 
@@ -117,6 +123,10 @@ public class LDAPProperties {
     /** group fall back property, check user group membership group file if user is not found in corresponding LDAP group.
      * true or false */
     public static final String FALLBACK_GROUP_MEMBERSHIP = "pa.ldap.group.membership.fallback";
+
+    /** tenant fall back property, check user tenant membership tenant file if user is not found in LDAP or if tenant LDAP attribute is not defined.
+     * true or false */
+    public static final String FALLBACK_TENANT_MEMBERSHIP = "pa.ldap.tenant.membership.fallback";
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

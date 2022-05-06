@@ -46,6 +46,10 @@ public class DBJobDataParameters {
 
     private final String user;
 
+    private final String tenant;
+
+    private final boolean isExplicitTenantFilter;
+
     private final boolean pending;
 
     private final boolean running;
@@ -64,12 +68,14 @@ public class DBJobDataParameters {
 
     private final Set<JobStatus> status;
 
-    DBJobDataParameters(int offset, int limit, String user, boolean pending, boolean running, boolean finished,
-            boolean childJobs, String jobName, String projectName, Long parentId,
-            List<SortParameter<JobSortParameter>> sortParameters) {
+    DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
+            boolean pending, boolean running, boolean finished, boolean childJobs, String jobName, String projectName,
+            Long parentId, List<SortParameter<JobSortParameter>> sortParameters) {
         this.offset = offset;
         this.limit = limit;
         this.user = user;
+        this.tenant = tenant;
+        this.isExplicitTenantFilter = isExplicitTenantFilter;
         this.pending = pending;
         this.running = running;
         this.finished = finished;
@@ -103,6 +109,14 @@ public class DBJobDataParameters {
 
     public String getUser() {
         return user;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public boolean isExplicitTenantFilter() {
+        return isExplicitTenantFilter;
     }
 
     public boolean isChildJobs() {

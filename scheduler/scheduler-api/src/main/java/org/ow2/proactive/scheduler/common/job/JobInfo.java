@@ -62,6 +62,13 @@ public interface JobInfo extends Serializable {
     String getJobOwner();
 
     /**
+     * Return the tenant associated with the job owner
+     *
+     * @return the tenant associated with the job owner or null if no tenant is associated
+     */
+    String getTenant();
+
+    /**
      * Returns the project name associated with this job
      * @return project name
      */

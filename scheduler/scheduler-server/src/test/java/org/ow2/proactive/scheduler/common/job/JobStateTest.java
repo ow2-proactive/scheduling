@@ -109,6 +109,11 @@ public class JobStateTest extends ProActiveTestClean {
             }
 
             @Override
+            public String getTenant() {
+                return null;
+            }
+
+            @Override
             public JobType getType() {
                 return null;
             }

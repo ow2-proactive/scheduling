@@ -86,6 +86,19 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract Set<String> getGroups();
 
     /**
+     *
+     * @return
+     */
+    public abstract boolean isAllTenantPermission();
+
+    /**
+     * Return the tenant associated with the current user, or null if no tenant is associated
+     *
+     * @return user tenant
+     */
+    public abstract String getTenant();
+
+    /**
      * Get the number of submit for this user.
      * 
      * @return the number of submit for this user.

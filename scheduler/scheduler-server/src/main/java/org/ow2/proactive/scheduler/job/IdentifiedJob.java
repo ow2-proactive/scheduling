@@ -33,6 +33,7 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -103,11 +104,11 @@ public class IdentifiedJob implements Serializable {
     }
 
     /**
-     * Check if the given user identification can managed this job.
+     * Check if the given user identification can manage this job.
      *
      * @param userId
      *            the user identification to check.
-     * @return true if userId has permission to managed this job.
+     * @return true if userId has permission to manage this job.
      */
     public boolean hasRight(UserIdentificationImpl userId) {
         if (userIdentification == null) {
@@ -124,6 +125,21 @@ public class IdentifiedJob implements Serializable {
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Check if the given user identification has access to this job according to the tenant policy.
+     *
+     * @param userId
+     *            the user identification to check.
+     * @return true if userId has permission to access this job.
+     */
+    public boolean hasTenantAccess(UserIdentificationImpl userId) {
+        // check tenant permission
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !userId.isAllTenantPermission()) {
+            return userIdentification.getTenant() == null || userIdentification.getTenant().equals(userId.getTenant());
+        }
         return true;
     }
 

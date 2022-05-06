@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -37,16 +38,22 @@ public class SchedulerUserInfo implements Serializable {
 
     private final String username;
 
+    private final Set<String> groups;
+
+    private final String tenant;
+
     private final long connectionTime;
 
     private final long lastSubmitTime;
 
     private final int submitNumber;
 
-    public SchedulerUserInfo(String hostName, String username, long connectionTime, long lastSubmitTime,
-            int submitNumber) {
+    public SchedulerUserInfo(String hostName, String username, Set<String> groups, String tenant, long connectionTime,
+            long lastSubmitTime, int submitNumber) {
         this.hostName = hostName;
         this.username = username;
+        this.groups = groups;
+        this.tenant = tenant;
         this.connectionTime = connectionTime;
         this.lastSubmitTime = lastSubmitTime;
         this.submitNumber = submitNumber;
@@ -58,6 +65,14 @@ public class SchedulerUserInfo implements Serializable {
 
     public String getUsername() {
         return username;
+    }
+
+    public Set<String> getGroups() {
+        return groups;
+    }
+
+    public String getTenant() {
+        return tenant;
     }
 
     public long getConnectionTime() {

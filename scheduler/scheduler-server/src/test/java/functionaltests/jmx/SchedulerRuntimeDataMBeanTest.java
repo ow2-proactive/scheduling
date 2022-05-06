@@ -103,6 +103,7 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
                                                                                            null,
                                                                                            null,
                                                                                            null,
+                                                                                           null,
                                                                                            null),
                                                                      null)
                                                             .getList();

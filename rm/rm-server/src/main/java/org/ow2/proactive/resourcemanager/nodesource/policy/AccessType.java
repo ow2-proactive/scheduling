@@ -61,6 +61,8 @@ public class AccessType implements Serializable {
 
     public static final String TOKEN_ACCESS_TYPE = "tokens";
 
+    public static final String TENANT_ACCESS_TYPE = "tenants";
+
     public static final AccessType ME = new AccessType("ME");
 
     @Deprecated
@@ -83,6 +85,8 @@ public class AccessType implements Serializable {
     private String[] includedGroups = null;
 
     private String[] excludedGroups = null;
+
+    private String[] includedTenants = null;
 
     private String[] tokens;
 
@@ -123,6 +127,7 @@ public class AccessType implements Serializable {
             ArrayList<String> excludedUsers = new ArrayList<>();
             ArrayList<String> includedGroups = new ArrayList<>();
             ArrayList<String> excludedGroups = new ArrayList<>();
+            ArrayList<String> includedTenants = new ArrayList<>();
             ArrayList<String> tokens = new ArrayList<>();
 
             for (String s : semicolon) {
@@ -152,6 +157,9 @@ public class AccessType implements Serializable {
                                 excludedGroups.add(value.replaceFirst("!", ""));
                             }
                             break;
+                        case TENANT_ACCESS_TYPE:
+                            includedTenants.add(value);
+                            break;
                         case TOKEN_ACCESS_TYPE:
                             tokens.add(value);
                             break;
@@ -167,12 +175,15 @@ public class AccessType implements Serializable {
                 accessType.includedGroups = includedGroups.toArray(new String[0]);
             if (!excludedGroups.isEmpty())
                 accessType.excludedGroups = excludedGroups.toArray(new String[0]);
+            if (!includedTenants.isEmpty())
+                accessType.includedTenants = includedTenants.toArray(new String[0]);
             if (!tokens.isEmpty())
                 accessType.tokens = tokens.toArray(new String[0]);
 
             if (accessType.includedUsers == null && accessType.excludedUsers == null &&
-                accessType.includedGroups == null && accessType.excludedGroups == null && accessType.tokens == null) {
-                throw new IllegalArgumentException("Not able to retrieve any users/groups/tokens " + type);
+                accessType.includedGroups == null && accessType.excludedGroups == null &&
+                accessType.includedTenants == null && accessType.tokens == null) {
+                throw new IllegalArgumentException("Not able to retrieve any users/groups/tenants/tokens " + type);
             }
         }
 
@@ -223,6 +234,11 @@ public class AccessType implements Serializable {
         if (excludedGroups != null) {
             for (String group : excludedGroups) {
                 identities.add(new ExcludedGroupNamePrincipal(group));
+            }
+        }
+        if (includedTenants != null) {
+            for (String tenant : includedTenants) {
+                identities.add(new TenantPrincipal(tenant));
             }
         }
         if (tokens != null) {

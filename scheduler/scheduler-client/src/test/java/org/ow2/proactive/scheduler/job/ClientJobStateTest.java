@@ -198,6 +198,11 @@ public class ClientJobStateTest {
             }
 
             @Override
+            public String getTenant() {
+                return null;
+            }
+
+            @Override
             public JobType getType() {
                 return null;
             }
@@ -236,6 +241,11 @@ public class ClientJobStateTest {
         @Override
         public String getOwner() {
             return "testOwnder";
+        }
+
+        @Override
+        public String getTenant() {
+            return null;
         }
 
         @Override

@@ -59,6 +59,7 @@ public class TaskDBUtils {
                                    params,
                                    params.getStatus(),
                                    params.hasUser(),
+                                   params.hasTenant(),
                                    params.hasTag(),
                                    params.hasDateFrom(),
                                    params.hasDateTo(),
@@ -99,6 +100,7 @@ public class TaskDBUtils {
                         params,
                         params.getStatus(),
                         params.hasUser(),
+                        params.hasTenant(),
                         params.hasTag(),
                         params.hasDateFrom(),
                         params.hasDateTo(),
@@ -109,20 +111,20 @@ public class TaskDBUtils {
     }
 
     private static Query getQuery(Session session, DBTaskDataParameters params, Set<TaskStatus> taskStatuses,
-            boolean hasUser, boolean hasTag, boolean hasDateFrom, boolean hasDateTo, SortSpecifierContainer sortParams,
-            String queryPrefix) {
-        Query query = session.createQuery(queryPrefix +
-                                          getQueryFilteringExpression(hasUser,
-                                                                      hasTag,
-                                                                      hasDateFrom,
-                                                                      hasDateTo,
-                                                                      sortParams));
-        setQueryParameters(taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo, query, params);
+            boolean hasUser, boolean hasTenant, boolean hasTag, boolean hasDateFrom, boolean hasDateTo,
+            SortSpecifierContainer sortParams, String queryPrefix) {
+        Query query = session.createQuery(queryPrefix + getQueryFilteringExpression(hasUser,
+                                                                                    hasTenant,
+                                                                                    hasTag,
+                                                                                    hasDateFrom,
+                                                                                    hasDateTo,
+                                                                                    sortParams));
+        setQueryParameters(taskStatuses, hasUser, hasTenant, hasTag, hasDateFrom, hasDateTo, query, params);
         return query;
     }
 
-    private static StringBuilder getQueryFilteringExpression(boolean hasUser, boolean hasTag, boolean hasDateFrom,
-            boolean hasDateTo, SortSpecifierContainer sortParams) {
+    private static StringBuilder getQueryFilteringExpression(boolean hasUser, boolean hasTenant, boolean hasTag,
+            boolean hasDateFrom, boolean hasDateTo, SortSpecifierContainer sortParams) {
         StringBuilder result = new StringBuilder();
 
         // Support for removedTime in queries has been discontinued
@@ -148,6 +150,11 @@ public class TaskDBUtils {
 
         if (hasUser) {
             result.append((oneClause ? "and " : "") + "owner = :user ");
+            oneClause = true;
+        }
+
+        if (hasTenant) {
+            result.append((oneClause ? "and " : "") + "(tenant = :tenant or tenant IS NULL) ");
             oneClause = true;
         }
 
@@ -178,12 +185,16 @@ public class TaskDBUtils {
         return result;
     }
 
-    private static void setQueryParameters(Set<TaskStatus> taskStatuses, boolean hasUser, boolean hasTag,
-            boolean hasDateFrom, boolean hasDateTo, Query query, DBTaskDataParameters params) {
+    private static void setQueryParameters(Set<TaskStatus> taskStatuses, boolean hasUser, boolean hasTenant,
+            boolean hasTag, boolean hasDateFrom, boolean hasDateTo, Query query, DBTaskDataParameters params) {
         query.setParameterList("taskStatus", taskStatuses);
 
         if (hasUser) {
             query.setParameter("user", params.getUser());
+        }
+
+        if (hasTenant) {
+            query.setParameter("tenant", params.getTenant());
         }
 
         if (hasDateFrom) {

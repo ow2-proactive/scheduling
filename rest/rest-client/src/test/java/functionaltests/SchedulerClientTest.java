@@ -337,6 +337,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                   "",
                                                                   "",
                                                                   "",
+                                                                  null,
                                                                   new Long(-1));
         List defaultSortOrder = Collections.singletonList(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
         List<JobInfo> allJobInfos = client.getJobs(0, 1000, allJobsCriteria, defaultSortOrder).getList();
@@ -393,6 +394,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                   "",
                                                                   "",
                                                                   "",
+                                                                  null,
                                                                   new Long(-1));
         SortParameter jobNameDescOrder = new SortParameter<>(JobSortParameter.NAME, SortOrder.DESC);
         SortParameter jobIdAscOrder = new SortParameter<>(JobSortParameter.ID, SortOrder.ASC);
@@ -420,6 +422,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                                       "",
                                                                                       "myProjectB",
                                                                                       "",
+                                                                                      null,
                                                                                       new Long(-1));
         List<JobInfo> jobsList3 = client.getJobs(0,
                                                  4,

@@ -36,10 +36,12 @@ import java.util.TimerTask;
 import javax.security.auth.Subject;
 
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
 
 
 /**
@@ -82,12 +84,16 @@ public class UserIdentificationImpl extends UserIdentification {
      * Constructor of user identification using user name.
      *
      * @param username the user name.
+     * @param tenant user tenant
      */
-    public UserIdentificationImpl(String username) {
+    public UserIdentificationImpl(String username, String tenant) {
         this.username = username;
         this.connectionTime = System.currentTimeMillis();
         this.subject = new Subject();
         this.subject.getPrincipals().add(new UserNamePrincipal(username));
+        if (tenant != null) {
+            this.subject.getPrincipals().add(new TenantPrincipal(tenant));
+        }
     }
 
     /**
@@ -125,6 +131,24 @@ public class UserIdentificationImpl extends UserIdentification {
             answer.add(principal.getName());
         }
         return answer;
+    }
+
+    @Override
+    public String getTenant() {
+        Set<TenantPrincipal> tenants = subject.getPrincipals(TenantPrincipal.class);
+        if (tenants == null || tenants.size() == 0) {
+            return null;
+        }
+        return tenants.iterator().next().getName();
+    }
+
+    @Override
+    public boolean isAllTenantPermission() {
+        try {
+            return checkPermission(new TenantAllAccessPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
     }
 
     /**
