@@ -36,6 +36,8 @@ import java.security.PrivateKey;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -48,6 +50,7 @@ import javax.security.auth.spi.LoginModule;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.core.properties.PASharedProperties;
 
@@ -84,6 +87,9 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     /** The file where to store group management */
     protected String groupFile = getGroupFileName();
 
+    /** The file where to store tenant management **/
+    protected String tenantFile = getTenantFileName();
+
     protected Subject subject;
 
     /**
@@ -101,6 +107,13 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     protected abstract String getGroupFileName();
 
     /**
+     * Defines tenant file name
+     *
+     * @return the tenant file name
+     */
+    protected abstract String getTenantFileName();
+
+    /**
      * Defines private key
      *
      * @return private key in use
@@ -116,9 +129,11 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         this.subject = subject;
         checkLoginFile();
         checkGroupFile();
+        checkTenantFile();
         if (logger.isDebugEnabled()) {
             logger.debug("Using Login file at : " + this.loginFile);
             logger.debug("Using Group file at : " + this.groupFile);
+            logger.debug("Using Tenant file at : " + this.tenantFile);
         }
         this.callbackHandler = callbackHandler;
     }
@@ -135,6 +150,14 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         //test group file existence
         if (!(new File(this.groupFile).exists())) {
             throw new RuntimeException("The file " + this.groupFile + " has not been found \n" +
+                                       "Unable to perform user authentication by file method");
+        }
+    }
+
+    protected void checkTenantFile() {
+        //test tenant file existence
+        if (!(new File(this.tenantFile).exists())) {
+            throw new RuntimeException("The file " + this.tenantFile + " has not been found \n" +
                                        "Unable to perform user authentication by file method");
         }
     }
@@ -221,6 +244,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
 
         subject.getPrincipals().add(new UserNamePrincipal(username));
         groupMembershipFromFile(username);
+        tenantMembershipFromFile(username);
         logger.debug("authentication succeeded for user '" + username + "'");
         return true;
     }
@@ -320,6 +344,40 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 if (u2g[0].trim().equals(username)) {
                     subject.getPrincipals().add(new GroupNamePrincipal(u2g[1]));
                     logger.debug("adding group principal '" + u2g[1] + "' for user '" + username + "'");
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new LoginException(e.toString());
+        } catch (IOException e) {
+            throw new LoginException(e.toString());
+        }
+    }
+
+    /**
+     * Return corresponding tenant for a user from the tenant file.
+     * @param username user's login
+     * @throws LoginException if tenant file is not found or unreadable.
+     */
+    protected void tenantMembershipFromFile(String username) throws LoginException {
+
+        Set<String> groupNames = subject.getPrincipals()
+                                        .stream()
+                                        .filter(principal -> principal instanceof GroupNamePrincipal)
+                                        .map(principal -> principal.getName())
+                                        .collect(Collectors.toSet());
+
+        try (FileInputStream stream = new FileInputStream(tenantFile)) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                String[] u2g = line.split(":");
+                if (groupNames.contains(u2g[0].trim())) {
+                    Set<TenantPrincipal> alreadyDefinedTenants = subject.getPrincipals(TenantPrincipal.class);
+                    if (alreadyDefinedTenants == null || alreadyDefinedTenants.size() == 0) {
+                        // only one tenant should be defined per user (the first tenant found)
+                        subject.getPrincipals().add(new TenantPrincipal(u2g[1]));
+                        logger.debug("adding tenant principal '" + u2g[1] + "' for user '" + username + "'");
+                    }
                 }
             }
         } catch (FileNotFoundException e) {

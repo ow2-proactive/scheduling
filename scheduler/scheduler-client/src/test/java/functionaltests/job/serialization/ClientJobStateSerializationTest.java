@@ -130,6 +130,11 @@ public class ClientJobStateSerializationTest {
         }
 
         @Override
+        public String getTenant() {
+            return null;
+        }
+
+        @Override
         public JobType getType() {
             return null;
         }

@@ -52,6 +52,8 @@ public class DBTaskDataParameters {
 
     private String user;
 
+    private String tenant;
+
     private Set<TaskStatus> status;
 
     private SortSpecifierContainer sortParams;
@@ -61,9 +63,10 @@ public class DBTaskDataParameters {
         this.sortParams = new SortSpecifierContainer();
     }
 
-    DBTaskDataParameters(String user, String tag, long from, long to, int offset, int limit, Set<TaskStatus> statuses,
-            SortSpecifierContainer sortParams) {
+    DBTaskDataParameters(String user, String tenant, String tag, long from, long to, int offset, int limit,
+            Set<TaskStatus> statuses, SortSpecifierContainer sortParams) {
         this.user = user;
+        this.tenant = tenant;
         this.tag = tag;
         this.from = from;
         this.to = to;
@@ -83,6 +86,18 @@ public class DBTaskDataParameters {
 
     public boolean hasUser() {
         return !Strings.isNullOrEmpty(user);
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
+
+    public boolean hasTenant() {
+        return !Strings.isNullOrEmpty(tenant);
     }
 
     public String getTag() {

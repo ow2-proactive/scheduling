@@ -25,42 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_DETACH_SERVICE_TO_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_IDS;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_STATES;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_LIST_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REGISTER_SERVICE_TO_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SHUTDOWN_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER;
-import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.*;
 
 import java.io.*;
 import java.net.URI;
@@ -177,6 +142,8 @@ import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.PAExecutors;
 import org.ow2.proactive.utils.Tools;
+
+import com.google.common.base.Strings;
 
 
 /**
@@ -1690,13 +1657,21 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         boolean myJobsOnly = filterCriteria.isMyJobsOnly();
 
         String user = filterCriteria.getUserName();
+        String tenant = filterCriteria.getTenant();
         if (myJobsOnly) {
             user = ident.getUsername();
+        }
+        boolean isExplicitTenantFilter = !Strings.isNullOrEmpty(tenant);
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
         }
 
         Page<JobInfo> jobsInfo = dbManager.getJobs(offset,
                                                    limit,
                                                    user,
+                                                   tenant,
+                                                   isExplicitTenantFilter,
                                                    filterCriteria.isPending(),
                                                    filterCriteria.isRunning(),
                                                    filterCriteria.isFinished(),
@@ -1867,12 +1842,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
             int offset, int limit) throws NotConnectedException, PermissionException {
         String userName = null;
-        String tmpUserName = frontendState.checkPermission("getTaskIds", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_IDS)
-                                          .getUsername();
+        UserIdentificationImpl userIdentification = frontendState.checkPermission("getTaskIds",
+                                                                                  YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_IDS);
+        String tmpUserName = userIdentification.getUsername();
+        String tenant = null;
         if (mytasks) {
             userName = tmpUserName;
         }
-        Page<TaskInfo> pTaskInfo = dbManager.getTasks(from, to, taskTag, offset, limit, userName, taskStatuses);
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() &&
+            !userIdentification.isAllTenantPermission()) {
+            tenant = userIdentification.getTenant();
+        }
+        Page<TaskInfo> pTaskInfo = dbManager.getTasks(from, to, taskTag, offset, limit, userName, tenant, taskStatuses);
         List<TaskId> lTaskId = new ArrayList<>(pTaskInfo.getList().size());
         for (TaskInfo taskInfo : pTaskInfo.getList()) {
             if (checkJobPermissionMethod(taskInfo.getJobId().value(), "getTaskIds")) {
@@ -1889,11 +1870,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, PermissionException {
 
         String userName = null;
-        String tmpUserName = frontendState.checkPermission("getTaskStates",
-                                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_STATES)
-                                          .getUsername();
+        UserIdentificationImpl userIdentification = frontendState.checkPermission("getTaskStates",
+                                                                                  YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_STATES);
+        String tmpUserName = userIdentification.getUsername();
+        String tenant = null;
         if (mytasks) {
             userName = tmpUserName;
+        }
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() &&
+            !userIdentification.isAllTenantPermission()) {
+            tenant = userIdentification.getTenant();
         }
         Page<TaskState> page = dbManager.getTaskStates(from,
                                                        to,
@@ -1901,6 +1887,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                        offset,
                                                        limit,
                                                        userName,
+                                                       tenant,
                                                        statusFilter,
                                                        sortParams);
         for (Iterator<TaskState> it = page.getList().iterator(); it.hasNext();) {
@@ -2012,7 +1999,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
-    public boolean changeStartAt(JobId jobId, String startAt) {
+    public boolean changeStartAt(JobId jobId, String startAt)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        frontendState.checkPermissions("changeStartAt",
+                                       frontendState.getIdentifiedJob(jobId),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_START_AT_VALUE_OF_THIS_JOB);
         return schedulingService.changeStartAt(jobId, startAt);
     }
 

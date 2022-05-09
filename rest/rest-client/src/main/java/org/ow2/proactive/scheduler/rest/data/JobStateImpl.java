@@ -82,6 +82,11 @@ public class JobStateImpl extends JobState {
     }
 
     @Override
+    public String getTenant() {
+        return jobStateData.getTenant();
+    }
+
+    @Override
     public List<TaskState> getTasks() {
         Map<String, TaskStateData> taskStateMap = jobStateData.getTasks();
         List<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());

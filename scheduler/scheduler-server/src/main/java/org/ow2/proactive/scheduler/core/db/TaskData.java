@@ -188,7 +188,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                        @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
                                        @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
                                        @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME"),
-                                       @Index(name = "TASK_DATA_OWNER", columnList = "OWNER") })
+                                       @Index(name = "TASK_DATA_OWNER", columnList = "OWNER"),
+                                       @Index(name = "TASK_DATA_TENANT", columnList = "TENANT") })
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
@@ -226,6 +227,8 @@ public class TaskData {
     private String taskName;
 
     private String owner;
+
+    private String tenant;
 
     private String tag;
 
@@ -536,6 +539,7 @@ public class TaskData {
 
         taskData.setId(taskId);
         taskData.setOwner(jobRuntimeData.getOwner());
+        taskData.setTenant(jobRuntimeData.getTenant());
         taskData.setDescription(task.getDescription());
         taskData.setTag(task.getTag());
         taskData.setParallelEnvironment(task.getParallelEnvironment());
@@ -921,6 +925,15 @@ public class TaskData {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    @Column(name = "TENANT")
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     @Column(name = "TYPE", nullable = false, updatable = false)

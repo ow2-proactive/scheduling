@@ -74,6 +74,21 @@ public class RMFileLoginModule extends FileLoginModule {
         return groupFile;
     }
 
+    /**
+     * Returns tenant file name from resource manager configuration file
+     */
+    @Override
+    protected String getTenantFileName() {
+        String tenantFile = PAResourceManagerProperties.RM_TENANT_FILE.getValueAsString();
+        //test that group file path is an absolute path or not
+        if (!(new File(tenantFile).isAbsolute())) {
+            //file path is relative, so we complete the path with the prefix RM_Home constant
+            tenantFile = PAResourceManagerProperties.getAbsolutePath(tenantFile);
+        }
+
+        return tenantFile;
+    }
+
     @Override
     protected PrivateKey getPrivateKey() throws KeyException {
         return Credentials.getPrivateKey(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()));

@@ -69,6 +69,7 @@ public class DataUtility {
         impl.setChildrenCount(d.getChildrenCount());
         impl.setFinishedTime(d.getFinishedTime());
         impl.setJobOwner(d.getJobOwner());
+        impl.setTenant(d.getTenant());
         impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());
         impl.setNumberOfPendingTasks(d.getNumberOfPendingTasks());
         impl.setNumberOfRunningTasks(d.getNumberOfRunningTasks());
@@ -150,6 +151,7 @@ public class DataUtility {
 
     public static JobUsage jobUsage(JobUsageData d) {
         JobUsage impl = new JobUsage(d.getOwner(),
+                                     d.getTenant(),
                                      d.getProject(),
                                      d.getJobId(),
                                      d.getJobName(),
@@ -194,6 +196,8 @@ public class DataUtility {
         for (SchedulerUserData sud : dataList) {
             schedulerUserInfos.add(new SchedulerUserInfo(sud.getHostName(),
                                                          sud.getUsername(),
+                                                         sud.getGroups(),
+                                                         sud.getTenant(),
                                                          sud.getConnectionTime(),
                                                          sud.getLastSubmitTime(),
                                                          sud.getSubmitNumber()));
@@ -204,6 +208,7 @@ public class DataUtility {
     public static UserIdentification userIdentification(SchedulerUserData d) {
         return new UserIdentificationImpl(d.getUsername(),
                                           d.getGroups(),
+                                          d.getTenant(),
                                           d.getSubmitNumber(),
                                           d.getHostName(),
                                           d.getConnectionTime(),

@@ -90,7 +90,7 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "getParentIds", query = "select parentId from JobData where id in :ids and parentId IS NOT NULL"),
                 @NamedQuery(name = "countJobDataFinished", query = "select count (*) from JobData where status = 3"),
                 @NamedQuery(name = "countJobData", query = "select count (*) from JobData"),
-                @NamedQuery(name = "findUsersWithJobs", query = "select owner, count(owner), max(submittedTime) from JobData group by owner"),
+                @NamedQuery(name = "findUsersWithJobs", query = "select owner, tenant, count(owner), max(submittedTime) from JobData group by owner, tenant"),
                 @NamedQuery(name = "getJobsNumberWithStatus", query = "select count(*) from JobData where status in (:status)"),
                 @NamedQuery(name = "getJobsNumberWithStatusUsername", query = "select count(*) from JobData where owner = :username and status in (:status)"),
                 @NamedQuery(name = "getJobSubmittedTime", query = "select submittedTime from JobData where id = :id"),
@@ -141,6 +141,7 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "updateJobDataExternalEndpointUrls", query = "update JobData set externalEndpointUrls = :externalEndpointUrls where id = :jobId") })
 @Table(name = "JOB_DATA", indexes = { @Index(name = "JOB_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
                                       @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
+                                      @Index(name = "JOB_DATA_TENANT", columnList = "TENANT"),
                                       @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
                                       @Index(name = "JOB_DATA_START_TIME", columnList = "START_TIME"),
                                       @Index(name = "JOB_DATA_SUBMIT_TIME", columnList = "SUBMIT_TIME"),
@@ -171,6 +172,8 @@ public class JobData implements Serializable {
     private List<String> preciousTasks;
 
     private String owner;
+
+    private String tenant;
 
     private String jobName;
 
@@ -240,6 +243,7 @@ public class JobData implements Serializable {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
         jobInfo.setJobOwner(getOwner());
+        jobInfo.setTenant(getTenant());
         jobInfo.setProjectName(getProjectName());
         jobInfo.setStatus(getStatus());
         jobInfo.setParentId(getParentId());
@@ -316,6 +320,7 @@ public class JobData implements Serializable {
         internalJob.setVariables(variablesToJobVariables());
         internalJob.setProjectName(getProjectName());
         internalJob.setOwner(getOwner());
+        internalJob.setTenant(getTenant());
         internalJob.setDescription(getDescription());
         internalJob.setInputSpace(getInputSpace());
         internalJob.setOutputSpace(getOutputSpace());
@@ -391,6 +396,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setVariables(variables);
         jobRuntimeData.setStatus(job.getStatus());
         jobRuntimeData.setOwner(job.getOwner());
+        jobRuntimeData.setTenant(job.getTenant());
         jobRuntimeData.setCredentials(job.getCredentials());
         jobRuntimeData.setPriority(job.getPriority());
         jobRuntimeData.setNumberOfPendingTasks(job.getNumberOfPendingTasks());
@@ -763,6 +769,15 @@ public class JobData implements Serializable {
         this.credentials = credentials;
     }
 
+    @Column(name = "TENANT", nullable = true)
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
+
     // NOTE: the jobData and jobContent is basically a one to one association,
     // but hibernate doesn't support lazy fetch mode in an one to one
     // association. Consider about the application performance, the jobContent
@@ -823,6 +838,7 @@ public class JobData implements Serializable {
     JobUsage toJobUsage() {
         JobIdImpl jobId = new JobIdImpl(getId(), getJobName());
         JobUsage jobUsage = new JobUsage(getOwner(),
+                                         getTenant(),
                                          getProjectName(),
                                          jobId.value(),
                                          getJobName(),

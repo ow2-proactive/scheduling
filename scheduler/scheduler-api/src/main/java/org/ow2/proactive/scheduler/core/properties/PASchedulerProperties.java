@@ -192,6 +192,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Group default filename */
     SCHEDULER_GROUP_FILENAME("pa.scheduler.core.defaultgroupfilename", PropertyType.STRING, "config/authentication/group.cfg"),
 
+    /** Tenant default filename */
+    SCHEDULER_TENANT_FILENAME("pa.scheduler.core.defaulttenantfilename", PropertyType.STRING, "config/authentication/tenant.cfg"),
+
+    /** If enabled, filter jobs according to user tenant */
+    SCHEDULER_TENANT_FILTER("pa.scheduler.core.tenant.filter", PropertyType.BOOLEAN, "false"),
+
     /** Property that define the method that have to be used for logging users to the Scheduler */
     SCHEDULER_LOGIN_METHOD("pa.scheduler.core.authentication.loginMethod", PropertyType.STRING, "SchedulerFileLoginMethod"),
 

@@ -1219,6 +1219,23 @@ public abstract class InternalJob extends JobState {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.job.JobState#getTenant()
+     */
+    @Override
+    public String getTenant() {
+        return jobInfo.getTenant();
+    }
+
+    /**
+     * To set the tenant of this job owner.
+     *
+     * @param tenant the tenant to set.
+     */
+    public void setTenant(String tenant) {
+        this.jobInfo.setTenant(tenant);
+    }
+
+    /**
      * Get the credentials for this job
      *
      * @return the credentials for this job

@@ -45,6 +45,12 @@ public class UserData implements Serializable {
 
     private Set<String> groups;
 
+    private String tenant;
+
+    private boolean filterByTenant;
+
+    private boolean allTenantPermission;
+
     public String getUserName() {
         return userName;
     }
@@ -59,5 +65,29 @@ public class UserData implements Serializable {
 
     public void setGroups(Set<String> groups) {
         this.groups = groups;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
+
+    public boolean isFilterByTenant() {
+        return filterByTenant;
+    }
+
+    public void setFilterByTenant(boolean filterByTenant) {
+        this.filterByTenant = filterByTenant;
+    }
+
+    public boolean isAllTenantPermission() {
+        return allTenantPermission;
+    }
+
+    public void setAllTenantPermission(boolean allTenantPermission) {
+        this.allTenantPermission = allTenantPermission;
     }
 }

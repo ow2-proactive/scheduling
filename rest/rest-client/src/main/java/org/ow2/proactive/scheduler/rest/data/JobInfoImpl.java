@@ -53,6 +53,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String jobOwner;
 
+    private String tenant;
+
     private String projectName;
 
     private int totalNumberOfTasks = 0;
@@ -128,6 +130,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public String getJobOwner() {
         return jobOwner;
+    }
+
+    @Override
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public void setProjectName(String projectName) {

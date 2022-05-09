@@ -34,6 +34,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class JobUsageData {
     private String owner;
 
+    private String tenant;
+
     private String project;
 
     private String jobId;
@@ -59,6 +61,14 @@ public class JobUsageData {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public String getProject() {

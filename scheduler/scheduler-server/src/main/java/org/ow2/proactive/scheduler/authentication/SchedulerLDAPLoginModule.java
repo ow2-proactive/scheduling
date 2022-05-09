@@ -91,6 +91,23 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
         return groupFile;
     }
 
+    /**
+     * Returns tenant file name from scheduler configuration file
+     *
+     * @return tenant file name from scheduler configuration file
+     */
+    @Override
+    protected String getTenantFileName() {
+        String tenantFile = PASchedulerProperties.SCHEDULER_TENANT_FILENAME.getValueAsString();
+        //test that group file path is an absolute path or not
+        if (!(new File(tenantFile).isAbsolute())) {
+            //file path is relative, so we complete the path with the prefix RM_Home constant
+            tenantFile = PASchedulerProperties.getAbsolutePath(tenantFile);
+        }
+
+        return tenantFile;
+    }
+
     @Override
     protected PrivateKey getPrivateKey() throws KeyException {
         return Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));

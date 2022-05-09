@@ -37,6 +37,8 @@ public class UserIdentificationImpl extends UserIdentification {
 
     private Set<String> groups;
 
+    private String tenant;
+
     private int submitNumber;
 
     private String hostName;
@@ -51,7 +53,7 @@ public class UserIdentificationImpl extends UserIdentification {
 
     }
 
-    public UserIdentificationImpl(String username, Set<String> groups, int submitNumber, String hostName,
+    public UserIdentificationImpl(String username, Set<String> groups, String tenant, int submitNumber, String hostName,
             long connectionTime, long lastSubmitTime, boolean myEventsOnly) {
         this.username = username;
         this.groups = groups;
@@ -60,6 +62,7 @@ public class UserIdentificationImpl extends UserIdentification {
         this.connectionTime = connectionTime;
         this.lastSubmitTime = lastSubmitTime;
         this.myEventsOnly = myEventsOnly;
+        this.tenant = tenant;
     }
 
     @Override
@@ -70,6 +73,16 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public Set<String> getGroups() {
         return groups;
+    }
+
+    @Override
+    public String getTenant() {
+        return tenant;
+    }
+
+    @Override
+    public boolean isAllTenantPermission() {
+        return false;
     }
 
     @Override
@@ -108,6 +121,10 @@ public class UserIdentificationImpl extends UserIdentification {
 
     public void setGroups(Set<String> groups) {
         this.groups = groups;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public void setSubmitNumber(int submitNumber) {

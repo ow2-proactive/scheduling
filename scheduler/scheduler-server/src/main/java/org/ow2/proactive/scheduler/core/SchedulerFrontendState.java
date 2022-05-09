@@ -110,6 +110,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB = "You do not have permission to get this job content !";
 
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_START_AT_VALUE_OF_THIS_JOB = "You do not have permission to check the start at value of this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB = "You do not have permission to get the task logs of this job !";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK = "You do not have permission to restart this task !";
@@ -538,6 +540,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
         // setting the job properties
         job.setOwner(ident.getUsername());
+        job.setTenant(ident.getTenant());
         // route project name inside job info
         job.setProjectName(job.getProjectName());
 
@@ -788,8 +791,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
+    void checkAccessPermissions(String methodName, IdentifiedJob identifiedJob, String errorMessage)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        checkPermissionChain(
+                             // if we are job owner
+                             () -> checkJobOwner(methodName, identifiedJob, errorMessage),
+                             // if we have tenant access
+                             () -> checkTenantAccess(methodName, identifiedJob, errorMessage));
+    }
+
     void checkPermissions(String methodName, IdentifiedJob identifiedJob, String errorMessage)
             throws NotConnectedException, UnknownJobException, PermissionException {
+        checkAccessPermissions(methodName, identifiedJob, errorMessage);
         checkPermissionChain(
                              // if we are job owner
                              () -> checkJobOwner(methodName, identifiedJob, errorMessage),
@@ -840,6 +853,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         ListeningUser ident = checkPermissionReturningListeningUser(methodName, permissionMsg);
 
         if (!IdentifiedJob.hasRight(ident.getUser())) {
+            throw new PermissionException(permissionMsg);
+        }
+    }
+
+    void checkTenantAccess(String methodName, IdentifiedJob IdentifiedJob, String permissionMsg)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        ListeningUser ident = checkPermissionReturningListeningUser(methodName, permissionMsg);
+
+        if (!IdentifiedJob.hasTenantAccess(ident.getUser())) {
             throw new PermissionException(permissionMsg);
         }
     }
@@ -1437,7 +1459,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 dispatchUsersUpdated(notification, true);
                 break;
             default:
-                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                logger.warn("**WARNING** - Inconsistent update type received from Scheduler Core : " +
                             notification.getEventType());
         }
     }
@@ -1457,6 +1479,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UserData userData = new UserData();
         userData.setUserName(userSessionInfo.getRight().getUsername());
         userData.setGroups(userSessionInfo.getRight().getGroups());
+        userData.setTenant(userSessionInfo.getRight().getTenant());
+        userData.setFilterByTenant(PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean());
+        userData.setAllTenantPermission(userSessionInfo.getRight().isAllTenantPermission());
         return userData;
     }
 
@@ -1466,6 +1491,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             UserIdentificationImpl user = listeningUser.getUser();
             return new SchedulerUserInfo(user.getHostName(),
                                          user.getUsername(),
+                                         user.getGroups(),
+                                         user.getTenant(),
                                          user.getConnectionTime(),
                                          user.getLastSubmitTime(),
                                          user.getSubmitNumber());
@@ -1496,7 +1523,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
-        UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner());
+        UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner(),
+                                                                   clientJobState.getTenant());
         return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
     }
 

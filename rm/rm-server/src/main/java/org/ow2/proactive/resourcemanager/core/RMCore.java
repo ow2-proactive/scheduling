@@ -3068,6 +3068,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         UserData userData = new UserData();
         userData.setUserName(caller.getName());
         userData.setGroups(caller.getGroups());
+        userData.setTenant(caller.getTenant());
         return userData;
     }
 

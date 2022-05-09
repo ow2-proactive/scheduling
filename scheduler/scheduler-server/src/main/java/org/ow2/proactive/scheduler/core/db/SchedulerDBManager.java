@@ -99,6 +99,7 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -200,9 +201,10 @@ public class SchedulerDBManager {
         }
     }
 
-    public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
-            final boolean running, final boolean finished, final boolean childJobs, String jobName, String projectName,
-            Long parentId, final List<SortParameter<JobSortParameter>> sortParameters) {
+    public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final String tenant,
+            final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
+            final boolean childJobs, String jobName, String projectName, Long parentId,
+            final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -211,6 +213,8 @@ public class SchedulerDBManager {
         DBJobDataParameters params = new DBJobDataParameters(offset,
                                                              limit,
                                                              user,
+                                                             tenant,
+                                                             isExplicitTenantFilter,
                                                              pending,
                                                              running,
                                                              finished,
@@ -231,6 +235,13 @@ public class SchedulerDBManager {
             }
             if (user != null && !user.isEmpty()) {
                 criteria.add(Restrictions.eq("owner", user));
+            }
+            if (tenant != null && !tenant.isEmpty()) {
+                if (isExplicitTenantFilter) {
+                    criteria.add(Restrictions.eq("tenant", tenant));
+                } else {
+                    criteria.add(Restrictions.or(Restrictions.eq("tenant", tenant), Restrictions.isNull("tenant")));
+                }
             }
             if (!childJobs) {
                 criteria.add(Restrictions.isNull("parentId"));
@@ -334,9 +345,11 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag, final int offset,
-            final int limit, final String user, Set<TaskStatus> statusFilter, SortSpecifierContainer sortParams) {
+            final int limit, final String user, final String tenant, Set<TaskStatus> statusFilter,
+            SortSpecifierContainer sortParams) {
 
         DBTaskDataParameters parameters = new DBTaskDataParameters(user,
+                                                                   tenant,
                                                                    tag,
                                                                    from,
                                                                    to,
@@ -351,9 +364,10 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskInfo> getTasks(final long from, final long to, final String tag, final int offset, final int limit,
-            final String user, Set<TaskStatus> statusFilter) {
+            final String user, final String tenant, Set<TaskStatus> statusFilter) {
 
         DBTaskDataParameters parameters = new DBTaskDataParameters(user,
+                                                                   tenant,
                                                                    tag,
                                                                    from,
                                                                    to,
@@ -385,12 +399,21 @@ public class SchedulerDBManager {
 
                 boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
 
+                boolean hasTenant = !Strings.isNullOrEmpty(params.getTenant());
+
                 StringBuilder queryString = new StringBuilder("select count(*) from JobData where ");
 
                 queryString.append("status in (:jobStatus) ");
 
                 if (hasUser) {
                     queryString.append("and owner = :user ");
+                }
+                if (hasTenant) {
+                    if (params.isExplicitTenantFilter()) {
+                        queryString.append("and tenant = :tenant ");
+                    } else {
+                        queryString.append("and (tenant = :tenant or tenant IS NULL) ");
+                    }
                 }
 
                 if (!params.isChildJobs()) {
@@ -413,6 +436,9 @@ public class SchedulerDBManager {
                 query.setParameterList("jobStatus", statuses);
                 if (hasUser) {
                     query.setParameter("user", params.getUser());
+                }
+                if (hasTenant) {
+                    query.setParameter("tenant", params.getTenant());
                 }
                 if (params.getJobName() != null && !params.getJobName().isEmpty()) {
                     query.setParameter("jobName", params.getJobName() + '%');
@@ -2193,9 +2219,12 @@ public class SchedulerDBManager {
             return list.stream()
                        .map(nameAndCount -> new SchedulerUserInfo(null,
                                                                   nameAndCount[0].toString(),
+                                                                  null,
+                                                                  nameAndCount[1] != null ? nameAndCount[1].toString()
+                                                                                          : null,
                                                                   0,
-                                                                  Long.parseLong(nameAndCount[2].toString()),
-                                                                  Integer.parseInt(nameAndCount[1].toString())))
+                                                                  Long.parseLong(nameAndCount[3].toString()),
+                                                                  Integer.parseInt(nameAndCount[2].toString())))
                        .collect(Collectors.toList());
         });
     }

@@ -34,7 +34,7 @@ import org.ow2.proactive.db.SortParameter;
 
 
 /**
- * Default values for the embedded criterias are the following:
+ * Default values for the embedded criteria are the following:
  * <ul>
  *     <li>no tag filtering</li>
  *     <li>no dates filtering</li>
@@ -56,6 +56,8 @@ public class TaskFilterCriteria implements Serializable {
     private int limit = 0;
 
     private String user = null;
+
+    private String tenant = null;
 
     private boolean running = true;
 
@@ -135,6 +137,14 @@ public class TaskFilterCriteria implements Serializable {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public List<SortSpecifierContainer> getSortParameters() {
@@ -230,6 +240,14 @@ public class TaskFilterCriteria implements Serializable {
          */
         public TFCBuilder user(String user) {
             criterias.setUser(user);
+            return this;
+        }
+
+        /**
+         * Default value is <code>null</code> (no user specific filtering)
+         */
+        public TFCBuilder tenant(String tenant) {
+            criterias.setTenant(tenant);
             return this;
         }
 

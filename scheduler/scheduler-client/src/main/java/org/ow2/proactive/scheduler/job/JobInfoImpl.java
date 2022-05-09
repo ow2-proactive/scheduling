@@ -61,6 +61,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String owner;
 
+    private String tenant;
+
     private String projectName;
 
     /** job submitted time */
@@ -165,6 +167,7 @@ public class JobInfoImpl implements JobInfo {
     public JobInfoImpl(JobInfoImpl jobInfo) {
         this.jobId = jobInfo.getJobId();
         this.owner = jobInfo.owner;
+        this.tenant = jobInfo.tenant;
         this.projectName = jobInfo.getProjectName();
         this.submittedTime = jobInfo.getSubmittedTime();
         this.startTime = jobInfo.getStartTime();
@@ -214,6 +217,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setJobOwner(String owner) {
         this.owner = owner;
+    }
+
+    @Override
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     @Override
