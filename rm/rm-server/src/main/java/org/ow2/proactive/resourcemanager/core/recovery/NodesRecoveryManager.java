@@ -209,8 +209,14 @@ public class NodesRecoveryManager {
             logger.info("Recover node source " + nodeSourceName);
             this.rmCore.recoverNodeSource(nodeSourceData.toNodeSourceDescriptor());
         } catch (Throwable t) {
-            logger.error("Failed to recover node source " + nodeSourceName, t);
-            this.rmCore.removeNodeSource(nodeSourceName, true);
+            logger.fatal("Failed to recover node source " + nodeSourceName, t);
+            System.err.println("Failed to recover node source " + nodeSourceName + ", see logs for more details.");
+            try {
+                this.rmCore.removeNodeSource(nodeSourceName, true);
+            } catch (Exception e) {
+                // exception can occur if the node was not at all registered in the resource manager, print the exception as debug only
+                logger.debug("Could not remove recovered node source", e);
+            }
         }
     }
 
