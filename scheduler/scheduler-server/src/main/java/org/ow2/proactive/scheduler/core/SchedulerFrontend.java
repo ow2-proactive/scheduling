@@ -144,6 +144,7 @@ import org.ow2.proactive.utils.PAExecutors;
 import org.ow2.proactive.utils.Tools;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 
 
 /**
@@ -1902,7 +1903,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
-        JobInfo jobInfo = getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
+        List<JobInfo> jobInfoList = getJobsInfoList(ImmutableList.of(jobId));
+        if (jobInfoList == null || jobInfoList.size() != 1) {
+            throw new UnknownJobException(JobIdImpl.makeJobId(jobId));
+        }
+        JobInfo jobInfo = jobInfoList.get(0);
         insertJobSignals(jobInfo);
         insertVisualization(jobInfo);
         filterVariablesGenericInfoAndEndpoints(jobInfo);
