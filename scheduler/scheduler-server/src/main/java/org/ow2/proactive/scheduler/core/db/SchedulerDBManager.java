@@ -397,7 +397,7 @@ public class SchedulerDBManager {
                 return 0;
             } else {
 
-                boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
+                boolean hasUser = !Strings.isNullOrEmpty(params.getUser());
 
                 boolean hasTenant = !Strings.isNullOrEmpty(params.getTenant());
 

@@ -492,6 +492,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 // Members of "watchers" group have only a read access to the scheduler and RM state
 // and the authorization to register a listener in order to receive updates of the scheduler state
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "watchers" {
+    permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAllNodesTokens";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAllEligibleNodesTokens";
