@@ -39,6 +39,7 @@ import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.api.UserCredentials;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -165,16 +166,26 @@ public class SchedulerSpacesSupport {
                 try {
                     UserCredentials userCredentials = getUserCredentials(username, credentials);
 
-                    DataSpaceServiceStarter.getDataSpaceServiceStarter()
-                                           .createSpaceWithUserNameSubfolder(username,
-                                                                             userCredentials,
-                                                                             SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
-                                                                             userSpaceName,
-                                                                             PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(),
-                                                                             localpath,
-                                                                             hostname,
-                                                                             false,
-                                                                             true);
+                    try {
+
+                        DataSpaceServiceStarter.getDataSpaceServiceStarter()
+                                               .createSpaceWithUserNameSubfolder(username,
+                                                                                 userCredentials,
+                                                                                 SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
+                                                                                 userSpaceName,
+                                                                                 PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(),
+                                                                                 localpath,
+                                                                                 hostname,
+                                                                                 false,
+                                                                                 true);
+
+                    } catch (SpaceAlreadyRegisteredException e) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(e.getMessage(), e);
+                        } else {
+                            logger.info(e.getMessage());
+                        }
+                    }
 
                     // immediately retrieve the User Space
                     userSpace = PADataSpaces.resolveOutput(userSpaceName, userCredentials);
