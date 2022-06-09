@@ -210,7 +210,6 @@ configure(javaSubprojects) {
         cache = System.getProperty("java.io.tmpdir") + File.separator + "ossindex.cache"
     }
 
-    compileJava.dependsOn 'audit'
 }
 
 
