@@ -125,7 +125,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                                 "where task.id.jobId in (:ids)"),
                 @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task " + "where task.id.jobId in (:ids)"),
                 @NamedQuery(name = "readAccountTasks", query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
-                                                               "where task.finishedTime > 0 and task.owner = :username"),
+                                                               "where task.finishedTime > 0 and task.startTime > 0 and task.owner = :username"),
                 @NamedQuery(name = "updateTaskData", query = "update TaskData task set task.taskStatus = :taskStatus, " +
                                                              "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
                                                              "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +

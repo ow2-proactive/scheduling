@@ -62,8 +62,8 @@ public class GroupByStatusSortOrder extends Order {
                " when " + column + " = " + JobStatus.PENDING.ordinal() + " then 0 " +
                // running, stalled, paused then
                " when " + column + " = " + JobStatus.RUNNING.ordinal() + " then 1 " + " when " + column + " = " +
-               JobStatus.STALLED.ordinal() + " then 1 " + " when " + column + " = " + JobStatus.PAUSED.ordinal() +
-               " then 1 " +
+               JobStatus.STALLED.ordinal() + " then 1 " + " when " + column + " = " + JobStatus.IN_ERROR.ordinal() +
+               " then 1 " + " when " + column + " = " + JobStatus.PAUSED.ordinal() + " then 1 " +
                // and the rest (killed, finished, etc)
                " else 2 end " + (ascending ? " asc" : " desc");
     }

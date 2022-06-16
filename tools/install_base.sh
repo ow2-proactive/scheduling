@@ -195,6 +195,8 @@ init_and_ignores()
     OLD_PWD=$(pwd)
     cd "$PA_DIR"
     git init
+    # necessary for recent git versions
+    git config --global --add safe-directory "$PA_DIR" || true
     git config user.email "support@activeeon.com"
     git config user.name "proactive"
     echo '

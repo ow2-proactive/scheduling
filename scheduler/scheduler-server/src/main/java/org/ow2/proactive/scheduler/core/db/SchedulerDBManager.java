@@ -37,12 +37,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -769,6 +764,25 @@ public class SchedulerDBManager {
     }
 
     public SchedulerAccount readAccount(final String username) {
+
+        int pendingJobsCount = getPendingJobsCount(username);
+        int stalledJobsCount = getStalledJobsCount(username);
+        int runningJobsCount = getRunningJobsCount(username);
+        int pausedJobsCount = getPausedJobsCount(username);
+        int inErrorJobsCount = getInErrorJobsCount(username);
+        int failedJobsCount = getFailedJobsCount(username);
+        int cancelledJobsCount = getCanceledJobsCount(username);
+        int killedJobsCount = getKilledJobsCount(username);
+        int finishedJobsCount = getFinishedJobsCount(username);
+
+        int pendingTasksCount = getTaskCountForUser(TaskStatus.PENDING_TASKS, username);
+        int currentTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.RUNNING), username);
+        int pastTasksCount = getTaskCountForUser(TaskStatus.FINISHED_TASKS, username);
+        int pausedTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.PAUSED), username);
+        int faultyTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.FAULTY), username);
+        int failedTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.FAILED), username);
+        int inErrorTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.IN_ERROR), username);
+
         return executeReadOnlyTransaction(session -> {
             Query tasksQuery = session.getNamedQuery("readAccountTasks").setParameter("username", username);
 
@@ -782,14 +796,6 @@ public class SchedulerDBManager {
             } else {
                 taskDuration = 0L;
             }
-
-            int pendingTasksCount = getTaskCountForUser(TaskStatus.PENDING_TASKS, username);
-            int currentTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.RUNNING), username);
-            int pastTasksCount = getTaskCountForUser(TaskStatus.FINISHED_TASKS, username);
-            int pausedTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.PAUSED), username);
-            int faultyTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.FAULTY), username);
-            int failedTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.FAILED), username);
-            int inErrorTasksCount = getTaskCountForUser(Collections.singleton(TaskStatus.IN_ERROR), username);
 
             Query jobQuery = session.getNamedQuery("readAccountJobs").setParameter("username", username);
 
@@ -817,15 +823,15 @@ public class SchedulerDBManager {
                                    .faultyTasksCount(faultyTasksCount)
                                    .failedJobsCount(failedTasksCount)
                                    .inErrorTasksCount(inErrorTasksCount)
-                                   .pendingJobsCount(getPendingJobsCount(username))
-                                   .stalledJobsCount(getStalledJobsCount(username))
-                                   .runningJobsCount(getRunningJobsCount(username))
-                                   .pausedJobsCount(getPausedJobsCount(username))
-                                   .inErrorJobsCount(getInErrorJobsCount(username))
-                                   .failedJobsCount(getFailedJobsCount(username))
-                                   .canceledJobsCount(getCanceledJobsCount(username))
-                                   .killedJobsCount(getKilledJobsCount(username))
-                                   .finishedJobsCount(getFinishedJobsCount(username))
+                                   .pendingJobsCount(pendingJobsCount)
+                                   .stalledJobsCount(stalledJobsCount)
+                                   .runningJobsCount(runningJobsCount)
+                                   .pausedJobsCount(pausedJobsCount)
+                                   .inErrorJobsCount(inErrorJobsCount)
+                                   .failedJobsCount(failedJobsCount)
+                                   .canceledJobsCount(cancelledJobsCount)
+                                   .killedJobsCount(killedJobsCount)
+                                   .finishedJobsCount(finishedJobsCount)
                                    .build();
         });
     }
