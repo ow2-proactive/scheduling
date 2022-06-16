@@ -132,6 +132,8 @@ public class SchedulerDBManager {
 
     private final TransactionHelper transactionHelper;
 
+    private static boolean IS_HSQLDB = false;
+
     public static SchedulerDBManager createUsingProperties() {
         if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
             return createInMemorySchedulerDBManager();
@@ -187,12 +189,29 @@ public class SchedulerDBManager {
 
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties())
                                                                                   .build();
+
+            IS_HSQLDB = "org.hibernate.dialect.HSQLDialect".equals(configuration.getProperty("hibernate.dialect"));
             sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             transactionHelper = new TransactionHelper(sessionFactory);
 
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed", ex);
+        }
+    }
+
+    public static class HSQLDBOrderByInterceptor extends EmptyInterceptor {
+        @Override
+        public String onPrepareStatement(String sql) {
+            if ((sql.contains("order by") || sql.contains("ORDER BY")) &&
+                (sql.contains("LIMIT") || sql.contains("limit")) && !sql.contains("JOB_DATA_VARIABLE")) {
+                if (sql.endsWith(";")) {
+                    return sql.substring(0, sql.length() - 1) + " USING INDEX;";
+                } else {
+                    return sql + " USING INDEX";
+                }
+            }
+            return sql;
         }
     }
 
@@ -219,7 +238,7 @@ public class SchedulerDBManager {
                                                              parentId,
                                                              sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
-        final Set<JobStatus> jobStatuses = params.getStatuses();
+        final Set<Integer> statusRanks = params.getStatusRanks();
         List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
             Criteria criteria = session.createCriteria(JobData.class);
             if (limit > 0) {
@@ -252,7 +271,7 @@ public class SchedulerDBManager {
             }
             boolean allJobs = pending && running && finished;
             if (!allJobs) {
-                criteria.add(Restrictions.in("status", jobStatuses));
+                criteria.add(Restrictions.in("statusRank", statusRanks));
             }
 
             if (sortParameters != null) {
@@ -272,7 +291,7 @@ public class SchedulerDBManager {
                             sortOrder = configureSortOrder(param, Property.forName("priority"));
                             break;
                         case STATE:
-                            sortOrder = new GroupByStatusSortOrder(param.getSortOrder(), "status");
+                            sortOrder = configureSortOrder(param, Property.forName("statusRank"));
                             break;
                         case SUBMIT_TIME:
                             sortOrder = configureSortOrder(param, Property.forName("submittedTime"));
@@ -316,7 +335,7 @@ public class SchedulerDBManager {
 
             List<JobData> jobsList = criteria.list();
             return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
-        });
+        }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
 
         return new Page<>(lJobs, totalNbJobs);
     }
@@ -386,9 +405,9 @@ public class SchedulerDBManager {
 
         return executeReadOnlyTransaction(session -> {
 
-            Set<JobStatus> statuses = params.getStatuses();
+            Set<Integer> statusRanks = params.getStatusRanks();
 
-            if (statuses.isEmpty()) {
+            if (statusRanks.isEmpty()) {
                 return 0;
             } else {
 
@@ -398,7 +417,7 @@ public class SchedulerDBManager {
 
                 StringBuilder queryString = new StringBuilder("select count(*) from JobData where ");
 
-                queryString.append("status in (:jobStatus) ");
+                queryString.append("statusRank in (:statusRanks) ");
 
                 if (hasUser) {
                     queryString.append("and owner = :user ");
@@ -428,7 +447,7 @@ public class SchedulerDBManager {
                 }
 
                 Query query = session.createQuery(queryString.toString());
-                query.setParameterList("jobStatus", statuses);
+                query.setParameterList("statusRanks", statusRanks);
                 if (hasUser) {
                     query.setParameter("user", params.getUser());
                 }
@@ -896,6 +915,16 @@ public class SchedulerDBManager {
         });
     }
 
+    public void setJobDataStatusRankIfNull() {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            Long nbEntriesNull = (Long) session.getNamedQuery("countJobDataStatusRankNull").uniqueResult();
+            if (nbEntriesNull != null && nbEntriesNull > 0L) {
+                session.getNamedQuery("setStatusRankInJobDataIfNull").executeUpdate();
+            }
+            return null;
+        });
+    }
+
     public Map<JobId, String> getJobsToRemove(final long time) {
         return executeReadOnlyTransaction(session -> {
             Query query = session.createSQLQuery("select ID, OWNER from JOB_DATA where " +
@@ -1199,6 +1228,7 @@ public class SchedulerDBManager {
 
             session.getNamedQuery("updateJobDataTaskStarted")
                    .setParameter("status", jobInfo.getStatus())
+                   .setParameter("statusRank", jobInfo.getStatus().getRank())
                    .setParameter("startTime", jobInfo.getStartTime())
                    .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
                    .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
@@ -1234,6 +1264,7 @@ public class SchedulerDBManager {
 
             session.getNamedQuery("updateJobDataTaskRestarted")
                    .setParameter("status", jobInfo.getStatus())
+                   .setParameter("statusRank", jobInfo.getStatus().getRank())
                    .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
                    .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
                    .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
@@ -1271,6 +1302,7 @@ public class SchedulerDBManager {
             JobInfo jobInfo = job.getJobInfo();
             session.getNamedQuery("updateJobDataAfterWorkflowTaskFinished")
                    .setParameter("status", jobInfo.getStatus())
+                   .setParameter("statusRank", jobInfo.getStatus().getRank())
                    .setParameter("finishedTime", jobInfo.getFinishedTime())
                    .setParameter("inErrorTime", jobInfo.getInErrorTime())
                    .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
@@ -1359,6 +1391,7 @@ public class SchedulerDBManager {
             int updateJob = 0;
             updateJob = session.getNamedQuery("updateJobDataAfterTaskFinished")
                                .setParameter("status", jobInfo.getStatus())
+                               .setParameter("statusRank", jobInfo.getStatus().getRank())
                                .setParameter("finishedTime", jobInfo.getFinishedTime())
                                .setParameter("inErrorTime", jobInfo.getInErrorTime())
                                .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
@@ -1446,6 +1479,7 @@ public class SchedulerDBManager {
                     JobInfo jobInfo = job.getJobInfo();
                     int result = session.getNamedQuery("updateJobDataAfterTaskFinished")
                                         .setParameter("status", jobInfo.getStatus())
+                                        .setParameter("statusRank", jobInfo.getStatus().getRank())
                                         .setParameter("finishedTime", jobInfo.getFinishedTime())
                                         .setParameter("inErrorTime", jobInfo.getInErrorTime())
                                         .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
@@ -1594,6 +1628,7 @@ public class SchedulerDBManager {
 
         session.getNamedQuery("updateJobAndTasksState")
                .setParameter("status", jobInfo.getStatus())
+               .setParameter("statusRank", jobInfo.getStatus().getRank())
                .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
                .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
@@ -1725,6 +1760,7 @@ public class SchedulerDBManager {
 
             session.getNamedQuery("updateJobDataAfterTaskFinished")
                    .setParameter("status", jobInfo.getStatus())
+                   .setParameter("statusRank", jobInfo.getStatus().getRank())
                    .setParameter("finishedTime", jobInfo.getFinishedTime())
                    .setParameter("inErrorTime", jobInfo.getInErrorTime())
                    .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
@@ -2245,6 +2281,10 @@ public class SchedulerDBManager {
 
     public <T> T executeReadOnlyTransaction(SessionWork<T> sessionWork) {
         return transactionHelper.executeReadOnlyTransaction(sessionWork);
+    }
+
+    public <T> T executeReadOnlyTransaction(SessionWork<T> sessionWork, Interceptor interceptor) {
+        return transactionHelper.executeReadOnlyTransaction(sessionWork, interceptor);
     }
 
     private static TaskData.DBTaskId taskId(InternalTask task) {

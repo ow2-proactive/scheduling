@@ -29,6 +29,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.Interceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.objectweb.proactive.utils.Sleeper;
@@ -60,7 +61,11 @@ public class TransactionHelper {
      * @return session work result based on the generic type.
      */
     public <T> T executeReadOnlyTransaction(SessionWork<T> sessionWork) {
-        return tryExecuteTransactionLoop(sessionWork, false, true);
+        return tryExecuteTransactionLoop(sessionWork, false, true, null);
+    }
+
+    public <T> T executeReadOnlyTransaction(SessionWork<T> sessionWork, Interceptor interceptor) {
+        return tryExecuteTransactionLoop(sessionWork, false, true, interceptor);
     }
 
     /**
@@ -78,15 +83,15 @@ public class TransactionHelper {
      * @return session work result based on the generic type.
      */
     public <T> T executeReadWriteTransaction(SessionWork<T> sessionWork) {
-        return tryExecuteTransactionLoop(sessionWork, true, true);
+        return tryExecuteTransactionLoop(sessionWork, true, true, null);
     }
 
     public <T> T executeReadWriteTransaction(SessionWork<T> sessionWork, boolean readOnlyEntities) {
-        return tryExecuteTransactionLoop(sessionWork, true, readOnlyEntities);
+        return tryExecuteTransactionLoop(sessionWork, true, readOnlyEntities, null);
     }
 
     private <T> T tryExecuteTransactionLoop(SessionWork<T> sessionWork, boolean readWriteTransaction,
-            boolean readOnlyEntities) {
+            boolean readOnlyEntities, Interceptor interceptor) {
         Throwable lastException = null;
 
         int dampingFactor = PASchedulerProperties.SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR.getValueAsInt();
@@ -96,7 +101,7 @@ public class TransactionHelper {
 
         for (int i = 0; i <= maximumNumberOfRetries; i++) {
             try {
-                return tryExecuteTransaction(sessionWork, readWriteTransaction, readOnlyEntities);
+                return tryExecuteTransaction(sessionWork, readWriteTransaction, readOnlyEntities, interceptor);
             } catch (DatabaseManagerException | IllegalArgumentException e) {
                 throw e;
             } catch (Throwable exception) {
@@ -125,8 +130,9 @@ public class TransactionHelper {
     }
 
     private <T> T tryExecuteTransaction(SessionWork<T> sessionWork, boolean readWriteTransaction,
-            boolean readOnlyEntities) {
-        Session session = sessionFactory.openSession();
+            boolean readOnlyEntities, Interceptor interceptor) {
+        Session session = interceptor != null ? sessionFactory.withOptions().interceptor(interceptor).openSession()
+                                              : sessionFactory.openSession();
         session.setDefaultReadOnly(readOnlyEntities);
 
         try {

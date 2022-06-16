@@ -247,7 +247,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters(new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
+                                 sortParameters(new SortParameter<>(JobSortParameter.STATE, SortOrder.DESC),
                                                 new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
                         .getList();
         checkJobs(jobs, 2, 4, 6, 3, 5, 1);
@@ -264,7 +264,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters(new SortParameter<>(JobSortParameter.STATE, SortOrder.DESC),
+                                 sortParameters(new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
                                                 new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
                         .getList();
         checkJobs(jobs, 1, 3, 5, 2, 4, 6);
