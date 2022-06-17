@@ -186,7 +186,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     protected static final List<SortParameter<JobSortParameter>> DEFAULT_JOB_SORT_PARAMS = Arrays.asList(new SortParameter<>(JobSortParameter.STATE,
-                                                                                                                             SortOrder.ASC),
+                                                                                                                             SortOrder.DESC),
                                                                                                          new SortParameter<>(JobSortParameter.ID,
                                                                                                                              SortOrder.DESC));
 

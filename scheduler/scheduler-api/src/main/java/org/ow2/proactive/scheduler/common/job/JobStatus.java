@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import static org.ow2.proactive.scheduler.common.job.JobState.*;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -37,64 +39,68 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public enum JobStatus implements java.io.Serializable {
+
     /**
      * The job is waiting to be scheduled.
      */
-    PENDING("Pending", true),
+    PENDING("Pending", true, PENDING_RANK),
     /**
      * The job is running. Actually at least one of its task has been scheduled.
      */
-    RUNNING("Running", true),
+    RUNNING("Running", true, RUNNING_RANK),
     /**
      * The job has been launched but no task are currently running.
      */
-    STALLED("Stalled", true),
+    STALLED("Stalled", true, RUNNING_RANK),
     /**
      * The job is finished. Every tasks are finished.
      */
-    FINISHED("Finished", false),
+    FINISHED("Finished", false, FINISHED_RANK),
     /**
      * The job is paused waiting for user to resume it.
      */
-    PAUSED("Paused", true),
+    PAUSED("Paused", true, RUNNING_RANK),
     /**
      * The job has been canceled due to user exception and order.
      * This status runs when a user exception occurs in a task
      * and when the user has asked to cancel On exception.
      */
-    CANCELED("Canceled", false),
+    CANCELED("Canceled", false, FINISHED_RANK),
     /**
      * The job has failed. One or more tasks have failed (due to resources failure).
      * There is no more executionOnFailure left for a task.
      */
-    FAILED("Failed", false),
+    FAILED("Failed", false, FINISHED_RANK),
     /**
      * The job has been killed by a user..
      * Nothing can be done anymore on this job expect read execution informations
      * such as output, time, etc...
      */
-    KILLED("Killed", false),
+    KILLED("Killed", false, FINISHED_RANK),
     /**
      * The job has at least one in-error task and in-error tasks are the last, among others,
      * which have changed their state (i.e. Job status is depicted by the last action).
      */
-    IN_ERROR("In-Error", true);
+    IN_ERROR("In-Error", true, RUNNING_RANK);
 
     /** The textual definition of the status */
     private final String definition;
 
     private final boolean jobAlive;
 
+    private final int rank;
+
     /**
      * Default constructor.
      * @param def the textual definition of the status.
      */
-    JobStatus(String def, boolean jobAlive) {
+    JobStatus(String def, boolean jobAlive, int rank) {
         definition = def;
         this.jobAlive = jobAlive;
+        this.rank = rank;
     }
 
-    public static JobStatus findPriority(String name) {
+    public static JobStatus findStatus(String name) {
 
         for (JobStatus jobStatus : JobStatus.values()) {
             if (name.equalsIgnoreCase(jobStatus.toString()))
@@ -118,4 +124,7 @@ public enum JobStatus implements java.io.Serializable {
         return jobAlive;
     }
 
+    public int getRank() {
+        return rank;
+    }
 }

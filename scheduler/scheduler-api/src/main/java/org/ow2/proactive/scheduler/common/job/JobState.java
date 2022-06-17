@@ -56,6 +56,12 @@ import org.ow2.proactive.scheduler.task.SchedulerVars;
 @PublicAPI
 public abstract class JobState extends Job implements Comparable<JobState> {
 
+    public static int PENDING_RANK = 2;
+
+    public static int RUNNING_RANK = 1;
+
+    public static int FINISHED_RANK = 0;
+
     /** Used to sort by id */
     public static final int SORT_BY_ID = 1;
 

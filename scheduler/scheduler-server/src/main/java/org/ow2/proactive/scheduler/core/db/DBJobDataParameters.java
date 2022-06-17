@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.JobState;
 
 
 /**
@@ -66,7 +66,7 @@ public class DBJobDataParameters {
 
     private final List<SortParameter<JobSortParameter>> sortParameters;
 
-    private final Set<JobStatus> status;
+    private final Set<Integer> statusRanks;
 
     DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
             boolean pending, boolean running, boolean finished, boolean childJobs, String jobName, String projectName,
@@ -85,17 +85,17 @@ public class DBJobDataParameters {
         this.parentId = parentId;
         this.sortParameters = sortParameters;
 
-        Set<JobStatus> newStatus = new HashSet<JobStatus>();
+        Set<Integer> newStatusRanks = new HashSet<Integer>();
         if (pending) {
-            newStatus.addAll(SchedulerDBManager.PENDING_JOB_STATUSES);
+            newStatusRanks.add(JobState.PENDING_RANK);
         }
         if (running) {
-            newStatus.addAll(SchedulerDBManager.RUNNING_JOB_STATUSES);
+            newStatusRanks.add(JobState.RUNNING_RANK);
         }
         if (finished) {
-            newStatus.addAll(SchedulerDBManager.FINISHED_JOB_STATUSES);
+            newStatusRanks.add(JobState.FINISHED_RANK);
         }
-        this.status = Collections.unmodifiableSet(newStatus);
+        this.statusRanks = Collections.unmodifiableSet(newStatusRanks);
 
     }
 
@@ -139,7 +139,7 @@ public class DBJobDataParameters {
         return sortParameters;
     }
 
-    public Set<JobStatus> getStatuses() {
-        return status;
+    public Set<Integer> getStatusRanks() {
+        return statusRanks;
     }
 }

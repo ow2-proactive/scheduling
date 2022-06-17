@@ -105,7 +105,7 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "loadJobDataIfNotRemoved", query = "from JobData as job where job.id in (:ids)"),
                 @NamedQuery(name = "readAccountJobs", query = "select count(*), sum(finishedTime) - sum(startTime) from JobData" +
                                                               " where owner = :username and finishedTime > 0"),
-                @NamedQuery(name = "updateJobAndTasksState", query = "update JobData set status = :status, " +
+                @NamedQuery(name = "updateJobAndTasksState", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
                                                                      "numberOfInErrorTasks = :numberOfInErrorTasks, inErrorTime = :inErrorTime, lastUpdatedTime = :lastUpdatedTime " +
                                                                      "where id = :jobId"),
@@ -116,29 +116,31 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "increaseJobDataChildrenCount", query = "update JobData set childrenCount = childrenCount+1, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "increaseJobDataChildrenCountAmount", query = "update JobData set childrenCount = childrenCount + :amount, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "decreaseJobDataChildrenCount", query = "update JobData set childrenCount = childrenCount-1, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
-                @NamedQuery(name = "updateJobDataAfterTaskFinished", query = "update JobData set status = :status, " +
+                @NamedQuery(name = "updateJobDataAfterTaskFinished", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                              "finishedTime = :finishedTime, inErrorTime= :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                              "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                              "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                              "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
                                                                              "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
-                @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, " +
+                @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                                      "finishedTime = :finishedTime, inErrorTime = :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                                      "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                                      "numberOfRunningTasks = :numberOfRunningTasks, totalNumberOfTasks =:totalNumberOfTasks, " +
                                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
                                                                                      "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, " +
                                                                                      "preciousTasks = :preciousTasks where id = :jobId"),
-                @NamedQuery(name = "updateJobDataTaskRestarted", query = "update JobData set status = :status, " +
+                @NamedQuery(name = "updateJobDataTaskRestarted", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                          "numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                          "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                          "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
                                                                          "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
-                @NamedQuery(name = "updateJobDataTaskStarted", query = "update JobData set status = :status, " +
+                @NamedQuery(name = "updateJobDataTaskStarted", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                        "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                        "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAttachedServices", query = "update JobData set attachedServices = :attachedServices where id = :jobId"),
-                @NamedQuery(name = "updateJobDataExternalEndpointUrls", query = "update JobData set externalEndpointUrls = :externalEndpointUrls where id = :jobId") })
+                @NamedQuery(name = "updateJobDataExternalEndpointUrls", query = "update JobData set externalEndpointUrls = :externalEndpointUrls where id = :jobId"),
+                @NamedQuery(name = "countJobDataStatusRankNull", query = "select count (*) from JobData where statusRank is null"),
+                @NamedQuery(name = "setStatusRankInJobDataIfNull", query = "update JobData job set job.statusRank = case when status = 0 then 2 when status in (1,2,4,8) then 1 else 0 end"), })
 @Table(name = "JOB_DATA", indexes = { @Index(name = "JOB_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
                                       @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
                                       @Index(name = "JOB_DATA_TENANT", columnList = "TENANT"),
@@ -147,8 +149,12 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_SUBMIT_TIME", columnList = "SUBMIT_TIME"),
                                       @Index(name = "JOB_DATA_REMOVAL_TIME", columnList = "SCHEDULED_TIME_FOR_REMOVAL"),
                                       @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"),
+                                      @Index(name = "JOB_DATA_STATUS_RANK", columnList = "STATUS_RANK"),
                                       @Index(name = "JOB_PARENT_JOB_ID", columnList = "PARENT_JOB_ID"),
-                                      @Index(name = "JOB_ID_STATUS", columnList = "ID,STATUS") })
+                                      @Index(name = "JOB_ID_STATUS", columnList = "ID,STATUS"),
+                                      @Index(name = "JOB_DATA_STATUS_RANK_ID", columnList = "STATUS_RANK DESC,ID DESC"),
+                                      @Index(name = "JOB_DATA_PARENT_RANK_ID", columnList = "PARENT_JOB_ID,STATUS_RANK DESC,ID DESC"),
+                                      @Index(name = "JOB_DATA_OWNER_PARENT_RANK_ID", columnList = "OWNER,PARENT_JOB_ID,STATUS_RANK DESC,ID DESC") })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
@@ -216,6 +222,8 @@ public class JobData implements Serializable {
     private JobPriority priority;
 
     private JobStatus status;
+
+    private Integer statusRank;
 
     private boolean toBeRemoved;
 
@@ -395,6 +403,7 @@ public class JobData implements Serializable {
         }
         jobRuntimeData.setVariables(variables);
         jobRuntimeData.setStatus(job.getStatus());
+        jobRuntimeData.setStatusRank(job.getStatus().getRank());
         jobRuntimeData.setOwner(job.getOwner());
         jobRuntimeData.setTenant(job.getTenant());
         jobRuntimeData.setCredentials(job.getCredentials());
@@ -739,6 +748,15 @@ public class JobData implements Serializable {
 
     public void setStatus(JobStatus status) {
         this.status = status;
+    }
+
+    @Column(name = "STATUS_RANK", nullable = true)
+    public int getStatusRank() {
+        return statusRank != null ? statusRank : getStatus().getRank();
+    }
+
+    public void setStatusRank(int statusRank) {
+        this.statusRank = statusRank;
     }
 
     @Column(name = "TO_BE_REMOVED")

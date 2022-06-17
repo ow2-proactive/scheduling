@@ -74,11 +74,8 @@ import java.util.stream.Collectors;
 import javax.security.auth.Subject;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.log4j.Logger;
@@ -1348,7 +1345,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setNumberOfFaultyTasks(jobInfoData.getNumberOfFaultyTasks());
         jobInfoImpl.setTotalNumberOfTasks(jobInfoData.getTotalNumberOfTasks());
         jobInfoImpl.setJobPriority(JobPriority.findPriority(jobInfoData.getPriority().toString()));
-        jobInfoImpl.setJobStatus(JobStatus.findPriority(jobInfoData.getStatus().toString()));
+        jobInfoImpl.setJobStatus(JobStatus.findStatus(jobInfoData.getStatus().toString()));
         if (jobInfoData.isToBeRemoved())
             jobInfoImpl.setToBeRemoved();
         jobInfoImpl.setGenericInformation(jobInfoData.getGenericInformation());
