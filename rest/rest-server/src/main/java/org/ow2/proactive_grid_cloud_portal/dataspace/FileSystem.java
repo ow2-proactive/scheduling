@@ -29,10 +29,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.Collator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -43,7 +46,6 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
@@ -58,6 +60,8 @@ public class FileSystem {
     public static final String X_PROACTIVE_DS_TYPE = "x-proactive-ds-type";
 
     public static final String X_PROACTIVE_DS_PERMISSIONS = "x-proactive-ds-permissions";
+
+    private static final Collator COLLATOR = Collator.getInstance(Locale.getDefault());
 
     private FileSystemManager fsm;
 
@@ -136,9 +140,9 @@ public class FileSystem {
                     throw new RuntimeException("Unknown : " + type);
             }
         }
-        Collections.sort(dirList);
-        Collections.sort(fileList);
-        Collections.sort(fullList);
+        Collections.sort(dirList, filenameComparator());
+        Collections.sort(fileList, filenameComparator());
+        Collections.sort(fullList, filenameComparator());
         answer.setDirectoryListing(dirList);
         answer.setFileListing(fileList);
         answer.setFullListing(fullList);
@@ -252,6 +256,24 @@ public class FileSystem {
 
     private static boolean isNullOrEmpty(List<?> list) {
         return list == null || list.isEmpty();
+    }
+
+    private static Comparator<String> filenameComparator() {
+        return (s1, s2) -> {
+            int lowerCaseCompare = COLLATOR.compare(s1.toLowerCase(), s2.toLowerCase());
+            if (lowerCaseCompare != 0) {
+                return lowerCaseCompare;
+            }
+            // lowercase comes before uppercase
+            for (int i = 0; i < s1.length(); i++) {
+                if (Character.isLowerCase(s1.charAt(i)) && Character.isUpperCase(s2.charAt(i))) {
+                    return -1;
+                } else if (Character.isUpperCase(s1.charAt(i)) && Character.isLowerCase(s2.charAt(i))) {
+                    return 1;
+                }
+            }
+            return 0;
+        };
     }
 
     static class Builder {
