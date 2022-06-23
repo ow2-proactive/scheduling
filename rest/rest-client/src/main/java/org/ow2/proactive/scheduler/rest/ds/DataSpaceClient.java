@@ -303,9 +303,10 @@ public class DataSpaceClient implements IDataSpaceClient {
     public ListFileMetadata listMetadata(IRemoteSource source) throws NotConnectedException, PermissionException {
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory)
-                .httpEngine(httpEngine)
-                .build();
-        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath()).queryParam("comp", "list-metadata");
+                                                           .httpEngine(httpEngine)
+                                                           .build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath()).queryParam("comp",
+                                                                                                       "list-metadata");
 
         List<String> includes = source.getIncludes();
         if (includes != null && !includes.isEmpty()) {
@@ -323,7 +324,7 @@ public class DataSpaceClient implements IDataSpaceClient {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
                     throw new RuntimeException(String.format("Cannot list the specified location: %s",
-                            source.getPath()));
+                                                             source.getPath()));
                 }
             }
             return response.readEntity(ListFileMetadata.class);

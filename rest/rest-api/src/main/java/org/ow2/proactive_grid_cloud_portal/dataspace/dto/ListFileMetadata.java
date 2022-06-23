@@ -39,7 +39,8 @@ public class ListFileMetadata extends ListFile {
 
     private Map<String, Long> sizes = new HashMap<>();
 
-    public ListFileMetadata() {}
+    public ListFileMetadata() {
+    }
 
     public ListFileMetadata(ListFile listFile) {
         super(listFile);
@@ -79,11 +80,7 @@ public class ListFileMetadata extends ListFile {
 
     @Override
     public String toString() {
-        return "ListFileMetadata{" +
-                "types=" + types +
-                ", permissions=" + permissions +
-                ", lastModifiedDates=" + lastModifiedDates +
-                ", sizes=" + sizes +
-                "} " + super.toString();
+        return "ListFileMetadata{" + "types=" + types + ", permissions=" + permissions + ", lastModifiedDates=" +
+               lastModifiedDates + ", sizes=" + sizes + "} " + super.toString();
     }
 }

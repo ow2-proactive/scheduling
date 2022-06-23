@@ -49,9 +49,9 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.rest.ds.*;
 import org.ow2.proactive_grid_cloud_portal.common.FileType;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFileMetadata;
 
 import com.google.common.io.Files;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFileMetadata;
 
 
 public class DataTransferTest extends AbstractRestFuncTestCase {
@@ -563,7 +563,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         System.out.println("Full : " + foundFiles);
         assertEquals(3, foundFiles.size());
         assertArrayEquals(new String[] { TEMP_DIR_NAME, TEMP_FILE_TMP_PATH, TEMP_FILE_TXT_NAME },
-                foundFiles.toArray(new String[0]));
+                          foundFiles.toArray(new String[0]));
 
         System.out.println("Metadata: " + listFile);
         assertEquals("DIRECTORY", listFile.getTypes().get(TEMP_DIR_NAME));

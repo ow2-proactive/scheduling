@@ -70,10 +70,7 @@ public class ListFile {
 
     @Override
     public String toString() {
-        return "ListFile{" +
-                "directoryListing=" + directoryListing +
-                ", fileListing=" + fileListing +
-                ", fullListing=" + fullListing +
-                '}';
+        return "ListFile{" + "directoryListing=" + directoryListing + ", fileListing=" + fileListing +
+               ", fullListing=" + fullListing + '}';
     }
 }
