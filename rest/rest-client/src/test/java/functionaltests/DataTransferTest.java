@@ -51,6 +51,7 @@ import org.ow2.proactive_grid_cloud_portal.common.FileType;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
 import com.google.common.io.Files;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFileMetadata;
 
 
 public class DataTransferTest extends AbstractRestFuncTestCase {
@@ -492,6 +493,125 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         System.out.println("Full : " + foundFiles);
         assertEquals(1, foundFiles.size());
         assertArrayEquals(new String[] { TEMP_FILE_TMP_PATH }, foundFiles.toArray(new String[0]));
+    }
+
+    @Test
+    public void testListFilesMetadataNonRecursive() throws Exception {
+        String testFolderName = "testListFilesMetadataNonRecursive";
+        System.out.println(testFolderName);
+        createFilesInUserSpace(testFolderName);
+
+        // use standard client
+        IDataSpaceClient client = clientInstance();
+        RemoteSource source = new RemoteSource(USER, testFolderName);
+        source.setIncludes("*");
+
+        ListFileMetadata listFile = client.listMetadata(source);
+
+        List<String> directories = listFile.getDirectoryListing();
+        System.out.println("Directories : " + directories);
+        assertEquals(1, directories.size());
+        assertEquals(TEMP_DIR_NAME, directories.get(0));
+
+        List<String> files = listFile.getFileListing();
+        System.out.println("Files : " + files);
+        assertEquals(1, files.size());
+        assertEquals(TEMP_FILE_TXT_NAME, files.get(0));
+
+        // use RemoteSpace API
+        List<String> foundFiles = client.getUserSpace().listFiles(testFolderName, "*");
+        System.out.println("Full : " + foundFiles);
+        assertEquals(2, foundFiles.size());
+        assertArrayEquals(new String[] { TEMP_DIR_NAME, TEMP_FILE_TXT_NAME }, foundFiles.toArray(new String[0]));
+
+        System.out.println("Metadata: " + listFile);
+        assertEquals("DIRECTORY", listFile.getTypes().get(TEMP_DIR_NAME));
+        assertNotNull(listFile.getLastModifiedDates().get(TEMP_DIR_NAME));
+        assertEquals("rwx", listFile.getPermissions().get(TEMP_DIR_NAME));
+        assertEquals("text/plain", listFile.getTypes().get(TEMP_FILE_TXT_NAME));
+        assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TXT_NAME));
+        assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TXT_NAME));
+        assertEquals(Long.valueOf(13), listFile.getSizes().get(TEMP_FILE_TXT_NAME));
+    }
+
+    @Test
+    public void testListFilesMetadataRecursive() throws Exception {
+        String testFolderName = "testListFilesMetadataRecursive";
+        System.out.println(testFolderName);
+        createFilesInUserSpace(testFolderName);
+
+        // use standard client
+        IDataSpaceClient client = clientInstance();
+        RemoteSource source = new RemoteSource(USER, testFolderName);
+        source.setIncludes("**");
+
+        ListFileMetadata listFile = client.listMetadata(source);
+
+        List<String> directories = listFile.getDirectoryListing();
+        System.out.println("Directories : " + directories);
+        assertEquals(1, directories.size());
+        assertEquals(DataTransferTest.TEMP_DIR_NAME, directories.get(0));
+
+        List<String> files = listFile.getFileListing();
+        System.out.println("Files : " + files);
+        assertEquals(2, files.size());
+        assertEquals(TEMP_FILE_TMP_PATH, files.get(0));
+        assertEquals(TEMP_FILE_TXT_NAME, files.get(1));
+
+        // use RemoteSpace API
+        List<String> foundFiles = client.getUserSpace().listFiles(testFolderName, "**");
+        System.out.println("Full : " + foundFiles);
+        assertEquals(3, foundFiles.size());
+        assertArrayEquals(new String[] { TEMP_DIR_NAME, TEMP_FILE_TMP_PATH, TEMP_FILE_TXT_NAME },
+                foundFiles.toArray(new String[0]));
+
+        System.out.println("Metadata: " + listFile);
+        assertEquals("DIRECTORY", listFile.getTypes().get(TEMP_DIR_NAME));
+        assertNotNull(listFile.getLastModifiedDates().get(TEMP_DIR_NAME));
+        assertEquals("rwx", listFile.getPermissions().get(TEMP_DIR_NAME));
+        assertEquals("text/plain", listFile.getTypes().get(TEMP_FILE_TXT_NAME));
+        assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TXT_NAME));
+        assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TXT_NAME));
+        assertEquals(Long.valueOf(13), listFile.getSizes().get(TEMP_FILE_TXT_NAME));
+        assertTrue(listFile.getTypes().containsKey(TEMP_FILE_TMP_PATH));
+        assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TMP_PATH));
+        assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TMP_PATH));
+        assertEquals(Long.valueOf(100), listFile.getSizes().get(TEMP_FILE_TMP_PATH));
+    }
+
+    @Test
+    public void testListFilesMetadataRecursiveWithPattern() throws Exception {
+        String testFolderName = "testListFilesMetadataRecursiveWithPattern";
+        System.out.println(testFolderName);
+        createFilesInUserSpace(testFolderName);
+
+        // use standard client
+        IDataSpaceClient client = clientInstance();
+        RemoteSource source = new RemoteSource(USER, testFolderName);
+        source.setIncludes("**/*.tmp");
+
+        ListFileMetadata listFile = client.listMetadata(source);
+
+        List<String> directories = listFile.getDirectoryListing();
+        System.out.println("Directories : " + directories);
+        assertEquals(0, directories.size());
+
+        List<String> files = listFile.getFileListing();
+        System.out.println("Files : " + files);
+        assertEquals(1, files.size());
+        assertEquals(TEMP_FILE_TMP_PATH, files.get(0));
+
+        // use RemoteSpace API
+        List<String> foundFiles = client.getUserSpace().listFiles(testFolderName, "**/*.tmp");
+        System.out.println("Full : " + foundFiles);
+        assertEquals(1, foundFiles.size());
+        assertArrayEquals(new String[] { TEMP_FILE_TMP_PATH }, foundFiles.toArray(new String[0]));
+
+        System.out.println("Metadata: " + listFile);
+        assertTrue(listFile.getTypes().containsKey(TEMP_FILE_TMP_PATH));
+        assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TMP_PATH));
+        assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TMP_PATH));
+        assertEquals(Long.valueOf(100), listFile.getSizes().get(TEMP_FILE_TMP_PATH));
     }
 
     @Test

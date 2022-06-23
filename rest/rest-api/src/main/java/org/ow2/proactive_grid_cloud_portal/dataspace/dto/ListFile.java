@@ -67,4 +67,13 @@ public class ListFile {
     public List<String> getFullListing() {
         return fullListing;
     }
+
+    @Override
+    public String toString() {
+        return "ListFile{" +
+                "directoryListing=" + directoryListing +
+                ", fileListing=" + fileListing +
+                ", fullListing=" + fullListing +
+                '}';
+    }
 }

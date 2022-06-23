@@ -117,16 +117,16 @@ public class FileSystem {
         List<String> fileList = Lists.newArrayList();
         List<String> fullList = Lists.newArrayList();
 
-        for (String filename : fileObjects.keySet()) {
-            FileType type = fileObjects.get(filename).getType();
+        for (String fileRelativePath : fileObjects.keySet()) {
+            FileType type = fileObjects.get(fileRelativePath).getType();
             switch (type) {
                 case FOLDER:
-                    dirList.add(filename);
-                    fullList.add(filename);
+                    dirList.add(fileRelativePath);
+                    fullList.add(fileRelativePath);
                     break;
                 case FILE:
-                    fileList.add(filename);
-                    fullList.add(filename);
+                    fileList.add(fileRelativePath);
+                    fullList.add(fileRelativePath);
                     break;
                 default:
                     throw new RuntimeException("Unknown : " + type);
@@ -181,18 +181,18 @@ public class FileSystem {
             throws FileSystemException {
         Map<String, FileObject> listFileObjects = listFileObjects(fo, includes, excludes);
         ListFileMetadata allFils = new ListFileMetadata(list(listFileObjects));
-        for (String dir : allFils.getDirectoryListing()) {
-            FileObject dirObject = listFileObjects.get(dir);
-            allFils.addType(dir, DIRECTORY_TYPE);
-            allFils.addLastModifiedDate(dir, new Date(dirObject.getContent().getLastModifiedTime()));
-            allFils.addPermission(dir, getPermissionsString(dirObject));
+        for (String dirRelativePath : allFils.getDirectoryListing()) {
+            FileObject dirObject = listFileObjects.get(dirRelativePath);
+            allFils.addType(dirRelativePath, DIRECTORY_TYPE);
+            allFils.addLastModifiedDate(dirRelativePath, new Date(dirObject.getContent().getLastModifiedTime()));
+            allFils.addPermission(dirRelativePath, getPermissionsString(dirObject));
         }
-        for (String file : allFils.getFileListing()) {
-            FileObject fileObject = listFileObjects.get(file);
-            allFils.addType(file, contentType(fileObject));
-            allFils.addLastModifiedDate(file, new Date(fileObject.getContent().getLastModifiedTime()));
-            allFils.addPermission(file, getPermissionsString(fileObject));
-            allFils.addSize(file, fileObject.getContent().getSize());
+        for (String fileRelativePath : allFils.getFileListing()) {
+            FileObject fileObject = listFileObjects.get(fileRelativePath);
+            allFils.addType(fileRelativePath, contentType(fileObject));
+            allFils.addLastModifiedDate(fileRelativePath, new Date(fileObject.getContent().getLastModifiedTime()));
+            allFils.addPermission(fileRelativePath, getPermissionsString(fileObject));
+            allFils.addSize(fileRelativePath, fileObject.getContent().getSize());
         }
         return allFils;
     }
