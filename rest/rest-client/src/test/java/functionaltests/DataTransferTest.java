@@ -752,13 +752,15 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
             srcTextFile = new File(srcDir, TEMP_FILE_TXT_NAME);
             Files.createParentDirs(srcTextFile);
             Files.write("some text ...".getBytes(), srcTextFile);
-            srcTextFile.setExecutable(false);
+            // make the file not executable for everyone
+            srcTextFile.setExecutable(false, false);
 
             File srcTempDir = new File(srcDir, TEMP_DIR_NAME);
             srcTempFile = new File(srcTempDir, TEMP_FILE_TMP_NAME);
             Files.createParentDirs(srcTempFile);
             Files.write(randomFileContents(), srcTempFile);
-            srcTempFile.setExecutable(true);
+            // make the file executable for everyone
+            srcTempFile.setExecutable(true, false);
             return this;
         }
     }
