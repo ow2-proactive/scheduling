@@ -575,7 +575,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals(Long.valueOf(13), listFile.getSizes().get(TEMP_FILE_TXT_NAME));
         assertTrue(listFile.getTypes().containsKey(TEMP_FILE_TMP_PATH));
         assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TMP_PATH));
-        assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TMP_PATH));
+        assertEquals("rwx", listFile.getPermissions().get(TEMP_FILE_TMP_PATH));
         assertEquals(Long.valueOf(100), listFile.getSizes().get(TEMP_FILE_TMP_PATH));
     }
 
@@ -610,7 +610,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         System.out.println("Metadata: " + listFile);
         assertTrue(listFile.getTypes().containsKey(TEMP_FILE_TMP_PATH));
         assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TMP_PATH));
-        assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TMP_PATH));
+        assertEquals("rwx", listFile.getPermissions().get(TEMP_FILE_TMP_PATH));
         assertEquals(Long.valueOf(100), listFile.getSizes().get(TEMP_FILE_TMP_PATH));
     }
 
@@ -752,11 +752,13 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
             srcTextFile = new File(srcDir, TEMP_FILE_TXT_NAME);
             Files.createParentDirs(srcTextFile);
             Files.write("some text ...".getBytes(), srcTextFile);
+            srcTextFile.setExecutable(false);
 
             File srcTempDir = new File(srcDir, TEMP_DIR_NAME);
             srcTempFile = new File(srcTempDir, TEMP_FILE_TMP_NAME);
             Files.createParentDirs(srcTempFile);
             Files.write(randomFileContents(), srcTempFile);
+            srcTempFile.setExecutable(true);
             return this;
         }
     }
