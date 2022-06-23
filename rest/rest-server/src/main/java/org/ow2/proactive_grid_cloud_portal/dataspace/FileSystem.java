@@ -184,15 +184,15 @@ public class FileSystem {
         for (String dir : allFils.getDirectoryListing()) {
             FileObject dirObject = listFileObjects.get(dir);
             allFils.addType(dir, DIRECTORY_TYPE);
-            allFils.addLastModifiedDates(dir, new Date(dirObject.getContent().getLastModifiedTime()));
-            allFils.addPermissions(dir, getPermissionsString(dirObject));
+            allFils.addLastModifiedDate(dir, new Date(dirObject.getContent().getLastModifiedTime()));
+            allFils.addPermission(dir, getPermissionsString(dirObject));
         }
         for (String file : allFils.getFileListing()) {
             FileObject fileObject = listFileObjects.get(file);
             allFils.addType(file, contentType(fileObject));
-            allFils.addLastModifiedDates(file, new Date(fileObject.getContent().getLastModifiedTime()));
-            allFils.addPermissions(file, getPermissionsString(fileObject));
-            allFils.addSizes(file, fileObject.getContent().getSize());
+            allFils.addLastModifiedDate(file, new Date(fileObject.getContent().getLastModifiedTime()));
+            allFils.addPermission(file, getPermissionsString(fileObject));
+            allFils.addSize(file, fileObject.getContent().getSize());
         }
         return allFils;
     }

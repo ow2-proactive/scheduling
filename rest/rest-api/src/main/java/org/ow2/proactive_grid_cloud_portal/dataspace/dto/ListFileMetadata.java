@@ -63,15 +63,15 @@ public class ListFileMetadata extends ListFile {
         types.put(filename, type);
     }
 
-    public void addPermissions(String filename, String permission) {
+    public void addPermission(String filename, String permission) {
         permissions.put(filename, permission);
     }
 
-    public void addLastModifiedDates(String filename, Date date) {
+    public void addLastModifiedDate(String filename, Date date) {
         lastModifiedDates.put(filename, date);
     }
 
-    public void addSizes(String filename, long size) {
+    public void addSize(String filename, long size) {
         sizes.put(filename, size);
     }
 }
