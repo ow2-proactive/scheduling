@@ -35,6 +35,15 @@ public class ListFile {
 
     private List<String> fullListing;
 
+    public ListFile() {
+    }
+
+    public ListFile(ListFile listFile) {
+        this.directoryListing = listFile.directoryListing;
+        this.fileListing = listFile.fileListing;
+        this.fullListing = listFile.fullListing;
+    }
+
     public List<String> getDirectoryListing() {
         return directoryListing;
     }
