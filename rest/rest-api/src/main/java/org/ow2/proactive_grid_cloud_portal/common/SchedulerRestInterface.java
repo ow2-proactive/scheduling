@@ -2257,6 +2257,27 @@ public interface SchedulerRestInterface {
      *            url to the workflow content
      * @param pathSegment
      *            variables of the workflow
+     * @param jsonBody
+     *            a json with the variables of the workflow
+     * @return the result of job validation
+     */
+    @POST
+    @Path("{path:validateurl}/body")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public JobValidationData validateFromUrl(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("link") String url, Map<String, String> jsonBody, @PathParam("path") PathSegment pathSegment)
+            throws NotConnectedRestException;
+
+    /**
+     * Validates a workflow taken from a given URL
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param url
+     *            url to the workflow content
+     * @param pathSegment
+     *            variables of the workflow
      * @return the result of job validation
      */
     @POST

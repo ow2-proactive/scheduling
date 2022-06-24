@@ -2599,6 +2599,45 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public JobValidationData validateFromUrl(String sessionId, String url, Map<String, String> jsonBody,
+            PathSegment pathSegment) throws NotConnectedRestException {
+
+        File tmpWorkflowFile = null;
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+            String jobXml = downloadWorkflowContent(sessionId, url);
+            tmpWorkflowFile = File.createTempFile("job", "d");
+            Map<String, String> jobVariables;
+            try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
+                IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
+
+                // Get the job submission variables from pathSegment
+                jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+                // Get job variables from json body
+                if (!MapUtils.isEmpty(jsonBody)) {
+                    if (jobVariables != null) {
+                        jobVariables.putAll(jsonBody);
+                    } else {
+                        jobVariables = jsonBody;
+                    }
+                }
+            }
+
+            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler, space, sessionId);
+
+        } catch (JobCreationRestException | IOException e) {
+            JobValidationData validation = new JobValidationData();
+            validation.setErrorMessage("Error while reading workflow at url: " + url);
+            validation.setStackTrace(getStackTrace(e));
+            return validation;
+        } finally {
+            FileUtils.deleteQuietly(tmpWorkflowFile);
+        }
+    }
+
+    @Override
     public JobValidationData validateFromUrl(String sessionId, String url, PathSegment pathSegment)
             throws NotConnectedRestException {
 
