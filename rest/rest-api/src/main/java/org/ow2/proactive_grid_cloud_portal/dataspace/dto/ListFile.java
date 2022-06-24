@@ -35,6 +35,15 @@ public class ListFile {
 
     private List<String> fullListing;
 
+    public ListFile() {
+    }
+
+    public ListFile(ListFile listFile) {
+        this.directoryListing = listFile.directoryListing;
+        this.fileListing = listFile.fileListing;
+        this.fullListing = listFile.fullListing;
+    }
+
     public List<String> getDirectoryListing() {
         return directoryListing;
     }
@@ -57,5 +66,11 @@ public class ListFile {
 
     public List<String> getFullListing() {
         return fullListing;
+    }
+
+    @Override
+    public String toString() {
+        return "ListFile{" + "directoryListing=" + directoryListing + ", fileListing=" + fileListing +
+               ", fullListing=" + fullListing + '}';
     }
 }

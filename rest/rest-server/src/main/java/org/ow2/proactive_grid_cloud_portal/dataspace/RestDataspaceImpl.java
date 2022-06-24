@@ -70,6 +70,8 @@ public class RestDataspaceImpl implements RestDataspace {
 
     public static final String GLOBAL = "global";
 
+    public static final String LIST_METADATA = "list-metadata";
+
     private static SessionStore sessions = SharedSessionStore.getInstance();
 
     @Override
@@ -129,6 +131,7 @@ public class RestDataspaceImpl implements RestDataspace {
             if (!Strings.isNullOrEmpty(component)) {
                 return componentResponse(component, fo, includes, excludes);
             }
+
             if (fo.getType() == FileType.FILE) {
                 if (VFSZipper.isZipFile(fo)) {
                     logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace.toUpperCase()));
@@ -247,6 +250,8 @@ public class RestDataspaceImpl implements RestDataspace {
         switch (type) {
             case "list":
                 return Response.ok(FileSystem.list(fo, includes, excludes), MediaType.APPLICATION_JSON).build();
+            case LIST_METADATA:
+                return Response.ok(FileSystem.listMetadata(fo, includes, excludes), MediaType.APPLICATION_JSON).build();
             default:
                 return Response.status(Response.Status.BAD_REQUEST)
                                .entity(String.format("Unknown query parameter: comp=%s", type))

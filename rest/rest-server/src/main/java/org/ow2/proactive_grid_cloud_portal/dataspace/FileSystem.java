@@ -33,7 +33,7 @@ import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFileMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -60,6 +61,8 @@ public class FileSystem {
     public static final String X_PROACTIVE_DS_TYPE = "x-proactive-ds-type";
 
     public static final String X_PROACTIVE_DS_PERMISSIONS = "x-proactive-ds-permissions";
+
+    public static final String DIRECTORY_TYPE = "DIRECTORY";
 
     private static final Collator COLLATOR = Collator.getInstance(Locale.getDefault());
 
@@ -105,36 +108,25 @@ public class FileSystem {
 
     public static ListFile list(FileObject fo, List<String> includes, List<String> excludes)
             throws FileSystemException {
-        fo.refresh();
+        return list(listFileObjects(fo, includes, excludes));
+    }
+
+    private static ListFile list(Map<String, FileObject> fileObjects) throws FileSystemException {
         ListFile answer = new ListFile();
         List<String> dirList = Lists.newArrayList();
         List<String> fileList = Lists.newArrayList();
         List<String> fullList = Lists.newArrayList();
-        List<FileObject> foundFileObjects = new LinkedList<>();
-        if (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) {
-            fo.findFiles(Selectors.SELECT_CHILDREN, false, foundFileObjects);
-        } else {
-            FileSelector selector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes,
-                                                                                                                excludes);
-            fo.findFiles(selector, false, foundFileObjects);
-        }
 
-        for (FileObject child : foundFileObjects) {
-            FileType type = child.getType();
-            FileName childName = child.getName();
+        for (String fileRelativePath : fileObjects.keySet()) {
+            FileType type = fileObjects.get(fileRelativePath).getType();
             switch (type) {
                 case FOLDER:
-                    if (!child.equals(fo)) {
-                        // exclude root directory from the list
-                        String relativePath = fo.getName().getRelativeName(childName);
-                        dirList.add(relativePath);
-                        fullList.add(relativePath);
-                    }
+                    dirList.add(fileRelativePath);
+                    fullList.add(fileRelativePath);
                     break;
                 case FILE:
-                    String relativePath = fo.getName().getRelativeName(childName);
-                    fileList.add(relativePath);
-                    fullList.add(relativePath);
+                    fileList.add(fileRelativePath);
+                    fullList.add(fileRelativePath);
                     break;
                 default:
                     throw new RuntimeException("Unknown : " + type);
@@ -147,6 +139,27 @@ public class FileSystem {
         answer.setFileListing(fileList);
         answer.setFullListing(fullList);
         return answer;
+    }
+
+    private static Map<String, FileObject> listFileObjects(FileObject fo, List<String> includes, List<String> excludes)
+            throws FileSystemException {
+        fo.refresh();
+        List<FileObject> fileObjects = Lists.newArrayList();
+        Map<String, FileObject> result = new HashMap<>();
+        if (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) {
+            fo.findFiles(Selectors.SELECT_CHILDREN, false, fileObjects);
+        } else {
+            FileSelector selector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes,
+                                                                                                                excludes);
+            fo.findFiles(selector, false, fileObjects);
+        }
+        for (FileObject file : fileObjects) {
+            if (!file.equals(fo)) { // exclude root directory from the list
+                String relativePath = fo.getName().getRelativeName(file.getName());
+                result.put(relativePath, file);
+            }
+        }
+        return result;
     }
 
     public static Map<String, Object> metadata(FileObject fo) throws FileSystemException {
@@ -164,8 +177,28 @@ public class FileSystem {
         return props;
     }
 
+    public static ListFileMetadata listMetadata(FileObject fo, List<String> includes, List<String> excludes)
+            throws FileSystemException {
+        Map<String, FileObject> listFileObjects = listFileObjects(fo, includes, excludes);
+        ListFileMetadata allFils = new ListFileMetadata(list(listFileObjects));
+        for (String dirRelativePath : allFils.getDirectoryListing()) {
+            FileObject dirObject = listFileObjects.get(dirRelativePath);
+            allFils.addType(dirRelativePath, DIRECTORY_TYPE);
+            allFils.addLastModifiedDate(dirRelativePath, new Date(dirObject.getContent().getLastModifiedTime()));
+            allFils.addPermission(dirRelativePath, getPermissionsString(dirObject));
+        }
+        for (String fileRelativePath : allFils.getFileListing()) {
+            FileObject fileObject = listFileObjects.get(fileRelativePath);
+            allFils.addType(fileRelativePath, contentType(fileObject));
+            allFils.addLastModifiedDate(fileRelativePath, new Date(fileObject.getContent().getLastModifiedTime()));
+            allFils.addPermission(fileRelativePath, getPermissionsString(fileObject));
+            allFils.addSize(fileRelativePath, fileObject.getContent().getSize());
+        }
+        return allFils;
+    }
+
     private static void fillDirProps(FileObject fo, Map<String, Object> properties) throws FileSystemException {
-        properties.put(X_PROACTIVE_DS_TYPE, "DIRECTORY");
+        properties.put(X_PROACTIVE_DS_TYPE, DIRECTORY_TYPE);
         properties.put("Last-Modified", new Date(fo.getContent().getLastModifiedTime()));
         properties.put(X_PROACTIVE_DS_PERMISSIONS, getPermissionsString(fo));
     }
