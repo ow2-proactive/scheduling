@@ -76,6 +76,8 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     static URL tgzFileUrl = DataTransferTest.class.getResource("/functionaltests/files/test2.tgz");
 
+    private boolean checkExecutable = true;
+
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
 
@@ -530,7 +532,12 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals("rwx", listFile.getPermissions().get(TEMP_DIR_NAME));
         assertEquals("text/plain", listFile.getTypes().get(TEMP_FILE_TXT_NAME));
         assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TXT_NAME));
-        assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TXT_NAME));
+        if (checkExecutable) {
+            assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TXT_NAME));
+        } else {
+            // on some system (e.g., windows), File.setExecutable may be failed, in this case, we don't check its exec permission.
+            assertTrue(listFile.getPermissions().get(TEMP_FILE_TXT_NAME).contains("rw"));
+        }
         assertEquals(Long.valueOf(13), listFile.getSizes().get(TEMP_FILE_TXT_NAME));
     }
 
@@ -571,7 +578,12 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals("rwx", listFile.getPermissions().get(TEMP_DIR_NAME));
         assertEquals("text/plain", listFile.getTypes().get(TEMP_FILE_TXT_NAME));
         assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TXT_NAME));
-        assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TXT_NAME));
+        if (checkExecutable) {
+            assertEquals("rw-", listFile.getPermissions().get(TEMP_FILE_TXT_NAME));
+        } else {
+            // on some system (e.g., windows), File.setExecutable may be failed, in this case, we don't check its exec permission.
+            assertTrue(listFile.getPermissions().get(TEMP_FILE_TXT_NAME).contains("rw"));
+        }
         assertEquals(Long.valueOf(13), listFile.getSizes().get(TEMP_FILE_TXT_NAME));
         assertTrue(listFile.getTypes().containsKey(TEMP_FILE_TMP_PATH));
         assertNotNull(listFile.getLastModifiedDates().get(TEMP_FILE_TMP_PATH));
@@ -753,7 +765,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
             Files.createParentDirs(srcTextFile);
             Files.write("some text ...".getBytes(), srcTextFile);
             // make the file not executable for everyone
-            srcTextFile.setExecutable(false, false);
+            checkExecutable = srcTextFile.setExecutable(false, false);
 
             File srcTempDir = new File(srcDir, TEMP_DIR_NAME);
             srcTempFile = new File(srcTempDir, TEMP_FILE_TMP_NAME);
