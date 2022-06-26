@@ -11,6 +11,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
         maven { url "http://nexus.qmino.com/content/repositories/miredot" }
+        maven { url "https://repo.jenkins-ci.org/releases/" }
     }
 
     dependencies {
