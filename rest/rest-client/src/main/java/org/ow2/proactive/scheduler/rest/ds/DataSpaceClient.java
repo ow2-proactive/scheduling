@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFileMetadata;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
 import com.google.common.base.Throwables;
@@ -291,6 +292,42 @@ public class DataSpaceClient implements IDataSpaceClient {
                 }
             }
             return response.readEntity(ListFile.class);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
+    @Override
+    public ListFileMetadata listMetadata(IRemoteSource source) throws NotConnectedException, PermissionException {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory)
+                                                           .httpEngine(httpEngine)
+                                                           .build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath()).queryParam("comp",
+                                                                                                       "list-metadata");
+
+        List<String> includes = source.getIncludes();
+        if (includes != null && !includes.isEmpty()) {
+            target = target.queryParam("includes", includes.toArray(new Object[includes.size()]));
+        }
+        List<String> excludes = source.getExcludes();
+        if (excludes != null && !excludes.isEmpty()) {
+            target = target.queryParam("excludes", excludes.toArray(new Object[excludes.size()]));
+        }
+        Response response = null;
+        try {
+            response = target.request().header("sessionid", sessionId).get();
+            if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+                if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new NotConnectedException("User not authenticated or session timeout.");
+                } else {
+                    throw new RuntimeException(String.format("Cannot list the specified location: %s",
+                                                             source.getPath()));
+                }
+            }
+            return response.readEntity(ListFileMetadata.class);
         } finally {
             if (response != null) {
                 response.close();

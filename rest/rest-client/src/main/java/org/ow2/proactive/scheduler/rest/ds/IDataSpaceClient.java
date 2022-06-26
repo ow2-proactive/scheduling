@@ -36,6 +36,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive_grid_cloud_portal.common.FileType;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFileMetadata;
 
 
 public interface IDataSpaceClient {
@@ -84,6 +85,18 @@ public interface IDataSpaceClient {
      *             the specified location in the server
      */
     ListFile list(IRemoteSource source) throws NotConnectedException, PermissionException;
+
+    /**
+     * Returns a {@link ListFileMetadata} type object which contains the names and metadata of files
+     * and directories in the specified location of the <i>dataspace</i>.
+     *
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    ListFileMetadata listMetadata(IRemoteSource source) throws NotConnectedException, PermissionException;
 
     /**
      * Deletes the specified directory or the file from the <i>dataspace</i>.
