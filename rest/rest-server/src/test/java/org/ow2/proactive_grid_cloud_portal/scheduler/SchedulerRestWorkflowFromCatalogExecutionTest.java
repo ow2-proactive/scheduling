@@ -34,7 +34,9 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -241,6 +243,71 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     public void testWhenValidatingATemplateWithoutValidSessionIdThenThrowException() throws Exception {
         String sessionId = "invalidSessionId";
         schedulerRest.validateFromUrl(sessionId, null, getEmptyPathSegment());
+    }
+
+    @Test
+    public void testWhenValidatingWithBodyAValidTemplateWithoutVariablesThenTheDefaultJobVariableIsUsed()
+            throws Exception {
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
+
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId,
+                                                                   workflowUrl,
+                                                                   new HashMap<>(),
+                                                                   getEmptyPathSegment());
+
+        Assert.assertEquals(1, response.getUpdatedVariables().size());
+        Assert.assertEquals("defaultvalue", response.getUpdatedVariables().get("var1"));
+    }
+
+    @Test
+    public void testWhenValidatingWithBodyAValidTemplateWithVariablesThenTheProvidedJobVariableIsUsed()
+            throws Exception {
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
+
+        Map<String, String> variables = new HashMap<>();
+        variables.put("var1", "value1");
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId,
+                                                                   workflowUrl,
+                                                                   variables,
+                                                                   getEmptyPathSegment());
+
+        Assert.assertEquals(1, response.getUpdatedVariables().size());
+        Assert.assertEquals("value1", response.getUpdatedVariables().get("var1"));
+    }
+
+    @Test
+    public void testWhenValidatingWithBodyACorruptWorkflowThenValidationContainsException() throws Exception {
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/corrupt";
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId,
+                                                                   workflowUrl,
+                                                                   new HashMap<>(),
+                                                                   getEmptyPathSegment());
+        checkInvalidResponse(response);
+    }
+
+    @Test
+    public void testWhenValidatingWithBodyUsingAnInvalidWorkflowUrlThenValidationContainsException() throws Exception {
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/nonexistent";
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId,
+                                                                   workflowUrl,
+                                                                   new HashMap<>(),
+                                                                   getEmptyPathSegment());
+        checkInvalidResponse(response);
+    }
+
+    @Test
+    public void testWhenValidatingWithBodyUsingANullWorkflowUrlThenValidationContainsException() throws Exception {
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId,
+                                                                   null,
+                                                                   new HashMap<>(),
+                                                                   getEmptyPathSegment());
+        checkInvalidResponse(response);
+    }
+
+    @Test(expected = NotConnectedRestException.class)
+    public void testWhenValidatingWithBodyATemplateWithoutValidSessionIdThenThrowException() throws Exception {
+        String sessionId = "invalidSessionId";
+        schedulerRest.validateFromUrl(sessionId, null, new HashMap<>(), getEmptyPathSegment());
     }
 
     private String getBaseUriTestWorkflowsServer() {
