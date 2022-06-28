@@ -165,7 +165,8 @@ public class ForkedProcessBuilderCreatorTest extends ProActiveTestClean {
         ForkEnvironmentScriptExecutor forkEnvironmentScriptExecutor = mock(ForkEnvironmentScriptExecutor.class);
         given(forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(any(TaskContext.class),
                                                                                        any(ScriptResult.class),
-                                                                                       any(String.class))).willReturn(Arrays.asList(forkEnJavaCommandString));
+                                                                                       any(String.class),
+                                                                                       any(OSProcessBuilder.class))).willReturn(Arrays.asList(forkEnJavaCommandString));
         given(taskContextVariableExtractor.extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(any(TaskContext.class))).willReturn(taskContextExtractedVariables);
         given(forkEnvironmentScriptExecutor.executeForkEnvironmentScript(any(TaskContext.class),
                                                                          any(PrintStream.class),

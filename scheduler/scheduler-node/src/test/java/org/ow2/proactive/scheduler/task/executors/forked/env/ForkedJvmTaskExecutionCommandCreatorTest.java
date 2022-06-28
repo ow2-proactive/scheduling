@@ -31,6 +31,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +43,13 @@ import org.junit.Test;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
+import org.objectweb.proactive.extensions.processbuilder.CoreBindingDescriptor;
+import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.objectweb.proactive.extensions.processbuilder.OSUser;
+import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
+import org.objectweb.proactive.extensions.processbuilder.exception.CoreBindingException;
+import org.objectweb.proactive.extensions.processbuilder.exception.FatalProcessBuilderException;
+import org.objectweb.proactive.extensions.processbuilder.exception.OSUserException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -95,7 +104,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
         ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
         List<String> containsJavaHome = forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(null,
                                                                                                                  null,
-                                                                                                                 null);
+                                                                                                                 null,
+                                                                                                                 (new PAOSProcessBuilderFactory(".")).getBuilder());
         assertThat(containsJavaHome.size(), is(0));
     }
 
@@ -204,7 +214,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
 
         List<String> containsJavaHome = forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(taskContext,
                                                                                                                  null,
-                                                                                                                 serializedContextAbsolutePath);
+                                                                                                                 serializedContextAbsolutePath,
+                                                                                                                 (new PAOSProcessBuilderFactory(".")).getBuilder());
 
         for (String insideJavaCommand : stringsContained) {
             if (contains) {

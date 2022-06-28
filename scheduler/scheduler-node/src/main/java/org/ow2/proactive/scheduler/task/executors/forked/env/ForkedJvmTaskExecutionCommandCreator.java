@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperty;
 import org.objectweb.proactive.core.config.PAPropertyString;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
+import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -50,6 +51,8 @@ import org.ow2.proactive.scheduler.task.executors.forked.env.command.JavaPrefixC
 import org.ow2.proactive.scripting.ForkEnvironmentScriptResult;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.OneJar;
+import org.ow2.proactive.utils.OperatingSystem;
+import org.ow2.proactive.utils.OperatingSystemFamily;
 
 import com.google.common.base.Strings;
 
@@ -81,7 +84,8 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
      *                   TaskContext.
      */
     public List<String> createForkedJvmTaskExecutionCommand(TaskContext taskContext,
-            ScriptResult forkEnvironmentScriptResult, String serializedContextAbsolutePath) throws Exception {
+            ScriptResult forkEnvironmentScriptResult, String serializedContextAbsolutePath,
+            OSProcessBuilder processBuilder) throws Exception {
         if (taskContext == null) {
             return new ArrayList<>(0);
         }
@@ -105,13 +109,15 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
             jvmArguments.add("-D" + DOCKER_FORK_WINDOWS2LINUX + "=true");
         }
 
-        configureLogging(jvmArguments, variables, isDockerWindowsToLinux);
+        configureLogging(jvmArguments, variables, isDockerWindowsToLinux, processBuilder);
 
         StringBuilder classpath = new StringBuilder("." + getPathSeparator(isDockerWindowsToLinux));
         if (!System.getProperty("java.class.path", "").contains("node.jar")) {
             // in case the class path of the node is not built with the node.jar, we
             // build the classpath with wildcards to avoid command too long errors on windows
-            String classPathEntries = getStandardClassPathEntries(variables).toString();
+            String classPathEntries = getStandardClassPathEntries(variables,
+                                                                  isDockerWindowsToLinux,
+                                                                  processBuilder).toString();
             classpath.append(convertToLinuxClassPathIfNeeded(isDockerWindowsToLinux, classPathEntries));
         }
 
@@ -162,8 +168,8 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
 
         List<String> javaCommand = new ArrayList<>(prefixes.size() + 3 + jvmArguments.size() + 2);
         javaCommand.addAll(prefixes);
-        javaCommand.add(javaHome +
-                        (isDockerWindowsToLinux ? JAVA_HOME_LINUX_JAVA_EXECUTABLE : JAVA_HOME_POSTFIX_JAVA_EXECUTABLE));
+        javaCommand.add(isDockerWindowsToLinux ? javaHome + JAVA_HOME_LINUX_JAVA_EXECUTABLE
+                                               : processBuilder.getShortPath(getJavaCommandPath(javaHome)));
 
         javaCommand.add("-cp");
         javaCommand.add(classpath.toString());
@@ -172,12 +178,20 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                                                                           : arg)
                                        .collect(Collectors.toList()));
         javaCommand.add(ExecuteForkedTaskInsideNewJvm.class.getName());
-        javaCommand.add(convertToLinuxPathIfNeeded(isDockerWindowsToLinux, serializedContextAbsolutePath));
+        javaCommand.add(convertToLinuxPathIfNeeded(isDockerWindowsToLinux,
+                                                   serializedContextAbsolutePath,
+                                                   processBuilder));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Forked JVM command : " + javaCommand);
         }
         return javaCommand;
+    }
+
+    private String getJavaCommandPath(String javaHome) {
+        return javaHome + JAVA_HOME_POSTFIX_JAVA_EXECUTABLE +
+               (OperatingSystem.resolveOrError(System.getProperty("os.name"))
+                               .getFamily() == OperatingSystemFamily.WINDOWS ? ".exe" : "");
     }
 
     private PAPropertyString createNodeSourceProperty() {
@@ -190,9 +204,10 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         return nodeSourceNameProperty;
     }
 
-    private String convertToLinuxPathIfNeeded(boolean isDockerWindowsToLinux, String serializedContextAbsolutePath) {
+    private String convertToLinuxPathIfNeeded(boolean isDockerWindowsToLinux, String serializedContextAbsolutePath,
+            OSProcessBuilder processBuilder) throws IOException {
         return isDockerWindowsToLinux ? ForkEnvironment.convertToLinuxPath(serializedContextAbsolutePath)
-                                      : serializedContextAbsolutePath;
+                                      : processBuilder.getShortPath(serializedContextAbsolutePath);
     }
 
     private String convertToLinuxClassPathIfNeeded(boolean isDockerWindowsToLinux, String classPathEntries) {
@@ -232,7 +247,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     }
 
     private void configureLogging(List<String> jvmArguments, Map<String, Serializable> variables,
-            boolean isDockerWindowsToLinux) {
+            boolean isDockerWindowsToLinux, OSProcessBuilder processBuilder) {
         String log4jFileUrl = null;
         String schedulerHome = getSchedulerHome(variables);
         String log4jConfig = schedulerHome + File.separator + "config" + File.separator + "log" + File.separator +
@@ -241,7 +256,8 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         if (new File(log4jConfig).exists()) {
             try {
                 String canonicalPath = new File(log4jConfig).getCanonicalPath();
-                log4jFileUrl = "file:" + (convertToLinuxPathIfNeeded(isDockerWindowsToLinux, canonicalPath));
+                log4jFileUrl = "file:" +
+                               (convertToLinuxPathIfNeeded(isDockerWindowsToLinux, canonicalPath, processBuilder));
             } catch (IOException e) {
                 logger.warn("Error when converting log4j path: " + log4jConfig, e);
             }
@@ -272,22 +288,25 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         return schedulerHome;
     }
 
-    private StringBuilder getStandardClassPathEntries(Map<String, Serializable> variables) throws IOException {
+    private StringBuilder getStandardClassPathEntries(Map<String, Serializable> variables,
+            boolean isDockerWindowsToLinux, OSProcessBuilder processBuilder) throws IOException {
         StringBuilder classpathEntries = new StringBuilder();
         String schedulerHome = getSchedulerHome(variables);
 
         if (schedulerHome != null) {
             File paHome = new File(schedulerHome).getCanonicalFile();
             File distLib = new File(paHome, "dist/lib").getCanonicalFile();
+            File distLibShort = getPathForCurrentOperatingSystem(isDockerWindowsToLinux, processBuilder, distLib);
             if (distLib.exists()) {
                 File addons = new File(paHome, "addons").getCanonicalFile();
-                classpathEntries.append(distLib);
+                File addonsShort = getPathForCurrentOperatingSystem(isDockerWindowsToLinux, processBuilder, addons);
+                classpathEntries.append(distLibShort);
                 classpathEntries.append(File.pathSeparatorChar);
-                classpathEntries.append(new File(distLib, "*"));
+                classpathEntries.append(new File(distLibShort, "*"));
                 classpathEntries.append(File.pathSeparatorChar);
-                classpathEntries.append(addons);
+                classpathEntries.append(addonsShort);
                 classpathEntries.append(File.pathSeparatorChar);
-                classpathEntries.append(new File(addons, "*"));
+                classpathEntries.append(new File(addonsShort, "*"));
             } else {
                 return getClassPathEntriesUsingJavaClassPath();
             }
@@ -297,6 +316,13 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
 
         return classpathEntries;
 
+    }
+
+    private File getPathForCurrentOperatingSystem(boolean isDockerWindowsToLinux, OSProcessBuilder processBuilder,
+            File folderPath) throws IOException {
+        // do not shorten the path if dockerWindowsToLinux is used
+        return new File(isDockerWindowsToLinux ? folderPath.getAbsolutePath()
+                                               : processBuilder.getShortPath(folderPath.getAbsolutePath()));
     }
 
     private StringBuilder getClassPathEntriesUsingJavaClassPath() {
