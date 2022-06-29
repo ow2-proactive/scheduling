@@ -82,7 +82,8 @@ public class ForkedProcessBuilderCreator implements Serializable {
         processBuilder.command()
                       .addAll(forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(context,
                                                                                                        forkEnvironmentScriptResult,
-                                                                                                       serializedContext.getAbsolutePath()));
+                                                                                                       serializedContext.getAbsolutePath(),
+                                                                                                       processBuilder));
 
         processBuilder = processBuilder.directory(workingDir);
         return processBuilder;
