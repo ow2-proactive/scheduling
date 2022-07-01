@@ -1701,9 +1701,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             // Get job variables from json body
             if (!MapUtils.isEmpty(jsonBody)) {
                 if (jobVariables != null) {
-                    jobVariables.putAll(jsonBody);
+                    jobVariables.putAll(workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
                 } else {
-                    jobVariables = jsonBody;
+                    jobVariables = workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody);
                 }
             }
 
@@ -2618,9 +2618,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 // Get job variables from json body
                 if (!MapUtils.isEmpty(jsonBody)) {
                     if (jobVariables != null) {
-                        jobVariables.putAll(jsonBody);
+                        jobVariables.putAll(workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
                     } else {
-                        jobVariables = jsonBody;
+                        jobVariables = workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody);
                     }
                 }
             }
