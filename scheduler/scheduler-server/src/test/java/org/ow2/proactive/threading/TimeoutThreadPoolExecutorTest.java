@@ -49,9 +49,9 @@ public class TimeoutThreadPoolExecutorTest extends ProActiveTestClean {
 
     @Before
     public void init() {
-        executor = TimeoutThreadPoolExecutor.newFixedThreadPool(1,
-                                                                new NamedThreadFactory("TestTimeoutThreadPoolExecutor",
-                                                                                       false));
+        executor = TimeoutThreadPoolExecutor.newCachedThreadPool(1,
+                                                                 new NamedThreadFactory("TestTimeoutThreadPoolExecutor",
+                                                                                        false));
     }
 
     @After

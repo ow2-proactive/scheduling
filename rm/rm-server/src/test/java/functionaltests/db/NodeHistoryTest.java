@@ -70,6 +70,8 @@ public class NodeHistoryTest {
         NodeHistory expected = createNodeHistory(1);
 
         dbManager.saveNodeHistory(expected);
+        // save node history is asynchronous
+        Thread.sleep(1000);
 
         List<?> rows = dbManager.executeSqlQuery("from NodeHistory");
         Assert.assertEquals(1, rows.size());
@@ -85,6 +87,8 @@ public class NodeHistoryTest {
         NodeHistory expected2 = createNodeHistory(2);
 
         dbManager.saveNodeHistory(expected2);
+        // save node history is asynchronous
+        Thread.sleep(1000);
 
         List<?> rows = dbManager.executeSqlQuery("from NodeHistory");
         Assert.assertEquals(2, rows.size());

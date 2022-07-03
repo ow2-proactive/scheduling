@@ -350,56 +350,46 @@ public abstract class SelectionManager {
 
         // the nodes are selected, now mark them as busy.
         int counter = 0;
+        int listCapacity = selectedNodes.size() +
+                           (selectedNodes.getExtraNodes() != null ? selectedNodes.getExtraNodes().size() : 0);
+        List<String> selectedNodesUrls = new ArrayList<>(listCapacity);
+        List<Map<String, String>> usageInfoList = new ArrayList<>(listCapacity);
         for (Node node : selectedNodes) {
-
-            try {
-
-                if (criteria.getListUsageInfo() != null) {
-                    if (criteria.getListUsageInfo().size() == 1) {
-                        // it is mutli node execution, which means we provide the same usage info for every node
-                        // Synchronous call
-                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
-                                           client,
-                                           criteria.getListUsageInfo().get(0));
-                    } else {
-                        // in this case, we have set of nodes, where will be set of compatible tasks
-                        // Synchronous call
-                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
-                                           client,
-                                           criteria.getListUsageInfo().get(counter));
-                    }
+            if (criteria.getListUsageInfo() != null) {
+                if (criteria.getListUsageInfo().size() == 1) {
+                    // it is mutli node execution, which means we provide the same usage info for every node
+                    selectedNodesUrls.add(node.getNodeInformation().getURL());
+                    usageInfoList.add(criteria.getListUsageInfo().get(0));
                 } else {
-                    // Synchronous call
-                    rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+                    // in this case, we have set of nodes, where will be set of compatible tasks
+                    selectedNodesUrls.add(node.getNodeInformation().getURL());
+                    usageInfoList.add(criteria.getListUsageInfo().get(counter));
                 }
-            } catch (NotConnectedException e) {
-                // client has disconnected during getNodes request
-                logger.warn(e.getMessage(), e);
-                return null;
+            } else {
+                selectedNodesUrls.add(node.getNodeInformation().getURL());
+                usageInfoList.add(Collections.EMPTY_MAP);
             }
             ++counter;
         }
         // marking extra selected nodes as busy
         if (selectedNodes.size() > 0 && selectedNodes.getExtraNodes() != null) {
             for (Node node : new LinkedList<>(selectedNodes.getExtraNodes())) {
-                try {
-
-                    if (criteria.getListUsageInfo() != null) {
-                        // synchronous call
-                        // here, we believe that it will be called only for multi node execution
-                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
-                                           client,
-                                           criteria.getListUsageInfo().get(0));
-                    } else {
-                        // synchronous call
-                        rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
-                    }
-                } catch (NotConnectedException e) {
-                    // client has disconnected during getNodes request
-                    logger.warn(e.getMessage(), e);
-                    return null;
+                if (criteria.getListUsageInfo() != null) {
+                    // here, we believe that it will be called only for multi node execution
+                    selectedNodesUrls.add(node.getNodeInformation().getURL());
+                    usageInfoList.add(criteria.getListUsageInfo().get(0));
+                } else {
+                    selectedNodesUrls.add(node.getNodeInformation().getURL());
+                    usageInfoList.add(Collections.EMPTY_MAP);
                 }
             }
+        }
+        try {
+            rmcore.setBusyNodes(selectedNodesUrls, client, usageInfoList);
+        } catch (NotConnectedException e) {
+            // client has disconnected during getNodes request
+            logger.warn(e.getMessage(), e);
+            return null;
         }
 
         if (logger.isInfoEnabled()) {

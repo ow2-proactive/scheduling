@@ -375,4 +375,6 @@ public interface RMNode extends Comparable<RMNode> {
     Set<String> getNodeTags();
 
     void setNodeTags(Set<String> tags);
+
+    void setStateChangeTime(long time);
 }

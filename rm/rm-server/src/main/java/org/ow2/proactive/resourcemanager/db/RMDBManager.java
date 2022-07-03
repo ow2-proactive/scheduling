@@ -29,14 +29,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
@@ -49,6 +45,7 @@ import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.db.TransactionHelper;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.core.history.Alive;
 import org.ow2.proactive.resourcemanager.core.history.LockHistory;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
@@ -56,6 +53,7 @@ import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import it.sauronsoftware.cron4j.Scheduler;
@@ -73,6 +71,8 @@ public class RMDBManager {
 
     private static final String PROP_HIBERNATE_CONNECTION_PASSWORD = "hibernate.connection.password";
 
+    public static final int MAX_ITEMS_IN_LIST = PAResourceManagerProperties.RM_DB_ITEMS_MAX_SIZE.getValueAsInt();
+
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
@@ -80,6 +80,8 @@ public class RMDBManager {
     private final RMDBManagerBuffer rmdbManagerBuffer;
 
     private Scheduler houseKeepingScheduler;
+
+    private Executor backgroundOperations = Executors.newSingleThreadExecutor();
 
     private static final class LazyHolder {
 
@@ -402,6 +404,41 @@ public class RMDBManager {
         rmdbManagerBuffer.addCreateNodeToPendingDatabaseOperations(rmNodeData, nodeSourceName);
     }
 
+    public void changeNodesState(List<RMNodeData> nodesList, Map<String, String> nodeSourceNameMap,
+            final NodeState nodeState, final long stateChangeTime) {
+        if (nodeRecoveryDisabled()) {
+            return;
+        }
+        Map<Boolean, List<RMNodeData>> syncAndAsyncNodesList = nodesList.stream()
+                                                                        .collect(Collectors.partitioningBy(rmNodeData -> rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNode(rmNodeData)));
+        if (syncAndAsyncNodesList.get(true) != null) {
+            final List<String> syncNodesUrlList = syncAndAsyncNodesList.get(true)
+                                                                       .stream()
+                                                                       .map(rmNodeData -> rmNodeData.getNodeUrl())
+                                                                       .collect(Collectors.toList());
+
+            List<List<String>> partitions = Lists.partition(syncNodesUrlList, MAX_ITEMS_IN_LIST);
+
+            partitions.forEach(nodeUrlList -> {
+                executeReadWriteTransaction((SessionWork<Void>) session -> {
+                    session.getNamedQuery("updateMultipleRMNodeStatus")
+                           .setParameter("nodeState", nodeState)
+                           .setParameter("stateChangeTime", stateChangeTime)
+                           .setParameterList("nodeUrls", nodeUrlList)
+                           .executeUpdate();
+                    return null;
+                });
+            });
+        }
+
+        if (syncAndAsyncNodesList.get(false) != null) {
+            syncAndAsyncNodesList.get(false)
+                                 .forEach(rmNodeData -> rmdbManagerBuffer.addUpdateNodeToPendingDatabaseOperations(rmNodeData,
+                                                                                                                   nodeSourceNameMap.get(rmNodeData.getNodeUrl())));
+        }
+
+    }
+
     public void updateNode(final RMNodeData rmNodeData, final String nodeSourceName) {
         if (nodeRecoveryDisabled()) {
             return;
@@ -583,27 +620,27 @@ public class RMDBManager {
     }
 
     public void saveUserHistory(final UserHistory history) {
-        executeReadWriteTransaction(new SessionWork<Void>() {
+        backgroundOperations.execute(() -> executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
                 session.save(history);
                 return null;
             }
-        });
+        }));
     }
 
     public void updateUserHistory(final UserHistory history) {
-        executeReadWriteTransaction(new SessionWork<Void>() {
+        backgroundOperations.execute(() -> executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
                 session.update(history);
                 return null;
             }
-        });
+        }));
     }
 
     public void saveNodeHistory(final NodeHistory nodeHistory) {
-        executeReadWriteTransaction(new SessionWork<Void>() {
+        backgroundOperations.execute(() -> executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
                 session.createSQLQuery("update NodeHistory set endTime=:endTime where nodeUrl=:nodeUrl and endTime=0")
@@ -616,7 +653,7 @@ public class RMDBManager {
                 }
                 return null;
             }
-        });
+        }));
     }
 
     public void deleteOldNodeHistory() {

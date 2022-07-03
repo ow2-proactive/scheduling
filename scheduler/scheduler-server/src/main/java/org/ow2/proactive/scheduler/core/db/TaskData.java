@@ -102,7 +102,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteTaskDataInBulk", query = "delete from TaskData where id.jobId in :jobIdList"),
+@NamedQueries({ @NamedQuery(name = "deleteTaskDataInBulk", query = "delete from TaskData where id.jobId in (:jobIdList)"),
                 @NamedQuery(name = "countTaskData", query = "select count (*) from TaskData"),
                 @NamedQuery(name = "countTaskDataOwnerNull", query = "select count (*) from TaskData where owner is null"),
                 @NamedQuery(name = "setOwnerInTaskDataIfNull", query = "update TaskData task set task.owner = (select job.owner from JobData job where job.id = task.id.jobId)"),
@@ -158,9 +158,9 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                                      "where task.id.jobId = :jobId " +
                                                                      "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.IN_ERROR "),
                 @NamedQuery(name = "updateTaskDataJobScripts", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
-                                                                       "cleanScript = null  where id.jobId in :ids"),
+                                                                       "cleanScript = null  where id.jobId in (:ids)"),
                 @NamedQuery(name = "updateTaskDataJobScriptsInBulk", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
-                                                                             "cleanScript = null  where id.jobId in :jobIdList"),
+                                                                             "cleanScript = null  where id.jobId in (:jobIdList)"),
                 @NamedQuery(name = "updateTaskDataStatusToPending", query = "update TaskData task set task.taskStatus = :taskStatus " +
                                                                             "where task.jobData = :job"),
                 @NamedQuery(name = "updateTaskDataTaskRestarted", query = "update TaskData set taskStatus = :taskStatus, " +

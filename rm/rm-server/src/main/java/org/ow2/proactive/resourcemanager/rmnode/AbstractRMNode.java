@@ -374,4 +374,9 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
     public void setUsageInfo(Map<String, String> usageInfo) {
         this.usageInfo = usageInfo;
     }
+
+    @Override
+    public void setStateChangeTime(long time) {
+        this.stateChangeTime = time;
+    }
 }

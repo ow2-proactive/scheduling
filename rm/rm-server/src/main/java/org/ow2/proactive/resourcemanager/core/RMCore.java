@@ -127,6 +127,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.rmnode.ThreadDumpNotAccessibleException;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
@@ -2266,6 +2267,74 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                              previousNodeState,
                                                              owner.getName()));
 
+    }
+
+    /**
+     * Set a list of nodes state to busy. Set the nodes to busy, and move the nodes to the
+     * internal busy nodes list. An event informing the node state's change is
+     * thrown to RMMonitoring.
+     *
+     * @param owner
+     * @param nodeUrlList list of node to mark as busy
+     */
+    public void setBusyNodes(final List<String> nodeUrlList, Client owner, List<Map<String, String>> usageInfoList)
+            throws NotConnectedException {
+
+        if (!clients.containsKey(owner.getId()) && owner != localClient) {
+            logger.warn("" + nodeUrlList + " cannot set busy as the client disconnected " + owner);
+            throw new NotConnectedException("Client " + owner + " is not connected to the resource manager");
+        }
+
+        if (nodeUrlList.size() != usageInfoList.size()) {
+            throw new IllegalArgumentException("nodeUrlList (" + nodeUrlList.size() + ") and usageInfoList (" +
+                                               usageInfoList.size() + ") size mismatch");
+        }
+
+        long setBusyTime = System.currentTimeMillis();
+
+        List<RMNode> rmNodeList = new ArrayList<>(nodeUrlList.size());
+        List<RMNodeData> rmNodeDataList = new ArrayList<>(nodeUrlList.size());
+        Map<String, String> nodeSourceNameMap = new HashMap<>(nodeUrlList.size());
+        List<NodeState> previousNodeStateList = new ArrayList<>(nodeUrlList.size());
+
+        for (int i = 0; i < nodeUrlList.size(); i++) {
+            String nodeUrl = nodeUrlList.get(i);
+            Map<String, String> usageInfo = usageInfoList.get(i);
+
+            final RMNode rmNode = this.allNodes.get(nodeUrl);
+            if (rmNode == null) {
+                logger.warn("setBusyNodes: unknown node " + nodeUrl);
+                continue;
+            }
+
+            // If the node is already busy no need to go further
+            if (rmNode.isBusy()) {
+                continue;
+            }
+            // Get the previous state of the node needed for the event
+            final NodeState previousNodeState = rmNode.getState();
+            rmNode.setBusy(owner, usageInfo);
+            rmNode.setStateChangeTime(setBusyTime);
+
+            this.eligibleNodes.remove(rmNode);
+            if (nodesRecoveryEnabledForNode(rmNode)) {
+                RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+                rmNodeDataList.add(rmNodeData);
+            }
+
+            rmNodeList.add(rmNode);
+            nodeSourceNameMap.put(rmNode.getNodeURL(), rmNode.getNodeSourceName());
+            previousNodeStateList.add(previousNodeState);
+        }
+
+        dbManager.changeNodesState(rmNodeDataList, nodeSourceNameMap, NodeState.BUSY, setBusyTime);
+        for (int i = 0; i < nodeUrlList.size(); i++) {
+            RMNode rmNode = rmNodeList.get(i);
+            NodeState previousNodeState = previousNodeStateList.get(i);
+            this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                                 previousNodeState,
+                                                                 owner.getName()));
+        }
     }
 
     /**

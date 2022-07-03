@@ -26,14 +26,7 @@
 package org.ow2.proactive.threading;
 
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 
 public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
@@ -45,13 +38,31 @@ public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
     }
 
-    public static TimeoutThreadPoolExecutor newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
-        return new TimeoutThreadPoolExecutor(nThreads,
-                                             nThreads,
-                                             0L,
-                                             TimeUnit.MILLISECONDS,
-                                             new LinkedBlockingQueue<Runnable>(),
-                                             threadFactory);
+    public static TimeoutThreadPoolExecutor newCachedThreadPool(int nThreads, ThreadFactory threadFactory) {
+
+        BlockingQueue<Runnable> queue = new LinkedTransferQueue<Runnable>() {
+            @Override
+            public boolean offer(Runnable e) {
+                return tryTransfer(e);
+            }
+        };
+        TimeoutThreadPoolExecutor threadPool = new TimeoutThreadPoolExecutor(0,
+                                                                             nThreads,
+                                                                             120L,
+                                                                             TimeUnit.SECONDS,
+                                                                             queue,
+                                                                             threadFactory);
+        threadPool.setRejectedExecutionHandler(new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                try {
+                    executor.getQueue().put(r);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+        return threadPool;
     }
 
     public <T> Future<T> submitWithTimeout(final CallableWithTimeoutAction<T> callable, long timeout, TimeUnit unit) {

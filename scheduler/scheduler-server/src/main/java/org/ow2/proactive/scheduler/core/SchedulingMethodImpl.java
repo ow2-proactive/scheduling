@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Level;
@@ -116,6 +116,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private TaskTerminateNotification terminateNotification;
 
+    private String terminateNotificationNodeURL;
+
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
     private MultipleTimingLogger schedulingMainLoopTimingLogger;
@@ -137,10 +139,14 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                           TaskTerminateNotification.class.getName(),
                                                           terminateNotificationNode);
 
-        this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
-                                                                       new NamedThreadFactory("DoTask_Action",
-                                                                                              true,
-                                                                                              7));
+        terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
+                                                     .getNodeInformation()
+                                                     .getURL();
+
+        this.threadPool = TimeoutThreadPoolExecutor.newCachedThreadPool(PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
+                                                                        new NamedThreadFactory("DoTask_Action",
+                                                                                               true,
+                                                                                               7));
         this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
     }
 
@@ -173,6 +179,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     public int schedule() {
         schedulingMainLoopTimingLogger = new MultipleTimingLogger("SchedulingMainLoopTiming", logger);
 
+        schedulingMainLoopTimingLogger.start("schedule");
+
         Policy currentPolicy = schedulingService.getPolicy();
         currentPolicy.setSchedulingService(schedulingService);
 
@@ -194,6 +202,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         int tasksStarted = startTasks(currentPolicy, jobMap, toUnlock);
+        schedulingMainLoopTimingLogger.end("schedule");
 
         if (tasksStarted > 0) {
             schedulingMainLoopTimingLogger.printTimings(Level.INFO);
@@ -358,14 +367,14 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
             int neededResourcesNumber = 0;
 
-            schedulingMainLoopTimingLogger.start("getNextcompatibleTasks");
+            schedulingMainLoopTimingLogger.start("getNextCompatibleTasks");
 
             while (!tasksRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
                 //the loop will search for next compatible task until it find something
                 neededResourcesNumber = getNextcompatibleTasks(jobMap, tasksRetrievedFromPolicy, tasksToSchedule);
             }
 
-            schedulingMainLoopTimingLogger.end("getNextcompatibleTasks");
+            schedulingMainLoopTimingLogger.end("getNextCompatibleTasks");
 
             if (logger.isDebugEnabled()) {
                 logger.debug("tasksToSchedule : " + tasksToSchedule);
@@ -387,86 +396,171 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             Map<String, Boolean> recoverableStatus = getRMProxiesManager().getRmProxy().areNodesRecoverable(nodeSet);
 
             //start selected tasks
-            Node node = null;
-            InternalJob currentJob = null;
-            try {
-                String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
-                                                                    .getNodeInformation()
-                                                                    .getURL();
-                while (nodeSet != null && !nodeSet.isEmpty()) {
-                    EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                    currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
-                    InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
+            schedulingMainLoopTimingLogger.start("createExecutions");
+            List<CreateExecutionInfo> executionFutures = new ArrayList<>();
+            while (nodeSet != null && !nodeSet.isEmpty()) {
+                EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
+                InternalJob currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
+                InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
 
-                    if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
-                        //create launcher and try to start the task
-                        node = nodeSet.get(0);
-
-                        schedulingMainLoopTimingLogger.start("createExecution");
-
-                        if (createExecution(nodeSet,
-                                            node,
-                                            currentJob,
-                                            internalTask,
-                                            taskDescriptor,
-                                            recoverableStatus,
-                                            terminateNotificationNodeURL)) {
-                            neededNodes -= taskDescriptor.getNumberOfNodesNeeded();
-                            numberOfTaskStarted++;
+                if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
+                    //create launcher and try to start the task
+                    if (nodeSet.size() >= internalTask.getNumberOfNodesNeeded() &&
+                        (internalTask.getStatus() != TaskStatus.PAUSED)) {
+                        Node node = nodeSet.remove(0);
+                        NodeSet taskExtraNodes;
+                        if (internalTask.isParallel()) {
+                            taskExtraNodes = new NodeSet(nodeSet);
+                            nodeSet.clear();
+                        } else {
+                            taskExtraNodes = new NodeSet();
                         }
-                        schedulingMainLoopTimingLogger.end("createExecution");
+                        final Node finalNode = node;
+                        final InternalJob finalJob = currentJob;
+                        final NodeSet allNodes = new NodeSet(taskExtraNodes);
+                        allNodes.add(node);
 
+                        executionFutures.add(new CreateExecutionInfo(threadPool.submit(() -> createExecution(taskExtraNodes,
+                                                                                                             finalNode,
+                                                                                                             finalJob,
+                                                                                                             internalTask,
+                                                                                                             taskDescriptor,
+                                                                                                             recoverableStatus,
+                                                                                                             terminateNotificationNodeURL)),
+                                                                     currentJob,
+                                                                     internalTask,
+                                                                     taskDescriptor,
+                                                                     allNodes));
                     }
 
-                    //if every task that should be launched have been removed
-                    if (tasksToSchedule.isEmpty()) {
-                        //get back unused nodes to the RManager
-                        if (!nodeSet.isEmpty()) {
-                            schedulingMainLoopTimingLogger.start("releaseNodes");
+                }
+
+                //if every task that should be launched have been removed
+                if (tasksToSchedule.isEmpty()) {
+                    //get back unused nodes to the RManager
+                    if (!nodeSet.isEmpty()) {
+                        schedulingMainLoopTimingLogger.start("releaseNodes");
+                        try {
                             releaseNodes(currentJob, nodeSet);
                             if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
                                 freeResources.addAll(nodeSet.getAllNodesUrls());
                             }
-                            schedulingMainLoopTimingLogger.end("releaseNodes");
+                        } catch (Exception e) {
+                            logger.warn("Unable to get back the nodeSet to the RM", e);
                         }
-                        //and leave the loop
-                        break;
+
+                        schedulingMainLoopTimingLogger.end("releaseNodes");
                     }
-                }
-            } catch (ActiveObjectCreationException e1) {
-                //Something goes wrong with the active object creation (createLauncher)
-                logger.warn("An exception occured while creating the task launcher.", e1);
-                //so try to get back every remaining nodes to the resource manager
-                try {
-                    releaseNodes(currentJob, nodeSet);
-                    if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
-                        freeResources.addAll(nodeSet.getAllNodesUrls());
-                    }
-                } catch (Exception e2) {
-                    logger.info("Unable to get back the nodeSet to the RM", e2);
-                }
-                if (--activeObjectCreationRetryTimeNumber == 0) {
+                    //and leave the loop
                     break;
                 }
-            } catch (Exception e1) {
-                //if we are here, it is that something append while launching the current task.
-                logger.warn("An exception occured while starting task.", e1);
-                //so try to get back every remaining nodes to the resource manager
+            }
+
+            for (CreateExecutionInfo executionInfo : executionFutures) {
                 try {
-                    releaseNodes(currentJob, nodeSet);
-                    if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
-                        freeResources.addAll(nodeSet.getAllNodesUrls());
+                    if (executionInfo.get()) {
+                        neededNodes -= executionInfo.getTaskDescriptor().getNumberOfNodesNeeded();
+                        numberOfTaskStarted++;
+                    } else {
+                        releaseNodes(freeResources, executionInfo);
                     }
-                } catch (Exception e2) {
-                    logger.info("Unable to get back the nodeSet to the RM", e2);
+                } catch (Exception e) {
+                    //if we are here, it is that something happened while launching the current task.
+                    logger.warn(String.format("An error occurred while starting task id=%s name=%s",
+                                              executionInfo.getTask().getId(),
+                                              executionInfo.getTask().getName()),
+                                e);
+                    //so try to get back every nodes used by the task to the resource manager
+                    releaseNodes(freeResources, executionInfo);
                 }
             }
+            schedulingMainLoopTimingLogger.end("createExecutions");
+
         }
 
         // number of nodes needed to start all pending tasks
         updateNeededNodes(neededNodes);
 
         return numberOfTaskStarted;
+    }
+
+    private void releaseNodes(Set<String> freeResources, CreateExecutionInfo executionInfo) {
+        try {
+            releaseNodes(executionInfo.getJob(), executionInfo.getNodes());
+            if (PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean()) {
+                freeResources.addAll(executionInfo.getNodes().getAllNodesUrls());
+            }
+        } catch (Exception e2) {
+            logger.warn("Unable to get back the nodeSet to the RM", e2);
+        }
+    }
+
+    public static class CreateExecutionInfo implements Future<Boolean> {
+
+        private Future<Boolean> executionCreated;
+
+        private InternalJob job;
+
+        private InternalTask task;
+
+        private TaskDescriptor taskDescriptor;
+
+        private NodeSet nodes;
+
+        public CreateExecutionInfo(Future<Boolean> executionCreated, InternalJob job, InternalTask task,
+                TaskDescriptor taskDescriptor, NodeSet nodes) {
+            this.executionCreated = executionCreated;
+            this.job = job;
+            this.task = task;
+            this.taskDescriptor = taskDescriptor;
+            this.nodes = nodes;
+        }
+
+        public Future<Boolean> getExecutionCreated() {
+            return executionCreated;
+        }
+
+        public InternalJob getJob() {
+            return job;
+        }
+
+        public InternalTask getTask() {
+            return task;
+        }
+
+        public TaskDescriptor getTaskDescriptor() {
+            return taskDescriptor;
+        }
+
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return executionCreated.cancel(mayInterruptIfRunning);
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return executionCreated.isCancelled();
+        }
+
+        @Override
+        public boolean isDone() {
+            return executionCreated.isDone();
+        }
+
+        @Override
+        public Boolean get() throws InterruptedException, ExecutionException {
+            return executionCreated.get();
+        }
+
+        @Override
+        public Boolean get(long timeout, TimeUnit unit)
+                throws InterruptedException, ExecutionException, TimeoutException {
+            return executionCreated.get(timeout, unit);
+        }
+
+        public NodeSet getNodes() {
+            return nodes;
+        }
     }
 
     private void loggingEligibleTasksDetails(LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy) {
@@ -775,144 +869,140 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /**
      * Create launcher and try to start the task.
      *
-     * @param nodeSet the node set containing every available nodes that can be used for execution
+     * @param extraNodes the node set containing nodes used by this task execution
      * @param node the node on which to start the task
      * @param job the job that owns the task to be started
      * @param task the task to be started
      * @param taskDescriptor the descriptor of the task to be started
      *
      */
-    protected boolean createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
+    protected boolean createExecution(NodeSet extraNodes, Node node, InternalJob job, InternalTask task,
             TaskDescriptor taskDescriptor, Map<String, Boolean> recoverableStatus, String terminateNotificationNodeURL)
             throws Exception {
         TaskLauncher launcher = null;
         LiveJobs.JobData jobData = null;
-        try {
-            schedulingMainLoopTimingLogger.start("jobLockAcquisition");
-            jobData = schedulingService.lockJob(job.getId());
-            schedulingMainLoopTimingLogger.end("jobLockAcquisition");
-            //enough nodes to be launched at same time for a communicating task
-            // task is not paused
-            if (nodeSet.size() >= task.getNumberOfNodesNeeded() && (task.getStatus() != TaskStatus.PAUSED) &&
-                (jobData != null)) {
+        String taskLauncherNodeUrl = null;
 
+        String sessionid = getSessionid(job);
+
+        jobData = schedulingService.lockJob(job.getId());
+        if (jobData != null) {
+            try {
+                //start dataspace app for this task
                 schedulingMainLoopTimingLogger.start("startDataspaceApp");
-                //start dataspace app for this job
                 DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure().getDataSpaceServiceStarter();
                 job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
                 job.setSynchronizationAPI(schedulingService.getSynchronizationAPI());
                 schedulingMainLoopTimingLogger.end("startDataspaceApp");
-                NodeSet nodes = new NodeSet();
-                String sessionid = getSessionid(job);
-                String taskLauncherNodeUrl = null;
-                Set<String> nodesUrls = new HashSet<>();
-                try {
-
-                    // create launcher
-                    schedulingMainLoopTimingLogger.start("createLauncher");
-
-                    launcher = task.createLauncher(node, sessionid);
-                    try {
-                        taskLauncherNodeUrl = PAActiveObject.getUrl(launcher);
-                    } catch (Exception e) {
-                        logger.warn("TaskLauncher node URL could not be retrieved for task " +
-                                    TaskIdWrapper.wrap(task.getId()), e);
-                    }
-
-                    schedulingMainLoopTimingLogger.end("createLauncher");
-
-                    activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-
-                    Node mainNode = nodeSet.remove(0);
-                    nodesUrls.add(mainNode.getNodeInformation().getURL());
-
-                    //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
-                    // we will need to update this code once topology will be allowed for single-node task
-                    if (task.isParallel()) {
-                        nodes = new NodeSet(nodeSet);
-                        task.getExecuterInformation().addNodes(nodes);
-                        nodeSet.clear();
-                        for (Node parallelNode : nodes) {
-                            nodesUrls.add(parallelNode.getNodeInformation().getURL());
-                        }
-                    }
-
-                    //set nodes in the executable container
-                    task.getExecutableContainer().setNodes(nodes);
-
-                    tlogger.debug(task.getId(), "deploying");
-
-                    // Dynamically adjust the start-task-timeout according to the number dependency tasks in a merge.
-                    // above 500 parent tasks, it is worth adjusting.
-                    if (taskDescriptor.getParents().size() > 500) {
-                        dotaskActionTimeout = (int) (taskDescriptor.getParents().size() / 500.0 *
-                                                     PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt());
-                    } else {
-                        // reset the dotaskActionTimeout to its default value otherwise.
-                        dotaskActionTimeout = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
-                    }
-
-                    schedulingMainLoopTimingLogger.start("areNodesRecoverable");
-                    boolean taskRecoverable = nodesUrls.stream().allMatch(nodeUrl -> recoverableStatus.get(nodeUrl));
-                    schedulingMainLoopTimingLogger.end("areNodesRecoverable");
-
-                    TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL,
-                                                                             taskRecoverable);
-
-                    schedulingMainLoopTimingLogger.start("submitWithTimeout");
-
-                    threadPool.submitWithTimeout(new TimedDoTaskAction(job,
-                                                                       taskDescriptor,
-                                                                       launcher,
-                                                                       schedulingService,
-                                                                       terminateNotification,
-                                                                       corePrivateKey,
-                                                                       taskRecoveryData,
-                                                                       sessionid),
-
-                                                 dotaskActionTimeout,
-                                                 TimeUnit.MILLISECONDS);
-
-                    schedulingMainLoopTimingLogger.end("submitWithTimeout");
-
-                    // we advertise here that the task is started, however
-                    // this is not entirely true: the only thing we are sure
-                    // about at this point is that we submitted to the thread
-                    // pool the action that will call the "doTask" of the task
-                    // launcher. There is thus a small gap here where the task
-                    // is seen as started whereas it is not yet started. We
-                    // cannot easily move the task started notification because
-                    // 1) it makes the job lock acquisition less predictable
-                    // (because the TimeDoTaskAction will have to compete with
-                    // the SchedulingMethodImpl)
-                    // and more importantly 2) the
-                    // SchedulingMethodImpl#createExecution may happen to be
-                    // called a second time for the task that is currently being
-                    // started by the TimedDoTaskAction.
-                    schedulingMainLoopTimingLogger.start("finalizeStarting");
-                    finalizeStarting(job, task, node, launcher, taskLauncherNodeUrl);
-                    schedulingMainLoopTimingLogger.end("finalizeStarting");
-                    return true;
-                } catch (Exception t) {
-                    try {
-                        //if there was a problem, free nodeSet for multi-nodes task
-                        nodes.add(node);
-                        releaseNodes(job, nodes);
-                    } catch (Throwable ni) {
-                        //miam miam
-                    }
-                    throw t;
-                }
-
-            } else {
-                return false;
-            }
-        } finally {
-            if (jobData != null) {
+            } finally {
                 jobData.unlock();
             }
         }
 
+        if (jobData != null) {
+            // create launcher
+            schedulingMainLoopTimingLogger.start("createLauncher");
+            launcher = task.createLauncher(node, sessionid);
+            try {
+                taskLauncherNodeUrl = PAActiveObject.getUrl(launcher);
+            } catch (Exception e) {
+                logger.warn("TaskLauncher node URL could not be retrieved for task " + TaskIdWrapper.wrap(task.getId()),
+                            e);
+            }
+            schedulingMainLoopTimingLogger.end("createLauncher");
+        }
+
+        schedulingMainLoopTimingLogger.start("jobLockAcquisition");
+        jobData = schedulingService.lockJob(job.getId());
+        schedulingMainLoopTimingLogger.end("jobLockAcquisition");
+        if (jobData != null) {
+            try {
+                Set<String> nodesUrls = new HashSet<>();
+
+                activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
+
+                nodesUrls.add(node.getNodeInformation().getURL());
+
+                //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
+                // we will need to update this code once topology will be allowed for single-node task
+                if (task.isParallel()) {
+                    task.getExecuterInformation().addNodes(extraNodes);
+                    for (Node parallelNode : extraNodes) {
+                        nodesUrls.add(parallelNode.getNodeInformation().getURL());
+                    }
+                }
+
+                //set nodes in the executable container
+                task.getExecutableContainer().setNodes(extraNodes);
+
+                tlogger.debug(task.getId(), "deploying");
+
+                // Dynamically adjust the start-task-timeout according to the number dependency tasks in a merge.
+                // above 500 parent tasks, it is worth adjusting.
+                if (taskDescriptor.getParents().size() > 500) {
+                    dotaskActionTimeout = (int) (taskDescriptor.getParents().size() / 500.0 *
+                                                 PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt());
+                } else {
+                    // reset the dotaskActionTimeout to its default value otherwise.
+                    dotaskActionTimeout = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
+                }
+
+                schedulingMainLoopTimingLogger.start("areNodesRecoverable");
+                boolean taskRecoverable = nodesUrls.stream().allMatch(nodeUrl -> recoverableStatus.get(nodeUrl));
+                schedulingMainLoopTimingLogger.end("areNodesRecoverable");
+
+                TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL, taskRecoverable);
+
+                schedulingMainLoopTimingLogger.start("submitWithTimeout");
+
+                threadPool.submitWithTimeout(new TimedDoTaskAction(job,
+                                                                   taskDescriptor,
+                                                                   launcher,
+                                                                   schedulingService,
+                                                                   terminateNotification,
+                                                                   corePrivateKey,
+                                                                   taskRecoveryData,
+                                                                   sessionid),
+
+                                             dotaskActionTimeout,
+                                             TimeUnit.MILLISECONDS);
+
+                schedulingMainLoopTimingLogger.end("submitWithTimeout");
+
+                // we advertise here that the task is started, however
+                // this is not entirely true: the only thing we are sure
+                // about at this point is that we submitted to the thread
+                // pool the action that will call the "doTask" of the task
+                // launcher. There is thus a small gap here where the task
+                // is seen as started whereas it is not yet started. We
+                // cannot easily move the task started notification because
+                // 1) it makes the job lock acquisition less predictable
+                // (because the TimeDoTaskAction will have to compete with
+                // the SchedulingMethodImpl)
+                // and more importantly 2) the
+                // SchedulingMethodImpl#createExecution may happen to be
+                // called a second time for the task that is currently being
+                // started by the TimedDoTaskAction.
+                schedulingMainLoopTimingLogger.start("finalizeStarting");
+                finalizeStarting(job, task, node, launcher, taskLauncherNodeUrl);
+                schedulingMainLoopTimingLogger.end("finalizeStarting");
+                return true;
+            } finally {
+                if (jobData != null) {
+                    jobData.unlock();
+                }
+            }
+
+        } else {
+            if (launcher != null) {
+                try {
+                    PAActiveObject.terminateActiveObject(launcher, true);
+                } catch (Exception ignored) {
+
+                }
+            }
+            return false;
+        }
     }
 
     public synchronized String getSessionid(InternalJob job) {
