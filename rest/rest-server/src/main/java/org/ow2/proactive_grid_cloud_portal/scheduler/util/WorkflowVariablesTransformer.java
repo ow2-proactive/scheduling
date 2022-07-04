@@ -26,6 +26,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler.util;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
@@ -48,6 +49,15 @@ public class WorkflowVariablesTransformer {
             }
         }
         return variables;
+    }
+
+    public Map<String, String> replaceNullValuesWithEmptyString(Map<String, String> map) {
+        map = map.entrySet().stream().peek(entry -> {
+            if (entry.getValue() == null)
+                entry.setValue("");
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return map;
     }
 
 }
