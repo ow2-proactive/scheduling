@@ -320,6 +320,8 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      */
     RM_NODES_DB_SYNCHRONOUS_UPDATES("pa.rm.nodes.db.operations.update.synchronous", PropertyType.BOOLEAN, "true"),
 
+    RM_DB_ITEMS_MAX_SIZE("pa.rm.db.items.max.size", PropertyType.INTEGER, "1000"),
+
     /**
      * Defines whether all the resources of the deployed cloud instances
      * should be destroyed along with the nodes termination when the scheduler 
@@ -345,7 +347,7 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /**
      * Defines the buffer size used in asynchronous appenders
      */
-    LOG4J_ASYNC_APPENDER_BUFFER_SIZE("pa.log4j.async.appender.buffer.size", PropertyType.INTEGER, "10000"),
+    LOG4J_ASYNC_APPENDER_BUFFER_SIZE("pa.log4j.async.appender.buffer.size", PropertyType.INTEGER, "50000"),
 
     /**
      * Defines the AsynchFileAppender flush timeout

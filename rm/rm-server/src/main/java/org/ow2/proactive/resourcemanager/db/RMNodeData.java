@@ -51,7 +51,8 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
                 @NamedQuery(name = "deleteAllRMNodeDataFromNodeSource", query = "delete from RMNodeData where nodeSource.name=:name"),
                 @NamedQuery(name = "getAllRMNodeData", query = "from RMNodeData"),
                 @NamedQuery(name = "getRMNodeDataByNameAndUrl", query = "from RMNodeData where name=:name and nodeUrl=:url"),
-                @NamedQuery(name = "getRMNodeDataByNodeSource", query = "from RMNodeData where nodeSource.name=:name") })
+                @NamedQuery(name = "getRMNodeDataByNodeSource", query = "from RMNodeData where nodeSource.name=:name"),
+                @NamedQuery(name = "updateMultipleRMNodeStatus", query = "update RMNodeData node set node.state = :nodeState, node.stateChangeTime = :stateChangeTime where node.nodeUrl in (:nodeUrls)") })
 @Table(name = "RMNodeData")
 public class RMNodeData implements Serializable {
 

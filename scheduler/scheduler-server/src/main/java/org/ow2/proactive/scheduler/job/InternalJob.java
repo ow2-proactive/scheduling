@@ -320,7 +320,7 @@ public abstract class InternalJob extends JobState {
      */
     public void startDataSpaceApplication(NamingService namingService, List<InternalTask> tasks) {
         if (taskDataSpaceApplications == null) {
-            taskDataSpaceApplications = new HashMap<>();
+            taskDataSpaceApplications = new ConcurrentHashMap<>();
         }
 
         UserCredentials userCredentials = getUserCredentials();
@@ -328,13 +328,12 @@ public abstract class InternalJob extends JobState {
         for (InternalTask internalTask : tasks) {
             long taskId = internalTask.getId().longValue();
 
+            String appId = internalTask.getId().toString();
+            TaskDataSpaceApplication taskDataSpaceApplication = new TaskDataSpaceApplication(appId, namingService);
+
             // reuse the already configured dataspaceApplication
             // if a task restart due to a failure for instance
-            if (!taskDataSpaceApplications.containsKey(taskId)) {
-                String appId = internalTask.getId().toString();
-                TaskDataSpaceApplication taskDataSpaceApplication = new TaskDataSpaceApplication(appId, namingService);
-
-                taskDataSpaceApplications.put(taskId, taskDataSpaceApplication);
+            if (taskDataSpaceApplications.putIfAbsent(taskId, taskDataSpaceApplication) == null) {
 
                 taskDataSpaceApplication.startDataSpaceApplication(getInputSpace(),
                                                                    getOutputSpace(),
