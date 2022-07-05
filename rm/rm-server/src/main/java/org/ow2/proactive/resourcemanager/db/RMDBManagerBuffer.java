@@ -336,8 +336,17 @@ public class RMDBManagerBuffer {
         }
     }
 
+    private int getPendingNodesOperationsSize() {
+        pendingNodeOperationsLock.lock();
+        try {
+            return pendingNodesOperations.size();
+        } finally {
+            pendingNodeOperationsLock.unlock();
+        }
+    }
+
     private void scheduleNodeTransactionOrFlush() {
-        if (pendingNodesOperations.size() < MAXIMUM_BUFFERIZED_NODE_OPERATIONS) {
+        if (getPendingNodesOperationsSize() < MAXIMUM_BUFFERIZED_NODE_OPERATIONS) {
             scheduledNodeTransaction = databaseTransactionExecutor.schedule(new Runnable() {
                 @Override
                 public void run() {

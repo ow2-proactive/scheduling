@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -45,6 +45,7 @@ import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.db.TransactionHelper;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.core.history.Alive;
 import org.ow2.proactive.resourcemanager.core.history.LockHistory;
@@ -81,7 +82,7 @@ public class RMDBManager {
 
     private Scheduler houseKeepingScheduler;
 
-    private Executor backgroundOperations = Executors.newSingleThreadExecutor();
+    private ExecutorService backgroundOperations = Executors.newSingleThreadExecutor();
 
     private static final class LazyHolder {
 
@@ -405,30 +406,52 @@ public class RMDBManager {
     }
 
     public void changeNodesState(List<RMNodeData> nodesList, Map<String, String> nodeSourceNameMap,
-            final NodeState nodeState, final long stateChangeTime) {
+            final NodeState nodeState, final long stateChangeTime, final Client owner,
+            final int usageInfoCriteriaSize) {
         if (nodeRecoveryDisabled()) {
             return;
         }
+        if (nodesList.size() == 0) {
+            return;
+        }
+        final Map<String, String> singleUsageInfo = usageInfoCriteriaSize == 1 ? nodesList.get(0).getUsageInfo() : null;
         Map<Boolean, List<RMNodeData>> syncAndAsyncNodesList = nodesList.stream()
                                                                         .collect(Collectors.partitioningBy(rmNodeData -> rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNode(rmNodeData)));
         if (syncAndAsyncNodesList.get(true) != null) {
-            final List<String> syncNodesUrlList = syncAndAsyncNodesList.get(true)
-                                                                       .stream()
-                                                                       .map(rmNodeData -> rmNodeData.getNodeUrl())
-                                                                       .collect(Collectors.toList());
+            final List<RMNodeData> syncNodesDataList = syncAndAsyncNodesList.get(true);
+            final List<String> syncNodesUrlList = syncNodesDataList.stream()
+                                                                   .map(rmNodeData -> rmNodeData.getNodeUrl())
+                                                                   .collect(Collectors.toList());
 
             List<List<String>> partitions = Lists.partition(syncNodesUrlList, MAX_ITEMS_IN_LIST);
 
             partitions.forEach(nodeUrlList -> {
                 executeReadWriteTransaction((SessionWork<Void>) session -> {
-                    session.getNamedQuery("updateMultipleRMNodeStatus")
-                           .setParameter("nodeState", nodeState)
-                           .setParameter("stateChangeTime", stateChangeTime)
-                           .setParameterList("nodeUrls", nodeUrlList)
-                           .executeUpdate();
+                    if (usageInfoCriteriaSize == 1) {
+                        session.getNamedQuery("updateMultipleRMNodeStatusWithUsageInfo")
+                               .setParameter("nodeState", nodeState)
+                               .setParameter("stateChangeTime", stateChangeTime)
+                               .setParameter("owner", owner)
+                               .setParameter("usageInfo", singleUsageInfo)
+                               .setParameterList("nodeUrls", nodeUrlList)
+                               .executeUpdate();
+                    } else {
+                        session.getNamedQuery("updateMultipleRMNodeStatus")
+                               .setParameter("nodeState", nodeState)
+                               .setParameter("stateChangeTime", stateChangeTime)
+                               .setParameter("owner", owner)
+                               .setParameterList("nodeUrls", nodeUrlList)
+                               .executeUpdate();
+                    }
                     return null;
                 });
             });
+
+            if (usageInfoCriteriaSize > 1) {
+                syncNodesDataList.forEach(rmNodeData -> rmdbManagerBuffer.addUpdateNodeToPendingDatabaseOperations(rmNodeData,
+                                                                                                                   nodeSourceNameMap.get(rmNodeData.getNodeUrl())));
+            }
+
         }
 
         if (syncAndAsyncNodesList.get(false) != null) {

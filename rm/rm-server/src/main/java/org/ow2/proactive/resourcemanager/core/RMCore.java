@@ -2274,11 +2274,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * internal busy nodes list. An event informing the node state's change is
      * thrown to RMMonitoring.
      *
-     * @param owner
      * @param nodeUrlList list of node to mark as busy
+     * @param owner who is using the nodes
+     * @param usageInfoList list of usage information for each node
+     * @param usageInfoCriteriaSize original size of the usage information criteria
      */
-    public void setBusyNodes(final List<String> nodeUrlList, Client owner, List<Map<String, String>> usageInfoList)
-            throws NotConnectedException {
+    public void setBusyNodes(final List<String> nodeUrlList, Client owner, List<Map<String, String>> usageInfoList,
+            int usageInfoCriteriaSize) throws NotConnectedException {
 
         if (!clients.containsKey(owner.getId()) && owner != localClient) {
             logger.warn("" + nodeUrlList + " cannot set busy as the client disconnected " + owner);
@@ -2288,6 +2290,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (nodeUrlList.size() != usageInfoList.size()) {
             throw new IllegalArgumentException("nodeUrlList (" + nodeUrlList.size() + ") and usageInfoList (" +
                                                usageInfoList.size() + ") size mismatch");
+        }
+
+        if (nodeUrlList.size() == 0) {
+            return;
         }
 
         long setBusyTime = System.currentTimeMillis();
@@ -2327,7 +2333,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             previousNodeStateList.add(previousNodeState);
         }
 
-        dbManager.changeNodesState(rmNodeDataList, nodeSourceNameMap, NodeState.BUSY, setBusyTime);
+        if (rmNodeDataList.size() > 0) {
+            dbManager.changeNodesState(rmNodeDataList,
+                                       nodeSourceNameMap,
+                                       NodeState.BUSY,
+                                       setBusyTime,
+                                       owner,
+                                       usageInfoCriteriaSize);
+        }
         for (int i = 0; i < nodeUrlList.size(); i++) {
             RMNode rmNode = rmNodeList.get(i);
             NodeState previousNodeState = previousNodeStateList.get(i);

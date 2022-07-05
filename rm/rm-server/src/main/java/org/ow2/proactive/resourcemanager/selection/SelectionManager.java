@@ -350,22 +350,22 @@ public abstract class SelectionManager {
 
         // the nodes are selected, now mark them as busy.
         int counter = 0;
+        int usageInfoCriteriaSize = criteria.getListUsageInfo() != null ? criteria.getListUsageInfo().size() : 0;
         int listCapacity = selectedNodes.size() +
                            (selectedNodes.getExtraNodes() != null ? selectedNodes.getExtraNodes().size() : 0);
         List<String> selectedNodesUrls = new ArrayList<>(listCapacity);
         List<Map<String, String>> usageInfoList = new ArrayList<>(listCapacity);
         for (Node node : selectedNodes) {
-            if (criteria.getListUsageInfo() != null) {
-                if (criteria.getListUsageInfo().size() == 1) {
-                    // it is mutli node execution, which means we provide the same usage info for every node
-                    selectedNodesUrls.add(node.getNodeInformation().getURL());
-                    usageInfoList.add(criteria.getListUsageInfo().get(0));
-                } else {
-                    // in this case, we have set of nodes, where will be set of compatible tasks
-                    selectedNodesUrls.add(node.getNodeInformation().getURL());
-                    usageInfoList.add(criteria.getListUsageInfo().get(counter));
-                }
+            if (usageInfoCriteriaSize == 1) {
+                // it is a multi-node execution, which means we provide the same usage info for every node
+                selectedNodesUrls.add(node.getNodeInformation().getURL());
+                usageInfoList.add(criteria.getListUsageInfo().get(0));
+            } else if (usageInfoCriteriaSize > 0) {
+                // in this case, we have a set of nodes, which correspond to a set of compatible tasks
+                selectedNodesUrls.add(node.getNodeInformation().getURL());
+                usageInfoList.add(criteria.getListUsageInfo().get(counter));
             } else {
+                // no usage info is provided
                 selectedNodesUrls.add(node.getNodeInformation().getURL());
                 usageInfoList.add(Collections.EMPTY_MAP);
             }
@@ -374,7 +374,7 @@ public abstract class SelectionManager {
         // marking extra selected nodes as busy
         if (selectedNodes.size() > 0 && selectedNodes.getExtraNodes() != null) {
             for (Node node : new LinkedList<>(selectedNodes.getExtraNodes())) {
-                if (criteria.getListUsageInfo() != null) {
+                if (usageInfoCriteriaSize != 0) {
                     // here, we believe that it will be called only for multi node execution
                     selectedNodesUrls.add(node.getNodeInformation().getURL());
                     usageInfoList.add(criteria.getListUsageInfo().get(0));
@@ -385,7 +385,7 @@ public abstract class SelectionManager {
             }
         }
         try {
-            rmcore.setBusyNodes(selectedNodesUrls, client, usageInfoList);
+            rmcore.setBusyNodes(selectedNodesUrls, client, usageInfoList, usageInfoCriteriaSize);
         } catch (NotConnectedException e) {
             // client has disconnected during getNodes request
             logger.warn(e.getMessage(), e);
