@@ -20,7 +20,7 @@
         </filter>
         <filter>
             <select>
-                <xpath><![CDATA[(/job/genericInformation/info[@name='bucketName' and (@value='auto-ml-optimization' or @value='machine-learning' or @value='machine-learning-workflows' or @value='deep-learning' or @value='deep-learning-workflows' or @value='federated-learning' or @value='model-as-a-service' or @value='data-visualization')])]]></xpath>
+                <xpath><![CDATA[(/job/genericInformation/info[@name='bucketName' and (@value='ai-auto-ml-optimization' or @value='ai-machine-learning' or @value='ai-machine-learning-workflows' or @value='ai-deep-learning' or @value='ai-deep-learning-workflows' or @value='ai-federated-learning' or @value='ai-model-as-a-service' or @value='ai-data-visualization')])]]></xpath>
             </select>
             <variables>
                 <variable name="NATIVE_SCHEDULER" value="" advanced="true" description="Name of the Native Scheduler node source to use when the workflow tasks must be deployed inside a cluster such as SLURM, LSF, etc." group="Resource Management" hidden="false" model="PA:MODEL_FROM_URL(${PA_SCHEDULER_REST_PUBLIC_URL}/rm/model/nodesources)"/>
@@ -33,6 +33,7 @@
                 <info name="NS" value="$NATIVE_SCHEDULER"/>
                 <info name="NODE_ACCESS_TOKEN" value="$NODE_ACCESS_TOKEN"/>
                 <info name="NS_BATCH" value="$NATIVE_SCHEDULER_PARAMS"/>
+                <info name="PYTHON_COMMAND" value="python3"/>
             </genericInformation>
         </filter>
         <filter>
@@ -50,6 +51,7 @@
                 <info name="NS" value="$NATIVE_SCHEDULER"/>
                 <info name="NODE_ACCESS_TOKEN" value="$NODE_ACCESS_TOKEN"/>
                 <info name="NS_BATCH" value="$NATIVE_SCHEDULER_PARAMS"/>
+                <info name="PYTHON_COMMAND" value="python3"/>
             </genericInformation>
         </filter>
         <filter>
