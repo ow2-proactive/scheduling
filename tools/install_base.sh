@@ -247,6 +247,15 @@ install_binaries()
            echo "Installation aborted."; exit 1 ;
         fi
     fi
+
+    if ! which curl > /dev/null 2>&1; then
+        echo "curl is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+            $PKG_TOOL -y install curl
+        else
+            echo "Installation aborted."; exit 1 ;
+        fi
+    fi
 }
 
 initial_commit()
