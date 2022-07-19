@@ -9,7 +9,7 @@ dependencies {
     compile 'sigar:sigar:1.7.0-proactive'
 
     compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
-    compile "org.ow2.proactive:common-http:${programmingVersion}"
+    compile project(':common:common-http')
     compile project(':common:common-client')
     compile project(':rm:rm-client')
 
