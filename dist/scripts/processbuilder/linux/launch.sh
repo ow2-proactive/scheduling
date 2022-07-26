@@ -45,7 +45,7 @@ crs=$5
 # create temp file for return value passing
 tmpdir=`mktemp -d`
 chmod 0777 $tmpdir
-tmp=`mktemp -p $tmpdir 2>/dev/null || mktemp -p $tmpdir -t 'mytmpfile.XXXXX'`
+tmp=`mktemp -p $tmpdir 2>/dev/null`
 
 if [ "$?" != "0" ]; then
   # if I can not create a tempfile
@@ -54,7 +54,7 @@ if [ "$?" != "0" ]; then
 fi;
 
 # create temp file for environment variables
-tmpenv=`mktemp -p $tmpdir 2>/dev/null || mktemp -p $tmpdir -t 'myenvfile.XXXXX'`
+tmpenv=`mktemp -p $tmpdir 2>/dev/null`
 
 if [ "$?" != "0" ]; then
   # if I can not create a tempfile
