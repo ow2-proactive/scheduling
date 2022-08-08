@@ -641,10 +641,17 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
             } else {
                 answer = new PredicateActionResult(false, value);
             }
-            logWithContextAndPersist(taskid,
-                                     channel,
-                                     "Run conditionalCompute" + ON_KEY + QUOTE + key + QUOTE + RESULT_IS + answer,
-                                     Level.DEBUG);
+            if (answer.isTrue()) {
+                logWithContextAndPersist(taskid,
+                                         channel,
+                                         "Run conditionalCompute" + ON_KEY + QUOTE + key + QUOTE + RESULT_IS + answer,
+                                         Level.DEBUG);
+            } else {
+                logWithContextAndPersist(taskid,
+                                         channel,
+                                         "Run conditionalCompute" + ON_KEY + QUOTE + key + QUOTE + RESULT_IS + answer,
+                                         Level.TRACE);
+            }
 
         } catch (InvalidChannelException | CompilationException | IOException e) {
             throw e;
