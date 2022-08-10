@@ -942,8 +942,10 @@ public class RMRest implements RMRestInterface {
 
         // grouped by node source name, host name, and node name
         Map<String, Map<String, Map<String, List<RMNodeHistory>>>> grouped = rawDataFromRM.stream()
-                                                                                          .collect(Collectors.groupingBy(RMNodeHistory::getNodeSource,
-                                                                                                                         Collectors.groupingBy(RMNodeHistory::getHost,
+                                                                                          .collect(Collectors.groupingBy(rmNodeHistory -> rmNodeHistory.getNodeSource() == null ? ""
+                                                                                                                                                                                : rmNodeHistory.getNodeSource(),
+                                                                                                                         Collectors.groupingBy(rmNodeHistory -> rmNodeHistory.getHost() == null ? ""
+                                                                                                                                                                                                : rmNodeHistory.getHost(),
                                                                                                                                                Collectors.groupingBy(this::getNodeName))));
         grouped.values().forEach(a -> a.values().forEach(b -> {
             b.values().forEach(c -> {
