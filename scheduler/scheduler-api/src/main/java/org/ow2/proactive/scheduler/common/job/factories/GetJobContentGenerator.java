@@ -249,7 +249,8 @@ public class GetJobContentGenerator {
         }
         content.append(String.format(ATTRIBUTE_FORMAT,
                                      XMLAttributes.VARIABLE_VALUE,
-                                     StringEscapeUtils.escapeXml10(varValue).replaceAll("\\R", "&#xA;")));
+                                     StringEscapeUtils.escapeXml10(Optional.ofNullable(varValue).orElse(""))
+                                                      .replaceAll("\\R", "&#xA;")));
 
         if (jobVariable.getModel() != null && !jobVariable.getModel().trim().isEmpty()) {
             content.append(String.format(ATTRIBUTE_FORMAT,
