@@ -88,7 +88,7 @@ public class GetJobContentGenerator {
                              XMLAttributes.COMMON_NAME,
                              pair.getKey(),
                              XMLAttributes.COMMON_VALUE,
-                             StringEscapeUtils.escapeXml11(pair.getValue()));
+                             StringEscapeUtils.escapeXml10(pair.getValue()));
     }
 
     private String replaceGenericInfoContent(String jobContent, String newContent, int end) {
@@ -249,17 +249,18 @@ public class GetJobContentGenerator {
         }
         content.append(String.format(ATTRIBUTE_FORMAT,
                                      XMLAttributes.VARIABLE_VALUE,
-                                     StringEscapeUtils.escapeXml11(varValue)));
+                                     StringEscapeUtils.escapeXml10(Optional.ofNullable(varValue).orElse(""))
+                                                      .replaceAll("\\R", "&#xA;")));
 
         if (jobVariable.getModel() != null && !jobVariable.getModel().trim().isEmpty()) {
             content.append(String.format(ATTRIBUTE_FORMAT,
                                          XMLAttributes.VARIABLE_MODEL,
-                                         StringEscapeUtils.escapeXml11(jobVariable.getModel())));
+                                         StringEscapeUtils.escapeXml10(jobVariable.getModel())));
         }
         if (jobVariable.getDescription() != null && !jobVariable.getDescription().trim().isEmpty()) {
             content.append(String.format(ATTRIBUTE_FORMAT,
                                          XMLAttributes.VARIABLE_DESCRIPTION,
-                                         StringEscapeUtils.escapeXml11(jobVariable.getDescription())));
+                                         StringEscapeUtils.escapeXml10(jobVariable.getDescription())));
         }
         if (jobVariable.getGroup() != null && !jobVariable.getGroup().trim().isEmpty()) {
             content.append(String.format(ATTRIBUTE_FORMAT, XMLAttributes.VARIABLE_GROUP, jobVariable.getGroup()));
