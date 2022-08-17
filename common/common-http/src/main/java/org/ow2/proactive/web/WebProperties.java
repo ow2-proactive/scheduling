@@ -131,8 +131,14 @@ public enum WebProperties implements PACommonProperties {
     /**
      * Paths that will be excluded from rewrite rules in the PCA proxy, this is to protect ProActive portals from
      * being redirected by the rules, which would make them unreachable.
+     * Any request starting with the following paths will not be modified
      */
     WEB_PCA_PROXY_REWRITE_EXCLUDED_PATHS("web.pca.proxy.rewrite.excluded.paths", PropertyType.LIST, "/automation-dashboard/,/studio/,/scheduler/,/rm/"),
+
+    /**
+     * Similar to the previous property but with exact match of the request path
+     */
+    WEB_PCA_PROXY_REWRITE_EXCLUDED_PATHS_EXACT("web.pca.proxy.rewrite.excluded.paths.exact", PropertyType.LIST, "/automation-dashboard,/studio,/scheduler,/rm"),
 
     METADATA_CONTENT_TYPE("content.type", PropertyType.STRING),
 

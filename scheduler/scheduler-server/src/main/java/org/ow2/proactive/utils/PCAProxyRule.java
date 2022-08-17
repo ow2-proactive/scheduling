@@ -83,6 +83,8 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
 
     private final List<String> excludedPaths;
 
+    private final List<String> excludedPathsExact;
+
     public PCAProxyRule() {
         _terminating = false;
         _handling = false;
@@ -94,6 +96,7 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
             }
         };
         excludedPaths = WebProperties.WEB_PCA_PROXY_REWRITE_EXCLUDED_PATHS.getValueAsList(",");
+        excludedPathsExact = WebProperties.WEB_PCA_PROXY_REWRITE_EXCLUDED_PATHS_EXACT.getValueAsList(",");
     }
 
     @Override
@@ -143,6 +146,11 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
             final MutableBoolean excluded = new MutableBoolean(false);
             excludedPaths.forEach(excludedPath -> {
                 if (target.startsWith(excludedPath)) {
+                    excluded.setValue(true);
+                }
+            });
+            excludedPathsExact.forEach(excludedPath -> {
+                if (target.equals(excludedPath)) {
                     excluded.setValue(true);
                 }
             });
