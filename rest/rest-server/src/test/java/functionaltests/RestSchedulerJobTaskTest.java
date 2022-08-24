@@ -26,6 +26,7 @@
 package functionaltests;
 
 import java.io.File;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
@@ -65,6 +66,8 @@ import functionaltests.utils.RestFuncTUtils;
 
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
+
+    final static URL dynamicVarsJobXml = RestSchedulerJobTaskTest.class.getResource("config/TestChoiceDynamicVarAndGi.xml");
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -161,6 +164,45 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertHttpStatusOK(response);
         JSONObject jsonObj = toJsonObject(response);
         assertNotNull(jsonObj.get("id").toString());
+    }
+
+    @Test
+    public void testSubmitFromUrlWithInferredVariablesAndGI() throws Exception {
+        // this test ensures that when a variable is modified in SPEL expressions,
+        // a generic information referencing this variable will be correctly set
+        String schedulerUrl = getResourceUrl("jobs;CHOICE=alternate;HIDDEN_VAR=value;CHOICE_HANDLER=");
+        HttpPost httpPost = new HttpPost(schedulerUrl);
+        setSessionHeader(httpPost);
+        File jobFile = new File(dynamicVarsJobXml.toURI());
+        httpPost.setHeader("link", jobFile.toURI().toURL().toExternalForm());
+        HttpResponse response = executeUriRequest(httpPost);
+        assertHttpStatusOK(response);
+        JSONObject jsonObj = toJsonObject(response);
+        final String jobId = jsonObj.get("id").toString();
+        assertNotNull(jobId);
+        waitJobState(jobId, JobStatus.FINISHED, TimeUnit.MINUTES.toMillis(1));
+        String logs = getResourceAsString("jobs/" + jobId + "/result/log/all");
+        System.out.println("job testSubmitFromUrlWithDynamicVariablesAndGI all logs: " + logs);
+        Assert.assertTrue("Logs should show that the job generic information has been correctly set",
+                          logs.contains("GI=alternate_value"));
+        Assert.assertTrue("Logs should show that the task generic information has been correctly set",
+                          logs.contains("TASK_GI=task_alternate_value"));
+
+        schedulerUrl = getResourceUrl("jobs/" + jobId + "/resubmit;CHOICE=normal;HIDDEN_VAR=value;CHOICE_HANDLER=");
+        HttpGet httpGet = new HttpGet(schedulerUrl);
+        setSessionHeader(httpGet);
+        response = executeUriRequest(httpGet);
+        assertHttpStatusOK(response);
+        jsonObj = toJsonObject(response);
+        final String jobId2 = jsonObj.get("id").toString();
+        assertNotNull(jobId2);
+        waitJobState(jobId2, JobStatus.FINISHED, TimeUnit.MINUTES.toMillis(1));
+        logs = getResourceAsString("jobs/" + jobId2 + "/result/log/all");
+        System.out.println("job testSubmitFromUrlWithDynamicVariablesAndGI resubmit all logs: " + logs);
+        Assert.assertTrue("Logs should show that the job generic information has been correctly set after resubmission",
+                          logs.contains("GI=value"));
+        Assert.assertTrue("Logs should show that the task generic information has been correctly set after resubmission",
+                          logs.contains("TASK_GI=task_value"));
     }
 
     @Test
