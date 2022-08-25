@@ -1415,6 +1415,28 @@ public interface SchedulerRestInterface {
             throws IOException, RestException;
 
     /**
+     * Re-submit a job to the scheduler
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            job id of the already submitted job
+     * @param pathSegment
+     *            variables of the workflow
+     * @param jsonBody
+     *            a json with the variables of the workflow
+     * @return the <code>jobid</code> of the newly created job
+     * @throws PermissionRestException if user does not have rights to access job with <code>jobId</code>
+     */
+    @POST
+    @Path("jobs/{jobid}/{path:resubmit/body}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    JobIdData reSubmit(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @PathParam("path") PathSegment pathSegment, Map<String, String> jsonBody, @Context UriInfo contextInfos)
+            throws IOException, RestException;
+
+    /**
      * Validate job variables before resubmitting a job
      *
      * @param sessionId
