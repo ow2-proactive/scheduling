@@ -806,9 +806,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             }
         }
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("New DeployingNode " + name + " instantiated in IM");
-        }
+        logger.info("New deploying Node " + deployingNode.getNodeURL());
 
         RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_ADDED,
                                                           null,
