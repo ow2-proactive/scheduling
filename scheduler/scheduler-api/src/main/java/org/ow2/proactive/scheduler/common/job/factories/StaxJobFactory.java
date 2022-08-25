@@ -37,14 +37,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -309,6 +302,17 @@ public class StaxJobFactory extends JobFactory {
         }
         long t4 = System.currentTimeMillis();
         validate((TaskFlowJob) job, scheduler, space, sessionId);
+        // as the value of variables can change after the validation (due to variable inferences), we must regenerate generic info values
+        updateGenericInformation((TaskFlowJob) job, replacementGenericInfos);
+
+        resolveCleaningScripts((TaskFlowJob) job, job.getVariablesAsReplacementMap());
+
+        String updatedJobContent = getJobContentFactory.replaceVarsAndGenericInfo(job.getJobContent(),
+                                                                                  job.getVariables(),
+                                                                                  getGenericInfoKeepReferences(job,
+                                                                                                               replacementGenericInfos));
+
+        job.setJobContent(updatedJobContent);
         long t5 = System.currentTimeMillis();
         long d1 = t1 - t0;
         long d2 = t2 - t1;
@@ -321,6 +325,33 @@ public class StaxJobFactory extends JobFactory {
         //debug mode only
         displayJobInfo(job);
         return job;
+    }
+
+    private void updateGenericInformation(TaskFlowJob job, Map<String, String> replacementGenericInfo)
+            throws JobCreationException {
+        Map<String, String> jobReplacementMap = job.getVariablesAsReplacementMap();
+        Set<String> jobVariableNames = jobReplacementMap.keySet();
+        for (Map.Entry<String, String> entry : job.getUnresolvedGenericInformation().entrySet()) {
+            String originalValue = entry.getValue();
+            // replacementGenericInfo contains generic info provided at submission time, overriding the workflow g.i.
+            if (replacementGenericInfo != null && replacementGenericInfo.containsKey(entry.getKey())) {
+                originalValue = replacementGenericInfo.get(entry.getKey());
+            }
+            if (jobVariableNames.stream().anyMatch(name -> entry.getValue().contains("$" + name) ||
+                                                           entry.getValue().contains("${" + name + "}"))) {
+                job.addGenericInformation(entry.getKey(), replace(originalValue, jobReplacementMap));
+            }
+        }
+        for (Task task : job.getTasks()) {
+            Map<String, String> taskReplacementMap = task.getVariablesOverriden(job);
+            Set<String> taskVariableNames = taskReplacementMap.keySet();
+            for (Map.Entry<String, String> entry : task.getUnresolvedGenericInformation().entrySet()) {
+                if (taskVariableNames.stream().anyMatch(name -> entry.getValue().contains("$" + name) ||
+                                                                entry.getValue().contains("${" + name + "}"))) {
+                    task.addGenericInformation(entry.getKey(), replace(entry.getValue(), taskReplacementMap));
+                }
+            }
+        }
     }
 
     /*
@@ -447,9 +478,7 @@ public class StaxJobFactory extends JobFactory {
                     }
                 }
             }
-            if (job != null) {
-                resolveCleaningScripts((TaskFlowJob) job, job.getVariablesAsReplacementMap());
-            }
+
             Map<String, JobVariable> globalVariables = new LinkedHashMap<>();
             for (String globalVariable : globalVariablesData.getVariables().keySet()) {
                 globalVariables.put(globalVariable, job.getVariables().get(globalVariable));
@@ -636,12 +665,7 @@ public class StaxJobFactory extends JobFactory {
                 job.setVariables(commonPropertiesHolder.getVariables());
                 job.setUnresolvedVariables(commonPropertiesHolder.getUnresolvedVariables());
                 job.setVisualization(commonPropertiesHolder.getVisualization());
-
-                String updatedJobContent = getJobContentFactory.replaceVarsAndGenericInfo(jobContent,
-                                                                                          commonPropertiesHolder.getVariables(),
-                                                                                          commonPropertiesHolder.getGenericInformation());
-
-                job.setJobContent(updatedJobContent);
+                job.setJobContent(jobContent);
 
             }
             return job;
@@ -656,6 +680,26 @@ public class StaxJobFactory extends JobFactory {
             throw new JobCreationException(cursorJob.getLocalName(), temporaryAttribute, e);
         }
 
+    }
+
+    private Map<String, String> getGenericInfoKeepReferences(Job job, Map<String, String> submittedGenericInfos) {
+        // try to keep references to variables in generic information that will be exported as job content xml
+        Set<String> variableNames = job.getVariables().keySet();
+        Map<String, String> resolvedGenericInfo = job.getGenericInformation();
+        Map<String, String> unresolvedGenericInfo = job.getUnresolvedGenericInformation();
+        for (String key : resolvedGenericInfo.keySet()) {
+            String unresolvedValue = unresolvedGenericInfo.get(key);
+            if (submittedGenericInfos != null && submittedGenericInfos.containsKey(key)) {
+                unresolvedValue = submittedGenericInfos.get(key);
+            }
+            final String unresolvedValueFinal = unresolvedValue;
+            if (unresolvedValue != null &&
+                variableNames.stream().anyMatch(name -> unresolvedValueFinal.contains("$" + name) ||
+                                                        unresolvedValueFinal.contains("${" + name + "}"))) {
+                resolvedGenericInfo.put(key, unresolvedValueFinal);
+            }
+        }
+        return resolvedGenericInfo;
     }
 
     private synchronized GlobalVariablesData getConfiguredGlobalVariablesData(String jobContent) {
@@ -729,7 +773,7 @@ public class StaxJobFactory extends JobFactory {
      */
     private Map<String, JobVariable> createUnresolvedJobVariables(XMLStreamReader cursorVariables,
             GlobalVariablesData globalVariablesData) throws JobCreationException {
-        // The following initializaion is to enable overridding of global variables by workflow variables
+        // The following initialization is to enable overriding of global variables by workflow variables
         Map<String, JobVariable> unresolvedVariablesMap = globalVariablesData.getVariables();
         try {
             int eventType;
@@ -1204,8 +1248,9 @@ public class StaxJobFactory extends JobFactory {
 
                             // Resolve task generic infos using job variables and job generic infos
                             Map<String, String> jobVariablesWithGenericInfos = tmpTask.getVariablesOverriden(job);
-                            if (job.getGenericInformation() != null)
+                            if (job.getGenericInformation() != null) {
                                 jobVariablesWithGenericInfos.putAll(job.getGenericInformation());
+                            }
 
                             Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformations(cursorTask,
                                                                                                                                  true,
@@ -2224,6 +2269,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("outputSpace: " + job.getOutputSpace());
             logger.debug("genericInformation: " + job.getGenericInformation());
             logger.debug("visualization: " + job.getVisualization());
+            logger.debug("jobContent: " + job.getJobContent());
             logger.debug("TASKS ------------------------------------------------");
 
             ArrayList<Task> tasks = job.getType().equals(JobType.TASKSFLOW) ? ((TaskFlowJob) job).getTasks()
