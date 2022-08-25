@@ -1665,11 +1665,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                                        new GenericType<Map<String, String>>() {
                                                                                        });
 
-                if (jobVariables != null) {
-                    jobVariables.putAll(variablesFromMultipart);
-                } else {
-                    jobVariables = variablesFromMultipart;
-                }
+                jobVariables = getAdditionalVariables(jobVariables, variablesFromMultipart);
             }
 
             // Get the job submission generic infos
@@ -1700,11 +1696,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             // Get job variables from json body
             if (!MapUtils.isEmpty(jsonBody)) {
-                if (jobVariables != null) {
-                    jobVariables.putAll(workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
-                } else {
-                    jobVariables = workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody);
-                }
+                jobVariables = getAdditionalVariables(jobVariables,
+                                                      workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
             }
 
             // Get the job submission generic infos
@@ -1829,11 +1822,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 // Add multipart variables to variables
                 if (variablesFromMultipart != null) {
 
-                    if (jobVariables != null) {
-                        jobVariables.putAll(variablesFromMultipart);
-                    } else {
-                        jobVariables = variablesFromMultipart;
-                    }
+                    jobVariables = getAdditionalVariables(jobVariables, variablesFromMultipart);
                 }
 
                 // Get the job submission generic infos
@@ -1927,6 +1916,42 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
             // Get the job submission variables
             Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            // Get the job submission generic infos
+            Map<String, String> genericInfos = null;
+            if (contextInfos != null) {
+                genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
+            }
+
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
+            newJobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
+        }
+        return mapper.map(newJobId, JobIdData.class);
+    }
+
+    @Override
+    public JobIdData reSubmit(String sessionId, String jobId, PathSegment pathSegment, Map<String, String> jsonBody,
+            UriInfo contextInfos) throws IOException, RestException {
+        Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/resubmit");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        JobId newJobId;
+        String jobXml;
+        try {
+            jobXml = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+        try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+            // Get the job submission variables
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            // Get job variables from json body
+            if (!MapUtils.isEmpty(jsonBody)) {
+                jobVariables = getAdditionalVariables(jobVariables,
+                                                      workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
+            }
 
             // Get the job submission generic infos
             Map<String, String> genericInfos = null;
@@ -2572,11 +2597,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 // Add multipart variables to variables
                 if (variablesFromMultipart != null) {
 
-                    if (jobVariables != null) {
-                        jobVariables.putAll(variablesFromMultipart);
-                    } else {
-                        jobVariables = variablesFromMultipart;
-                    }
+                    jobVariables = getAdditionalVariables(jobVariables, variablesFromMultipart);
                 }
             }
 
@@ -2617,11 +2638,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
                 // Get job variables from json body
                 if (!MapUtils.isEmpty(jsonBody)) {
-                    if (jobVariables != null) {
-                        jobVariables.putAll(workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
-                    } else {
-                        jobVariables = workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody);
-                    }
+                    jobVariables = getAdditionalVariables(jobVariables,
+                                                          workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
                 }
             }
 
@@ -2689,11 +2707,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                                            new GenericType<Map<String, String>>() {
                                                                                            });
 
-                    if (jobVariables != null) {
-                        jobVariables.putAll(variablesFromMultipart);
-                    } else {
-                        jobVariables = variablesFromMultipart;
-                    }
+                    jobVariables = getAdditionalVariables(jobVariables, variablesFromMultipart);
                 }
 
             }
@@ -2861,6 +2875,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
         workflowCache.put(key, downloadedWorkflow);
         return downloadedWorkflow;
+    }
+
+    private Map<String, String> getAdditionalVariables(Map<String, String> jobVariables,
+            Map<String, String> variablesFromMultipart) {
+        if (jobVariables != null) {
+            jobVariables.putAll(variablesFromMultipart);
+        } else {
+            jobVariables = variablesFromMultipart;
+        }
+        return jobVariables;
     }
 
     protected static Map<String, String> createSortableTaskAttrMap() {
