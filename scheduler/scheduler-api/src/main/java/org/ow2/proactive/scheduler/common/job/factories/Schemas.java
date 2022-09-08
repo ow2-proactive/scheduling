@@ -73,12 +73,15 @@ public enum Schemas {
     SCHEMA_3_13(
             "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.13/schedulerjob.rng",
             "urn:proactive:jobdescriptor:3.13"),
+    SCHEMA_3_14(
+            "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.14/schedulerjob.rng",
+            "urn:proactive:jobdescriptor:3.14"),
     SCHEMA_DEV(
             "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng",
             "urn:proactive:jobdescriptor:dev"),
 
     // should contain a reference to the last one declared, see #validate
-    SCHEMA_LATEST(SCHEMA_3_13.location, SCHEMA_3_13.namespace);
+    SCHEMA_LATEST(SCHEMA_3_14.location, SCHEMA_3_14.namespace);
 
     private String location;
 

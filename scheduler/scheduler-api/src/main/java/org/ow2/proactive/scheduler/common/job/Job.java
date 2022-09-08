@@ -32,9 +32,11 @@ import static org.ow2.proactive.scheduler.common.util.LogFormatter.lineWithQuote
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -85,6 +87,11 @@ public abstract class Job extends CommonAttribute {
      * Project name for this job
      */
     protected String projectName = "";
+
+    /**
+     * Tags of this job
+     */
+    protected Set<String> tags = new HashSet<>();
 
     /**
      * Job priority
@@ -221,6 +228,19 @@ public abstract class Job extends CommonAttribute {
      */
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    /**
+     * Returns the tags of this job
+     *
+     * @return tag set
+     */
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
     /**
@@ -397,6 +417,7 @@ public abstract class Job extends CommonAttribute {
         return "Job '" + name + "' : " + System.lineSeparator() +
                addIndent(Stream.of(lineWithQuotes("Description", description),
                                    lineWithQuotes("ProjectName", projectName),
+                                   line("tags", tags),
                                    line("onTaskError", onTaskError),
                                    line("restartTaskOnError", restartTaskOnError),
                                    line("taskRetryDelay", taskRetryDelay),

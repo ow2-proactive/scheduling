@@ -57,6 +57,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String projectName;
 
+    private Set<String> tags;
+
     private int totalNumberOfTasks = 0;
 
     private int numberOfPendingTasks = 0;
@@ -148,6 +150,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public String getProjectName() {
         return projectName;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
+
+    @Override
+    public Set<String> getTags() {
+        return tags;
     }
 
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {

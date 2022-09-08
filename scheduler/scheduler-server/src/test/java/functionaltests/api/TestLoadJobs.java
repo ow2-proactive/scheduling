@@ -317,16 +317,26 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished) {
-        return criteria(myJobsOnly, pending, running, finished, true, null, null, null, null);
+        return criteria(myJobsOnly, pending, running, finished, true, null, null, null, null, null);
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
             boolean childJobs) {
-        return new JobFilterCriteria(myJobsOnly, pending, running, finished, childJobs, null, null, null, null, null);
+        return new JobFilterCriteria(myJobsOnly,
+                                     pending,
+                                     running,
+                                     finished,
+                                     childJobs,
+                                     null,
+                                     null,
+                                     null,
+                                     null,
+                                     null,
+                                     null);
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
-            boolean childJobs, String jobName, String projectName, String userName, Long parentId) {
+            boolean childJobs, String jobName, String projectName, Set<String> tags, String userName, Long parentId) {
         return new JobFilterCriteria(myJobsOnly,
                                      pending,
                                      running,
@@ -334,6 +344,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
                                      childJobs,
                                      jobName,
                                      projectName,
+                                     tags,
                                      userName,
                                      null,
                                      parentId);

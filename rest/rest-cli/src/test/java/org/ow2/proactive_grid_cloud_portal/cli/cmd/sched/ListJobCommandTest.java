@@ -106,6 +106,7 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
@@ -120,6 +121,7 @@ public class ListJobCommandTest {
                                     true,
                                     true,
                                     true,
+                                    null,
                                     null,
                                     null,
                                     null,
@@ -155,6 +157,7 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
@@ -169,6 +172,7 @@ public class ListJobCommandTest {
                                     true,
                                     true,
                                     true,
+                                    null,
                                     null,
                                     null,
                                     null,
@@ -205,6 +209,7 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
@@ -219,6 +224,7 @@ public class ListJobCommandTest {
                                     true,
                                     true,
                                     true,
+                                    null,
                                     null,
                                     null,
                                     null,
@@ -254,6 +260,7 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
@@ -268,6 +275,7 @@ public class ListJobCommandTest {
                                     true,
                                     true,
                                     true,
+                                    null,
                                     null,
                                     null,
                                     null,
@@ -304,6 +312,7 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
+                                                                    null,
                                                                     null))
                .thenReturn(page);
 
@@ -318,6 +327,7 @@ public class ListJobCommandTest {
                                     true,
                                     true,
                                     true,
+                                    null,
                                     null,
                                     null,
                                     null,

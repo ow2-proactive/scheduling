@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -47,6 +48,8 @@ public class JobFilterCriteria implements Serializable {
 
     private final String projectName;
 
+    private final Set<String> tags;
+
     private final String userName;
 
     private final String tenant;
@@ -54,7 +57,7 @@ public class JobFilterCriteria implements Serializable {
     private final Long parentId;
 
     public JobFilterCriteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished, boolean childJobs,
-            String jobName, String projectName, String userName, String tenant, Long parentId) {
+            String jobName, String projectName, Set<String> tags, String userName, String tenant, Long parentId) {
         this.myJobsOnly = myJobsOnly;
         this.pending = pending;
         this.running = running;
@@ -62,6 +65,7 @@ public class JobFilterCriteria implements Serializable {
         this.childJobs = childJobs;
         this.jobName = jobName;
         this.projectName = projectName;
+        this.tags = tags;
         this.userName = userName;
         this.tenant = tenant;
         this.parentId = parentId;
@@ -93,6 +97,10 @@ public class JobFilterCriteria implements Serializable {
 
     public String getProjectName() {
         return projectName;
+    }
+
+    public Set<String> getTags() {
+        return tags;
     }
 
     public String getUserName() {

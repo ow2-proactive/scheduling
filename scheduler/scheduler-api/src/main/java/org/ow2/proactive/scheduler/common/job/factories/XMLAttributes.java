@@ -40,6 +40,7 @@ public enum XMLAttributes {
     // JOBS
     JOB_PRIORITY("priority"),
     JOB_PROJECT_NAME("projectName"),
+    JOB_TAGS("tags"),
 
     // COMMON
     COMMON_CANCEL_JOB_ON_ERROR("cancelJobOnError"),

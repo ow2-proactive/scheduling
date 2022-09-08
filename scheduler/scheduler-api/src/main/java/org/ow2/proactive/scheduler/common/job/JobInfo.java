@@ -75,6 +75,12 @@ public interface JobInfo extends Serializable {
     String getProjectName();
 
     /**
+     * Returns the tag set
+     * @return tag set
+     */
+    Set<String> getTags();
+
+    /**
      * Returns the time at which the Job has finished.
      *
      * @return the time at which the Job has finished
