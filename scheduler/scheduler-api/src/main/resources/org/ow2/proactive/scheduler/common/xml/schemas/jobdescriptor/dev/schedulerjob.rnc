@@ -69,7 +69,7 @@ infoValue = ## Value of the information variable
 projectName = ## Name of the project related to this job. It is also used in the policy to group some jobs together
 	attribute projectName { xsd:string }
 tags = ## Tags related to this job separated by commas
-	attribute tags { xsd:string }
+	attribute tags { workflowTagPattern }
 jobDescription = ## Textual description of this job
     element description { text }
 taskFlow = ## A job composed of a flow of tasks with or without dependencies 
@@ -315,3 +315,4 @@ controlFlowAction = 'goto' | 'replicate' | 'continue'
 blockAttr = 'start' | 'end' | 'none'
 scriptTypeT = 'dynamic' | 'static' | variableRefType
 propertyAppendChar = xsd:string { pattern="." }
+workflowTagPattern = xsd:string { pattern="^$|^([A-Za-z_0-9\-& ]+,)*[A-Za-z_0-9\-& ]+$" }

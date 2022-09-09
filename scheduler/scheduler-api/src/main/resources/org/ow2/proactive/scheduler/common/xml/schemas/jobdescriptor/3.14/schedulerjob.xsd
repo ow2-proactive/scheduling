@@ -63,7 +63,7 @@
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="tags" type="xs:string">
+      <xs:attribute name="tags" type="jd:workflowTagPattern">
         <xs:annotation>
           <xs:documentation>Tags related to this job separated by commas</xs:documentation>
         </xs:annotation>
@@ -281,7 +281,7 @@
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="tags">
-    <xs:attribute name="tags" use="required" type="xs:string">
+    <xs:attribute name="tags" type="jd:workflowTagPattern">
       <xs:annotation>
         <xs:documentation>Tags related to this job separated by commas</xs:documentation>
       </xs:annotation>
@@ -1508,6 +1508,11 @@
   <xs:simpleType name="propertyAppendChar">
     <xs:restriction base="xs:string">
       <xs:pattern value="."/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="workflowTagPattern">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="^$|^([A-Za-z_0-9\-& ]+,)*[A-Za-z_0-9\-& ]+$"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

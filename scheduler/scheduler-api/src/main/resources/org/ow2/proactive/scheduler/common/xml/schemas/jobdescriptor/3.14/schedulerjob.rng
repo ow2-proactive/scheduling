@@ -229,7 +229,7 @@
   <define name="tags">
     <attribute name="tags">
       <doc:documentation>Tags related to this job separated by commas</doc:documentation>
-      <data type="string"/>
+      <ref name="workflowTagPattern"/>
     </attribute>
   </define>
   <define name="jobDescription">
@@ -1157,6 +1157,11 @@
   <define name="propertyAppendChar">
     <data type="string">
       <param name="pattern">.</param>
+    </data>
+  </define>
+  <define name="workflowTagPattern">
+    <data type="string">
+      <param name="pattern">^$|^([A-Za-z_0-9\-& ]+,)*[A-Za-z_0-9\-& ]+$</param>
     </data>
   </define>
 </grammar>
