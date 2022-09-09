@@ -125,7 +125,6 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
-                                    null,
                                     null);
     }
 
@@ -170,7 +169,6 @@ public class ListJobCommandTest {
                                     true,
                                     true,
                                     true,
-                                    null,
                                     null,
                                     null,
                                     null,
@@ -226,7 +224,6 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
-                                    null,
                                     null);
     }
 
@@ -271,7 +268,6 @@ public class ListJobCommandTest {
                                     true,
                                     true,
                                     true,
-                                    null,
                                     null,
                                     null,
                                     null,
@@ -322,7 +318,6 @@ public class ListJobCommandTest {
                                     true,
                                     true,
                                     true,
-                                    null,
                                     null,
                                     null,
                                     null,

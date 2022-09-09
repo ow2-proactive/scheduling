@@ -91,7 +91,7 @@ public abstract class Job extends CommonAttribute {
     /**
      * Tags of this job
      */
-    protected Set<String> tags = new HashSet<>();
+    protected Set<String> workflowTags = new HashSet<>();
 
     /**
      * Job priority
@@ -235,12 +235,12 @@ public abstract class Job extends CommonAttribute {
      *
      * @return tag set
      */
-    public Set<String> getTags() {
-        return tags;
+    public Set<String> getWorkflowTags() {
+        return workflowTags;
     }
 
-    public void setTags(Set<String> tags) {
-        this.tags = tags;
+    public void setWorkflowTags(Set<String> workflowTags) {
+        this.workflowTags = workflowTags;
     }
 
     /**
@@ -417,7 +417,7 @@ public abstract class Job extends CommonAttribute {
         return "Job '" + name + "' : " + System.lineSeparator() +
                addIndent(Stream.of(lineWithQuotes("Description", description),
                                    lineWithQuotes("ProjectName", projectName),
-                                   lineWithQuotes("tags", tags),
+                                   lineWithQuotes("workflowTags", workflowTags),
                                    line("onTaskError", onTaskError),
                                    line("restartTaskOnError", restartTaskOnError),
                                    line("taskRetryDelay", taskRetryDelay),

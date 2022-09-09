@@ -288,7 +288,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * To get the list of available tags in a job.
      * @return the list of tags.
      */
-    public List<String> getTaskTags() {
+    public List<String> getTags() {
         Set<String> result = new HashSet<>();
         String tag = null;
         for (TaskState task : this.getTasks()) {

@@ -803,7 +803,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tags");
             JobState jobState = s.getJobState(jobId);
-            return jobState.getTaskTags();
+            return jobState.getTags();
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }

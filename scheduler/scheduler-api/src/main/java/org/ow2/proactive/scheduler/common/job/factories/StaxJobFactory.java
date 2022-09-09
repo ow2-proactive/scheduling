@@ -659,7 +659,7 @@ public class StaxJobFactory extends JobFactory {
                 job.setName(commonPropertiesHolder.getName());
                 job.setPriority(commonPropertiesHolder.getPriority());
                 job.setProjectName(commonPropertiesHolder.getProjectName());
-                job.setTags(commonPropertiesHolder.getTags());
+                job.setWorkflowTags(commonPropertiesHolder.getWorkflowTags());
                 job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
                 job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
                 if (commonPropertiesHolder.getTaskRetryDelayProperty().isSet()) {
@@ -761,7 +761,7 @@ public class StaxJobFactory extends JobFactory {
             } else if (XMLAttributes.JOB_TAGS.matches(attributeName)) {
                 String resolvedTags = replace(attributeValue, commonPropertiesHolder.getVariablesAsReplacementMap());
                 Set<String> resolvedTagSet = new HashSet<>(Arrays.asList(resolvedTags.split("\\s*,\\s*")));
-                commonPropertiesHolder.setTags(resolvedTagSet);
+                commonPropertiesHolder.setWorkflowTags(resolvedTagSet);
             }
         }
     }
@@ -2273,7 +2273,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("name: " + job.getName());
             logger.debug("description: " + job.getDescription());
             logger.debug("projectName: " + job.getProjectName());
-            logger.debug("tags: " + job.getTags());
+            logger.debug("tags: " + job.getWorkflowTags());
             logger.debug("variables: " + job.getVariables());
             logger.debug("priority: " + job.getPriority());
             logger.debug("onTaskError: " + job.getOnTaskErrorProperty().getValue().toString());

@@ -183,8 +183,8 @@ public class Job2XMLTransformer {
             setAttribute(rootJob, XMLAttributes.JOB_PROJECT_NAME, job.getProjectName(), true);
         }
 
-        if (!job.getTags().isEmpty()) {
-            String joinedTagsWithCommas = String.join(",", job.getTags());
+        if (!job.getWorkflowTags().isEmpty()) {
+            String joinedTagsWithCommas = String.join(",", job.getWorkflowTags());
             setAttribute(rootJob, XMLAttributes.JOB_TAGS, joinedTagsWithCommas);
         }
 

@@ -94,7 +94,7 @@ public class ClientJobState extends JobState {
         this.name = jobState.getName();
         this.description = jobState.getDescription();
         this.projectName = jobState.getProjectName();
-        this.tags = jobState.getTags();
+        this.workflowTags = jobState.getWorkflowTags();
         this.priority = jobState.getPriority();
         this.inputSpace = jobState.getInputSpace();
         this.outputSpace = jobState.getOutputSpace();
