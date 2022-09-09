@@ -216,7 +216,6 @@ public interface SchedulerRestInterface {
             @QueryParam("childJobs") @DefaultValue("true") boolean childJobs,
             @QueryParam("jobName") @DefaultValue("") String jobName,
             @QueryParam("projectName") @DefaultValue("") String projectName,
-            @QueryParam("tags") @DefaultValue("") Set<String> tags,
             @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("tenant") String tenant,
             @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams)
             throws RestException;

@@ -94,11 +94,6 @@ public class JobComparator {
             return false;
         }
 
-        if (job1.getTags() != job2.getTags()) {
-            stack.push("Tags");
-            return false;
-        }
-
         if (!job1.getPriority().equals(job2.getPriority())) {
             stack.push("Priority");
             return false;

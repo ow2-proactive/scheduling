@@ -1083,7 +1083,6 @@ public abstract class InternalJob extends JobState {
     @Override
     public void setTags(Set<String> tags) {
         super.setTags(tags);
-        jobInfo.setTags(tags);
     }
 
     /**

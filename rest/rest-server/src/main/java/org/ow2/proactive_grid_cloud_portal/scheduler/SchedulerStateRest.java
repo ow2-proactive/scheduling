@@ -238,7 +238,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                  null,
                                                                  null,
                                                                  null,
-                                                                 null,
                                                                  null),
                                            DEFAULT_JOB_SORT_PARAMS);
 
@@ -328,7 +327,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                  null,
                                                                  null,
                                                                  null,
-                                                                 null,
                                                                  null),
                                            DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<>(page.getList().size());
@@ -363,8 +361,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
             boolean myJobs, boolean pending, boolean running, boolean finished, boolean childJobs, String jobName,
-            String projectName, Set<String> tags, String userName, String tenant, Long parentId, String sortParams)
-            throws RestException {
+            String projectName, String userName, String tenant, Long parentId, String sortParams) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
@@ -391,7 +388,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                  childJobs,
                                                                  jobName,
                                                                  projectName,
-                                                                 tags,
                                                                  userName,
                                                                  tenant,
                                                                  parentId),

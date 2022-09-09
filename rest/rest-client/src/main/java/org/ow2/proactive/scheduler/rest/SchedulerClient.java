@@ -335,7 +335,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                            criteria.isChildJobs(),
                                                                                                            criteria.getJobName(),
                                                                                                            criteria.getProjectName(),
-                                                                                                           criteria.getTags(),
                                                                                                            criteria.getUserName(),
                                                                                                            criteria.getTenant(),
                                                                                                            criteria.getParentId(),
@@ -1334,7 +1333,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setJobOwner(jobInfoData.getJobOwner());
         jobInfoImpl.setTenant(jobInfoData.getTenant());
         jobInfoImpl.setProjectName(jobInfoData.getProjectName());
-        jobInfoImpl.setTags(jobInfoData.getTags());
         jobInfoImpl.setFinishedTime(jobInfoData.getFinishedTime());
         jobInfoImpl.setRemovedTime(jobInfoData.getRemovedTime());
         jobInfoImpl.setStartTime(jobInfoData.getStartTime());
