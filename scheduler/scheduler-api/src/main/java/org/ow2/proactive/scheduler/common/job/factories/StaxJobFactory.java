@@ -759,8 +759,11 @@ public class StaxJobFactory extends JobFactory {
                 commonPropertiesHolder.setProjectName(replace(attributeValue,
                                                               commonPropertiesHolder.getVariablesAsReplacementMap()));
             } else if (XMLAttributes.JOB_TAGS.matches(attributeName)) {
-                String resolvedTags = replace(attributeValue, commonPropertiesHolder.getVariablesAsReplacementMap());
-                Set<String> resolvedTagSet = new HashSet<>(Arrays.asList(resolvedTags.split("\\s*,\\s*")));
+                Set<String> tagSet = new HashSet<>(Arrays.asList(attributeValue.split("\\s*,\\s*")));
+                Set<String> resolvedTagSet = new HashSet<>();
+                for (String tag: tagSet) {
+                    resolvedTagSet.add(replace(tag, commonPropertiesHolder.getVariablesAsReplacementMap()));
+                }
                 commonPropertiesHolder.setWorkflowTags(resolvedTagSet);
             }
         }
