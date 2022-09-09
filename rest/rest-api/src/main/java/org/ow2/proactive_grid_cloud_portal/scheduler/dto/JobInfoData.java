@@ -71,8 +71,6 @@ public class JobInfoData implements java.io.Serializable {
 
     private String projectName;
 
-    private Set<String> tags;
-
     private boolean toBeRemoved = false;
 
     private Map<String, String> genericInformation;
@@ -195,14 +193,6 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
-    }
-
-    public Set<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(Set<String> tags) {
-        this.tags = tags;
     }
 
     public JobIdData getJobId() {

@@ -417,7 +417,7 @@ public abstract class Job extends CommonAttribute {
         return "Job '" + name + "' : " + System.lineSeparator() +
                addIndent(Stream.of(lineWithQuotes("Description", description),
                                    lineWithQuotes("ProjectName", projectName),
-                                   line("tags", tags),
+                                   lineWithQuotes("tags", tags),
                                    line("onTaskError", onTaskError),
                                    line("restartTaskOnError", restartTaskOnError),
                                    line("taskRetryDelay", taskRetryDelay),

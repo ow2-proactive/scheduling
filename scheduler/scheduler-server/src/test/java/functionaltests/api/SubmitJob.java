@@ -25,8 +25,6 @@
  */
 package functionaltests.api;
 
-import java.util.Set;
-
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;

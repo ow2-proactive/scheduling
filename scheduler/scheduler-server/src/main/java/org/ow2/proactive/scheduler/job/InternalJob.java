@@ -1080,11 +1080,6 @@ public abstract class InternalJob extends JobState {
         jobInfo.setProjectName(projectName);
     }
 
-    @Override
-    public void setTags(Set<String> tags) {
-        super.setTags(tags);
-    }
-
     /**
      * To set the removedTime
      *

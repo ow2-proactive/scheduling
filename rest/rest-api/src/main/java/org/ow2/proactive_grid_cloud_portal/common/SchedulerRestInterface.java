@@ -188,8 +188,6 @@ public interface SchedulerRestInterface {
      *             Include only jobs with a name that starts with jobName (case in-sensitive)
      * @param projectName
      *             Include only jobs with a project name that starts with projectName (case in-sensitive)
-     * @param tags
-     *             Include only jobs with at least one tag included in the tag set (case in-sensitive)
      * @param userName
      *             Include only jobs with a user name that matches exactly with userName (case in-sensitive)
      * @param parentId
