@@ -76,6 +76,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.RMStatistics;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -230,6 +231,39 @@ public class RMRest implements RMRestInterface {
             LOGGER.debug("Invalid session : " + sessionId);
             return null;
         }
+    }
+
+    @Override
+    public RMStatistics getStatistics(String sessionId) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        RMStatistics statistics = new RMStatistics();
+
+        for (RMNodeEvent node : rm.getMonitoring().getState().getNodeEvents()) {
+            switch (node.getNodeState()) {
+                case FREE:
+                    statistics.addFreeNode();
+                    break;
+                case BUSY:
+                    statistics.addBusyNode();
+                    break;
+                case DEPLOYING:
+                    statistics.addDeployingNode();
+                    break;
+                case CONFIGURING:
+                    statistics.addConfigNode();
+                    break;
+                case DOWN:
+                    statistics.addDownNode();
+                    break;
+                case LOST:
+                    statistics.addLostNode();
+                    break;
+                case TO_BE_REMOVED:
+                    statistics.addToBeRemovedNodesCount();
+                    break;
+            }
+        }
+        return statistics;
     }
 
     @Override
