@@ -1161,7 +1161,7 @@
   </define>
   <define name="workflowTagPattern">
     <data type="string">
-      <param name="pattern">^$|^[A-Za-z_0-9\-& ]+(?:,[A-Za-z_0-9\-& ]+)*$</param>
+      <param name="pattern">^$|^[A-Za-z_0-9\-&amp;]+(?:,[A-Za-z_0-9\-&amp;]+)*$</param>
     </data>
   </define>
 </grammar>

@@ -1512,7 +1512,7 @@
   </xs:simpleType>
   <xs:simpleType name="workflowTagPattern">
     <xs:restriction base="xs:string">
-      <xs:pattern value="^$|^[A-Za-z_0-9\-& ]+(?:,[A-Za-z_0-9\-& ]+)*$"/>
+      <xs:pattern value="^$|^[A-Za-z_0-9\-&amp;]+(?:,[A-Za-z_0-9\-&amp;]+)*$"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>
