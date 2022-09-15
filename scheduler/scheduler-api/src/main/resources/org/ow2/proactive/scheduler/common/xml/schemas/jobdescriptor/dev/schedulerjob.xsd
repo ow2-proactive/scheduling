@@ -281,7 +281,7 @@
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="tags">
-    <xs:attribute name="tags" type="jd:workflowTagPattern">
+    <xs:attribute name="tags" use="required" type="jd:workflowTagPattern">
       <xs:annotation>
         <xs:documentation>Tags related to this job separated by commas</xs:documentation>
       </xs:annotation>
@@ -291,7 +291,7 @@
     <xs:sequence>
       <xs:element name="description" type="xs:string">
         <xs:annotation>
-          <xs:documentation>Textual description of this job </xs:documentation>
+          <xs:documentation>Textual description of this job</xs:documentation>
         </xs:annotation>
       </xs:element>
     </xs:sequence>
@@ -1512,7 +1512,7 @@
   </xs:simpleType>
   <xs:simpleType name="workflowTagPattern">
     <xs:restriction base="xs:string">
-      <xs:pattern value="^$|^[A-Za-z_0-9\-\s&]+(,[A-Za-z_0-9\-\s&]+)*$"/>
+      <xs:pattern value="^$|^[A-Za-z_0-9\-\s&amp;]+(,[A-Za-z_0-9\-\s&amp;]+)*$"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

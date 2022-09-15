@@ -234,7 +234,7 @@
   </define>
   <define name="jobDescription">
     <element name="description">
-      <doc:documentation>Textual description of this job </doc:documentation>
+      <doc:documentation>Textual description of this job</doc:documentation>
       <text/>
     </element>
   </define>
@@ -1161,7 +1161,7 @@
   </define>
   <define name="workflowTagPattern">
     <data type="string">
-      <param name="pattern">^$|^[A-Za-z_0-9\-\s&]+(,[A-Za-z_0-9\-\s&]+)*$</param>
+      <param name="pattern">^$|^[A-Za-z_0-9\-\s&amp;]+(,[A-Za-z_0-9\-\s&amp;]+)*$</param>
     </data>
   </define>
 </grammar>
