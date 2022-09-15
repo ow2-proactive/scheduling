@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="urn:proactive:jobdescriptor:dev" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="urn:proactive:jobdescriptor:3.14" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:jd="urn:proactive:jobdescriptor:3.14" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <ref name="job"/>
   </start>
@@ -406,7 +406,7 @@
   </define>
   <define name="taskVariableAdvanced">
     <attribute name="advanced">
-      <doc:documentation>It specifies whether the variable is advanced. Advanced variables are hidden by default during the workflow submission.</doc:documentation>
+      <doc:documentation>It specifies whether the variable is advanced. Advanced variables are not shown by default during the workflow submission.</doc:documentation>
       <data type="boolean"/>
     </attribute>
   </define>

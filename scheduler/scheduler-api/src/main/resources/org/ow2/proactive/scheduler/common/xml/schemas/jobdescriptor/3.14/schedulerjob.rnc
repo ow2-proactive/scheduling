@@ -1,5 +1,5 @@
-default namespace = "urn:proactive:jobdescriptor:dev"
-namespace jd = "urn:proactive:jobdescriptor:dev"
+default namespace = "urn:proactive:jobdescriptor:3.14"
+namespace jd = "urn:proactive:jobdescriptor:3.14"
 namespace xsi = "http://www.w3.org/2001/XMLSchema-instance"
 namespace doc = "http://relaxng.org/ns/compatibility/annotations/1.0"
 start = job
@@ -126,7 +126,7 @@ taskVariableDescription = ## Description of the variable
     attribute description { xsd:string }
 taskVariableGroup = ## Group of the variable
     attribute group { xsd:string }
-taskVariableAdvanced = ## It specifies whether the variable is advanced. Advanced variables are hidden by default during the workflow submission.
+taskVariableAdvanced = ## It specifies whether the variable is advanced. Advanced variables are not shown by default during the workflow submission.
     attribute advanced { xsd:boolean }
 taskVariableHidden = ## It specifies whether the variable is hidden. Hidden variables are always hidden during the workflow submission.
     attribute hidden { xsd:boolean }
