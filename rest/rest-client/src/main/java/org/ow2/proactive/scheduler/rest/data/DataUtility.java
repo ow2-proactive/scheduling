@@ -205,6 +205,27 @@ public class DataUtility {
         return schedulerUserInfos;
     }
 
+    public static FilteredStatistics toFilteredStatistics(FilteredStatisticsData jobsReportData) {
+        return new FilteredStatistics(jobsReportData.getCurrentJobs(),
+                                      jobsReportData.getRunningJobs(),
+                                      jobsReportData.getPausedJobs(),
+                                      jobsReportData.getStalledJobs(),
+                                      jobsReportData.getPendingJobs(),
+                                      jobsReportData.getCurrentJobsWithIssues(),
+                                      jobsReportData.getInErrorJobs(),
+                                      jobsReportData.getRunningJobsWithIssues(),
+                                      jobsReportData.getPausedJobsWithIssues(),
+                                      jobsReportData.getStalledJobsWithIssues(),
+                                      jobsReportData.getPastJobsWithIssues(),
+                                      jobsReportData.getCanceledJobs(),
+                                      jobsReportData.getKilledJobs(),
+                                      jobsReportData.getFailedJobs(),
+                                      jobsReportData.getFinishedJobsWithIssues(),
+                                      jobsReportData.getSuccessfulJobs(),
+                                      jobsReportData.getTotalJobs(),
+                                      jobsReportData.getSuccessfulRate());
+    }
+
     public static UserIdentification userIdentification(SchedulerUserData d) {
         return new UserIdentificationImpl(d.getUsername(),
                                           d.getGroups(),

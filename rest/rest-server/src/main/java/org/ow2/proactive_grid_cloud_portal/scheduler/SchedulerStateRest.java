@@ -2546,6 +2546,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @GET
+    @Path("stats/filters")
+    @Produces("application/json")
+    @Override
+    public FilteredStatisticsData getFilteredStatistics(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("startdate") @DateFormatter.DateFormat() Date startDate,
+            @QueryParam("enddate") @DateFormatter.DateFormat() Date endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return mapper.map(scheduler.getFilteredStatistics(workflowName, myJobs, startDate, endDate),
+                              FilteredStatisticsData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
     @Path("usage/account")
     @Produces("application/json")
     @Override
