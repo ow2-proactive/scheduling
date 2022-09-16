@@ -58,6 +58,7 @@ import org.ow2.proactive.db.TransactionHelper;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -567,9 +568,195 @@ public class SchedulerDBManager {
         return getJobsNumberWithStatusForUser(Collections.singletonList(JobStatus.CANCELED), username);
     }
 
+    public long getRunningJobsWithNoIssuesCount(String workflowName, String username, String tenant) {
+        return getJobsWithNoIssuesCount(workflowName, username, Collections.singletonList(JobStatus.RUNNING), tenant);
+    }
+
+    public long getStalledJobsWithNoIssuesCount(String workflowName, String username, String tenant) {
+        return getJobsWithNoIssuesCount(workflowName, username, Collections.singletonList(JobStatus.STALLED), tenant);
+    }
+
+    public long getPausedJobsWithNoIssuesCount(String workflowName, String username, String tenant) {
+        return getJobsWithNoIssuesCount(workflowName, username, Collections.singletonList(JobStatus.PAUSED), tenant);
+    }
+
+    public long getPendingJobsWithNoIssuesCount(String workflowName, String username, String tenant) {
+        return getJobsWithNoIssuesCount(workflowName, username, Collections.singletonList(JobStatus.PENDING), tenant);
+    }
+
+    public long getRunningJobsWithIssuesCount(String workflowName, String username, String tenant) {
+        return getJobsWithIssuesCount(workflowName, username, Collections.singletonList(JobStatus.RUNNING), tenant);
+    }
+
+    public long getStalledJobsWithIssuesCount(String workflowName, String username, String tenant) {
+        return getJobsWithIssuesCount(workflowName, username, Collections.singletonList(JobStatus.STALLED), tenant);
+    }
+
+    public long getPausedJobsWithIssuesCount(String workflowName, String username, String tenant) {
+        return getJobsWithIssuesCount(workflowName, username, Collections.singletonList(JobStatus.PAUSED), tenant);
+    }
+
+    public long getKilledJobsWithPeriod(String workflowName, String username, Date startTime, Date endTime,
+            String tenant) {
+        return getUnSuccessfulJobsCount(Collections.singletonList(JobStatus.KILLED),
+                                        workflowName,
+                                        username,
+                                        startTime,
+                                        endTime,
+                                        tenant);
+    }
+
+    public long getCanceledJobsWithPeriod(String workflowName, String username, Date startTime, Date endTime,
+            String tenant) {
+        return getUnSuccessfulJobsCount(Collections.singletonList(JobStatus.CANCELED),
+                                        workflowName,
+                                        username,
+                                        startTime,
+                                        endTime,
+                                        tenant);
+    }
+
+    public long getFailedJobsWithPeriod(String workflowName, String username, Date startTime, Date endTime,
+            String tenant) {
+        return getUnSuccessfulJobsCount(Collections.singletonList(JobStatus.FAILED),
+                                        workflowName,
+                                        username,
+                                        startTime,
+                                        endTime,
+                                        tenant);
+    }
+
+    public long getInErrorJobsCount(String workflowName, String username, String tenant) {
+        if (workflowName != null && username != null) {
+            return getUserJobsNumberWithJobNameAndStatus(Collections.singletonList(JobStatus.IN_ERROR),
+                                                         workflowName,
+                                                         username,
+                                                         tenant);
+        } else if (workflowName == null && username != null) {
+            return getUserJobsNumberWithStatus(Collections.singletonList(JobStatus.IN_ERROR), username, tenant);
+        } else if (workflowName != null) {
+            return getJobsNumberWithJobNameAndStatus(Collections.singletonList(JobStatus.IN_ERROR),
+                                                     workflowName,
+                                                     tenant);
+        } else {
+            return getJobsNumberWithStatusAndTenant(Collections.singletonList(JobStatus.IN_ERROR), tenant);
+        }
+    }
+
+    public long getJobsWithNoIssuesCount(String workflowName, String username, final Collection<JobStatus> status,
+            String tenant) {
+        if (workflowName != null && username != null) {
+            return getUserJobsCountWithStatusAndJobNameAndNoIssues(status, workflowName, username, tenant);
+        } else if (workflowName == null && username != null) {
+            return getUserJobsCountWithStatusAndNoIssues(status, username, tenant);
+        } else if (workflowName != null) {
+            return getJobsCountWithStatusAndJobNameAndNoIssues(status, workflowName, tenant);
+        } else {
+            return getJobsCountWithStatusAndNoIssues(status, tenant);
+        }
+    }
+
+    public long getJobsWithIssuesCount(String workflowName, String username, final Collection<JobStatus> status,
+            String tenant) {
+        if (workflowName != null && username != null) {
+            return getUserJobsCountWithStatusAndJobNameAndIssues(status, workflowName, username, tenant);
+        } else if (workflowName == null && username != null) {
+            return getUserJobsCountWithStatusAndIssues(status, username, tenant);
+        } else if (workflowName != null) {
+            return getJobsCountWithStatusAndJobNameAndIssues(status, workflowName, tenant);
+        } else {
+            return getJobsCountWithStatusAndIssues(status, tenant);
+        }
+    }
+
+    public long getSuccessfulJobsCount(String workflowName, String username, Date startTime, Date endTime,
+            String tenant) {
+        if (workflowName != null && username != null) {
+            return getUserJobsCountWithPeriodAndJobNameAndNoIssues(ImmutableSet.of(JobStatus.FINISHED),
+                                                                   workflowName,
+                                                                   username,
+                                                                   startTime,
+                                                                   endTime,
+                                                                   tenant);
+        } else if (workflowName == null && username != null) {
+            return getUserJobsCountWithPeriodAndNoIssues(ImmutableSet.of(JobStatus.FINISHED),
+                                                         username,
+                                                         startTime,
+                                                         endTime,
+                                                         tenant);
+        } else if (workflowName != null) {
+            return getJobsCountWithPeriodAndJobNameAndNoIssues(ImmutableSet.of(JobStatus.FINISHED),
+                                                               workflowName,
+                                                               startTime,
+                                                               endTime,
+                                                               tenant);
+        } else {
+            return getJobsCountWithPeriodAndNoIssues(ImmutableSet.of(JobStatus.FINISHED), startTime, endTime, tenant);
+        }
+    }
+
+    public long getFinishedJobsCountWithIssues(String workflowName, String username, Date startTime, Date endTime,
+            String tenant) {
+        if (workflowName != null && username != null) {
+            return getUserJobsWithFailedTasksAndJobName(ImmutableSet.of(JobStatus.FINISHED),
+                                                        workflowName,
+                                                        username,
+                                                        startTime,
+                                                        endTime,
+                                                        tenant);
+        } else if (workflowName == null && username != null) {
+            return getUserJobsWithFailedTasks(ImmutableSet.of(JobStatus.FINISHED),
+                                              username,
+                                              startTime,
+                                              endTime,
+                                              tenant);
+        } else if (workflowName != null) {
+            return getJobsWithFailedTasksAndJobName(ImmutableSet.of(JobStatus.FINISHED),
+                                                    workflowName,
+                                                    startTime,
+                                                    endTime,
+                                                    tenant);
+        } else {
+            return getJobsWithFailedTasks(ImmutableSet.of(JobStatus.FINISHED), startTime, endTime, tenant);
+        }
+    }
+
+    public long getUnSuccessfulJobsCount(final Collection<JobStatus> statuses, String workflowName, String username,
+            Date startTime, Date endTime, String tenant) {
+        if (workflowName != null && username != null) {
+            return getUserUnSuccessfulJobsCountWithJobName(statuses,
+                                                           workflowName,
+                                                           username,
+                                                           startTime,
+                                                           endTime,
+                                                           tenant);
+        } else if (workflowName == null && username != null) {
+            return getUserUnSuccessfulJobsCount(statuses, username, startTime, endTime, tenant);
+        } else if (workflowName != null) {
+            return getUnSuccessfulJobsCountWithJobName(statuses, workflowName, startTime, endTime, tenant);
+        } else {
+            return getUnSuccessfulJobsNumber(statuses, startTime, endTime, tenant);
+        }
+    }
+
     public long getTotalJobsCount() {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getTotalJobsCount");
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    private long getJobsNumberWithStatusAndTenant(final Collection<JobStatus> status, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsNumberWithStatusAndNoTenant").setParameterList("status",
+                                                                                                       status);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsNumberWithStatusAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("tenant", tenant);
+
             return (Long) query.uniqueResult();
         });
     }
@@ -582,11 +769,476 @@ public class SchedulerDBManager {
         });
     }
 
+    private long getJobsCountWithStatusAndNoIssues(final Collection<JobStatus> status, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithStatusAndNoIssuesAndNoTenant")
+                                 .setParameterList("status", status);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithStatusAndNoIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
     private int getJobsNumberWithStatusForUser(final Collection<JobStatus> status, String username) {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getJobsNumberWithStatusUsername")
                                  .setParameter("username", username)
                                  .setParameterList("status", status);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getUserJobsCountWithPeriodAndJobNameAndNoIssues(final Collection<JobStatus> status, String workflowName,
+            String username, Date startTime, Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithPeriodAndJobNameAndNoIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithPeriodAndJobNameAndNoIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getUserJobsCountWithPeriodAndNoIssues(final Collection<JobStatus> status, String username,
+            Date startTime, Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithPeriodAndNoIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithPeriodAndNoIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getJobsCountWithPeriodAndJobNameAndNoIssues(final Collection<JobStatus> status, String workflowName,
+            Date startTime, Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithPeriodAndJobNameAndNoIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithPeriodAndJobNameAndNoIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getJobsCountWithPeriodAndNoIssues(final Collection<JobStatus> status, Date startTime, Date endTime,
+            String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithPeriodAndNoIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithPeriodAndNoIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getUserJobsWithFailedTasksAndJobName(final Collection<JobStatus> status, String workflowName,
+            String username, Date startTime, Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsWithFailedTasksAndJobNameAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsWithFailedTasksAndJobNameAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getUserJobsWithFailedTasks(final Collection<JobStatus> status, String username, Date startTime,
+            Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsWithFailedTasksAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsWithFailedTasksAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getJobsWithFailedTasksAndJobName(final Collection<JobStatus> status, String workflowName,
+            Date startTime, Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsWithFailedTasksAndJobNameAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsWithFailedTasksAndJobNameAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getJobsWithFailedTasks(final Collection<JobStatus> status, Date startTime, Date endTime,
+            String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsWithFailedTasksAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsWithFailedTasksAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private long getUserJobsCountWithStatusAndJobNameAndNoIssues(final Collection<JobStatus> status,
+            String workflowName, String username, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithStatusAndJobNameAndNoIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithStatusAndJobNameAndNoIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    private long getUserJobsNumberWithJobNameAndStatus(final Collection<JobStatus> status, String workflowName,
+            String username, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsNumberWithJobNameAndStatusAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsNumberWithJobNameAndStatusAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    private long getJobsCountWithStatusAndJobNameAndNoIssues(final Collection<JobStatus> status, String workflowName,
+            String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithStatusAndJobNameAndNoIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithStatusAndJobNameAndNoIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    private long getJobsNumberWithJobNameAndStatus(final Collection<JobStatus> status, String workflowName,
+            String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsNumberWithJobNameAndStatusAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsNumberWithJobNameAndStatusAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    private long getUserJobsCountWithStatusAndNoIssues(final Collection<JobStatus> status, String username,
+            String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithStatusAndNoIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithStatusAndNoIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    private long getUserJobsNumberWithStatus(final Collection<JobStatus> status, String username, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsNumberWithStatusAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsNumberWithStatusAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    private long getUserJobsCountWithStatusAndJobNameAndIssues(final Collection<JobStatus> status, String workflowName,
+            String username, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithStatusAndJobNameAndIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithStatusAndJobNameAndIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+
+    }
+
+    private long getUserJobsCountWithStatusAndIssues(final Collection<JobStatus> status, String username,
+            String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithStatusAndIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserJobsCountWithStatusAndIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+
+    }
+
+    private long getJobsCountWithStatusAndJobNameAndIssues(final Collection<JobStatus> status, String workflowName,
+            String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithStatusAndJobNameAndIssuesAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithStatusAndJobNameAndIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+
+    }
+
+    private long getJobsCountWithStatusAndIssues(final Collection<JobStatus> status, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithStatusAndIssuesAndNoTenant").setParameterList("status",
+                                                                                                               status);
+
+            return (Long) query.uniqueResult();
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getJobsCountWithStatusAndIssuesAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("tenant", tenant);
+
+            return (Long) query.uniqueResult();
+        });
+
+    }
+
+    private int getUserUnSuccessfulJobsCountWithJobName(final Collection<JobStatus> status, String workflowName,
+            String username, Date startTime, Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserTotalJobsCountWithStatusAndJobNameAndPeriodAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserTotalJobsCountWithStatusAndJobNameAndPeriodAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getUnSuccessfulJobsCountWithJobName(final Collection<JobStatus> status, String workflowName,
+            Date startTime, Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTotalJobsCountWithStatusAndJobNameAndPeriodAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTotalJobsCountWithStatusAndJobNameAndPeriodAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("jobName", workflowName)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getUserUnSuccessfulJobsCount(final Collection<JobStatus> status, String username, Date startTime,
+            Date endTime, String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserTotalJobsCountWithStatusAndPeriodAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getUserTotalJobsCountWithStatusAndPeriodAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("username", username)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        });
+    }
+
+    private int getUnSuccessfulJobsNumber(final Collection<JobStatus> status, Date startTime, Date endTime,
+            String tenant) {
+        return tenant == null ? executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTotalJobsCountWithStatusAndPeriodAndNoTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime());
+
+            return Math.toIntExact((Long) query.uniqueResult());
+        }) : executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTotalJobsCountWithStatusAndPeriodAndTenant")
+                                 .setParameterList("status", status)
+                                 .setParameter("startTime", startTime.getTime())
+                                 .setParameter("endTime", endTime.getTime())
+                                 .setParameter("tenant", tenant);
 
             return Math.toIntExact((Long) query.uniqueResult());
         });
@@ -853,6 +1505,52 @@ public class SchedulerDBManager {
                                    .finishedJobsCount(finishedJobsCount)
                                    .build();
         });
+    }
+
+    public FilteredStatistics getFilteredStatistics(final String workflowName, String user, String tenant,
+            final Date startTime, final Date endTime) {
+
+        long runningJobs = getRunningJobsWithNoIssuesCount(workflowName, user, tenant);
+        long stalledJobs = getStalledJobsWithNoIssuesCount(workflowName, user, tenant);
+        long pausedJobs = getPausedJobsWithNoIssuesCount(workflowName, user, tenant);
+        long pendingJobs = getPendingJobsWithNoIssuesCount(workflowName, user, tenant);
+        long currentJobs = runningJobs + stalledJobs + pausedJobs + pendingJobs;
+
+        long inErrorJobs = getInErrorJobsCount(workflowName, user, tenant);
+        long runningJobsWithIssues = getRunningJobsWithIssuesCount(workflowName, user, tenant);
+        long stalledJobsWithIssues = getStalledJobsWithIssuesCount(workflowName, user, tenant);
+        long pausedJobsWithIssues = getPausedJobsWithIssuesCount(workflowName, user, tenant);
+        long currentJobsWithIssues = inErrorJobs + runningJobsWithIssues + stalledJobsWithIssues + pausedJobsWithIssues;
+
+        long canceledJobs = getCanceledJobsWithPeriod(workflowName, user, startTime, endTime, tenant);
+        long failedJobs = getFailedJobsWithPeriod(workflowName, user, startTime, endTime, tenant);
+        long killedJobs = getKilledJobsWithPeriod(workflowName, user, startTime, endTime, tenant);
+        long finishedJobsWithIssues = getFinishedJobsCountWithIssues(workflowName, user, startTime, endTime, tenant);
+        long pastJobsWithIssues = canceledJobs + failedJobs + killedJobs + finishedJobsWithIssues;
+
+        long successfulJobs = getSuccessfulJobsCount(workflowName, user, startTime, endTime, tenant);
+        long totalJobs = currentJobs + currentJobsWithIssues + pastJobsWithIssues + successfulJobs;
+        long successfulRate = (long) ((float) successfulJobs / (successfulJobs + pastJobsWithIssues) * 100);
+
+        return new FilteredStatistics(currentJobs,
+                                      runningJobs,
+                                      pausedJobs,
+                                      stalledJobs,
+                                      pendingJobs,
+                                      currentJobsWithIssues,
+                                      inErrorJobs,
+                                      runningJobsWithIssues,
+                                      pausedJobsWithIssues,
+                                      stalledJobsWithIssues,
+                                      pastJobsWithIssues,
+                                      canceledJobs,
+                                      killedJobs,
+                                      failedJobs,
+                                      finishedJobsWithIssues,
+                                      successfulJobs,
+                                      totalJobs,
+                                      successfulRate);
+
     }
 
     private void removeJobScripts(Session session, List<Long> jobIds) {
