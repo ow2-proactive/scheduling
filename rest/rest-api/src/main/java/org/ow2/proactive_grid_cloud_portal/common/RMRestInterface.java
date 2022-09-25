@@ -179,6 +179,8 @@ public interface RMRestInterface {
     UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId);
 
     /**
+     * Resource Manager statistics
+     *
      * Get the current statistics of the Resource Manager state including the following information:
      * <pre>
      * 	{ "availableNodesCount",
