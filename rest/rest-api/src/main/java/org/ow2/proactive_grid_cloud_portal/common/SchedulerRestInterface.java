@@ -2115,7 +2115,7 @@ public interface SchedulerRestInterface {
      * @throws RestException if an error occurs or the session is invalid
      */
     @GET
-    @Path("stats/topWorkflowWithIssues")
+    @Path("stats/topWorkflowsWithIssues")
     @Produces(MediaType.APPLICATION_JSON)
     List<FilteredTopWorkflowData> getTopWorkflowsWithIssues(@HeaderParam("sessionid") String sessionId,
             @QueryParam("startdate") Date startDate, @QueryParam("enddate") Date endDate,
