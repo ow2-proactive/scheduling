@@ -486,7 +486,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, Date startDate, Date endDate)
+    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException {
 
         try {
@@ -503,11 +503,12 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(String workflowName, Boolean myJobs, Date startDate,
-            Date endDate) throws NotConnectedException, PermissionException {
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
 
         try {
             List<FilteredTopWorkflowData> filteredWorkflows = restApi().getTopWorkflowsWithIssues(sid,
+                                                                                                  numberOfWorkflows,
                                                                                                   startDate,
                                                                                                   endDate,
                                                                                                   myJobs,

@@ -2099,14 +2099,16 @@ public interface SchedulerRestInterface {
     @Path("stats/filters")
     @Produces(MediaType.APPLICATION_JSON)
     FilteredStatisticsData getFilteredStatistics(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("startdate") Date startDate, @QueryParam("enddate") Date endDate,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
 
     /**
-     * Returns an object containing the top 10 workflows with issues based on the given filters
+     * Returns an object containing the top workflows with issues based on the given filters
      *
      * @param sessionId id of a session
+     * @param numberOfWorkflows number of workflows to show
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
@@ -2118,7 +2120,9 @@ public interface SchedulerRestInterface {
     @Path("stats/topWorkflowsWithIssues")
     @Produces(MediaType.APPLICATION_JSON)
     List<FilteredTopWorkflowData> getTopWorkflowsWithIssues(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("startdate") Date startDate, @QueryParam("enddate") Date endDate,
+            @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
 

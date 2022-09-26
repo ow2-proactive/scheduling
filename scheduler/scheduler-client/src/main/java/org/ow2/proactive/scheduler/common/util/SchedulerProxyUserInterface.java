@@ -761,16 +761,16 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, Date startDate, Date endDate)
+    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException {
         return uischeduler.getFilteredStatistics(workflowName, myJobs, startDate, endDate);
     }
 
     @Override
     @ImmediateService
-    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(String workflowName, Boolean myJobs, Date startDate,
-            Date endDate) throws NotConnectedException, PermissionException {
-        return uischeduler.getTopWorkflowsWithIssues(workflowName, myJobs, startDate, endDate);
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+        return uischeduler.getTopWorkflowsWithIssues(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
     }
 
     @Override

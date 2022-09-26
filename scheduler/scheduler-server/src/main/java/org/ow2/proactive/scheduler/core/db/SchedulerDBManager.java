@@ -343,8 +343,8 @@ public class SchedulerDBManager {
         return new Page<>(lJobs, totalNbJobs);
     }
 
-    public int getNumberOfFilteredJobs(final String workflowName, String user, String tenant, final Date startTime,
-            final Date endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
+    public int getNumberOfFilteredJobs(final String workflowName, String user, String tenant, final long startTime,
+            final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
 
         List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
             Criteria criteria = session.createCriteria(JobData.class);
@@ -358,9 +358,9 @@ public class SchedulerDBManager {
             if (StringUtils.isNotEmpty(workflowName)) {
                 criteria.add(Restrictions.like("jobName", workflowName, MatchMode.START));
             }
-            if (startTime != null && endTime != null) {
-                criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startTime.getTime()),
-                                              Restrictions.le("finishedTime", endTime.getTime())));
+            if (startTime != 0 && endTime != 0) {
+                criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startTime),
+                                              Restrictions.le("finishedTime", endTime)));
             }
             if (Boolean.TRUE.equals(withFailedTasks)) {
                 criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
@@ -892,8 +892,8 @@ public class SchedulerDBManager {
         });
     }
 
-    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(final String workflowName, String user, String tenant,
-            final Date startTime, final Date endTime) {
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, final String workflowName,
+            String user, String tenant, final long startTime, final long endTime) {
 
         return executeReadOnlyTransaction(session -> {
 
@@ -912,16 +912,16 @@ public class SchedulerDBManager {
                     queryString.append("and (tenant = :tenant or tenant = null) ");
                 }
             }
-            if (startTime != null) {
+            if (startTime != 0) {
                 queryString.append("and finishedTime >= :startTime ");
             }
-            if (endTime != null) {
+            if (endTime != 0) {
                 queryString.append("and finishedTime <= :endTime ");
             }
             queryString.append("group by jobName, projectName order by errorCount desc");
 
             Query query = session.createQuery(queryString.toString());
-            query.setMaxResults(10);
+            query.setMaxResults(numberOfWorkflows);
             if (hasWorkflowName) {
                 query.setParameter("workflowName", workflowName);
             }
@@ -931,11 +931,11 @@ public class SchedulerDBManager {
                     query.setParameter("tenant", tenant);
                 }
             }
-            if (startTime != null) {
-                query.setParameter("startTime", startTime.getTime());
+            if (startTime != 0) {
+                query.setParameter("startTime", startTime);
             }
-            if (endTime != null) {
-                query.setParameter("endTime", endTime.getTime());
+            if (endTime != 0) {
+                query.setParameter("endTime", endTime);
             }
 
             List<Object[]> list = query.list();
@@ -949,34 +949,34 @@ public class SchedulerDBManager {
     }
 
     public FilteredStatistics getFilteredStatistics(final String workflowName, String user, String tenant,
-            final Date startTime, final Date endTime) {
+            final long startTime, final long endTime) {
 
         long runningJobs = getNumberOfFilteredJobs(workflowName,
                                                    user,
                                                    tenant,
-                                                   null,
-                                                   null,
+                                                   0,
+                                                   0,
                                                    Collections.singletonList(JobStatus.RUNNING),
                                                    null);
         long stalledJobs = getNumberOfFilteredJobs(workflowName,
                                                    user,
                                                    tenant,
-                                                   null,
-                                                   null,
+                                                   0,
+                                                   0,
                                                    Collections.singletonList(JobStatus.STALLED),
                                                    null);
         long pausedJobs = getNumberOfFilteredJobs(workflowName,
                                                   user,
                                                   tenant,
-                                                  null,
-                                                  null,
+                                                  0,
+                                                  0,
                                                   Collections.singletonList(JobStatus.PAUSED),
                                                   null);
         long pendingJobs = getNumberOfFilteredJobs(workflowName,
                                                    user,
                                                    tenant,
-                                                   null,
-                                                   null,
+                                                   0,
+                                                   0,
                                                    Collections.singletonList(JobStatus.PENDING),
                                                    null);
         long currentJobs = runningJobs + stalledJobs + pausedJobs + pendingJobs;
@@ -984,29 +984,29 @@ public class SchedulerDBManager {
         long inErrorJobs = getNumberOfFilteredJobs(workflowName,
                                                    user,
                                                    tenant,
-                                                   null,
-                                                   null,
+                                                   0,
+                                                   0,
                                                    Collections.singletonList(JobStatus.IN_ERROR),
                                                    null);
         long runningJobsWithIssues = getNumberOfFilteredJobs(workflowName,
                                                              user,
                                                              tenant,
-                                                             null,
-                                                             null,
+                                                             0,
+                                                             0,
                                                              Collections.singletonList(JobStatus.RUNNING),
                                                              true);
         long stalledJobsWithIssues = getNumberOfFilteredJobs(workflowName,
                                                              user,
                                                              tenant,
-                                                             null,
-                                                             null,
+                                                             0,
+                                                             0,
                                                              Collections.singletonList(JobStatus.STALLED),
                                                              true);
         long pausedJobsWithIssues = getNumberOfFilteredJobs(workflowName,
                                                             user,
                                                             tenant,
-                                                            null,
-                                                            null,
+                                                            0,
+                                                            0,
                                                             Collections.singletonList(JobStatus.PAUSED),
                                                             true);
         long currentJobsWithIssues = inErrorJobs + runningJobsWithIssues + stalledJobsWithIssues + pausedJobsWithIssues;
