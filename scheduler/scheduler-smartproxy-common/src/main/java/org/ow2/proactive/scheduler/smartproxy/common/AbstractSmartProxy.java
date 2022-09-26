@@ -245,6 +245,12 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         return getScheduler().getFilteredStatistics(workflowName, myJobs, startDate, endDate);
     }
 
+    @Override
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(String workflowName, Boolean myJobs, Date startDate,
+            Date endDate) throws PermissionException, NotConnectedException {
+        return getScheduler().getTopWorkflowsWithIssues(workflowName, myJobs, startDate, endDate);
+    }
+
     /**
      * Reconnects this smart proxy to the scheduler
      * @throws SchedulerException

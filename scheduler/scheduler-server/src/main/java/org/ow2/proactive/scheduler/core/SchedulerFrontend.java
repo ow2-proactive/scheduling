@@ -1802,6 +1802,24 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                endDate);
     }
 
+    @Override
+    @ImmediateService
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(String workflowName, Boolean myJobs, Date startDate,
+            Date endDate) throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getFilteredStatistics",
+                                                                     "You don't have permissions to get filtered statistics");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        return dbManager.getTopWorkflowsWithIssues(workflowName,
+                                                   myJobs ? ident.getUsername() : null,
+                                                   tenant,
+                                                   startDate,
+                                                   endDate);
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -2104,6 +2104,25 @@ public interface SchedulerRestInterface {
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
 
     /**
+     * Returns an object containing the top 10 workflows with issues based on the given filters
+     *
+     * @param sessionId id of a session
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @param workflowName the workflow name of the filtered jobs
+     * @return {@link FilteredStatisticsData}
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("stats/topWorkflowWithIssues")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<FilteredTopWorkflowData> getTopWorkflowsWithIssues(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("startdate") Date startDate, @QueryParam("enddate") Date endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+
+    /**
      * Returns details on job and task execution times for the caller's
      * executions.
      * <p>

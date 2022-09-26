@@ -837,6 +837,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(String workflowName, Boolean myJobs, Date startDate,
+            Date endDate) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.getTopWorkflowsWithIssues(workflowName, myJobs, startDate, endDate);
+    }
+
+    @Override
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
             int offset, int limit) throws SchedulerException {
         renewSession();
