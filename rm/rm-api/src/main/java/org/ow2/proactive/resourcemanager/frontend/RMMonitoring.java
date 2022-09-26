@@ -74,4 +74,6 @@ public interface RMMonitoring {
      */
     RMInitialState getState();
 
+    int getNeededNodes();
+
 }

@@ -263,6 +263,9 @@ public class RMRest implements RMRestInterface {
                     break;
             }
         }
+
+        statistics.setNeededNodesCount(rm.getMonitoring().getNeededNodes());
+
         return statistics;
     }
 
