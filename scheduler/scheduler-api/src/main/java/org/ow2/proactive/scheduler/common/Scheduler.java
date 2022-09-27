@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
+import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobIdDataAndError;
@@ -1571,8 +1572,11 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException;
 
-    FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, Date startDate, Date endDate)
+    FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException;
+
+    List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException;
 
     /**
      * Retrieve a tasks names list from the scheduler.
