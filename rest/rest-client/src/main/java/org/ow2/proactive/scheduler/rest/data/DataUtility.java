@@ -97,6 +97,13 @@ public class DataUtility {
         return impl;
     }
 
+    public static FilteredTopWorkflow toFilteredTopWorkflow(FilteredTopWorkflowData filteredTopWorkflowData) {
+        return new FilteredTopWorkflow(filteredTopWorkflowData.getProjectName(),
+                                       filteredTopWorkflowData.getWorkflowName(),
+                                       filteredTopWorkflowData.getNumberOfIssues(),
+                                       filteredTopWorkflowData.getNumberOfExecutions());
+    }
+
     public static TaskInfo taskInfo(TaskInfoData d) {
         TaskInfoImpl impl = new TaskInfoImpl();
         JobIdData jobIdData = d.getJobId();
@@ -189,6 +196,15 @@ public class DataUtility {
             jobInfos.add(toJobInfo(ujd.getJobInfo()));
         }
         return jobInfos;
+    }
+
+    public static List<FilteredTopWorkflow>
+            toFilteredTopWorkflow(List<FilteredTopWorkflowData> filteredTopWorkflowsData) {
+        List<FilteredTopWorkflow> filteredTopWorkflows = new ArrayList<>(filteredTopWorkflowsData.size());
+        for (FilteredTopWorkflowData filteredTopWorkflow : filteredTopWorkflowsData) {
+            filteredTopWorkflows.add(toFilteredTopWorkflow(filteredTopWorkflow));
+        }
+        return filteredTopWorkflows;
     }
 
     public static List<SchedulerUserInfo> toSchedulerUserInfos(List<SchedulerUserData> dataList) {

@@ -45,6 +45,8 @@ public class RMStatistics implements Serializable {
 
     private int availableNodesCount;
 
+    private int neededNodesCount;
+
     public int getFreeNodesCount() {
         return freeNodesCount;
     }
@@ -99,6 +101,14 @@ public class RMStatistics implements Serializable {
 
     public void setToBeRemovedNodesCount(int toBeRemovedNodesCount) {
         this.toBeRemovedNodesCount = toBeRemovedNodesCount;
+    }
+
+    public int getNeededNodesCount() {
+        return neededNodesCount;
+    }
+
+    public void setNeededNodesCount(int neededNodesCount) {
+        this.neededNodesCount = neededNodesCount;
     }
 
     public int getAvailableNodesCount() {

@@ -1786,7 +1786,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, Date startDate, Date endDate)
+    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getFilteredStatistics",
                                                                      "You don't have permissions to get filtered statistics");
@@ -1800,6 +1800,25 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                tenant,
                                                startDate,
                                                endDate);
+    }
+
+    @Override
+    @ImmediateService
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getFilteredStatistics",
+                                                                     "You don't have permissions to get filtered statistics");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        return dbManager.getTopWorkflowsWithIssues(numberOfWorkflows,
+                                                   workflowName,
+                                                   myJobs ? ident.getUsername() : null,
+                                                   tenant,
+                                                   startDate,
+                                                   endDate);
     }
 
     /**
