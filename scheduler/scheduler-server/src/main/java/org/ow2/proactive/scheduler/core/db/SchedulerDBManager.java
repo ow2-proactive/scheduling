@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
+import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowExecutionTime;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -96,6 +97,7 @@ import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.FilteredTopWorkflowExecutionTimeData;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
@@ -897,46 +899,17 @@ public class SchedulerDBManager {
 
         return executeReadOnlyTransaction(session -> {
 
-            StringBuilder queryString = new StringBuilder("select jobName, projectName, (sum(numberOfFailedTasks) + sum(numberOfFaultyTasks)) as errorCount, count(*) as numberOfExecution from JobData where (numberOfFailedTasks > 0 or numberOfFaultyTasks > 0) ");
-
-            boolean hasWorkflowName = !Strings.isNullOrEmpty(workflowName);
-            boolean hasUser = !Strings.isNullOrEmpty(user);
-            boolean hasTenant = !Strings.isNullOrEmpty(tenant);
-
-            if (hasWorkflowName) {
-                queryString.append("and jobName = :workflowName ");
-            }
-            if (hasUser) {
-                queryString.append("and owner = :user ");
-                if (hasTenant) {
-                    queryString.append("and (tenant = :tenant or tenant = null) ");
-                }
-            }
-            if (startTime != 0) {
-                queryString.append("and finishedTime >= :startTime ");
-            }
-            if (endTime != 0) {
-                queryString.append("and finishedTime <= :endTime ");
-            }
-            queryString.append("group by jobName, projectName order by errorCount desc");
-
-            Query query = session.createQuery(queryString.toString());
-            query.setMaxResults(numberOfWorkflows);
-            if (hasWorkflowName) {
-                query.setParameter("workflowName", workflowName);
-            }
-            if (hasUser) {
-                query.setParameter("user", user);
-                if (hasTenant) {
-                    query.setParameter("tenant", tenant);
-                }
-            }
-            if (startTime != 0) {
-                query.setParameter("startTime", startTime);
-            }
-            if (endTime != 0) {
-                query.setParameter("endTime", endTime);
-            }
+            String selectQuery = "select jobName, projectName, (sum(numberOfFailedTasks) + sum(numberOfFaultyTasks)) as errorCount, count(*) as numberOfExecution from JobData where (numberOfFailedTasks > 0 or numberOfFaultyTasks > 0) ";
+            String groupByQuery = "group by jobName, projectName order by errorCount desc";
+            Query query = getTopWorkflowsQuery(session,
+                                               workflowName,
+                                               user,
+                                               tenant,
+                                               startTime,
+                                               endTime,
+                                               numberOfWorkflows,
+                                               selectQuery,
+                                               groupByQuery);
 
             List<Object[]> list = query.list();
             return list.stream()
@@ -946,6 +919,78 @@ public class SchedulerDBManager {
                                                                     Long.parseLong(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
+    }
+
+    public List<FilteredTopWorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows,
+            final String workflowName, String user, String tenant, final long startTime, final long endTime) {
+
+        return executeReadOnlyTransaction(session -> {
+
+            String selectQuery = "select jobName, projectName, avg(finishedTime - startTime) as executionTime, count(*) as numberOfExecution from JobData where startTime > 0 and finishedTime > 0 ";
+            String groupByQuery = "group by jobName, projectName order by executionTime desc";
+            Query query = getTopWorkflowsQuery(session,
+                                               workflowName,
+                                               user,
+                                               tenant,
+                                               startTime,
+                                               endTime,
+                                               numberOfWorkflows,
+                                               selectQuery,
+                                               groupByQuery);
+
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .map(nameAndCount -> new FilteredTopWorkflowExecutionTime(nameAndCount[0].toString(),
+                                                                                 nameAndCount[1].toString(),
+                                                                                 Double.parseDouble(nameAndCount[2].toString()),
+                                                                                 Long.parseLong(nameAndCount[3].toString())))
+                       .collect(Collectors.toList());
+        });
+    }
+
+    private Query getTopWorkflowsQuery(Session session, String workflowName, String user, String tenant, long startTime,
+            long endTime, int numberOfWorkflows, String selectQuery, String groupByQuery) {
+        StringBuilder queryString = new StringBuilder(selectQuery);
+
+        boolean hasWorkflowName = !Strings.isNullOrEmpty(workflowName);
+        boolean hasUser = !Strings.isNullOrEmpty(user);
+        boolean hasTenant = !Strings.isNullOrEmpty(tenant);
+
+        if (hasWorkflowName) {
+            queryString.append("and jobName = :workflowName ");
+        }
+        if (hasUser) {
+            queryString.append("and owner = :user ");
+            if (hasTenant) {
+                queryString.append("and (tenant = :tenant or tenant = null) ");
+            }
+        }
+        if (startTime != 0) {
+            queryString.append("and finishedTime >= :startTime ");
+        }
+        if (endTime != 0) {
+            queryString.append("and finishedTime <= :endTime ");
+        }
+        queryString.append(groupByQuery);
+
+        Query query = session.createQuery(queryString.toString());
+        query.setMaxResults(numberOfWorkflows);
+        if (hasWorkflowName) {
+            query.setParameter("workflowName", workflowName);
+        }
+        if (hasUser) {
+            query.setParameter("user", user);
+            if (hasTenant) {
+                query.setParameter("tenant", tenant);
+            }
+        }
+        if (startTime != 0) {
+            query.setParameter("startTime", startTime);
+        }
+        if (endTime != 0) {
+            query.setParameter("endTime", endTime);
+        }
+        return query;
     }
 
     public FilteredStatistics getFilteredStatistics(final String workflowName, String user, String tenant,
