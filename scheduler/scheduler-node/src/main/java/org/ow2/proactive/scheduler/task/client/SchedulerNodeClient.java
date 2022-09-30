@@ -844,9 +844,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public List<FilteredTopWorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws NotConnectedException, PermissionException {
+    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
         renewSession();
         return client.getTopExecutionTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
     }

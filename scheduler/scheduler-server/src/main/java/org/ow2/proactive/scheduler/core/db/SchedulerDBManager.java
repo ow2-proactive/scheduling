@@ -61,12 +61,12 @@ import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
-import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowExecutionTime;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.WorkflowExecutionTime;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -97,7 +97,6 @@ import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.FilteredTopWorkflowExecutionTimeData;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
@@ -899,8 +898,8 @@ public class SchedulerDBManager {
 
         return executeReadOnlyTransaction(session -> {
 
-            String selectQuery = "select jobName, projectName, (sum(numberOfFailedTasks) + sum(numberOfFaultyTasks)) as errorCount, count(*) as numberOfExecution from JobData where (numberOfFailedTasks > 0 or numberOfFaultyTasks > 0) ";
-            String groupByQuery = "group by jobName, projectName order by errorCount desc";
+            String selectSubQuery = "select jobName, projectName, (sum(numberOfFailedTasks) + sum(numberOfFaultyTasks)) as errorCount, count(*) as numberOfExecution from JobData where (numberOfFailedTasks > 0 or numberOfFaultyTasks > 0) ";
+            String subQueryGroupByStatement = "group by jobName, projectName order by errorCount desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
                                                user,
@@ -908,8 +907,8 @@ public class SchedulerDBManager {
                                                startTime,
                                                endTime,
                                                numberOfWorkflows,
-                                               selectQuery,
-                                               groupByQuery);
+                                               selectSubQuery,
+                                               subQueryGroupByStatement);
 
             List<Object[]> list = query.list();
             return list.stream()
@@ -921,13 +920,13 @@ public class SchedulerDBManager {
         });
     }
 
-    public List<FilteredTopWorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows,
-            final String workflowName, String user, String tenant, final long startTime, final long endTime) {
+    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, final String workflowName,
+            String user, String tenant, final long startTime, final long endTime) {
 
         return executeReadOnlyTransaction(session -> {
 
-            String selectQuery = "select jobName, projectName, avg(finishedTime - startTime) as executionTime, count(*) as numberOfExecution from JobData where startTime > 0 and finishedTime > 0 ";
-            String groupByQuery = "group by jobName, projectName order by executionTime desc";
+            String selectSubQuery = "select jobName, projectName, avg(finishedTime - startTime) as executionTime, count(*) as numberOfExecution from JobData where startTime > 0 and finishedTime > 0 ";
+            String subQueryGroupByStatement = "group by jobName, projectName order by executionTime desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
                                                user,
@@ -935,22 +934,22 @@ public class SchedulerDBManager {
                                                startTime,
                                                endTime,
                                                numberOfWorkflows,
-                                               selectQuery,
-                                               groupByQuery);
+                                               selectSubQuery,
+                                               subQueryGroupByStatement);
 
             List<Object[]> list = query.list();
             return list.stream()
-                       .map(nameAndCount -> new FilteredTopWorkflowExecutionTime(nameAndCount[0].toString(),
-                                                                                 nameAndCount[1].toString(),
-                                                                                 Double.parseDouble(nameAndCount[2].toString()),
-                                                                                 Long.parseLong(nameAndCount[3].toString())))
+                       .map(nameAndCount -> new WorkflowExecutionTime(nameAndCount[0].toString(),
+                                                                      nameAndCount[1].toString(),
+                                                                      Long.parseLong(nameAndCount[2].toString()),
+                                                                      Long.parseLong(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
     }
 
     private Query getTopWorkflowsQuery(Session session, String workflowName, String user, String tenant, long startTime,
-            long endTime, int numberOfWorkflows, String selectQuery, String groupByQuery) {
-        StringBuilder queryString = new StringBuilder(selectQuery);
+            long endTime, int numberOfWorkflows, String selectSubQuery, String subQueryGroupByStatement) {
+        StringBuilder queryString = new StringBuilder(selectSubQuery);
 
         boolean hasWorkflowName = !Strings.isNullOrEmpty(workflowName);
         boolean hasUser = !Strings.isNullOrEmpty(user);
@@ -969,9 +968,9 @@ public class SchedulerDBManager {
             queryString.append("and finishedTime >= :startTime ");
         }
         if (endTime != 0) {
-            queryString.append("and finishedTime <= :endTime ");
+            queryString.append("and finishedTime < :endTime ");
         }
-        queryString.append(groupByQuery);
+        queryString.append(subQueryGroupByStatement);
 
         Query query = session.createQuery(queryString.toString());
         query.setMaxResults(numberOfWorkflows);

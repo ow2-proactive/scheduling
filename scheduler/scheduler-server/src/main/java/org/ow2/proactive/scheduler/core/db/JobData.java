@@ -154,7 +154,9 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_ID_STATUS", columnList = "ID,STATUS"),
                                       @Index(name = "JOB_DATA_STATUS_RANK_ID", columnList = "STATUS_RANK DESC,ID DESC"),
                                       @Index(name = "JOB_DATA_PARENT_RANK_ID", columnList = "PARENT_JOB_ID,STATUS_RANK DESC,ID DESC"),
-                                      @Index(name = "JOB_DATA_OWNER_PARENT_RANK_ID", columnList = "OWNER,PARENT_JOB_ID,STATUS_RANK DESC,ID DESC") })
+                                      @Index(name = "JOB_DATA_OWNER_PARENT_RANK_ID", columnList = "OWNER,PARENT_JOB_ID,STATUS_RANK DESC,ID DESC"),
+                                      @Index(name = "JOB_DATA_FAILED_TASKS", columnList = "FAILED_TASKS"),
+                                      @Index(name = "JOB_DATA_FAULTY_TASKS", columnList = "FAULTY_TASKS") })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);

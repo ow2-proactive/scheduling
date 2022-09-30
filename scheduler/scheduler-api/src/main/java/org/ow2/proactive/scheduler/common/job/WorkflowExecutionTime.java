@@ -23,53 +23,44 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
+package org.ow2.proactive.scheduler.common.job;
 
-public class FilteredTopWorkflowExecutionTimeData implements java.io.Serializable {
+import java.io.Serializable;
 
-    private String projectName;
+import org.objectweb.proactive.annotation.PublicAPI;
 
-    private String workflowName;
 
-    private double executionTime;
+@PublicAPI
+public class WorkflowExecutionTime implements Serializable {
 
-    private long numberOfExecutions;
+    private final String projectName;
+
+    private final String workflowName;
+
+    private final long executionTime;
+
+    private final long numberOfExecutions;
+
+    public WorkflowExecutionTime(String projectName, String workflowName, long executionTime, long numberOfExecutions) {
+        this.projectName = projectName;
+        this.workflowName = workflowName;
+        this.executionTime = executionTime;
+        this.numberOfExecutions = numberOfExecutions;
+    }
 
     public String getProjectName() {
         return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 
     public String getWorkflowName() {
         return workflowName;
     }
 
-    public void setWorkflowName(String workflowName) {
-        this.workflowName = workflowName;
-    }
-
-    public double getExecutionTime() {
+    public long getExecutionTime() {
         return executionTime;
-    }
-
-    public void setExecutionTime(double executionTime) {
-        this.executionTime = executionTime;
     }
 
     public long getNumberOfExecutions() {
         return numberOfExecutions;
-    }
-
-    public void setNumberOfExecutions(long numberOfExecutions) {
-        this.numberOfExecutions = numberOfExecutions;
-    }
-
-    @Override
-    public String toString() {
-        return "FilteredTopWorkflowData{" + "projectName='" + projectName + '\'' + ", workflowName='" + workflowName +
-               '\'' + ", executionTime=" + executionTime + ", numberOfExecutions=" + numberOfExecutions + '}';
     }
 }

@@ -1823,9 +1823,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public List<FilteredTopWorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws NotConnectedException, PermissionException {
+    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getTopExecutionTimeWorkflows",
                                                                      "You don't have permissions to get top execution time workflows");
         String tenant = null;

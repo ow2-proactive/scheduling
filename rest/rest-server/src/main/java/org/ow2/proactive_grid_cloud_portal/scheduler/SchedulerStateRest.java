@@ -2590,8 +2590,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("stats/topWorkflowsWithExecutionTime")
     @Produces("application/json")
     @Override
-    public List<FilteredTopWorkflowExecutionTimeData> getTopExecutionTimeWorkflows(
-            @HeaderParam("sessionid") String sessionId, @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+    public List<WorkflowExecutionTimeData> getTopExecutionTimeWorkflows(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("numberOfWorkflows") int numberOfWorkflows,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
@@ -2604,7 +2604,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                               myJobs,
                                                               startDate,
                                                               endDate),
-                       FilteredTopWorkflowExecutionTimeData.class);
+                       WorkflowExecutionTimeData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }

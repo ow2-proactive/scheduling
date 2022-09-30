@@ -521,17 +521,16 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<FilteredTopWorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws NotConnectedException, PermissionException {
+    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
 
         try {
-            List<FilteredTopWorkflowExecutionTimeData> filteredWorkflows = restApi().getTopExecutionTimeWorkflows(sid,
-                                                                                                                  numberOfWorkflows,
-                                                                                                                  startDate,
-                                                                                                                  endDate,
-                                                                                                                  myJobs,
-                                                                                                                  workflowName);
+            List<WorkflowExecutionTimeData> filteredWorkflows = restApi().getTopExecutionTimeWorkflows(sid,
+                                                                                                       numberOfWorkflows,
+                                                                                                       startDate,
+                                                                                                       endDate,
+                                                                                                       myJobs,
+                                                                                                       workflowName);
             return new ArrayList<>(toFilteredTopWorkflowsWithExecutionTime(filteredWorkflows));
         } catch (RestException e) {
             throwNCEOrPE(e);

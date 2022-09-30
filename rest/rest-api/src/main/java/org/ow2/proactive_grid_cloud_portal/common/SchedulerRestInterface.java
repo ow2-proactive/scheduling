@@ -2141,7 +2141,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("stats/topExecutionTimeWorkflows")
     @Produces(MediaType.APPLICATION_JSON)
-    List<FilteredTopWorkflowExecutionTimeData> getTopExecutionTimeWorkflows(@HeaderParam("sessionid") String sessionId,
+    List<WorkflowExecutionTimeData> getTopExecutionTimeWorkflows(@HeaderParam("sessionid") String sessionId,
             @QueryParam("numberOfWorkflows") int numberOfWorkflows,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,

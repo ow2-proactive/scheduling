@@ -104,12 +104,12 @@ public class DataUtility {
                                        filteredTopWorkflowData.getNumberOfExecutions());
     }
 
-    public static FilteredTopWorkflowExecutionTime
-            toFilteredTopWorkflowWithExecutionTime(FilteredTopWorkflowExecutionTimeData filteredTopWorkflowData) {
-        return new FilteredTopWorkflowExecutionTime(filteredTopWorkflowData.getProjectName(),
-                                                    filteredTopWorkflowData.getWorkflowName(),
-                                                    filteredTopWorkflowData.getExecutionTime(),
-                                                    filteredTopWorkflowData.getNumberOfExecutions());
+    public static WorkflowExecutionTime
+            toFilteredTopWorkflowWithExecutionTime(WorkflowExecutionTimeData filteredTopWorkflowData) {
+        return new WorkflowExecutionTime(filteredTopWorkflowData.getProjectName(),
+                                         filteredTopWorkflowData.getWorkflowName(),
+                                         filteredTopWorkflowData.getExecutionTime(),
+                                         filteredTopWorkflowData.getNumberOfExecutions());
     }
 
     public static TaskInfo taskInfo(TaskInfoData d) {
@@ -215,10 +215,10 @@ public class DataUtility {
         return filteredTopWorkflows;
     }
 
-    public static List<FilteredTopWorkflowExecutionTime> toFilteredTopWorkflowsWithExecutionTime(
-            List<FilteredTopWorkflowExecutionTimeData> filteredTopWorkflowsData) {
-        List<FilteredTopWorkflowExecutionTime> filteredTopWorkflows = new ArrayList<>(filteredTopWorkflowsData.size());
-        for (FilteredTopWorkflowExecutionTimeData filteredTopWorkflow : filteredTopWorkflowsData) {
+    public static List<WorkflowExecutionTime>
+            toFilteredTopWorkflowsWithExecutionTime(List<WorkflowExecutionTimeData> filteredTopWorkflowsData) {
+        List<WorkflowExecutionTime> filteredTopWorkflows = new ArrayList<>(filteredTopWorkflowsData.size());
+        for (WorkflowExecutionTimeData filteredTopWorkflow : filteredTopWorkflowsData) {
             filteredTopWorkflows.add(toFilteredTopWorkflowWithExecutionTime(filteredTopWorkflow));
         }
         return filteredTopWorkflows;
