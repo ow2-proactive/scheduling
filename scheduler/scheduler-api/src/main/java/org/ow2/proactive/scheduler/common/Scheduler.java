@@ -26,7 +26,6 @@
 package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +54,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.common.job.WorkflowExecutionTime;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -1576,6 +1576,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             throws NotConnectedException, PermissionException;
 
     List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException;
+
+    List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException;
 
     /**

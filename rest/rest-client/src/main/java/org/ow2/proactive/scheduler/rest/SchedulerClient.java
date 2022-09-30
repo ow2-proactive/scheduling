@@ -39,7 +39,7 @@ import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrP
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toFilteredStatistics;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toFilteredTopWorkflow;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toFilteredTopWorkflowsWithExecutionTime;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
@@ -513,7 +513,25 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                   endDate,
                                                                                                   myJobs,
                                                                                                   workflowName);
-            return new ArrayList<>(toFilteredTopWorkflow(filteredWorkflows));
+            return new ArrayList<>(DataUtility.toFilteredTopWorkflowsWithIssues(filteredWorkflows));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+
+        try {
+            List<WorkflowExecutionTimeData> filteredWorkflows = restApi().getTopExecutionTimeWorkflows(sid,
+                                                                                                       numberOfWorkflows,
+                                                                                                       startDate,
+                                                                                                       endDate,
+                                                                                                       myJobs,
+                                                                                                       workflowName);
+            return new ArrayList<>(toFilteredTopWorkflowsWithExecutionTime(filteredWorkflows));
         } catch (RestException e) {
             throwNCEOrPE(e);
         }
