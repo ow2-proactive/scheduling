@@ -37,11 +37,12 @@ public class WorkflowExecutionTime implements Serializable {
 
     private final String workflowName;
 
-    private final long executionTime;
+    private final double executionTime;
 
     private final long numberOfExecutions;
 
-    public WorkflowExecutionTime(String projectName, String workflowName, long executionTime, long numberOfExecutions) {
+    public WorkflowExecutionTime(String projectName, String workflowName, double executionTime,
+            long numberOfExecutions) {
         this.projectName = projectName;
         this.workflowName = workflowName;
         this.executionTime = executionTime;
@@ -56,7 +57,7 @@ public class WorkflowExecutionTime implements Serializable {
         return workflowName;
     }
 
-    public long getExecutionTime() {
+    public double getExecutionTime() {
         return executionTime;
     }
 

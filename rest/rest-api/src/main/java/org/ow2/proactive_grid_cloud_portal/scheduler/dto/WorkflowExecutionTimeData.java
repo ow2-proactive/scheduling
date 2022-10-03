@@ -31,7 +31,7 @@ public class WorkflowExecutionTimeData implements java.io.Serializable {
 
     private String workflowName;
 
-    private long executionTime;
+    private double executionTime;
 
     private long numberOfExecutions;
 
@@ -51,11 +51,11 @@ public class WorkflowExecutionTimeData implements java.io.Serializable {
         this.workflowName = workflowName;
     }
 
-    public long getExecutionTime() {
+    public double getExecutionTime() {
         return executionTime;
     }
 
-    public void setExecutionTime(long executionTime) {
+    public void setExecutionTime(double executionTime) {
         this.executionTime = executionTime;
     }
 
