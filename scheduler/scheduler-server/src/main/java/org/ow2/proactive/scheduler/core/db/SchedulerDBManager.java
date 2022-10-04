@@ -941,7 +941,9 @@ public class SchedulerDBManager {
             return list.stream()
                        .map(nameAndCount -> new WorkflowExecutionTime(nameAndCount[0].toString(),
                                                                       nameAndCount[1].toString(),
-                                                                      Double.parseDouble(nameAndCount[2].toString()),
+                                                                      (long) (Math.round(Double.parseDouble(nameAndCount[2].toString()) *
+                                                                                         100.0) /
+                                                                              100.0),
                                                                       Long.parseLong(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
