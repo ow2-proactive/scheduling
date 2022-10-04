@@ -38,6 +38,8 @@ import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrP
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toFilteredStatistics;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toFilteredTopWorkflowsWithExecutionTime;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
@@ -481,6 +483,59 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throwNCEOrPE(e);
         }
         return schedulerUserInfos;
+    }
+
+    @Override
+    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
+
+        try {
+            FilteredStatisticsData usersWithJobs = restApi().getFilteredStatistics(sid,
+                                                                                   startDate,
+                                                                                   endDate,
+                                                                                   myJobs,
+                                                                                   workflowName);
+            return toFilteredStatistics(usersWithJobs);
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+
+        try {
+            List<FilteredTopWorkflowData> filteredWorkflows = restApi().getTopWorkflowsWithIssues(sid,
+                                                                                                  numberOfWorkflows,
+                                                                                                  startDate,
+                                                                                                  endDate,
+                                                                                                  myJobs,
+                                                                                                  workflowName);
+            return new ArrayList<>(DataUtility.toFilteredTopWorkflowsWithIssues(filteredWorkflows));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+
+        try {
+            List<WorkflowExecutionTimeData> filteredWorkflows = restApi().getTopExecutionTimeWorkflows(sid,
+                                                                                                       numberOfWorkflows,
+                                                                                                       startDate,
+                                                                                                       endDate,
+                                                                                                       myJobs,
+                                                                                                       workflowName);
+            return new ArrayList<>(toFilteredTopWorkflowsWithExecutionTime(filteredWorkflows));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
     }
 
     @Override

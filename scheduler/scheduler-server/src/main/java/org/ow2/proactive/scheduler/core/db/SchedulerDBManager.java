@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.*;
@@ -58,11 +59,14 @@ import org.ow2.proactive.db.TransactionHelper;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
+import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.WorkflowExecutionTime;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -338,6 +342,40 @@ public class SchedulerDBManager {
         }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
 
         return new Page<>(lJobs, totalNbJobs);
+    }
+
+    public int getNumberOfFilteredJobs(final String workflowName, String user, String tenant, final long startTime,
+            final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
+
+        List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
+            Criteria criteria = session.createCriteria(JobData.class);
+            criteria.add(Restrictions.in("status", statuses));
+            if (StringUtils.isNotEmpty(user)) {
+                criteria.add(Restrictions.eq("owner", user));
+                if (StringUtils.isNotEmpty(tenant)) {
+                    criteria.add(Restrictions.or(Restrictions.eq("tenant", tenant), Restrictions.isNull("tenant")));
+                }
+            }
+            if (StringUtils.isNotEmpty(workflowName)) {
+                criteria.add(Restrictions.like("jobName", workflowName, MatchMode.START));
+            }
+            if (startTime != 0 && endTime != 0) {
+                criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startTime),
+                                              Restrictions.le("finishedTime", endTime)));
+            }
+            if (Boolean.TRUE.equals(withFailedTasks)) {
+                criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
+                                             Restrictions.gt("numberOfFaultyTasks", 0)));
+            } else if (Boolean.FALSE.equals(withFailedTasks)) {
+                criteria.add(Restrictions.and(Restrictions.eq("numberOfFailedTasks", 0),
+                                              Restrictions.eq("numberOfFaultyTasks", 0)));
+            }
+
+            List<JobData> jobsList = criteria.list();
+            return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
+        }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
+
+        return lJobs.size();
     }
 
     public List<JobInfo> getJobs(final List<String> jobIds) {
@@ -853,6 +891,229 @@ public class SchedulerDBManager {
                                    .finishedJobsCount(finishedJobsCount)
                                    .build();
         });
+    }
+
+    public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, final String workflowName,
+            String user, String tenant, final long startTime, final long endTime) {
+
+        return executeReadOnlyTransaction(session -> {
+
+            String selectSubQuery = "select jobName, projectName, (sum(numberOfFailedTasks) + sum(numberOfFaultyTasks)) as errorCount, count(*) as numberOfExecution from JobData where (numberOfFailedTasks > 0 or numberOfFaultyTasks > 0) ";
+            String subQueryGroupByStatement = "group by jobName, projectName order by errorCount desc";
+            Query query = getTopWorkflowsQuery(session,
+                                               workflowName,
+                                               user,
+                                               tenant,
+                                               startTime,
+                                               endTime,
+                                               numberOfWorkflows,
+                                               selectSubQuery,
+                                               subQueryGroupByStatement);
+
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .map(nameAndCount -> new FilteredTopWorkflow(nameAndCount[0].toString(),
+                                                                    nameAndCount[1].toString(),
+                                                                    Long.parseLong(nameAndCount[2].toString()),
+                                                                    Long.parseLong(nameAndCount[3].toString())))
+                       .collect(Collectors.toList());
+        });
+    }
+
+    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, final String workflowName,
+            String user, String tenant, final long startTime, final long endTime) {
+
+        return executeReadOnlyTransaction(session -> {
+
+            String selectSubQuery = "select jobName, projectName, avg(finishedTime - startTime) as executionTime, count(*) as numberOfExecution from JobData where startTime > 0 and finishedTime > 0 ";
+            String subQueryGroupByStatement = "group by jobName, projectName order by executionTime desc";
+            Query query = getTopWorkflowsQuery(session,
+                                               workflowName,
+                                               user,
+                                               tenant,
+                                               startTime,
+                                               endTime,
+                                               numberOfWorkflows,
+                                               selectSubQuery,
+                                               subQueryGroupByStatement);
+
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .map(nameAndCount -> new WorkflowExecutionTime(nameAndCount[0].toString(),
+                                                                      nameAndCount[1].toString(),
+                                                                      Double.parseDouble(nameAndCount[2].toString()),
+                                                                      Long.parseLong(nameAndCount[3].toString())))
+                       .collect(Collectors.toList());
+        });
+    }
+
+    private Query getTopWorkflowsQuery(Session session, String workflowName, String user, String tenant, long startTime,
+            long endTime, int numberOfWorkflows, String selectSubQuery, String subQueryGroupByStatement) {
+        StringBuilder queryString = new StringBuilder(selectSubQuery);
+
+        boolean hasWorkflowName = !Strings.isNullOrEmpty(workflowName);
+        boolean hasUser = !Strings.isNullOrEmpty(user);
+        boolean hasTenant = !Strings.isNullOrEmpty(tenant);
+
+        if (hasWorkflowName) {
+            queryString.append("and jobName = :workflowName ");
+        }
+        if (hasUser) {
+            queryString.append("and owner = :user ");
+            if (hasTenant) {
+                queryString.append("and (tenant = :tenant or tenant = null) ");
+            }
+        }
+        if (startTime != 0) {
+            queryString.append("and finishedTime >= :startTime ");
+        }
+        if (endTime != 0) {
+            queryString.append("and finishedTime < :endTime ");
+        }
+        queryString.append(subQueryGroupByStatement);
+
+        Query query = session.createQuery(queryString.toString());
+        query.setMaxResults(numberOfWorkflows);
+        if (hasWorkflowName) {
+            query.setParameter("workflowName", workflowName);
+        }
+        if (hasUser) {
+            query.setParameter("user", user);
+            if (hasTenant) {
+                query.setParameter("tenant", tenant);
+            }
+        }
+        if (startTime != 0) {
+            query.setParameter("startTime", startTime);
+        }
+        if (endTime != 0) {
+            query.setParameter("endTime", endTime);
+        }
+        return query;
+    }
+
+    public FilteredStatistics getFilteredStatistics(final String workflowName, String user, String tenant,
+            final long startTime, final long endTime) {
+
+        long runningJobs = getNumberOfFilteredJobs(workflowName,
+                                                   user,
+                                                   tenant,
+                                                   0,
+                                                   0,
+                                                   Collections.singletonList(JobStatus.RUNNING),
+                                                   null);
+        long stalledJobs = getNumberOfFilteredJobs(workflowName,
+                                                   user,
+                                                   tenant,
+                                                   0,
+                                                   0,
+                                                   Collections.singletonList(JobStatus.STALLED),
+                                                   null);
+        long pausedJobs = getNumberOfFilteredJobs(workflowName,
+                                                  user,
+                                                  tenant,
+                                                  0,
+                                                  0,
+                                                  Collections.singletonList(JobStatus.PAUSED),
+                                                  null);
+        long pendingJobs = getNumberOfFilteredJobs(workflowName,
+                                                   user,
+                                                   tenant,
+                                                   0,
+                                                   0,
+                                                   Collections.singletonList(JobStatus.PENDING),
+                                                   null);
+        long currentJobs = runningJobs + stalledJobs + pausedJobs + pendingJobs;
+
+        long inErrorJobs = getNumberOfFilteredJobs(workflowName,
+                                                   user,
+                                                   tenant,
+                                                   0,
+                                                   0,
+                                                   Collections.singletonList(JobStatus.IN_ERROR),
+                                                   null);
+        long runningJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                             user,
+                                                             tenant,
+                                                             0,
+                                                             0,
+                                                             Collections.singletonList(JobStatus.RUNNING),
+                                                             true);
+        long stalledJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                             user,
+                                                             tenant,
+                                                             0,
+                                                             0,
+                                                             Collections.singletonList(JobStatus.STALLED),
+                                                             true);
+        long pausedJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                            user,
+                                                            tenant,
+                                                            0,
+                                                            0,
+                                                            Collections.singletonList(JobStatus.PAUSED),
+                                                            true);
+        long currentJobsWithIssues = inErrorJobs + runningJobsWithIssues + stalledJobsWithIssues + pausedJobsWithIssues;
+
+        long canceledJobs = getNumberOfFilteredJobs(workflowName,
+                                                    user,
+                                                    tenant,
+                                                    startTime,
+                                                    endTime,
+                                                    Collections.singletonList(JobStatus.CANCELED),
+                                                    null);
+        long failedJobs = getNumberOfFilteredJobs(workflowName,
+                                                  user,
+                                                  tenant,
+                                                  startTime,
+                                                  endTime,
+                                                  Collections.singletonList(JobStatus.FAILED),
+                                                  null);
+        long killedJobs = getNumberOfFilteredJobs(workflowName,
+                                                  user,
+                                                  tenant,
+                                                  startTime,
+                                                  endTime,
+                                                  Collections.singletonList(JobStatus.KILLED),
+                                                  null);
+        long finishedJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                              user,
+                                                              tenant,
+                                                              startTime,
+                                                              endTime,
+                                                              Collections.singletonList(JobStatus.FINISHED),
+                                                              true);
+        long pastJobsWithIssues = canceledJobs + failedJobs + killedJobs + finishedJobsWithIssues;
+
+        long successfulJobs = getNumberOfFilteredJobs(workflowName,
+                                                      user,
+                                                      tenant,
+                                                      startTime,
+                                                      endTime,
+                                                      Collections.singletonList(JobStatus.FINISHED),
+                                                      false);
+        long totalJobs = currentJobs + currentJobsWithIssues + pastJobsWithIssues + successfulJobs;
+        long successfulRate = (long) ((float) successfulJobs / (successfulJobs + pastJobsWithIssues) * 100);
+
+        return new FilteredStatistics(currentJobs,
+                                      runningJobs,
+                                      pausedJobs,
+                                      stalledJobs,
+                                      pendingJobs,
+                                      currentJobsWithIssues,
+                                      inErrorJobs,
+                                      runningJobsWithIssues,
+                                      pausedJobsWithIssues,
+                                      stalledJobsWithIssues,
+                                      pastJobsWithIssues,
+                                      canceledJobs,
+                                      killedJobs,
+                                      failedJobs,
+                                      finishedJobsWithIssues,
+                                      successfulJobs,
+                                      totalJobs,
+                                      successfulRate);
+
     }
 
     private void removeJobScripts(Session session, List<Long> jobIds) {

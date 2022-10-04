@@ -54,6 +54,11 @@
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="tags" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Tags related to this job separated by commas</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute ref="xsi:schemaLocation"/>
     </xs:complexType>
   </xs:element>
@@ -184,6 +189,13 @@
     <xs:attribute name="projectName" use="required" type="xs:string">
       <xs:annotation>
         <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tags">
+    <xs:attribute name="tags" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Tags related to this job separated by commas</xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>

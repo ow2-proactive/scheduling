@@ -1987,6 +1987,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public JobValidationData validate(String sessionId, String jobId, PathSegment pathSegment,
+            Map<String, String> jsonBody, UriInfo contextInfos) throws IOException, RestException {
+        Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/validate");
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        String jobXml;
+        try {
+            jobXml = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+        try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+            // Get the job submission variables
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            // Get job variables from json body
+            if (!MapUtils.isEmpty(jsonBody)) {
+                jobVariables = getAdditionalVariables(jobVariables,
+                                                      workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
+            }
+            return ValidationUtil.validateJob(tmpWorkflowStream, jobVariables, scheduler, space, sessionId);
+        }
+    }
+
+    @Override
     public WorkflowDescription getDescription(String sessionId, String jobId) throws IOException, RestException {
         Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/variables");
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
@@ -2517,6 +2543,72 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
+    }
+
+    @GET
+    @Path("stats/filters")
+    @Produces("application/json")
+    @Override
+    public FilteredStatisticsData getFilteredStatistics(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return mapper.map(scheduler.getFilteredStatistics(workflowName, myJobs, startDate, endDate),
+                              FilteredStatisticsData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
+    @Path("stats/topWorkflowsWithIssues")
+    @Produces("application/json")
+    @Override
+    public List<FilteredTopWorkflowData> getTopWorkflowsWithIssues(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.getTopWorkflowsWithIssues(numberOfWorkflows, workflowName, myJobs, startDate, endDate),
+                       FilteredTopWorkflowData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
+    @Path("stats/topWorkflowsWithExecutionTime")
+    @Produces("application/json")
+    @Override
+    public List<WorkflowExecutionTimeData> getTopExecutionTimeWorkflows(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.getTopExecutionTimeWorkflows(numberOfWorkflows,
+                                                              workflowName,
+                                                              myJobs,
+                                                              startDate,
+                                                              endDate),
+                       WorkflowExecutionTimeData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
     }
 
     @GET

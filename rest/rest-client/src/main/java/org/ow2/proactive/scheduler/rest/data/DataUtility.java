@@ -97,6 +97,21 @@ public class DataUtility {
         return impl;
     }
 
+    public static FilteredTopWorkflow toFilteredTopWorkflowWithIssues(FilteredTopWorkflowData filteredTopWorkflowData) {
+        return new FilteredTopWorkflow(filteredTopWorkflowData.getProjectName(),
+                                       filteredTopWorkflowData.getWorkflowName(),
+                                       filteredTopWorkflowData.getNumberOfIssues(),
+                                       filteredTopWorkflowData.getNumberOfExecutions());
+    }
+
+    public static WorkflowExecutionTime
+            toFilteredTopWorkflowWithExecutionTime(WorkflowExecutionTimeData filteredTopWorkflowData) {
+        return new WorkflowExecutionTime(filteredTopWorkflowData.getProjectName(),
+                                         filteredTopWorkflowData.getWorkflowName(),
+                                         filteredTopWorkflowData.getExecutionTime(),
+                                         filteredTopWorkflowData.getNumberOfExecutions());
+    }
+
     public static TaskInfo taskInfo(TaskInfoData d) {
         TaskInfoImpl impl = new TaskInfoImpl();
         JobIdData jobIdData = d.getJobId();
@@ -191,6 +206,24 @@ public class DataUtility {
         return jobInfos;
     }
 
+    public static List<FilteredTopWorkflow>
+            toFilteredTopWorkflowsWithIssues(List<FilteredTopWorkflowData> filteredTopWorkflowsData) {
+        List<FilteredTopWorkflow> filteredTopWorkflows = new ArrayList<>(filteredTopWorkflowsData.size());
+        for (FilteredTopWorkflowData filteredTopWorkflow : filteredTopWorkflowsData) {
+            filteredTopWorkflows.add(toFilteredTopWorkflowWithIssues(filteredTopWorkflow));
+        }
+        return filteredTopWorkflows;
+    }
+
+    public static List<WorkflowExecutionTime>
+            toFilteredTopWorkflowsWithExecutionTime(List<WorkflowExecutionTimeData> filteredTopWorkflowsData) {
+        List<WorkflowExecutionTime> filteredTopWorkflows = new ArrayList<>(filteredTopWorkflowsData.size());
+        for (WorkflowExecutionTimeData filteredTopWorkflow : filteredTopWorkflowsData) {
+            filteredTopWorkflows.add(toFilteredTopWorkflowWithExecutionTime(filteredTopWorkflow));
+        }
+        return filteredTopWorkflows;
+    }
+
     public static List<SchedulerUserInfo> toSchedulerUserInfos(List<SchedulerUserData> dataList) {
         List<SchedulerUserInfo> schedulerUserInfos = new ArrayList<>(dataList.size());
         for (SchedulerUserData sud : dataList) {
@@ -203,6 +236,27 @@ public class DataUtility {
                                                          sud.getSubmitNumber()));
         }
         return schedulerUserInfos;
+    }
+
+    public static FilteredStatistics toFilteredStatistics(FilteredStatisticsData jobsReportData) {
+        return new FilteredStatistics(jobsReportData.getCurrentJobs(),
+                                      jobsReportData.getRunningJobs(),
+                                      jobsReportData.getPausedJobs(),
+                                      jobsReportData.getStalledJobs(),
+                                      jobsReportData.getPendingJobs(),
+                                      jobsReportData.getCurrentJobsWithIssues(),
+                                      jobsReportData.getInErrorJobs(),
+                                      jobsReportData.getRunningJobsWithIssues(),
+                                      jobsReportData.getPausedJobsWithIssues(),
+                                      jobsReportData.getStalledJobsWithIssues(),
+                                      jobsReportData.getPastJobsWithIssues(),
+                                      jobsReportData.getCanceledJobs(),
+                                      jobsReportData.getKilledJobs(),
+                                      jobsReportData.getFailedJobs(),
+                                      jobsReportData.getFinishedJobsWithIssues(),
+                                      jobsReportData.getSuccessfulJobs(),
+                                      jobsReportData.getTotalJobs(),
+                                      jobsReportData.getSuccessfulRate());
     }
 
     public static UserIdentification userIdentification(SchedulerUserData d) {

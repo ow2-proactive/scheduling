@@ -1445,6 +1445,28 @@ public interface SchedulerRestInterface {
      *            job id of the already submitted job
      * @param pathSegment
      *            variables of the workflow
+     * @param jsonBody
+     *            a json with the variables of the workflow
+     * @return the result of job validation
+     * @throws PermissionRestException if user does not have rights to access job with <code>jobId</code>
+     */
+    @POST
+    @Path("jobs/{jobid}/{path:validate/body}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    JobValidationData validate(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @PathParam("path") PathSegment pathSegment, Map<String, String> jsonBody, @Context UriInfo contextInfos)
+            throws IOException, RestException;
+
+    /**
+     * Validate job variables before resubmitting a job
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            job id of the already submitted job
+     * @param pathSegment
+     *            variables of the workflow
      * @return the result of job validation
      * @throws PermissionRestException if user does not have rights to access job with <code>jobId</code>
      */
@@ -2061,6 +2083,70 @@ public interface SchedulerRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     List<JobUsageData> getUsageOnMyAccount(@HeaderParam("sessionid") String sessionId,
             @QueryParam("startdate") Date startDate, @QueryParam("enddate") Date endDate) throws RestException;
+
+    /**
+     * Returns an object containing jobs count-by-state and statistics based on the given filters
+     *
+     * @param sessionId id of a session
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @param workflowName the workflow name of the filtered jobs
+     * @return {@link FilteredStatisticsData}
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("stats/filters")
+    @Produces(MediaType.APPLICATION_JSON)
+    FilteredStatisticsData getFilteredStatistics(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+
+    /**
+     * Returns an object containing the top workflows with issues based on the given filters
+     *
+     * @param sessionId id of a session
+     * @param numberOfWorkflows number of workflows to show
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @param workflowName the workflow name of the filtered jobs
+     * @return {@link FilteredStatisticsData}
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("stats/topWorkflowsWithIssues")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<FilteredTopWorkflowData> getTopWorkflowsWithIssues(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+
+    /**
+     * Returns an object containing the top workflows with the longest execution time based on the given filters
+     *
+     * @param sessionId id of a session
+     * @param numberOfWorkflows number of workflows to show
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @param workflowName the workflow name of the filtered jobs
+     * @return {@link FilteredStatisticsData}
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("stats/topExecutionTimeWorkflows")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<WorkflowExecutionTimeData> getTopExecutionTimeWorkflows(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
 
     /**
      * Returns details on job and task execution times for the caller's

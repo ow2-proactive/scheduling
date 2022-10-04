@@ -61,6 +61,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.RMStatistics;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
@@ -176,6 +177,30 @@ public interface RMRestInterface {
     @Path("logins/sessionid/{sessionId}/userdata")
     @Produces(MediaType.APPLICATION_JSON)
     UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId);
+
+    /**
+     * Resource Manager statistics.
+     *
+     * Get the current statistics of the Resource Manager state including the following information:
+     * <pre>
+     * 	{ "availableNodesCount",
+     * 	"freeNodesCount",
+     * 	"busyNodesCount",
+     * 	"deployingNodesCount",
+     * 	"configNodesCount",
+     * 	"downNodesCount",
+     * 	"lostNodesCount",
+     * 	"toBeRemovedNodesCount",
+     * 	"neededNodesCount" };
+     * </pre>
+     *
+     * @param sessionId current session
+     * @return a JSON object containing the current statistic data
+     */
+    @GET
+    @Path("statistics")
+    @Produces(MediaType.APPLICATION_JSON)
+    RMStatistics getStatistics(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     /**
      * Minimal state of the Resource Manager.

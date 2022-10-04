@@ -37,7 +37,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -650,6 +659,7 @@ public class StaxJobFactory extends JobFactory {
                 job.setName(commonPropertiesHolder.getName());
                 job.setPriority(commonPropertiesHolder.getPriority());
                 job.setProjectName(commonPropertiesHolder.getProjectName());
+                job.setWorkflowTags(commonPropertiesHolder.getWorkflowTags());
                 job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
                 job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
                 if (commonPropertiesHolder.getTaskRetryDelayProperty().isSet()) {
@@ -748,6 +758,8 @@ public class StaxJobFactory extends JobFactory {
             } else if (XMLAttributes.JOB_PROJECT_NAME.matches(attributeName)) {
                 commonPropertiesHolder.setProjectName(replace(attributeValue,
                                                               commonPropertiesHolder.getVariablesAsReplacementMap()));
+            } else if (XMLAttributes.JOB_TAGS.matches(attributeName)) {
+                commonPropertiesHolder.setWorkflowTags(new HashSet<>(Arrays.asList(attributeValue.split("\\s*,\\s*"))));
             }
         }
     }
@@ -2259,6 +2271,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("name: " + job.getName());
             logger.debug("description: " + job.getDescription());
             logger.debug("projectName: " + job.getProjectName());
+            logger.debug("tags: " + job.getWorkflowTags());
             logger.debug("variables: " + job.getVariables());
             logger.debug("priority: " + job.getPriority());
             logger.debug("onTaskError: " + job.getOnTaskErrorProperty().getValue().toString());

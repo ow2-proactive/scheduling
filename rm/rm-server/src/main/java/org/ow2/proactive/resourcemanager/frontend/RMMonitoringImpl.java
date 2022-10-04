@@ -426,6 +426,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         RMMonitoringImpl.rmStatistics.setNeededNodes(neededNodes);
     }
 
+    public int getNeededNodes() {
+        return RMMonitoringImpl.rmStatistics.getNeededNodes();
+    }
+
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
