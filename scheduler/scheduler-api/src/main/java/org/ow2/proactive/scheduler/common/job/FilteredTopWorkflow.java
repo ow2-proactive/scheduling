@@ -33,27 +33,27 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class FilteredTopWorkflow implements Serializable {
 
-    private final String projectName;
-
     private final String workflowName;
+
+    private final String projectName;
 
     private final long numberOfIssues;
 
     private final long numberOfExecutions;
 
-    public FilteredTopWorkflow(String projectName, String workflowName, long numberOfIssues, long numberOfExecutions) {
-        this.projectName = projectName;
+    public FilteredTopWorkflow(String workflowName, String projectName, long numberOfIssues, long numberOfExecutions) {
         this.workflowName = workflowName;
+        this.projectName = projectName;
         this.numberOfIssues = numberOfIssues;
         this.numberOfExecutions = numberOfExecutions;
     }
 
-    public String getProjectName() {
-        return projectName;
-    }
-
     public String getWorkflowName() {
         return workflowName;
+    }
+
+    public String getProjectName() {
+        return projectName;
     }
 
     public long getNumberOfIssues() {

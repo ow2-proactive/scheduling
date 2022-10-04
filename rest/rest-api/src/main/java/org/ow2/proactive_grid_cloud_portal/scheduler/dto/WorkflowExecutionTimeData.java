@@ -27,21 +27,13 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 public class WorkflowExecutionTimeData implements java.io.Serializable {
 
-    private String projectName;
-
     private String workflowName;
 
-    private double executionTime;
+    private String projectName;
+
+    private long executionTime;
 
     private long numberOfExecutions;
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
 
     public String getWorkflowName() {
         return workflowName;
@@ -51,11 +43,19 @@ public class WorkflowExecutionTimeData implements java.io.Serializable {
         this.workflowName = workflowName;
     }
 
-    public double getExecutionTime() {
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public long getExecutionTime() {
         return executionTime;
     }
 
-    public void setExecutionTime(double executionTime) {
+    public void setExecutionTime(long executionTime) {
         this.executionTime = executionTime;
     }
 
@@ -69,7 +69,7 @@ public class WorkflowExecutionTimeData implements java.io.Serializable {
 
     @Override
     public String toString() {
-        return "FilteredTopWorkflowData{" + "projectName='" + projectName + '\'' + ", workflowName='" + workflowName +
+        return "WorkflowExecutionTimeData{" + "workflowName='" + workflowName + '\'' + ", projectName='" + projectName +
                '\'' + ", executionTime=" + executionTime + ", numberOfExecutions=" + numberOfExecutions + '}';
     }
 }
