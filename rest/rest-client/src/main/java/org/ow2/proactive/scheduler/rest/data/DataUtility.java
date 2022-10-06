@@ -104,12 +104,16 @@ public class DataUtility {
                                        filteredTopWorkflowData.getNumberOfExecutions());
     }
 
-    public static WorkflowExecutionTime
-            toFilteredTopWorkflowWithExecutionTime(WorkflowExecutionTimeData filteredTopWorkflowData) {
+    public static WorkflowExecutionTime toWorkflowExecutionTime(WorkflowExecutionTimeData filteredTopWorkflowData) {
         return new WorkflowExecutionTime(filteredTopWorkflowData.getProjectName(),
                                          filteredTopWorkflowData.getWorkflowName(),
                                          filteredTopWorkflowData.getExecutionTime(),
                                          filteredTopWorkflowData.getNumberOfExecutions());
+    }
+
+    public static CompletedJobsCount toCompletedJobsCount(CompletedJobsCountData completedJobsCountData) {
+        return new CompletedJobsCount(completedJobsCountData.getJobsWithIssues(),
+                                      completedJobsCountData.getJobsWithIssues());
     }
 
     public static TaskInfo taskInfo(TaskInfoData d) {
@@ -216,10 +220,10 @@ public class DataUtility {
     }
 
     public static List<WorkflowExecutionTime>
-            toFilteredTopWorkflowsWithExecutionTime(List<WorkflowExecutionTimeData> filteredTopWorkflowsData) {
+            toWorkflowsExecutionTime(List<WorkflowExecutionTimeData> filteredTopWorkflowsData) {
         List<WorkflowExecutionTime> filteredTopWorkflows = new ArrayList<>(filteredTopWorkflowsData.size());
         for (WorkflowExecutionTimeData filteredTopWorkflow : filteredTopWorkflowsData) {
-            filteredTopWorkflows.add(toFilteredTopWorkflowWithExecutionTime(filteredTopWorkflow));
+            filteredTopWorkflows.add(toWorkflowExecutionTime(filteredTopWorkflow));
         }
         return filteredTopWorkflows;
     }

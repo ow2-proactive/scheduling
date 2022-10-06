@@ -33,6 +33,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,7 @@ import org.ow2.proactive.db.TransactionHelper;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -66,6 +68,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TimeWindow;
 import org.ow2.proactive.scheduler.common.job.WorkflowExecutionTime;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -348,34 +351,65 @@ public class SchedulerDBManager {
             final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
 
         List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
-            Criteria criteria = session.createCriteria(JobData.class);
-            criteria.add(Restrictions.in("status", statuses));
-            if (StringUtils.isNotEmpty(user)) {
-                criteria.add(Restrictions.eq("owner", user));
-                if (StringUtils.isNotEmpty(tenant)) {
-                    criteria.add(Restrictions.or(Restrictions.eq("tenant", tenant), Restrictions.isNull("tenant")));
-                }
-            }
-            if (StringUtils.isNotEmpty(workflowName)) {
-                criteria.add(Restrictions.like("jobName", workflowName, MatchMode.START));
-            }
-            if (startTime != 0 && endTime != 0) {
-                criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startTime),
-                                              Restrictions.le("finishedTime", endTime)));
-            }
-            if (Boolean.TRUE.equals(withFailedTasks)) {
-                criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
-                                             Restrictions.gt("numberOfFaultyTasks", 0)));
-            } else if (Boolean.FALSE.equals(withFailedTasks)) {
-                criteria.add(Restrictions.and(Restrictions.eq("numberOfFailedTasks", 0),
-                                              Restrictions.eq("numberOfFaultyTasks", 0)));
-            }
+            Criteria criteria = getFilteredJobsCriteria(workflowName,
+                                                        user,
+                                                        tenant,
+                                                        startTime,
+                                                        endTime,
+                                                        statuses,
+                                                        withFailedTasks,
+                                                        session);
 
             List<JobData> jobsList = criteria.list();
             return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
         }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
 
         return lJobs.size();
+    }
+
+    public List<JobInfo> getFilteredJobs(final String workflowName, String user, String tenant, final long startTime,
+            final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
+
+        return executeReadOnlyTransaction(session -> {
+            Criteria criteria = getFilteredJobsCriteria(workflowName,
+                                                        user,
+                                                        tenant,
+                                                        startTime,
+                                                        endTime,
+                                                        statuses,
+                                                        withFailedTasks,
+                                                        session);
+
+            List<JobData> jobsList = criteria.list();
+            return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
+        }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
+    }
+
+    private Criteria getFilteredJobsCriteria(String workflowName, String user, String tenant, long startTime,
+            long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks, Session session) {
+        Criteria criteria = session.createCriteria(JobData.class);
+        criteria.add(Restrictions.in("status", statuses));
+        if (StringUtils.isNotEmpty(user)) {
+            criteria.add(Restrictions.eq("owner", user));
+            if (StringUtils.isNotEmpty(tenant)) {
+                criteria.add(Restrictions.or(Restrictions.eq("tenant", tenant), Restrictions.isNull("tenant")));
+            }
+        }
+        if (StringUtils.isNotEmpty(workflowName)) {
+            criteria.add(Restrictions.like("jobName", workflowName, MatchMode.START));
+        }
+        if (startTime != 0 && endTime != 0) {
+            criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startTime),
+                                          Restrictions.lt("finishedTime", endTime)));
+        }
+        if (Boolean.TRUE.equals(withFailedTasks)) {
+            criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
+                                         Restrictions.gt("numberOfFaultyTasks", 0)));
+        } else if (Boolean.FALSE.equals(withFailedTasks)) {
+            criteria.add(Restrictions.and(Restrictions.eq("numberOfFailedTasks", 0),
+                                          Restrictions.eq("numberOfFaultyTasks", 0)));
+        }
+        return criteria;
     }
 
     public List<JobInfo> getJobs(final List<String> jobIds) {
@@ -956,7 +990,7 @@ public class SchedulerDBManager {
         boolean hasTenant = !Strings.isNullOrEmpty(tenant);
 
         if (hasWorkflowName) {
-            queryString.append("and jobName = :workflowName ");
+            queryString.append("and jobName like :workflowName ");
         }
         if (hasUser) {
             queryString.append("and owner = :user ");
@@ -1113,6 +1147,84 @@ public class SchedulerDBManager {
                                       successfulJobs,
                                       totalJobs,
                                       successfulRate);
+
+    }
+
+    public CompletedJobsCount getCompletedJobs(String user, String tenant, final String workflowName,
+            TimeWindow timeWindow) {
+
+        long startTime = 0;
+        long endTime = new Date().getTime();
+        long timeInterval = 0;
+
+        switch (timeWindow) {
+            case DAILY:
+                startTime = endTime - TimeUnit.HOURS.toMillis(24);
+                timeInterval = TimeUnit.HOURS.toMillis(1);
+                break;
+            case WEEKLY:
+                startTime = endTime - TimeUnit.DAYS.toMillis(7);
+                timeInterval = TimeUnit.DAYS.toMillis(1);
+                break;
+            case MONTHLY:
+                startTime = endTime - TimeUnit.DAYS.toMillis(30);
+                timeInterval = TimeUnit.DAYS.toMillis(1);
+                break;
+            case YEARLY:
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.YEAR, -1);
+                startTime = cal.getTimeInMillis();
+                timeInterval = TimeUnit.DAYS.toMillis(30);
+                break;
+        }
+
+        List<JobInfo> completedJobsWithIssues = getFilteredJobs(workflowName,
+                                                                user,
+                                                                tenant,
+                                                                startTime,
+                                                                endTime,
+                                                                Collections.singletonList(JobStatus.FINISHED),
+                                                                true);
+        List<JobInfo> completedJobsWithoutIssues = getFilteredJobs(workflowName,
+                                                                   user,
+                                                                   tenant,
+                                                                   startTime,
+                                                                   endTime,
+                                                                   Collections.singletonList(JobStatus.FINISHED),
+                                                                   false);
+        List<JobInfo> failedJobs = getFilteredJobs(workflowName,
+                                                   user,
+                                                   tenant,
+                                                   startTime,
+                                                   endTime,
+                                                   ImmutableSet.of(JobStatus.CANCELED,
+                                                                   JobStatus.FAILED,
+                                                                   JobStatus.KILLED),
+                                                   null);
+        completedJobsWithIssues.addAll(failedJobs);
+
+        Map<Integer, Integer> jobsWithoutIssuesCount = new TreeMap<>();
+        Map<Integer, Integer> jobsWithIssuesCount = new TreeMap<>();
+        int position = 0;
+        for (long i = startTime; i < endTime; i = i + timeInterval, position++) {
+            long finalI = i;
+            long finalTimeInterval = timeInterval;
+            Integer nrOfJobsWithoutIssues = new Long(completedJobsWithoutIssues.stream()
+                                                                               .filter(c -> c.getFinishedTime() >= finalI &&
+                                                                                            c.getFinishedTime() < finalI +
+                                                                                                                  finalTimeInterval)
+                                                                               .count()).intValue();
+            jobsWithoutIssuesCount.put(position, nrOfJobsWithoutIssues);
+
+            Integer nrOfJobsWithIssues = new Long(completedJobsWithIssues.stream()
+                                                                         .filter(c -> c.getFinishedTime() >= finalI &&
+                                                                                      c.getFinishedTime() < finalI +
+                                                                                                            finalTimeInterval)
+                                                                         .count()).intValue();
+            jobsWithIssuesCount.put(position, nrOfJobsWithIssues);
+        }
+
+        return new CompletedJobsCount(jobsWithIssuesCount, jobsWithoutIssuesCount);
 
     }
 

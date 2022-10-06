@@ -39,13 +39,13 @@ import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrP
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toFilteredStatistics;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toFilteredTopWorkflowsWithExecutionTime;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toWorkflowsExecutionTime;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -531,7 +531,20 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                        endDate,
                                                                                                        myJobs,
                                                                                                        workflowName);
-            return new ArrayList<>(toFilteredTopWorkflowsWithExecutionTime(filteredWorkflows));
+            return new ArrayList<>(DataUtility.toWorkflowsExecutionTime(filteredWorkflows));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow)
+            throws NotConnectedException, PermissionException {
+
+        try {
+            CompletedJobsCountData completedJob = restApi().getCompletedJobs(sid, myJobs, workflowName, timeWindow);
+            return DataUtility.toCompletedJobsCount(completedJob);
         } catch (RestException e) {
             throwNCEOrPE(e);
         }

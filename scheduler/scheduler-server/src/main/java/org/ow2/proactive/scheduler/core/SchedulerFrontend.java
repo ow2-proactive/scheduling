@@ -86,6 +86,7 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
+import org.ow2.proactive.scheduler.common.exception.InvalidTimeWindowException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
@@ -1838,6 +1839,25 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                       tenant,
                                                       startDate,
                                                       endDate);
+    }
+
+    @Override
+    @ImmediateService
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow)
+            throws NotConnectedException, PermissionException, InvalidTimeWindowException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getCompletedJobs",
+                                                                     "You don't have permissions to get top execution time workflows");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        TimeWindow timeWindowEnum = TimeWindow.getTimeWindow(timeWindow);
+        if (timeWindowEnum == null) {
+            throw new InvalidTimeWindowException(timeWindow + " is not a valid time window. Accepted values are " +
+                                                 Arrays.toString(TimeWindow.values()));
+        }
+        return dbManager.getCompletedJobs(myJobs ? ident.getUsername() : null, tenant, workflowName, timeWindowEnum);
     }
 
     /**
