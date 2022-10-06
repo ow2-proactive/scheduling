@@ -137,13 +137,17 @@ public class TestStaxJobFactory {
 
         jobDescriptorWithParsingIssue = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/load_bmw_mini_datafeeds.ksh $WV_ARGS $BATCH_NAME.xml")
                                                                 .toURI();
-        jobDescriptorEmptyTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_empty_tags.xml").toURI();
+        jobDescriptorEmptyTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_empty_tags.xml")
+                                                         .toURI();
 
-        jobDescriptorSingleTag = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_single_tag.xml").toURI();
+        jobDescriptorSingleTag = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_single_tag.xml")
+                                                         .toURI();
 
-        jobDescriptorMultipleTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_multiple_tags.xml").toURI();
+        jobDescriptorMultipleTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_multiple_tags.xml")
+                                                            .toURI();
 
-        jobDescriptorInvalidTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_invalid_tags.xml").toURI();
+        jobDescriptorInvalidTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_invalid_tags.xml")
+                                                           .toURI();
 
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
