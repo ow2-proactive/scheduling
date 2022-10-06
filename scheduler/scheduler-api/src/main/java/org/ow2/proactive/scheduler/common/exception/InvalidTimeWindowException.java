@@ -35,7 +35,7 @@ package org.ow2.proactive.scheduler.common.exception;
 public class InvalidTimeWindowException extends SchedulerException {
 
     /**
-     * Create a new instance of AccessRightException
+     * Create a new instance of InvalidTimeWindowException
      *
      * @param msg the message to attach.
      */
