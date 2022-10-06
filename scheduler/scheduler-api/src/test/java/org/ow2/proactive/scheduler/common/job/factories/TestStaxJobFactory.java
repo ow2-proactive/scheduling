@@ -85,11 +85,19 @@ public class TestStaxJobFactory {
 
     private static URI jobDescriptorAttrDefVariableXmlElement;
 
-    private static URI jobWithParsingIssue;
+    private static URI jobDescriptorWithParsingIssue;
 
     private static URI jobDescriptorTaskVariable;
 
     private static URI jobDescriptorVariableOrder;
+
+    private static URI jobDescriptorEmptyTags;
+
+    private static URI jobDescriptorSingleTag;
+
+    private static URI jobDescriptorMultipleTags;
+
+    private static URI jobDescriptorInvalidTags;
 
     private StaxJobFactory factory;
 
@@ -127,8 +135,19 @@ public class TestStaxJobFactory {
 
         jobDescriptorVariableOrder = TestStaxJobFactory.class.getResource("job_variables_order.xml").toURI();
 
-        jobWithParsingIssue = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/load_bmw_mini_datafeeds.ksh $WV_ARGS $BATCH_NAME.xml")
-                                                      .toURI();
+        jobDescriptorWithParsingIssue = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/load_bmw_mini_datafeeds.ksh $WV_ARGS $BATCH_NAME.xml")
+                                                                .toURI();
+        jobDescriptorEmptyTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_empty_tags.xml")
+                                                         .toURI();
+
+        jobDescriptorSingleTag = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_single_tag.xml")
+                                                         .toURI();
+
+        jobDescriptorMultipleTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_multiple_tags.xml")
+                                                            .toURI();
+
+        jobDescriptorInvalidTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_invalid_tags.xml")
+                                                           .toURI();
 
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
@@ -157,13 +176,38 @@ public class TestStaxJobFactory {
 
     @Test
     public void testJobWithParsingIssue() throws Exception {
-        Job job = factory.createJob(jobWithParsingIssue);
+        Job job = factory.createJob(jobDescriptorWithParsingIssue);
         assertEquals("load_bmw_mini_datafeeds.ksh  -f load_mini_datafeeds.cfg  -t Service ",
                      job.getVariables().get("WV_COMMAND").getValue());
         assertEquals(" -f load_mini_datafeeds.cfg  -t Service ", job.getVariables().get("WV_ARGS").getValue());
         assertEquals("process_DP,process_DLR_NGR", job.getGenericInformation().get("REQUIRED_LICENSES"));
         assertEquals("60d", job.getGenericInformation().get("REMOVE_DELAY"));
         assertEquals("load_bmw_mini_datafeeds.ksh  -f load_mini_datafeeds.cfg  -t Service   -- BMWLOAD", job.getName());
+    }
+
+    @Test
+    public void testCreateJobShouldFailWhenParsingInvalidTags() throws Exception {
+        try {
+            factory.createJob(jobDescriptorInvalidTags);
+            assertFalse(true);
+        } catch (JobCreationException e) {
+            assertTrue(e.getMessage().contains("tags"));
+        }
+    }
+
+    @Test
+    public void testCreateJobShouldNotFailWhenParsingEmptyTags() throws Exception {
+        factory.createJob(jobDescriptorEmptyTags);
+    }
+
+    @Test
+    public void testCreateJobShouldNotFailWhenParsingSingleTag() throws Exception {
+        factory.createJob(jobDescriptorSingleTag);
+    }
+
+    @Test
+    public void testCreateJobShouldNotFailWhenParsingMultipleTags() throws Exception {
+        factory.createJob(jobDescriptorMultipleTags);
     }
 
     @Test
