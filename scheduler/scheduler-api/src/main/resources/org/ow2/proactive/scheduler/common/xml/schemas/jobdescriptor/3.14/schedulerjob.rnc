@@ -315,4 +315,4 @@ controlFlowAction = 'goto' | 'replicate' | 'continue'
 blockAttr = 'start' | 'end' | 'none'
 scriptTypeT = 'dynamic' | 'static' | variableRefType
 propertyAppendChar = xsd:string { pattern="." }
-workflowTagPattern = xsd:string { pattern="^$|^[A-Za-z_0-9\-\s&]+(,[A-Za-z_0-9\-\s&]+)*$" }
+workflowTagPattern = xsd:string { pattern="([A-Za-z_0-9\-\s]+(,[A-Za-z_0-9\-\s]+)*)?" }

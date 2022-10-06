@@ -223,6 +223,23 @@ public class Job2XMLTransformerTest {
     }
 
     @Test
+    public void checkWorkflowTags() throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        Set<String> workflowTags = new HashSet<>(Arrays.asList("aaa", "bbb"));
+        job.setWorkflowTags(workflowTags);
+        JavaTask defaultTask = new JavaTask();
+        defaultTask.setExecutableClassName("foo.Bar");
+        job.addTask(defaultTask);
+
+        File xmlFile = tmpFolder.newFile();
+        new Job2XMLTransformer().job2xmlFile(job, xmlFile);
+        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
+
+        Set<String> resWorkflowTags = recreatedJob.getWorkflowTags();
+        assertEquals(resWorkflowTags, workflowTags);
+    }
+
+    @Test
     public void checkTaskVariables() throws Exception {
         File xmlFile = tmpFolder.newFile();
         Map<String, TaskVariable> variablesMap = new HashMap<>();
