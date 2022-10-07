@@ -113,7 +113,7 @@ public class DataUtility {
 
     public static CompletedJobsCount toCompletedJobsCount(CompletedJobsCountData completedJobsCountData) {
         return new CompletedJobsCount(completedJobsCountData.getJobsWithIssues(),
-                                      completedJobsCountData.getJobsWithIssues());
+                                      completedJobsCountData.getJobsWithoutIssues());
     }
 
     public static TaskInfo taskInfo(TaskInfoData d) {
