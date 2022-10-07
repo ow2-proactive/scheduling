@@ -30,6 +30,7 @@ import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -95,20 +96,6 @@ public class DataUtility {
         impl.setResultMapPresent(d.isResultMapPresent());
         impl.setPreciousTasks(d.getPreciousTasks());
         return impl;
-    }
-
-    public static FilteredTopWorkflow toFilteredTopWorkflowWithIssues(FilteredTopWorkflowData filteredTopWorkflowData) {
-        return new FilteredTopWorkflow(filteredTopWorkflowData.getProjectName(),
-                                       filteredTopWorkflowData.getWorkflowName(),
-                                       filteredTopWorkflowData.getNumberOfIssues(),
-                                       filteredTopWorkflowData.getNumberOfExecutions());
-    }
-
-    public static WorkflowExecutionTime toWorkflowExecutionTime(WorkflowExecutionTimeData filteredTopWorkflowData) {
-        return new WorkflowExecutionTime(filteredTopWorkflowData.getProjectName(),
-                                         filteredTopWorkflowData.getWorkflowName(),
-                                         filteredTopWorkflowData.getExecutionTime(),
-                                         filteredTopWorkflowData.getNumberOfExecutions());
     }
 
     public static CompletedJobsCount toCompletedJobsCount(CompletedJobsCountData completedJobsCountData) {
@@ -212,20 +199,22 @@ public class DataUtility {
 
     public static List<FilteredTopWorkflow>
             toFilteredTopWorkflowsWithIssues(List<FilteredTopWorkflowData> filteredTopWorkflowsData) {
-        List<FilteredTopWorkflow> filteredTopWorkflows = new ArrayList<>(filteredTopWorkflowsData.size());
-        for (FilteredTopWorkflowData filteredTopWorkflow : filteredTopWorkflowsData) {
-            filteredTopWorkflows.add(toFilteredTopWorkflowWithIssues(filteredTopWorkflow));
-        }
-        return filteredTopWorkflows;
+        return filteredTopWorkflowsData.stream()
+                                       .map(filteredTopWorkflow -> new FilteredTopWorkflow(filteredTopWorkflow.getWorkflowName(),
+                                                                                           filteredTopWorkflow.getProjectName(),
+                                                                                           filteredTopWorkflow.getNumberOfIssues(),
+                                                                                           filteredTopWorkflow.getNumberOfExecutions()))
+                                       .collect(Collectors.toList());
     }
 
     public static List<WorkflowExecutionTime>
             toWorkflowsExecutionTime(List<WorkflowExecutionTimeData> filteredTopWorkflowsData) {
-        List<WorkflowExecutionTime> filteredTopWorkflows = new ArrayList<>(filteredTopWorkflowsData.size());
-        for (WorkflowExecutionTimeData filteredTopWorkflow : filteredTopWorkflowsData) {
-            filteredTopWorkflows.add(toWorkflowExecutionTime(filteredTopWorkflow));
-        }
-        return filteredTopWorkflows;
+        return filteredTopWorkflowsData.stream()
+                                       .map(filteredTopWorkflow -> new WorkflowExecutionTime(filteredTopWorkflow.getWorkflowName(),
+                                                                                             filteredTopWorkflow.getProjectName(),
+                                                                                             filteredTopWorkflow.getExecutionTime(),
+                                                                                             filteredTopWorkflow.getNumberOfExecutions()))
+                                       .collect(Collectors.toList());
     }
 
     public static List<SchedulerUserInfo> toSchedulerUserInfos(List<SchedulerUserData> dataList) {
