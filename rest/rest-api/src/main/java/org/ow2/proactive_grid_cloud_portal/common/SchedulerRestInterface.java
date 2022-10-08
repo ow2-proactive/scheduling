@@ -2155,6 +2155,7 @@ public interface SchedulerRestInterface {
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param workflowName the workflow name of the filtered jobs
      * @param timeWindow the statistics time window: daily, weekly or monthly
+     * @param zoneId the requested zone id, e.g. Europe/Paris. If it remains empty, the zone id will be the same as the server zone
      * @return {@link CompletedJobsCountData}
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2164,7 +2165,8 @@ public interface SchedulerRestInterface {
     CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName,
-            @QueryParam("timeWindow") String timeWindow) throws RestException;
+            @QueryParam("timeWindow") String timeWindow, @QueryParam("timeWindow") @DefaultValue("null") String zoneId)
+            throws RestException;
 
     /**
      * Returns details on job and task execution times for the caller's

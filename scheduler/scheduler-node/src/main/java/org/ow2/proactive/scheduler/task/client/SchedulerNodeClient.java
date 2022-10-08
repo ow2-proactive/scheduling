@@ -852,10 +852,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow)
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
             throws NotConnectedException, PermissionException, InvalidTimeWindowException {
         renewSession();
-        return client.getCompletedJobs(myJobs, workflowName, timeWindow);
+        return client.getCompletedJobs(myJobs, workflowName, timeWindow, zoneId);
     }
 
     @Override

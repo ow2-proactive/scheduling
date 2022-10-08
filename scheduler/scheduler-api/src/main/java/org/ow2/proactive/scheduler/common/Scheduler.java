@@ -1583,7 +1583,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException;
 
-    CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow)
+    CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
             throws NotConnectedException, PermissionException, InvalidTimeWindowException;
 
     /**

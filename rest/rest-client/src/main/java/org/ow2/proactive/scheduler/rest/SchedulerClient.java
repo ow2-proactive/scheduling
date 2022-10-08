@@ -539,11 +539,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow)
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
             throws NotConnectedException, PermissionException {
 
         try {
-            CompletedJobsCountData completedJob = restApi().getCompletedJobs(sid, myJobs, workflowName, timeWindow);
+            CompletedJobsCountData completedJob = restApi().getCompletedJobs(sid,
+                                                                             myJobs,
+                                                                             workflowName,
+                                                                             timeWindow,
+                                                                             zoneId);
             return DataUtility.toCompletedJobsCount(completedJob);
         } catch (RestException e) {
             throwNCEOrPE(e);

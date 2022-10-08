@@ -783,9 +783,9 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow)
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
             throws NotConnectedException, PermissionException, InvalidTimeWindowException {
-        return uischeduler.getCompletedJobs(myJobs, workflowName, timeWindow);
+        return uischeduler.getCompletedJobs(myJobs, workflowName, timeWindow, zoneId);
     }
 
     @Override

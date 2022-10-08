@@ -259,9 +259,9 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow)
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
             throws PermissionException, NotConnectedException, InvalidTimeWindowException {
-        return getScheduler().getCompletedJobs(myJobs, workflowName, timeWindow);
+        return getScheduler().getCompletedJobs(myJobs, workflowName, timeWindow, zoneId);
     }
 
     /**
