@@ -2612,6 +2612,25 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @GET
+    @Path("stats/completedJobs")
+    @Produces("application/json")
+    @Override
+    public CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName, @QueryParam("timeWindow") String timeWindow,
+            @QueryParam("zoneId") String zoneId) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return mapper.map(scheduler.getCompletedJobs(myJobs, workflowName, timeWindow, zoneId),
+                              CompletedJobsCountData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
     @Path("usage/account")
     @Produces("application/json")
     @Override

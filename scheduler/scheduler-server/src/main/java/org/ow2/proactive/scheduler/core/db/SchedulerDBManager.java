@@ -32,7 +32,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +48,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
@@ -59,6 +64,7 @@ import org.ow2.proactive.db.TransactionHelper;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -66,6 +72,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TimeWindow;
 import org.ow2.proactive.scheduler.common.job.WorkflowExecutionTime;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -347,7 +354,7 @@ public class SchedulerDBManager {
     public int getNumberOfFilteredJobs(final String workflowName, String user, String tenant, final long startTime,
             final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
 
-        List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
+        return executeReadOnlyTransaction(session -> {
             Criteria criteria = session.createCriteria(JobData.class);
             criteria.add(Restrictions.in("status", statuses));
             if (StringUtils.isNotEmpty(user)) {
@@ -361,7 +368,7 @@ public class SchedulerDBManager {
             }
             if (startTime != 0 && endTime != 0) {
                 criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startTime),
-                                              Restrictions.le("finishedTime", endTime)));
+                                              Restrictions.lt("finishedTime", endTime)));
             }
             if (Boolean.TRUE.equals(withFailedTasks)) {
                 criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
@@ -370,12 +377,8 @@ public class SchedulerDBManager {
                 criteria.add(Restrictions.and(Restrictions.eq("numberOfFailedTasks", 0),
                                               Restrictions.eq("numberOfFaultyTasks", 0)));
             }
-
-            List<JobData> jobsList = criteria.list();
-            return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
+            return ((Number) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
         }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
-
-        return lJobs.size();
     }
 
     public List<JobInfo> getJobs(final List<String> jobIds) {
@@ -956,7 +959,7 @@ public class SchedulerDBManager {
         boolean hasTenant = !Strings.isNullOrEmpty(tenant);
 
         if (hasWorkflowName) {
-            queryString.append("and jobName = :workflowName ");
+            queryString.append("and jobName like :workflowName ");
         }
         if (hasUser) {
             queryString.append("and owner = :user ");
@@ -1114,6 +1117,97 @@ public class SchedulerDBManager {
                                       totalJobs,
                                       successfulRate);
 
+    }
+
+    public CompletedJobsCount getCompletedJobs(String user, String tenant, final String workflowName,
+            TimeWindow timeWindow, String zoneId) {
+
+        ZonedDateTime endTime;
+        if (!StringUtils.isBlank(zoneId)) {
+            ZoneId zone = ZoneId.of(zoneId);
+            LocalDateTime localDateTime = LocalDateTime.now();
+            endTime = localDateTime.atZone(zone);
+        } else {
+            endTime = ZonedDateTime.now();
+        }
+        ZonedDateTime startTime = getStartTime(timeWindow, endTime);
+
+        Map<Integer, Integer> jobsWithoutIssuesCount = new TreeMap<>();
+        Map<Integer, Integer> jobsWithIssuesCount = new TreeMap<>();
+        int position = 0;
+
+        while (startTime.isBefore(endTime)) {
+            ZonedDateTime endTimeInterval = getEndTimeInterval(timeWindow, startTime);
+            long epochStartTime = startTime.toInstant().toEpochMilli();
+            long epochEndTimeInterval = endTimeInterval.toInstant().toEpochMilli();
+
+            Integer nrOfJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                    user,
+                                                                    tenant,
+                                                                    epochStartTime,
+                                                                    epochEndTimeInterval,
+                                                                    Collections.singletonList(JobStatus.FINISHED),
+                                                                    false);
+            jobsWithoutIssuesCount.put(position, nrOfJobsWithoutIssues);
+
+            Integer nrOfJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                                 user,
+                                                                 tenant,
+                                                                 epochStartTime,
+                                                                 epochEndTimeInterval,
+                                                                 Collections.singletonList(JobStatus.FINISHED),
+                                                                 true);
+            Integer nrOfFailedJobs = getNumberOfFilteredJobs(workflowName,
+                                                             user,
+                                                             tenant,
+                                                             epochStartTime,
+                                                             epochEndTimeInterval,
+                                                             ImmutableSet.of(JobStatus.CANCELED,
+                                                                             JobStatus.FAILED,
+                                                                             JobStatus.KILLED),
+                                                             null);
+            jobsWithIssuesCount.put(position, nrOfJobsWithIssues + nrOfFailedJobs);
+            startTime = endTimeInterval;
+            position++;
+        }
+        return new CompletedJobsCount(jobsWithIssuesCount, jobsWithoutIssuesCount);
+
+    }
+
+    private ZonedDateTime getEndTimeInterval(TimeWindow timeWindow, ZonedDateTime startTime) {
+        ZonedDateTime endTimeInterval = null;
+        switch (timeWindow) {
+            case DAILY:
+                endTimeInterval = startTime.plusHours(1);
+                break;
+            case WEEKLY:
+            case MONTHLY:
+                endTimeInterval = startTime.plusDays(1);
+                break;
+            case YEARLY:
+                endTimeInterval = startTime.plusMonths(1);
+                break;
+        }
+        return endTimeInterval;
+    }
+
+    private ZonedDateTime getStartTime(TimeWindow timeWindow, ZonedDateTime endTime) {
+        ZonedDateTime startTime = null;
+        switch (timeWindow) {
+            case DAILY:
+                startTime = endTime.minusHours(23).withMinute(0).withSecond(0);
+                break;
+            case WEEKLY:
+                startTime = endTime.minusDays(6).withHour(0).withMinute(0).withSecond(0);
+                break;
+            case MONTHLY:
+                startTime = endTime.minusMonths(1).plusDays(1).withHour(0).withMinute(0).withSecond(0);
+                break;
+            case YEARLY:
+                startTime = endTime.minusMonths(11).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+                break;
+        }
+        return startTime;
     }
 
     private void removeJobScripts(Session session, List<Long> jobIds) {

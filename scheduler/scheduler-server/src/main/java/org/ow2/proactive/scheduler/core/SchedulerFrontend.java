@@ -86,6 +86,8 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
+import org.ow2.proactive.scheduler.common.exception.InvalidTimeWindowException;
+import org.ow2.proactive.scheduler.common.exception.InvalidTimeZoneId;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
@@ -1838,6 +1840,34 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                       tenant,
                                                       startDate,
                                                       endDate);
+    }
+
+    @Override
+    @ImmediateService
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
+            throws NotConnectedException, PermissionException, InvalidTimeWindowException, InvalidTimeZoneId {
+        UserIdentificationImpl ident = frontendState.checkPermission("getCompletedJobs",
+                                                                     "You don't have permissions to get completed jobs");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        TimeWindow timeWindowEnum = TimeWindow.getTimeWindow(timeWindow);
+        if (timeWindowEnum == null) {
+            throw new InvalidTimeWindowException(timeWindow + " is not a valid time window. Accepted values are " +
+                                                 Arrays.toString(TimeWindow.values()));
+        }
+        if (!StringUtils.isBlank(zoneId) && !Arrays.asList(TimeZone.getAvailableIDs()).contains(zoneId)) {
+            throw new InvalidTimeZoneId(zoneId + " is not a valid time zone id. Accepted values are " +
+                                        Arrays.toString(TimeZone.getAvailableIDs()));
+        }
+        return dbManager.getCompletedJobs(myJobs ? ident.getUsername() : null,
+                                          tenant,
+                                          workflowName,
+                                          timeWindowEnum,
+                                          zoneId);
+
     }
 
     /**
