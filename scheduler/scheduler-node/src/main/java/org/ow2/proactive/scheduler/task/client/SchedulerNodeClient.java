@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.InvalidTimeWindowException;
+import org.ow2.proactive.scheduler.common.exception.InvalidTimeZoneId;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
@@ -853,7 +854,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     @Override
     public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
-            throws NotConnectedException, PermissionException, InvalidTimeWindowException {
+            throws NotConnectedException, PermissionException, InvalidTimeWindowException, InvalidTimeZoneId {
         renewSession();
         return client.getCompletedJobs(myJobs, workflowName, timeWindow, zoneId);
     }

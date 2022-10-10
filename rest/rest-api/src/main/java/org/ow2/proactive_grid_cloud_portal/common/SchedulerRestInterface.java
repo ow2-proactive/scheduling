@@ -2165,7 +2165,7 @@ public interface SchedulerRestInterface {
     CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName,
-            @QueryParam("timeWindow") String timeWindow, @QueryParam("timeWindow") @DefaultValue("null") String zoneId)
+            @QueryParam("timeWindow") String timeWindow, @QueryParam("zoneId") @DefaultValue("null") String zoneId)
             throws RestException;
 
     /**

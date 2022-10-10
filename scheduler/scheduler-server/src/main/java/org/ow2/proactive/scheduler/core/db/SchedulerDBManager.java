@@ -1135,7 +1135,6 @@ public class SchedulerDBManager {
         } else {
             endTime = ZonedDateTime.now();
         }
-
         switch (timeWindow) {
             case DAILY:
                 startTime = endTime.minusHours(24);
@@ -1154,21 +1153,19 @@ public class SchedulerDBManager {
                 timeInterval = TimeUnit.DAYS.toMillis(30);
                 break;
         }
-
         Map<Integer, Integer> jobsWithoutIssuesCount = new TreeMap<>();
         Map<Integer, Integer> jobsWithIssuesCount = new TreeMap<>();
         int position = 0;
         long epochStartTime = startTime.toInstant().toEpochMilli();
         long epochEndTime = endTime.toInstant().toEpochMilli();
-
-        for (long startPeriod = epochStartTime; startPeriod < epochEndTime; startPeriod++, position++) {
+        for (long startPeriod = epochStartTime; startPeriod < epochEndTime; startPeriod += timeInterval, position++) {
             Integer nrOfJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
                                                                     user,
                                                                     tenant,
                                                                     startPeriod,
                                                                     startPeriod + timeInterval,
                                                                     Collections.singletonList(JobStatus.FINISHED),
-                                                                    true);
+                                                                    false);
             jobsWithoutIssuesCount.put(position, nrOfJobsWithoutIssues);
 
             Integer nrOfJobsWithIssues = getNumberOfFilteredJobs(workflowName,
@@ -1177,7 +1174,7 @@ public class SchedulerDBManager {
                                                                  startPeriod,
                                                                  startPeriod + timeInterval,
                                                                  Collections.singletonList(JobStatus.FINISHED),
-                                                                 false);
+                                                                 true);
             Integer nrOfFailedJobs = getNumberOfFilteredJobs(workflowName,
                                                              user,
                                                              tenant,
