@@ -1125,9 +1125,7 @@ public class SchedulerDBManager {
     public CompletedJobsCount getCompletedJobs(String user, String tenant, final String workflowName,
             TimeWindow timeWindow, String zoneId) {
 
-        ZonedDateTime startTime = null;
         ZonedDateTime endTime;
-        long timeInterval = 0;
         if (!StringUtils.isBlank(zoneId)) {
             ZoneId zone = ZoneId.of(zoneId);
             LocalDateTime localDateTime = LocalDateTime.now();
@@ -1135,35 +1133,22 @@ public class SchedulerDBManager {
         } else {
             endTime = ZonedDateTime.now();
         }
-        switch (timeWindow) {
-            case DAILY:
-                startTime = endTime.minusHours(24);
-                timeInterval = TimeUnit.HOURS.toMillis(1);
-                break;
-            case WEEKLY:
-                startTime = endTime.minusDays(7);
-                timeInterval = TimeUnit.DAYS.toMillis(1);
-                break;
-            case MONTHLY:
-                startTime = endTime.minusDays(30);
-                timeInterval = TimeUnit.DAYS.toMillis(1);
-                break;
-            case YEARLY:
-                startTime = endTime.minusYears(1);
-                timeInterval = TimeUnit.DAYS.toMillis(30);
-                break;
-        }
+        ZonedDateTime startTime = getStartTime(timeWindow, endTime);
+
         Map<Integer, Integer> jobsWithoutIssuesCount = new TreeMap<>();
         Map<Integer, Integer> jobsWithIssuesCount = new TreeMap<>();
         int position = 0;
-        long epochStartTime = startTime.toInstant().toEpochMilli();
-        long epochEndTime = endTime.toInstant().toEpochMilli();
-        for (long startPeriod = epochStartTime; startPeriod < epochEndTime; startPeriod += timeInterval, position++) {
+
+        while (startTime.isBefore(endTime)) {
+            ZonedDateTime endTimeInterval = getEndTimeInterval(timeWindow, startTime);
+            long epochStartTime = startTime.toInstant().toEpochMilli();
+            long epochEndTimeInterval = endTimeInterval.toInstant().toEpochMilli();
+
             Integer nrOfJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
                                                                     user,
                                                                     tenant,
-                                                                    startPeriod,
-                                                                    startPeriod + timeInterval,
+                                                                    epochStartTime,
+                                                                    epochEndTimeInterval,
                                                                     Collections.singletonList(JobStatus.FINISHED),
                                                                     false);
             jobsWithoutIssuesCount.put(position, nrOfJobsWithoutIssues);
@@ -1171,23 +1156,61 @@ public class SchedulerDBManager {
             Integer nrOfJobsWithIssues = getNumberOfFilteredJobs(workflowName,
                                                                  user,
                                                                  tenant,
-                                                                 startPeriod,
-                                                                 startPeriod + timeInterval,
+                                                                 epochStartTime,
+                                                                 epochEndTimeInterval,
                                                                  Collections.singletonList(JobStatus.FINISHED),
                                                                  true);
             Integer nrOfFailedJobs = getNumberOfFilteredJobs(workflowName,
                                                              user,
                                                              tenant,
-                                                             startPeriod,
-                                                             startPeriod + timeInterval,
+                                                             epochStartTime,
+                                                             epochEndTimeInterval,
                                                              ImmutableSet.of(JobStatus.CANCELED,
                                                                              JobStatus.FAILED,
                                                                              JobStatus.KILLED),
                                                              null);
             jobsWithIssuesCount.put(position, nrOfJobsWithIssues + nrOfFailedJobs);
+            startTime = endTimeInterval;
+            position++;
         }
         return new CompletedJobsCount(jobsWithIssuesCount, jobsWithoutIssuesCount);
 
+    }
+
+    private ZonedDateTime getEndTimeInterval(TimeWindow timeWindow, ZonedDateTime startTime) {
+        ZonedDateTime endTimeInterval = null;
+        switch (timeWindow) {
+            case DAILY:
+                endTimeInterval = startTime.plusHours(1);
+                break;
+            case WEEKLY:
+            case MONTHLY:
+                endTimeInterval = startTime.plusDays(1);
+                break;
+            case YEARLY:
+                endTimeInterval = startTime.plusMonths(1);
+                break;
+        }
+        return endTimeInterval;
+    }
+
+    private ZonedDateTime getStartTime(TimeWindow timeWindow, ZonedDateTime endTime) {
+        ZonedDateTime startTime = null;
+        switch (timeWindow) {
+            case DAILY:
+                startTime = endTime.minusHours(23).withMinute(0).withSecond(0);
+                break;
+            case WEEKLY:
+                startTime = endTime.minusDays(6).withHour(0).withMinute(0).withSecond(0);
+                break;
+            case MONTHLY:
+                startTime = endTime.minusMonths(1).plusDays(1).withHour(0).withMinute(0).withSecond(0);
+                break;
+            case YEARLY:
+                startTime = endTime.minusMonths(11).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+                break;
+        }
+        return startTime;
     }
 
     private void removeJobScripts(Session session, List<Long> jobIds) {
