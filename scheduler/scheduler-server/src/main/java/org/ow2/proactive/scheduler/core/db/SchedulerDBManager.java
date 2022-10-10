@@ -48,6 +48,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
@@ -353,7 +354,7 @@ public class SchedulerDBManager {
     public int getNumberOfFilteredJobs(final String workflowName, String user, String tenant, final long startTime,
             final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
 
-        List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
+        return executeReadOnlyTransaction(session -> {
             Criteria criteria = session.createCriteria(JobData.class);
             criteria.add(Restrictions.in("status", statuses));
             if (StringUtils.isNotEmpty(user)) {
@@ -376,12 +377,8 @@ public class SchedulerDBManager {
                 criteria.add(Restrictions.and(Restrictions.eq("numberOfFailedTasks", 0),
                                               Restrictions.eq("numberOfFaultyTasks", 0)));
             }
-
-            List<JobData> jobsList = criteria.list();
-            return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
+            return ((Number) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
         }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
-
-        return lJobs.size();
     }
 
     public List<JobInfo> getJobs(final List<String> jobIds) {
