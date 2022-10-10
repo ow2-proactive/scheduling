@@ -2113,7 +2113,7 @@ public interface SchedulerRestInterface {
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
      * @param workflowName the workflow name of the filtered jobs
-     * @return {@link FilteredStatisticsData}
+     * @return {@link FilteredTopWorkflowData}
      * @throws RestException if an error occurs or the session is invalid
      */
     @GET
@@ -2135,7 +2135,7 @@ public interface SchedulerRestInterface {
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
      * @param workflowName the workflow name of the filtered jobs
-     * @return {@link FilteredStatisticsData}
+     * @return {@link WorkflowExecutionTimeData}
      * @throws RestException if an error occurs or the session is invalid
      */
     @GET
@@ -2147,6 +2147,26 @@ public interface SchedulerRestInterface {
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+
+    /**
+     * Returns an object containing a map of finished jobs with issues count by time interval and a map of finished jobs without issues count by time interval
+     *
+     * @param sessionId id of a session
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param workflowName the workflow name of the filtered jobs
+     * @param timeWindow the statistics time window: daily, weekly or monthly
+     * @param zoneId the requested zone id, e.g. Europe/Paris. If it remains empty, the zone id will be the same as the server zone
+     * @return {@link CompletedJobsCountData}
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("stats/completedJobs")
+    @Produces(MediaType.APPLICATION_JSON)
+    CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("timeWindow") String timeWindow, @QueryParam("zoneId") @DefaultValue("null") String zoneId)
+            throws RestException;
 
     /**
      * Returns details on job and task execution times for the caller's

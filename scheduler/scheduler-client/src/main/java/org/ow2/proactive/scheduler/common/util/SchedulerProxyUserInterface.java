@@ -59,6 +59,8 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.InvalidTimeWindowException;
+import org.ow2.proactive.scheduler.common.exception.InvalidTimeZoneId;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
@@ -778,6 +780,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
         return uischeduler.getTopExecutionTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+    }
+
+    @Override
+    @ImmediateService
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
+            throws NotConnectedException, PermissionException, InvalidTimeWindowException, InvalidTimeZoneId {
+        return uischeduler.getCompletedJobs(myJobs, workflowName, timeWindow, zoneId);
     }
 
     @Override

@@ -35,6 +35,8 @@ import javax.security.auth.Subject;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.exception.InvalidTimeWindowException;
+import org.ow2.proactive.scheduler.common.exception.InvalidTimeZoneId;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
@@ -44,6 +46,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -1580,6 +1583,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException;
+
+    CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
+            throws NotConnectedException, PermissionException, InvalidTimeWindowException, InvalidTimeZoneId;
 
     /**
      * Retrieve a tasks names list from the scheduler.
