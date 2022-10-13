@@ -41,6 +41,7 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
 import org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
 
 
@@ -146,6 +147,15 @@ public class UserIdentificationImpl extends UserIdentification {
     public boolean isAllTenantPermission() {
         try {
             return checkPermission(new TenantAllAccessPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isAllJobPlannerPermission() {
+        try {
+            return checkPermission(new JobPlannerAllAccessPermission(), "N/A");
         } catch (PermissionException e) {
             return false;
         }
