@@ -420,6 +420,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
     permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+    permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodeTokens";
