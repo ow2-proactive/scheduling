@@ -92,7 +92,7 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract boolean isAllTenantPermission();
 
     /**
-     *
+     * Check if the user has all job planner permission
      */
     public abstract boolean isAllJobPlannerPermission();
 
