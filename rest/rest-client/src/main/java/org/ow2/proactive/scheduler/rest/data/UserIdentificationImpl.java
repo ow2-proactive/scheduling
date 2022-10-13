@@ -86,6 +86,11 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isAllJobPlannerPermission() {
+        return false;
+    }
+
+    @Override
     public int getSubmitNumber() {
         return submitNumber;
     }

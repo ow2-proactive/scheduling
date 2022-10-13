@@ -92,6 +92,11 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract boolean isAllTenantPermission();
 
     /**
+     *
+     */
+    public abstract boolean isAllJobPlannerPermission();
+
+    /**
      * Return the tenant associated with the current user, or null if no tenant is associated
      *
      * @return user tenant

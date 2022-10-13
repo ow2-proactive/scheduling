@@ -51,6 +51,16 @@ public class UserData implements Serializable {
 
     private boolean allTenantPermission;
 
+    private boolean allJobPlannerPermission;
+
+    public boolean isAllJobPlannerPermission() {
+        return allJobPlannerPermission;
+    }
+
+    public void setAllJobPlannerPermission(boolean allJobPlannerPermission) {
+        this.allJobPlannerPermission = allJobPlannerPermission;
+    }
+
     public String getUserName() {
         return userName;
     }
