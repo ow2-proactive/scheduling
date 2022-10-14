@@ -133,7 +133,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         restSmartProxy = new RestSmartProxyImpl();
         restSmartProxy.cleanDatabase();
         restSmartProxy.setSessionName(uniqueSessionId());
-        restSmartProxy.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
+        restSmartProxy.init(new ConnectionInfo(getRestServerUrl(), getLogin(), null, getPassword(), null, true));
 
         // we add special characters and space to the folders to make sure
         // transfer occurs normally

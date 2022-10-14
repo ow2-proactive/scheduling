@@ -42,6 +42,8 @@ public class ConnectionInfo implements Serializable {
 
     private String login;
 
+    private String domain;
+
     private String password;
 
     private File credentialFile;
@@ -51,13 +53,32 @@ public class ConnectionInfo implements Serializable {
     /**
      * @param url            the REST server URL
      * @param login          the login
+     * @param domain         the user domain
+     * @param password       the password
+     * @param credentialFile path to a file containing encrypted credentials
+     * @param insecure       if true the server certificate will not be verified
+     */
+    public ConnectionInfo(String url, String login, String domain, String password, File credentialFile,
+            boolean insecure) {
+        this.url = url;
+        this.login = login;
+        this.domain = domain;
+        this.password = password;
+        this.credentialFile = credentialFile;
+        this.insecure = insecure;
+    }
+
+    /**
+     * @param url            the REST server URL
+     * @param login          the login, can be in the form domain_name\\user_name
      * @param password       the password
      * @param credentialFile path to a file containing encrypted credentials
      * @param insecure       if true the server certificate will not be verified
      */
     public ConnectionInfo(String url, String login, String password, File credentialFile, boolean insecure) {
         this.url = url;
-        this.login = login;
+        this.login = parseLogin(login);
+        this.domain = parseDomain(domain);
         this.password = password;
         this.credentialFile = credentialFile;
         this.insecure = insecure;
@@ -69,6 +90,10 @@ public class ConnectionInfo implements Serializable {
 
     public String getLogin() {
         return login;
+    }
+
+    public String getDomain() {
+        return domain;
     }
 
     public String getPassword() {
@@ -91,6 +116,10 @@ public class ConnectionInfo implements Serializable {
         this.login = login;
     }
 
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -101,5 +130,41 @@ public class ConnectionInfo implements Serializable {
 
     public void setInsecure(boolean insecure) {
         this.insecure = insecure;
+    }
+
+    /**
+     * Extract the Windows domain name from the full login
+     * parseDomain("domain\\user") returns domain
+     * parseDomain("user") returns null
+     * @param fullLogin the login to parse
+     * @return the domain name, null if no domain is specified
+     * @since Scheduling 3.0.1
+     */
+    public static String parseDomain(String fullLogin) {
+        if (fullLogin.contains("\\")) {
+            String domain = fullLogin.substring(0, fullLogin.indexOf("\\"));
+            if ("".equals(domain.trim())) {
+                return null;
+            }
+            return "".equals(domain.trim()) ? null : domain;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Extract the user name from the full login
+     * parseDomain("domain\\user") returns user
+     * parseDomain("user") returns user
+     * @param fullLogin the login to parse
+     * @return the user name
+     * @since Scheduling 3.0.1
+     */
+    public static String parseLogin(String fullLogin) {
+        if (fullLogin.contains("\\")) {
+            return fullLogin.substring(fullLogin.indexOf("\\") + 1, fullLogin.length());
+        } else {
+            return fullLogin;
+        }
     }
 }

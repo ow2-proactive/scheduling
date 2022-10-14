@@ -148,7 +148,12 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
         String schedulerUrl = SchedulerTHelper.getLocalUrl();
         schedProxy.setSessionName(TEST_SESSION_NAME);
 
-        schedProxy.init(new ConnectionInfo(schedulerUrl, TestUsers.DEMO.username, TestUsers.DEMO.password, null, true));
+        schedProxy.init(new ConnectionInfo(schedulerUrl,
+                                           TestUsers.DEMO.username,
+                                           null,
+                                           TestUsers.DEMO.password,
+                                           null,
+                                           true));
 
         eventListener = new MyEventListener();
         MyEventListener myListenerRemoteReference = PAActiveObject.turnActive(eventListener);

@@ -56,6 +56,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.rrd4j.ConsolFun;
 
+import com.google.common.base.Strings;
+
 
 @PublicAPI
 public class RMNodeClient implements IRMClient, Serializable {
@@ -76,7 +78,12 @@ public class RMNodeClient implements IRMClient, Serializable {
     }
 
     public void connect() throws Exception {
-        init(new ConnectionInfo(schedulerRestUrl, userCreds.getLogin(), userCreds.getPassword(), null, true));
+        init(new ConnectionInfo(schedulerRestUrl,
+                                userCreds.getLogin(),
+                                userCreds.getDomain(),
+                                userCreds.getPassword(),
+                                null,
+                                true));
     }
 
     public void connect(String url) throws Exception {
@@ -95,7 +102,11 @@ public class RMNodeClient implements IRMClient, Serializable {
         this.connectionInfo = connectionInfo;
 
         try {
-            String sid = rm.rmConnect(connectionInfo.getLogin(), connectionInfo.getPassword());
+            String sid = rm.rmConnect(Strings.isNullOrEmpty(connectionInfo.getDomain()) ? connectionInfo.getLogin()
+                                                                                        : connectionInfo.getDomain() +
+                                                                                          "\\" +
+                                                                                          connectionInfo.getLogin(),
+                                      connectionInfo.getPassword());
             setSession(sid);
         } catch (Exception e) {
             throw new RuntimeException(e);

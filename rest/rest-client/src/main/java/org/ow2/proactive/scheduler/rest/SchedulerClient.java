@@ -124,6 +124,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
+import com.google.common.base.Strings;
 import com.google.common.io.Closer;
 import com.google.common.net.UrlEscapers;
 
@@ -1238,7 +1239,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         Closer closer = Closer.create();
         try {
             LoginForm loginForm = new LoginForm();
-            loginForm.setUsername(connectionInfo.getLogin());
+            loginForm.setUsername(Strings.isNullOrEmpty(connectionInfo.getDomain()) ? connectionInfo.getLogin()
+                                                                                    : connectionInfo.getDomain() +
+                                                                                      "\\" + connectionInfo.getLogin());
             loginForm.setPassword(connectionInfo.getPassword());
             if (connectionInfo.getCredentialFile() != null) {
                 FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile());

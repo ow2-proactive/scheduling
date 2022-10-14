@@ -119,6 +119,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
 
             this.restSchedulerClient.init(new ConnectionInfo(connectionInfo.getUrl(),
                                                              connectionInfo.getLogin(),
+                                                             connectionInfo.getDomain(),
                                                              connectionInfo.getPassword(),
                                                              connectionInfo.getCredentialFile(),
                                                              connectionInfo.isInsecure()));

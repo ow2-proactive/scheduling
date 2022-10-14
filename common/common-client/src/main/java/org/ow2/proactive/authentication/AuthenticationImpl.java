@@ -140,6 +140,7 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
         }
         String username = credentials.getLogin();
         String password = credentials.getPassword();
+        String domain = credentials.getDomain();
 
         if (username == null || username.equals("")) {
             throw new LoginException("Bad user name (user is null or empty)");
@@ -154,16 +155,21 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
             params.put("username", username);
             //password to check
             params.put("pw", password);
+            params.put("domain", domain);
 
             //Load LoginContext according to login method defined in jaas.config
             LoginContext lc = new LoginContext(getLoginMethod(), new NoCallbackHandler(params));
 
             lc.login();
-            getLogger().info("User " + username + " logged successfully");
+            getLogger().info("User " + (domain != null ? domain + "\\" : "") + username + " logged successfully");
 
             return lc.getSubject();
         } catch (LoginException e) {
-            getLogger().info(e.getMessage());
+            if (getLogger().isDebugEnabled()) {
+                getLogger().warn(e.getMessage(), e);
+            } else {
+                getLogger().warn(e.getMessage());
+            }
             //Nature of exception is hidden for user, we don't want to inform
             //user about the reason of non authentication
             throw new LoginException("Authentication failed");

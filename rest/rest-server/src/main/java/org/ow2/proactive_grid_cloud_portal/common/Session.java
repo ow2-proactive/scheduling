@@ -136,7 +136,9 @@ public class Session {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credData);
         this.credData = credData;
         setUserName(credData.getLogin());
-        CredentialsCreator.INSTANCE.createAndStoreCredentialFile(credData.getLogin(), credData.getPassword());
+        CredentialsCreator.INSTANCE.createAndStoreCredentialFile(credData.getLogin(),
+                                                                 credData.getDomain(),
+                                                                 credData.getPassword());
 
     }
 
@@ -159,7 +161,9 @@ public class Session {
         rm = schedulerRMProxyFactory.connectToRM(credData);
         this.credData = credData;
         setUserName(credData.getLogin());
-        CredentialsCreator.INSTANCE.createAndStoreCredentialFile(credData.getLogin(), credData.getPassword());
+        CredentialsCreator.INSTANCE.createAndStoreCredentialFile(credData.getLogin(),
+                                                                 credData.getDomain(),
+                                                                 credData.getPassword());
 
     }
 
