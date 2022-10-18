@@ -2339,9 +2339,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if ((username == null) || (password == null)) {
                 throw new LoginException("Empty login/password");
             }
-            Session session = sessionStore.create(username);
-            session.connectToScheduler(new CredData(username, password));
-            logger.info("Binding user " + username + " to session " + session.getSessionId());
+            String loginName = CredData.parseLogin(username);
+            String domain = CredData.parseDomain(username);
+            Session session = sessionStore.create(loginName);
+            session.connectToScheduler(new CredData(loginName, domain, password));
+            logger.info("Binding user " + loginName + (Strings.isNullOrEmpty(domain) ? "" : " on domain " + domain) +
+                        " to session " + session.getSessionId());
 
             return session.getSessionId();
         } catch (ActiveObjectCreationException | SchedulerException | NodeException e) {

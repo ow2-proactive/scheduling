@@ -28,33 +28,46 @@ package org.ow2.proactive.scheduler.authentication;
 import java.io.File;
 import java.security.KeyException;
 import java.security.PrivateKey;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.ow2.proactive.authentication.LDAPLoginModule;
+import org.ow2.proactive.authentication.MultiLDAPLoginModule;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
- * LDAP login module implementation for scheduling. Extracts LDAP configurations file from
+ * LDAP login module implementation for scheduling. Extracts LDAP configuration files from
  * scheduler configuration and uses it to authenticate users.
  */
-public class SchedulerLDAPLoginModule extends LDAPLoginModule {
+public class SchedulerMultiLDAPLoginModule extends MultiLDAPLoginModule {
 
     /**
-     * Returns LDAP configuration file name defined in scheduler configuration file
+     * Returns Multiple LDAP configuration defined in scheduler configuration file
      *
-     * @return LDAP configuration file name defined in scheduler configuration file
+     * @return a map of (domain_name,configuration_file)
      */
     @Override
-    protected String getLDAPConfigFileName() {
-        String ldapFile = PASchedulerProperties.SCHEDULER_LDAP_CONFIG_FILE_PATH.getValueAsString();
-        //test that ldap file path is an absolute path or not
-        if (!(new File(ldapFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the scheduler home
-            ldapFile = PASchedulerProperties.getAbsolutePath(ldapFile);
+    protected Map<String, String> getMultiLDAPConfig() {
+        Map<String, String> answer = new HashMap<>();
+        List<String> ldapConfigList = PASchedulerProperties.SCHEDULER_MULTI_LDAP_CONFIG.getValueAsList(",");
+        for (String config : ldapConfigList) {
+            String[] configPair = config.split("\\s*:\\s*");
+            if (configPair.length != 2) {
+                throw new IllegalArgumentException("invalid multi-ldap configuration string : " + config);
+            }
+            String domain = configPair[0];
+            String ldapFile = configPair[1];
+            //test that ldap file path is an absolute path or not
+            if (!(new File(ldapFile).isAbsolute())) {
+                //file path is relative, so we complete the path with the scheduler home
+                ldapFile = PASchedulerProperties.getAbsolutePath(ldapFile);
+            }
+            answer.put(domain, ldapFile);
         }
-        return ldapFile;
+        return answer;
     }
 
     /**
@@ -119,6 +132,6 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
      * @return logger for authentication
      */
     public Logger getLogger() {
-        return Logger.getLogger(SchedulerLDAPLoginModule.class);
+        return Logger.getLogger(SchedulerMultiLDAPLoginModule.class);
     }
 }

@@ -45,6 +45,8 @@ import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
+import com.google.common.base.Strings;
+
 
 public class CredentialsCreator {
 
@@ -53,12 +55,14 @@ public class CredentialsCreator {
     private CredentialsCreator() {
     }
 
-    public synchronized void createAndStoreCredentialFile(String username, String password) {
+    public synchronized void createAndStoreCredentialFile(String username, String domain, String password) {
         if (!PASchedulerProperties.SCHEDULER_CREATE_CREDENTIALS_WHEN_LOGIN.getValueAsBoolean()) {
             return;
         }
         try {
-            byte[] credentialBytes = createCredentials(username, password);
+            byte[] credentialBytes = createCredentials(Strings.isNullOrEmpty(domain) ? username
+                                                                                     : domain + "\\" + username,
+                                                       password);
 
             saveCredentialsFile(username, credentialBytes);
 

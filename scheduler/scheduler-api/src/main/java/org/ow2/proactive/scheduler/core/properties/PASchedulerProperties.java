@@ -186,6 +186,13 @@ public enum PASchedulerProperties implements PACommonProperties {
      */
     SCHEDULER_LDAP_CONFIG_FILE_PATH("pa.scheduler.ldap.config.path", PropertyType.STRING, "config/authentication/ldap.cfg"),
 
+    /**
+     * Support for multi-ldap login configuration.
+     * This property must be defined using a list of the following form:
+     * domain1:path_to_domain1.cfg,domain2:path_to_domain2.cfg, etc
+     */
+    SCHEDULER_MULTI_LDAP_CONFIG("pa.scheduler.multi.ldap.config", PropertyType.LIST),
+
     /** Login default file name */
     SCHEDULER_LOGIN_FILENAME("pa.scheduler.core.defaultloginfilename", PropertyType.STRING, "config/authentication/login.cfg"),
 

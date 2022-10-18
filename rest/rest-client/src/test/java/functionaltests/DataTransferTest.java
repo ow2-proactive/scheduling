@@ -704,7 +704,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     private IDataSpaceClient clientInstance() throws Exception {
         DataSpaceClient client = new DataSpaceClient();
-        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
+        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), null, getPassword(), null, true));
         return client;
     }
 

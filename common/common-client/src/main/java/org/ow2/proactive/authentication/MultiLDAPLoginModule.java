@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -39,11 +40,7 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
-import javax.naming.ldap.InitialLdapContext;
-import javax.naming.ldap.LdapContext;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.StartTlsRequest;
-import javax.naming.ldap.StartTlsResponse;
+import javax.naming.ldap.*;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.Subject;
@@ -73,34 +70,16 @@ import com.google.common.base.Strings;
  * @author The ActiveEon Team
  * @since ProActive Scheduling 2.1.1
  */
-public abstract class LDAPLoginModule extends FileLoginModule implements Loggable {
+public abstract class MultiLDAPLoginModule extends FileLoginModule implements Loggable {
 
     /** connection logger */
     private final Logger logger = getLogger();
 
-    /** LDAP configuration properties */
-    private LDAPProperties ldapProperties = new LDAPProperties(getLDAPConfigFileName());
-
-    /** default value for Context.SECURITY_AUTHENTICATION
-     * that correspond to anonymous connection
-    */
-    public static final String ANONYMOUS_LDAP_CONNECTION = "none";
-
-    /** name of key store path java property */
-    public static final String SSL_KEYSTORE_PATH_PROPERTY = "javax.net.ssl.keyStore";
-
-    /** name of key store password java property */
-    public static final String SSL_KEYSTORE_PASSWD_PROPERTY = "javax.net.ssl.keyStorePassword";
-
-    /** name of trust store password java property */
-    public static String SSL_TRUSTSTORE_PATH_PROPERTY = "javax.net.ssl.trustStore";
-
-    /** name of trust store password java property */
-    public static String SSL_TRUSTSTORE_PASSWD_PROPERTY = "javax.net.ssl.trustStorePassword";
+    private final Map<String, LDAPDomainConfiguration> ldapDomainConfigurations;
 
     private final static String FAKE_PASSWORD = "Frth481d";
 
-    private final LDAPDomainConfiguration ldapDomainConfiguration;
+    public static final String ANONYMOUS_LDAP_CONNECTION = "none";
 
     /** authentication status */
     private boolean succeeded = false;
@@ -108,23 +87,22 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     /**
      * Creates a new instance of LDAPLoginModule
      */
-    public LDAPLoginModule() {
-        ldapDomainConfiguration = new LDAPDomainConfiguration(ldapProperties, logger);
+    public MultiLDAPLoginModule() {
 
-        if (ldapDomainConfiguration.isFallbackUserAuth()) {
-            checkLoginFile();
-            checkGroupFile();
-            logger.debug("Using Login file for fall back authentication at: " + loginFile);
-            logger.debug("Using Group file for fall back group membership at: " + groupFile);
-        } else if (ldapDomainConfiguration.isFallbackGroupMembership()) {
-            checkGroupFile();
-            logger.debug("Using Group file for fall back group membership at: " + groupFile);
+        ldapDomainConfigurations = new HashMap<>();
+
+        Map<String, String> ldapConfigurationPaths = getMultiLDAPConfig();
+        for (Map.Entry<String, String> entry : ldapConfigurationPaths.entrySet()) {
+            ldapDomainConfigurations.put(entry.getKey(),
+                                         new LDAPDomainConfiguration(new LDAPProperties(entry.getValue()), logger));
         }
 
-        if (ldapDomainConfiguration.isFallbackTenantMembership()) {
-            checkTenantFile();
-            logger.debug("Using Tenant file for fall back tenant membership at: " + tenantFile);
-        }
+        checkLoginFile();
+        checkGroupFile();
+        checkTenantFile();
+        logger.debug("Using Login file for fall back authentication at: " + loginFile);
+        logger.debug("Using Group file for fall back group membership at: " + groupFile);
+        logger.debug("Using Tenant file for fall back tenant membership at: " + tenantFile);
     }
 
     /**
@@ -151,10 +129,6 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             Map<String, ?> options) {
         this.subject = subject;
         this.callbackHandler = callbackHandler;
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Using LDAP: " + ldapDomainConfiguration.getLdapUrl());
-        }
     }
 
     /**
@@ -189,6 +163,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             // gets the user name, password, group Membership, and group Hierarchy from call back handler
             callbackHandler.handle(callbacks);
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
+            String domain = (String) params.get("domain");
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
 
@@ -200,10 +175,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            succeeded = logUser(username, password);
+            succeeded = logUser(domain, username, password);
             return succeeded;
 
-        } catch (java.io.IOException ioe) {
+        } catch (IOException ioe) {
             throw new LoginException(ioe.toString());
         } catch (UnsupportedCallbackException uce) {
             throw new LoginException("Error: " + uce.getCallback().toString() +
@@ -219,19 +194,20 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication and group membership fails.
      */
-    protected boolean logUser(String username, String password) throws LoginException {
-        if (ldapDomainConfiguration.isFallbackUserAuth()) {
-            try {
-                return super.logUser(username, password, false);
-            } catch (LoginException ex) {
-                return internalLogUser(username, password);
-            }
+    protected boolean logUser(String domain, String username, String password) throws LoginException {
+        if (domain == null) {
+            return super.logUser(username, password, false);
         } else {
-            return internalLogUser(username, password);
+            if (ldapDomainConfigurations.containsKey(domain)) {
+                return internalLogUser(domain, username, password);
+            } else {
+                throw new FailedLoginException("Cannot login as " + domain + "\\" + username + ". LDAP domain " +
+                                               domain + " is not configured");
+            }
         }
     }
 
-    private boolean internalLogUser(String username, String password) throws LoginException {
+    private boolean internalLogUser(String domain, String username, String password) throws LoginException {
 
         removeOldFailedAttempts(username);
         if (tooManyFailedAttempts(username)) {
@@ -245,20 +221,20 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         String userDN = null;
         boolean passwordMatch = false;
         try {
-            userDN = getLDAPUserDN(username);
+            userDN = getLDAPUserDN(domain, username);
         } catch (NamingException e) {
             logger.error("Cannot connect to LDAP server", e);
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
 
         if (userDN == null) {
-            logger.info("user entry not found in subtree " + ldapDomainConfiguration.getUsersDn() + " for user " +
-                        username);
+            logger.info("user entry not found in " + domain + " subtree " +
+                        ldapDomainConfigurations.get(domain).getUsersDn() + " for user " + username);
             storeFailedAttempt(username);
             throw new FailedLoginException("User name doesn't exists");
         } else {
             // Check if the password match the user name
-            passwordMatch = checkLDAPPassword(userDN, password);
+            passwordMatch = checkLDAPPassword(domain, userDN, password);
         }
 
         if (passwordMatch) {
@@ -267,10 +243,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             }
             resetFailedAttempt(username);
 
-            if (ldapDomainConfiguration.isFallbackGroupMembership()) {
+            if (ldapDomainConfigurations.get(domain).isFallbackGroupMembership()) {
                 super.groupMembershipFromFile(username);
             }
-            if (ldapDomainConfiguration.isFallbackTenantMembership()) {
+            if (ldapDomainConfigurations.get(domain).isFallbackTenantMembership()) {
                 super.tenantMembershipFromFile(username);
             }
         } else {
@@ -357,7 +333,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * <p>
      * @return true if the authentication is successful, false otherwise.
      */
-    private boolean checkLDAPPassword(String userDN, String password) {
+    private boolean checkLDAPPassword(String domain, String userDN, String password) {
         if (logger.isDebugEnabled()) {
             logger.debug("check password for user: " + userDN);
         }
@@ -368,7 +344,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             password = FAKE_PASSWORD;
         }
 
-        ContextHandler handler = createLdapContext(userDN, password, true);
+        ContextHandler handler = createLdapContext(domain, userDN, password, true);
         closeContext(handler);
         return handler != null;
     }
@@ -392,22 +368,26 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         }
     }
 
-    private ContextHandler createLdapContext(String user, String password, boolean requireAuthentication) {
+    private ContextHandler createLdapContext(String domain, String user, String password,
+            boolean requireAuthentication) {
         LdapContext ctx = null;
         StartTlsResponse tls = null;
 
-        Hashtable<String, String> env = createBasicEnvForInitalContext();
+        Hashtable<String, String> env = createBasicEnvForInitalContext(domain);
         try {
-            if (!ldapDomainConfiguration.isStartTls()) {
+            if (!ldapDomainConfigurations.get(domain).isStartTls()) {
                 if (requireAuthentication ||
-                    !ldapDomainConfiguration.getAuthenticationMethod().equals(ANONYMOUS_LDAP_CONNECTION)) {
+                    !ldapDomainConfigurations.get(domain).getAuthenticationMethod().equals(ANONYMOUS_LDAP_CONNECTION)) {
                     if (requireAuthentication) {
                         // In case of anonymous bind, when we need to check some user credentials, we must force authentication to be simple
                         env.put(Context.SECURITY_AUTHENTICATION,
-                                ANONYMOUS_LDAP_CONNECTION.equals(ldapDomainConfiguration.getAuthenticationMethod()) ? "simple"
-                                                                                                                    : ldapDomainConfiguration.getAuthenticationMethod());
+                                ANONYMOUS_LDAP_CONNECTION.equals(ldapDomainConfigurations.get(domain)
+                                                                                         .getAuthenticationMethod()) ? "simple"
+                                                                                                                     : ldapDomainConfigurations.get(domain)
+                                                                                                                                               .getAuthenticationMethod());
                     } else {
-                        env.put(Context.SECURITY_AUTHENTICATION, ldapDomainConfiguration.getAuthenticationMethod());
+                        env.put(Context.SECURITY_AUTHENTICATION,
+                                ldapDomainConfigurations.get(domain).getAuthenticationMethod());
                     }
                     env.put(Context.SECURITY_PRINCIPAL, user);
                     env.put(Context.SECURITY_CREDENTIALS, password);
@@ -416,13 +396,13 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             // Create the initial directory context
             ctx = new InitialLdapContext(env, null);
 
-            if (ldapDomainConfiguration.isStartTls()) {
+            if (ldapDomainConfigurations.get(domain).isStartTls()) {
                 // Start TLS
                 tls = (StartTlsResponse) ctx.extendedOperation(new StartTlsRequest());
-                if (ldapDomainConfiguration.isAnyHostname()) {
+                if (ldapDomainConfigurations.get(domain).isAnyHostname()) {
                     tls.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
                 }
-                if (ldapDomainConfiguration.isAnyCertificate()) {
+                if (ldapDomainConfigurations.get(domain).isAnyCertificate()) {
                     SSLContext context = SSLContext.getInstance("TLS");
                     context.init(null, new X509TrustManager[] { new X509TrustManager() {
                         public void checkClientTrusted(X509Certificate[] chain, String authType)
@@ -442,15 +422,17 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                     tls.negotiate();
                 }
                 if (requireAuthentication ||
-                    !ldapDomainConfiguration.getAuthenticationMethod().equals(ANONYMOUS_LDAP_CONNECTION)) {
+                    !ldapDomainConfigurations.get(domain).getAuthenticationMethod().equals(ANONYMOUS_LDAP_CONNECTION)) {
                     if (requireAuthentication) {
                         // In case of anonymous bind, when we need to check some user credentials, we must force authentication to be simple
                         ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION,
-                                             ANONYMOUS_LDAP_CONNECTION.equals(ldapDomainConfiguration.getAuthenticationMethod()) ? "simple"
-                                                                                                                                 : ldapDomainConfiguration.getAuthenticationMethod());
+                                             ANONYMOUS_LDAP_CONNECTION.equals(ldapDomainConfigurations.get(domain)
+                                                                                                      .getAuthenticationMethod()) ? "simple"
+                                                                                                                                  : ldapDomainConfigurations.get(domain)
+                                                                                                                                                            .getAuthenticationMethod());
                     } else {
                         ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION,
-                                             ldapDomainConfiguration.getAuthenticationMethod());
+                                             ldapDomainConfigurations.get(domain).getAuthenticationMethod());
                     }
                     ctx.addToEnvironment(Context.SECURITY_PRINCIPAL, user);
                     ctx.addToEnvironment(Context.SECURITY_CREDENTIALS, password);
@@ -478,14 +460,15 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return the String containing the UID of the user or null if the user is
      *         not found.
      */
-    private String getLDAPUserDN(String username) throws NamingException {
+    private String getLDAPUserDN(String domain, String username) throws NamingException {
 
         String userDN = null;
         ContextHandler ctx = null;
+        LDAPDomainConfiguration ldapDomainConfiguration = ldapDomainConfigurations.get(domain);
         try {
 
             // Create the initial directory context
-            ctx = this.connectAndGetContext();
+            ctx = this.connectAndGetContext(domain);
             if (ctx != null) {
                 SearchControls sControl = new SearchControls();
                 sControl.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -508,6 +491,9 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                         if (tenantAttr != null && tenantAttr.get() != null && !tenantAttr.get().toString().isEmpty()) {
                             subject.getPrincipals().add(new TenantPrincipal(tenantAttr.get().toString()));
                         }
+                    } else {
+                        // if a tenant attribute is not specified, the domain is used as tenant
+                        subject.getPrincipals().add(new TenantPrincipal(domain));
                     }
 
                     // looking for the user groups
@@ -552,25 +538,26 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return directory service interface.
      * @throws NamingException
      */
-    private ContextHandler connectAndGetContext() throws NamingException {
+    private ContextHandler connectAndGetContext(String domain) throws NamingException {
         // Create the initial directory context
-        return createLdapContext(ldapDomainConfiguration.getBindLogin(),
-                                 ldapDomainConfiguration.getBindPasswd(),
+        return createLdapContext(domain,
+                                 ldapDomainConfigurations.get(domain).getBindLogin(),
+                                 ldapDomainConfigurations.get(domain).getBindPasswd(),
                                  false);
     }
 
     /**
-     * Retrieves LDAP configuration file name.
+     * Retrieves Multi LDAP configuration.
      *
-     * @return name of the file with LDAP configuration.
+     * @return a map of (domain_name,configuration_file)
      */
-    protected abstract String getLDAPConfigFileName();
+    protected abstract Map<String, String> getMultiLDAPConfig();
 
-    private Hashtable<String, String> createBasicEnvForInitalContext() {
+    private Hashtable<String, String> createBasicEnvForInitalContext(String domain) {
         Hashtable<String, String> env = new Hashtable<>(6, 1f);
-        env.put("com.sun.jndi.ldap.connect.pool", ldapDomainConfiguration.getLdapConnectionPooling());
+        env.put("com.sun.jndi.ldap.connect.pool", ldapDomainConfigurations.get(domain).getLdapConnectionPooling());
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, ldapDomainConfiguration.getLdapUrl());
+        env.put(Context.PROVIDER_URL, ldapDomainConfigurations.get(domain).getLdapUrl());
 
         return env;
     }
