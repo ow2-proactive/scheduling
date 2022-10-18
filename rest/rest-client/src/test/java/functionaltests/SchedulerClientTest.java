@@ -954,7 +954,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test(timeout = MAX_WAIT_TIME)
     public void testGetGroups() throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, null, true));
+        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), null, getPassword(), null, true));
         UserData userData = client.getCurrentUserData();
         Assert.assertNotNull(userData);
         Assert.assertNotNull(userData.getGroups());
@@ -976,7 +976,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     protected ISchedulerClient clientInstance() throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, null, true));
+        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), null, getPassword(), null, true));
         return client;
     }
 
