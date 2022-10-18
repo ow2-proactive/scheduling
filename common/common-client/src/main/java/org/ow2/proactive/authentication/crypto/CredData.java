@@ -73,9 +73,6 @@ public class CredData implements Serializable {
     public static String parseDomain(String fullLogin) {
         if (fullLogin.contains("\\")) {
             String domain = fullLogin.substring(0, fullLogin.indexOf("\\"));
-            if ("".equals(domain.trim())) {
-                return null;
-            }
             return "".equals(domain.trim()) ? null : domain;
         } else {
             return null;

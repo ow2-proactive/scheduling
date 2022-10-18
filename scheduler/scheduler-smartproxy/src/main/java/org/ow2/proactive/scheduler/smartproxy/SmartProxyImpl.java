@@ -244,9 +244,16 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
                 throw new LoginException(e.getMessage());
             }
         } else {
-            CredData cred = new CredData(CredData.parseLogin(connectionInfo.getLogin()),
-                                         CredData.parseDomain(connectionInfo.getLogin()),
-                                         connectionInfo.getPassword());
+            CredData cred;
+            if (connectionInfo.getDomain() == null) {
+                cred = new CredData(CredData.parseLogin(connectionInfo.getLogin()),
+                                    CredData.parseDomain(connectionInfo.getLogin()),
+                                    connectionInfo.getPassword());
+            } else {
+                cred = new CredData(connectionInfo.getLogin(),
+                                    connectionInfo.getDomain(),
+                                    connectionInfo.getPassword());
+            }
             init(connectionInfo.getUrl(), cred);
         }
     }
@@ -262,7 +269,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     private void init(String url, Credentials credentials, CredData credData)
             throws SchedulerException, LoginException {
         if (this.connectionInfo == null) {
-            this.connectionInfo = new ConnectionInfo(url, null, null, null, false);
+            this.connectionInfo = new ConnectionInfo(url, null, null, null, null, false);
         }
         this.connectionInfo.setUrl(url);
         this.credentials = credentials;

@@ -87,7 +87,7 @@ public class CredentialsCreatorTest {
         PASchedulerProperties.SCHEDULER_CREATE_CREDENTIALS_WHEN_LOGIN.updateProperty("false");
         String username = "user1";
         String password = "pass1";
-        credentialsCreator.createAndStoreCredentialFile(username, password);
+        credentialsCreator.createAndStoreCredentialFile(username, password, null);
         File f = new File(authenticationPath + username + ".cred");
         Assert.assertFalse(f.exists());
     }

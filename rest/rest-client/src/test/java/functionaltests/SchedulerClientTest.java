@@ -939,7 +939,12 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         File tmpFile = testFolder.newFile();
         Files.write("non_admin_user_push_file_contents".getBytes(), tmpFile);
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(), null, true));
+        client.init(new ConnectionInfo(getRestServerUrl(),
+                                       getNonAdminLogin(),
+                                       null,
+                                       getNonAdminLoginPassword(),
+                                       null,
+                                       true));
         client.pushFile("USERSPACE", "/test_non_admin_user_push_file", "tmpfile.tmp", tmpFile.getAbsolutePath());
         String destDirPath = URI.create(client.getUserSpaceURIs().get(0)).getPath();
         File destFile = new File(destDirPath, "test_non_admin_user_push_file/tmpfile.tmp");
@@ -949,14 +954,19 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test(timeout = MAX_WAIT_TIME)
     public void testGetGroups() throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
+        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), null, getPassword(), null, true));
         UserData userData = client.getCurrentUserData();
         Assert.assertNotNull(userData);
         Assert.assertNotNull(userData.getGroups());
         Assert.assertTrue(userData.getGroups().contains("scheduleradmins"));
         client.disconnect();
 
-        client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(), null, true));
+        client.init(new ConnectionInfo(getRestServerUrl(),
+                                       getNonAdminLogin(),
+                                       null,
+                                       getNonAdminLoginPassword(),
+                                       null,
+                                       true));
         userData = client.getCurrentUserData();
         Assert.assertNotNull(userData);
         Assert.assertNotNull(userData.getGroups());
@@ -966,7 +976,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     protected ISchedulerClient clientInstance() throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
+        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), null, getPassword(), null, true));
         return client;
     }
 

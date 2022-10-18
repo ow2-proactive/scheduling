@@ -142,7 +142,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         if (client.isConnected()) {
             return;
         }
-        client.init(new ConnectionInfo(url, userCreds.getLogin(), userCreds.getPassword(), null, true));
+        client.init(new ConnectionInfo(url,
+                                       userCreds.getLogin(),
+                                       userCreds.getDomain(),
+                                       userCreds.getPassword(),
+                                       null,
+                                       true));
     }
 
     private Map<String, String> addGlobalGenericInfoAndParentJobId(Map<String, String> genericInformation) {
