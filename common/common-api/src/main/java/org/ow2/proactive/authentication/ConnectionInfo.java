@@ -77,8 +77,10 @@ public class ConnectionInfo implements Serializable {
      */
     public ConnectionInfo(String url, String login, String password, File credentialFile, boolean insecure) {
         this.url = url;
-        this.login = parseLogin(login);
-        this.domain = parseDomain(domain);
+        if (login != null) {
+            this.login = parseLogin(login);
+            this.domain = parseDomain(login);
+        }
         this.password = password;
         this.credentialFile = credentialFile;
         this.insecure = insecure;
