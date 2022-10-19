@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.util;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Level;
@@ -67,8 +68,9 @@ public class MultipleTimingLogger {
     }
 
     public void start(String nameOfTiming) {
-        allTimings.putIfAbsent(nameOfTiming, new TimingModel());
-        allTimings.get(nameOfTiming).start();
+        TimingModel model = new TimingModel();
+        TimingModel storedModel = allTimings.putIfAbsent(nameOfTiming, model);
+        Optional.ofNullable(storedModel).orElse(model).start();
     }
 
     public void end(String nameOfTiming) {
