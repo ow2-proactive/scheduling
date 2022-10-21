@@ -920,6 +920,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public boolean checkPermission(String method) throws SecurityException {
+        return uischeduler.checkPermission(method);
+    }
+
+    @Override
     @ImmediateService
     public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
         return uischeduler.checkJobPermissionMethod(jobId, method);

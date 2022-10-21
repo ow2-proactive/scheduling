@@ -25,8 +25,12 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import static org.ow2.proactive.permissions.RoleUtils.findMethod;
+import static org.ow2.proactive.permissions.RoleUtils.findRole;
+
 import java.io.File;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -74,11 +78,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
-import org.ow2.proactive.permissions.MethodCallPermission;
-import org.ow2.proactive.permissions.NSAdminPermission;
-import org.ow2.proactive.permissions.NodeUserAllPermission;
-import org.ow2.proactive.permissions.PrincipalPermission;
-import org.ow2.proactive.permissions.RMCoreAllPermission;
+import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl;
@@ -127,7 +127,6 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.rmnode.ThreadDumpNotAccessibleException;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
@@ -530,7 +529,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 if (request != null) {
                     try {
                         try {
-                            caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
+                            caller = checkMethodCallPermission(request.getMethodCall().getReifiedMethod(),
+                                                               request.getSourceBodyID());
                             service.serve(request);
                         } catch (SecurityException ex) {
                             logger.warn("Cannot serve request: " + request, ex);
@@ -628,6 +628,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodes to be free
      * @return true if all successful, false if there is a down node among nodes
      */
+    @RoleWrite
     public BooleanWrapper setFreeNodes(List<RMNode> nodes) {
         boolean result = true;
         for (RMNode node : nodes) {
@@ -709,6 +710,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @param configuredNode the node that is going to be added.
      */
+    @RoleProvider
     public void internalAddNodeToCore(RMNode configuredNode) {
         String nodeURL = configuredNode.getNodeURL();
         if (!this.allNodes.containsKey(nodeURL)) {
@@ -762,6 +764,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @return total number of alive nodes
      */
+    @RoleRead
     public int getTotalAliveNodesNumber() {
         return listAliveNodeUrls().size();
     }
@@ -783,6 +786,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @param rmNode the node to make available
      */
+    @RoleProvider
     public BooleanWrapper registerAvailableNode(RMNode rmNode) {
         this.allNodes.put(rmNode.getNodeURL(), rmNode);
         return new BooleanWrapper(true);
@@ -797,6 +801,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @param rmnode the node in the configuration state
      */
+    @RoleProvider
     public void internalRegisterConfiguringNode(RMNode rmnode) {
         if (toShutDown) {
             logger.warn("The RM core is shutting down, cannot configure the node");
@@ -825,6 +830,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         nodeConfigurator.configureNode(rmnode);
     }
 
+    @RoleRead
     public String getId() {
         return this.id;
     }
@@ -862,6 +868,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleProvider
     public BooleanWrapper addNode(String nodeUrl) {
         return addNode(nodeUrl, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
     }
@@ -869,6 +876,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleProvider
     public BooleanWrapper addNode(String nodeUrl, String sourceName) {
         if (toShutDown) {
             throw new AddingNodesException("The resource manager is shutting down");
@@ -906,6 +914,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleWrite
     public BooleanWrapper acquireNodes(String sourceName, int numberNodes, long timeout,
             Map<String, ?> nodeConfiguration) {
         if (this.deployedNodeSources.containsKey(sourceName)) {
@@ -924,10 +933,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodeUrl URL of the node to remove.
      * @param preempt if true remove the node immediately without waiting while it will be freed. ( ignored if deploying node )
      */
+    @RoleProvider
     public BooleanWrapper removeNode(String nodeUrl, boolean preempt) {
         return removeNode(nodeUrl, preempt, false);
     }
 
+    @RoleProvider
     public BooleanWrapper removeNode(String nodeUrl, boolean preempt, boolean isTriggeredFromShutdownHook) {
         //waiting for better integration of deploying node
         //if we get a "deploying node url" we change the flow
@@ -975,6 +986,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodeSourceName a node source name
      * @param preemptive     if true remove nodes immediately without waiting while they will be freed
      */
+    @RoleProvider
     public void removeNodes(int number, String nodeSourceName, boolean preemptive) {
         int numberOfRemovedNodes = 0;
 
@@ -1023,6 +1035,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodeSourceName a name of the node source
      * @param preemptive     if true remove nodes immediately without waiting while they will be freed
      */
+    @RoleProvider
     public void removeAllNodes(String nodeSourceName, boolean preemptive) {
         removeAllNodes(nodeSourceName, preemptive, false);
     }
@@ -1034,6 +1047,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param preemptive                  if true remove nodes immediately without waiting while they will be freed
      * @param isTriggeredFromShutdownHook boolean saying if the calling is performed from a shutdown hook.
      */
+    @RoleProvider
     public void removeAllNodes(String nodeSourceName, final boolean preemptive,
             final boolean isTriggeredFromShutdownHook) {
 
@@ -1062,6 +1076,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, preemptive, isTriggeredFromShutdownHook));
     }
 
+    @RoleProvider
     public void addEligibleNodesToRecover(List<RMNode> eligibleNodes) {
         this.eligibleNodes.addAll(eligibleNodes);
     }
@@ -1121,6 +1136,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodeUrl the tested node.
      * @return true if the node nodeUrl is registered.
      */
+    @RoleRead
     public BooleanWrapper nodeIsAvailable(String nodeUrl) {
         final RMNode node = this.allNodes.get(nodeUrl);
         return new BooleanWrapper(node != null && !node.isDown());
@@ -1153,6 +1169,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @ImmediateService
     @Override
+    @RoleWrite
     public Set<String> setNodesAvailable(Set<String> nodeUrls) {
 
         checkPermissionAndGetClientIsSuccessful();
@@ -1214,6 +1231,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         node.getNodeSource().setNodeAvailable(node);
     }
 
+    @RoleRead
     public NodeState getNodeState(String nodeUrl) {
         RMNode node = this.allNodes.get(nodeUrl);
         if (node == null) {
@@ -1226,6 +1244,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @RoleNSAdmin
     public BooleanWrapper defineNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable) {
 
@@ -1260,11 +1279,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @RoleNSAdmin
     public BooleanWrapper editNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable) {
 
         logger.info("Edit node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
         NodeSource oldNodeSource = this.getEditableNodeSourceOrFail(nodeSourceName);
+
+        this.caller.checkPermission(oldNodeSource.getAdminPermission(),
+                                    this.caller + " is not authorized to edit " + nodeSourceName,
+                                    new RMCoreAllPermission(),
+                                    new NSAdminPermission());
+
         NodeSourceData nodeSourceData = this.getNodeSourceToPersist(nodeSourceName,
                                                                     infrastructureType,
                                                                     infraParams,
@@ -1293,12 +1319,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @RoleNSAdmin
     public BooleanWrapper updateDynamicParameters(String nodeSourceName, String infrastructureType,
             Object[] infraParams, String policyType, Object[] policyParams) {
 
         logger.info("Update dynamic parameters of node source " + nodeSourceName + REQUESTED_BY_STRING +
                     this.caller.getName());
         NodeSource definedNodeSource = getDefinedNodeSourceOrFail(nodeSourceName);
+
+        this.caller.checkPermission(definedNodeSource.getAdminPermission(),
+                                    this.caller + " is not authorized to update dynamic parameters for " +
+                                                                            nodeSourceName,
+                                    new RMCoreAllPermission(),
+                                    new NSAdminPermission());
 
         // needed to rollback in case of an issue
         List<Serializable> oldInfrastructureParameters = definedNodeSource.getDescriptor()
@@ -1456,6 +1489,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Deprecated
     @Override
+    @RoleNSAdmin
     public BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType,
             Object[] infrastructureParameters, String policyType, Object[] policyParameters, boolean nodesRecoverable) {
 
@@ -1475,6 +1509,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @RoleNSAdmin
     public BooleanWrapper deployNodeSource(String nodeSourceName) {
         logger.info("Deploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
         if (!this.deployedNodeSources.containsKey(nodeSourceName)) {
@@ -1623,6 +1658,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @param nodeSourceDescriptor the descriptor of the node source to recover
      */
+    @RoleAdmin
     public void recoverNodeSource(NodeSourceDescriptor nodeSourceDescriptor) {
 
         String nodeSourceName = nodeSourceDescriptor.getName();
@@ -1668,6 +1704,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleNSAdmin
     public BooleanWrapper undeployNodeSource(String nodeSourceName, boolean preempt) {
 
         logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
@@ -1714,6 +1751,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Shutdown the resource manager
      */
+    @RoleAdmin
     public BooleanWrapper shutdown(boolean preempt) {
         // this method could be called twice from shutdown hook and user action
         if (toShutDown)
@@ -1794,6 +1832,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleWrite
     public BooleanWrapper releaseNode(Node node) {
         NodeSet nodes = new NodeSet();
         nodes.add(node);
@@ -1803,6 +1842,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleWrite
     public BooleanWrapper releaseNodes(NodeSet nodes) {
 
         if (nodes.getExtraNodes() != null) {
@@ -1917,6 +1957,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleWrite
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript) {
         List<SelectionScript> selectionScriptList = selectionScript == null ? null
                                                                             : Collections.singletonList(selectionScript);
@@ -1926,6 +1967,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleWrite
     public NodeSet getAtMostNodes(int number, SelectionScript selectionScript, NodeSet exclusion) {
         List<SelectionScript> selectionScriptList = selectionScript == null ? null
                                                                             : Collections.singletonList(selectionScript);
@@ -1935,15 +1977,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleWrite
     public NodeSet getAtMostNodes(int number, List<SelectionScript> scripts, NodeSet exclusion) {
         return getAtMostNodes(number, TopologyDescriptor.ARBITRARY, scripts, exclusion);
     }
 
+    @RoleWrite
     public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor, List<SelectionScript> selectionScrips,
             NodeSet exclusion) {
         return getNodes(number, descriptor, selectionScrips, exclusion, true);
     }
 
+    @RoleAdmin
     public RMDBManager getDbManager() {
         return dbManager;
     }
@@ -1951,6 +1996,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleWrite
     public NodeSet getNodes(int number, TopologyDescriptor topology, List<SelectionScript> selectionScrips,
             NodeSet exclusion, boolean bestEffort) {
 
@@ -1965,6 +2011,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleWrite
     public NodeSet getNodes(Criteria criteria) {
         if (criteria.getSize() <= 0) {
             throw new IllegalArgumentException("Illegal node number " + criteria.getSize());
@@ -1982,6 +2029,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleWrite
     public NodeSet getExactlyNodes(int nb, SelectionScript selectionScript) {
         throw new RuntimeException("Not supported");
     }
@@ -1997,6 +2045,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
+    @RoleRead
     public RMInitialState getRMInitialState() {
 
         final Map<String, RMNodeEvent> nodeEvents = this.allNodes.values()
@@ -2043,6 +2092,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Gets RM monitoring stub
      */
     @ImmediateService
+    @RoleRead
     public RMMonitoring getMonitoring() {
         try {
             // return the stub on RMMonitoring interface to keep avoid using server class on client side
@@ -2055,6 +2105,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @ImmediateService
+    @RoleAdmin
     public StringWrapper getRMThreadDump() {
         checkPermissionAndGetClientIsSuccessful();
         String threadDump;
@@ -2071,6 +2122,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @ImmediateService
+    @RoleNSAdmin
     public StringWrapper getNodeThreadDump(String nodeUrl) {
         checkPermissionAndGetClientIsSuccessful();
         RMNode node;
@@ -2108,6 +2160,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Set<String> listAliveNodeUrls() {
         HashSet<String> aliveNodes = new HashSet<>();
         for (RMNode node : this.allNodes.values()) {
@@ -2119,6 +2172,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames) {
         HashSet<String> aliveNodes = new HashSet<>();
         for (String nodeSource : nodeSourceNames) {
@@ -2132,6 +2186,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Set<String> listNodeUrls() {
         return this.allNodes.keySet();
     }
@@ -2139,6 +2194,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Unregisters node source from the resource manager core.
      */
+    @RoleNSAdmin
     public BooleanWrapper nodeSourceUnregister(String nodeSourceName, NodeSourceStatus nodeSourceStatus,
             RMNodeSourceEvent evt) {
 
@@ -2225,6 +2281,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @RoleWrite
     public void setBusyNode(final String nodeUrl, Client owner) throws NotConnectedException {
         setBusyNode(nodeUrl, owner, Collections.EMPTY_MAP);
     }
@@ -2237,6 +2294,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param owner
      * @param nodeUrl node to set
      */
+    @RoleWrite
     public void setBusyNode(final String nodeUrl, Client owner, Map<String, String> usageInfo)
             throws NotConnectedException {
         final RMNode rmNode = this.allNodes.get(nodeUrl);
@@ -2279,6 +2337,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param usageInfoList list of usage information for each node
      * @param usageInfoCriteriaSize original size of the usage information criteria
      */
+    @RoleWrite
     public void setBusyNodes(final List<String> nodeUrlList, Client owner, List<Map<String, String>> usageInfoList,
             int usageInfoCriteriaSize) throws NotConnectedException {
 
@@ -2354,6 +2413,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Sets a node state to down and updates all internal structures of rm core
      * accordingly. Sends an event indicating that the node is down.
      */
+    @RoleWrite
     public void setDownNode(String nodeUrl) {
         RMNode rmNode = getNodebyUrl(nodeUrl);
         if (rmNode != null) {
@@ -2384,6 +2444,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @RoleRead
     public void registerAndEmitNodeEvent(final RMNodeEvent event) {
         this.monitoring.nodeEvent(event);
     }
@@ -2394,6 +2455,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodeUrl down node to be removed
      * @return true if the nodes was successfully removed, false otherwise
      */
+    @RoleProvider
     public BooleanWrapper removeNodeFromCore(String nodeUrl) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
         if (rmnode != null) {
@@ -2404,6 +2466,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @RoleRead
     public List<RMNode> getFreeNodes() {
         return eligibleNodes;
     }
@@ -2411,6 +2474,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleRead
     public IntWrapper getNodeSourcePingFrequency(String sourceName) {
         if (this.deployedNodeSources.containsKey(sourceName)) {
             return this.deployedNodeSources.get(sourceName).getPingFrequency();
@@ -2422,6 +2486,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleNSAdmin
     public BooleanWrapper setNodeSourcePingFrequency(int frequency, String sourceName) {
         if (deployedNodeSources.containsKey(sourceName)) {
             deployedNodeSources.get(sourceName).setPingFrequency(frequency);
@@ -2436,6 +2501,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @return list of existing Node Sources
      */
+    @RoleRead
     public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
         return getRMInitialState().getNodeSourceEvents();
     }
@@ -2444,6 +2510,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @Deprecated
+    @RoleRead
     public List<RMNodeEvent> getNodesList() {
         return getRMInitialState().getNodeEvents();
     }
@@ -2451,6 +2518,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleNSAdmin
     public BooleanWrapper removeNodeSource(String nodeSourceName, boolean preempt) {
 
         logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
@@ -2524,6 +2592,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleRead
     public RMState getState() {
         RMStateNodeUrls rmStateNodeUrls = new RMStateNodeUrls(nodesListToUrlsSet(eligibleNodes),
                                                               listAliveNodeUrls(),
@@ -2532,6 +2601,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return state;
     }
 
+    @RoleRead
     public List<String> getToBeRemovedUnavailableNodesUrls() {
 
         List<String> unavailableNodesUrl = new LinkedList<>();
@@ -2568,6 +2638,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @ImmediateService
+    @RoleBasic
     public BooleanWrapper isActive() {
         // return false for non connected clients
         // it should be verified by checkPermissionsMethod but it returns true for
@@ -2578,13 +2649,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     protected Client checkPermissionAndGetClientIsSuccessful() {
         final Request currentRequest = PAActiveObject.getContext().getCurrentRequest();
-        String methodName = currentRequest.getMethodName();
-        return checkMethodCallPermission(methodName, currentRequest.getSourceBodyID());
+        return checkMethodCallPermission(currentRequest.getMethodCall().getReifiedMethod(),
+                                         currentRequest.getSourceBodyID());
     }
 
     /**
      * {@inheritDoc}
      */
+    @RoleBasic
     public BooleanWrapper disconnect() {
         disconnect(PAActiveObject.getContext().getCurrentRequest().getSender().getID());
         return new BooleanWrapper(true);
@@ -2593,6 +2665,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Disconnects the client and releases all nodes held by him
      */
+    @RoleBasic
     public void disconnect(UniqueID clientId) {
         Client client = RMCore.clients.remove(clientId);
         if (client != null) {
@@ -2628,6 +2701,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleRead
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
         return this.nodeSourceParameterHelper.getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
     }
@@ -2635,6 +2709,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleRead
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
         return this.nodeSourceParameterHelper.getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
     }
@@ -2643,6 +2718,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @RoleRead
     public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName) {
 
         NodeSource nodeSource = getDefinedNodeSourceOrFail(nodeSourceName);
@@ -2662,34 +2738,105 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                            policyPluginDescriptor);
     }
 
+    @Override
+    @ImmediateService
+    @RoleBasic
+    public boolean checkPermission(String methodName) throws SecurityException {
+        final Request currentRequest = PAActiveObject.getContext().getCurrentRequest();
+        UniqueID clientId = currentRequest.getSourceBodyID();
+        Client client = RMCore.clients.get(clientId);
+
+        Method method = findMethod(this.getClass(), methodName);
+
+        if (client == null) {
+            return getLocalClient(clientId) != null;
+        }
+
+        checkPermissionInternal(method, client, methodName);
+
+        return true;
+    }
+
     /**
-     * Checks if the caller thread has permissions to call particular method name
+     * Checks if the caller thread has permissions to call particular method
      *
      * @return client object corresponding to the caller thread
      */
-    private Client checkMethodCallPermission(final String methodName, UniqueID clientId) {
+    private Client checkMethodCallPermission(final Method method, UniqueID clientId) {
         Client client = RMCore.clients.get(clientId);
 
         if (client == null) {
-            // Check if the client id is a local body or half body
-            LocalBodyStore lbs = LocalBodyStore.getInstance();
-            if (lbs.getLocalBody(clientId) != null || lbs.getLocalHalfBody(clientId) != null) {
-                return RMCore.localClient;
-            }
-
-            throw new NotConnectedException("Client " + clientId.shortString() +
-                                            " is not connected to the resource manager");
+            return getLocalClient(clientId);
         }
 
-        final String fullMethodName = RMCore.class.getName() + "." + methodName;
-        final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
+        // check if the current client is a super admin
+        try {
+            client.checkPermission(new AllPermission(), "");
+            logger.trace("permission " + method.getName() + " from " + client.getName() + " -> authorized");
+            return client;
+        } catch (SecurityException e) {
+            // not a super admin
+        }
 
-        client.checkPermission(methodCallPermission,
-                               client + " is not authorized to call " + fullMethodName,
-                               new RMCoreAllPermission());
+        checkPermissionInternal(method, client, method.getName());
+
         return client;
     }
 
+    private void checkPermissionInternal(Method method, Client client, String methodName) {
+        logger.trace("checking permission " + methodName + " from " + client.getName());
+        final String fullMethodName = RMCore.class.getName() + "." + method.getName();
+        final String fullMethodRole = RMCore.class.getName() + "." + findRole(method);
+        final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
+        final ServiceRolePermission serviceRolePermission = new ServiceRolePermission(fullMethodRole);
+        final DeniedMethodCallPermission deniedMethodCallPermission = new DeniedMethodCallPermission(fullMethodName);
+
+        final String permissionMsg = client + " is not authorized to call " + fullMethodName;
+
+        checkDeniedMethodCallPermission(client, fullMethodName, deniedMethodCallPermission, permissionMsg);
+        checkMethodCallOrRolePermission(client, methodCallPermission, serviceRolePermission, permissionMsg);
+        logger.trace("permission " + methodName + " from " + client.getName() + " -> authorized");
+    }
+
+    private Client getLocalClient(UniqueID clientId) {
+        Client client;
+        // Check if the client id is a local body or half body
+        LocalBodyStore lbs = LocalBodyStore.getInstance();
+        if (lbs.getLocalBody(clientId) != null || lbs.getLocalHalfBody(clientId) != null) {
+            client = RMCore.localClient;
+        } else {
+            throw new NotConnectedException("Client " + clientId.shortString() +
+                                            " is not connected to the resource manager");
+        }
+        return client;
+    }
+
+    private void checkMethodCallOrRolePermission(Client client, MethodCallPermission methodCallPermission,
+            ServiceRolePermission serviceRolePermission, String permissionMsg) {
+        try {
+            client.checkPermission(methodCallPermission, permissionMsg, new RMCoreAllPermission());
+        } catch (SecurityException ex) {
+            try {
+                client.checkPermission(serviceRolePermission, permissionMsg, new RMCoreAllPermission());
+            } catch (SecurityException ex2) {
+                logger.debug(permissionMsg);
+                throw ex2;
+            }
+        }
+    }
+
+    private void checkDeniedMethodCallPermission(Client client, String fullMethodName,
+            DeniedMethodCallPermission deniedMethodCallPermission, String permissionMsg) {
+        try {
+            client.checkPermission(deniedMethodCallPermission, permissionMsg);
+            logger.trace("Denied method access : " + fullMethodName);
+            throw new SecurityException(permissionMsg);
+        } catch (SecurityException ex) {
+            // ok, the check should throw an exception unless it is denied
+        }
+    }
+
+    @RoleRead
     public Topology getTopology() {
         if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             throw new TopologyException("Topology is disabled");
@@ -2854,10 +3001,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @RoleWrite
     public BooleanWrapper lockNodes(Set<String> urls) {
         return lockNodes(urls, caller);
     }
 
+    @RoleWrite
     public BooleanWrapper lockNodes(Set<String> urls, final Client caller) {
         return mapOnNodeUrlSet(urls, node -> internalLockNode(node, caller), "lock");
     }
@@ -2897,11 +3046,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @RoleWrite
     public BooleanWrapper unlockNodes(Set<String> urls) {
         return mapOnNodeUrlSet(urls, this::internalUnlockNode, "unlock");
     }
 
-    public BooleanWrapper mapOnNodeUrlSet(Set<String> nodeUrls, Predicate<RMNode> operation, String operationName) {
+    private BooleanWrapper mapOnNodeUrlSet(Set<String> nodeUrls, Predicate<RMNode> operation, String operationName) {
         boolean result = true;
 
         for (String url : nodeUrls) {
@@ -2924,7 +3074,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(result);
     }
 
-    public Map<String, Boolean> getMapOnNodeUrlSet(Set<String> nodeUrls, Predicate<RMNode> operation,
+    private Map<String, Boolean> getMapOnNodeUrlSet(Set<String> nodeUrls, Predicate<RMNode> operation,
             String operationName) {
         Map<String, Boolean> result = new HashMap<>();
 
@@ -2994,6 +3144,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleBasic
     public BooleanWrapper isNodeAdmin(String nodeUrl) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
 
@@ -3001,8 +3152,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Unknown node " + nodeUrl);
         }
 
+        return isNodeAdminInternal(rmnode, caller);
+    }
+
+    private BooleanWrapper isNodeAdminInternal(RMNode rmnode, Client client) {
         try {
-            caller.checkPermission(rmnode.getAdminPermission(),
+            client.checkPermission(rmnode.getAdminPermission(),
                                    caller + " is not authorized to administrate the node " + rmnode.getNodeURL() +
                                                                 " from " + rmnode.getNodeSource().getName(),
                                    new RMCoreAllPermission(),
@@ -3018,6 +3173,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @RoleBasic
     public BooleanWrapper isNodeUser(String nodeUrl) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
 
@@ -3041,6 +3197,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @ImmediateService
+    @RoleNSAdmin
     public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets) {
         try {
@@ -3055,6 +3212,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     @ImmediateService
+    @RoleNSAdmin
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
         Client client;
         try {
@@ -3063,6 +3221,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.error("Error while checking permission to execute node script", e);
             return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
         }
+        boolean accessDenied = false;
         // Depending on the target type, select nodes for script execution
         final TargetType tType = TargetType.valueOf(targetType);
         final HashSet<RMNode> selectedRMNodes = new HashSet<>();
@@ -3117,6 +3276,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void selectCandidateNode(HashSet<RMNode> selectedRMNodes, RMNode candidateNode, Client clientCaller) {
+        if (!isNodeAdminInternal(candidateNode, clientCaller).getBooleanValue()) {
+            throw new SecurityException("" + clientCaller.getName() +
+                                        " is not authorized to execute a script on node " + candidateNode.getNodeURL());
+        }
         if (this.internalLockNode(candidateNode, clientCaller)) {
             selectedRMNodes.add(candidateNode);
         } else {
@@ -3135,17 +3298,20 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @RoleWrite
     public boolean setDeploying(RMNode rmNode) {
         nodesRecoveryManager.restoreLock(rmNode, caller);
         return true;
     }
 
     @Override
+    @RoleBasic
     public StringWrapper getCurrentUser() {
         return new StringWrapper(caller.getName());
     }
 
     @Override
+    @RoleBasic
     public UserData getCurrentUserData() {
         UserData userData = new UserData();
         userData.setUserName(caller.getName());
@@ -3155,6 +3321,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleWrite
     public void releaseBusyNodesNotInList(List<NodeSet> nodesToNotRelease) {
         Set<String> nodesUrlToNotRelease = new HashSet<>();
 
@@ -3187,6 +3354,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public boolean areNodesKnown(NodeSet nodes) {
         Set<String> nodesURL = nodes.getAllNodesUrls();
         if (logger.isDebugEnabled()) {
@@ -3205,6 +3373,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Map<String, Boolean> areNodesRecoverable(NodeSet nodes) {
         Map<String, Boolean> answer = new HashMap<>(nodes.size());
         Set<String> nodesURL = nodes.getAllNodesUrls();
@@ -3223,11 +3392,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleWrite
     public void setNeededNodes(int neededNodes) {
         this.monitoring.setNeededNodes(neededNodes);
     }
 
     @Override
+    @RoleRead
     public Map<String, List<String>> getInfrasToPoliciesMapping() {
         Map<String, List<String>> mapping = new HashMap<>();
         String fileName = null;
@@ -3254,6 +3425,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd) {
         List<NodeHistory> nodesHistory = dbManager.getNodesHistory(windowStart, windowEnd);
 
@@ -3310,6 +3482,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleWrite
     public void addNodeToken(String nodeUrl, String token) throws RMException {
         if (token == null || token.isEmpty()) {
             throw new RMException("Invalid empty token");
@@ -3338,6 +3511,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public List<String> getNodeTokens(String nodeUrl) throws RMException {
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
@@ -3348,6 +3522,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Map<String, List<String>> getAllNodesTokens() throws RMException {
         Map<String, List<String>> allNodesTokens = new LinkedHashMap<>(allNodes.size());
         for (Map.Entry<String, RMNode> entry : allNodes.entrySet()) {
@@ -3357,6 +3532,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Map<String, List<String>> getAllEligibleNodesTokens() throws RMException {
         Map<String, List<String>> allNodesTokens = new LinkedHashMap<>(eligibleNodes.size());
         for (RMNode rmNode : eligibleNodes) {
@@ -3366,6 +3542,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Set<String> getNodeTags(String nodeUrl) throws RMException {
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
@@ -3376,6 +3553,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Set<String> getNodesByTag(String tag) {
         Set<String> result = new HashSet<>();
         for (RMNode rmNode : this.allNodes.values()) {
@@ -3387,6 +3565,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleRead
     public Set<String> getNodesByTags(Set<String> tags, boolean all) {
         Set<String> result = new HashSet<>();
         for (RMNode rmNode : this.allNodes.values()) {
@@ -3406,6 +3585,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleWrite
     public void removeNodeToken(String nodeUrl, String token) throws RMException {
         if (token == null || token.isEmpty()) {
             throw new RMException("Invalid empty token");
@@ -3433,6 +3613,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @RoleWrite
     public void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException {
         if (tokens.stream().anyMatch(token -> token == null || token.isEmpty())) {
             throw new RMException("Invalid empty token in list " + tokens);
@@ -3459,6 +3640,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodePermission(String, boolean)
      */
     @Override
+    @RoleBasic
     public BooleanWrapper checkNodePermission(String nodeUrl, boolean provider) {
         RMNode rmnode = this.allNodes.get(nodeUrl);
         if (rmnode == null) {
@@ -3473,6 +3655,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#checkNodeSourcePermission(String, boolean)
      */
     @Override
+    @RoleBasic
     public BooleanWrapper checkNodeSourcePermission(String nodeSourceName, boolean provider) {
         if (nodeSourceName == null) {
             return new BooleanWrapper(false);

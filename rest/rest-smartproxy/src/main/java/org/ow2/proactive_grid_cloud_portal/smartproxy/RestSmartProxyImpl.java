@@ -815,6 +815,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public boolean checkPermission(String method) throws SecurityException {
+        return (_getScheduler()).checkPermission(method);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
         return (_getScheduler()).checkJobPermissionMethod(jobId, method);
     }

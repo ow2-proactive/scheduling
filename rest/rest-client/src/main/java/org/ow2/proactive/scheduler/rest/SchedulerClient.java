@@ -1628,6 +1628,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public boolean checkPermission(String method) throws SecurityException {
+        try {
+            return restApi().checkPermissionMethod(sid, method);
+        } catch (Exception e) {
+            throw new SecurityException(e.getMessage(), e);
+        }
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
         try {
             return restApi().checkJobPermissionMethod(sid, method, jobId);

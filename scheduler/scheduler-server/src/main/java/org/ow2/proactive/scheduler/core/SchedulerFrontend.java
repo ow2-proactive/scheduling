@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.core;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.*;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyException;
@@ -68,6 +69,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -145,6 +147,7 @@ import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.PAExecutors;
 import org.ow2.proactive.utils.Tools;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
@@ -451,6 +454,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         return busyNodesWithTask;
     }
 
+    @VisibleForTesting
+    public Method findMethod(String methodName) throws PermissionException {
+        for (Method method : this.getClass().getMethods()) {
+            if (methodName.equals(method.getName())) {
+                return method;
+            }
+        }
+        throw new PermissionException("Method " + methodName + " does not exist in " + this.getClass().getName());
+    }
+
     /*
      * *******************************
      *
@@ -473,6 +486,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      *             if the user is already connected
      */
     @ImmediateService
+    @RoleBasic
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
         Credentials enrichedCreds = cred;
@@ -492,9 +506,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos,
             String sessionId) throws NotConnectedException, UnknownJobException, PermissionException,
             JobCreationException, SubmissionClosedException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
         final String jobContent = getJobContent(currentJobId);
         final Job job = JobFactory.getFactory().createJob(IOUtils.toInputStream(jobContent, Charset.forName("UTF-8")),
                                                           jobVariables,
@@ -510,6 +528,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public JobId submit(Job userJob)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         try {
@@ -523,7 +542,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                 logger.info(msg);
                 throw new SubmissionClosedException(msg);
             }
-            UserIdentificationImpl ident = frontendState.checkPermission("submit",
+            Method currentMethod = new Object() {
+            }.getClass().getEnclosingMethod();
+            UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                          YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
             MultipleTimingLogger timingLogger = new MultipleTimingLogger("SubmitTimer", logger, true);
             timingLogger.start("createJob");
@@ -541,6 +562,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public List<JobIdDataAndError> submit(List<Job> jobs) throws NotConnectedException {
 
         List<JobIdDataAndError> answer = new ArrayList<>(jobs.size());
@@ -557,7 +579,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
         UserIdentificationImpl ident = null;
         try {
-            ident = frontendState.checkPermission("submit", YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
+            Method currentMethod = new Object() {
+            }.getClass().getEnclosingMethod();
+            ident = frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
         } catch (Exception e) {
             for (int i = 0; i < jobs.size(); i++) {
                 answer.add(new JobIdDataAndError(e.getMessage(), StackTraceUtil.getStackTrace(e)));
@@ -613,8 +637,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
-        SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials("getUserSpaceURIs",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials(currentMethod,
                                                                                                                          "You don't have permissions to read the USER Space URIs",
                                                                                                                          false);
         return this.spacesSupport.getUserSpaceURIs(userAndCredentials.getListeningUser().getUser().getUsername(),
@@ -626,8 +653,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("getGlobalSpaceURIs", "You don't have permissions to read the GLOBAL Space URI");
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to read the GLOBAL Space URI");
         return this.spacesSupport.getGlobalSpaceURIs();
     }
 
@@ -636,17 +666,21 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public JobResult getJobResult(final JobId jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
 
         // checking permissions
         IdentifiedJob ij = frontendState.getIdentifiedJob(jobId);
 
-        frontendState.checkPermissions("getJobResult", ij, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+
+        frontendState.checkPermissions(currentMethod, ij, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB);
 
         if (!ij.isFinished()) {
             logger.info("Job " + jobId + " is not finished");
-            logger.info("Job " + jobId + " state: " + frontendState.getJobState(jobId).getStatus());
+            logger.info("Job " + jobId + " state: " + getJobState(jobId).getStatus());
             return null;
         }
 
@@ -672,6 +706,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         return this.getJobResult(JobIdImpl.makeJobId(jobId));
     }
@@ -681,6 +716,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public TaskResult getTaskResult(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return this.getTaskResultFromIncarnation(jobId, taskName, 0);
@@ -691,6 +727,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public TaskResult getTaskResult(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);
@@ -698,10 +735,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        frontendState.checkPermission("getTaskResultByTag",
-                                      YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         List<TaskState> taskStates = getJobState(jobId).getTasksByTag(taskTag);
         ArrayList<TaskResult> results = new ArrayList<>(taskStates.size());
         for (TaskState currentState : taskStates) {
@@ -720,6 +759,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return this.getTaskResultsByTag(JobIdImpl.makeJobId(jobId), taskTag);
@@ -730,6 +770,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return this.getTaskResultFromIncarnation(JobIdImpl.makeJobId(jobId), taskName, inc);
@@ -740,11 +781,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
 
         // checking permissions
-        frontendState.checkPermissions("getTaskResultFromIncarnation",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
 
@@ -810,6 +854,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return this.getTaskResultAllIncarnations(JobIdImpl.makeJobId(jobId), taskName);
@@ -820,10 +865,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
-        frontendState.checkPermissions("getTaskResultFromIncarnation",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
 
@@ -843,11 +891,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
         // checking permissions
-        frontendState.checkPermissions("killTask",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK);
         logger.info("Request to kill task " + taskName + " of job " + jobId + " received from " + currentUser);
@@ -859,6 +910,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean killTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return killTask(JobIdImpl.makeJobId(jobId), taskName);
@@ -869,11 +921,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean restartTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermissions("restartTask",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
         logger.info("Request to restart task " + taskName + " of job " + jobId + " received from " + currentUser);
@@ -885,6 +940,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean restartTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return restartTask(JobIdImpl.makeJobId(jobId), taskName, restartDelay);
@@ -895,12 +951,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean finishInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("finishInErrorTask",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
         logger.info("Request to finish in-error task " + taskName + " of job " + jobId + " received from " +
@@ -913,12 +972,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("restartInErrorTask",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
         logger.info("Request to restart in-error task " + taskName + " of job " + jobId + " received from " +
@@ -928,11 +990,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public void enableRemoteVisualization(String jobId, String taskName, String connectionString)
             throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException {
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("enableRemoteVisualization",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK);
         logger.info("Request to enable visualization on task " + taskName + " of job " + jobId + " received from " +
@@ -942,11 +1007,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public void registerService(String jobId, int serviceInstanceid, boolean enableActions)
             throws NotConnectedException, PermissionException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("registerService",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_REGISTER_SERVICE_TO_THIS_JOB);
         logger.info("Request to register service instance " + serviceInstanceid + " on job " + jobId +
@@ -956,11 +1024,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public void detachService(String jobId, int serviceInstanceid)
             throws NotConnectedException, PermissionException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("detachService",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_DETACH_SERVICE_TO_THIS_JOB);
         logger.info("Request to detach service instance " + serviceInstanceid + " on job " + jobId + " received from " +
@@ -973,11 +1044,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean preemptTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermissions("preemptTask",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK);
         logger.info("Request to preempt task " + taskName + " of job " + jobId + " received from " + currentUser);
@@ -989,6 +1063,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean preemptTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return preemptTask(JobIdImpl.makeJobId(jobId), taskName, restartDelay);
@@ -999,11 +1074,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
 
         String currentUser = frontendState.getCurrentUser();
         // checking permissions
-        frontendState.checkPermissions("removeJob",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
         logger.info("Request to remove job " + jobId + " received from " + currentUser);
@@ -1015,17 +1093,21 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
+    @RoleWrite
     public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
         if (jobIds.isEmpty()) {
             return false;
         }
         List<JobId> jobIdsDup = new ArrayList<>(jobIds);
         // checking permission for each of the job
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
         for (Iterator<JobId> it = jobIdsDup.iterator(); it.hasNext();) {
             JobId jobId = it.next();
             try {
-                frontendState.checkPermissions("removeJob",
+                frontendState.checkPermissions(currentMethod,
                                                frontendState.getIdentifiedJob(jobId),
                                                YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
             } catch (UnknownJobException e) {
@@ -1041,6 +1123,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     }
 
     @Override
+    @ImmediateService
+    @RoleWrite
     public boolean removeJobs(long olderThan) throws NotConnectedException, PermissionException {
         List<JobId> jobsId = dbManager.getJobsByFinishedTime(olderThan);
         return removeJobs(jobsId);
@@ -1051,10 +1135,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         // checking permissions
-        frontendState.checkPermissions("listenJobLogs",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB);
 
@@ -1070,6 +1157,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public void listenJobLogs(String jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         this.listenJobLogs(JobIdImpl.makeJobId(jobId), appenderProvider);
@@ -1080,7 +1168,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
+        // checking permissions
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS);
         return frontendState.getStatus();
     }
 
@@ -1089,6 +1182,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         return getState(false);
     }
@@ -1098,8 +1192,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
-        return frontendState.getState(myJobsOnly);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        ListeningUser ui = frontendState.checkPermissionReturningListeningUser(currentMethod,
+                                                                               YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE);
+        return frontendState.getState(myJobsOnly, ui);
     }
 
     /**
@@ -1107,6 +1206,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException {
         addEventListener(sel, myEventsOnly, false, events);
@@ -1117,9 +1217,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
             SchedulerEvent... events) throws NotConnectedException, PermissionException {
-        return frontendState.addEventListener(sel, myEventsOnly, getCurrentState, events);
+        ListeningUser uIdent = frontendState.checkPermissionReturningListeningUser(new Object() {
+        }.getClass().getEnclosingMethod(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
+        return frontendState.addEventListener(sel, myEventsOnly, getCurrentState, uIdent, events);
     }
 
     /**
@@ -1127,6 +1230,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public void removeEventListener() throws NotConnectedException, PermissionException {
         frontendState.removeEventListener();
     }
@@ -1147,9 +1251,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean start() throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermission("start", YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER);
         logger.info("Request to start scheduler server received from " + currentUser);
         return schedulingService.start();
     }
@@ -1158,9 +1265,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean stop() throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermission("stop", YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER);
         logger.info("Request to stop scheduler server received from " + currentUser);
         return schedulingService.stop();
     }
@@ -1169,9 +1279,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean pause() throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermission("pause", YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THE_SCHEDULER);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THE_SCHEDULER);
         logger.info("Request to pause scheduler server received from " + currentUser);
         return schedulingService.pause();
     }
@@ -1180,9 +1293,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean freeze() throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermission("freeze", YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER);
         logger.info("Request to freeze scheduler server received from " + currentUser);
         return schedulingService.freeze();
     }
@@ -1191,9 +1307,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean resume() throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermission("resume", YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THE_SCHEDULER);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THE_SCHEDULER);
         logger.info("Request to resume scheduler server received from " + currentUser);
         return schedulingService.resume();
     }
@@ -1202,9 +1321,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean shutdown() throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermission("shutdown", YOU_DO_NOT_HAVE_PERMISSION_TO_SHUTDOWN_THE_SCHEDULER);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_SHUTDOWN_THE_SCHEDULER);
         logger.info("Request to shutdown scheduler server received from " + currentUser);
         return schedulingService.shutdown();
     }
@@ -1213,9 +1335,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean kill() throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermission("kill", YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER);
         logger.info("Request to kill scheduler server received from " + currentUser);
         return schedulingService.kill();
     }
@@ -1225,6 +1350,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleBasic
     public void disconnect() throws NotConnectedException, PermissionException {
         frontendState.disconnect();
     }
@@ -1234,18 +1360,27 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleBasic
     public boolean isConnected() {
         return frontendState.isConnected();
     }
 
     @Override
+    @RoleRead
     public String getCurrentPolicy() throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_READ_THE_CURRENT_POLICY);
         return policyFullName;
     }
 
     @Override
     @ImmediateService
+    @RoleRead
     public Map<JobId, JobDescriptor> getJobsToSchedule() throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_READ_THE_JOBS_TO_SCHEDULE);
         Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
         schedulingService.unlockJobsToSchedule(jobMap.values());
         return jobMap;
@@ -1253,8 +1388,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
         Policy policy = null;
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_READ_THE_TASKS_TO_SCHEDULE);
         List<TaskDescriptor> eligibleTasks = new ArrayList<>();
         Map<JobId, JobDescriptor> jobMap = null;
         try {
@@ -1288,6 +1427,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleBasic
     public void renewSession() throws NotConnectedException {
         frontendState.renewSession(false);
     }
@@ -1297,9 +1437,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermissions("pauseJob",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB);
         logger.info("Request to pause job " + jobId + " received from " + currentUser);
@@ -1311,9 +1454,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermissions("resumeJob",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB);
         logger.info("Request to resume job " + jobId + " received from " + currentUser);
@@ -1325,9 +1471,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermissions("killJob",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
         logger.info("Request to kill job " + jobId + " received from " + currentUser);
@@ -1339,9 +1488,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public void changeJobPriority(JobId jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         String currentUser = frontendState.getCurrentUser();
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
+                                       frontendState.getIdentifiedJob(jobId),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB);
         frontendState.checkChangeJobPriority(jobId, priority);
         logger.info("Request to change job " + jobId + " priority to " + priority + " received from " + currentUser);
         schedulingService.changeJobPriority(jobId, priority);
@@ -1352,13 +1507,25 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
+                                       frontendState.getIdentifiedJob(jobId),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return frontendState.getJobState(jobId);
     }
 
     @Override
+    @RoleRead
     public TaskState getTaskState(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, PermissionException, UnknownTaskException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
+                                       frontendState.getIdentifiedJob(jobId),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
         return frontendState.getTaskState(jobId, taskName);
     }
 
@@ -1367,23 +1534,38 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
+                                       frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), offset, limit);
     }
 
     @Override
     @ImmediateService
+    @RoleRead
     public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
+                                       frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), statusFilter, offset, limit);
     }
 
     @Override
     @ImmediateService
+    @RoleRead
     public List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        frontendState.checkPermissions("getJobResult",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         List<TaskState> taskStates = getJobState(jobId).getTasks()
@@ -1410,10 +1592,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
             throws UnknownJobException, NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
         for (String jobId : jobsId) {
-            frontendState.checkPermissions("getJobResult",
+            frontendState.checkPermissions(currentMethod,
                                            frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
                                            YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         }
@@ -1422,8 +1607,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
             throws NotConnectedException, PermissionException {
+        // permission check is skipped for efficiency reason, security is not mandatory on this method
         return dbManager.getPreciousTaskNames(jobsId);
     }
 
@@ -1432,12 +1619,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.killJob(JobIdImpl.makeJobId(jobId));
     }
 
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean killJobs(List<String> jobIds) throws NotConnectedException, PermissionException {
 
         if (jobIds.isEmpty()) {
@@ -1446,9 +1635,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         String currentUser = frontendState.getCurrentUser();
         List<JobId> jobIdsConverted = jobIds.stream().map(JobIdImpl::makeJobId).collect(Collectors.toList());
         // checking permission for each of the job
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
         for (JobId jobId : jobIdsConverted) {
             try {
-                frontendState.checkPermissions("killJob",
+                frontendState.checkPermissions(currentMethod,
                                                frontendState.getIdentifiedJob(jobId),
                                                YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
             } catch (UnknownJobException e) {
@@ -1466,6 +1657,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.pauseJob(JobIdImpl.makeJobId(jobId));
     }
@@ -1475,17 +1667,21 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.removeJob(JobIdImpl.makeJobId(jobId));
     }
 
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean restartAllInErrorTasks(String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermissions("restartAllInErrorTasks",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB);
         logger.info("Request to restart all in-error tasks on job " + jobId + " received from " + currentUser);
@@ -1497,6 +1693,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.resumeJob(JobIdImpl.makeJobId(jobId));
     }
@@ -1506,6 +1703,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public void changeJobPriority(String jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         this.changeJobPriority(JobIdImpl.makeJobId(jobId), priority);
@@ -1516,6 +1714,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.getJobState(JobIdImpl.makeJobId(jobId));
     }
@@ -1524,6 +1723,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean changePolicy(String newPolicyClassname) throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
         frontendState.checkChangePolicy();
@@ -1536,6 +1736,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
         frontendState.checkLinkResourceManager();
@@ -1547,10 +1748,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      * {@inheritDoc}
      */
     @Override
+    @RoleAdmin
     public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
         String currentUser = frontendState.getCurrentUser();
-        frontendState.checkPermission("reloadPolicyConfiguration",
-                                      YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION);
         logger.info("Request to reload policy configuration received from " + currentUser);
         return schedulingService.reloadPolicyConfiguration();
     }
@@ -1601,10 +1804,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public String getJobServerLogs(String jobId)
             throws UnknownJobException, NotConnectedException, PermissionException {
         JobId id = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("getJobServerLogs",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(id),
                                        YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB);
 
@@ -1613,11 +1819,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public String getTaskServerLogs(String jobId, String taskName)
             throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
 
         JobId id = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("getTaskServerLogs",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(id),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
 
@@ -1632,10 +1841,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public String getTaskServerLogsByTag(String jobId, String taskTag)
             throws UnknownJobException, NotConnectedException, PermissionException {
         JobId id = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("getTaskServerLogsByTag",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(id),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
         List<TaskState> lTaskState = frontendState.getJobState(id).getTasksByTag(taskTag);
@@ -1652,9 +1864,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getJobs",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      "You don't have permissions to load jobs");
 
         boolean myJobsOnly = filterCriteria.isMyJobsOnly();
@@ -1734,8 +1949,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException {
-        frontendState.checkPermission("getJobs", "You don't have permissions to load jobs");
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to load jobs");
         List<JobInfo> jobsInfo = dbManager.getJobs(jobsId);
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
@@ -1759,8 +1977,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("getUsers", "You don't have permissions to get users");
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to get users");
         return frontendState.getUsers();
     }
 
@@ -1769,8 +1990,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleAdmin
     public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("getUsersWithJobs", "You don't have permissions to get users with jobs");
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to get users with jobs");
         return dbManager.loadUsersWithJobs();
     }
 
@@ -1779,18 +2003,24 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleRead
     public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getMyAccountUsage",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      "You don't have permissions to get usage data for your account");
         return dbManager.getUsage(ident.getUsername(), startDate, endDate);
     }
 
     @Override
     @ImmediateService
+    @RoleRead
     public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getFilteredStatistics",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      "You don't have permissions to get filtered statistics");
         String tenant = null;
         if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
@@ -1806,9 +2036,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getTopWorkflowsWithIssues",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      "You don't have permissions to get top workflows with issues");
         String tenant = null;
         if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
@@ -1825,9 +2058,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getTopExecutionTimeWorkflows",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      "You don't have permissions to get top execution time workflows");
         String tenant = null;
         if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
@@ -1844,9 +2080,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
             throws NotConnectedException, PermissionException, InvalidTimeWindowException, InvalidTimeZoneId {
-        UserIdentificationImpl ident = frontendState.checkPermission("getCompletedJobs",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      "You don't have permissions to get completed jobs");
         String tenant = null;
         if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
@@ -1875,17 +2114,20 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleAdmin
     public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
         try {
-            frontendState.checkPermission("getAccountUsage", "You don't have permissions to get usage data of " + user);
+            Method currentMethod = new Object() {
+            }.getClass().getEnclosingMethod();
+            frontendState.checkPermission(currentMethod, "You don't have permissions to get usage data of " + user);
 
             return dbManager.getUsage(user, startDate, endDate);
         } catch (PermissionException e) {
             // try to fallback on my account usage if user is the caller
-            UserIdentificationImpl ident = frontendState.checkPermission("getMyAccountUsage",
+            UserIdentificationImpl ident = frontendState.checkPermission(findMethod("getMyAccountUsage"),
                                                                          "You don't have permissions to get usage data of " +
-                                                                                              user);
+                                                                                                          user);
             if (user != null && user.equals(ident.getUsername())) {
                 return dbManager.getUsage(ident.getUsername(), startDate, endDate);
             }
@@ -1895,8 +2137,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
 
         HybridEncryptionUtil.HybridEncryptedData encryptedData = null;
@@ -1910,26 +2155,35 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("thirdPartyCredentialsKeySet",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_LIST_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
         return dbManager.thirdPartyCredentialsKeySet(ident.getUsername());
     }
 
     @Override
     @ImmediateService
+    @RoleWrite
     public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("removeThirdPartyCredential",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER);
         dbManager.removeThirdPartyCredential(ident.getUsername(), key);
     }
 
     @Override
     @ImmediateService
+    @RoleRead
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
             int offset, int limit) throws NotConnectedException, PermissionException {
         String userName = null;
-        UserIdentificationImpl userIdentification = frontendState.checkPermission("getTaskIds",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl userIdentification = frontendState.checkPermission(currentMethod,
                                                                                   YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_IDS);
         String tmpUserName = userIdentification.getUsername();
         String tenant = null;
@@ -1952,12 +2206,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
             Set<TaskStatus> statusFilter, int offset, int limit, SortSpecifierContainer sortParams)
             throws NotConnectedException, PermissionException {
 
         String userName = null;
-        UserIdentificationImpl userIdentification = frontendState.checkPermission("getTaskStates",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl userIdentification = frontendState.checkPermission(currentMethod,
                                                                                   YOU_DO_NOT_HAVE_PERMISSION_TO_GET_TASK_STATES);
         String tmpUserName = userIdentification.getUsername();
         String tenant = null;
@@ -1988,7 +2245,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
+        // authorization is performed in the following call
         List<JobInfo> jobInfoList = getJobsInfoList(ImmutableList.of(jobId));
         if (jobInfoList == null || jobInfoList.size() != 1) {
             throw new UnknownJobException(JobIdImpl.makeJobId(jobId));
@@ -2090,9 +2349,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
      */
     @Override
     @ImmediateService
+    @RoleWrite
     public boolean changeStartAt(JobId jobId, String startAt)
             throws UnknownJobException, NotConnectedException, PermissionException {
-        frontendState.checkPermissions("changeStartAt",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_START_AT_VALUE_OF_THIS_JOB);
         return schedulingService.changeStartAt(jobId, startAt);
@@ -2100,8 +2362,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public String getJobContent(JobId jobId) throws UnknownJobException, NotConnectedException, PermissionException {
-        frontendState.checkPermissions("getJobContent",
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB);
         return updateJobSchemaVersionToLatest(dbManager.loadInitalJobContent(jobId));
@@ -2140,6 +2405,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public Map<Object, Object> getPortalConfiguration() {
         return schedulerPortalConfiguration.getProperties();
     }
@@ -2164,16 +2430,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public Map getSchedulerProperties() throws NotConnectedException {
         return frontendState.getSchedulerProperties();
     }
 
     @Override
     @ImmediateService
+    @RoleBasic
+    public boolean checkPermission(String method) throws SecurityException {
+        try {
+            frontendState.checkPermission(findMethod(method), YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION);
+        } catch (Exception e) {
+            throw new SecurityException(e.getMessage(), e);
+        }
+
+        return true;
+    }
+
+    @Override
+    @ImmediateService
+    @RoleBasic
     public boolean checkJobPermissionMethod(String jobId, String method) {
         try {
             JobId id = JobIdImpl.makeJobId(jobId);
-            frontendState.checkPermissions(method,
+            frontendState.checkPermissions(findMethod(method),
                                            frontendState.getIdentifiedJob(id),
                                            YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION);
         } catch (Exception p) {
@@ -2184,13 +2465,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleBasic
     public List<String> checkJobsPermissionMethod(List<String> jobIds, String method) {
         List<String> answer = new ArrayList<>();
         if (jobIds != null) {
             for (String jobId : jobIds) {
                 try {
                     JobId id = JobIdImpl.makeJobId(jobId);
-                    frontendState.checkPermissions(method,
+                    frontendState.checkPermissions(findMethod(method),
                                                    frontendState.getIdentifiedJob(id),
                                                    YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION);
                     answer.add(jobId);
@@ -2204,9 +2486,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public boolean isFolder(String dataspace, String pathname) throws NotConnectedException, PermissionException {
         try {
-            SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials("isFolder",
+            Method currentMethod = new Object() {
+            }.getClass().getEnclosingMethod();
+            SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials(currentMethod,
                                                                                                                              "You don't have permissions to check the file type in the DataSpace",
                                                                                                                              false);
             DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace,
@@ -2224,10 +2509,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleRead
     public boolean checkFileExists(String dataspace, String pathname)
             throws NotConnectedException, PermissionException {
         try {
-            SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials("checkFileExists",
+            Method currentMethod = new Object() {
+            }.getClass().getEnclosingMethod();
+            SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials(currentMethod,
                                                                                                                              "You don't have permissions to check the file existence in the DataSpace",
                                                                                                                              false);
             DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace,
@@ -2251,14 +2539,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public Set<String> addJobSignal(String jobId, String signalName, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException {
 
         String currentUser = frontendState.getCurrentUser();
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
         logger.info("Request to send signalName " + signalName + " on job " + jobId + " received from " + currentUser);
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("addJobSignal",
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
         if (StringUtils.isBlank(signalName.trim())) {
@@ -2325,6 +2616,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public List<JobVariable> validateJobSignal(String jobId, String signalName, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException {
@@ -2333,9 +2625,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             return null;
         }
         String currentUser = frontendState.getCurrentUser();
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
         logger.debug("Request to validate signal " + signalName + " on job " + jobId + " received from " + currentUser);
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("addJobSignal",
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
 
@@ -2372,6 +2666,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleBasic
     public Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
             throws NotConnectedException, UnknownJobException {
         if (methods == null || jobIds == null) {
@@ -2384,7 +2679,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             for (String method : methods) {
                 boolean hasPermission = true;
                 try {
-                    frontendState.checkPermissions(method,
+                    frontendState.checkPermissions(findMethod(method),
                                                    frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
                                                    SchedulerFrontendState.getErrorMessageForMethodPermission(method));
                 } catch (PermissionException e) {
@@ -2399,11 +2694,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl,
             String endpointIconUri) throws NotConnectedException, PermissionException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("addExternalEndpointUrl",
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
         logger.info("Request to add external endpoint " + endpointName + " on job " + jobId + " received from " +
@@ -2413,11 +2711,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
+    @RoleWrite
     public void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException {
         String currentUser = frontendState.getCurrentUser();
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("removeExternalEndpointUrl",
+        frontendState.checkPermissions(currentMethod,
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
         logger.info("Request to remove external endpoint " + endpointName + " on job " + jobId + " received from " +

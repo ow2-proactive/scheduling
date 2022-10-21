@@ -23,18 +23,18 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.jmx;
+package org.ow2.proactive.permissions;
 
-import org.ow2.proactive.authentication.crypto.Credentials;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
-public interface PermissionChecker {
-
-    /**
-     * Checks that client has the specified permission.
-     * @param cred 
-     *
-     * @return true if it has, throw {@link SecurityException} otherwise with specified error message
-     */
-    boolean checkPermission(Credentials cred, String username);
+/**
+ * Method annotation, specific to the Resource Manage which represents the ability to create and manage node sources
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface RoleNSAdmin {
 }

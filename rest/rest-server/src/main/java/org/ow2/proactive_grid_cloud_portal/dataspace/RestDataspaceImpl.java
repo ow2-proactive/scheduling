@@ -28,12 +28,18 @@ package org.ow2.proactive_grid_cloud_portal.dataspace;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.vfs2.Selectors.SELECT_ALL;
 import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
+import static org.ow2.proactive.permissions.RoleUtils.findRole;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.security.Permission;
+import java.security.PrivilegedAction;
 import java.util.List;
+import java.util.Locale;
 
+import javax.security.auth.Subject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -46,6 +52,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -75,10 +82,16 @@ public class RestDataspaceImpl implements RestDataspace {
     private static SessionStore sessions = SharedSessionStore.getInstance();
 
     @Override
+    @RoleWrite
     public Response store(@HeaderParam("sessionid") String sessionId, @HeaderParam("Content-Encoding") String encoding,
             @PathParam("dataspace") String dataspace, @PathParam("path-name") String pathname, InputStream is)
             throws NotConnectedRestException, PermissionRestException {
-        Session session = checkSessionValidity(sessionId);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        Session session = checkAuthorization(sessionId,
+                                             dataspace,
+                                             currentMethod,
+                                             "You are not authorized to write to files in dataspace " + dataspace);
         try {
             checkPathParams(dataspace, pathname);
             logger.debug(String.format("Storing file(s) in %s/%s", dataspace.toUpperCase(), pathname));
@@ -98,6 +111,7 @@ public class RestDataspaceImpl implements RestDataspace {
     }
 
     @Override
+    @RoleRead
     public Response retrieve(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("Accept-Encoding") String headerAcceptEncoding, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("comp") String component,
@@ -117,7 +131,12 @@ public class RestDataspaceImpl implements RestDataspace {
             sessionId = TokenStore.getInstance().getSessionId(token);
         }
 
-        Session session = checkSessionValidity(sessionId);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        Session session = checkAuthorization(sessionId,
+                                             dataspace,
+                                             currentMethod,
+                                             "You are not authorized to read files from dataspace " + dataspace);
         try {
             checkPathParams(dataspace, pathname);
             FileObject fo = resolveFile(session, dataspace, pathname);
@@ -162,10 +181,16 @@ public class RestDataspaceImpl implements RestDataspace {
     }
 
     @Override
+    @RoleWrite
     public Response delete(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("includes") List<String> includes,
             @QueryParam("excludes") List<String> excludes) throws NotConnectedRestException, PermissionRestException {
-        Session session = checkSessionValidity(sessionId);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        Session session = checkAuthorization(sessionId,
+                                             dataspace,
+                                             currentMethod,
+                                             "You are not authorized to delete files from dataspace " + dataspace);
 
         try {
             checkPathParams(dataspace, pathname);
@@ -192,9 +217,16 @@ public class RestDataspaceImpl implements RestDataspace {
     }
 
     @Override
+    @RoleRead
     public Response metadata(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspacePath,
             @PathParam("path-name") String pathname) throws NotConnectedRestException, PermissionRestException {
-        Session session = checkSessionValidity(sessionId);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        Session session = checkAuthorization(sessionId,
+                                             dataspacePath,
+                                             currentMethod,
+                                             "You are not authorized to read files information from dataspace " +
+                                                            dataspacePath);
         try {
             checkPathParams(dataspacePath, pathname);
             FileObject fo = resolveFile(session, dataspacePath, pathname);
@@ -212,11 +244,17 @@ public class RestDataspaceImpl implements RestDataspace {
     }
 
     @Override
+    @RoleWrite
     public Response create(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspacePath,
             @PathParam("path-name") String pathname, @FormParam("mimetype") String mimeType)
             throws NotConnectedRestException, PermissionRestException {
 
-        Session session = checkSessionValidity(sessionId);
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        Session session = checkAuthorization(sessionId,
+                                             dataspacePath,
+                                             currentMethod,
+                                             "You are not authorized to create files in dataspace " + dataspacePath);
         try {
             checkPathParams(dataspacePath, pathname);
             FileObject fileObject = resolveFile(session, dataspacePath, pathname);
@@ -433,6 +471,74 @@ public class RestDataspaceImpl implements RestDataspace {
             throw new NotConnectedRestException("User not authenticated or session timeout.");
         }
         return session;
+    }
+
+    public Session checkAuthorization(String sessionId, String dataspace, Method method, String permissionMsg)
+            throws NotConnectedRestException, PermissionRestException {
+        Session session = sessions.get(sessionId);
+        if (session.getScheduler() == null) {
+            throw new NotConnectedRestException("User not authenticated or session timeout.");
+        }
+
+        Subject subject;
+
+        try {
+            subject = session.getScheduler().getSubject();
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException("User not authenticated or session timeout.");
+        }
+
+        String dataspacePath = Strings.isNullOrEmpty(dataspace) ? "" : dataspace.toLowerCase() + ".";
+
+        final String fullMethodName = RestDataspaceImpl.class.getName() + "." + dataspacePath + method.getName();
+        final String fullMethodRole = RestDataspaceImpl.class.getName() + "." + dataspacePath + findRole(method);
+        final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
+        final ServiceRolePermission serviceRolePermission = new ServiceRolePermission(fullMethodRole);
+        final DeniedMethodCallPermission deniedMethodCallPermission = new DeniedMethodCallPermission(fullMethodName);
+
+        try {
+            checkPermission(subject, deniedMethodCallPermission, permissionMsg);
+            throw new PermissionRestException(permissionMsg);
+        } catch (PermissionRestException ex) {
+            // ok, the check should throw an exception unless it is denied
+        }
+
+        try {
+            checkPermission(subject, methodCallPermission, permissionMsg);
+        } catch (PermissionRestException ex) {
+            try {
+                checkPermission(subject, serviceRolePermission, permissionMsg);
+            } catch (PermissionRestException ex2) {
+                logger.debug(permissionMsg);
+                throw ex2;
+            }
+        }
+
+        return session;
+    }
+
+    /**
+     * Checks if user has the specified permission.
+     *
+     * @return true if it has, throw {@link SecurityException} otherwise with specified error message
+     */
+    public boolean checkPermission(final Subject subject, final Permission permission, String errorMessage)
+            throws PermissionRestException {
+        try {
+            Subject.doAsPrivileged(subject, new PrivilegedAction<Object>() {
+                public Object run() {
+                    SecurityManager sm = System.getSecurityManager();
+                    if (sm != null) {
+                        sm.checkPermission(permission);
+                    }
+                    return null;
+                }
+            }, null);
+        } catch (SecurityException ex) {
+            throw new PermissionRestException(errorMessage);
+        }
+
+        return true;
     }
 
     private RuntimeException rethrow(Throwable error) throws PermissionRestException {

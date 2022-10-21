@@ -23,18 +23,16 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.jmx;
+package org.ow2.proactive.permissions;
 
-import org.ow2.proactive.authentication.crypto.Credentials;
-
-
-public interface PermissionChecker {
+public interface ServiceUsingPermission {
 
     /**
-     * Checks that client has the specified permission.
-     * @param cred 
-     *
-     * @return true if it has, throw {@link SecurityException} otherwise with specified error message
+     * Checks if the current user is allowed to execute the provided method
+     * @param method method name
+     * @return true if authorization is successful
+     * @throws SecurityException if the user is not allowed to execute this method
      */
-    boolean checkPermission(Credentials cred, String username);
+    @RoleBasic
+    boolean checkPermission(String method) throws SecurityException;
 }

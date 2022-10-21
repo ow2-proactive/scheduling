@@ -35,6 +35,7 @@ import javax.security.auth.Subject;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.scheduler.common.exception.InvalidTimeWindowException;
 import org.ow2.proactive.scheduler.common.exception.InvalidTimeZoneId;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
@@ -87,7 +88,7 @@ import org.ow2.proactive.scheduler.signal.SignalApiException;
  * @since ProActive Scheduling 2.0
  */
 @PublicAPI
-public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
+public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, ServiceUsingPermission {
 
     /**
      * Check if the connected user has the permission to execute the method passed as argument
@@ -98,6 +99,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      * @throws UnknownJobException
      */
+    @RoleBasic
     boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException;
 
     /**
@@ -107,6 +109,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param method operation to test
      * @return a list of authorized jobs ids for the given method
      */
+    @RoleBasic
     List<String> checkJobsPermissionMethod(List<String> jobIds, String method) throws SchedulerException;
 
     /**
@@ -127,6 +130,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws SignalApiException
      *            if the given updated variables are not compatible with the job input values
      */
+    @RoleWrite
     Set<String> addJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException;
@@ -149,6 +153,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws SignalApiException
      *             if the given updated variables are not compatible with the job input values
      */
+    @RoleWrite
     List<JobVariable> validateJobSignal(String jobId, String signal, Map<String, String> updatedVariables)
             throws NotConnectedException, UnknownJobException, PermissionException, SignalApiException,
             JobValidationException;
@@ -160,6 +165,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      */
+    @RoleRead
     List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException;
 
     /**
@@ -169,6 +175,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      */
+    @RoleRead
     List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException;
 
     /**
@@ -191,6 +198,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**
@@ -233,6 +241,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if the incarnation argument is lower than 0 or greater than
      *             the number of terminated execution.
      */
+    @RoleRead
     TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -263,6 +272,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if the incarnation argument is lower than 0 or greater than
      *             the number of terminated execution.
      */
+    @RoleRead
     List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -293,6 +303,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if the incarnation argument is lower than 0 or greater than
      *             the number of terminated execution.
      */
+    @RoleRead
     List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -323,6 +334,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job and task.
      */
+    @RoleWrite
     boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -367,6 +379,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job and task.
      */
+    @RoleWrite
     boolean restartTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -403,6 +416,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job and task.
      */
+    @RoleWrite
     boolean preemptTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -418,6 +432,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -426,6 +441,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated
      * @throws PermissionException if you can't access to at least one of the job
      */
+    @RoleWrite
     boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException;
 
     /**
@@ -435,6 +451,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated
      * @throws PermissionException if you can't access to at least one of the job
      */
+    @RoleWrite
     boolean removeJobs(long olderThan) throws NotConnectedException, PermissionException;
 
     /**
@@ -454,6 +471,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -473,6 +491,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -491,6 +510,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -507,6 +527,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -526,6 +547,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws JobAlreadyFinishedException
      *             if you want to change the priority on a finished job.
      */
+    @RoleWrite
     void changeJobPriority(JobId jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException;
 
@@ -543,6 +565,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean changePolicy(String policyClassName) throws NotConnectedException, PermissionException;
 
     /**
@@ -554,6 +577,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean start() throws NotConnectedException, PermissionException;
 
     /**
@@ -568,6 +592,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean stop() throws NotConnectedException, PermissionException;
 
     /**
@@ -579,6 +604,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean pause() throws NotConnectedException, PermissionException;
 
     /**
@@ -591,6 +617,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean freeze() throws NotConnectedException, PermissionException;
 
     /**
@@ -602,6 +629,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean resume() throws NotConnectedException, PermissionException;
 
     /**
@@ -613,6 +641,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean shutdown() throws NotConnectedException, PermissionException;
 
     /**
@@ -625,6 +654,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean kill() throws NotConnectedException, PermissionException;
 
     /**
@@ -642,6 +672,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException;
 
     /**
@@ -660,6 +691,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleAdmin
     boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException;
 
     /**
@@ -686,6 +718,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws JobCreationException
      *             if Their was a problem while creation the job
      */
+    @RoleWrite
     JobId submit(Job job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
@@ -696,6 +729,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return a list of objects containing, for each job, a job id or any error occurring during job submission
      * @throws NotConnectedException
      */
+    @RoleWrite
     List<JobIdDataAndError> submit(List<Job> jobs) throws NotConnectedException;
 
     /**
@@ -707,6 +741,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException if <code>currentJobId</code> does not correspond to any submitted job
      * @throws PermissionException if user cannot access job with <code>currentJobId</code>
      */
+    @RoleWrite
     JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos,
             String sessionId) throws NotConnectedException, UnknownJobException, PermissionException,
             JobCreationException, SubmissionClosedException;
@@ -733,6 +768,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**
@@ -762,6 +798,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     TaskResult getTaskResult(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -788,6 +825,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -818,6 +856,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -846,6 +885,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     TaskResult getTaskResult(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -885,6 +925,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if the incarnation argument is lower than 0 or greater than
      *             the number of terminated execution.
      */
+    @RoleRead
     TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -907,6 +948,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -927,6 +969,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     void listenJobLogs(String jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -952,6 +995,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -959,6 +1003,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access to at least one particular job
      */
+    @RoleWrite
     boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException;
 
     /**
@@ -986,6 +1031,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job and task.
      */
+    @RoleWrite
     boolean killTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -1029,12 +1075,15 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job and task.
      */
+    @RoleWrite
     boolean restartTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
+    @RoleWrite
     boolean finishInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
+    @RoleWrite
     boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -1053,6 +1102,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownTaskException
      *              if this task does not exist in the job.
      */
+    @RoleWrite
     void enableRemoteVisualization(String jobId, String taskName, String connectionString)
             throws NotConnectedException, PermissionException, UnknownJobException, UnknownTaskException;
 
@@ -1069,6 +1119,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *              if the job does not exist.
      */
+    @RoleWrite
     void registerService(String jobId, int serviceInstanceid, boolean enableActions)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
@@ -1084,6 +1135,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *              if the job does not exist.
      */
+    @RoleWrite
     void detachService(String jobId, int serviceInstanceid)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
@@ -1117,6 +1169,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job and task.
      */
+    @RoleWrite
     boolean preemptTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -1142,6 +1195,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -1164,6 +1218,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean restartAllInErrorTasks(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -1186,6 +1241,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleWrite
     boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -1211,6 +1267,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws JobAlreadyFinishedException
      *             if you want to change the priority on a finished job.
      */
+    @RoleWrite
     void changeJobPriority(String jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException;
 
@@ -1235,6 +1292,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -1246,6 +1304,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular method.
      */
+    @RoleRead
     SchedulerStatus getStatus() throws NotConnectedException, PermissionException;
 
     /**
@@ -1267,6 +1326,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
@@ -1289,6 +1349,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     TaskState getTaskState(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
@@ -1309,6 +1370,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular method.
      */
+    @RoleRead
     SchedulerState getState() throws NotConnectedException, PermissionException;
 
     /**
@@ -1329,6 +1391,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular method.
      */
+    @RoleRead
     SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException;
 
     /**
@@ -1354,6 +1417,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException;
 
@@ -1394,6 +1458,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
             SchedulerEvent... events) throws NotConnectedException, PermissionException;
 
@@ -1406,6 +1471,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular method.
      */
+    @RoleRead
     void removeEventListener() throws NotConnectedException, PermissionException;
 
     /**
@@ -1416,6 +1482,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular method.
      */
+    @RoleBasic
     void disconnect() throws NotConnectedException, PermissionException;
 
     /**
@@ -1424,6 +1491,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *
      * @return true if the user connected to a Scheduler, false otherwise.
      */
+    @RoleBasic
     boolean isConnected();
 
     /**
@@ -1431,20 +1499,21 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return the name of the current policy.
      */
 
+    @RoleRead
     String getCurrentPolicy() throws NotConnectedException, PermissionException;
 
     /**
      *  get job Descriptor Map with eligible jobs (running and pending)
      * @return a Map of eligible jobs.
      */
-
+    @RoleRead
     Map<JobId, JobDescriptor> getJobsToSchedule() throws NotConnectedException, PermissionException;
 
     /**
      *  get task descriptor list with eligible tasks (running)
      * @return a List of eligible task descriptor.
      */
-
+    @RoleRead
     List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException;
 
     /**
@@ -1453,6 +1522,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      *             if you are not authenticated.
      */
+    @RoleBasic
     void renewSession() throws NotConnectedException;
 
     /**
@@ -1473,6 +1543,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleRead
     String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException, PermissionException;
 
     /**
@@ -1497,6 +1568,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleRead
     String getTaskServerLogs(String id, String taskName)
             throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException;
 
@@ -1520,6 +1592,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleRead
     String getTaskServerLogsByTag(String id, String taskTag)
             throws UnknownJobException, NotConnectedException, PermissionException;
 
@@ -1547,6 +1620,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleRead
     Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException;
 
@@ -1562,28 +1636,35 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      */
+    @RoleRead
     List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException;
 
     /**
      * Returns a list of connected users.
      */
+    @RoleRead
     List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException;
 
     /**
      * Returns a list of users having jobs. These are meaningful users for
      * accounting {@link SchedulerUsage}
      */
+    @RoleAdmin
     List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException;
 
+    @RoleRead
     FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException;
 
+    @RoleRead
     List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException;
 
+    @RoleRead
     List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException;
 
+    @RoleRead
     CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
             throws NotConnectedException, PermissionException, InvalidTimeWindowException, InvalidTimeZoneId;
 
@@ -1611,6 +1692,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return the paginated list of tasks names satisfying the given criterias.
      *         The total number of tasks (without pagination() is also returned.
      */
+    @RoleRead
     Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
             int offset, int limit) throws SchedulerException;
 
@@ -1636,6 +1718,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return the paginated list of taskstates satisfying the given criterias.
      *         The total number of tasks (without pagination() is also returned.
      */
+    @RoleRead
     Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> statusFilter,
             int offset, int limit, SortSpecifierContainer sortParams) throws SchedulerException;
 
@@ -1646,6 +1729,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *            the id of the job we want to fetch info.
      * @return the <code>JobInfo</code> associated to the given id
      */
+    @RoleRead
     JobInfo getJobInfo(String jobId) throws SchedulerException;
 
     /**
@@ -1657,6 +1741,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param startAt
      *            its value should be ISO 8601 compliant
      */
+    @RoleWrite
     boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -1664,6 +1749,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param jobId job id of existing job
      * @return copy of the xml which was submitted to the scheduler
      */
+    @RoleRead
     String getJobContent(JobId jobId) throws SchedulerException;
 
     /**
@@ -1671,18 +1757,21 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      * @throws NotConnectedException
      */
+    @RoleRead
     Map<Object, Object> getPortalConfiguration() throws SchedulerException;
 
     /**
      * Returns the user currently connected
      * @return user name
      */
+    @RoleBasic
     String getCurrentUser() throws NotConnectedException;
 
     /**
      * Returns the user data object associated with the user currently connected
      * @return a user data object
      */
+    @RoleBasic
     UserData getCurrentUserData() throws NotConnectedException;
 
     /**
@@ -1690,12 +1779,14 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return jaas subject
      * @throws NotConnectedException
      */
+    @RoleBasic
     Subject getSubject() throws NotConnectedException;
 
     /**
      * Returns the scheduler properties associated with the user currently connected
      * @return scheduler properties
      */
+    @RoleRead
     Map<String, Object> getSchedulerProperties() throws SchedulerException;
 
     /**
@@ -1712,9 +1803,11 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException;;
 
+    @RoleRead
     TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -1729,6 +1822,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access this particular job.
      */
+    @RoleRead
     List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
@@ -1743,6 +1837,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access one job in the list.
      */
+    @RoleRead
     Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
             throws NotConnectedException, UnknownJobException, PermissionException;
 
@@ -1752,6 +1847,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return a list of task names declared as "preciousResult" for the given job
      * @throws SchedulerException
      */
+    @RoleRead
     Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws SchedulerException;
 
     /**
@@ -1763,6 +1859,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException if the user is not authenticated.
      * @throws UnknownJobException  if the job does not exist.
      */
+    @RoleBasic
     Map<String, Map<String, Boolean>> checkJobsPermissionMethods(List<String> jobIds, List<String> methods)
             throws NotConnectedException, UnknownJobException;
 
@@ -1777,6 +1874,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException if you can't access this particular job.
      * @throws UnknownJobException if the job does not exist or is terminated.
      */
+    @RoleWrite
     void addExternalEndpointUrl(String jobId, String endpointName, String externalEndpointUrl, String endpointIconUri)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
@@ -1789,6 +1887,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException if you can't access this particular job.
      * @throws UnknownJobException if the job does not exist or is terminated.
      */
+    @RoleWrite
     void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException;
 }

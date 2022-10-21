@@ -2499,6 +2499,24 @@ public interface SchedulerRestInterface {
      *
      * @param sessionId
      *            current session
+     * @param method
+     *            method name to check
+     *
+     * @return true if the user has the permission to execute the java method
+     */
+    @GET
+    @Path("/permission/{method}")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    boolean checkPermissionMethod(@HeaderParam("sessionid") String sessionId, @PathParam("method") String method)
+            throws RestException;
+
+    /**
+     *
+     * Check if the user has the permission to execute the method passed as argument
+     *
+     * @param sessionId
+     *            current session
      * @param jobId
      *            id of the job
      * @param method

@@ -941,6 +941,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public boolean checkPermission(String method) throws SecurityException {
+        return schedulerProxy.checkPermission(method);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
         return schedulerProxy.checkJobPermissionMethod(jobId, method);
     }
