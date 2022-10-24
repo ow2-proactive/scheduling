@@ -457,7 +457,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      */
     @Override
     public String getDescription() {
-        return "Deploy nodes via SSH with login/password or login/pkey";
+        return "SSHV2 Infrastructure deploys nodes via SSH with login/password or login/pkey";
     }
 
     /**
@@ -465,7 +465,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      */
     @Override
     public String toString() {
-        return "SSH Infrastructure V2";
+        return getDescription();
     }
 
     @Override

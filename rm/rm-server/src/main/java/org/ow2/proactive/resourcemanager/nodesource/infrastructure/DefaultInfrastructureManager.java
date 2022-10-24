@@ -117,7 +117,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public String toString() {
-        return NamesConvertor.beautifyName(this.getClass().getSimpleName());
+        return getDescription();
     }
 
     /**
@@ -125,7 +125,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public String getDescription() {
-        return "Default infrastructure";
+        return "Default Infrastructure";
     }
 
     /**

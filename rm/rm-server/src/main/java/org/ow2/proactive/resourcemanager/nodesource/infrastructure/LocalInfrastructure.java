@@ -114,7 +114,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public String getDescription() {
-        return "Deploys nodes on Resource Manager's machine";
+        return "Local Infrastructure deploys nodes on Resource Manager's machine";
     }
 
     @Override
@@ -416,7 +416,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public String toString() {
-        return "Local Infrastructure";
+        return getDescription();
     }
 
     @Override
