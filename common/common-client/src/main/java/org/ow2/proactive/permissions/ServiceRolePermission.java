@@ -23,18 +23,18 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.jmx;
+package org.ow2.proactive.permissions;
 
-import org.ow2.proactive.authentication.crypto.Credentials;
+/**
+ * Allows to remotely call role-based methods (e.g. read, write, admin) of the service.
+ */
+public class ServiceRolePermission extends ClientPermission {
 
+    // This serial version uid is meant to prevent issues when restoring Resource Manager database from a previous version.
+    // any addition to this class (new method, field, etc) should imply to change this uid.
+    private static final long serialVersionUID = 1L;
 
-public interface PermissionChecker {
-
-    /**
-     * Checks that client has the specified permission.
-     * @param cred 
-     *
-     * @return true if it has, throw {@link SecurityException} otherwise with specified error message
-     */
-    boolean checkPermission(Credentials cred, String username);
+    public ServiceRolePermission(String name) {
+        super(name);
+    }
 }

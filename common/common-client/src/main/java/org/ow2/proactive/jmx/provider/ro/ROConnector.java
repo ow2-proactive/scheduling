@@ -163,7 +163,12 @@ public class ROConnector implements JMXConnector, NotificationListener, Serializ
             final String message = "Unable to establish a connection with the Remote Object JMX server at " +
                                    this.jmxServiceURL;
             // Log the exception
-            LOGGER.error(message, e);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn(message, e);
+            } else {
+                LOGGER.warn(message + " : " + e.getMessage());
+            }
             // Throw the IOException
             if (e instanceof IOException) {
                 throw (IOException) e;

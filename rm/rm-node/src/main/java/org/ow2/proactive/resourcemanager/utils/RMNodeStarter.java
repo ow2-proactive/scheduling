@@ -1244,7 +1244,7 @@ public class RMNodeStarter {
             logger.info("Starting JMX monitoring.");
             sigarExposer.boot(auth, false, new PermissionChecker() {
                 @Override
-                public boolean checkPermission(Credentials cred) {
+                public boolean checkPermission(Credentials cred, String username) {
                     ResourceManager rm = null;
                     try {
                         rm = rmAuth.login(cred);
@@ -1254,7 +1254,7 @@ public class RMNodeStarter {
                         boolean isAdmin = rm.isNodeAdmin(nodes.values().iterator().next().getNodeInformation().getURL())
                                             .getBooleanValue();
                         if (!isAdmin) {
-                            throw new SecurityException("Permission denied");
+                            throw new SecurityException("Permission denied for user " + username);
                         }
                         return true;
                     } catch (LoginException e) {

@@ -1096,6 +1096,11 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public boolean checkPermission(String method) throws SecurityException {
+        return client.checkPermission(method);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String jobId, String method) throws SchedulerException {
         renewSession();
         return client.checkJobPermissionMethod(jobId, method);

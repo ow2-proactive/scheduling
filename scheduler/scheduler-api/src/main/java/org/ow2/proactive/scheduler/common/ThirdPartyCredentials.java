@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.common;
 
 import java.util.Set;
 
+import org.ow2.proactive.permissions.RoleRead;
+import org.ow2.proactive.permissions.RoleWrite;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -46,6 +48,7 @@ public interface ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
+    @RoleWrite
     void putThirdPartyCredential(String key, String value) throws SchedulerException;
 
     /**
@@ -53,6 +56,7 @@ public interface ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
+    @RoleRead
     Set<String> thirdPartyCredentialsKeySet() throws SchedulerException;
 
     /**
@@ -61,5 +65,6 @@ public interface ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
+    @RoleWrite
     void removeThirdPartyCredential(String key) throws SchedulerException;
 }

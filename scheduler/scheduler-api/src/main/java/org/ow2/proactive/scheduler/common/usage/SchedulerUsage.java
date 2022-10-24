@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.permissions.RoleAdmin;
+import org.ow2.proactive.permissions.RoleRead;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 
@@ -54,6 +56,7 @@ public interface SchedulerUsage {
      * @throws NotConnectedException if the caller is not connected
      * @throws PermissionException if the caller hasn't the permission to call this method
      */
+    @RoleRead
     List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException;
 
     /**
@@ -71,6 +74,7 @@ public interface SchedulerUsage {
      * @throws NotConnectedException if the caller is not connected
      * @throws PermissionException if the caller hasn't the permission to call this method
      */
+    @RoleAdmin
     List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate)
             throws NotConnectedException, PermissionException;
 }

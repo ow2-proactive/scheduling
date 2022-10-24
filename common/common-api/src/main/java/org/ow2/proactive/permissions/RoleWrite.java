@@ -23,18 +23,21 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.jmx;
+package org.ow2.proactive.permissions;
 
-import org.ow2.proactive.authentication.crypto.Credentials;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
-public interface PermissionChecker {
-
-    /**
-     * Checks that client has the specified permission.
-     * @param cred 
-     *
-     * @return true if it has, throw {@link SecurityException} otherwise with specified error message
-     */
-    boolean checkPermission(Credentials cred, String username);
+/**
+ * Method annotation which represents a write operation
+ * The nature of a write operation definition depends on the component.
+ * For example, in resource manager, a write operation represents the ability to use nodes (reserve, release).
+ * In the scheduler, a write operation represents the ability to submit and handle jobs.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface RoleWrite {
 }

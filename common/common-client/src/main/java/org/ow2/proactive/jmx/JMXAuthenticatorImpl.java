@@ -99,7 +99,7 @@ public final class JMXAuthenticatorImpl implements JMXAuthenticator {
         try {
             Subject s = this.authentication.authenticate(internalCredentials);
             if (permissionChecker != null) {
-                boolean allowed = permissionChecker.checkPermission(internalCredentials);
+                boolean allowed = permissionChecker.checkPermission(internalCredentials, username);
                 if (!allowed) {
                     throw new SecurityException("Permission denied");
                 }

@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.ow2.proactive.permissions.RoleUtils.findRole;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.PARENT_JOB_ID;
 import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE;
 
@@ -44,7 +45,7 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.permissions.MethodCallPermission;
+import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -173,6 +174,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION = "You do not have permission to reload policy configuration !";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER = "You do not have permission to kill the scheduler !";
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_READ_THE_CURRENT_POLICY = "You do not have permission to read the current policy";
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_READ_THE_JOBS_TO_SCHEDULE = "You do not have permission to read the jobs to schedule";
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_READ_THE_TASKS_TO_SCHEDULE = "You do not have permission to read the tasks to schedule";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK = "You do not have permission to finish this task!";
 
@@ -374,23 +381,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
-        // checking permissions
-        checkPermission("getStatus", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS);
         return Lambda.withLock(stateReadLock, () -> schedulerState.getStatus());
-    }
-
-    SchedulerState getState() throws NotConnectedException, PermissionException {
-        return getState(false);
     }
 
     SchedulerState getStateInternally() {
         return schedulerState;
     }
 
-    SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
-        // checking permissions
-        ListeningUser ui = checkPermissionReturningListeningUser("getState",
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE);
+    SchedulerState getState(boolean myJobsOnly, ListeningUser ui) {
 
         return Lambda.withLock(stateReadLock,
                                () -> myJobsOnly ? schedulerState.filterOnUser(ui.getUser().getUsername())
@@ -449,16 +447,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                            ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
     }
 
-    void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
-            throws NotConnectedException, PermissionException {
-        addEventListener(sel, myEventsOnly, false, events);
+    void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, ListeningUser uIdent,
+            SchedulerEvent... events) throws PermissionException {
+        addEventListener(sel, myEventsOnly, false, uIdent, events);
     }
 
     SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
-            SchedulerEvent... events) throws NotConnectedException, PermissionException {
+            ListeningUser uIdent, SchedulerEvent... events) throws PermissionException {
         // checking permissions
-        ListeningUser uIdent = checkPermissionReturningListeningUser("addEventListener",
-                                                                     YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
 
         // check if listener is not null
         if (sel == null) {
@@ -477,7 +473,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         SchedulerState currentState = null;
         if (getCurrentState) {
             // check get state permission is checked in getState method
-            currentState = getState(myEventsOnly);
+            currentState = getState(myEventsOnly, uIdent);
         } else {
             // check get state permission
             handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
@@ -635,8 +631,13 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    UserAndCredentials checkPermissionReturningCredentials(String methodName, String permissionMsg,
-            boolean clearListener) throws NotConnectedException, PermissionException {
+    UserIdentificationImpl checkPermission(Method method, String permissionMsg)
+            throws NotConnectedException, PermissionException {
+        return checkPermissionReturningListeningUser(method, permissionMsg).getUser();
+    }
+
+    UserAndCredentials checkPermissionReturningCredentials(Method method, String permissionMsg, boolean clearListener)
+            throws NotConnectedException, PermissionException {
 
         UniqueID id = checkAccess();
         UserAndCredentials userAndCredentials = identifications.get(id);
@@ -650,40 +651,46 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
         Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
 
-        final String fullMethodName = SchedulerFrontend.class.getName() + "." + methodName;
-        final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
-
-        try {
-            userSessionInfo.getRight().checkPermission(methodCallPermission, permissionMsg);
-        } catch (PermissionException ex) {
-            logger.debug(permissionMsg);
-            throw ex;
-        }
+        checkPermissionInternal(method, userSessionInfo, permissionMsg);
         return userAndCredentials;
 
     }
 
-    ListeningUser checkPermissionReturningListeningUser(String methodName, String permissionMsg)
+    ListeningUser checkPermissionReturningListeningUser(Method method, String permissionMsg)
             throws NotConnectedException, PermissionException {
 
         Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
 
-        final String fullMethodName = SchedulerFrontend.class.getName() + "." + methodName;
+        checkPermissionInternal(method, userSessionInfo, permissionMsg);
+
+        return userSessionInfo.getLeft();
+    }
+
+    private void checkPermissionInternal(Method method, Pair<ListeningUser, UserIdentificationImpl> userSessionInfo,
+            String permissionMsg) throws PermissionException {
+        final String fullMethodName = SchedulerFrontend.class.getName() + "." + method.getName();
+        final String fullMethodRole = SchedulerFrontend.class.getName() + "." + findRole(method);
         final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
+        final ServiceRolePermission serviceRolePermission = new ServiceRolePermission(fullMethodRole);
+        final DeniedMethodCallPermission deniedMethodCallPermission = new DeniedMethodCallPermission(fullMethodName);
+
+        try {
+            userSessionInfo.getRight().checkPermission(deniedMethodCallPermission, permissionMsg);
+            throw new PermissionException(permissionMsg);
+        } catch (PermissionException ex) {
+            // ok, the check should throw an exception unless it is denied
+        }
 
         try {
             userSessionInfo.getRight().checkPermission(methodCallPermission, permissionMsg);
         } catch (PermissionException ex) {
-            logger.debug(permissionMsg);
-            throw ex;
+            try {
+                userSessionInfo.getRight().checkPermission(serviceRolePermission, permissionMsg);
+            } catch (PermissionException ex2) {
+                logger.debug(permissionMsg);
+                throw ex2;
+            }
         }
-        return userSessionInfo.getLeft();
-
-    }
-
-    UserIdentificationImpl checkPermission(String methodName, String permissionMsg)
-            throws NotConnectedException, PermissionException {
-        return checkPermissionReturningListeningUser(methodName, permissionMsg).getUser();
     }
 
     void disconnect() throws NotConnectedException {
@@ -764,11 +771,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     void checkChangeJobPriority(JobId jobId, JobPriority priority)
-            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
-
-        checkPermissions("changeJobPriority",
-                         getIdentifiedJob(jobId),
-                         YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB);
+            throws PermissionException, JobAlreadyFinishedException {
 
         UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext()
                                                                       .getCurrentRequest()
@@ -791,38 +794,38 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    void checkAccessPermissions(String methodName, IdentifiedJob identifiedJob, String errorMessage)
+    void checkAccessPermissions(Method method, IdentifiedJob identifiedJob, String errorMessage)
             throws NotConnectedException, UnknownJobException, PermissionException {
         checkPermissionChain(
                              // if we are job owner
-                             () -> checkJobOwner(methodName, identifiedJob, errorMessage),
+                             () -> checkJobOwner(method, identifiedJob, errorMessage),
                              // if we have tenant access
-                             () -> checkTenantAccess(methodName, identifiedJob, errorMessage));
+                             () -> checkTenantAccess(method, identifiedJob, errorMessage));
     }
 
-    void checkPermissions(String methodName, IdentifiedJob identifiedJob, String errorMessage)
+    void checkPermissions(Method method, IdentifiedJob identifiedJob, String errorMessage)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        checkAccessPermissions(methodName, identifiedJob, errorMessage);
+
+        checkAccessPermissions(method, identifiedJob, errorMessage);
         checkPermissionChain(
                              // if we are job owner
-                             () -> checkJobOwner(methodName, identifiedJob, errorMessage),
+                             () -> checkJobOwner(method, identifiedJob, errorMessage),
                              // if it is 'only my jobs' permission
                              () -> handleOnlyMyJobsPermission(false,
-                                                              checkPermission(methodName, errorMessage),
+                                                              checkPermission(method, errorMessage),
                                                               errorMessage),
                              // if generic info matches
                              () -> handleJobsWithGenericInformationPermission(identifiedJob.getGenericInformation(),
-                                                                              checkPermission(methodName, errorMessage),
+                                                                              checkPermission(method, errorMessage),
                                                                               errorMessage),
                              // if bucket name is allowed
                              () -> handleJobBucketNameGenericInformationPermission(identifiedJob.getGenericInformation(),
-                                                                                   checkPermission(methodName,
+                                                                                   checkPermission(method,
                                                                                                    errorMessage),
                                                                                    errorMessage),
                              // if group name is allows
                              () -> handleJobGroupNameGenericInformationPermission(identifiedJob.getGenericInformation(),
-                                                                                  checkPermission(methodName,
-                                                                                                  errorMessage),
+                                                                                  checkPermission(method, errorMessage),
                                                                                   errorMessage));
     }
 
@@ -848,18 +851,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     }
 
-    void checkJobOwner(String methodName, IdentifiedJob IdentifiedJob, String permissionMsg)
-            throws NotConnectedException, UnknownJobException, PermissionException {
-        ListeningUser ident = checkPermissionReturningListeningUser(methodName, permissionMsg);
+    void checkJobOwner(Method method, IdentifiedJob IdentifiedJob, String permissionMsg)
+            throws NotConnectedException, PermissionException {
+        ListeningUser ident = checkPermissionReturningListeningUser(method, permissionMsg);
 
         if (!IdentifiedJob.hasRight(ident.getUser())) {
             throw new PermissionException(permissionMsg);
         }
     }
 
-    void checkTenantAccess(String methodName, IdentifiedJob IdentifiedJob, String permissionMsg)
-            throws NotConnectedException, UnknownJobException, PermissionException {
-        ListeningUser ident = checkPermissionReturningListeningUser(methodName, permissionMsg);
+    void checkTenantAccess(Method method, IdentifiedJob IdentifiedJob, String permissionMsg)
+            throws NotConnectedException, PermissionException {
+        ListeningUser ident = checkPermissionReturningListeningUser(method, permissionMsg);
 
         if (!IdentifiedJob.hasTenantAccess(ident.getUser())) {
             throw new PermissionException(permissionMsg);
@@ -888,9 +891,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
-        checkPermissions("getJobState",
-                         getIdentifiedJob(jobId),
-                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return Lambda.withLock(stateReadLock, () -> {
             ClientJobState jobState = getClientJobState(jobId);
             ClientJobState jobStateCopy;
@@ -912,11 +912,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         });
     }
 
-    TaskState getTaskState(JobId jobId, TaskId taskId)
-            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        checkPermissions("getJobState",
-                         getIdentifiedJob(jobId),
-                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
+    TaskState getTaskState(JobId jobId, TaskId taskId) throws UnknownJobException, UnknownTaskException {
+        // this method is not currently used. If in the future it is used,
+        // a permission check should be added in the enclosing method
         return Lambda.withLockException2(stateReadLock, () -> {
             ClientJobState jobState = getClientJobState(jobId);
             if (jobState == null) {
@@ -935,12 +933,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }, UnknownJobException.class, UnknownTaskException.class);
     }
 
-    TaskState getTaskState(JobId jobId, String taskName)
-            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-
-        checkPermissions("getJobState",
-                         getIdentifiedJob(jobId),
-                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
+    TaskState getTaskState(JobId jobId, String taskName) throws UnknownJobException, UnknownTaskException {
 
         return Lambda.withLockException2(stateReadLock, () -> {
             ClientJobState jobState = getClientJobState(jobId);
@@ -1529,11 +1522,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
     }
 
-    TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
-            throws UnknownJobException, NotConnectedException, PermissionException {
-        checkPermissions("getJobState",
-                         getIdentifiedJob(jobId),
-                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
+    TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit) throws UnknownJobException {
         ClientJobState jobState = getClientJobState(jobId);
         if (jobState == null) {
             throw new UnknownJobException(jobId);
@@ -1555,9 +1544,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     public TaskStatesPage getTaskPaginated(JobId jobId, String statusFilter, int offset, int limit)
             throws UnknownJobException, NotConnectedException, PermissionException {
-        checkPermissions("getJobState",
-                         getIdentifiedJob(jobId),
-                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         ClientJobState jobState = getClientJobState(jobId);
         if (jobState == null) {
             throw new UnknownJobException(jobId);

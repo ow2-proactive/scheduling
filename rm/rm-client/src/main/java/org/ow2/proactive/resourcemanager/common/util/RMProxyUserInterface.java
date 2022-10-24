@@ -543,4 +543,8 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return this.target.checkNodeSourcePermission(nodeSourceName, provider);
     }
 
+    @Override
+    public boolean checkPermission(String method) throws SecurityException {
+        return this.target.checkPermission(method);
+    }
 }

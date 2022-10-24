@@ -26,6 +26,8 @@
 package org.ow2.proactive.scheduler.core;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
@@ -42,6 +44,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB;
 
+import java.lang.reflect.Method;
 import java.security.KeyException;
 import java.util.Properties;
 
@@ -127,7 +130,9 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         }
 
         Mockito.verify(frontendState, times(1))
-               .checkPermissions("getJobResult", ij, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB);
+               .checkPermissions(any(Method.class),
+                                 eq(ij),
+                                 eq(YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB));
 
     }
 
@@ -145,9 +150,9 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         }
 
         Mockito.verify(frontendState, times(1))
-               .checkPermissions("getTaskResultFromIncarnation",
-                                 ij,
-                                 YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+               .checkPermissions(any(Method.class),
+                                 eq(ij),
+                                 eq(YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB));
 
     }
 
@@ -164,18 +169,16 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("killTask",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK));
 
         try {
             schedulerFrontend.killTask("jobId", "taskname");
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("killTask",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK));
 
     }
 
@@ -192,18 +195,16 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("restartTask",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK));
 
         try {
             schedulerFrontend.restartTask("jobId", "taskname", 1);
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("restartTask",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK));
 
     }
 
@@ -218,9 +219,8 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("finishInErrorTask",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK));
     }
 
     @Test
@@ -236,9 +236,8 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("restartInErrorTask",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK));
 
     }
 
@@ -260,9 +259,8 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(2)).checkPermissions("preemptTask",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK);
+        Mockito.verify(frontendState, times(2))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK));
 
     }
 
@@ -284,9 +282,8 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(2)).checkPermissions("removeJob",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
+        Mockito.verify(frontendState, times(2))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB));
 
     }
 
@@ -311,7 +308,9 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         }
 
         Mockito.verify(frontendState, times(2))
-               .checkPermissions("listenJobLogs", ij, YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB);
+               .checkPermissions(any(Method.class),
+                                 eq(ij),
+                                 eq(YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB));
 
     }
 
@@ -328,9 +327,8 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("pauseJob",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB));
 
     }
 
@@ -347,9 +345,8 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("resumeJob",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB));
 
     }
 
@@ -366,9 +363,8 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("killJob",
-                                                                 ij,
-                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
+        Mockito.verify(frontendState, times(1))
+               .checkPermissions(any(Method.class), eq(ij), eq(YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB));
 
     }
 
@@ -386,9 +382,9 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         }
 
         Mockito.verify(frontendState, times(1))
-               .checkPermissions("restartAllInErrorTasks",
-                                 ij,
-                                 YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB);
+               .checkPermissions(any(Method.class),
+                                 eq(ij),
+                                 eq(YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB));
 
     }
 
@@ -406,7 +402,9 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         }
 
         Mockito.verify(frontendState, times(1))
-               .checkPermissions("getJobServerLogs", ij, YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB);
+               .checkPermissions(any(Method.class),
+                                 eq(ij),
+                                 eq(YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB));
 
     }
 
@@ -424,7 +422,9 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         }
 
         Mockito.verify(frontendState, times(1))
-               .checkPermissions("getTaskServerLogs", ij, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
+               .checkPermissions(any(Method.class),
+                                 eq(ij),
+                                 eq(YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB));
     }
 
     @Test
@@ -441,9 +441,9 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         }
 
         Mockito.verify(frontendState, times(1))
-               .checkPermissions("getTaskServerLogsByTag",
-                                 ij,
-                                 YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
+               .checkPermissions(any(Method.class),
+                                 eq(ij),
+                                 eq(YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB));
     }
 
     @Test

@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
@@ -69,7 +70,7 @@ import org.ow2.proactive.utils.NodeSet;
  * All the methods of this interface are asynchronous.
  */
 @PublicAPI
-public interface ResourceManager {
+public interface ResourceManager extends ServiceUsingPermission {
 
     /**
      * Defines a new node source in the resource manager.
@@ -82,6 +83,7 @@ public interface ResourceManager {
      * @param nodesRecoverable whether the nodes can be recovered in case of a scheduler crash
      * @return true if a new node source was created successfully, runtime exception otherwise
      */
+    @RoleNSAdmin
     BooleanWrapper defineNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable);
 
@@ -96,6 +98,7 @@ public interface ResourceManager {
      * @param nodesRecoverable whether the nodes can be recovered in case of a scheduler crash
      * @return true if the node source was edited successfully, runtime exception otherwise
      */
+    @RoleNSAdmin
     BooleanWrapper editNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable);
 
@@ -110,6 +113,7 @@ public interface ResourceManager {
      * @param policyParams parameters of the policy, including the dynamic parameters values to update
      * @return true if a new node source was edited successfully, runtime exception otherwise
      */
+    @RoleNSAdmin
     BooleanWrapper updateDynamicParameters(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams);
 
@@ -133,6 +137,7 @@ public interface ResourceManager {
      * @return true if a new node source was created successfully, runtime exception otherwise
      */
     @Deprecated
+    @RoleNSAdmin
     BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
             String policyType, Object[] policyParameters, boolean nodesRecoverable);
 
@@ -144,6 +149,7 @@ public interface ResourceManager {
      * @return true if the node source was deployed successfully, false if the
      * node source is already deployed, runtime exception otherwise
      */
+    @RoleNSAdmin
     BooleanWrapper deployNodeSource(String nodeSourceName);
 
     /**
@@ -156,6 +162,7 @@ public interface ResourceManager {
      * @return true if the node source was undeployed successfully, false if the
      * node source is already undeployed, runtime exception otherwise
      */
+    @RoleNSAdmin
     BooleanWrapper undeployNodeSource(String nodeSourceName, boolean preempt);
 
     /**
@@ -166,6 +173,7 @@ public interface ResourceManager {
      * @param preempt if true remove the node immediately without waiting while it will be freed.
      * @return true if the node source was removed successfully, runtime exception otherwise
      */
+    @RoleNSAdmin
     BooleanWrapper removeNodeSource(String sourceName, boolean preempt);
 
     /**
@@ -173,6 +181,7 @@ public interface ResourceManager {
      *
      * @return the list of existing node source infrastructures 
      */
+    @RoleRead
     List<RMNodeSourceEvent> getExistingNodeSourcesList();
 
     /**
@@ -180,6 +189,7 @@ public interface ResourceManager {
      *
      * @return the list of supported node source infrastructures descriptors
      */
+    @RoleRead
     Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures();
 
     /**
@@ -187,11 +197,13 @@ public interface ResourceManager {
      *
      * @return the list of supported node source policies descriptors
      */
+    @RoleRead
     Collection<PluginDescriptor> getSupportedNodeSourcePolicies();
 
     /**
      * Returns the current configuration of a node source.
      */
+    @RoleRead
     NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName);
 
     /**
@@ -202,6 +214,7 @@ public interface ResourceManager {
      * @param sourceName name of the node source to set the frequency
      * @return true if ping frequency is successfully changed, runtime exception otherwise
      */
+    @RoleNSAdmin
     BooleanWrapper setNodeSourcePingFrequency(int frequency, String sourceName);
 
     /**
@@ -210,6 +223,7 @@ public interface ResourceManager {
      * @param sourceName name of the node source
      * @return the ping frequency
      */
+    @RoleRead
     IntWrapper getNodeSourcePingFrequency(String sourceName);
 
     /**
@@ -218,6 +232,7 @@ public interface ResourceManager {
      * @param nodeUrl URL of the node to add.
      * @return true if new node is added successfully, runtime exception otherwise
      */
+    @RoleProvider
     BooleanWrapper addNode(String nodeUrl);
 
     /**
@@ -227,6 +242,7 @@ public interface ResourceManager {
      * @param sourceName name of the static node source that will handle the node
      * @return true if new node is added successfully, runtime exception otherwise
      */
+    @RoleProvider
     BooleanWrapper addNode(String nodeUrl, String sourceName);
 
     /**
@@ -238,6 +254,7 @@ public interface ResourceManager {
      * @param nodeConfiguration configuration of acquiring nodes
      * @return true if the request of acquiring nodes is successfully received, false or exception otherwise
      */
+    @RoleProvider
     BooleanWrapper acquireNodes(String sourceName, int numberNodes, long timeout, Map<String, ?> nodeConfiguration);
 
     /**
@@ -247,6 +264,7 @@ public interface ResourceManager {
      * @param preempt if true remove the node immediately without waiting while it will be freed.
      * @return true if the node is removed successfully, false or exception otherwise
      */
+    @RoleProvider
     BooleanWrapper removeNode(String nodeUrl, boolean preempt);
 
     /**
@@ -262,6 +280,7 @@ public interface ResourceManager {
      * @return {@code true} if all the nodes become locked, {@code false} otherwise.
      *
      */
+    @RoleWrite
     BooleanWrapper lockNodes(Set<String> urls);
 
     /**
@@ -275,6 +294,7 @@ public interface ResourceManager {
      *
      * @return {@code true} if all the nodes are unlocked with success, {@code false} otherwise.
      */
+    @RoleWrite
     BooleanWrapper unlockNodes(Set<String> urls);
 
     /**
@@ -283,6 +303,7 @@ public interface ResourceManager {
      * @param nodeUrl of node to ping.
      * @return true if the node nodeUrl is registered and not down.
      */
+    @RoleRead
     BooleanWrapper nodeIsAvailable(String nodeUrl);
 
     /**
@@ -297,6 +318,7 @@ public interface ResourceManager {
      * @return The set of worker node URLs that are unknown to the Resource Manager
      * (i.e. have been removed by a user).
      */
+    @RoleWrite
     Set<String> setNodesAvailable(Set<String> nodeUrls);
 
     /**
@@ -305,6 +327,7 @@ public interface ResourceManager {
      * Throws SecurityException if client is not connected.
      * @return true if the resource manager is operational, false otherwise
      */
+    @RoleBasic
     BooleanWrapper isActive();
 
     /**
@@ -313,6 +336,7 @@ public interface ResourceManager {
      *
      * @return the resource manager summary state.
      */
+    @RoleRead
     RMState getState();
 
     /**
@@ -320,6 +344,7 @@ public interface ResourceManager {
      *
      * @return the resource manager monitoring interface
      */
+    @RoleRead
     RMMonitoring getMonitoring();
 
     /**
@@ -328,6 +353,7 @@ public interface ResourceManager {
      *
      * @return the thread dump on the RM node
      */
+    @RoleAdmin
     StringWrapper getRMThreadDump();
 
     /**
@@ -337,12 +363,14 @@ public interface ResourceManager {
      * @param nodeUrl node to ask the thread dump to
      * @return the thread dump on this node
      */
+    @RoleNSAdmin
     StringWrapper getNodeThreadDump(String nodeUrl);
 
     /**
      * Returns a list of all alive Nodes Urls. Alive means neither down nor currently deploying.
      * @return list of node urls
      */
+    @RoleRead
     Set<String> listAliveNodeUrls();
 
     /**
@@ -350,12 +378,14 @@ public interface ResourceManager {
      * @param nodeSourceNames set of node sources containing the nodes.
      * @return list of node urls
      */
+    @RoleRead
     Set<String> listAliveNodeUrls(Set<String> nodeSourceNames);
 
     /**
      * Returns a list of all nodes Urls known by RMCore.
      * @return set of node urls
      */
+    @RoleRead
     Set<String> listNodeUrls();
 
     /**
@@ -371,6 +401,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
+    @RoleWrite
     NodeSet getAtMostNodes(int number, SelectionScript selectionScript);
 
     /**
@@ -387,6 +418,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
+    @RoleWrite
     NodeSet getAtMostNodes(int number, SelectionScript selectionScript, NodeSet exclusion);
 
     /**
@@ -404,6 +436,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
+    @RoleWrite
     NodeSet getAtMostNodes(int number, List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
     /**
@@ -423,6 +456,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
+    @RoleWrite
     NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor, List<SelectionScript> selectionScriptsList,
             NodeSet exclusion);
 
@@ -448,6 +482,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
+    @RoleWrite
     NodeSet getNodes(int number, TopologyDescriptor descriptor, List<SelectionScript> selectionScriptsList,
             NodeSet exclusion, boolean bestEffort);
 
@@ -459,6 +494,7 @@ public interface ResourceManager {
      * @see Criteria
      * @return a list of nodes according to the criteria
      */
+    @RoleWrite
     NodeSet getNodes(Criteria criteria);
 
     /**
@@ -470,6 +506,7 @@ public interface ResourceManager {
      * {@link SecurityException} may be thrown if the user does not have right to release the node or it tries to release
      * a foreign node.
      */
+    @RoleWrite
     BooleanWrapper releaseNode(Node node);
 
     /**
@@ -481,6 +518,7 @@ public interface ResourceManager {
      * {@link SecurityException} may be thrown if the user does not have right to release one of nodes or it tries to release
      * a foreign node.
      */
+    @RoleWrite
     BooleanWrapper releaseNodes(NodeSet nodes);
 
     /**
@@ -488,6 +526,7 @@ public interface ResourceManager {
      *
      * @return true if successfully disconnected, runtime exception otherwise
      */
+    @RoleBasic
     BooleanWrapper disconnect();
 
     /**
@@ -498,24 +537,28 @@ public interface ResourceManager {
      *
      * @return true if the shutdown process is successfully triggered, runtime exception otherwise
      */
+    @RoleAdmin
     BooleanWrapper shutdown(boolean preempt);
 
     /**
      * Returns the topology information of nodes.
      * @return nodes topology
      */
+    @RoleRead
     Topology getTopology();
 
     /**
      * Checks if the currently connected user is the node administrator
      * @return true if yes, false otherwise
      */
+    @RoleBasic
     BooleanWrapper isNodeAdmin(String nodeUrl);
 
     /**
      * Checks if the currently connected user can use node for computations
      * @return true if yes, false otherwise
      */
+    @RoleBasic
     BooleanWrapper isNodeUser(String nodeUrl);
 
     /**
@@ -527,6 +570,7 @@ public interface ResourceManager {
      *
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
+    @RoleNSAdmin
     <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets);
 
     /**
@@ -538,6 +582,7 @@ public interface ResourceManager {
      * @param targets are names of particular resources
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
+    @RoleNSAdmin
     List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets);
 
@@ -545,18 +590,21 @@ public interface ResourceManager {
      * Returns the user currently connected
      * @return user name
      */
+    @RoleBasic
     StringWrapper getCurrentUser();
 
     /**
      * Returns the groups associated with the current connected user.
      * @return a set of groups
      */
+    @RoleBasic
     UserData getCurrentUserData();
 
     /**
      * Release the nodes that are busy and that are not part of the given node set
      * @param verifiedBusyNodes nodes that should not be released
      */
+    @RoleWrite
     void releaseBusyNodesNotInList(List<NodeSet> verifiedBusyNodes);
 
     /**
@@ -566,6 +614,7 @@ public interface ResourceManager {
      * @param nodes the node set to verify
      * @return whether all nodes in the node set appear in the resource manager
      */
+    @RoleRead
     boolean areNodesKnown(NodeSet nodes);
 
     /**
@@ -575,12 +624,14 @@ public interface ResourceManager {
      * @param nodes the node set to verify
      * @return a map containing recoverable status for each node of the node set
      */
+    @RoleRead
     Map<String, Boolean> areNodesRecoverable(NodeSet nodes);
 
     /**
      * Set the amount of nodes currently needed by the resource manager
      * @param neededNodes number of nodes needed
      */
+    @RoleWrite
     void setNeededNodes(int neededNodes);
 
     /**
@@ -588,6 +639,7 @@ public interface ResourceManager {
      * For each infrastructure name, the list of policies which can be associated
      * @return infrastructure and policies associations
      */
+    @RoleRead
     Map<String, List<String>> getInfrasToPoliciesMapping();
 
     /**
@@ -596,6 +648,7 @@ public interface ResourceManager {
      * @param windowEnd period end time
      * @return a list of node state events
      */
+    @RoleRead
     List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd);
 
     /**
@@ -604,6 +657,7 @@ public interface ResourceManager {
      * @param token token to add
      * @throws RMException
      */
+    @RoleWrite
     void addNodeToken(String nodeUrl, String token) throws RMException;
 
     /**
@@ -612,6 +666,7 @@ public interface ResourceManager {
      * @param token token to remove
      * @throws RMException
      */
+    @RoleWrite
     void removeNodeToken(String nodeUrl, String token) throws RMException;
 
     /**
@@ -620,6 +675,7 @@ public interface ResourceManager {
      * @param tokens list of tokens
      * @throws RMException
      */
+    @RoleWrite
     void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException;
 
     /**
@@ -628,6 +684,7 @@ public interface ResourceManager {
      * @return list of tokens
      * @throws RMException
      */
+    @RoleRead
     List<String> getNodeTokens(String nodeUrl) throws RMException;
 
     /**
@@ -635,6 +692,7 @@ public interface ResourceManager {
      * @return nodes / token list association
      * @throws RMException
      */
+    @RoleRead
     Map<String, List<String>> getAllNodesTokens() throws RMException;
 
     /**
@@ -642,6 +700,7 @@ public interface ResourceManager {
      * @return eligible nodes / token list association
      * @throws RMException
      */
+    @RoleRead
     Map<String, List<String>> getAllEligibleNodesTokens() throws RMException;
 
     /**
@@ -650,6 +709,7 @@ public interface ResourceManager {
      * @return set of tags
      * @throws RMException
      */
+    @RoleRead
     Set<String> getNodeTags(String nodeUrl) throws RMException;
 
     /**
@@ -657,6 +717,7 @@ public interface ResourceManager {
      * @param tag the expected tag which should be contained in the returned node
      * @return node urls which contain the tag
      */
+    @RoleRead
     Set<String> getNodesByTag(String tag);
 
     /**
@@ -666,6 +727,7 @@ public interface ResourceManager {
      *            when false, the search return nodes which contain any tag among the list tags.
      * @return nodes urls which contain all or any specified list of tags
      */
+    @RoleRead
     Set<String> getNodesByTags(Set<String> tags, boolean all);
 
     /**
@@ -674,6 +736,7 @@ public interface ResourceManager {
      * @param provider if false, the method will check if the user is admin, if true, the method will also check if the node is a provider
      * @return true if the user has permission to access the node, false otherwise
      */
+    @RoleBasic
     BooleanWrapper checkNodePermission(String nodeUrl, boolean provider);
 
     /**
@@ -682,6 +745,7 @@ public interface ResourceManager {
      * @param provider if false, the method will check if the user is admin, if true, the method will also check if the node is a provider
      * @return true if the user has permission to access the nodeSource, false otherwise
      */
+    @RoleBasic
     BooleanWrapper checkNodeSourcePermission(String nodeSourceName, boolean provider);
 
 }

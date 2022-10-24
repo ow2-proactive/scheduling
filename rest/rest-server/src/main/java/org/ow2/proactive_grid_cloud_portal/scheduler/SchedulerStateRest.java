@@ -32,6 +32,7 @@ import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_FIL
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_FILE_NAME;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -83,6 +84,8 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.permissions.RoleRead;
+import org.ow2.proactive.permissions.RoleWrite;
 import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
@@ -249,6 +252,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
+    }
+
+    @Override
+    public boolean checkPermissionMethod(String sessionId, String method)
+            throws SecurityException, NotConnectedRestException {
+        Scheduler s = checkAccess(sessionId, "/permission");
+        return s.checkPermission(method);
     }
 
     @Override
@@ -2070,12 +2080,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    @RoleWrite
     public boolean pushFile(String sessionId, String spaceName, String filePath, MultipartFormDataInput multipart)
             throws IOException, NotConnectedRestException, PermissionRestException {
         try {
             checkAccess(sessionId, "pushFile");
 
-            Session session = dataspaceRestApi.checkSessionValidity(sessionId);
+            if (Strings.isNullOrEmpty(spaceName)) {
+                throw new IllegalArgumentException("spaceName is empty");
+            }
+
+            Method currentMethod = new Object() {
+            }.getClass().getEnclosingMethod();
+            Session session = dataspaceRestApi.checkAuthorization(sessionId,
+                                                                  spaceName.toLowerCase().replace("space", ""),
+                                                                  currentMethod,
+                                                                  "You are not authorized to write files into dataspace " +
+                                                                                 spaceName);
 
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
 
@@ -2126,11 +2147,21 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    @RoleRead
     public InputStream pullFile(String sessionId, String spaceName, String filePath)
             throws IOException, NotConnectedRestException, PermissionRestException {
 
         checkAccess(sessionId, "pullFile");
-        Session session = dataspaceRestApi.checkSessionValidity(sessionId);
+        if (Strings.isNullOrEmpty(spaceName)) {
+            throw new IllegalArgumentException("spaceName is empty");
+        }
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        Session session = dataspaceRestApi.checkAuthorization(sessionId,
+                                                              spaceName.toLowerCase().replace("space", ""),
+                                                              currentMethod,
+                                                              "You are not authorized to read files from dataspace " +
+                                                                             spaceName);
 
         filePath = normalizeFilePath(filePath, null);
 
@@ -2168,11 +2199,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    @RoleWrite
     public boolean deleteFile(String sessionId, String spaceName, String filePath)
             throws IOException, NotConnectedRestException, PermissionRestException {
         checkAccess(sessionId, "deleteFile");
 
-        Session session = dataspaceRestApi.checkSessionValidity(sessionId);
+        if (Strings.isNullOrEmpty(spaceName)) {
+            throw new IllegalArgumentException("spaceName is empty");
+        }
+
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        Session session = dataspaceRestApi.checkAuthorization(sessionId,
+                                                              spaceName.toLowerCase().replace("space", ""),
+                                                              currentMethod,
+                                                              "You are not authorized to delete files from dataspace " +
+                                                                             spaceName);
 
         filePath = normalizeFilePath(filePath, null);
 

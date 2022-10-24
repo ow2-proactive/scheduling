@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
+
 import java.security.KeyException;
 import java.security.Permission;
 import java.security.PrivilegedAction;
@@ -40,6 +43,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.permissions.*;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -56,6 +60,8 @@ public class CommonRest implements CommonRestInterface {
     private static final Logger logger = Logger.getLogger(CommonRest.class);
 
     public static final String YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the scheduler, you should log on first";
+
+    public static final String YOU_ARE_NOT_CONNECTED_TO_THE_RM_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the resource manager, you should log on first";
 
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
@@ -123,7 +129,7 @@ public class CommonRest implements CommonRestInterface {
 
     @Override
     public List<String> portalsAccesses(String sessionId, List<String> portals) throws RestException {
-        Scheduler scheduler = checkAccess(sessionId);
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
         if (portals == null || portals.isEmpty()) {
             throw new RestException("Invalid \"portals\" parameter : " + portals);
         }
@@ -148,31 +154,50 @@ public class CommonRest implements CommonRestInterface {
         if (methods == null || methods.isEmpty()) {
             return Collections.emptyMap();
         }
-        Scheduler scheduler = checkAccess(sessionId);
+        Map<String, List<String>> methodsByClass = groupMethodsByClass(methods);
+
         Map<String, Boolean> answer = new HashMap<>(methods.size());
-        for (String method : methods) {
-            try {
-                checkPermission(scheduler.getSubject(),
-                                new MethodCallPermission(method),
-                                "Access to the method " + method + " is not allowed");
-                answer.put(method, Boolean.TRUE);
-            } catch (PermissionException e) {
-                answer.put(method, Boolean.FALSE);
-            } catch (NotConnectedException e) {
-                throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+
+        for (String className : methodsByClass.keySet()) {
+            ServiceUsingPermission service = null;
+            switch (className) {
+                case "org.ow2.proactive.resourcemanager.core.RMCore":
+                    service = checkRMAccess(sessionId);
+                    break;
+                case "org.ow2.proactive.scheduler.core.SchedulerFrontend":
+                    service = checkSchedulerAccess(sessionId);
+                    break;
+                default:
+                    throw new RestException("Unknown service class " + className);
+            }
+
+            for (String method : methodsByClass.get(className)) {
+                try {
+                    service.checkPermission(method);
+                    answer.put(className + "." + method, Boolean.TRUE);
+                } catch (SecurityException e) {
+                    answer.put(className + "." + method, Boolean.FALSE);
+                }
             }
         }
         return answer;
     }
 
+    Map<String, List<String>> groupMethodsByClass(List<String> methods) {
+        return methods.stream()
+                      .collect(Collectors.groupingBy(method -> method.substring(0, method.lastIndexOf(".")),
+                                                     mapping(method -> method.substring(method.lastIndexOf(".") + 1),
+                                                             toList())));
+    }
+
     @Override
     public boolean portalAccess(String sessionId, String portal) throws NotConnectedRestException {
-        Scheduler scheduler = checkAccess(sessionId);
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
 
         try {
             return checkPermission(scheduler.getSubject(),
                                    new PortalAccessPermission(portal),
-                                   "Acess to portal " + portal + " is disabled");
+                                   "Access to portal " + portal + " is disabled");
         } catch (PermissionException e) {
             return false;
         } catch (NotConnectedException e) {
@@ -182,7 +207,7 @@ public class CommonRest implements CommonRestInterface {
 
     @Override
     public boolean checkSubscriptionAdmin(String sessionId) throws NotConnectedRestException {
-        Scheduler scheduler = checkAccess(sessionId);
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
 
         try {
             return checkPermission(scheduler.getSubject(),
@@ -197,7 +222,7 @@ public class CommonRest implements CommonRestInterface {
 
     @Override
     public boolean checkPcaAdmin(String sessionId) throws NotConnectedRestException {
-        Scheduler scheduler = checkAccess(sessionId);
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
 
         try {
             return checkPermission(scheduler.getSubject(),
@@ -219,7 +244,7 @@ public class CommonRest implements CommonRestInterface {
      * NotConnectedRestException, if no such mapping exists.
      * @throws NotConnectedRestException
      */
-    private Scheduler checkAccess(String sessionId) throws NotConnectedRestException {
+    private Scheduler checkSchedulerAccess(String sessionId) throws NotConnectedRestException {
         Session session = sessionStore.get(sessionId);
 
         Scheduler schedulerProxy = session.getScheduler();
@@ -231,6 +256,20 @@ public class CommonRest implements CommonRestInterface {
         renewSession(sessionId);
 
         return schedulerProxy;
+    }
+
+    private ResourceManager checkRMAccess(String sessionId) throws NotConnectedRestException {
+        Session session = sessionStore.get(sessionId);
+
+        ResourceManager rmProxy = session.getRM();
+
+        if (rmProxy == null) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_RM_YOU_SHOULD_LOG_ON_FIRST);
+        }
+
+        renewSession(sessionId);
+
+        return rmProxy;
     }
 
     /**
@@ -271,7 +310,7 @@ public class CommonRest implements CommonRestInterface {
 
     @Override
     public String getLogLevel(String sessionId, String name) throws RestException {
-        Scheduler scheduler = checkAccess(sessionId);
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
         try {
             checkPermission(scheduler.getSubject(),
                             new RMCoreAllPermission(),
@@ -296,7 +335,7 @@ public class CommonRest implements CommonRestInterface {
 
     @Override
     public boolean setLogLevel(String sessionId, String name, String level) throws RestException {
-        Scheduler scheduler = checkAccess(sessionId);
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
         boolean levelChanged;
         try {
             checkPermission(scheduler.getSubject(),
@@ -334,18 +373,12 @@ public class CommonRest implements CommonRestInterface {
     @Override
     public boolean setLogLevelMultiple(String sessionId, Map<String, String> loggersConfiguration)
             throws RestException {
-        Scheduler scheduler = checkAccess(sessionId);
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
         boolean levelChanged = false;
         try {
-            try {
-                checkPermission(scheduler.getSubject(),
-                                new RMCoreAllPermission(),
-                                "Resource Manager administrative rights is required");
-            } catch (PermissionException e) {
-                checkPermission(scheduler.getSubject(),
-                                new NSAdminPermission(),
-                                "Resource Manager administrative rights is required");
-            }
+            checkPermission(scheduler.getSubject(),
+                            new RMCoreAllPermission(),
+                            "Resource Manager administrative rights is required");
             if (loggersConfiguration != null) {
                 for (Map.Entry<String, String> entry : loggersConfiguration.entrySet()) {
                     Logger loggerInstance;
@@ -382,17 +415,11 @@ public class CommonRest implements CommonRestInterface {
 
     @Override
     public Map<String, String> getCurrentLoggers(String sessionId) throws RestException {
-        Scheduler scheduler = checkAccess(sessionId);
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
         try {
-            try {
-                checkPermission(scheduler.getSubject(),
-                                new RMCoreAllPermission(),
-                                "Resource Manager administrative rights is required");
-            } catch (PermissionException e) {
-                checkPermission(scheduler.getSubject(),
-                                new NSAdminPermission(),
-                                "Resource Manager administrative rights is required");
-            }
+            checkPermission(scheduler.getSubject(),
+                            new RMCoreAllPermission(),
+                            "Resource Manager administrative rights is required");
             Map<String, String> loggers = new LinkedHashMap<>();
             Enumeration loggerEnumeration = LogManager.getCurrentLoggers();
             while (loggerEnumeration.hasMoreElements()) {
