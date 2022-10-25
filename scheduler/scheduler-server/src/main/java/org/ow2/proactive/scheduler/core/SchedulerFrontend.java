@@ -2059,7 +2059,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     @RoleRead
-    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
+    public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
@@ -2076,6 +2076,28 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                       tenant,
                                                       startDate,
                                                       endDate);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleRead
+    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to get top pending time workflows");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        return dbManager.getTopPendingTimeWorkflows(numberOfWorkflows,
+                                                    workflowName,
+                                                    myJobs ? ident.getUsername() : null,
+                                                    tenant,
+                                                    startDate,
+                                                    endDate);
     }
 
     @Override

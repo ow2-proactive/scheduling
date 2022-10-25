@@ -36,7 +36,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +72,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TimeWindow;
-import org.ow2.proactive.scheduler.common.job.WorkflowExecutionTime;
+import org.ow2.proactive.scheduler.common.job.WorkflowDuration;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -923,7 +922,7 @@ public class SchedulerDBManager {
         });
     }
 
-    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, final String workflowName,
+    public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, final String workflowName,
             String user, String tenant, final long startTime, final long endTime) {
 
         return executeReadOnlyTransaction(session -> {
@@ -942,10 +941,37 @@ public class SchedulerDBManager {
 
             List<Object[]> list = query.list();
             return list.stream()
-                       .map(nameAndCount -> new WorkflowExecutionTime(nameAndCount[0].toString(),
-                                                                      nameAndCount[1].toString(),
-                                                                      Math.round(Double.parseDouble(nameAndCount[2].toString())),
-                                                                      Long.parseLong(nameAndCount[3].toString())))
+                       .map(nameAndCount -> new WorkflowDuration(nameAndCount[0].toString(),
+                                                                 nameAndCount[1].toString(),
+                                                                 Math.round(Double.parseDouble(nameAndCount[2].toString())),
+                                                                 Long.parseLong(nameAndCount[3].toString())))
+                       .collect(Collectors.toList());
+        });
+    }
+
+    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, final String workflowName,
+            String user, String tenant, final long startTime, final long endTime) {
+
+        return executeReadOnlyTransaction(session -> {
+
+            String selectSubQuery = "select jobName, projectName, avg(startTime - submittedTime) as pendingTime, count(*) as numberOfExecution from JobData where startTime > 0 and finishedTime > 0 ";
+            String subQueryGroupByStatement = "group by jobName, projectName order by pendingTime desc";
+            Query query = getTopWorkflowsQuery(session,
+                                               workflowName,
+                                               user,
+                                               tenant,
+                                               startTime,
+                                               endTime,
+                                               numberOfWorkflows,
+                                               selectSubQuery,
+                                               subQueryGroupByStatement);
+
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .map(nameAndCount -> new WorkflowDuration(nameAndCount[0].toString(),
+                                                                 nameAndCount[1].toString(),
+                                                                 Math.round(Double.parseDouble(nameAndCount[2].toString())),
+                                                                 Long.parseLong(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
     }
