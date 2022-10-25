@@ -41,10 +41,10 @@ public class WorkflowDuration implements Serializable {
 
     private final long numberOfExecutions;
 
-    public WorkflowDuration(String workflowName, String projectName, long executionTime, long numberOfExecutions) {
+    public WorkflowDuration(String workflowName, String projectName, long duration, long numberOfExecutions) {
         this.workflowName = workflowName;
         this.projectName = projectName;
-        this.duration = executionTime;
+        this.duration = duration;
         this.numberOfExecutions = numberOfExecutions;
     }
 
