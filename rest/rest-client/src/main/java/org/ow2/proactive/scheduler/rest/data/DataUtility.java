@@ -207,13 +207,12 @@ public class DataUtility {
                                        .collect(Collectors.toList());
     }
 
-    public static List<WorkflowExecutionTime>
-            toWorkflowsExecutionTime(List<WorkflowExecutionTimeData> filteredTopWorkflowsData) {
+    public static List<WorkflowDuration> toWorkflowsDuration(List<WorkflowDurationData> filteredTopWorkflowsData) {
         return filteredTopWorkflowsData.stream()
-                                       .map(filteredTopWorkflow -> new WorkflowExecutionTime(filteredTopWorkflow.getWorkflowName(),
-                                                                                             filteredTopWorkflow.getProjectName(),
-                                                                                             filteredTopWorkflow.getExecutionTime(),
-                                                                                             filteredTopWorkflow.getNumberOfExecutions()))
+                                       .map(filteredTopWorkflow -> new WorkflowDuration(filteredTopWorkflow.getWorkflowName(),
+                                                                                        filteredTopWorkflow.getProjectName(),
+                                                                                        filteredTopWorkflow.getDuration(),
+                                                                                        filteredTopWorkflow.getNumberOfExecutions()))
                                        .collect(Collectors.toList());
     }
 

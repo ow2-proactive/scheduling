@@ -1825,7 +1825,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    public List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
+    public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getTopExecutionTimeWorkflows",
                                                                      "You don't have permissions to get top execution time workflows");
@@ -1840,6 +1840,25 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                       tenant,
                                                       startDate,
                                                       endDate);
+    }
+
+    @Override
+    @ImmediateService
+    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getTopPendingTimeWorkflows",
+                                                                     "You don't have permissions to get top pending time workflows");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        return dbManager.getTopPendingTimeWorkflows(numberOfWorkflows,
+                                                    workflowName,
+                                                    myJobs ? ident.getUsername() : null,
+                                                    tenant,
+                                                    startDate,
+                                                    endDate);
     }
 
     @Override

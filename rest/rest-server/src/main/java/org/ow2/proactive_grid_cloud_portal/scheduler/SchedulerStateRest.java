@@ -2593,7 +2593,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("stats/topWorkflowsWithExecutionTime")
     @Produces("application/json")
     @Override
-    public List<WorkflowExecutionTimeData> getTopExecutionTimeWorkflows(@HeaderParam("sessionid") String sessionId,
+    public List<WorkflowDurationData> getTopExecutionTimeWorkflows(@HeaderParam("sessionid") String sessionId,
             @QueryParam("numberOfWorkflows") int numberOfWorkflows,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
@@ -2607,7 +2607,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                               myJobs,
                                                               startDate,
                                                               endDate),
-                       WorkflowExecutionTimeData.class);
+                       WorkflowDurationData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
+    @Path("stats/topPendingTimeWorkflows")
+    @Produces("application/json")
+    @Override
+    public List<WorkflowDurationData> getTopPendingTimeWorkflows(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.getTopPendingTimeWorkflows(numberOfWorkflows,
+                                                            workflowName,
+                                                            myJobs,
+                                                            startDate,
+                                                            endDate),
+                       WorkflowDurationData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
