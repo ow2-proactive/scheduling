@@ -114,7 +114,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public String getDescription() {
-        return "Local Infrastructure deploys nodes on Resource Manager's machine";
+        return this.getClass().getSimpleName() + " deploys nodes on Resource Manager's machine";
     }
 
     @Override

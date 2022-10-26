@@ -216,7 +216,8 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
      */
     @Override
     public String getDescription() {
-        return "AutoUpdate Infrastructure ssh to a computer and uses wget to download proactive node distribution to deploy a node. It keep nodes always up-to-dated and does not require pre-installed proactive on a node machine.";
+        return this.getClass().getSimpleName() +
+               " ssh to a computer and uses wget to download proactive node distribution to deploy a node. It keep nodes always up-to-dated and does not require pre-installed proactive on a node machine.";
     }
 
     /**

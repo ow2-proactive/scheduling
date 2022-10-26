@@ -362,7 +362,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      */
     @Override
     public String getDescription() {
-        return "SSH Infrastructure creates remote runtimes using SSH";
+        return this.getClass().getSimpleName() + " creates remote runtimes using SSH";
     }
 
     /**
