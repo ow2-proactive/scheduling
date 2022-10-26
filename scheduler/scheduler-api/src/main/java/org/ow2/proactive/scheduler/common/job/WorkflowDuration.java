@@ -31,20 +31,20 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 @PublicAPI
-public class WorkflowExecutionTime implements Serializable {
+public class WorkflowDuration implements Serializable {
 
     private final String workflowName;
 
     private final String projectName;
 
-    private final long executionTime;
+    private final long duration;
 
     private final long numberOfExecutions;
 
-    public WorkflowExecutionTime(String workflowName, String projectName, long executionTime, long numberOfExecutions) {
+    public WorkflowDuration(String workflowName, String projectName, long duration, long numberOfExecutions) {
         this.workflowName = workflowName;
         this.projectName = projectName;
-        this.executionTime = executionTime;
+        this.duration = duration;
         this.numberOfExecutions = numberOfExecutions;
     }
 
@@ -56,8 +56,8 @@ public class WorkflowExecutionTime implements Serializable {
         return projectName;
     }
 
-    public long getExecutionTime() {
-        return executionTime;
+    public long getDuration() {
+        return duration;
     }
 
     public long getNumberOfExecutions() {

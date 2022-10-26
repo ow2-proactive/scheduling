@@ -58,7 +58,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
-import org.ow2.proactive.scheduler.common.job.WorkflowExecutionTime;
+import org.ow2.proactive.scheduler.common.job.WorkflowDuration;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -1661,7 +1661,11 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
             long startDate, long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
-    List<WorkflowExecutionTime> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
+    List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException;
+
+    @RoleRead
+    List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
