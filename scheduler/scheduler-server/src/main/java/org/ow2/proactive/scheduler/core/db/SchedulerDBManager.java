@@ -227,7 +227,7 @@ public class SchedulerDBManager {
 
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final String tenant,
             final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
-            final boolean childJobs, String jobName, String projectName, Long parentId,
+            final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName, Long parentId,
             final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
@@ -242,6 +242,7 @@ public class SchedulerDBManager {
                                                              pending,
                                                              running,
                                                              finished,
+                                                             withIssuesOnly,
                                                              childJobs,
                                                              jobName,
                                                              projectName,
@@ -282,6 +283,11 @@ public class SchedulerDBManager {
             boolean allJobs = pending && running && finished;
             if (!allJobs) {
                 criteria.add(Restrictions.in("statusRank", statusRanks));
+            }
+            if (withIssuesOnly) {
+                criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
+                                             Restrictions.gt("numberOfFaultyTasks", 0),
+                                             Restrictions.gt("numberOfInErrorTasks", 0)));
             }
 
             if (sortParameters != null) {
@@ -458,6 +464,10 @@ public class SchedulerDBManager {
                 StringBuilder queryString = new StringBuilder("select count(*) from JobData where ");
 
                 queryString.append("statusRank in (:statusRanks) ");
+
+                if (params.isWithIssuesOnly()) {
+                    queryString.append("and ( numberOfFailedTasks > 0 or numberOfFaultyTasks > 0 or numberOfInErrorTasks > 0)");
+                }
 
                 if (hasUser) {
                     queryString.append("and owner = :user ");

@@ -317,20 +317,32 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished) {
-        return criteria(myJobsOnly, pending, running, finished, true, null, null, null, null);
+        return criteria(myJobsOnly, pending, running, finished, false, true, null, null, null, null);
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
             boolean childJobs) {
-        return new JobFilterCriteria(myJobsOnly, pending, running, finished, childJobs, null, null, null, null, null);
-    }
-
-    private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
-            boolean childJobs, String jobName, String projectName, String userName, Long parentId) {
         return new JobFilterCriteria(myJobsOnly,
                                      pending,
                                      running,
                                      finished,
+                                     false,
+                                     childJobs,
+                                     null,
+                                     null,
+                                     null,
+                                     null,
+                                     null);
+    }
+
+    private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
+            boolean withIssuesOnly, boolean childJobs, String jobName, String projectName, String userName,
+            Long parentId) {
+        return new JobFilterCriteria(myJobsOnly,
+                                     pending,
+                                     running,
+                                     finished,
+                                     withIssuesOnly,
                                      childJobs,
                                      jobName,
                                      projectName,

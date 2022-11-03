@@ -113,6 +113,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -129,6 +130,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -146,6 +148,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  null,
                                  null,
                                  null,
@@ -162,6 +165,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -179,6 +183,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -195,6 +200,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -211,6 +217,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -227,6 +234,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -243,6 +251,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -260,6 +269,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -322,7 +332,20 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<>();
         sortParameters.add(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
 
-        jobs = dbManager.getJobs(5, 1, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(5,
+                                 1,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         JobInfo jobInfo = jobs.get(0);
         Assert.assertEquals("6", jobInfo.getJobId().value());
@@ -335,48 +358,191 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         Assert.assertEquals(JobPriority.NORMAL, jobInfo.getPriority());
         Assert.assertEquals(DEFAULT_USER_NAME, jobInfo.getJobOwner());
 
-        jobs = dbManager.getJobs(0, 10, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
         Assert.assertEquals(2, jobs.get(0).getChildrenCount());
 
-        jobs = dbManager.getJobs(-1, -1, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(-1,
+                                 -1,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(-1, 5, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(-1,
+                                 5,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5);
 
-        jobs = dbManager.getJobs(2, -1, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(2,
+                                 -1,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(0, 0, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(0,
+                                 0,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(0, 1, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(0,
+                                 1,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 1);
 
-        jobs = dbManager.getJobs(0, 3, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(0,
+                                 3,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 1, 2, 3);
 
-        jobs = dbManager.getJobs(1, 10, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(1,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(5, 10, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(5,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 6, 7);
 
-        jobs = dbManager.getJobs(6, 10, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(6,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 7);
 
-        jobs = dbManager.getJobs(7, 10, null, null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(7,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs);
 
@@ -388,6 +554,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -396,7 +563,20 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                         .getList();
         checkJobs(jobs, 1, 3, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, "user1", null, false, true, true, true, true, null, null, null, sortParameters)
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 "user1",
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 2);
 
@@ -406,6 +586,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  false,
                                  true,
+                                 false,
                                  false,
                                  false,
                                  true,
@@ -423,6 +604,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  false,
                                  false,
                                  true,
+                                 false,
                                  false,
                                  true,
                                  null,
@@ -440,6 +622,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  false,
                                  false,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -456,6 +639,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  false,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -472,6 +656,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  false,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -488,6 +673,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  false,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -504,6 +690,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  false,
                                  false,
                                  false,
+                                 false,
                                  true,
                                  null,
                                  null,
@@ -512,7 +699,20 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                         .getList();
         checkJobs(jobs);
 
-        jobs = dbManager.getJobs(0, 10, null, null, false, true, true, true, true, jobName, null, null, sortParameters)
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 jobName,
+                                 null,
+                                 null,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 2);
 
@@ -524,6 +724,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  projectName,
@@ -532,11 +733,37 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                         .getList();
         checkJobs(jobs, 1, 3);
 
-        jobs = dbManager.getJobs(0, 10, null, null, false, true, true, true, true, null, null, 1L, sortParameters)
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 1L,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 2, 3);
 
-        jobs = dbManager.getJobs(0, 10, null, null, false, true, true, true, true, jobName, null, 1L, sortParameters)
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 jobName,
+                                 null,
+                                 1L,
+                                 sortParameters)
                         .getList();
         checkJobs(jobs, 2);
 
@@ -548,6 +775,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  true,
                                  true,
                                  true,
+                                 false,
                                  true,
                                  null,
                                  projectName,

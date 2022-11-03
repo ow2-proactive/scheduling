@@ -182,6 +182,8 @@ public interface SchedulerRestInterface {
      *            fetch running jobs
      * @param finished
      *            fetch finished jobs
+     * @param withIssuesOnly
+     *            fetch only jobs with issues
      * @param childJobs
      *             fetch childJobs (submitted by parent job(s))
      * @param jobName
@@ -211,6 +213,7 @@ public interface SchedulerRestInterface {
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("running") @DefaultValue("true") boolean running,
             @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("withIssuesOnly") @DefaultValue("false") boolean withIssuesOnly,
             @QueryParam("childJobs") @DefaultValue("true") boolean childJobs,
             @QueryParam("jobName") @DefaultValue("") String jobName,
             @QueryParam("projectName") @DefaultValue("") String projectName,

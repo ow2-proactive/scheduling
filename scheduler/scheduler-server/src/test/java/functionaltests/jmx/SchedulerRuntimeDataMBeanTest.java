@@ -99,6 +99,7 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
                                                                                            false,
                                                                                            true,
                                                                                            true,
+                                                                                           false,
                                                                                            true,
                                                                                            null,
                                                                                            null,

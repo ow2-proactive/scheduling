@@ -243,15 +243,54 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         initExpectedResults("testGetTotalJobsCount-Job", "TEST-TAG");
 
         // default parameters
-        actualJobPage = dbManager.getJobs(0, 0, null, null, false, true, true, true, true, null, null, null, null);
+        actualJobPage = dbManager.getJobs(0,
+                                          0,
+                                          null,
+                                          null,
+                                          false,
+                                          true,
+                                          true,
+                                          true,
+                                          false,
+                                          true,
+                                          null,
+                                          null,
+                                          null,
+                                          null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
         // no pagination, no user, no pending, no running, no finished
-        actualJobPage = dbManager.getJobs(0, 0, null, null, false, false, false, false, true, null, null, null, null);
+        actualJobPage = dbManager.getJobs(0,
+                                          0,
+                                          null,
+                                          null,
+                                          false,
+                                          false,
+                                          false,
+                                          false,
+                                          false,
+                                          true,
+                                          null,
+                                          null,
+                                          null,
+                                          null);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
         // no pagination, user = "admin", pending, running, finished
-        actualJobPage = dbManager.getJobs(0, 0, "admin", null, false, true, true, true, true, null, null, null, null);
+        actualJobPage = dbManager.getJobs(0,
+                                          0,
+                                          "admin",
+                                          null,
+                                          false,
+                                          true,
+                                          true,
+                                          true,
+                                          false,
+                                          true,
+                                          null,
+                                          null,
+                                          null,
+                                          null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
         // no pagination, user = "admin", pending, running, finished, jobName = "testGetTotalJobsCount-Job"
@@ -263,6 +302,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           true,
                                           true,
                                           true,
+                                          false,
                                           true,
                                           "testGetTotalJobsCount-Job",
                                           null,
@@ -279,6 +319,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           true,
                                           true,
                                           true,
+                                          false,
                                           true,
                                           "testGetTotal",
                                           null,
@@ -295,6 +336,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           true,
                                           true,
                                           true,
+                                          false,
                                           true,
                                           "invalid_job_name",
                                           null,
@@ -311,6 +353,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           true,
                                           true,
                                           true,
+                                          false,
                                           true,
                                           null,
                                           null,
@@ -319,7 +362,20 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
         // pagination [0,5[, user = "admin", pending, running, finished
-        actualJobPage = dbManager.getJobs(0, 5, "admin", null, false, true, true, true, true, null, null, null, null);
+        actualJobPage = dbManager.getJobs(0,
+                                          5,
+                                          "admin",
+                                          null,
+                                          false,
+                                          true,
+                                          true,
+                                          true,
+                                          false,
+                                          true,
+                                          null,
+                                          null,
+                                          null,
+                                          null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
     }
 
@@ -470,6 +526,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                                true,
                                                true,
                                                true,
+                                               false,
                                                true,
                                                null,
                                                null,

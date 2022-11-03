@@ -56,6 +56,8 @@ public class DBJobDataParameters {
 
     private final boolean finished;
 
+    private final boolean withIssuesOnly;
+
     private final boolean childJobs;
 
     private final String jobName;
@@ -69,8 +71,8 @@ public class DBJobDataParameters {
     private final Set<Integer> statusRanks;
 
     DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
-            boolean pending, boolean running, boolean finished, boolean childJobs, String jobName, String projectName,
-            Long parentId, List<SortParameter<JobSortParameter>> sortParameters) {
+            boolean pending, boolean running, boolean finished, boolean withIssuesOnly, boolean childJobs,
+            String jobName, String projectName, Long parentId, List<SortParameter<JobSortParameter>> sortParameters) {
         this.offset = offset;
         this.limit = limit;
         this.user = user;
@@ -79,6 +81,7 @@ public class DBJobDataParameters {
         this.pending = pending;
         this.running = running;
         this.finished = finished;
+        this.withIssuesOnly = withIssuesOnly;
         this.childJobs = childJobs;
         this.jobName = jobName;
         this.projectName = projectName;
@@ -141,5 +144,9 @@ public class DBJobDataParameters {
 
     public Set<Integer> getStatusRanks() {
         return statusRanks;
+    }
+
+    public boolean isWithIssuesOnly() {
+        return withIssuesOnly;
     }
 }
