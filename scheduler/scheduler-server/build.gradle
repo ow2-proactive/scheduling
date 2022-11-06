@@ -54,7 +54,7 @@ dependencies {
     testCompile 'org.apache.sshd:sshd-core:0.14.0'
 
 
-    runtime 'org.hsqldb:hsqldb:2.7.1:jdk8'
+    runtime 'org.hsqldb:hsqldb:2.5.1'
     runtime 'net.sf.saxon:Saxon-HE:10.5'
 
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
