@@ -1893,6 +1893,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.isPending(),
                                                    filterCriteria.isRunning(),
                                                    filterCriteria.isFinished(),
+                                                   filterCriteria.isWithIssuesOnly(),
                                                    filterCriteria.isChildJobs(),
                                                    filterCriteria.getJobName(),
                                                    filterCriteria.getProjectName(),

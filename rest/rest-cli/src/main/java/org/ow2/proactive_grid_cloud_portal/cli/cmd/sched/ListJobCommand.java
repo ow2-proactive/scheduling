@@ -96,6 +96,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
                                                                                             true,
                                                                                             true,
                                                                                             true,
+                                                                                            false,
                                                                                             true,
                                                                                             null,
                                                                                             null,

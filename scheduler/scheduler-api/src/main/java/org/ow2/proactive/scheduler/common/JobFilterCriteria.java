@@ -41,6 +41,8 @@ public class JobFilterCriteria implements Serializable {
 
     private final boolean finished;
 
+    private final boolean withIssuesOnly;
+
     private final boolean childJobs;
 
     private final String jobName;
@@ -53,12 +55,14 @@ public class JobFilterCriteria implements Serializable {
 
     private final Long parentId;
 
-    public JobFilterCriteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished, boolean childJobs,
-            String jobName, String projectName, String userName, String tenant, Long parentId) {
+    public JobFilterCriteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
+            boolean withIssuesOnly, boolean childJobs, String jobName, String projectName, String userName,
+            String tenant, Long parentId) {
         this.myJobsOnly = myJobsOnly;
         this.pending = pending;
         this.running = running;
         this.finished = finished;
+        this.withIssuesOnly = withIssuesOnly;
         this.childJobs = childJobs;
         this.jobName = jobName;
         this.projectName = projectName;
@@ -81,6 +85,10 @@ public class JobFilterCriteria implements Serializable {
 
     public boolean isFinished() {
         return finished;
+    }
+
+    public boolean isWithIssuesOnly() {
+        return withIssuesOnly;
     }
 
     public boolean isChildJobs() {
