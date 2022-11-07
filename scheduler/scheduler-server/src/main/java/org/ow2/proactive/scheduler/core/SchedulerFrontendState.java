@@ -674,11 +674,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         final ServiceRolePermission serviceRolePermission = new ServiceRolePermission(fullMethodRole);
         final DeniedMethodCallPermission deniedMethodCallPermission = new DeniedMethodCallPermission(fullMethodName);
 
-        try {
-            userSessionInfo.getRight().checkPermission(deniedMethodCallPermission, permissionMsg);
-            throw new PermissionException(permissionMsg);
-        } catch (PermissionException ex) {
-            // ok, the check should throw an exception unless it is denied
+        if (System.getSecurityManager() != null) {
+            try {
+                userSessionInfo.getRight().checkPermission(deniedMethodCallPermission, permissionMsg);
+                throw new DeniedMethodCallException(permissionMsg);
+            } catch (PermissionException ex) {
+                // ok, the check should throw an exception unless it is denied
+            } catch (DeniedMethodCallException e) {
+                throw new PermissionException(permissionMsg, e);
+            }
         }
 
         try {

@@ -496,11 +496,15 @@ public class RestDataspaceImpl implements RestDataspace {
         final ServiceRolePermission serviceRolePermission = new ServiceRolePermission(fullMethodRole);
         final DeniedMethodCallPermission deniedMethodCallPermission = new DeniedMethodCallPermission(fullMethodName);
 
-        try {
-            checkPermission(subject, deniedMethodCallPermission, permissionMsg);
-            throw new PermissionRestException(permissionMsg);
-        } catch (PermissionRestException ex) {
-            // ok, the check should throw an exception unless it is denied
+        if (System.getSecurityManager() != null) {
+            try {
+                checkPermission(subject, deniedMethodCallPermission, permissionMsg);
+                throw new DeniedMethodCallException(permissionMsg);
+            } catch (PermissionRestException ex) {
+                // ok, the check should throw an exception unless it is denied
+            } catch (DeniedMethodCallException e) {
+                throw new PermissionRestException(permissionMsg);
+            }
         }
 
         try {
