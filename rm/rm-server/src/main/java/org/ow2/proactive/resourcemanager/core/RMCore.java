@@ -2793,7 +2793,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         final String permissionMsg = client + " is not authorized to call " + fullMethodName;
 
-        checkDeniedMethodCallPermission(client, fullMethodName, deniedMethodCallPermission, permissionMsg);
+        if (System.getSecurityManager() != null) {
+            checkDeniedMethodCallPermission(client, fullMethodName, deniedMethodCallPermission, permissionMsg);
+        }
         checkMethodCallOrRolePermission(client, methodCallPermission, serviceRolePermission, permissionMsg);
         logger.trace("permission " + methodName + " from " + client.getName() + " -> authorized");
     }
@@ -2830,9 +2832,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             client.checkPermission(deniedMethodCallPermission, permissionMsg);
             logger.trace("Denied method access : " + fullMethodName);
-            throw new SecurityException(permissionMsg);
+            throw new DeniedMethodCallException(permissionMsg);
         } catch (SecurityException ex) {
             // ok, the check should throw an exception unless it is denied
+        } catch (DeniedMethodCallException e) {
+            throw new SecurityException(permissionMsg, e);
         }
     }
 
