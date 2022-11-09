@@ -37,6 +37,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.Boolea
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelType;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.SPELParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
@@ -122,6 +123,19 @@ public class DefaultModelJobValidatorServiceProviderTest {
     public void testValidateJobWithTaskModelVariableValidPrefixButUnknownModel()
             throws UserException, JobValidationException {
         factory.validateJob(createJobWithTaskModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"));
+    }
+
+    @Test
+    public void testValidateJobWithNullVariables() throws UserException, JobValidationException {
+        TaskFlowJob jobWithNullVariables = new TaskFlowJob();
+        jobWithNullVariables.setName("jobWithNullVariables");
+        jobWithNullVariables.getVariables().put("nullVar", new JobVariable("nullVar", null));
+        Task taskWithNullVariables = new JavaTask();
+        taskWithNullVariables.setName("taskWithNullVariables");
+        taskWithNullVariables.getVariables().put("nullVar", new TaskVariable("nullVar", null));
+        jobWithNullVariables.addTask(taskWithNullVariables);
+        factory.validateJob(jobWithNullVariables);
+
     }
 
     private TaskFlowJob createJobWithJobModelVariable(String value, String model) throws UserException {

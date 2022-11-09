@@ -101,6 +101,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_generic_info.xml");
 
+    private static URL jobDescriptorNullVariable = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_variable.xml");
+
     private static URL jobDescriptorParentId = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_parent_id.xml");
 
     @Rule
@@ -848,6 +850,25 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // The job generic info must be returned by the task
         TaskResult taskResult = client.getJobResult(jobId).getResult("task1");
         Assert.assertEquals(jobSubmissionGenericInfoValue, taskResult.value());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME * 2)
+    public void testJobSubmissionWithNullVariables() throws Throwable {
+        ISchedulerClient client = clientInstance();
+
+        // Create a generic infos map
+        String jobSubmissionVariableKey = "job_null_variable";
+        String jobSubmissionVariableValue = null;
+        Map<String, String> variablesMap = Collections.singletonMap(jobSubmissionVariableKey,
+                                                                    jobSubmissionVariableValue);
+
+        // Submit a job with the generic informations map
+        JobId jobId = client.submit(jobDescriptorNullVariable, variablesMap, anyMap(), anyMap());
+        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));
+
+        // The job generic info must be returned by the task
+        TaskResult taskResult = client.getJobResult(jobId).getResult("task1");
+        Assert.assertEquals("", taskResult.value());
     }
 
     @Test(timeout = MAX_WAIT_TIME * 3)

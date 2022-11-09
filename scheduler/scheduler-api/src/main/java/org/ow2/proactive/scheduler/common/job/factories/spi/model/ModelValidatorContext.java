@@ -26,12 +26,8 @@
 package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
@@ -277,7 +273,12 @@ public class ModelValidatorContext {
         private Boolean valid;
 
         public SpELVariables(Map<String, Serializable> variables, Map<String, String> models, Set<String> groupsNames) {
-            this.variables = variables;
+            this.variables = variables != null ? variables.entrySet()
+                                                          .stream()
+                                                          .collect(Collectors.toMap(e -> e.getKey(),
+                                                                                    e -> (e.getValue() != null ? e.getValue()
+                                                                                                               : "")))
+                                               : null;
             this.models = models;
             this.tempMap = new LinkedHashMap<>();
             this.hiddenVariables = new LinkedHashMap<>();

@@ -74,7 +74,11 @@ public class RestrictedTypeLocator extends StandardTypeLocator {
                                                                 "ImmutableMap",
                                                                 "com.google.common.collect.ImmutableMap",
                                                                 "ImmutableList",
-                                                                "com.google.common.collect.ImmutableList");
+                                                                "com.google.common.collect.ImmutableList",
+                                                                "Strings",
+                                                                "com.google.common.base.Strings",
+                                                                "Joiner",
+                                                                "com.google.common.base.Joiner");
 
     public RestrictedTypeLocator() {
         this(ClassUtils.getDefaultClassLoader());

@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -264,6 +265,13 @@ public class StaxJobFactory extends JobFactory {
             Map<String, String> replacementGenericInfos, Scheduler scheduler, SchedulerSpaceInterface space,
             String sessionId) throws JobCreationException, IOException, XMLStreamException {
         long t0 = System.currentTimeMillis();
+        if (replacementVariables != null) {
+            replacementVariables = replacementVariables.entrySet()
+                                                       .stream()
+                                                       .collect(Collectors.toMap(e -> e.getKey(),
+                                                                                 e -> e.getValue() != null ? e.getValue()
+                                                                                                           : ""));
+        }
         byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
         String md5Job = DigestUtils.md5Hex(bytes);
         String md5Variables = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementVariables));
