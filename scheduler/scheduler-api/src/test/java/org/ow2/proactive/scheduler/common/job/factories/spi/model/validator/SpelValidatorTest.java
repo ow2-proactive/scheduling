@@ -44,6 +44,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 
@@ -278,7 +279,7 @@ public class SpelValidatorTest {
 
     @Test
     public void testSpelOKUpdateJobVariableWhenEmptyOK() throws ValidationException, UserException {
-        SpelValidator validator = new SpelValidator("#value == 'MyString' ? (variables['var4'] == null ? (variables['var4'] = 'toto1') instanceof T(String) : true) : false");
+        SpelValidator validator = new SpelValidator("#value == 'MyString' ? (T(com.google.common.base.Strings).isNullOrEmpty(variables['var4']) ? (variables['var4'] = 'toto1') instanceof T(String) : true) : false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
         Assert.assertEquals(value, validator.validate(value, context, false));
@@ -287,7 +288,7 @@ public class SpelValidatorTest {
 
     @Test
     public void testSpelOKUpdateJobVariableWhenEmptyKO() throws ValidationException, UserException {
-        SpelValidator validator = new SpelValidator("#value == 'MyString' ? (variables['var2'] == null ? (variables['var2'] = 'toto1') instanceof T(String) : true) : false");
+        SpelValidator validator = new SpelValidator("#value == 'MyString' ? (T(com.google.common.base.Strings).isNullOrEmpty(variables['var2']) ? (variables['var2'] = 'toto1') instanceof T(String) : true) : false");
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
         Assert.assertEquals(value, validator.validate(value, context, false));
