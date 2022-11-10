@@ -37,7 +37,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.*;
@@ -957,7 +959,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/" + taskTag + "/paginated");
             JobState jobState = s.getJobState(jobId);
-            TaskStatesPage page = jobState.getTaskByTagByStatusPaginated(offset, limit, taskTag, statusFilter);
+            String decodedStatusFilter;
+            try {
+                decodedStatusFilter = URLDecoder.decode(statusFilter, StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException ex) {
+                decodedStatusFilter = statusFilter;
+            }
+            TaskStatesPage page = jobState.getTaskByTagByStatusPaginated(offset, limit, taskTag, decodedStatusFilter);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
