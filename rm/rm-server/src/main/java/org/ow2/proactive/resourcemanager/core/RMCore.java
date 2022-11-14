@@ -55,6 +55,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.security.auth.Subject;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -2752,6 +2754,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return getLocalClient(clientId) != null;
         }
 
+        // check if the current client is a super admin
+        if (isSuperAdmin(client)) {
+            logger.trace("permission " + method.getName() + " from " + client.getName() + " -> authorized");
+            return true;
+        }
+
         checkPermissionInternal(method, client, methodName);
 
         return true;
@@ -2770,17 +2778,26 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         // check if the current client is a super admin
-        try {
-            client.checkPermission(new AllPermission(), "");
+        if (isSuperAdmin(client)) {
             logger.trace("permission " + method.getName() + " from " + client.getName() + " -> authorized");
             return client;
-        } catch (SecurityException e) {
-            // not a super admin
         }
 
         checkPermissionInternal(method, client, method.getName());
 
         return client;
+    }
+
+    private boolean isSuperAdmin(Client client) {
+        if (System.getSecurityManager() != null) {
+            try {
+                client.checkPermission(new AllPermission(), "");
+            } catch (SecurityException e) {
+                // not a super admin
+                return false;
+            }
+        }
+        return true;
     }
 
     private void checkPermissionInternal(Method method, Client client, String methodName) {
