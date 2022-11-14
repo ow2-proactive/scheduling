@@ -666,8 +666,26 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return userSessionInfo.getLeft();
     }
 
+    private boolean isSuperAdmin(UserIdentificationImpl userIdentification) {
+        if (System.getSecurityManager() != null) {
+            try {
+                userIdentification.checkPermission(new AllPermission(), "");
+            } catch (PermissionException e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void checkPermissionInternal(Method method, Pair<ListeningUser, UserIdentificationImpl> userSessionInfo,
             String permissionMsg) throws PermissionException {
+
+        if (isSuperAdmin(userSessionInfo.getRight())) {
+            return;
+        }
+
+        permissionMsg = "(" + userSessionInfo.getRight().getUsername() + ") " + permissionMsg;
+
         final String fullMethodName = SchedulerFrontend.class.getName() + "." + method.getName();
         final String fullMethodRole = SchedulerFrontend.class.getName() + "." + findRole(method);
         final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
