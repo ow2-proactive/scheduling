@@ -66,6 +66,7 @@ import org.apache.log4j.Logger;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
 import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.util.uri.UriComponent;
 import org.atmosphere.websocket.WebSocketEventListenerAdapter;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
@@ -962,15 +963,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             TaskStatesPage page = jobState.getTaskByTagByStatusPaginated(offset,
                                                                          limit,
                                                                          taskTag,
-                                                                         URLDecoder.decode(statusFilter.getPath(),
-                                                                                           String.valueOf(Charset.forName(PASchedulerProperties.FILE_ENCODING.getValueAsString()))));
+                                                                         UriComponent.decode(statusFilter.getPath(),
+                                                                                             UriComponent.Type.PATH_SEGMENT));
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
-        } catch (UnsupportedEncodingException ignored) {
-            //can never occur because UTF-8 is always supported
-            return null;
         }
     }
 
