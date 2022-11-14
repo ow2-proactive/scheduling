@@ -473,6 +473,17 @@ public class RestDataspaceImpl implements RestDataspace {
         return session;
     }
 
+    private boolean isSuperAdmin(Subject subject) {
+        if (System.getSecurityManager() != null) {
+            try {
+                checkPermission(subject, new AllPermission(), "");
+            } catch (PermissionRestException e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Session checkAuthorization(String sessionId, String dataspace, Method method, String permissionMsg)
             throws NotConnectedRestException, PermissionRestException {
         Session session = sessions.get(sessionId);
@@ -486,6 +497,10 @@ public class RestDataspaceImpl implements RestDataspace {
             subject = session.getScheduler().getSubject();
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException("User not authenticated or session timeout.");
+        }
+
+        if (isSuperAdmin(subject)) {
+            return session;
         }
 
         String dataspacePath = Strings.isNullOrEmpty(dataspace) ? "" : dataspace.toLowerCase() + ".";
