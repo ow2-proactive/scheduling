@@ -37,7 +37,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.*;
@@ -951,17 +953,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(String sessionId, String jobId, int offset,
-            int limit, String taskTag, String statusFilter) throws RestException {
+            int limit, String taskTag, PathSegment statusFilter) throws RestException {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/" + taskTag + "/paginated");
             JobState jobState = s.getJobState(jobId);
-            TaskStatesPage page = jobState.getTaskByTagByStatusPaginated(offset, limit, taskTag, statusFilter);
+            TaskStatesPage page = jobState.getTaskByTagByStatusPaginated(offset,
+                                                                         limit,
+                                                                         taskTag,
+                                                                         URLDecoder.decode(statusFilter.getPath(),
+                                                                                           StandardCharsets.UTF_8.name()));
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
+        } catch (UnsupportedEncodingException ignored) {
+            //can never occur because UTF-8 is always supported
+            return null;
         }
     }
 

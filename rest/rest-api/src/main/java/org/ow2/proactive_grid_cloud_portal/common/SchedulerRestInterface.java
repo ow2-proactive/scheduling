@@ -746,7 +746,7 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit, @PathParam("tasktag") String taskTag,
-            @PathParam("statusFilter") String statusFilter) throws RestException;
+            @PathParam("statusFilter") PathSegment statusFilter) throws RestException;
 
     /**
      * Returns a paginated list of <code>TaskStateData</code> regarding the
