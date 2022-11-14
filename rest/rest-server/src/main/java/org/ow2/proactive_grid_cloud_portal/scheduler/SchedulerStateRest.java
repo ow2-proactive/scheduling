@@ -963,7 +963,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                          limit,
                                                                          taskTag,
                                                                          URLDecoder.decode(statusFilter.getPath(),
-                                                                                           StandardCharsets.UTF_8.name()));
+                                                                                           String.valueOf(Charset.forName(PASchedulerProperties.FILE_ENCODING.getValueAsString()))));
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
