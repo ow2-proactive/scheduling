@@ -36,8 +36,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.permissions.*;
-import org.ow2.proactive.scheduler.common.exception.InvalidTimeWindowException;
-import org.ow2.proactive.scheduler.common.exception.InvalidTimeZoneId;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
@@ -1669,8 +1667,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
             long startDate, long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
-    CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
-            throws NotConnectedException, PermissionException, InvalidTimeWindowException, InvalidTimeZoneId;
+    CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, long startDate, long endDate,
+            int numberOfIntervals) throws NotConnectedException, PermissionException;
 
     /**
      * Retrieve a tasks names list from the scheduler.
