@@ -64,6 +64,7 @@ import org.apache.log4j.Logger;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
 import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.util.uri.UriComponent;
 import org.atmosphere.websocket.WebSocketEventListenerAdapter;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
@@ -951,13 +952,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(String sessionId, String jobId, int offset,
-            int limit, String taskTag, String statusFilter) throws RestException {
+            int limit, String taskTag, PathSegment statusFilter) throws RestException {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/" + taskTag + "/paginated");
             JobState jobState = s.getJobState(jobId);
-            TaskStatesPage page = jobState.getTaskByTagByStatusPaginated(offset, limit, taskTag, statusFilter);
+            TaskStatesPage page = jobState.getTaskByTagByStatusPaginated(offset,
+                                                                         limit,
+                                                                         taskTag,
+                                                                         UriComponent.decode(statusFilter.getPath(),
+                                                                                             UriComponent.Type.PATH_SEGMENT));
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
