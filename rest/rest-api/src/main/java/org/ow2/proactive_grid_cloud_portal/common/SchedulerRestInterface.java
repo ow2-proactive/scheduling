@@ -2180,7 +2180,7 @@ public interface SchedulerRestInterface {
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param workflowName the workflow name of the filtered jobs
      * @param startDate start date of the filtered jobs
-     * @param endDate end date of the filtered jobs
+     * @param endDate end date of the filtered jobs, default value represents the current date
      * @param numberOfIntervals number of time intervals
      * @return {@link CompletedJobsCountData}
      * @throws RestException if an error occurs or the session is invalid
