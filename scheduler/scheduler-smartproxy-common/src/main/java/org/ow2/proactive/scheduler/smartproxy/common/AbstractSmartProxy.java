@@ -53,8 +53,6 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
-import org.ow2.proactive.scheduler.common.exception.InvalidTimeWindowException;
-import org.ow2.proactive.scheduler.common.exception.InvalidTimeZoneId;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -266,9 +264,9 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String timeWindow, String zoneId)
-            throws PermissionException, NotConnectedException, InvalidTimeWindowException, InvalidTimeZoneId {
-        return getScheduler().getCompletedJobs(myJobs, workflowName, timeWindow, zoneId);
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, long startDate, long endDate,
+            int numberOfIntervals) throws PermissionException, NotConnectedException {
+        return getScheduler().getCompletedJobs(myJobs, workflowName, startDate, endDate, numberOfIntervals);
     }
 
     /**

@@ -1155,95 +1155,43 @@ public class SchedulerDBManager {
 
     }
 
-    public CompletedJobsCount getCompletedJobs(String user, String tenant, final String workflowName,
-            TimeWindow timeWindow, String zoneId) {
-
-        ZonedDateTime endTime;
-        if (!StringUtils.isBlank(zoneId)) {
-            ZoneId zone = ZoneId.of(zoneId);
-            LocalDateTime localDateTime = LocalDateTime.now();
-            endTime = localDateTime.atZone(zone);
-        } else {
-            endTime = ZonedDateTime.now();
-        }
-        ZonedDateTime startTime = getStartTime(timeWindow, endTime);
+    public CompletedJobsCount getCompletedJobs(String user, String tenant, final String workflowName, long startDate,
+            long endDate, int numberOfIntervals) {
 
         Map<Integer, Integer> jobsWithoutIssuesCount = new TreeMap<>();
         Map<Integer, Integer> jobsWithIssuesCount = new TreeMap<>();
-        int position = 0;
+        long intervalTime = (endDate - startDate) / numberOfIntervals;
 
-        while (startTime.isBefore(endTime)) {
-            ZonedDateTime endTimeInterval = getEndTimeInterval(timeWindow, startTime);
-            long epochStartTime = startTime.toInstant().toEpochMilli();
-            long epochEndTimeInterval = endTimeInterval.toInstant().toEpochMilli();
-
+        for (int interval = 0; interval < numberOfIntervals && startDate < endDate; interval++) {
+            long endTimeInterval = startDate + intervalTime;
             Integer nrOfJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
                                                                     user,
                                                                     tenant,
-                                                                    epochStartTime,
-                                                                    epochEndTimeInterval,
+                                                                    startDate,
+                                                                    endTimeInterval,
                                                                     Collections.singletonList(JobStatus.FINISHED),
                                                                     false);
-            jobsWithoutIssuesCount.put(position, nrOfJobsWithoutIssues);
-
+            jobsWithoutIssuesCount.put(interval, nrOfJobsWithoutIssues);
             Integer nrOfJobsWithIssues = getNumberOfFilteredJobs(workflowName,
                                                                  user,
                                                                  tenant,
-                                                                 epochStartTime,
-                                                                 epochEndTimeInterval,
+                                                                 startDate,
+                                                                 endTimeInterval,
                                                                  Collections.singletonList(JobStatus.FINISHED),
                                                                  true);
             Integer nrOfFailedJobs = getNumberOfFilteredJobs(workflowName,
                                                              user,
                                                              tenant,
-                                                             epochStartTime,
-                                                             epochEndTimeInterval,
+                                                             startDate,
+                                                             endTimeInterval,
                                                              ImmutableSet.of(JobStatus.CANCELED,
                                                                              JobStatus.FAILED,
                                                                              JobStatus.KILLED),
                                                              null);
-            jobsWithIssuesCount.put(position, nrOfJobsWithIssues + nrOfFailedJobs);
-            startTime = endTimeInterval;
-            position++;
+            jobsWithIssuesCount.put(interval, nrOfJobsWithIssues + nrOfFailedJobs);
+            startDate = endTimeInterval;
         }
         return new CompletedJobsCount(jobsWithIssuesCount, jobsWithoutIssuesCount);
-
-    }
-
-    private ZonedDateTime getEndTimeInterval(TimeWindow timeWindow, ZonedDateTime startTime) {
-        ZonedDateTime endTimeInterval = null;
-        switch (timeWindow) {
-            case DAILY:
-                endTimeInterval = startTime.plusHours(1);
-                break;
-            case WEEKLY:
-            case MONTHLY:
-                endTimeInterval = startTime.plusDays(1);
-                break;
-            case YEARLY:
-                endTimeInterval = startTime.plusMonths(1);
-                break;
-        }
-        return endTimeInterval;
-    }
-
-    private ZonedDateTime getStartTime(TimeWindow timeWindow, ZonedDateTime endTime) {
-        ZonedDateTime startTime = null;
-        switch (timeWindow) {
-            case DAILY:
-                startTime = endTime.minusHours(23).withMinute(0).withSecond(0);
-                break;
-            case WEEKLY:
-                startTime = endTime.minusDays(6).withHour(0).withMinute(0).withSecond(0);
-                break;
-            case MONTHLY:
-                startTime = endTime.minusMonths(1).plusDays(1).withHour(0).withMinute(0).withSecond(0);
-                break;
-            case YEARLY:
-                startTime = endTime.minusMonths(11).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
-                break;
-        }
-        return startTime;
     }
 
     private void removeJobScripts(Session session, List<Long> jobIds) {
