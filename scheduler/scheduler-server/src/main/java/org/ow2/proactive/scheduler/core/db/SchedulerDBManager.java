@@ -1162,7 +1162,7 @@ public class SchedulerDBManager {
         Map<Integer, Integer> jobsWithIssuesCount = new TreeMap<>();
         long intervalTime = (endDate - startDate) / numberOfIntervals;
 
-        for (int interval = 0; interval < numberOfIntervals; interval++) {
+        for (int interval = 0; interval < numberOfIntervals && startDate < endDate; interval++) {
             long endTimeInterval = startDate + intervalTime;
             Integer nrOfJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
                                                                     user,
