@@ -33,6 +33,8 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -2112,6 +2114,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
             // overwrite tenant filter if the user only has access to his own tenant
             tenant = ident.getTenant();
+        }
+        if (endDate == -1) {
+            endDate = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         }
         return dbManager.getCompletedJobs(myJobs ? ident.getUsername() : null,
                                           tenant,

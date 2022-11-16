@@ -2192,8 +2192,8 @@ public interface SchedulerRestInterface {
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
-            @QueryParam("enddate") @DefaultValue("0") long endDate,
-            @QueryParam("numberOfIntervals") int numberOfIntervals) throws RestException;
+            @QueryParam("enddate") @DefaultValue("-1") long endDate,
+            @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException;
 
     /**
      * Returns details on job and task execution times for the caller's
