@@ -395,7 +395,7 @@ class CustomCreateStartScripts extends CreateStartScripts {
         generator.mainClassName = getMainClassName()
 
         if (getApplicationName().equals("proactive-server")) {
-            generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8", "-Dresteasy.allowGzip=true", "-Xms4g"]
+            generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8", "-Dresteasy.allowGzip=true", "-Doracle.jdbc.useFetchSizeWithLongColumn=true", "-Xms4g"]
         } else {
             generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8"]
         }
