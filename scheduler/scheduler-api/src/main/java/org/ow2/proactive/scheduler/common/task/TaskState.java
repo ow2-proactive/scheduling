@@ -26,10 +26,7 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,6 +35,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 
@@ -116,13 +114,11 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      *
      * @return the the list of dependences of the task, or null if this task
      *      has been submitted
-     * @throws IllegalStateException if this task was already submitted to the scheduler
      */
     @Override
     @XmlTransient
     public List<Task> getDependencesList() {
-        throw new IllegalStateException("This method cannot be used on a submitted task;" + "use " +
-                                        this.getClass().getCanonicalName() + "#getDependences()");
+        return null;
     }
 
     /**
@@ -429,7 +425,9 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      */
     public Map<String, Serializable> getScopeVariables() {
         Map<String, Serializable> scopeVariables = new HashMap<>();
-        Map<String, String> jobVariables = getTaskInfo().getJobInfo().getVariables();
+        Map<String, String> jobVariables = Optional.ofNullable(getTaskInfo().getJobInfo())
+                                                   .map(JobInfo::getVariables)
+                                                   .orElse(null);
         for (TaskVariable variable : variables.values()) {
             if (!variable.isJobInherited() ||
                 (variable.isJobInherited() &&
@@ -453,7 +451,8 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
                 systemVariables.put(SchedulerVars.PA_TASK_ID.toString(), getId().value());
                 systemVariables.put(SchedulerVars.PA_TASK_NAME.toString(), getName());
             }
-            systemVariables.put(SchedulerVars.PA_USER.toString(), getTaskInfo().getJobInfo().getJobOwner());
+            systemVariables.put(SchedulerVars.PA_USER.toString(),
+                                Optional.ofNullable(getTaskInfo().getJobInfo()).map(JobInfo::getJobOwner).orElse(null));
 
             systemVariables.put(SchedulerVars.PA_TASK_ITERATION.toString(), getIterationIndex());
             systemVariables.put(SchedulerVars.PA_TASK_REPLICATION.toString(), getReplicationIndex());
@@ -486,7 +485,7 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
         Map<String, Serializable> runtimeVariables = getRuntimeVariables();
 
         // Add job generic information
-        if (getTaskInfo().getJobInfo().getGenericInformation() != null) {
+        if (getTaskInfo().getJobInfo() != null && getTaskInfo().getJobInfo().getGenericInformation() != null) {
             runtimeGenericInformation.putAll(applyReplacementsOnGenericInformation(getTaskInfo().getJobInfo()
                                                                                                 .getGenericInformation(),
                                                                                    runtimeVariables));
