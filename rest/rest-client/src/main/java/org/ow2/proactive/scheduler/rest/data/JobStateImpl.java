@@ -124,7 +124,7 @@ public class JobStateImpl extends JobState {
 
     @Override
     public JobType getType() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -134,7 +134,7 @@ public class JobStateImpl extends JobState {
 
     @Override
     public JobPriority getPriority() {
-        return JobPriority.valueOf(jobStateData.getPriority());
+        return JobPriority.findPriority(jobStateData.getPriority());
     }
 
     public JobStateData getJobStateData() {

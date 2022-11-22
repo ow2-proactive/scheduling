@@ -74,6 +74,15 @@ public enum JobPriority implements java.io.Serializable {
     }
 
     /**
+     * Return the name representing the priority.
+     *
+     * @return the name representing the priority.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * Return the integer representing the priority.
      *
      * @return the integer representing the priority.

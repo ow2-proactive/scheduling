@@ -54,7 +54,7 @@ public class TaskStateImpl extends TaskState {
 
     @Override
     public List<TaskState> getDependences() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override

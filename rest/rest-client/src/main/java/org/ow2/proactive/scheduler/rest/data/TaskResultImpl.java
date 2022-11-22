@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.rest.data;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public FlowAction getAction() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -123,7 +124,7 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public Map<String, Serializable> getResultMap() {
-        throw new UnsupportedOperationException();
+        return Collections.emptyMap();
     }
 
     @Override
