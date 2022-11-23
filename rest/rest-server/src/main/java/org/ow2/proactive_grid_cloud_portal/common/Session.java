@@ -41,6 +41,7 @@ import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -215,6 +216,18 @@ public class Session {
     }
 
     public void terminate() {
+        try {
+            if (scheduler.isConnected()) {
+                scheduler.disconnect();
+            }
+        } catch (Exception ignored) {
+        }
+        try {
+            if (rm.isActive().getBooleanValue()) {
+                rm.disconnect();
+            }
+        } catch (Exception ignored) {
+        }
         terminateActiveObject(rm);
         terminateActiveObject(scheduler);
         jobsOutputController.terminate();
