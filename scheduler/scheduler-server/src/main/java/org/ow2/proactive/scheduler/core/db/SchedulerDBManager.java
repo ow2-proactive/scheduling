@@ -925,7 +925,8 @@ public class SchedulerDBManager {
             List<Object[]> list = query.list();
             return list.stream()
                        .map(nameAndCount -> new FilteredTopWorkflow(nameAndCount[0].toString(),
-                                                                    nameAndCount[1].toString(),
+                                                                    nameAndCount[1] != null ? nameAndCount[1].toString()
+                                                                                            : null,
                                                                     Long.parseLong(nameAndCount[2].toString()),
                                                                     Long.parseLong(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
@@ -952,7 +953,8 @@ public class SchedulerDBManager {
             List<Object[]> list = query.list();
             return list.stream()
                        .map(nameAndCount -> new WorkflowDuration(nameAndCount[0].toString(),
-                                                                 nameAndCount[1].toString(),
+                                                                 nameAndCount[1] != null ? nameAndCount[1].toString()
+                                                                                         : null,
                                                                  Math.round(Double.parseDouble(nameAndCount[2].toString())),
                                                                  Long.parseLong(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
@@ -979,7 +981,8 @@ public class SchedulerDBManager {
             List<Object[]> list = query.list();
             return list.stream()
                        .map(nameAndCount -> new WorkflowDuration(nameAndCount[0].toString(),
-                                                                 nameAndCount[1].toString(),
+                                                                 nameAndCount[1] != null ? nameAndCount[1].toString()
+                                                                                         : null,
                                                                  Math.round(Double.parseDouble(nameAndCount[2].toString())),
                                                                  Long.parseLong(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
