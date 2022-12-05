@@ -377,10 +377,12 @@ public class SchedulerDBManager {
             }
             if (Boolean.TRUE.equals(withFailedTasks)) {
                 criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
-                                             Restrictions.gt("numberOfFaultyTasks", 0)));
+                                             Restrictions.gt("numberOfFaultyTasks", 0),
+                                             Restrictions.gt("numberOfInErrorTasks", 0)));
             } else if (Boolean.FALSE.equals(withFailedTasks)) {
                 criteria.add(Restrictions.and(Restrictions.eq("numberOfFailedTasks", 0),
-                                              Restrictions.eq("numberOfFaultyTasks", 0)));
+                                              Restrictions.eq("numberOfFaultyTasks", 0),
+                                              Restrictions.eq("numberOfInErrorTasks", 0)));
             }
             return ((Number) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
         }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
