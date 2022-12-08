@@ -1475,6 +1475,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         InfrastructureManager infrastructureManager = InfrastructureManagerFactory.create(nodeSourceDescriptor);
 
         NodeSourcePolicy notActivePolicy = NodeSourcePolicyFactory.create(nodeSourceDescriptor.getPolicyType());
+        notActivePolicy.configure(nodeSourceDescriptor.getPolicyParameters());
 
         return new NodeSource(this.getUrl(),
                               nodeSourceDescriptor.getName(),
