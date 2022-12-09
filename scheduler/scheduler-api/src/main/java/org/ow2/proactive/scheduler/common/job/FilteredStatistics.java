@@ -43,6 +43,14 @@ public class FilteredStatistics implements Serializable {
 
     private final long pendingJobs;
 
+    private final long currentJobsWithoutIssues;
+
+    private final long runningJobsWithoutIssues;
+
+    private final long pausedJobsWithoutIssues;
+
+    private final long stalledJobsWithoutIssues;
+
     private final long currentJobsWithIssues;
 
     private final long inErrorJobs;
@@ -70,14 +78,20 @@ public class FilteredStatistics implements Serializable {
     private final long successfulRate;
 
     public FilteredStatistics(long currentJobs, long runningJobs, long pausedJobs, long stalledJobs, long pendingJobs,
-            long currentJobsWithIssues, long inErrorJobs, long runningJobsWithIssues, long pausedJobsWithIssues,
-            long stalledJobsWithIssues, long pastJobsWithIssues, long canceledJobs, long killedJobs, long failedJobs,
-            long finishedJobsWithIssues, long successfulJobs, long totalJobs, long successfulRate) {
+            long currentJobsWithoutIssues, long runningJobsWithoutIssues, long pausedJobsWithoutIssues,
+            long stalledJobsWithoutIssues, long currentJobsWithIssues, long inErrorJobs, long runningJobsWithIssues,
+            long pausedJobsWithIssues, long stalledJobsWithIssues, long pastJobsWithIssues, long canceledJobs,
+            long killedJobs, long failedJobs, long finishedJobsWithIssues, long successfulJobs, long totalJobs,
+            long successfulRate) {
         this.currentJobs = currentJobs;
         this.runningJobs = runningJobs;
         this.pausedJobs = pausedJobs;
         this.stalledJobs = stalledJobs;
         this.pendingJobs = pendingJobs;
+        this.currentJobsWithoutIssues = currentJobsWithoutIssues;
+        this.runningJobsWithoutIssues = runningJobsWithoutIssues;
+        this.pausedJobsWithoutIssues = pausedJobsWithoutIssues;
+        this.stalledJobsWithoutIssues = stalledJobsWithoutIssues;
         this.currentJobsWithIssues = currentJobsWithIssues;
         this.inErrorJobs = inErrorJobs;
         this.runningJobsWithIssues = runningJobsWithIssues;
@@ -163,5 +177,21 @@ public class FilteredStatistics implements Serializable {
 
     public long getSuccessfulRate() {
         return successfulRate;
+    }
+
+    public long getCurrentJobsWithoutIssues() {
+        return currentJobsWithoutIssues;
+    }
+
+    public long getRunningJobsWithoutIssues() {
+        return runningJobsWithoutIssues;
+    }
+
+    public long getPausedJobsWithoutIssues() {
+        return pausedJobsWithoutIssues;
+    }
+
+    public long getStalledJobsWithoutIssues() {
+        return stalledJobsWithoutIssues;
     }
 }

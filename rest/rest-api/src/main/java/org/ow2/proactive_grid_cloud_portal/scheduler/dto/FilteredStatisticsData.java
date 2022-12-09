@@ -37,6 +37,14 @@ public class FilteredStatisticsData implements java.io.Serializable {
 
     private long pendingJobs;
 
+    private long currentJobsWithoutIssues;
+
+    private long runningJobsWithoutIssues;
+
+    private long pausedJobsWithoutIssues;
+
+    private long stalledJobsWithoutIssues;
+
     private long currentJobsWithIssues;
 
     private long inErrorJobs;
@@ -207,15 +215,50 @@ public class FilteredStatisticsData implements java.io.Serializable {
         this.successfulRate = successfulRate;
     }
 
+    public long getCurrentJobsWithoutIssues() {
+        return currentJobsWithoutIssues;
+    }
+
+    public void setCurrentJobsWithoutIssues(long currentJobsWithoutIssues) {
+        this.currentJobsWithoutIssues = currentJobsWithoutIssues;
+    }
+
+    public long getRunningJobsWithoutIssues() {
+        return runningJobsWithoutIssues;
+    }
+
+    public void setRunningJobsWithoutIssues(long runningJobsWithoutIssues) {
+        this.runningJobsWithoutIssues = runningJobsWithoutIssues;
+    }
+
+    public long getPausedJobsWithoutIssues() {
+        return pausedJobsWithoutIssues;
+    }
+
+    public void setPausedJobsWithoutIssues(long pausedJobsWithoutIssues) {
+        this.pausedJobsWithoutIssues = pausedJobsWithoutIssues;
+    }
+
+    public long getStalledJobsWithoutIssues() {
+        return stalledJobsWithoutIssues;
+    }
+
+    public void setStalledJobsWithoutIssues(long stalledJobsWithoutIssues) {
+        this.stalledJobsWithoutIssues = stalledJobsWithoutIssues;
+    }
+
     @Override
     public String toString() {
         return "FilteredStatisticsData{" + "currentJobs=" + currentJobs + ", runningJobs=" + runningJobs +
                ", pausedJobs=" + pausedJobs + ", stalledJobs=" + stalledJobs + ", pendingJobs=" + pendingJobs +
-               ", currentJobsWithIssues=" + currentJobsWithIssues + ", inErrorJobs=" + inErrorJobs +
-               ", runningJobsWithIssues=" + runningJobsWithIssues + ", pausedJobsWithIssues=" + pausedJobsWithIssues +
-               ", stalledJobsWithIssues=" + stalledJobsWithIssues + "}, pastJobsWithIssues=" + pastJobsWithIssues +
-               ", canceledJobs=" + canceledJobs + ", killedJobs=" + killedJobs + ", failedJobs=" + failedJobs +
-               ", finishedJobsWithIssues=" + finishedJobsWithIssues + ", successfulJobs=" + successfulJobs +
-               ", totalJobs=" + totalJobs + ", successfulRate=" + successfulRate + '}';
+               ", currentJobsWithoutIssues=" + currentJobsWithoutIssues + ", runningJobsWithoutIssues=" +
+               runningJobsWithoutIssues + ", pausedJobsWithoutIssues=" + pausedJobsWithoutIssues +
+               ", stalledJobsWithoutIssues=" + stalledJobsWithoutIssues + ", currentJobsWithIssues=" +
+               currentJobsWithIssues + ", inErrorJobs=" + inErrorJobs + ", runningJobsWithIssues=" +
+               runningJobsWithIssues + ", pausedJobsWithIssues=" + pausedJobsWithIssues + ", stalledJobsWithIssues=" +
+               stalledJobsWithIssues + ", pastJobsWithIssues=" + pastJobsWithIssues + ", canceledJobs=" + canceledJobs +
+               ", killedJobs=" + killedJobs + ", failedJobs=" + failedJobs + ", finishedJobsWithIssues=" +
+               finishedJobsWithIssues + ", successfulJobs=" + successfulJobs + ", totalJobs=" + totalJobs +
+               ", successfulRate=" + successfulRate + '}';
     }
 }

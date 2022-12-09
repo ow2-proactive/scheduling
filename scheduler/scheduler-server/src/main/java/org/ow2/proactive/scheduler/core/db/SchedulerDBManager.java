@@ -1039,27 +1039,27 @@ public class SchedulerDBManager {
     public FilteredStatistics getFilteredStatistics(final String workflowName, String user, String tenant,
             final long startTime, final long endTime) {
 
-        long runningJobs = getNumberOfFilteredJobs(workflowName,
-                                                   user,
-                                                   tenant,
-                                                   0,
-                                                   0,
-                                                   Collections.singletonList(JobStatus.RUNNING),
-                                                   null);
-        long stalledJobs = getNumberOfFilteredJobs(workflowName,
-                                                   user,
-                                                   tenant,
-                                                   0,
-                                                   0,
-                                                   Collections.singletonList(JobStatus.STALLED),
-                                                   null);
-        long pausedJobs = getNumberOfFilteredJobs(workflowName,
-                                                  user,
-                                                  tenant,
-                                                  0,
-                                                  0,
-                                                  Collections.singletonList(JobStatus.PAUSED),
-                                                  null);
+        long runningJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                user,
+                                                                tenant,
+                                                                0,
+                                                                0,
+                                                                Collections.singletonList(JobStatus.RUNNING),
+                                                                false);
+        long stalledJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                user,
+                                                                tenant,
+                                                                0,
+                                                                0,
+                                                                Collections.singletonList(JobStatus.STALLED),
+                                                                false);
+        long pausedJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                               user,
+                                                               tenant,
+                                                               0,
+                                                               0,
+                                                               Collections.singletonList(JobStatus.PAUSED),
+                                                               false);
         long pendingJobs = getNumberOfFilteredJobs(workflowName,
                                                    user,
                                                    tenant,
@@ -1067,7 +1067,8 @@ public class SchedulerDBManager {
                                                    0,
                                                    Collections.singletonList(JobStatus.PENDING),
                                                    null);
-        long currentJobs = runningJobs + stalledJobs + pausedJobs + pendingJobs;
+        long currentJobsWithoutIssues = runningJobsWithoutIssues + stalledJobsWithoutIssues + pausedJobsWithoutIssues +
+                                        pendingJobs;
 
         long inErrorJobs = getNumberOfFilteredJobs(workflowName,
                                                    user,
@@ -1136,7 +1137,12 @@ public class SchedulerDBManager {
                                                       endTime,
                                                       Collections.singletonList(JobStatus.FINISHED),
                                                       false);
-        long totalJobs = currentJobs + currentJobsWithIssues + pastJobsWithIssues + successfulJobs;
+        long currentJobs = currentJobsWithoutIssues + currentJobsWithIssues;
+        long runningJobs = runningJobsWithoutIssues + runningJobsWithIssues;
+        long pausedJobs = pausedJobsWithoutIssues + pausedJobsWithIssues;
+        long stalledJobs = stalledJobsWithoutIssues + stalledJobsWithIssues;
+
+        long totalJobs = currentJobs + pastJobsWithIssues + successfulJobs;
         long successfulRate = (long) ((float) successfulJobs / (successfulJobs + pastJobsWithIssues) * 100);
 
         return new FilteredStatistics(currentJobs,
@@ -1144,6 +1150,10 @@ public class SchedulerDBManager {
                                       pausedJobs,
                                       stalledJobs,
                                       pendingJobs,
+                                      currentJobsWithoutIssues,
+                                      runningJobsWithoutIssues,
+                                      pausedJobsWithoutIssues,
+                                      stalledJobsWithoutIssues,
                                       currentJobsWithIssues,
                                       inErrorJobs,
                                       runningJobsWithIssues,
