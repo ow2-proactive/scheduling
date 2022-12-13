@@ -25,10 +25,12 @@
  */
 package org.ow2.proactive.scheduler.core.db.types;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.SerializableToBlobType;
 
 import com.google.common.collect.ImmutableSet;
@@ -39,11 +41,11 @@ import com.google.common.collect.ImmutableSet;
  * type used with the current version of the product. It is there for backward
  * compatibility only.
  */
-public class PatternType extends SerializableToBlobType {
+public class PatternType extends SerializableToBlobType<Serializable> {
 
     @Override
-    public Object get(ResultSet rs, String name, SessionImplementor implementor) throws SQLException {
-        Object result = super.get(rs, name, implementor);
+    public Object get(ResultSet rs, String name, SharedSessionContractImplementor session) throws SQLException {
+        Object result = super.get(rs, name, session);
 
         // in the past includes and excludes patterns
         // were stored as String[]
