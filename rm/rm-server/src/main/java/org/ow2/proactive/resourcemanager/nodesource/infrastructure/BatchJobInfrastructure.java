@@ -112,7 +112,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * Additional java options to append to the command executed on the remote
      * host
      */
-    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts", sectionSelector = 3)
+    @Configurable(textArea = true, description = "Options for the java command\nlaunching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
     /**
