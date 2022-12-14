@@ -1930,7 +1930,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                 return publicStore.keySet(SIGNAL_ORIGINATOR,
                                           taskId,
                                           signalsChannel + jobInfo.getJobId().value()) != null;
-            } catch (InvalidChannelException e) {
+            } catch (Exception e) {
             }
             return false;
         }).forEach(jobInfo -> insertJobSignals(jobInfo));
