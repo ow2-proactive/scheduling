@@ -34,6 +34,7 @@ import java.sql.Types;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
@@ -72,7 +73,8 @@ public class BinaryLargeOBject implements UserType {
         return (x == y) || (x != null && y != null && java.util.Arrays.equals((byte[]) x, (byte[]) y));
     }
 
-    public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor s, Object owner)
+    @Override
+    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner)
             throws HibernateException, SQLException {
         /*
          * Blob blob = rs.getBlob(names[0]);
@@ -87,7 +89,8 @@ public class BinaryLargeOBject implements UserType {
 
     }
 
-    public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor s)
+    @Override
+    public void nullSafeSet(PreparedStatement st, Object value, int index, SharedSessionContractImplementor session)
             throws HibernateException, SQLException {
         try {
             st.setBytes(index, ObjectToByteConverter.ObjectStream.convert(value));

@@ -25,12 +25,14 @@
  */
 package org.ow2.proactive.scheduler.core.db.types;
 
+import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.type.SerializableToBlobType;
 
@@ -40,7 +42,7 @@ import org.hibernate.type.SerializableToBlobType;
  * <br>
  * <b>Warning</b>: when reading back the value, a null value will be returned if an empty Map was stored.
  */
-public class NonEmptyMapToBlobType extends SerializableToBlobType {
+public class NonEmptyMapToBlobType extends SerializableToBlobType<Serializable> {
 
     @Override
     public boolean[] toColumnNullness(Object value, Mapping mapping) {
@@ -51,7 +53,8 @@ public class NonEmptyMapToBlobType extends SerializableToBlobType {
     }
 
     @Override
-    public void set(PreparedStatement st, Object value, int index, SessionImplementor session) throws SQLException {
+    public void set(PreparedStatement st, Serializable value, int index, SharedSessionContractImplementor session)
+            throws SQLException {
         if (value instanceof Map && ((Map) value).isEmpty()) {
             st.setNull(index, sqlTypes(null)[0]);
         } else {

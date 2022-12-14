@@ -32,11 +32,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
@@ -45,10 +47,6 @@ import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
@@ -71,7 +69,6 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TimeWindow;
 import org.ow2.proactive.scheduler.common.job.WorkflowDuration;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -251,105 +248,123 @@ public class SchedulerDBManager {
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<Integer> statusRanks = params.getStatusRanks();
         List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
-            Criteria criteria = session.createCriteria(JobData.class);
-            if (limit > 0) {
-                criteria.setMaxResults(limit);
-            }
-            if (offset >= 0) {
-                criteria.setFirstResult(offset);
-            }
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<JobData> criteriaQuery = cb.createQuery(JobData.class);
+            Root<JobData> root = criteriaQuery.from(JobData.class);
+
+            List<Predicate> predicates = new ArrayList<>();
+
             if (user != null && !user.isEmpty()) {
-                criteria.add(Restrictions.eq("owner", user));
+                predicates.add(cb.equal(root.get("owner"), user));
             }
             if (tenant != null && !tenant.isEmpty()) {
                 if (isExplicitTenantFilter) {
-                    criteria.add(Restrictions.eq("tenant", tenant));
+                    predicates.add(cb.equal(root.get("tenant"), tenant));
                 } else {
-                    criteria.add(Restrictions.or(Restrictions.eq("tenant", tenant), Restrictions.isNull("tenant")));
+                    predicates.add(cb.or(cb.equal(root.get("tenant"), tenant), cb.isNull(root.get("tenant"))));
                 }
             }
             if (!childJobs) {
-                criteria.add(Restrictions.isNull("parentId"));
+                predicates.add(cb.isNull(root.get("parentId")));
             }
             if (jobName != null && !jobName.isEmpty()) {
-                criteria.add(Restrictions.like("jobName", jobName, MatchMode.START));
+                predicates.add(cb.like(root.get("jobName"), jobName + "%"));
             }
             if (projectName != null && !projectName.isEmpty()) {
-                criteria.add(Restrictions.like("projectName", projectName, MatchMode.START));
+                predicates.add(cb.like(root.get("projectName"), projectName + "%"));
             }
             if (childJobs && parentId != null && parentId > 0L) {
-                criteria.add(Restrictions.eq("parentId", parentId));
+                predicates.add(cb.equal(root.get("parentId"), parentId));
             }
             boolean allJobs = pending && running && finished;
             if (!allJobs) {
-                criteria.add(Restrictions.in("statusRank", statusRanks));
+                predicates.add(root.get("statusRank").in(statusRanks));
             }
             if (withIssuesOnly) {
-                criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
-                                             Restrictions.gt("numberOfFaultyTasks", 0),
-                                             Restrictions.gt("numberOfInErrorTasks", 0)));
+                predicates.add(cb.or(cb.gt(root.get("numberOfFailedTasks"), 0),
+                                     cb.gt(root.get("numberOfFaultyTasks"), 0),
+                                     cb.gt(root.get("numberOfInErrorTasks"), 0)));
             }
 
+            if (!predicates.isEmpty()) {
+                criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
+            } else {
+                criteriaQuery.select(root);
+            }
+
+            List<javax.persistence.criteria.Order> orders = new ArrayList<>();
             if (sortParameters != null) {
-                Order sortOrder;
+                javax.persistence.criteria.Order sortOrder;
                 for (SortParameter<JobSortParameter> param : sortParameters) {
                     switch (param.getParameter()) {
                         case ID:
-                            sortOrder = configureSortOrder(param, Property.forName("id"));
+                            sortOrder = configureSortOrder(cb, root, param, "id");
                             break;
                         case NAME:
-                            sortOrder = configureSortOrder(param, Property.forName("jobName"));
+                            sortOrder = configureSortOrder(cb, root, param, "jobName");
                             break;
                         case OWNER:
-                            sortOrder = configureSortOrder(param, Property.forName("owner"));
+                            sortOrder = configureSortOrder(cb, root, param, "owner");
                             break;
                         case PRIORITY:
-                            sortOrder = configureSortOrder(param, Property.forName("priority"));
+                            sortOrder = configureSortOrder(cb, root, param, "priority");
                             break;
                         case STATE:
-                            sortOrder = configureSortOrder(param, Property.forName("statusRank"));
+                            sortOrder = configureSortOrder(cb, root, param, "statusRank");
                             break;
                         case SUBMIT_TIME:
-                            sortOrder = configureSortOrder(param, Property.forName("submittedTime"));
+                            sortOrder = configureSortOrder(cb, root, param, "submittedTime");
                             break;
                         case START_TIME:
-                            sortOrder = configureSortOrder(param, Property.forName("startTime"));
+                            sortOrder = configureSortOrder(cb, root, param, "startTime");
                             break;
                         case FINISH_TIME:
-                            sortOrder = configureSortOrder(param, Property.forName("finishedTime"));
+                            sortOrder = configureSortOrder(cb, root, param, "finishedTime");
                             break;
                         case IN_ERROR_TIME:
-                            sortOrder = configureSortOrder(param, Property.forName("finishedTime"));
+                            sortOrder = configureSortOrder(cb, root, param, "finishedTime");
                             break;
                         case TOTAL_TASKS:
-                            sortOrder = configureSortOrder(param, Property.forName("totalNumberOfTasks"));
+                            sortOrder = configureSortOrder(cb, root, param, "totalNumberOfTasks");
                             break;
                         case PENDING_TASKS:
-                            sortOrder = configureSortOrder(param, Property.forName("numberOfPendingTasks"));
+                            sortOrder = configureSortOrder(cb, root, param, "numberOfPendingTasks");
                             break;
                         case RUNNING_TASKS:
-                            sortOrder = configureSortOrder(param, Property.forName("numberOfRunningTasks"));
+                            sortOrder = configureSortOrder(cb, root, param, "numberOfRunningTasks");
                             break;
                         case IN_ERROR_TASKS:
-                            sortOrder = configureSortOrder(param, Property.forName("numberOfInErrorTasks"));
+                            sortOrder = configureSortOrder(cb, root, param, "numberOfInErrorTasks");
                             break;
                         case FINISHED_TASKS:
-                            sortOrder = configureSortOrder(param, Property.forName("numberOfFinishedTasks"));
+                            sortOrder = configureSortOrder(cb, root, param, "numberOfFinishedTasks");
                             break;
                         case FAULTY_TASKS:
-                            sortOrder = configureSortOrder(param, Property.forName("numberOfFaultyTasks"));
+                            sortOrder = configureSortOrder(cb, root, param, "numberOfFaultyTasks");
                             break;
                         case FAILED_TASKS:
-                            sortOrder = configureSortOrder(param, Property.forName("numberOfFailedTasks"));
+                            sortOrder = configureSortOrder(cb, root, param, "numberOfFailedTasks");
                             break;
                         default:
                             throw new IllegalArgumentException("Unsupported sort parameter: " + param.getParameter());
                     }
-                    criteria.addOrder(sortOrder);
+                    orders.add(sortOrder);
                 }
             }
+            if (!orders.isEmpty()) {
+                criteriaQuery.orderBy(orders);
+            }
 
-            List<JobData> jobsList = criteria.list();
+            org.hibernate.query.Query<JobData> query = session.createQuery(criteriaQuery);
+
+            if (limit > 0) {
+                query.setMaxResults(limit);
+            }
+            if (offset >= 0) {
+                query.setFirstResult(offset);
+            }
+
+            List<JobData> jobsList = query.list();
             return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
         }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
 
@@ -360,31 +375,40 @@ public class SchedulerDBManager {
             final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
 
         return executeReadOnlyTransaction(session -> {
-            Criteria criteria = session.createCriteria(JobData.class);
-            criteria.add(Restrictions.in("status", statuses));
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
+            Root<JobData> root = criteriaQuery.from(JobData.class);
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(root.get("status").in(statuses));
             if (StringUtils.isNotEmpty(user)) {
-                criteria.add(Restrictions.eq("owner", user));
+                predicates.add(cb.equal(root.get("owner"), user));
                 if (StringUtils.isNotEmpty(tenant)) {
-                    criteria.add(Restrictions.or(Restrictions.eq("tenant", tenant), Restrictions.isNull("tenant")));
+                    predicates.add(cb.or(cb.equal(root.get("tenant"), tenant), cb.isNull(root.get("tenant"))));
                 }
             }
             if (StringUtils.isNotEmpty(workflowName)) {
-                criteria.add(Restrictions.like("jobName", workflowName, MatchMode.START));
+                predicates.add(cb.like(root.get("jobName"), workflowName + "%"));
             }
             if (startTime != 0 && endTime != 0) {
-                criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startTime),
-                                              Restrictions.lt("finishedTime", endTime)));
+                predicates.add(cb.and(cb.ge(root.get("finishedTime"), startTime),
+                                      cb.lt(root.get("finishedTime"), endTime)));
             }
             if (Boolean.TRUE.equals(withFailedTasks)) {
-                criteria.add(Restrictions.or(Restrictions.gt("numberOfFailedTasks", 0),
-                                             Restrictions.gt("numberOfFaultyTasks", 0),
-                                             Restrictions.gt("numberOfInErrorTasks", 0)));
+                predicates.add(cb.or(cb.gt(root.get("numberOfFailedTasks"), 0),
+                                     cb.gt(root.get("numberOfFaultyTasks"), 0),
+                                     cb.gt(root.get("numberOfInErrorTasks"), 0)));
             } else if (Boolean.FALSE.equals(withFailedTasks)) {
-                criteria.add(Restrictions.and(Restrictions.eq("numberOfFailedTasks", 0),
-                                              Restrictions.eq("numberOfFaultyTasks", 0),
-                                              Restrictions.eq("numberOfInErrorTasks", 0)));
+                predicates.add(cb.and(cb.equal(root.get("numberOfFailedTasks"), 0),
+                                      cb.equal(root.get("numberOfFaultyTasks"), 0),
+                                      cb.equal(root.get("numberOfInErrorTasks"), 0)));
             }
-            return ((Number) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
+            if (!predicates.isEmpty()) {
+                criteriaQuery.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
+            } else {
+                criteriaQuery.select(cb.count(root));
+            }
+            org.hibernate.query.Query<Long> query = session.createQuery(criteriaQuery);
+            return query.getSingleResult().intValue();
         }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
     }
 
@@ -395,11 +419,16 @@ public class SchedulerDBManager {
         List<List<Long>> jobIdSubSets = Lists.partition(longJobIds, MAX_ITEMS_IN_LIST);
         for (List<Long> jobIdSubList : jobIdSubSets) {
             jobsList.addAll(executeReadOnlyTransaction(session -> {
-                Criteria criteria = session.createCriteria(JobData.class);
+                CriteriaBuilder cb = session.getCriteriaBuilder();
+                CriteriaQuery<JobData> criteriaQuery = cb.createQuery(JobData.class);
+                Root<JobData> root = criteriaQuery.from(JobData.class);
                 if (!jobIdSubList.isEmpty()) {
-                    criteria.add(Restrictions.in("id", jobIdSubList));
+                    criteriaQuery.select(root).where(root.in("id", jobIdSubList));
+                } else {
+                    criteriaQuery.select(root);
                 }
-                List<JobData> subJobsList = criteria.list();
+                org.hibernate.query.Query<JobData> query = session.createQuery(criteriaQuery);
+                List<JobData> subJobsList = query.getResultList();
                 return subJobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
             }));
         }
@@ -525,11 +554,12 @@ public class SchedulerDBManager {
         });
     }
 
-    private Order configureSortOrder(SortParameter<JobSortParameter> param, Property property) {
+    private javax.persistence.criteria.Order configureSortOrder(CriteriaBuilder criteriaBuilder, Root<JobData> root,
+            SortParameter<JobSortParameter> param, String field) {
         if (param.getSortOrder().isAscending()) {
-            return property.asc();
+            return criteriaBuilder.asc(root.get(field));
         } else {
-            return property.desc();
+            return criteriaBuilder.desc(root.get(field));
         }
     }
 
@@ -2125,7 +2155,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                   .setParameter("preciousTasks", job.getPreciousTasksFinished())
+                   .setParameter("preciousTasks", ObjectByteConverter.serializeList(job.getPreciousTasksFinished()))
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
