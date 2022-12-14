@@ -97,7 +97,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * Additional java options to append to the command executed on the remote
      * host
      */
-    @Configurable(textArea = true, description = "Options for the java command\nlaunching the node on the remote hosts", sectionSelector = 3)
+    @Configurable(textAreaOneLine = true, description = "Options for the java command\nlaunching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
     /**

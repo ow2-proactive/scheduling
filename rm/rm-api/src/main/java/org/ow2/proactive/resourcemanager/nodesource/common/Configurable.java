@@ -70,6 +70,11 @@ public @interface Configurable {
     boolean textArea() default false;
 
     /**
+     * Field is a multiline text area that does not allow new lines.
+     */
+    boolean textAreaOneLine() default false;
+
+    /**
      * Field is a checkbox
      */
     boolean checkbox() default false;
