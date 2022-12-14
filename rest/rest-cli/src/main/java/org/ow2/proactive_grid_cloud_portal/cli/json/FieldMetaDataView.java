@@ -38,6 +38,8 @@ public class FieldMetaDataView {
 
         TEXTAREA("textArea"),
 
+        TEXTAREAONELINE("textAreaOneLine"),
+
         CHECKBOX("checkbox");
 
         private String name;
