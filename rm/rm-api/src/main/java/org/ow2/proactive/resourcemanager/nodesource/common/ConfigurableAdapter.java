@@ -53,6 +53,7 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
         PASSWORD("password"),
         FILEBROWSER("fileBrowser"),
         TEXTAREA("textArea"),
+        TEXTAREAONELINE("textAreaOneLine"),
         CHECKBOX("checkbox"),
         NONE("none");
 
@@ -108,6 +109,8 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
             type = ConfigurableValues.FILEBROWSER;
         } else if (arg0.textArea()) {
             type = ConfigurableValues.TEXTAREA;
+        } else if (arg0.textAreaOneLine()) {
+            type = ConfigurableValues.TEXTAREAONELINE;
         } else if (arg0.checkbox()) {
             type = ConfigurableValues.CHECKBOX;
         } else {
@@ -157,6 +160,11 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
             @Override
             public boolean textArea() {
                 return arg0.type == ConfigurableValues.TEXTAREA;
+            }
+
+            @Override
+            public boolean textAreaOneLine() {
+                return arg0.type == ConfigurableValues.TEXTAREAONELINE;
             }
 
             @Override
