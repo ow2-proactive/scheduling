@@ -423,7 +423,12 @@ public class SchedulerDBManager {
                 CriteriaQuery<JobData> criteriaQuery = cb.createQuery(JobData.class);
                 Root<JobData> root = criteriaQuery.from(JobData.class);
                 if (!jobIdSubList.isEmpty()) {
-                    criteriaQuery.select(root).where(root.in("id", jobIdSubList));
+                    criteriaQuery.select(root);
+                    CriteriaBuilder.In<Long> inExpression = cb.in(root.get("id"));
+                    for (Long jobIdToInclude : jobIdSubList) {
+                        inExpression.value(jobIdToInclude);
+                    }
+                    criteriaQuery.where(inExpression);
                 } else {
                     criteriaQuery.select(root);
                 }
@@ -1698,7 +1703,7 @@ public class SchedulerDBManager {
                    .setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                   .setParameter("preciousTasks", jobInfo.getPreciousTasks())
+                   .setParameter("preciousTasks", ObjectByteConverter.serializeList(jobInfo.getPreciousTasks()))
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
@@ -1787,7 +1792,8 @@ public class SchedulerDBManager {
                                .setParameter("lastUpdatedTime", new Date().getTime())
                                .setParameter("resultMap",
                                              ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                               .setParameter("preciousTasks", job.getPreciousTasksFinished())
+                               .setParameter("preciousTasks",
+                                             ObjectByteConverter.serializeList(job.getPreciousTasksFinished()))
                                .setParameter("jobId", jobId)
                                .executeUpdate();
 
@@ -1875,7 +1881,8 @@ public class SchedulerDBManager {
                                         .setParameter("lastUpdatedTime", new Date().getTime())
                                         .setParameter("resultMap",
                                                       ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                                        .setParameter("preciousTasks", job.getPreciousTasksFinished())
+                                        .setParameter("preciousTasks",
+                                                      ObjectByteConverter.serializeList(job.getPreciousTasksFinished()))
                                         .setParameter("jobId", jobId)
                                         .executeUpdate();
                     if (result != 0) {
