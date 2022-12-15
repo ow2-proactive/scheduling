@@ -71,7 +71,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost", sectionSelector = 3)
     private long nodeTimeout = DEFAULT_TIMEOUT;
 
-    @Configurable(description = "Additional ProActive properties", sectionSelector = 3)
+    @Configurable(textAreaOneLine = true, description = "Additional ProActive properties", sectionSelector = 3)
     private String paProperties = "";
 
     private Map<String, String> meta = new HashMap<>();
