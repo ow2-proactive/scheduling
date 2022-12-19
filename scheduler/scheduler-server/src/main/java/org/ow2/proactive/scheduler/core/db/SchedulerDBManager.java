@@ -50,6 +50,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
+import org.hibernate.type.SerializableToBlobType;
 import org.hibernate.type.StandardBasicTypes;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
@@ -1704,9 +1705,7 @@ public class SchedulerDBManager {
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                    // the following distinction is necessary as hsqldb has some issue with its hibernate dialect without visible fix
-                   .setParameter("preciousTasks",
-                                 IS_HSQLDB ? ObjectByteConverter.serializeList(jobInfo.getPreciousTasks())
-                                           : jobInfo.getPreciousTasks())
+                   .setParameter("preciousTasks", jobInfo.getPreciousTasks(), new SerializableToBlobType())
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
@@ -1797,8 +1796,8 @@ public class SchedulerDBManager {
                                              ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                                // the following distinction is necessary as hsqldb has some issue with its hibernate dialect without visible fix
                                .setParameter("preciousTasks",
-                                             IS_HSQLDB ? ObjectByteConverter.serializeList(job.getPreciousTasksFinished())
-                                                       : job.getPreciousTasksFinished())
+                                             job.getPreciousTasksFinished(),
+                                             new SerializableToBlobType())
                                .setParameter("jobId", jobId)
                                .executeUpdate();
 
@@ -1888,8 +1887,8 @@ public class SchedulerDBManager {
                                                       ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                                         // the following distinction is necessary as hsqldb has some issue with its hibernate dialect without visible fix
                                         .setParameter("preciousTasks",
-                                                      IS_HSQLDB ? ObjectByteConverter.serializeList(job.getPreciousTasksFinished())
-                                                                : job.getPreciousTasksFinished())
+                                                      job.getPreciousTasksFinished(),
+                                                      new SerializableToBlobType())
                                         .setParameter("jobId", jobId)
                                         .executeUpdate();
                     if (result != 0) {
@@ -2170,9 +2169,7 @@ public class SchedulerDBManager {
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                    // the following distinction is necessary as hsqldb has some issue with its hibernate dialect without visible fix
-                   .setParameter("preciousTasks",
-                                 IS_HSQLDB ? ObjectByteConverter.serializeList(job.getPreciousTasksFinished())
-                                           : job.getPreciousTasksFinished())
+                   .setParameter("preciousTasks", job.getPreciousTasksFinished(), new SerializableToBlobType())
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
