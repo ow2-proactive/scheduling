@@ -97,6 +97,11 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract boolean isAllJobPlannerPermission();
 
     /**
+     * Check if the user has permission to handle only its jobs
+     */
+    public abstract boolean isHandleOnlyMyJobsPermission();
+
+    /**
      * Return the tenant associated with the current user, or null if no tenant is associated
      *
      * @return user tenant
