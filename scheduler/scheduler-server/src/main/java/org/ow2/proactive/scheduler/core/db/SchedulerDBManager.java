@@ -1053,7 +1053,9 @@ public class SchedulerDBManager {
         queryString.append(subQueryGroupByStatement);
 
         Query query = session.createQuery(queryString.toString());
-        query.setMaxResults(numberOfWorkflows);
+        if (numberOfWorkflows > 0) {
+            query.setMaxResults(numberOfWorkflows);
+        }
         if (hasWorkflowName) {
             query.setParameter("workflowName", workflowName);
         }
@@ -1704,7 +1706,7 @@ public class SchedulerDBManager {
                    .setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                   // the following distinction is necessary as hsqldb has some issue with its hibernate dialect without visible fix
+                   // the following forces hibernate 5.2 to use the proper conversion for list of strings Lob parameters
                    .setParameter("preciousTasks", jobInfo.getPreciousTasks(), new SerializableToBlobType())
                    .setParameter("jobId", jobId)
                    .executeUpdate();
@@ -1794,7 +1796,7 @@ public class SchedulerDBManager {
                                .setParameter("lastUpdatedTime", new Date().getTime())
                                .setParameter("resultMap",
                                              ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                               // the following distinction is necessary as hsqldb has some issue with its hibernate dialect without visible fix
+                               // the following forces hibernate 5.2 to use the proper conversion for list of strings Lob parameters
                                .setParameter("preciousTasks",
                                              job.getPreciousTasksFinished(),
                                              new SerializableToBlobType())
@@ -1885,7 +1887,7 @@ public class SchedulerDBManager {
                                         .setParameter("lastUpdatedTime", new Date().getTime())
                                         .setParameter("resultMap",
                                                       ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                                        // the following distinction is necessary as hsqldb has some issue with its hibernate dialect without visible fix
+                                        // the following forces hibernate 5.2 to use the proper conversion for list of strings Lob parameters
                                         .setParameter("preciousTasks",
                                                       job.getPreciousTasksFinished(),
                                                       new SerializableToBlobType())
@@ -2168,7 +2170,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                   // the following distinction is necessary as hsqldb has some issue with its hibernate dialect without visible fix
+                   // the following forces hibernate 5.2 to use the proper conversion for list of strings Lob parameters
                    .setParameter("preciousTasks", job.getPreciousTasksFinished(), new SerializableToBlobType())
                    .setParameter("jobId", jobId)
                    .executeUpdate();
