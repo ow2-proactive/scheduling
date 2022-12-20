@@ -91,6 +91,11 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isHandleOnlyMyJobsPermission() {
+        return false;
+    }
+
+    @Override
     public int getSubmitNumber() {
         return submitNumber;
     }

@@ -53,6 +53,8 @@ public class UserData implements Serializable {
 
     private boolean allJobPlannerPermission;
 
+    private boolean handleOnlyMyJobsPermission;
+
     public boolean isAllJobPlannerPermission() {
         return allJobPlannerPermission;
     }
@@ -99,5 +101,13 @@ public class UserData implements Serializable {
 
     public void setAllTenantPermission(boolean allTenantPermission) {
         this.allTenantPermission = allTenantPermission;
+    }
+
+    public boolean isHandleOnlyMyJobsPermission() {
+        return handleOnlyMyJobsPermission;
+    }
+
+    public void setHandleOnlyMyJobsPermission(boolean handleOnlyMyJobsPermission) {
+        this.handleOnlyMyJobsPermission = handleOnlyMyJobsPermission;
     }
 }
