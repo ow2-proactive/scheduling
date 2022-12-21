@@ -96,18 +96,22 @@ public class TaskDBUtils {
     }
 
     private static List<TaskData> fetchTaskData(Session session, DBTaskDataParameters params) {
-        return getQuery(session,
-                        params,
-                        params.getStatus(),
-                        params.hasUser(),
-                        params.hasTenant(),
-                        params.hasTag(),
-                        params.hasDateFrom(),
-                        params.hasDateTo(),
-                        params.getSortParams(),
-                        "select T from TaskData T where ").setMaxResults(params.getLimit())
-                                                          .setFirstResult(params.getOffset())
-                                                          .list();
+        Query query = getQuery(session,
+                               params,
+                               params.getStatus(),
+                               params.hasUser(),
+                               params.hasTenant(),
+                               params.hasTag(),
+                               params.hasDateFrom(),
+                               params.hasDateTo(),
+                               params.getSortParams(),
+                               "select T from TaskData T where ");
+        // since hibernate 5.2.6 a limit of 0 return no result (vs unlimited before)
+        if (params.getLimit() > 0) {
+            return query.setMaxResults(params.getLimit()).setFirstResult(params.getOffset()).list();
+        } else {
+            return query.setFirstResult(params.getOffset()).list();
+        }
     }
 
     private static Query getQuery(Session session, DBTaskDataParameters params, Set<TaskStatus> taskStatuses,
