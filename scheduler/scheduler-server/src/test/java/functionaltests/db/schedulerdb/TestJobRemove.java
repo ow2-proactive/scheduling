@@ -27,6 +27,7 @@ package functionaltests.db.schedulerdb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,7 +36,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.hibernate.Session;
-import org.hibernate.metadata.ClassMetadata;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -59,7 +59,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 
 import com.google.common.collect.ImmutableSet;
 
-import groovy.lang.IntRange;
+import javax.persistence.metamodel.EntityType;
 
 
 public class TestJobRemove extends BaseSchedulerDBTest {
@@ -349,11 +349,14 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
         Session session = dbManager.getSessionFactory().openSession();
         try {
-            for (ClassMetadata metadata : session.getSessionFactory().getAllClassMetadata().values()) {
-                if (!skip.contains(metadata.getEntityName())) {
-                    System.out.println("Check " + metadata.getEntityName());
-                    List<Object> list = session.createCriteria(metadata.getEntityName()).list();
-                    Assert.assertEquals("Unexpected " + metadata.getEntityName(), 0, list.size());
+            for (Class entity : session.getSessionFactory().getMetamodel().getEntities().stream()
+                    .map(EntityType::getJavaType)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList())) {
+                if (!skip.contains(entity.getName())) {
+                    System.out.println("Check " + entity.getName());
+                    List<Object> list = session.createCriteria(entity).list();
+                    Assert.assertEquals("Unexpected " + entity.getName(), 0, list.size());
                 }
             }
         } finally {
