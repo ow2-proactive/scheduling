@@ -35,6 +35,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.persistence.metamodel.EntityType;
+
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,8 +60,6 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 
 import com.google.common.collect.ImmutableSet;
-
-import javax.persistence.metamodel.EntityType;
 
 
 public class TestJobRemove extends BaseSchedulerDBTest {
@@ -349,10 +349,13 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
         Session session = dbManager.getSessionFactory().openSession();
         try {
-            for (Class entity : session.getSessionFactory().getMetamodel().getEntities().stream()
-                    .map(EntityType::getJavaType)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList())) {
+            for (Class entity : session.getSessionFactory()
+                                       .getMetamodel()
+                                       .getEntities()
+                                       .stream()
+                                       .map(EntityType::getJavaType)
+                                       .filter(Objects::nonNull)
+                                       .collect(Collectors.toList())) {
                 if (!skip.contains(entity.getName())) {
                     System.out.println("Check " + entity.getName());
                     List<Object> list = session.createCriteria(entity).list();
