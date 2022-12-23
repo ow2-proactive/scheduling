@@ -77,18 +77,34 @@ public class CatalogObjectParserValidator extends BaseParserValidator<String> {
 
         String kind = "";
         String contentType = "";
-        if (splitParameters.length == 1) {
-            kind = splitParameters[0].trim();
-        } else if (splitParameters.length == 2) {
-            kind = splitParameters[0].trim();
-            contentType = splitParameters[1].trim();
-        } else {
-            throw new ModelSyntaxException(String.format("Illegal parameters format for the model [%s], the model CATALOG_OBJECT can have at most two parameters: kind and content type, split by comma.",
-                                                         model));
+        String bucketName = "";
+        String objectName = "";
+        switch (splitParameters.length) {
+            case 1:
+                kind = splitParameters[0].trim();
+                break;
+            case 2:
+                kind = splitParameters[0].trim();
+                contentType = splitParameters[1].trim();
+                break;
+            case 3:
+                kind = splitParameters[0].trim();
+                contentType = splitParameters[1].trim();
+                bucketName = splitParameters[2].trim();
+                break;
+            case 4:
+                kind = splitParameters[0].trim();
+                contentType = splitParameters[1].trim();
+                bucketName = splitParameters[2].trim();
+                objectName = splitParameters[3].trim();
+                break;
+            default:
+                throw new ModelSyntaxException(String.format("Illegal parameters format for the model [%s], the model CATALOG_OBJECT can have at most two parameters: kind and content type, split by comma.",
+                                                             model));
         }
 
         try {
-            return new CatalogObjectValidator(kind, contentType);
+            return new CatalogObjectValidator(kind, contentType, bucketName, objectName);
         } catch (ParseException e) {
             throw new ModelSyntaxException(e.getMessage(), e);
         }

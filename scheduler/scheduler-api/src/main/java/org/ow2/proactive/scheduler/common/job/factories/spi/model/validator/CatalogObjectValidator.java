@@ -66,13 +66,19 @@ public class CatalogObjectValidator implements Validator<String> {
 
     private final String expectedContentType;
 
+    private final String expectedBucketName;
+
+    private final String expectedObjectName;
+
     public CatalogObjectValidator() {
-        this("", "");
+        this("", "", "", "");
     }
 
-    public CatalogObjectValidator(String kind, String contentType) {
+    public CatalogObjectValidator(String kind, String contentType, String bucketName, String objectName) {
         this.expectedKind = kind;
         this.expectedContentType = contentType;
+        this.expectedBucketName = bucketName;
+        this.expectedObjectName = objectName;
     }
 
     @Override
@@ -173,6 +179,26 @@ public class CatalogObjectValidator implements Validator<String> {
                 throw new ValidationException(String.format("Catalog object [%s] does not match the expected content type [%s].",
                                                             catalogObjectValue,
                                                             expectedContentType));
+            }
+        }
+        if (StringUtils.isNotEmpty(expectedBucketName)) {
+            String catalogObjBucketName = jsonNode.path("bucket_name").asText();
+            if (!catalogObjBucketName.contains(expectedBucketName) ||
+                (expectedBucketName.startsWith("%") && !catalogObjBucketName.startsWith(expectedBucketName)) ||
+                (expectedBucketName.endsWith("%") && !catalogObjBucketName.endsWith(expectedBucketName))) {
+                throw new ValidationException(String.format("Catalog object [%s] does not match the expected bucket name [%s].",
+                                                            catalogObjectValue,
+                                                            expectedBucketName));
+            }
+        }
+        if (StringUtils.isNotEmpty(expectedObjectName)) {
+            String catalogObjName = jsonNode.path("name").asText();
+            if (!catalogObjName.contains(expectedObjectName) ||
+                (expectedObjectName.startsWith("%") && !catalogObjName.startsWith(expectedObjectName)) ||
+                (expectedObjectName.endsWith("%") && !catalogObjName.endsWith(expectedObjectName))) {
+                throw new ValidationException(String.format("Catalog object [%s] does not match the expected name [%s].",
+                                                            catalogObjectValue,
+                                                            expectedObjectName));
             }
         }
         return true;
