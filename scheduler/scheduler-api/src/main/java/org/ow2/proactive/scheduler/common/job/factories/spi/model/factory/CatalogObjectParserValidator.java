@@ -99,7 +99,7 @@ public class CatalogObjectParserValidator extends BaseParserValidator<String> {
                 objectName = splitParameters[3].trim();
                 break;
             default:
-                throw new ModelSyntaxException(String.format("Illegal parameters format for the model [%s], the model CATALOG_OBJECT can have at most two parameters: kind and content type, split by comma.",
+                throw new ModelSyntaxException(String.format("Illegal parameters format for the model [%s], the model CATALOG_OBJECT can have at most four parameters: kind, content type, bucket name and object name, split by comma.",
                                                              model));
         }
 
