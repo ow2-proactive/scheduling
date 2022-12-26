@@ -212,9 +212,11 @@ public class CatalogObjectValidator implements Validator<String> {
         return true;
     }
 
-    private boolean matchExpectedName(String name, String expectedName) {
+    static boolean matchExpectedName(String name, String expectedName) {
         return (name.contains(expectedName.replace("%", "")) &&
-                !(expectedName.startsWith("%") && !name.startsWith(expectedName.replace("%", ""))) &&
-                !(expectedName.endsWith("%") && !name.endsWith(expectedName.replace("%", ""))));
+                !(expectedName.startsWith("%") && !expectedName.endsWith("%") &&
+                  !name.endsWith(expectedName.replace("%", ""))) &&
+                !(expectedName.endsWith("%") && !expectedName.startsWith("%") &&
+                  !name.startsWith(expectedName.replace("%", ""))));
     }
 }
