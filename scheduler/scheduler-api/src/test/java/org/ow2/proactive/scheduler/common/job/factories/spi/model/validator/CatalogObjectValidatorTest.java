@@ -67,6 +67,12 @@ public class CatalogObjectValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testCatalogObjectWithValidBucket() throws ValidationException {
+        String value = " bucket_2";
+        new CatalogObjectValidator().validate(value, null, false);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testCatalogObjectWithShortRevisionNumber() throws ValidationException {
         String value = " bucket_1/object10/123445";
         new CatalogObjectValidator().validate(value, null, false);

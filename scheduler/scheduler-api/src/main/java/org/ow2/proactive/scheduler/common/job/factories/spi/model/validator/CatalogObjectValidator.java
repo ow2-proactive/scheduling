@@ -183,9 +183,7 @@ public class CatalogObjectValidator implements Validator<String> {
         }
         if (StringUtils.isNotEmpty(expectedBucketName)) {
             String catalogObjBucketName = jsonNode.path("bucket_name").asText();
-            if (!catalogObjBucketName.contains(expectedBucketName) ||
-                (expectedBucketName.startsWith("%") && !catalogObjBucketName.startsWith(expectedBucketName)) ||
-                (expectedBucketName.endsWith("%") && !catalogObjBucketName.endsWith(expectedBucketName))) {
+            if (!matchesExpected(catalogObjBucketName, expectedBucketName)) {
                 throw new ValidationException(String.format("Catalog object [%s] does not match the expected bucket name [%s].",
                                                             catalogObjectValue,
                                                             expectedBucketName));
@@ -193,14 +191,18 @@ public class CatalogObjectValidator implements Validator<String> {
         }
         if (StringUtils.isNotEmpty(expectedObjectName)) {
             String catalogObjName = jsonNode.path("name").asText();
-            if (!catalogObjName.contains(expectedObjectName) ||
-                (expectedObjectName.startsWith("%") && !catalogObjName.startsWith(expectedObjectName)) ||
-                (expectedObjectName.endsWith("%") && !catalogObjName.endsWith(expectedObjectName))) {
+            if (!matchesExpected(catalogObjName, expectedObjectName)) {
                 throw new ValidationException(String.format("Catalog object [%s] does not match the expected name [%s].",
                                                             catalogObjectValue,
                                                             expectedObjectName));
             }
         }
         return true;
+    }
+
+    private boolean matchesExpected(String name, String expectedName) {
+        return (name.contains(expectedName.replace("%", "")) &&
+                !(expectedName.startsWith("%") && !name.startsWith(expectedName.replace("%", ""))) &&
+                !(expectedName.endsWith("%") && !name.endsWith(expectedName.replace("%", ""))));
     }
 }
