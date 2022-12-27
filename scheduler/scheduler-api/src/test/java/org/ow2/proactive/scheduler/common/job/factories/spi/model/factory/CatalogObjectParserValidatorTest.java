@@ -70,11 +70,20 @@ public class CatalogObjectParserValidatorTest {
         Assert.assertEquals(validValue, new CatalogObjectParserValidator(model).parseAndValidate(validValue));
     }
 
+    @Test
+    public void testCatalogObjectParserValidatorOKWithBucketAndName()
+            throws ModelSyntaxException, ValidationException, ConversionException {
+        String validValue = "bucket_1/object10/1539310165443";
+        String model = ModelType.CATALOG_OBJECT.name() + "(,,bucket_1,object10)";
+        Assert.assertEquals(validValue, new CatalogObjectParserValidator(model).parseAndValidate(validValue));
+    }
+
     @Test(expected = ModelSyntaxException.class)
     public void testCatalogObjectParserValidatorKOWithTooManyParametersInModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
         String validValue = "bucket_1/object10/1539310165443";
-        String model = ModelType.CATALOG_OBJECT.name() + "(Workflow/standard,application/xml,extraParameter)";
+        String model = ModelType.CATALOG_OBJECT.name() +
+                       "(Workflow/standard,application/xml,bucket_1,object10,extraParameter)";
         Assert.assertEquals(validValue, new CatalogObjectParserValidator(model).parseAndValidate(validValue));
     }
 

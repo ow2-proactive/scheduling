@@ -66,13 +66,19 @@ public class CatalogObjectValidator implements Validator<String> {
 
     private final String expectedContentType;
 
+    private final String expectedBucketName;
+
+    private final String expectedObjectName;
+
     public CatalogObjectValidator() {
-        this("", "");
+        this("", "", "", "");
     }
 
-    public CatalogObjectValidator(String kind, String contentType) {
+    public CatalogObjectValidator(String kind, String contentType, String bucketName, String objectName) {
         this.expectedKind = kind;
         this.expectedContentType = contentType;
+        this.expectedBucketName = bucketName;
+        this.expectedObjectName = objectName;
     }
 
     @Override
@@ -131,7 +137,8 @@ public class CatalogObjectValidator implements Validator<String> {
                                                                                             .getResponse(sessionId,
                                                                                                          url,
                                                                                                          true);
-        return analyseResponseCode(response) && matchKindAndContentType(response, catalogObjectValue);
+        return analyseResponseCode(response) && matchKindAndContentType(response, catalogObjectValue) &&
+               matchBucketAndObjectName(response, catalogObjectValue);
     }
 
     private boolean analyseResponseCode(CommonHttpResourceDownloader.ResponseContent response)
@@ -176,5 +183,40 @@ public class CatalogObjectValidator implements Validator<String> {
             }
         }
         return true;
+    }
+
+    private boolean matchBucketAndObjectName(CommonHttpResourceDownloader.ResponseContent response,
+            String catalogObjectValue) throws IOException, ValidationException {
+        if (expectedBucketName.isEmpty() && expectedObjectName.isEmpty()) {
+            return true;
+        }
+
+        JsonNode jsonNode = new ObjectMapper().readTree(response.getContent());
+
+        if (StringUtils.isNotEmpty(expectedBucketName)) {
+            String catalogObjBucketName = jsonNode.path("bucket_name").asText();
+            if (!matchExpectedName(catalogObjBucketName, expectedBucketName)) {
+                throw new ValidationException(String.format("Catalog object [%s] does not match the expected bucket name [%s].",
+                                                            catalogObjectValue,
+                                                            expectedBucketName));
+            }
+        }
+        if (StringUtils.isNotEmpty(expectedObjectName)) {
+            String catalogObjName = jsonNode.path("name").asText();
+            if (!matchExpectedName(catalogObjName, expectedObjectName)) {
+                throw new ValidationException(String.format("Catalog object [%s] does not match the expected name [%s].",
+                                                            catalogObjectValue,
+                                                            expectedObjectName));
+            }
+        }
+        return true;
+    }
+
+    static boolean matchExpectedName(String name, String expectedName) {
+        return (name.contains(expectedName.replace("%", "")) &&
+                !(expectedName.startsWith("%") && !expectedName.endsWith("%") &&
+                  !name.endsWith(expectedName.replace("%", ""))) &&
+                !(expectedName.endsWith("%") && !expectedName.startsWith("%") &&
+                  !name.startsWith(expectedName.replace("%", ""))));
     }
 }
