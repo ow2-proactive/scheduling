@@ -165,9 +165,10 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public boolean isHandleOnlyMyJobsPermission() {
         try {
-            return checkPermission(new HandleOnlyMyJobsPermission(true), "N/A");
-        } catch (PermissionException e) {
+            checkPermission(new HandleOnlyMyJobsPermission(false), "N/A");
             return false;
+        } catch (PermissionException e) {
+            return true;
         }
     }
 
