@@ -71,7 +71,7 @@ public class ErrorCases {
         skipIfHeadlessEnvironment();
         server = new Server();
 
-        SslContextFactory sslContextFactory = new SslContextFactory();
+        SslContextFactory sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStorePath(ErrorCases.class.getResource("keystore").getPath());
         sslContextFactory.setKeyStorePassword("activeeon");
 

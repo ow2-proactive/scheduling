@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -94,6 +95,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         File tmpFile = tmpDir.newFile(TEMP_FILE_TMP_NAME);
         Files.write(randomFileContents(), tmpFile);
+        Assert.assertTrue(tmpFile.exists() && tmpFile.isFile());
 
         // use standard client
         IDataSpaceClient client = clientInstance();
@@ -122,8 +124,10 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         File tmpFolder = tmpDir.newFolder(testFolderName);
         File subFolder = new File(tmpFolder, subFolderName);
         subFolder.mkdirs();
+        Assert.assertTrue(subFolder.exists() && subFolder.isDirectory());
         File tmpFile = new File(subFolder, TEMP_FILE_TMP_NAME);
         Files.write(randomFileContents(), tmpFile);
+        Assert.assertTrue(tmpFile.exists() && tmpFile.isFile());
 
         // use standard client
         IDataSpaceClient client = clientInstance();
@@ -158,6 +162,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
             throws Exception {
         File tmpZipFile = tmpDir.newFile(archiveFileName);
         FileUtils.copyInputStreamToFile(archiveFileSource.openStream(), tmpZipFile);
+        Assert.assertTrue(tmpZipFile.exists() && tmpZipFile.isFile());
 
         // use standard client
         IDataSpaceClient client = clientInstance();
@@ -183,6 +188,8 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         TestFilesToUploadCreator testFiles = new TestFilesToUploadCreator().invoke();
         File tempTextFile = testFiles.getTempTextFile();
         File tempFile = testFiles.getTempFile();
+        Assert.assertTrue(tempTextFile.exists() && tempTextFile.isFile());
+        Assert.assertTrue(tempFile.exists() && tempFile.isFile());
 
         // use standard client
         IDataSpaceClient client = clientInstance();
@@ -211,6 +218,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         TestFilesToUploadCreator testFiles = new TestFilesToUploadCreator().invoke();
         File tempTextFile = testFiles.getTempTextFile();
         File tempFile = testFiles.getTempFile();
+        Assert.assertTrue(tempTextFile.exists() && tempTextFile.isFile());
 
         // use standard client
         IDataSpaceClient client = clientInstance();
@@ -241,6 +249,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         TestFilesToUploadCreator testFiles = new TestFilesToUploadCreator().invoke();
         File tempTextFile = testFiles.getTempTextFile();
         File tempFile = testFiles.getTempFile();
+        Assert.assertTrue(tempFile.exists() && tempFile.isFile());
 
         // use standard client
         IDataSpaceClient client = clientInstance();

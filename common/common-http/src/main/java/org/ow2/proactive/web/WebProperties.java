@@ -105,7 +105,9 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_IDLE_TIMEOUT("web.idle_timeout", PropertyType.INTEGER, "60000"),
 
-    WEB_REQUEST_HEADER_SIZE("web.request_header_size", PropertyType.INTEGER, "8192"),
+    WEB_REQUEST_HEADER_SIZE("web.request_header_size", PropertyType.INTEGER, "16384"),
+
+    WEB_RESPONSE_HEADER_SIZE("web.response_header_size", PropertyType.INTEGER, "16384"),
 
     WEB_REDIRECT_HTTP_TO_HTTPS("web.redirect_http_to_https", PropertyType.BOOLEAN, "false"),
 
