@@ -49,6 +49,8 @@ public class JobInfoImpl implements JobInfo {
 
     private long lastUpdatedTime = -1;
 
+    private long cumulatedCoreTime = 0;
+
     private JobId jobId;
 
     private String jobOwner;
@@ -266,6 +268,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public long getLastUpdatedTime() {
         return lastUpdatedTime;
+    }
+
+    @Override
+    public long getCumulatedCoreTime() {
+        return cumulatedCoreTime;
+    }
+
+    public void setCumulatedCoreTime(long cumulatedCoreTime) {
+        this.cumulatedCoreTime = cumulatedCoreTime;
     }
 
     public void setLastUpdatedTime(long lastUpdatedTime) {

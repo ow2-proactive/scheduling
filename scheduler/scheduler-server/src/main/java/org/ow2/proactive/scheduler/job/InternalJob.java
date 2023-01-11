@@ -1074,6 +1074,14 @@ public abstract class InternalJob extends JobState {
         jobInfo.setSubmittedTime(submittedTime);
     }
 
+    public void setCumulatedCoreTime(long cumulatedCoreTime) {
+        jobInfo.setCumulatedCoreTime(cumulatedCoreTime);
+    }
+
+    public synchronized void increaseCumulatedCoreTime(long additionalTime) {
+        jobInfo.setCumulatedCoreTime(jobInfo.getCumulatedCoreTime() + additionalTime);
+    }
+
     @Override
     public void setProjectName(String projectName) {
         super.setProjectName(projectName);

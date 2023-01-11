@@ -121,19 +121,19 @@ import com.google.common.collect.Lists;
                                                                              "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                              "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                              "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
+                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                                      "finishedTime = :finishedTime, inErrorTime = :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                                      "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                                      "numberOfRunningTasks = :numberOfRunningTasks, totalNumberOfTasks =:totalNumberOfTasks, " +
                                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, " +
+                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, " +
                                                                                      "preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskRestarted", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                          "numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                          "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                          "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                         "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                                                                         "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskStarted", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                        "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                        "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
@@ -249,6 +249,8 @@ public class JobData implements Serializable {
 
     private long lastUpdatedTime;
 
+    private Long cumulatedCoreTime;
+
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
@@ -273,6 +275,7 @@ public class JobData implements Serializable {
         jobInfo.setSubmittedTime(getSubmittedTime());
         jobInfo.setRemovedTime(getRemovedTime());
         jobInfo.setLastUpdatedTime(getLastUpdatedTime());
+        jobInfo.setCumulatedCoreTime(getCumulatedCoreTime());
         if (isToBeRemoved()) {
             jobInfo.setToBeRemoved();
         }
@@ -329,6 +332,7 @@ public class JobData implements Serializable {
         internalJob.setGenericInformation(getGenericInformation());
         internalJob.setVariables(variablesToJobVariables());
         internalJob.setProjectName(getProjectName());
+        internalJob.setCumulatedCoreTime(getCumulatedCoreTime());
         internalJob.setOwner(getOwner());
         internalJob.setTenant(getTenant());
         internalJob.setDescription(getDescription());
@@ -419,6 +423,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setTotalNumberOfTasks(job.getTotalNumberOfTasks());
         jobRuntimeData.addJobContent(job.getTaskFlowJob());
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
+        jobRuntimeData.setCumulatedCoreTime(job.getCumulatedCoreTime());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
         jobRuntimeData.setPreciousTasks(job.getPreciousTasksFinished());
         jobRuntimeData.setParentId(job.getParentId());
@@ -823,6 +828,15 @@ public class JobData implements Serializable {
 
     public void setLastUpdatedTime(long lastUpdatedTime) {
         this.lastUpdatedTime = lastUpdatedTime;
+    }
+
+    @Column(name = "CUMULATED_CORE_TIME")
+    public long getCumulatedCoreTime() {
+        return cumulatedCoreTime != null ? cumulatedCoreTime : 0L;
+    }
+
+    public void setCumulatedCoreTime(long cumulatedCoreTime) {
+        this.cumulatedCoreTime = cumulatedCoreTime;
     }
 
     @Column(name = "ATTACHED_SERVICES", length = Integer.MAX_VALUE)

@@ -775,6 +775,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
+    public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
+            String workflowName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
+        return uischeduler.getTopWorkflowsCumulatedCoreTime(numberOfWorkflows,
+                                                            workflowName,
+                                                            myJobs,
+                                                            startDate,
+                                                            endDate);
+    }
+
+    @Override
+    @ImmediateService
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
         return uischeduler.getTopExecutionTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);

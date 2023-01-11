@@ -207,6 +207,16 @@ public class DataUtility {
                                        .collect(Collectors.toList());
     }
 
+    public static List<FilteredTopWorkflowsCumulatedCoreTime>
+            toFilteredTopCumulatedCoreTime(List<FilteredTopWorkflowsCumulatedCoreTimeData> filteredTopWorkflowsData) {
+        return filteredTopWorkflowsData.stream()
+                                       .map(filteredTopWorkflow -> new FilteredTopWorkflowsCumulatedCoreTime(filteredTopWorkflow.getWorkflowName(),
+                                                                                                             filteredTopWorkflow.getProjectName(),
+                                                                                                             filteredTopWorkflow.getCumulatedCoreTime(),
+                                                                                                             filteredTopWorkflow.getNumberOfExecutions()))
+                                       .collect(Collectors.toList());
+    }
+
     public static List<WorkflowDuration> toWorkflowsDuration(List<WorkflowDurationData> filteredTopWorkflowsData) {
         return filteredTopWorkflowsData.stream()
                                        .map(filteredTopWorkflow -> new WorkflowDuration(filteredTopWorkflow.getWorkflowName(),

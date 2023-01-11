@@ -2130,6 +2130,28 @@ public interface SchedulerRestInterface {
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
 
     /**
+     * Returns an object containing the top workflows that consumes the most CPU/nodes
+     *
+     * @param sessionId id of a session
+     * @param numberOfWorkflows number of workflows to show
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @param workflowName the workflow name of the filtered jobs
+     * @return {@link FilteredTopWorkflowsCumulatedCoreTimeData}
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("stats/topWorkflowsCumulatedCoreTime")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<FilteredTopWorkflowsCumulatedCoreTimeData> getTopWorkflowsCumulatedCoreTime(
+            @HeaderParam("sessionid") String sessionId, @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+
+    /**
      * Returns an object containing the top workflows with the longest execution time based on the given filters
      *
      * @param sessionId id of a session

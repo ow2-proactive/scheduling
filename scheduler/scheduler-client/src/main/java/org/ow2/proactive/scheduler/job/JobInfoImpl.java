@@ -91,6 +91,8 @@ public class JobInfoImpl implements JobInfo {
     /** last updated time on the job*/
     private long lastUpdatedTime = -1;
 
+    private long cumulatedCoreTime = 0L;
+
     /** total number of tasks */
     private int totalNumberOfTasks = 0;
 
@@ -321,6 +323,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setLastUpdatedTime(long lastUpdatedTime) {
         this.lastUpdatedTime = lastUpdatedTime;
+    }
+
+    @Override
+    public long getCumulatedCoreTime() {
+        return cumulatedCoreTime;
+    }
+
+    public void setCumulatedCoreTime(long cumulatedCoreTime) {
+        this.cumulatedCoreTime = cumulatedCoreTime;
     }
 
     /**

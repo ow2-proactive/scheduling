@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
+import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsCumulatedCoreTime;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -971,6 +972,36 @@ public class SchedulerDBManager {
         });
     }
 
+    public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsMostConsumingNodes(int numberOfWorkflows,
+            final String workflowName, String user, String tenant, final long startTime, final long endTime) {
+
+        return executeReadOnlyTransaction(session -> {
+
+            String selectSubQuery = "select jobName, projectName, sum(cumulatedCoreTime) as totalCumulatedCoreTime, count(*) as numberOfExecution from JobData ";
+            String subQueryGroupByStatement = "group by jobName, projectName order by totalCumulatedCoreTime desc";
+            Query query = getTopWorkflowsQuery(session,
+                                               workflowName,
+                                               user,
+                                               tenant,
+                                               startTime,
+                                               endTime,
+                                               numberOfWorkflows,
+                                               selectSubQuery,
+                                               subQueryGroupByStatement);
+
+            List<Object[]> list = query.list();
+            list.stream()
+                .forEach(nameAndCount -> logger.error("TASK core " + Long.parseLong(nameAndCount[2].toString())));
+            return list.stream()
+                       .map(nameAndCount -> new FilteredTopWorkflowsCumulatedCoreTime(nameAndCount[0].toString(),
+                                                                                      nameAndCount[1] != null ? nameAndCount[1].toString()
+                                                                                                              : null,
+                                                                                      Long.parseLong(nameAndCount[2].toString()),
+                                                                                      Long.parseLong(nameAndCount[3].toString())))
+                       .collect(Collectors.toList());
+        });
+    }
+
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, final String workflowName,
             String user, String tenant, final long startTime, final long endTime) {
 
@@ -1662,6 +1693,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                   .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("jobId", jobId)
                    .executeUpdate();
@@ -1704,6 +1736,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
+                   .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                    // the following forces hibernate 5.2 to use the proper conversion for list of strings Lob parameters
@@ -1793,6 +1826,7 @@ public class SchedulerDBManager {
                                .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
                                .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                                .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                               .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
                                .setParameter("lastUpdatedTime", new Date().getTime())
                                .setParameter("resultMap",
                                              ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
@@ -1884,6 +1918,7 @@ public class SchedulerDBManager {
                                         .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
                                         .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                                         .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                                        .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
                                         .setParameter("lastUpdatedTime", new Date().getTime())
                                         .setParameter("resultMap",
                                                       ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
@@ -2168,6 +2203,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                   .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                    // the following forces hibernate 5.2 to use the proper conversion for list of strings Lob parameters
