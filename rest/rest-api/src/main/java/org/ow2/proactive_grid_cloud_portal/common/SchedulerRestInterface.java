@@ -2130,7 +2130,7 @@ public interface SchedulerRestInterface {
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
 
     /**
-     * Returns an object containing the top workflows that consumes the most CPU/nodes
+     * Returns an object containing the top workflows that consumes the most CPU
      *
      * @param sessionId id of a session
      * @param numberOfWorkflows number of workflows to show
