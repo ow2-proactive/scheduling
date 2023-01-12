@@ -430,6 +430,15 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     }
 
     /**
+     * To get the cumulatedCoreTime
+     *
+     * @return the cumulatedCoreTime
+     */
+    public long getCumulatedCoreTime() {
+        return getJobInfo().getCumulatedCoreTime();
+    }
+
+    /**
      * To get the status of the job.
      *
      * @return the status of the job.

@@ -125,6 +125,12 @@ public interface JobInfo extends Serializable {
     long getLastUpdatedTime();
 
     /**
+     * Returns the cumulated time consumed by task executions for this job
+     * @return sum of all time consumed by each task execution
+     */
+    long getCumulatedCoreTime();
+
+    /**
      * Returns the number of tasks managed by the Job.
      *
      * @return the number of tasks managed by the Job.

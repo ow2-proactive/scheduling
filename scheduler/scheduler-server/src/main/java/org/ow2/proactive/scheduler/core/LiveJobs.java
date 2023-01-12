@@ -342,6 +342,18 @@ class LiveJobs {
                 jlogger.info(jobId, "has just been paused.");
                 dbManager.pauseJobAndTasks(job);
                 updateTasksInSchedulerState(job, updatedTasks);
+                long additionalCoreTime = 0;
+
+                for (Iterator<RunningTaskData> i = runningTasksData.values().iterator(); i.hasNext();) {
+                    RunningTaskData taskData = i.next();
+                    if (taskData.getTask().getJobId().equals(jobId)) {
+                        // remove previous read progress
+                        i.remove();
+                        additionalCoreTime += System.currentTimeMillis() -
+                                              taskData.getTask().getTaskInfo().getStartTime();
+                    }
+                }
+                jobData.job.increaseCumulatedCoreTime(additionalCoreTime);
             }
 
             // update tasks events list and send it to front-end
@@ -736,10 +748,14 @@ class LiveJobs {
                                            terminationData);
 
                         tlogger.info(taskId, "new restart is scheduled");
+                        jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() -
+                                                              task.getTaskInfo().getStartTime());
 
                         return terminationData;
                     } else {
                         jobData.job.increaseNumberOfFaultyTasks(taskId);
+                        jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() -
+                                                              task.getTaskInfo().getStartTime());
 
                         restartTaskOnError(jobData,
                                            task,
@@ -762,6 +778,9 @@ class LiveJobs {
                     } else if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration(), result);
                         tlogger.info(taskId, "Task still contains errors after restart, so it stays in InError state");
+                        jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() -
+                                                              task.getTaskInfo().getStartTime());
+
                         return terminationData;
                     } else if (requiresPauseJobOnError) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration(), result);
@@ -919,6 +938,7 @@ class LiveJobs {
                                                                        new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
                 listener.jobUpdatedFullData(job);
             }
+            jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() - task.getTaskInfo().getStartTime());
 
             return terminationData;
         } finally {
@@ -1145,6 +1165,8 @@ class LiveJobs {
                                                                            TerminationData.TerminationStatus.ABORTED);
 
             long waitTime = restartDelay * 1000L;
+            jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() - task.getTaskInfo().getStartTime());
+
             restartTaskOnError(jobData, task, TaskStatus.SUBMITTED, taskResult, waitTime, terminationData);
 
             return terminationData;
@@ -1236,6 +1258,8 @@ class LiveJobs {
             jobs.remove(job.getId());
         }
 
+        jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() - task.getTaskInfo().getStartTime());
+
         task.setTaskResult(result);
 
         // Update database
@@ -1313,18 +1337,24 @@ class LiveJobs {
 
                 jlogger.info(job.getId(), "ending request");
 
+                long additionalCoreTime = 0;
+
                 for (Iterator<RunningTaskData> i = runningTasksData.values().iterator(); i.hasNext();) {
                     RunningTaskData taskData = i.next();
                     if (taskData.getTask().getJobId().equals(jobId)) {
                         i.remove();
                         // remove previous read progress
                         taskData.getTask().setProgress(0);
+                        additionalCoreTime += System.currentTimeMillis() -
+                                              taskData.getTask().getTaskInfo().getStartTime();
                         terminationData.addTaskData(job,
                                                     taskData,
                                                     TerminationData.TerminationStatus.ABORTED,
                                                     taskResult);
                     }
                 }
+
+                jobData.job.increaseCumulatedCoreTime(additionalCoreTime);
 
                 // if job has been killed
                 tasksToUpdate.addAll(job.failed(null, jobStatus));
@@ -1390,6 +1420,7 @@ class LiveJobs {
         } else {
             jlogger.info(job.getId(), "ending request");
         }
+        long additionalCoreTime = 0;
 
         for (Iterator<RunningTaskData> i = runningTasksData.values().iterator(); i.hasNext();) {
             RunningTaskData taskData = i.next();
@@ -1397,9 +1428,11 @@ class LiveJobs {
                 i.remove();
                 // remove previous read progress
                 taskData.getTask().setProgress(0);
+                additionalCoreTime += System.currentTimeMillis() - taskData.getTask().getTaskInfo().getStartTime();
                 terminationData.addTaskData(job, taskData, TerminationData.TerminationStatus.ABORTED, taskResult);
             }
         }
+        jobData.job.increaseCumulatedCoreTime(additionalCoreTime);
 
         // if job has been killed
         if (jobStatus == JobStatus.KILLED) {

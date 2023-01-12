@@ -2641,6 +2641,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @GET
+    @Path("stats/topWorkflowsCumulatedCoreTime")
+    @Produces("application/json")
+    @Override
+    public List<FilteredTopWorkflowsCumulatedCoreTimeData> getTopWorkflowsCumulatedCoreTime(
+            @HeaderParam("sessionid") String sessionId, @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.getTopWorkflowsCumulatedCoreTime(numberOfWorkflows,
+                                                                  workflowName,
+                                                                  myJobs,
+                                                                  startDate,
+                                                                  endDate),
+                       FilteredTopWorkflowsCumulatedCoreTimeData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
     @Path("stats/topWorkflowsWithExecutionTime")
     @Produces("application/json")
     @Override

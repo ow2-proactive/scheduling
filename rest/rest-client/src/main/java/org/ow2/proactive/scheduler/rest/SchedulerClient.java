@@ -522,6 +522,25 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
+            String workflowName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
+
+        try {
+            List<FilteredTopWorkflowsCumulatedCoreTimeData> filteredWorkflows = restApi().getTopWorkflowsCumulatedCoreTime(sid,
+                                                                                                                           numberOfWorkflows,
+                                                                                                                           startDate,
+                                                                                                                           endDate,
+                                                                                                                           myJobs,
+                                                                                                                           workflowName);
+            return new ArrayList<>(DataUtility.toFilteredTopCumulatedCoreTime(filteredWorkflows));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
 
@@ -1432,6 +1451,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setStartTime(jobInfoData.getStartTime());
         jobInfoImpl.setInErrorTime(jobInfoData.getInErrorTime());
         jobInfoImpl.setSubmittedTime(jobInfoData.getSubmittedTime());
+        jobInfoImpl.setCumulatedCoreTime(jobInfoData.getCumulatedCoreTime());
         jobInfoImpl.setNumberOfFinishedTasks(jobInfoData.getNumberOfFinishedTasks());
         jobInfoImpl.setNumberOfPendingTasks(jobInfoData.getNumberOfPendingTasks());
         jobInfoImpl.setNumberOfRunningTasks(jobInfoData.getNumberOfRunningTasks());
