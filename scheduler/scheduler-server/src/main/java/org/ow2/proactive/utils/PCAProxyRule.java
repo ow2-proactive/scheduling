@@ -40,8 +40,10 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.HttpURI;
 import org.eclipse.jetty.rewrite.handler.Rule;
 import org.eclipse.jetty.server.HttpChannel;
+import org.eclipse.jetty.server.HttpConnection;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.URIUtil;
 import org.ow2.proactive.web.WebProperties;
@@ -189,17 +191,29 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
         // Other type of requests redirection behaves erratically
         String newUri = null;
         try {
-            String oldUri = ((Request) request).getUri().getCompletePath();
-            String uriWithoutEndpoint = oldUri.replace(endpointPath, "");
-            newUri = endpointPath + uriWithoutEndpoint;
+            if (request instanceof Request) {
+                Request jettyRequest = (Request) request;
+                HttpURI httpUri = jettyRequest.getHttpURI();
+                String oldUri = httpUri.getPathQuery();
+                if (httpUri.getFragment() != null) {
+                    oldUri += "#" + httpUri.getFragment();
+                }
+                String uriWithoutEndpoint = oldUri.replace(endpointPath, "");
+                newUri = endpointPath + uriWithoutEndpoint;
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Relocation URI %s", newUri));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("Relocation URI %s", newUri));
+                }
+
+                response.sendRedirect(response.encodeRedirectURL(newUri));
+                jettyRequest.setHandled(true);
+            } else {
+                if (HttpConnection.getCurrentConnection() != null &&
+                    HttpConnection.getCurrentConnection().getHttpChannel() != null &&
+                    HttpConnection.getCurrentConnection().getHttpChannel().getRequest() != null) {
+                    HttpConnection.getCurrentConnection().getHttpChannel().getRequest().setHandled(true);
+                }
             }
-
-            response.sendRedirect(response.encodeRedirectURL(newUri));
-            (request instanceof Request ? (Request) request
-                                        : HttpChannel.getCurrentHttpChannel().getRequest()).setHandled(true);
         } catch (IOException e) {
             logger.error(String.format("Error while redirecting %s to %s", targetWithoutEndpoint, newUri), e);
         }
@@ -217,7 +231,7 @@ public class PCAProxyRule extends Rule implements Rule.ApplyURI {
         if (isRedirection && oldURI.startsWith(originalPath)) {
             String remaining = oldURI.substring(originalPath.length());
             String uriRewritten = newURI + remaining;
-            request.setRequestURI(uriRewritten);
+            request.setURIPathQuery(uriRewritten);
             if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Rewrote URI %s to %s", oldURI, uriRewritten));
             }

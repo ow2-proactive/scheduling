@@ -217,6 +217,7 @@ public class JettyStarter {
         httpConfiguration.setSendDateHeader(false);
         httpConfiguration.setSendServerVersion(false);
         httpConfiguration.setRequestHeaderSize(WebProperties.WEB_REQUEST_HEADER_SIZE.getValueAsInt());
+        httpConfiguration.setResponseHeaderSize(WebProperties.WEB_RESPONSE_HEADER_SIZE.getValueAsInt());
 
         Connector[] connectors;
 
@@ -236,7 +237,7 @@ public class JettyStarter {
     private Connector[] configureHttps(int httpPort, int httpsPort, boolean redirectHttpToHttps, Server server,
             HttpConfiguration httpConfiguration) {
         Connector[] connectors;
-        SslContextFactory sslContextFactory = new SslContextFactory();
+        SslContextFactory sslContextFactory = new SslContextFactory.Server();
 
         if (WebProperties.WEB_HTTPS_PROTOCOLS_INCLUDED.isSet()) {
             sslContextFactory.setIncludeProtocols(WebProperties.WEB_HTTPS_PROTOCOLS_INCLUDED.getValueAsList(",")
@@ -262,7 +263,7 @@ public class JettyStarter {
             sslContextFactory.setSecureRandomAlgorithm(WebProperties.WEB_HTTPS_SECURE_RANDOM_ALGORITHM.getValueAsString());
         }
         if (WebProperties.WEB_HTTPS_KEY_FACTORY_ALGORITHM.isSet()) {
-            sslContextFactory.setSslKeyManagerFactoryAlgorithm(WebProperties.WEB_HTTPS_KEY_FACTORY_ALGORITHM.getValueAsString());
+            sslContextFactory.setKeyManagerFactoryAlgorithm(WebProperties.WEB_HTTPS_KEY_FACTORY_ALGORITHM.getValueAsString());
         }
         if (WebProperties.WEB_HTTPS_TRUST_FACTORY_ALGORITHM.isSet()) {
             sslContextFactory.setTrustManagerFactoryAlgorithm(WebProperties.WEB_HTTPS_TRUST_FACTORY_ALGORITHM.getValueAsString());
@@ -531,12 +532,18 @@ public class JettyStarter {
                             "org.apache.commons.logging.",
                             "com.zaxxer.hikari.");
         if (contextPath.contains("cloud-automation-service")) {
-            // Make jetty.util not overridable and not hidden for cloud-automation
-            // as jetty websocket is loaded from the system class loader and uses jetty.util
-            // Otherwise, cloud-automation-service will not be able to use SslContextFactory
-            // see https://www.eclipse.org/lists/jetty-dev/msg03096.html for the same issue report
+            // Make jetty.util|client|io not overridable and not hidden for cloud-automation
+            // as jetty websocket is loaded from the system class loader and uses these packages
+            // Otherwise, cloud-automation-service will not be able to use SslContextFactory or HttpClient
+            // see https://www.eclipse.org/lists/jetty-dev/msg03096.html for a similar issue report
             webApp.prependServerClass("-org.eclipse.jetty.util.");
             webApp.prependSystemClass("org.eclipse.jetty.util.");
+            webApp.prependServerClass("-org.eclipse.jetty.client.");
+            webApp.prependSystemClass("org.eclipse.jetty.client.");
+            webApp.prependServerClass("-org.eclipse.jetty.http.");
+            webApp.prependSystemClass("org.eclipse.jetty.http.");
+            webApp.prependServerClass("-org.eclipse.jetty.io.");
+            webApp.prependSystemClass("org.eclipse.jetty.io.");
         }
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);

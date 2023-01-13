@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.client.utils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -113,7 +114,7 @@ public class Zipper {
                 FileObject[] fos = rootObject.findFiles(selector);
 
                 for (FileObject fo : fos) {
-                    listFiles.add(new File(fo.getName().getPath()));
+                    listFiles.add(new File(new URI(fo.getName().getURI())));
                 }
             } catch (Exception e) {
                 logger.error("An error occurred while zipping files: ", e);

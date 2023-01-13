@@ -102,7 +102,7 @@ public class PCAProxyRuleTest {
         HttpURI requestUri = new HttpURI(target);
         when(request.getMethod()).thenReturn(method.asString());
         when(request.getHeader(HttpHeaders.REFERER)).thenReturn(referer);
-        when(request.getUri()).thenReturn(requestUri);
+        when(request.getHttpURI()).thenReturn(requestUri);
         ArgumentCaptor<String> redirectString = ArgumentCaptor.forClass(String.class);
         when(response.encodeRedirectURL(anyString())).then(returnsFirstArg());
         String newTarget = rule.matchAndApply(target, request, response);
