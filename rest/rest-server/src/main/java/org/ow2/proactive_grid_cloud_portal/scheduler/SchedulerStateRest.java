@@ -2740,14 +2740,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     @Override
     public CompletedTasksCountData getCompletedTasks(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs, @QueryParam("taskName") String taskName,
+            @QueryParam("myTasks") @DefaultValue("false") boolean myTasks, @QueryParam("taskName") String taskName,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("-1") long endDate,
             @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
-            return mapper.map(scheduler.getCompletedTasks(myJobs, taskName, startDate, endDate, numberOfIntervals),
+            return mapper.map(scheduler.getCompletedTasks(myTasks, taskName, startDate, endDate, numberOfIntervals),
                               CompletedTasksCountData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);

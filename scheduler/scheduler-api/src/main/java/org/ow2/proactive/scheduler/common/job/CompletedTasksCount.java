@@ -38,9 +38,9 @@ public class CompletedTasksCount implements Serializable {
 
     private final Map<Integer, Integer> tasksWithoutIssues;
 
-    public CompletedTasksCount(Map<Integer, Integer> jobsWithIssues, Map<Integer, Integer> jobsWithoutIssues) {
-        this.tasksWithIssues = jobsWithIssues;
-        this.tasksWithoutIssues = jobsWithoutIssues;
+    public CompletedTasksCount(Map<Integer, Integer> tasksWithIssues, Map<Integer, Integer> tasksWithoutIssues) {
+        this.tasksWithIssues = tasksWithIssues;
+        this.tasksWithoutIssues = tasksWithoutIssues;
     }
 
     public Map<Integer, Integer> getTasksWithIssues() {

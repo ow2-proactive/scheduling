@@ -2221,7 +2221,7 @@ public interface SchedulerRestInterface {
      * Returns an object containing a map of number of completed tasks with issues by time interval and a map of number of finished tasks without issues by time interval
      *
      * @param sessionId id of a session
-     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param myTasks fetch only the tasks owned by the user making the request
      * @param taskName the task name of the filtered tasks
      * @param startDate start date of the filtered tasks
      * @param endDate end date of the filtered tasks, default value represents the current date
@@ -2233,7 +2233,7 @@ public interface SchedulerRestInterface {
     @Path("stats/completedTasks")
     @Produces(MediaType.APPLICATION_JSON)
     CompletedTasksCountData getCompletedTasks(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("myTasks") @DefaultValue("false") boolean myTasks,
             @QueryParam("taskName") @DefaultValue("null") String taskName,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("-1") long endDate,
