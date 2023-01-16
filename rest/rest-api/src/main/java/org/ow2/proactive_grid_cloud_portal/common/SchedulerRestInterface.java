@@ -2196,7 +2196,7 @@ public interface SchedulerRestInterface {
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
 
     /**
-     * Returns an object containing a map of finished jobs with issues count by time interval and a map of finished jobs without issues count by time interval
+     * Returns an object containing a map of number of finished jobs with issues by time interval and a map of number of finished jobs without issues by time interval
      *
      * @param sessionId id of a session
      * @param myJobs fetch only the jobs owned by the user making the request
@@ -2213,6 +2213,28 @@ public interface SchedulerRestInterface {
     CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("-1") long endDate,
+            @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException;
+
+    /**
+     * Returns an object containing a map of number of completed tasks with issues by time interval and a map of number of finished tasks without issues by time interval
+     *
+     * @param sessionId id of a session
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param taskName the task name of the filtered tasks
+     * @param startDate start date of the filtered tasks
+     * @param endDate end date of the filtered tasks, default value represents the current date
+     * @param numberOfIntervals number of time intervals
+     * @return {@link CompletedTasksCountData}
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("stats/completedTasks")
+    @Produces(MediaType.APPLICATION_JSON)
+    CompletedTasksCountData getCompletedTasks(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("taskName") @DefaultValue("null") String taskName,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("-1") long endDate,
             @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException;

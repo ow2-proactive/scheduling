@@ -595,6 +595,24 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
+            int numberOfIntervals) throws NotConnectedException, PermissionException {
+
+        try {
+            CompletedTasksCountData completedTask = restApi().getCompletedTasks(sid,
+                                                                                myTasks,
+                                                                                taskName,
+                                                                                startDate,
+                                                                                endDate,
+                                                                                numberOfIntervals);
+            return DataUtility.toCompletedTasksCount(completedTask);
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
     public boolean isConnected() {
         boolean isConnected = false;
         if (initialized) {

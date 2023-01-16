@@ -808,6 +808,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
+    public CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
+            int numberOfIntervals) throws NotConnectedException, PermissionException {
+        return uischeduler.getCompletedTasks(myTasks, taskName, startDate, endDate, numberOfIntervals);
+    }
+
+    @Override
+    @ImmediateService
     public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
         return uischeduler.getMyAccountUsage(startDate, endDate);
