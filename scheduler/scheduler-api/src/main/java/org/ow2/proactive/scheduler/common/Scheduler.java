@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
+import org.ow2.proactive.scheduler.common.job.CompletedTasksCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsCumulatedCoreTime;
@@ -1674,6 +1675,10 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
 
     @RoleRead
     CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, long startDate, long endDate,
+            int numberOfIntervals) throws NotConnectedException, PermissionException;
+
+    @RoleRead
+    CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
             int numberOfIntervals) throws NotConnectedException, PermissionException;
 
     /**

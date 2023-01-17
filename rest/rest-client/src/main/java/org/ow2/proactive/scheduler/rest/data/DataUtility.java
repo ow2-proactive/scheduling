@@ -103,6 +103,11 @@ public class DataUtility {
                                       completedJobsCountData.getJobsWithoutIssues());
     }
 
+    public static CompletedTasksCount toCompletedTasksCount(CompletedTasksCountData completedTasksCountData) {
+        return new CompletedTasksCount(completedTasksCountData.getTasksWithIssues(),
+                                       completedTasksCountData.getTasksWithoutIssues());
+    }
+
     public static TaskInfo taskInfo(TaskInfoData d) {
         TaskInfoImpl impl = new TaskInfoImpl();
         JobIdData jobIdData = d.getJobId();

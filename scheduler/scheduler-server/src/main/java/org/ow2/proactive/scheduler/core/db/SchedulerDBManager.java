@@ -63,6 +63,7 @@ import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
+import org.ow2.proactive.scheduler.common.job.CompletedTasksCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsCumulatedCoreTime;
@@ -391,9 +392,11 @@ public class SchedulerDBManager {
             if (StringUtils.isNotEmpty(workflowName)) {
                 predicates.add(cb.like(root.get("jobName"), workflowName + "%"));
             }
-            if (startTime != 0 && endTime != 0) {
-                predicates.add(cb.and(cb.ge(root.get("finishedTime"), startTime),
-                                      cb.lt(root.get("finishedTime"), endTime)));
+            if (startTime > 0) {
+                predicates.add(cb.ge(root.get("finishedTime"), startTime));
+            }
+            if (endTime > 0) {
+                predicates.add(cb.lt(root.get("finishedTime"), endTime));
             }
             if (Boolean.TRUE.equals(withFailedTasks)) {
                 predicates.add(cb.or(cb.gt(root.get("numberOfFailedTasks"), 0),
@@ -403,6 +406,40 @@ public class SchedulerDBManager {
                 predicates.add(cb.and(cb.equal(root.get("numberOfFailedTasks"), 0),
                                       cb.equal(root.get("numberOfFaultyTasks"), 0),
                                       cb.equal(root.get("numberOfInErrorTasks"), 0)));
+            }
+            if (!predicates.isEmpty()) {
+                criteriaQuery.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
+            } else {
+                criteriaQuery.select(cb.count(root));
+            }
+            org.hibernate.query.Query<Long> query = session.createQuery(criteriaQuery);
+            return query.getSingleResult().intValue();
+        }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
+    }
+
+    public int getNumberOfFilteredTasks(final String taskName, String user, String tenant, final long startTime,
+            final long endTime, Collection<TaskStatus> statuses) {
+
+        return executeReadOnlyTransaction(session -> {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
+            Root<TaskData> root = criteriaQuery.from(TaskData.class);
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(root.get("taskStatus").in(statuses));
+            if (StringUtils.isNotEmpty(user)) {
+                predicates.add(cb.equal(root.get("owner"), user));
+                if (StringUtils.isNotEmpty(tenant)) {
+                    predicates.add(cb.or(cb.equal(root.get("tenant"), tenant), cb.isNull(root.get("tenant"))));
+                }
+            }
+            if (StringUtils.isNotEmpty(taskName)) {
+                predicates.add(cb.like(root.get("taskName"), taskName + "%"));
+            }
+            if (startTime > 0) {
+                predicates.add(cb.ge(root.get("finishedTime"), startTime));
+            }
+            if (endTime > 0) {
+                predicates.add(cb.lt(root.get("finishedTime"), endTime));
             }
             if (!predicates.isEmpty()) {
                 criteriaQuery.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
@@ -977,7 +1014,7 @@ public class SchedulerDBManager {
 
         return executeReadOnlyTransaction(session -> {
 
-            String selectSubQuery = "select jobName, projectName, sum(cumulatedCoreTime) as totalCumulatedCoreTime, count(*) as numberOfExecution from JobData ";
+            String selectSubQuery = "select jobName, projectName, sum(cumulatedCoreTime) as totalCumulatedCoreTime, count(*) as numberOfExecution from JobData where startTime > 0 and finishedTime > 0  ";
             String subQueryGroupByStatement = "group by jobName, projectName order by totalCumulatedCoreTime desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
@@ -1075,10 +1112,10 @@ public class SchedulerDBManager {
                 queryString.append("and (tenant = :tenant or tenant = null) ");
             }
         }
-        if (startTime != 0) {
+        if (startTime > 0) {
             queryString.append("and finishedTime >= :startTime ");
         }
-        if (endTime != 0) {
+        if (endTime > 0) {
             queryString.append("and finishedTime < :endTime ");
         }
         queryString.append(subQueryGroupByStatement);
@@ -1096,10 +1133,10 @@ public class SchedulerDBManager {
                 query.setParameter("tenant", tenant);
             }
         }
-        if (startTime != 0) {
+        if (startTime > 0) {
             query.setParameter("startTime", startTime);
         }
-        if (endTime != 0) {
+        if (endTime > 0) {
             query.setParameter("endTime", endTime);
         }
         return query;
@@ -1276,6 +1313,39 @@ public class SchedulerDBManager {
             startDate = endTimeInterval;
         }
         return new CompletedJobsCount(jobsWithIssuesCount, jobsWithoutIssuesCount);
+    }
+
+    public CompletedTasksCount getCompletedTasks(String user, String tenant, final String taskName, long startDate,
+            long endDate, int numberOfIntervals) {
+
+        Map<Integer, Integer> tasksWithoutIssuesCount = new TreeMap<>();
+        Map<Integer, Integer> tasksWithIssuesCount = new TreeMap<>();
+        long intervalTime = (endDate - startDate) / numberOfIntervals;
+
+        for (int interval = 0; interval < numberOfIntervals && startDate < endDate; interval++) {
+            long endTimeInterval = startDate + intervalTime;
+            Integer nrOfTasksWithoutIssues = getNumberOfFilteredTasks(taskName,
+                                                                      user,
+                                                                      tenant,
+                                                                      startDate,
+                                                                      endTimeInterval,
+                                                                      ImmutableSet.of(TaskStatus.FINISHED,
+                                                                                      TaskStatus.SKIPPED));
+            tasksWithoutIssuesCount.put(interval, nrOfTasksWithoutIssues);
+            Integer nrOfFailedTasks = getNumberOfFilteredTasks(taskName,
+                                                               user,
+                                                               tenant,
+                                                               startDate,
+                                                               endTimeInterval,
+                                                               ImmutableSet.of(TaskStatus.ABORTED,
+                                                                               TaskStatus.FAILED,
+                                                                               TaskStatus.FAULTY,
+                                                                               TaskStatus.NOT_STARTED,
+                                                                               TaskStatus.NOT_RESTARTED));
+            tasksWithIssuesCount.put(interval, nrOfFailedTasks);
+            startDate = endTimeInterval;
+        }
+        return new CompletedTasksCount(tasksWithIssuesCount, tasksWithoutIssuesCount);
     }
 
     private void removeJobScripts(Session session, List<Long> jobIds) {

@@ -2149,6 +2149,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                           numberOfIntervals);
     }
 
+    @Override
+    @ImmediateService
+    @RoleRead
+    public CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
+            int numberOfIntervals) throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to get completed tasks");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        if (endDate == -1) {
+            endDate = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        }
+        return dbManager.getCompletedTasks(myTasks ? ident.getUsername() : null,
+                                           tenant,
+                                           taskName,
+                                           startDate,
+                                           endDate,
+                                           numberOfIntervals);
+    }
+
     /**
      * {@inheritDoc}
      */

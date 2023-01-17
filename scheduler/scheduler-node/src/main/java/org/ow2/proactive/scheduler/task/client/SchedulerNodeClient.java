@@ -878,6 +878,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
+            int numberOfIntervals) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.getCompletedTasks(myTasks, taskName, startDate, endDate, numberOfIntervals);
+    }
+
+    @Override
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
             int offset, int limit) throws SchedulerException {
         renewSession();

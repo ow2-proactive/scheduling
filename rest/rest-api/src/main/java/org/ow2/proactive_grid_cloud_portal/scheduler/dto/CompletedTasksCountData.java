@@ -25,51 +25,34 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-public class FilteredTopWorkflowsCumulatedCoreTimeData {
+import java.util.Map;
 
-    private String workflowName;
 
-    private String projectName;
+public class CompletedTasksCountData {
 
-    private long cumulatedCoreTime;
+    private Map<Integer, Integer> tasksWithIssues;
 
-    private long numberOfExecutions;
+    private Map<Integer, Integer> tasksWithoutIssues;
 
-    public String getWorkflowName() {
-        return workflowName;
+    public Map<Integer, Integer> getTasksWithIssues() {
+        return tasksWithIssues;
     }
 
-    public void setWorkflowName(String workflowName) {
-        this.workflowName = workflowName;
+    public void setTasksWithIssues(Map<Integer, Integer> tasksWithIssues) {
+        this.tasksWithIssues = tasksWithIssues;
     }
 
-    public String getProjectName() {
-        return projectName;
+    public Map<Integer, Integer> getTasksWithoutIssues() {
+        return tasksWithoutIssues;
     }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public long getCumulatedCoreTime() {
-        return cumulatedCoreTime;
-    }
-
-    public void setCumulatedCoreTime(long cumulatedCoreTime) {
-        this.cumulatedCoreTime = cumulatedCoreTime;
-    }
-
-    public long getNumberOfExecutions() {
-        return numberOfExecutions;
-    }
-
-    public void setNumberOfExecutions(long numberOfExecutions) {
-        this.numberOfExecutions = numberOfExecutions;
+    public void setTasksWithoutIssues(Map<Integer, Integer> tasksWithoutIssues) {
+        this.tasksWithoutIssues = tasksWithoutIssues;
     }
 
     @Override
     public String toString() {
-        return "FilteredTopWorkflowData{" + "workflowName='" + workflowName + '\'' + ", projectName='" + projectName +
-               '\'' + ", cumulatedCoreTime=" + cumulatedCoreTime + ", numberOfExecutions=" + numberOfExecutions + '}';
+        return "CompletedTasksCountData{" + "tasksWithIssues=" + tasksWithIssues + ", tasksWithoutIssues=" +
+               tasksWithoutIssues + '}';
     }
 }

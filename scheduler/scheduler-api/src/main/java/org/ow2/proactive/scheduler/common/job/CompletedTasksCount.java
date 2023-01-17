@@ -23,36 +23,31 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
+package org.ow2.proactive.scheduler.common.job;
 
+import java.io.Serializable;
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
-public class CompletedJobsCountData {
 
-    private Map<Integer, Integer> jobsWithIssues;
+@PublicAPI
+public class CompletedTasksCount implements Serializable {
 
-    private Map<Integer, Integer> jobsWithoutIssues;
+    private final Map<Integer, Integer> tasksWithIssues;
 
-    public Map<Integer, Integer> getJobsWithIssues() {
-        return jobsWithIssues;
+    private final Map<Integer, Integer> tasksWithoutIssues;
+
+    public CompletedTasksCount(Map<Integer, Integer> tasksWithIssues, Map<Integer, Integer> tasksWithoutIssues) {
+        this.tasksWithIssues = tasksWithIssues;
+        this.tasksWithoutIssues = tasksWithoutIssues;
     }
 
-    public void setJobsWithIssues(Map<Integer, Integer> jobsWithIssues) {
-        this.jobsWithIssues = jobsWithIssues;
+    public Map<Integer, Integer> getTasksWithIssues() {
+        return tasksWithIssues;
     }
 
-    public Map<Integer, Integer> getJobsWithoutIssues() {
-        return jobsWithoutIssues;
-    }
-
-    public void setJobsWithoutIssues(Map<Integer, Integer> jobsWithoutIssues) {
-        this.jobsWithoutIssues = jobsWithoutIssues;
-    }
-
-    @Override
-    public String toString() {
-        return "CompletedJobsCountData{" + "jobsWithIssues=" + jobsWithIssues + ", jobsWithoutIssues=" +
-               jobsWithoutIssues + '}';
+    public Map<Integer, Integer> getTasksWithoutIssues() {
+        return tasksWithoutIssues;
     }
 }
