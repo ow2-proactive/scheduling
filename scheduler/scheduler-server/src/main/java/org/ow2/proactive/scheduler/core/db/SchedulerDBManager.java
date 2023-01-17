@@ -1329,7 +1329,8 @@ public class SchedulerDBManager {
                                                                       tenant,
                                                                       startDate,
                                                                       endTimeInterval,
-                                                                      Collections.singletonList(TaskStatus.FINISHED));
+                                                                      ImmutableSet.of(TaskStatus.FINISHED,
+                                                                                      TaskStatus.SKIPPED));
             tasksWithoutIssuesCount.put(interval, nrOfTasksWithoutIssues);
             Integer nrOfFailedTasks = getNumberOfFilteredTasks(taskName,
                                                                user,
@@ -1339,7 +1340,8 @@ public class SchedulerDBManager {
                                                                ImmutableSet.of(TaskStatus.ABORTED,
                                                                                TaskStatus.FAILED,
                                                                                TaskStatus.FAULTY,
-                                                                               TaskStatus.IN_ERROR));
+                                                                               TaskStatus.NOT_STARTED,
+                                                                               TaskStatus.NOT_RESTARTED));
             tasksWithIssuesCount.put(interval, nrOfFailedTasks);
             startDate = endTimeInterval;
         }
