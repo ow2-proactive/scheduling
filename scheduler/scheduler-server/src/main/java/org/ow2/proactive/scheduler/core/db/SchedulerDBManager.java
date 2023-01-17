@@ -392,9 +392,11 @@ public class SchedulerDBManager {
             if (StringUtils.isNotEmpty(workflowName)) {
                 predicates.add(cb.like(root.get("jobName"), workflowName + "%"));
             }
-            if (startTime != 0 && endTime != 0) {
-                predicates.add(cb.and(cb.ge(root.get("finishedTime"), startTime),
-                                      cb.lt(root.get("finishedTime"), endTime)));
+            if (startTime != 0) {
+                predicates.add(cb.ge(root.get("finishedTime"), startTime));
+            }
+            if (endTime != 0) {
+                predicates.add(cb.lt(root.get("finishedTime"), endTime));
             }
             if (Boolean.TRUE.equals(withFailedTasks)) {
                 predicates.add(cb.or(cb.gt(root.get("numberOfFailedTasks"), 0),
@@ -433,9 +435,11 @@ public class SchedulerDBManager {
             if (StringUtils.isNotEmpty(taskName)) {
                 predicates.add(cb.like(root.get("taskName"), taskName + "%"));
             }
-            if (startTime != 0 && endTime != 0) {
-                predicates.add(cb.and(cb.ge(root.get("finishedTime"), startTime),
-                                      cb.lt(root.get("finishedTime"), endTime)));
+            if (startTime != 0) {
+                predicates.add(cb.ge(root.get("finishedTime"), startTime));
+            }
+            if (endTime != 0) {
+                predicates.add(cb.lt(root.get("finishedTime"), endTime));
             }
             if (!predicates.isEmpty()) {
                 criteriaQuery.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));

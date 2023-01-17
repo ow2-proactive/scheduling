@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-public class FilteredTopWorkflowData implements java.io.Serializable {
+public class FilteredTopWorkflowData {
 
     private String workflowName;
 

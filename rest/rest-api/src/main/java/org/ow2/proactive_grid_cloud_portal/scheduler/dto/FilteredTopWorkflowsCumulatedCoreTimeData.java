@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-public class FilteredTopWorkflowsCumulatedCoreTimeData implements java.io.Serializable {
+public class FilteredTopWorkflowsCumulatedCoreTimeData {
 
     private String workflowName;
 

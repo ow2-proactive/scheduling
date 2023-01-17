@@ -28,7 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 import java.util.Map;
 
 
-public class CompletedJobsCountData implements java.io.Serializable {
+public class CompletedJobsCountData {
 
     private Map<Integer, Integer> jobsWithIssues;
 
