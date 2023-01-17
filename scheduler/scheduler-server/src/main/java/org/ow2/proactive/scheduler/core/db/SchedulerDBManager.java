@@ -392,10 +392,10 @@ public class SchedulerDBManager {
             if (StringUtils.isNotEmpty(workflowName)) {
                 predicates.add(cb.like(root.get("jobName"), workflowName + "%"));
             }
-            if (startTime != 0) {
+            if (startTime > 0) {
                 predicates.add(cb.ge(root.get("finishedTime"), startTime));
             }
-            if (endTime != 0) {
+            if (endTime > 0) {
                 predicates.add(cb.lt(root.get("finishedTime"), endTime));
             }
             if (Boolean.TRUE.equals(withFailedTasks)) {
@@ -435,10 +435,10 @@ public class SchedulerDBManager {
             if (StringUtils.isNotEmpty(taskName)) {
                 predicates.add(cb.like(root.get("taskName"), taskName + "%"));
             }
-            if (startTime != 0) {
+            if (startTime > 0) {
                 predicates.add(cb.ge(root.get("finishedTime"), startTime));
             }
-            if (endTime != 0) {
+            if (endTime > 0) {
                 predicates.add(cb.lt(root.get("finishedTime"), endTime));
             }
             if (!predicates.isEmpty()) {
@@ -1112,10 +1112,10 @@ public class SchedulerDBManager {
                 queryString.append("and (tenant = :tenant or tenant = null) ");
             }
         }
-        if (startTime != 0) {
+        if (startTime > 0) {
             queryString.append("and finishedTime >= :startTime ");
         }
-        if (endTime != 0) {
+        if (endTime > 0) {
             queryString.append("and finishedTime < :endTime ");
         }
         queryString.append(subQueryGroupByStatement);
@@ -1133,10 +1133,10 @@ public class SchedulerDBManager {
                 query.setParameter("tenant", tenant);
             }
         }
-        if (startTime != 0) {
+        if (startTime > 0) {
             query.setParameter("startTime", startTime);
         }
-        if (endTime != 0) {
+        if (endTime > 0) {
             query.setParameter("endTime", endTime);
         }
         return query;
