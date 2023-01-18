@@ -99,7 +99,7 @@ public class JobInfoData implements java.io.Serializable {
 
     private int childrenCount = 0;
 
-    private int cumulatedCoreTime = 0;
+    private long cumulatedCoreTime = 0;
 
     public void setToBeRemoved() {
         toBeRemoved = true;
@@ -357,11 +357,11 @@ public class JobInfoData implements java.io.Serializable {
         this.childrenCount = childrenCount;
     }
 
-    public int getCumulatedCoreTime() {
+    public long getCumulatedCoreTime() {
         return cumulatedCoreTime;
     }
 
-    public void setCumulatedCoreTime(int cumulatedCoreTime) {
+    public void setCumulatedCoreTime(long cumulatedCoreTime) {
         this.cumulatedCoreTime = cumulatedCoreTime;
     }
 
