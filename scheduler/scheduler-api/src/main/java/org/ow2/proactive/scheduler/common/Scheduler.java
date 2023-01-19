@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.job.CompletedTasksCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsCumulatedCoreTime;
+import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsNumberOfNodes;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobIdDataAndError;
@@ -1664,6 +1665,10 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
             String workflowName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException;
+
+    @RoleRead
+    List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows, String workflowName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
     List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,

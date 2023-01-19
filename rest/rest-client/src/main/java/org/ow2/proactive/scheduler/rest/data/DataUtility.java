@@ -222,6 +222,16 @@ public class DataUtility {
                                        .collect(Collectors.toList());
     }
 
+    public static List<FilteredTopWorkflowsNumberOfNodes>
+            tFilteredTopWorkflowsNumberOfNodes(List<FilteredTopWorkflowsNumberOfNodesData> filteredTopWorkflowsData) {
+        return filteredTopWorkflowsData.stream()
+                                       .map(filteredTopWorkflow -> new FilteredTopWorkflowsNumberOfNodes(filteredTopWorkflow.getWorkflowName(),
+                                                                                                         filteredTopWorkflow.getProjectName(),
+                                                                                                         filteredTopWorkflow.getNumberOfNodes(),
+                                                                                                         filteredTopWorkflow.getNumberOfExecutions()))
+                                       .collect(Collectors.toList());
+    }
+
     public static List<WorkflowDuration> toWorkflowsDuration(List<WorkflowDurationData> filteredTopWorkflowsData) {
         return filteredTopWorkflowsData.stream()
                                        .map(filteredTopWorkflow -> new WorkflowDuration(filteredTopWorkflow.getWorkflowName(),

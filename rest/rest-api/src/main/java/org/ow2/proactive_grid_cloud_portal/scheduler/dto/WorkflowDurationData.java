@@ -33,7 +33,7 @@ public class WorkflowDurationData implements java.io.Serializable {
 
     private long duration;
 
-    private long numberOfExecutions;
+    private int numberOfExecutions;
 
     public String getWorkflowName() {
         return workflowName;
@@ -59,11 +59,11 @@ public class WorkflowDurationData implements java.io.Serializable {
         this.duration = duration;
     }
 
-    public long getNumberOfExecutions() {
+    public int getNumberOfExecutions() {
         return numberOfExecutions;
     }
 
-    public void setNumberOfExecutions(long numberOfExecutions) {
+    public void setNumberOfExecutions(int numberOfExecutions) {
         this.numberOfExecutions = numberOfExecutions;
     }
 

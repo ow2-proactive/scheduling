@@ -25,9 +25,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.security.KeyException;
 import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,7 +67,6 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
-import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -82,7 +79,6 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.utils.ObjectByteConverter;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -1080,6 +1076,14 @@ public abstract class InternalJob extends JobState {
 
     public synchronized void increaseCumulatedCoreTime(long additionalTime) {
         jobInfo.setCumulatedCoreTime(jobInfo.getCumulatedCoreTime() + additionalTime);
+    }
+
+    public synchronized void setNumberOfNodes(int numberOfNodes) {
+        jobInfo.setNumberOfNodes(numberOfNodes);
+    }
+
+    public synchronized void incrementNumberOfNodes() {
+        jobInfo.setNumberOfNodes(jobInfo.getNumberOfNodes() + 1);
     }
 
     @Override

@@ -93,6 +93,8 @@ public class JobInfoImpl implements JobInfo {
 
     private long cumulatedCoreTime = 0L;
 
+    private int numberOfNodes = 0;
+
     /** total number of tasks */
     private int totalNumberOfTasks = 0;
 
@@ -332,6 +334,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setCumulatedCoreTime(long cumulatedCoreTime) {
         this.cumulatedCoreTime = cumulatedCoreTime;
+    }
+
+    @Override
+    public int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    public void setNumberOfNodes(int numberOfNodes) {
+        this.numberOfNodes = numberOfNodes;
     }
 
     /**

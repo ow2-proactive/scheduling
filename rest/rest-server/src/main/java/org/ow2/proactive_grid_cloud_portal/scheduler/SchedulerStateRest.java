@@ -2666,6 +2666,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @GET
+    @Path("stats/topWorkflowsNumberOfNodes")
+    @Produces("application/json")
+    @Override
+    public List<FilteredTopWorkflowsNumberOfNodesData> getTopWorkflowsNumberOfNodes(
+            @HeaderParam("sessionid") String sessionId, @QueryParam("numberOfWorkflows") int numberOfWorkflows,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.getTopWorkflowsNumberOfNodes(numberOfWorkflows,
+                                                              workflowName,
+                                                              myJobs,
+                                                              startDate,
+                                                              endDate),
+                       FilteredTopWorkflowsNumberOfNodesData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
     @Path("stats/topWorkflowsWithExecutionTime")
     @Produces("application/json")
     @Override

@@ -439,6 +439,15 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     }
 
     /**
+     * To get the numberOfNodes
+     *
+     * @return the numberOfNodes
+     */
+    public int getNumberOfNodes() {
+        return getJobInfo().getNumberOfNodes();
+    }
+
+    /**
      * To get the status of the job.
      *
      * @return the status of the job.

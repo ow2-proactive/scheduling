@@ -33,7 +33,7 @@ public class FilteredTopWorkflowData {
 
     private long numberOfIssues;
 
-    private long numberOfExecutions;
+    private int numberOfExecutions;
 
     public String getWorkflowName() {
         return workflowName;
@@ -59,11 +59,11 @@ public class FilteredTopWorkflowData {
         this.numberOfIssues = numberOfIssues;
     }
 
-    public long getNumberOfExecutions() {
+    public int getNumberOfExecutions() {
         return numberOfExecutions;
     }
 
-    public void setNumberOfExecutions(long numberOfExecutions) {
+    public void setNumberOfExecutions(int numberOfExecutions) {
         this.numberOfExecutions = numberOfExecutions;
     }
 

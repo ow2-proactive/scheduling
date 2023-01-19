@@ -39,9 +39,9 @@ public class FilteredTopWorkflow implements Serializable {
 
     private final long numberOfIssues;
 
-    private final long numberOfExecutions;
+    private final int numberOfExecutions;
 
-    public FilteredTopWorkflow(String workflowName, String projectName, long numberOfIssues, long numberOfExecutions) {
+    public FilteredTopWorkflow(String workflowName, String projectName, long numberOfIssues, int numberOfExecutions) {
         this.workflowName = workflowName;
         this.projectName = projectName;
         this.numberOfIssues = numberOfIssues;
@@ -60,7 +60,7 @@ public class FilteredTopWorkflow implements Serializable {
         return numberOfIssues;
     }
 
-    public long getNumberOfExecutions() {
+    public int getNumberOfExecutions() {
         return numberOfExecutions;
     }
 }
