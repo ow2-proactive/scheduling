@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -188,6 +189,28 @@ public class CommonRest implements CommonRestInterface {
                       .collect(Collectors.groupingBy(method -> method.substring(0, method.lastIndexOf(".")),
                                                      mapping(method -> method.substring(method.lastIndexOf(".") + 1),
                                                              toList())));
+    }
+
+    @Override
+    public Map<String, Boolean> checkRolePermissions(String sessionId, List<String> roles) throws RestException {
+        if (CollectionUtils.isEmpty(roles)) {
+            return Collections.emptyMap();
+        }
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        Map<String, Boolean> answer = new HashMap<>(roles.size());
+        for (String role : roles) {
+            try {
+                checkPermission(scheduler.getSubject(),
+                                new ServiceRolePermission(role),
+                                "Access to the role " + role + " is not allowed");
+                answer.put(role, Boolean.TRUE);
+            } catch (PermissionException e) {
+                answer.put(role, Boolean.FALSE);
+            } catch (NotConnectedException e) {
+                throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+            }
+        }
+        return answer;
     }
 
     @Override
