@@ -439,7 +439,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     }
 
     /**
-     * To get the numberOfNodes
+     * Returns the number of nodes used by the job since the beginning of its execution
      *
      * @return the numberOfNodes
      */

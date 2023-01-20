@@ -1082,8 +1082,8 @@ public abstract class InternalJob extends JobState {
         jobInfo.setNumberOfNodes(numberOfNodes);
     }
 
-    public synchronized void incrementNumberOfNodes() {
-        jobInfo.setNumberOfNodes(jobInfo.getNumberOfNodes() + 1);
+    public synchronized void increaseNumberOfNodes(int numberOfNodes) {
+        jobInfo.setNumberOfNodes(jobInfo.getNumberOfNodes() + numberOfNodes);
     }
 
     @Override

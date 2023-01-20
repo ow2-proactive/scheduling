@@ -95,6 +95,8 @@ public class DataUtility {
         impl.setExternalEndpointUrls(d.getExternalEndpointUrls());
         impl.setResultMapPresent(d.isResultMapPresent());
         impl.setPreciousTasks(d.getPreciousTasks());
+        impl.setCumulatedCoreTime(d.getCumulatedCoreTime());
+        impl.setNumberOfNodes(d.getNumberOfNodes());
         return impl;
     }
 

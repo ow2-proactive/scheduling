@@ -640,7 +640,7 @@ class LiveJobs {
 
         // set the different informations on task
         job.startTask(task);
-        jobData.job.incrementNumberOfNodes();
+        jobData.job.increaseNumberOfNodes(task.getExecuterInformation().getNodes().getTotalNumberOfNodes());
         dbManager.jobTaskStarted(job, task, firstTaskStarted, taskLauncherNodeUrl);
 
         listener.taskStateUpdated(job.getOwner(),
