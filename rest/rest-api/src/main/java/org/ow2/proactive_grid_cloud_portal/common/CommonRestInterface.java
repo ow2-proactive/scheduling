@@ -280,4 +280,21 @@ public interface CommonRestInterface {
     Map<String, Boolean> checkPermissions(@HeaderParam("sessionid") String sessionId, List<String> methods)
             throws RestException;
 
+    /**
+     * Check multiple service role permission.
+     *
+     * Test if a user has access to the specified service roles.
+     *
+     * @param sessionId id of a session
+     * @param roles a list of service roles to check
+     * @throws RestException if an error occurs or the session is invalid
+     * @return a map containing the service role and true/false if the user has permission
+     */
+    @POST
+    @Path("permissions/roles")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, Boolean> checkRolePermissions(@HeaderParam("sessionid") String sessionId, List<String> roles)
+            throws RestException;
+
 }
