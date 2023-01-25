@@ -192,12 +192,10 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setMaxNumberOfExecution(5);
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
+        internalTask.setExecuterInformation(executerInformation);
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
@@ -394,12 +392,10 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setMaxNumberOfExecution(5);
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
+        internalTask.setExecuterInformation(executerInformation);
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
@@ -434,12 +430,10 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setMaxNumberOfExecution(5);
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
+        internalTask.setExecuterInformation(executerInformation);
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
@@ -470,12 +464,10 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
+        internalTask.setExecuterInformation(executerInformation);
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
@@ -499,12 +491,9 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
         internalTask.setExecuterInformation(executerInformation);
         TaskInfoImpl taskInfoImpl = (TaskInfoImpl) internalTask.getTaskInfo();
         taskInfoImpl.setNumberOfExecutionLeft(2);
@@ -544,12 +533,10 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
+        internalTask.setExecuterInformation(executerInformation);
         TaskInfoImpl taskInfoImpl = (TaskInfoImpl) internalTask.getTaskInfo();
         taskInfoImpl.setNumberOfExecutionLeft(0);
 
@@ -587,12 +574,10 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setId(taskId);
         internalTask.setName("task-name");
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
+        internalTask.setExecuterInformation(executerInformation);
         TaskInfoImpl taskInfoImpl = (TaskInfoImpl) internalTask.getTaskInfo();
         taskInfoImpl.setNumberOfExecutionLeft(10);
 
@@ -646,12 +631,10 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
+        internalTask.setExecuterInformation(executerInformation);
         TaskInfoImpl taskInfoImpl = (TaskInfoImpl) internalTask.getTaskInfo();
         taskInfoImpl.setNumberOfExecutionLeft(1);
 
@@ -689,12 +672,10 @@ public class LiveJobsTest extends ProActiveTestClean {
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         ExecuterInformation executerInformation = Mockito.mock(ExecuterInformation.class);
-        Mockito.when(executerInformation.getNodes()).thenAnswer(new Answer<NodeSet>() {
-            @Override
-            public NodeSet answer(InvocationOnMock invocation) throws Throwable {
-                return Mockito.mock(NodeSet.class);
-            }
-        });
+        Mockito.when(executerInformation.getNodes()).thenReturn(Mockito.mock(NodeSet.class));
+        Mockito.when(executerInformation.getHostName()).thenReturn("");
+        Mockito.when(executerInformation.getNodeName()).thenReturn("");
+        internalTask.setExecuterInformation(executerInformation);
         TaskInfoImpl taskInfoImpl = (TaskInfoImpl) internalTask.getTaskInfo();
         taskInfoImpl.setNumberOfExecutionLeft(2);
 
