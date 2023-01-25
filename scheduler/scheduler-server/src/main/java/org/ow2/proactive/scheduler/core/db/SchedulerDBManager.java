@@ -67,6 +67,7 @@ import org.ow2.proactive.scheduler.common.job.CompletedTasksCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflow;
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsCumulatedCoreTime;
+import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsNumberOfNodes;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -1004,7 +1005,7 @@ public class SchedulerDBManager {
                                                                     nameAndCount[1] != null ? nameAndCount[1].toString()
                                                                                             : null,
                                                                     Long.parseLong(nameAndCount[2].toString()),
-                                                                    Long.parseLong(nameAndCount[3].toString())))
+                                                                    Integer.parseInt(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
     }
@@ -1027,14 +1028,42 @@ public class SchedulerDBManager {
                                                subQueryGroupByStatement);
 
             List<Object[]> list = query.list();
-            list.stream()
-                .forEach(nameAndCount -> logger.error("TASK core " + Long.parseLong(nameAndCount[2].toString())));
             return list.stream()
                        .map(nameAndCount -> new FilteredTopWorkflowsCumulatedCoreTime(nameAndCount[0].toString(),
                                                                                       nameAndCount[1] != null ? nameAndCount[1].toString()
                                                                                                               : null,
-                                                                                      Long.parseLong(nameAndCount[2].toString()),
-                                                                                      Long.parseLong(nameAndCount[3].toString())))
+                                                                                      nameAndCount[2] != null ? Long.parseLong(nameAndCount[2].toString())
+                                                                                                              : 0L,
+                                                                                      Integer.parseInt(nameAndCount[3].toString())))
+                       .collect(Collectors.toList());
+        });
+    }
+
+    public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
+            final String workflowName, String user, String tenant, final long startTime, final long endTime) {
+
+        return executeReadOnlyTransaction(session -> {
+
+            String selectSubQuery = "select jobName, projectName, sum(numberOfNodes) as totalNumberOfNodes, count(*) as numberOfExecution from JobData where startTime > 0 and finishedTime > 0  ";
+            String subQueryGroupByStatement = "group by jobName, projectName order by totalNumberOfNodes desc";
+            Query query = getTopWorkflowsQuery(session,
+                                               workflowName,
+                                               user,
+                                               tenant,
+                                               startTime,
+                                               endTime,
+                                               numberOfWorkflows,
+                                               selectSubQuery,
+                                               subQueryGroupByStatement);
+
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .map(nameAndCount -> new FilteredTopWorkflowsNumberOfNodes(nameAndCount[0].toString(),
+                                                                                  nameAndCount[1] != null ? nameAndCount[1].toString()
+                                                                                                          : null,
+                                                                                  nameAndCount[2] != null ? Integer.parseInt(nameAndCount[2].toString())
+                                                                                                          : 0,
+                                                                                  Integer.parseInt(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
     }
@@ -1062,7 +1091,7 @@ public class SchedulerDBManager {
                                                                  nameAndCount[1] != null ? nameAndCount[1].toString()
                                                                                          : null,
                                                                  Math.round(Double.parseDouble(nameAndCount[2].toString())),
-                                                                 Long.parseLong(nameAndCount[3].toString())))
+                                                                 Integer.parseInt(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
     }
@@ -1090,7 +1119,7 @@ public class SchedulerDBManager {
                                                                  nameAndCount[1] != null ? nameAndCount[1].toString()
                                                                                          : null,
                                                                  Math.round(Double.parseDouble(nameAndCount[2].toString())),
-                                                                 Long.parseLong(nameAndCount[3].toString())))
+                                                                 Integer.parseInt(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
     }
@@ -1764,6 +1793,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
+                   .setParameter("numberOfNodes", jobInfo.getNumberOfNodes())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("jobId", jobId)
                    .executeUpdate();
@@ -1807,6 +1837,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
                    .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
+                   .setParameter("numberOfNodes", jobInfo.getNumberOfNodes())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                    // the following forces hibernate 5.2 to use the proper conversion for list of strings Lob parameters
@@ -1897,6 +1928,7 @@ public class SchedulerDBManager {
                                .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                                .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                                .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
+                               .setParameter("numberOfNodes", jobInfo.getNumberOfNodes())
                                .setParameter("lastUpdatedTime", new Date().getTime())
                                .setParameter("resultMap",
                                              ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
@@ -1989,6 +2021,7 @@ public class SchedulerDBManager {
                                         .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                                         .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                                         .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
+                                        .setParameter("numberOfNodes", jobInfo.getNumberOfNodes())
                                         .setParameter("lastUpdatedTime", new Date().getTime())
                                         .setParameter("resultMap",
                                                       ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
@@ -2274,6 +2307,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
+                   .setParameter("numberOfNodes", jobInfo.getNumberOfNodes())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                    // the following forces hibernate 5.2 to use the proper conversion for list of strings Lob parameters

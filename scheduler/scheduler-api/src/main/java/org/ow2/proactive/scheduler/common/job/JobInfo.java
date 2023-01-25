@@ -131,6 +131,12 @@ public interface JobInfo extends Serializable {
     long getCumulatedCoreTime();
 
     /**
+     * Returns the number of nodes used by the job since the beginning of its execution
+     * @return number of nodes used by the job
+     */
+    int getNumberOfNodes();
+
+    /**
      * Returns the number of tasks managed by the Job.
      *
      * @return the number of tasks managed by the Job.

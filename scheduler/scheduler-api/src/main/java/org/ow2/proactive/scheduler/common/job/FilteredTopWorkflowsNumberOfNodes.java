@@ -31,20 +31,21 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 @PublicAPI
-public class WorkflowDuration implements Serializable {
+public class FilteredTopWorkflowsNumberOfNodes implements Serializable {
 
     private final String workflowName;
 
     private final String projectName;
 
-    private final long duration;
+    private final int numberOfNodes;
 
     private final int numberOfExecutions;
 
-    public WorkflowDuration(String workflowName, String projectName, long duration, int numberOfExecutions) {
+    public FilteredTopWorkflowsNumberOfNodes(String workflowName, String projectName, int numberOfNodes,
+            int numberOfExecutions) {
         this.workflowName = workflowName;
         this.projectName = projectName;
-        this.duration = duration;
+        this.numberOfNodes = numberOfNodes;
         this.numberOfExecutions = numberOfExecutions;
     }
 
@@ -56,8 +57,8 @@ public class WorkflowDuration implements Serializable {
         return projectName;
     }
 
-    public long getDuration() {
-        return duration;
+    public int getNumberOfNodes() {
+        return numberOfNodes;
     }
 
     public int getNumberOfExecutions() {

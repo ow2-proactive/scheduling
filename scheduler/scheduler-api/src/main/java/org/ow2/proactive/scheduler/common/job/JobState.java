@@ -439,6 +439,15 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     }
 
     /**
+     * Returns the number of nodes used by the job since the beginning of its execution
+     *
+     * @return the numberOfNodes
+     */
+    public int getNumberOfNodes() {
+        return getJobInfo().getNumberOfNodes();
+    }
+
+    /**
      * To get the status of the job.
      *
      * @return the status of the job.

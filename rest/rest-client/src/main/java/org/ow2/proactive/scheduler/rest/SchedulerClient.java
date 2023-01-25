@@ -541,6 +541,25 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
+            String workflowName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
+
+        try {
+            List<FilteredTopWorkflowsNumberOfNodesData> filteredWorkflows = restApi().getTopWorkflowsNumberOfNodes(sid,
+                                                                                                                   numberOfWorkflows,
+                                                                                                                   startDate,
+                                                                                                                   endDate,
+                                                                                                                   myJobs,
+                                                                                                                   workflowName);
+            return new ArrayList<>(DataUtility.tFilteredTopWorkflowsNumberOfNodes(filteredWorkflows));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
 

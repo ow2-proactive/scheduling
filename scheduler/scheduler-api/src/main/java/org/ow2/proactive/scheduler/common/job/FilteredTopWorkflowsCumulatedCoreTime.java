@@ -39,10 +39,10 @@ public class FilteredTopWorkflowsCumulatedCoreTime implements Serializable {
 
     private final long cumulatedCoreTime;
 
-    private final long numberOfExecutions;
+    private final int numberOfExecutions;
 
     public FilteredTopWorkflowsCumulatedCoreTime(String workflowName, String projectName, long cumulatedCoreTime,
-            long numberOfExecutions) {
+            int numberOfExecutions) {
         this.workflowName = workflowName;
         this.projectName = projectName;
         this.cumulatedCoreTime = cumulatedCoreTime;
@@ -61,7 +61,7 @@ public class FilteredTopWorkflowsCumulatedCoreTime implements Serializable {
         return cumulatedCoreTime;
     }
 
-    public long getNumberOfExecutions() {
+    public int getNumberOfExecutions() {
         return numberOfExecutions;
     }
 }

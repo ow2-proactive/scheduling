@@ -263,6 +263,13 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
+    public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
+            String workflowName, Boolean myJobs, long startDate, long endDate)
+            throws PermissionException, NotConnectedException {
+        return getScheduler().getTopWorkflowsNumberOfNodes(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+    }
+
+    @Override
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
             Boolean myJobs, long startDate, long endDate) throws PermissionException, NotConnectedException {
         return getScheduler().getTopExecutionTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);

@@ -101,6 +101,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private long cumulatedCoreTime = 0;
 
+    private int numberOfNodes = 0;
+
     public void setToBeRemoved() {
         toBeRemoved = true;
     }
@@ -365,6 +367,14 @@ public class JobInfoData implements java.io.Serializable {
         this.cumulatedCoreTime = cumulatedCoreTime;
     }
 
+    public int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    public void setNumberOfNodes(int numberOfNodes) {
+        this.numberOfNodes = numberOfNodes;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{ " + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
@@ -377,7 +387,7 @@ public class JobInfoData implements java.io.Serializable {
                projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" + genericInformation +
                ", variables=" + variables + ", signals=" + signals + ", detailedSignals=" + detailedSignals +
                ", attachedServices=" + attachedServices + ", externalEndpointUrls=" + externalEndpointUrls +
-               ", cumulatedCoreTime=" + cumulatedCoreTime + " }";
+               ", cumulatedCoreTime=" + cumulatedCoreTime + ", numberOfNodes=" + numberOfNodes + " }";
     }
 
 }

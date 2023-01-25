@@ -95,6 +95,8 @@ public class DataUtility {
         impl.setExternalEndpointUrls(d.getExternalEndpointUrls());
         impl.setResultMapPresent(d.isResultMapPresent());
         impl.setPreciousTasks(d.getPreciousTasks());
+        impl.setCumulatedCoreTime(d.getCumulatedCoreTime());
+        impl.setNumberOfNodes(d.getNumberOfNodes());
         return impl;
     }
 
@@ -219,6 +221,16 @@ public class DataUtility {
                                                                                                              filteredTopWorkflow.getProjectName(),
                                                                                                              filteredTopWorkflow.getCumulatedCoreTime(),
                                                                                                              filteredTopWorkflow.getNumberOfExecutions()))
+                                       .collect(Collectors.toList());
+    }
+
+    public static List<FilteredTopWorkflowsNumberOfNodes>
+            tFilteredTopWorkflowsNumberOfNodes(List<FilteredTopWorkflowsNumberOfNodesData> filteredTopWorkflowsData) {
+        return filteredTopWorkflowsData.stream()
+                                       .map(filteredTopWorkflow -> new FilteredTopWorkflowsNumberOfNodes(filteredTopWorkflow.getWorkflowName(),
+                                                                                                         filteredTopWorkflow.getProjectName(),
+                                                                                                         filteredTopWorkflow.getNumberOfNodes(),
+                                                                                                         filteredTopWorkflow.getNumberOfExecutions()))
                                        .collect(Collectors.toList());
     }
 

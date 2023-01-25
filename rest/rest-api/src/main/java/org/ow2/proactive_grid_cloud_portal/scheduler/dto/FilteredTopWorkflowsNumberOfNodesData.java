@@ -23,44 +23,53 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.job;
+package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import java.io.Serializable;
+public class FilteredTopWorkflowsNumberOfNodesData {
 
-import org.objectweb.proactive.annotation.PublicAPI;
+    private String workflowName;
 
+    private String projectName;
 
-@PublicAPI
-public class WorkflowDuration implements Serializable {
+    private int numberOfNodes;
 
-    private final String workflowName;
-
-    private final String projectName;
-
-    private final long duration;
-
-    private final int numberOfExecutions;
-
-    public WorkflowDuration(String workflowName, String projectName, long duration, int numberOfExecutions) {
-        this.workflowName = workflowName;
-        this.projectName = projectName;
-        this.duration = duration;
-        this.numberOfExecutions = numberOfExecutions;
-    }
+    private int numberOfExecutions;
 
     public String getWorkflowName() {
         return workflowName;
+    }
+
+    public void setWorkflowName(String workflowName) {
+        this.workflowName = workflowName;
     }
 
     public String getProjectName() {
         return projectName;
     }
 
-    public long getDuration() {
-        return duration;
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    public void setNumberOfNodes(int numberOfNodes) {
+        this.numberOfNodes = numberOfNodes;
     }
 
     public int getNumberOfExecutions() {
         return numberOfExecutions;
+    }
+
+    public void setNumberOfExecutions(int numberOfExecutions) {
+        this.numberOfExecutions = numberOfExecutions;
+    }
+
+    @Override
+    public String toString() {
+        return "FilteredTopWorkflowData{" + "workflowName='" + workflowName + '\'' + ", projectName='" + projectName +
+               '\'' + ", numberOfNodes=" + numberOfNodes + ", numberOfExecutions=" + numberOfExecutions + '}';
     }
 }

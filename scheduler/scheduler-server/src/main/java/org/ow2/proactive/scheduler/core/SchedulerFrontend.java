@@ -2066,7 +2066,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
-                                                                     "You don't have permissions to get top workflows consuming the most CPU/nodes");
+                                                                     "You don't have permissions to get top workflows consuming the most CPU");
         String tenant = null;
         if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
             // overwrite tenant filter if the user only has access to his own tenant
@@ -2078,6 +2078,29 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                            tenant,
                                                            startDate,
                                                            endDate);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleRead
+    public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
+            String workflowName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to get top workflows that use the most nodes");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        return dbManager.getTopWorkflowsNumberOfNodes(numberOfWorkflows,
+                                                      workflowName,
+                                                      myJobs ? ident.getUsername() : null,
+                                                      tenant,
+                                                      startDate,
+                                                      endDate);
     }
 
     @Override
