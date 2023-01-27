@@ -53,7 +53,7 @@ public class EncryptCommand {
      * Entry point
      *
      * @param args arguments, try '-h' for help
-     * @see org.ow2.proactive.authentication.crypto.Credentials
+     * @see org.ow2.proactive.core.properties.PropertyDecrypter
      */
     public static void main(String[] args) {
 
@@ -134,7 +134,11 @@ public class EncryptCommand {
     private static void displayHelp(Options options) {
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(135);
-        hf.printHelp("encrypt" + Tools.shellExtension(), "", options, "", true);
+        hf.printHelp("encrypt" + Tools.shellExtension(),
+                     "Encrypt a string in a format that can be used to store passwords in configuration files.",
+                     options,
+                     "",
+                     true);
     }
 
     static class EncryptCommandException extends Exception {
