@@ -705,7 +705,11 @@ public class ManageUsers {
     private static void displayHelp(Options options) {
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(135);
-        hf.printHelp("proactive-users" + Tools.shellExtension(), "", options, "", true);
+        hf.printHelp("proactive-users" + Tools.shellExtension(),
+                     "Create, update or delete ProActive users.",
+                     options,
+                     "",
+                     true);
     }
 
     enum Action {
