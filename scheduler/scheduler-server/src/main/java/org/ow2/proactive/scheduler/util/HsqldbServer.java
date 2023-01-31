@@ -312,6 +312,12 @@ public class HsqldbServer extends AbstractIdleService {
         try (InputStream stream = Files.newInputStream(configuration)) {
             dbProperties.load(stream);
         }
+        // Unwrap the decrypted property to let the connection pool framework see it
+        // (as the connection pool framework reads properties using entryset iterators and jasypt EncryptableProperties does not override them)
+        if (dbProperties.containsKey(PROP_HIBERNATE_CONNECTION_PASSWORD)) {
+            dbProperties.setProperty(PROP_HIBERNATE_CONNECTION_PASSWORD,
+                                     dbProperties.getProperty(PROP_HIBERNATE_CONNECTION_PASSWORD));
+        }
 
         return dbProperties;
     }
