@@ -85,6 +85,10 @@ public class ChangeDBConfiguration {
 
     public static final String PASSWORD_OPTION_NAME = "password";
 
+    public static final String DIALECT_OPTION = "D";
+
+    public static final String DIALECT_OPTION_NAME = "dialect";
+
     public static final String MYSQL_TIMEZONE_OPTION = "z";
 
     public static final String MYSQL_TIMEZONE_OPTION_NAME = "timezone";
@@ -174,14 +178,14 @@ public class ChangeDBConfiguration {
                                                                                   "ojdbc8");
 
     // hibernate dialect per database vendor
-    private static final Map<String, String> vendorsDialects = ImmutableMap.of(HSQLDB,
-                                                                               "org.hibernate.dialect.HSQLDialect",
-                                                                               POSTGRESQL,
-                                                                               "org.hibernate.dialect.PostgreSQLDialect",
-                                                                               MYSQL,
-                                                                               "org.hibernate.dialect.MySQL5InnoDBDialect",
-                                                                               ORACLE,
-                                                                               "org.hibernate.dialect.Oracle12cDialect");
+    private static final Map<String, String> vendorsDefaultDialects = ImmutableMap.of(HSQLDB,
+                                                                                      "org.hibernate.dialect.HSQLDialect",
+                                                                                      POSTGRESQL,
+                                                                                      "org.hibernate.dialect.PostgreSQL94Dialect",
+                                                                                      MYSQL,
+                                                                                      "org.hibernate.dialect.MySQL5InnoDBDialect",
+                                                                                      ORACLE,
+                                                                                      "org.hibernate.dialect.Oracle12cDialect");
 
     // JDBC driver class name per database vendor
     private static final Map<String, String> vendorsDrivers = ImmutableMap.of(HSQLDB,
@@ -250,6 +254,8 @@ public class ChangeDBConfiguration {
     private static String hostname = null;
 
     private static String port = null;
+
+    private static String dialect = null;
 
     private static String timezone = null;
 
@@ -401,6 +407,10 @@ public class ChangeDBConfiguration {
             }
         } else if (url == null) {
             port = defaultPorts.get(vendor);
+        }
+
+        if (cmd.hasOption(DIALECT_OPTION_NAME)) {
+            dialect = cmd.getOptionValue(DIALECT_OPTION_NAME).trim();
         }
 
         if (cmd.hasOption(MYSQL_TIMEZONE_OPTION_NAME)) {
@@ -598,6 +608,16 @@ public class ChangeDBConfiguration {
         opt.setArgs(1);
         options.addOption(opt);
 
+        opt = new Option(DIALECT_OPTION,
+                         DIALECT_OPTION_NAME,
+                         true,
+                         "Override default database vendor dialect. Use this option when the default dialect does not match your database version. Defaults are " +
+                               vendorsDefaultDialects);
+        opt.setRequired(false);
+        opt.setArgName(DIALECT_OPTION_NAME.toUpperCase());
+        opt.setArgs(1);
+        options.addOption(opt);
+
         opt = new Option(MYSQL_TIMEZONE_OPTION,
                          MYSQL_TIMEZONE_OPTION_NAME,
                          true,
@@ -752,7 +772,8 @@ public class ChangeDBConfiguration {
         } else if (line.startsWith(HIBERNATE_CONNECTION_URL)) {
             return answerAndLog(HIBERNATE_CONNECTION_URL + "=" + url);
         } else if (line.startsWith(HIBERNATE_DIALECT)) {
-            return answerAndLog(HIBERNATE_DIALECT + "=" + vendorsDialects.get(vendor));
+            return answerAndLog(HIBERNATE_DIALECT + "=" +
+                                (dialect == null ? vendorsDefaultDialects.get(vendor) : dialect));
         } else if (line.startsWith(HIBERNATE_CONNECTION_USERNAME)) {
             return answerAndLog(HIBERNATE_CONNECTION_USERNAME + "=" + username);
         } else if (line.startsWith(HIBERNATE_CONNECTION_PASSWORD)) {
@@ -762,7 +783,8 @@ public class ChangeDBConfiguration {
         } else if (line.startsWith(SPRING_DATASOURCE_URL)) {
             return answerAndLog(SPRING_DATASOURCE_URL + "=" + url);
         } else if (line.startsWith(SPRING_DATASOURCE_DIALECT)) {
-            return answerAndLog(SPRING_DATASOURCE_DIALECT + "=" + vendorsDialects.get(vendor));
+            return answerAndLog(SPRING_DATASOURCE_DIALECT + "=" +
+                                (dialect == null ? vendorsDefaultDialects.get(vendor) : dialect));
         } else if (line.startsWith(SPRING_DATASOURCE_USERNAME)) {
             return answerAndLog(SPRING_DATASOURCE_USERNAME + "=" + username);
         } else if (line.startsWith(SPRING_DATASOURCE_PASSWORD)) {
