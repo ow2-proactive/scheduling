@@ -42,6 +42,9 @@ import org.ow2.proactive.web.WebProperties;
 import com.google.common.base.Strings;
 
 
+/**
+ * Command-line tool to change the Http configuration inside the ProActive server
+ */
 public class ChangeHttpConfiguration {
 
     private static final String newline = System.lineSeparator();
@@ -50,15 +53,15 @@ public class ChangeHttpConfiguration {
 
     public static final String HELP_OPTION_NAME = "help";
 
-    public static final String SCHEME_OPTION = "s";
+    public static final String SCHEME_OPTION = "S";
 
     public static final String SCHEME_OPTION_NAME = "scheme";
 
-    public static final String HOSTNAME_OPTION = "n";
+    public static final String HOSTNAME_OPTION = "H";
 
     public static final String HOSTNAME_OPTION_NAME = "hostname";
 
-    public static final String PORT_OPTION = "p";
+    public static final String PORT_OPTION = "P";
 
     public static final String PORT_OPTION_NAME = "port";
 
@@ -92,6 +95,8 @@ public class ChangeHttpConfiguration {
 
     private static Integer port = null;
 
+    private static String configuredHostname = null;
+
     /**
      * Entry point
      *
@@ -101,7 +106,10 @@ public class ChangeHttpConfiguration {
     public static void main(String[] args) {
 
         try {
-            changeHttpConfiguration(args);
+            if (changeHttpConfiguration(args)) {
+                log("Applied configuration: scheme=" + (isHttps ? "https" : "http") + " hostname=" +
+                    configuredHostname + " port=" + port);
+            }
         } catch (ChangeHttpConfigurationException e) {
             System.err.println("ERROR : " + e.getMessage());
             if (e.getCause() != null) {
@@ -120,11 +128,10 @@ public class ChangeHttpConfiguration {
             System.exit(1);
         }
 
-        log("Http configuration successfully applied");
         System.exit(0);
     }
 
-    public static void changeHttpConfiguration(String... args)
+    public static boolean changeHttpConfiguration(String... args)
             throws ChangeHttpConfigurationException, IOException, URISyntaxException {
         Options options = new Options();
         CommandLine cmd = getCommandLine(args, options);
@@ -135,14 +142,16 @@ public class ChangeHttpConfiguration {
 
         if (cmd.hasOption(HELP_OPTION_NAME) || cmd.getOptions().length == 0) {
             displayHelp(options);
-            return;
+            return false;
         }
+
         if (cmd.hasOption(SCHEME_OPTION_NAME)) {
             scheme = cmd.getOptionValue(SCHEME_OPTION_NAME).trim();
             if (!"http".equals(scheme) && !"https".equals(scheme)) {
                 exitWithErrorMessage(SCHEME_OPTION_NAME + " must be either http or https.", null, null);
             }
         }
+
         if (cmd.hasOption(HOSTNAME_OPTION_NAME)) {
             hostname = cmd.getOptionValue(HOSTNAME_OPTION_NAME).trim();
             Matcher hostnameMatcher = hostnamePattern.matcher(hostname);
@@ -154,6 +163,7 @@ public class ChangeHttpConfiguration {
             }
 
         }
+
         if (cmd.hasOption(PORT_OPTION_NAME)) {
             port = cmd.getOptionValue(PORT_OPTION_NAME).trim();
             try {
@@ -168,6 +178,7 @@ public class ChangeHttpConfiguration {
                 exitWithErrorMessage(PORT_OPTION_NAME + " must be a valid port value.", null, null);
             }
         }
+
         if (cmd.hasOption(DEBUG_OPTION_NAME)) {
             isDebug = true;
         }
@@ -175,9 +186,13 @@ public class ChangeHttpConfiguration {
         if (Strings.isNullOrEmpty(scheme) && Strings.isNullOrEmpty(hostname) && Strings.isNullOrEmpty(port)) {
             exitWithErrorMessage("At least one option needs to be provided, nothing to do.", null, null);
         }
+        // resolve the final configuration to apply, based on the command line parameters and the existing ProActive configuration.
         setCurrentConfiguration(scheme, port);
+        // update the config/web/settings.ini file
         changeWebPropertiesConfiguration();
+        // update all application.properties files in dist/war
         changeAllApplicationPropertiesConfiguration(hostname);
+        return true;
     }
 
     /**
@@ -192,7 +207,10 @@ public class ChangeHttpConfiguration {
         opt.setRequired(false);
         options.addOption(opt);
 
-        opt = new Option(SCHEME_OPTION, SCHEME_OPTION_NAME, false, "Http protocol to use (http or https)");
+        opt = new Option(SCHEME_OPTION,
+                         SCHEME_OPTION_NAME,
+                         false,
+                         "Http protocol to use (http or https). When this option is not provided, the currently configured scheme will remain unchanged.");
         opt.setRequired(false);
         opt.setArgName(SCHEME_OPTION_NAME.toUpperCase());
         opt.setArgs(1);
@@ -201,13 +219,16 @@ public class ChangeHttpConfiguration {
         opt = new Option(HOSTNAME_OPTION,
                          HOSTNAME_OPTION_NAME,
                          true,
-                         "Hostname used (localhost, myserver) or IP address (127.0.0.1, 192.168.12.1)");
+                         "Hostname used (e.g. localhost, myserver) or IP address (e.g. 127.0.0.1, 192.168.12.1). When this option is not provided, the hostname appearing in existing configuration files urls will be unchanged.");
         opt.setRequired(false);
         opt.setArgName(HOSTNAME_OPTION_NAME.toUpperCase());
         opt.setArgs(1);
         options.addOption(opt);
 
-        opt = new Option(PORT_OPTION, PORT_OPTION_NAME, true, "Port used (8080, 8443, etc...)");
+        opt = new Option(PORT_OPTION,
+                         PORT_OPTION_NAME,
+                         true,
+                         "Port used (e.g. 8080, 8443). When this option is not provided, the port configured for the current scheme (http or https) will be used.");
         opt.setRequired(false);
         opt.setArgName(PORT_OPTION_NAME.toUpperCase());
         opt.setArgs(1);
@@ -229,13 +250,21 @@ public class ChangeHttpConfiguration {
     }
 
     private static void displayHelp(Options options) {
+        String header = newline +
+                        "Change ProActive Jetty (Web) Server parameters and apply it to all configuration files." +
+                        newline;
+        header += "This command can be used, for example, to change the ProActive server HTTP port or switch the server to the HTTPS protocol." +
+                  newline + newline;
+
+        String footer = newline + "Examples: " + newline;
+        footer += "# Configure scheme to https with port 8444 and default hostname. Debug output to see all modifications." +
+                  newline;
+        footer += "configure-http -S https -P 8444 -d" + newline;
+        footer += "# Configure scheme to http with default port and specific hostname" + newline;
+        footer += "configure-http -S http -H myserver" + newline;
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(135);
-        hf.printHelp("configure-http" + Tools.shellExtension(),
-                     "Change parameters of the http configuration and apply it to all configuration files.",
-                     options,
-                     "",
-                     true);
+        hf.printHelp("configure-http" + Tools.shellExtension(), header, options, footer, true);
     }
 
     private static File getSchedulerFile(String path) {
@@ -251,10 +280,17 @@ public class ChangeHttpConfiguration {
         }
     }
 
+    /**
+     * Return the config/web/settings.ini file
+     */
     private static File getWebPropertiesFile() {
         return getSchedulerFile(WebProperties.PA_WEB_PROPERTIES_RELATIVE_FILEPATH);
     }
 
+    /**
+     * Find all application.properties files inside the dist/war microservice
+     * @return a list of application.properties file paths
+     */
     private static List<File> findAllPropertiesFiles() throws ChangeHttpConfigurationException {
         final List<File> answer = new ArrayList<>();
         File distWarDirectory = getSchedulerFile(APPLICATIONS_PROPERTIES_SEARCH_BASE_PATH);
@@ -276,6 +312,12 @@ public class ChangeHttpConfiguration {
         return answer;
     }
 
+    /**
+     * Check that an application properties file exists and can be written to
+     * @param answer list where this application.properties file will be added
+     * @param applicationPropertiesFile file to analyse
+     * @throws ChangeHttpConfigurationException when the application.properties file cannot be modified
+     */
     private static void checkApplicationPropertiesFile(List<File> answer, File applicationPropertiesFile)
             throws ChangeHttpConfigurationException {
         if (applicationPropertiesFile != null && applicationPropertiesFile.exists() &&
@@ -287,6 +329,9 @@ public class ChangeHttpConfiguration {
         }
     }
 
+    /**
+     * Apply the current configuration to config/web/settings.ini
+     */
     private static void changeWebPropertiesConfiguration() throws IOException {
         File webPropertiesFile = getWebPropertiesFile();
         if (isDebug) {
@@ -309,6 +354,9 @@ public class ChangeHttpConfiguration {
         System.out.println(line);
     }
 
+    /**
+     * Apply the current configuration to all application.properties files
+     */
     private static void changeAllApplicationPropertiesConfiguration(String hostname)
             throws IOException, ChangeHttpConfigurationException, URISyntaxException {
         List<File> propertiesFiles = findAllPropertiesFiles();
@@ -317,11 +365,14 @@ public class ChangeHttpConfiguration {
         }
     }
 
+    /**
+     * Apply the current configuration to one application.properties file
+     */
     private static void changeApplicationPropertiesConfiguration(File applicationPropertiesFile, String hostname)
             throws IOException, URISyntaxException {
         List<String> inputLines;
         if (isDebug) {
-            log("Checking " + applicationPropertiesFile);
+            log("DEBUG: Checking " + applicationPropertiesFile);
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(applicationPropertiesFile))) {
             inputLines = IOUtils.readLines(reader);
@@ -335,6 +386,12 @@ public class ChangeHttpConfiguration {
         }
     }
 
+    /**
+     * Use the provided command-line and the current configuration in config/web/settings.ini
+     * to determine the overall configuration that must be applied.
+     * @param scheme provided scheme parameter in the command line
+     * @param port provided port parameter in the command line
+     */
     private static void setCurrentConfiguration(String scheme, String port) {
         System.setProperty(WebProperties.REST_HOME.getKey(), PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
         WebProperties.load();
@@ -354,11 +411,17 @@ public class ChangeHttpConfiguration {
 
     private static String answerAndLog(String line) {
         if (isDebug) {
-            log(" -> Set " + line);
+            log("DEBUG:  -> Set " + line);
         }
         return line;
     }
 
+    /**
+     * Analyse a line inside the config/web/settings.ini file
+     * Return a modified line if a parameter needs to be updated
+     * @param line input line
+     * @return a modified or identical line
+     */
     private static String analyseLineInWebPropertiesFile(String line) {
         line = line.trim();
         if (!isHttps && line.startsWith(WebProperties.WEB_HTTP_PORT.getKey())) {
@@ -387,6 +450,12 @@ public class ChangeHttpConfiguration {
         return line;
     }
 
+    /**
+     * Analyse a line inside one application.properties file
+     * Return a modified line if a parameter needs to be updated
+     * @param line input line
+     * @return a modified or identical line
+     */
     private static String analyseLineInApplicationPropertiesFile(String line, String hostname)
             throws URISyntaxException {
         line = line.trim();
@@ -396,6 +465,10 @@ public class ChangeHttpConfiguration {
             // remove the starting =
             urlInFile = urlInFile.replaceFirst("=\\s*", "");
             URI oldUri = new URI(urlInFile);
+            if (configuredHostname == null) {
+                // store configured hostname to display the final configuration message
+                configuredHostname = hostname != null ? hostname : oldUri.getHost();
+            }
             URI newUri = new URI(isHttps ? "https" : "http",
                                  oldUri.getUserInfo(),
                                  hostname != null ? hostname : oldUri.getHost(),

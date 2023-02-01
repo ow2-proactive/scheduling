@@ -29,6 +29,7 @@ import static org.ow2.proactive.scheduler.util.HsqldbServer.PROP_HIBERNATE_CONNE
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -2863,9 +2864,14 @@ public class SchedulerDBManager {
                 if (configFile.getName().endsWith(".xml")) {
                     configuration.configure(configFile);
                 } else {
+                    Properties properties;
                     try {
-                        Properties properties = PropertyDecrypter.getDecryptableProperties();
-                        properties.load(Files.newBufferedReader(configFile.toPath(), Charset.defaultCharset()));
+                        properties = PropertyDecrypter.getDecryptableProperties();
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                    try (Reader reader = Files.newBufferedReader(configFile.toPath(), Charset.defaultCharset())) {
+                        properties.load(reader);
                         configuration.addProperties(properties);
                         // Unwrap the decrypted property to let the connection pool framework see it
                         // (as the connection pool framework reads properties using entryset iterators and jasypt EncryptableProperties does not override them)

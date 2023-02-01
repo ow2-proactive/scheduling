@@ -215,6 +215,12 @@ class LoadPackage {
         def bis = new BufferedInputStream(response.getEntity().getContent())
         def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
         bis.close()
+        def responseStatusLine = response.getStatusLine()
+        if (responseStatusLine.getStatusCode() >= 400) {
+            writeToOutput("Result of " + list_buckets_rest_query + ":")
+            writeToOutput(result)
+            throw new IllegalStateException("Invalid response status from " + list_buckets_rest_query + ": " + responseStatusLine)
+        }
         def buckets = slurper.parseText(result)
         def bucket_found = buckets.find { object -> object.name == bucket }
 
@@ -230,6 +236,12 @@ class LoadPackage {
                 put.addHeader("Accept", "application/json")
                 put.addHeader("Content-Type", "application/json")
                 def putResponse = getHttpClientBuilder().build().execute(put)
+                def putResponseStatusLine = putResponse.getStatusLine()
+                if (putResponseStatusLine.getStatusCode() >= 400) {
+                    writeToOutput("Result of " + update_bucket_query + ":")
+                    writeToOutput(result)
+                    throw new IllegalStateException("Invalid response status from " + update_bucket_query + ": " + putResponseStatusLine)
+                }
                 def putRes = new BufferedInputStream(putResponse.getEntity().getContent())
                 result = org.apache.commons.io.IOUtils.toString(putRes, "UTF-8")
                 def bucket_name = slurper.parseText(result.toString()).get("name")
@@ -246,6 +258,12 @@ class LoadPackage {
             post.addHeader("sessionId", this.sessionId)
 
             response = getHttpClientBuilder().build().execute(post)
+            responseStatusLine = response.getStatusLine()
+            if (responseStatusLine.getStatusCode() >= 400) {
+                writeToOutput("Result of " + create_bucket_query + ":")
+                writeToOutput(result)
+                throw new IllegalStateException("Invalid response status from " + create_bucket_query + ": " + responseStatusLine)
+            }
             bis = new BufferedInputStream(response.getEntity().getContent())
             result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
             def bucket_name = slurper.parseText(result.toString()).get("name")
@@ -289,6 +307,12 @@ class LoadPackage {
             def get = new org.apache.http.client.methods.HttpGet(list_bucket_resources_rest_query)
             get.addHeader("sessionid", this.sessionId)
             def response = getHttpClientBuilder().build().execute(get)
+            def responseStatusLine = response.getStatusLine()
+            if (responseStatusLine.getStatusCode() >= 400) {
+                writeToOutput("Result of " + list_bucket_resources_rest_query + ":")
+                writeToOutput(result)
+                throw new IllegalStateException("Invalid response status from " + list_bucket_resources_rest_query + ": " + responseStatusLine)
+            }
             def bis = new BufferedInputStream(response.getEntity().getContent())
             def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
             bis.close()
