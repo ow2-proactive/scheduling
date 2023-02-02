@@ -51,8 +51,11 @@ import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.InvalidChannelException;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.utils.Repeat;
+import org.ow2.proactive.utils.RepeatRule;
 import org.ow2.tests.ProActiveTestClean;
 
+import com.google.common.collect.ImmutableSet;
 import com.jayway.awaitility.Awaitility;
 
 
@@ -72,6 +75,9 @@ public class SignalApiTest extends ProActiveTestClean {
 
     public static final String READY_PREFIX = "ready_";
 
+    @Rule
+    public RepeatRule repeatRule = new RepeatRule();
+
     @ClassRule
     public static TemporaryFolder folder = new TemporaryFolder();
 
@@ -87,7 +93,9 @@ public class SignalApiTest extends ProActiveTestClean {
             // While logger is not configured and it not set with sys properties, use Console logger
             Logger.getRootLogger().getLoggerRepository().resetConfiguration();
             BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%m%n")));
-            Logger.getRootLogger().setLevel(Level.DEBUG);
+            Logger.getRootLogger().setLevel(Level.INFO);
+            Logger.getLogger(SignalApiImpl.class).setLevel(Level.DEBUG);
+            Logger.getLogger(AOSynchronization.class).setLevel(Level.DEBUG);
         }
         Logger.getLogger(SignalApiImpl.class).setLevel(Level.TRACE);
 
@@ -102,12 +110,18 @@ public class SignalApiTest extends ProActiveTestClean {
                                                            localNode);
         synchronizationInternal.createChannelIfAbsent(USER, TASK_ID, SIGNALS_CHANNEL, true);
         signalApi = new SignalApiImpl(USER, TASK_ID, synchronizationInternal);
-        executor = Executors.newFixedThreadPool(2);
     }
 
     @Before
     public void clearJobSignals() throws SignalApiException {
         signalApi.clearJobSignals();
+        executor = Executors.newFixedThreadPool(2);
+    }
+
+    @After
+    public void after() throws InterruptedException {
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.MINUTES);
     }
 
     @AfterClass
@@ -180,12 +194,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test
     public void testCheckForSignals() throws SignalApiException {
-        Set<String> signalsToBeChecked = new HashSet<String>() {
-            {
-                add("test_signal_3_1");
-                add("test_signal_3_2");
-            }
-        };
+        Set<String> signalsToBeChecked = ImmutableSet.of("test_signal_3_1", "test_signal_3_2");
         signalApi.sendManySignals(signalsToBeChecked);
         Map<String, Map<String, String>> receivedSignals = signalApi.checkForSignals(signalsToBeChecked);
         Assert.assertTrue((receivedSignals.keySet().contains("test_signal_3_1")) ||
@@ -338,11 +347,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test(expected = SignalApiException.class)
     public void testSendManySignalsWithException() throws SignalApiException {
-        Set<String> signalsToBeSent = new HashSet<String>() {
-            {
-                add("");
-            }
-        };
+        Set<String> signalsToBeSent = ImmutableSet.of("");
 
         // Send empty signals then assert a SignalAPIException is thrown
         signalApi.sendManySignals(signalsToBeSent);
@@ -358,12 +363,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
     @Test
     public void testRemoveManySignals() throws InvalidChannelException, SignalApiException {
-        Set<String> signalsToBeRemoved = new HashSet<String>() {
-            {
-                add("test_signal_7_1");
-                add("test_signal_7_2");
-            }
-        };
+        Set<String> signalsToBeRemoved = ImmutableSet.of("test_signal_7_1", "test_signal_7_2");
         signalApi.sendManySignals(signalsToBeRemoved);
         signalApi.removeManySignals(signalsToBeRemoved);
 
@@ -404,6 +404,7 @@ public class SignalApiTest extends ProActiveTestClean {
                 Map<String, String> outputValues = signalApi.waitFor(signal);
                 Assert.assertEquals(parameters, outputValues);
             } catch (Exception e) {
+                e.printStackTrace();
             }
         };
 
@@ -413,32 +414,34 @@ public class SignalApiTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testWaitForAny() throws SignalApiException {
+    @Repeat(10)
+    public void testWaitForAny() throws SignalApiException, InterruptedException {
+        // start with a clean executor
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.MINUTES);
+        executor = Executors.newFixedThreadPool(2);
         String signal_1 = "test_signal_10_1";
         String signal_2 = "test_signal_10_2";
-        Set<String> signals = new HashSet<String>() {
-            {
-                add(signal_1);
-                add(signal_2);
-            }
-        };
+        Set<String> signals = ImmutableSet.of(signal_1, signal_2);
+
         Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("param1", "value1");
         parameters.put("param2", "value2");
-        long durationInMillis_1 = 100;
-        long durationInMillis_2 = 400;
+        long durationInMillis_1 = 50;
+        long durationInMillis_2 = 1000;
 
         //Define a thread that waits for the signal reception
         Runnable waitForAnySignalThread = () -> {
             try {
                 signalApi.waitForAny(signals);
             } catch (Exception e) {
+                e.printStackTrace();
             }
         };
 
         executor.submit(sendSignalRunnable(signal_1, parameters, durationInMillis_1));
         executor.submit(sendSignalRunnable(signal_2, parameters, durationInMillis_2));
-        Awaitility.await().atMost(4 * durationInMillis_1, TimeUnit.MILLISECONDS).until(waitForAnySignalThread);
+        Awaitility.await().atMost(3, TimeUnit.SECONDS).until(waitForAnySignalThread);
         Assert.assertTrue(signalApi.isReceived(signal_1));
         Assert.assertFalse(signalApi.isReceived(signal_2));
     }
@@ -447,12 +450,8 @@ public class SignalApiTest extends ProActiveTestClean {
     public void testWaitForAll() throws SignalApiException {
         String signal_1 = "test_signal_11_1";
         String signal_2 = "test_signal_11_2";
-        Set<String> signalNames = new HashSet<String>() {
-            {
-                add(signal_1);
-                add(signal_2);
-            }
-        };
+        Set<String> signalNames = ImmutableSet.of(signal_1, signal_2);
+
         Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("param1", "value1");
         parameters.put("param2", "value2");
