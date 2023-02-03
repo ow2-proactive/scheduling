@@ -1376,7 +1376,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    @RoleRead
+    @RoleAdmin
     public Map<JobId, JobDescriptor> getJobsToSchedule() throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
@@ -1388,7 +1388,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
     @Override
     @ImmediateService
-    @RoleRead
+    @RoleAdmin
     public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
         Policy policy = null;
         Method currentMethod = new Object() {

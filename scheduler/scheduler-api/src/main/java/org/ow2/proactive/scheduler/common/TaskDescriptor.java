@@ -26,8 +26,10 @@
 package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Vector;
 
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 
@@ -88,5 +90,23 @@ public interface TaskDescriptor extends Serializable {
      * @return the number of attempt the core has made to start this task.
      */
     int getAttempt();
+
+    /**
+     * Get the task generic information
+     * @return generic information associated with the task
+     */
+    Map<String, String> getGenericInformation();
+
+    /**
+     * Get the owner of this task
+     * @return the task owner
+     */
+    String getOwner();
+
+    /**
+     * Get the task owner encrypted credentials
+     * @return encrypted credentials
+     */
+    Credentials getCredentials();
 
 }

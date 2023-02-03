@@ -85,23 +85,8 @@ public class Credentials implements Serializable {
     /** Java properly describing the path to the encrypted credentials on the local drive */
     public static final String credentialsPathProperty = "pa.common.auth.credentials";
 
-    /** Default pubkey location */
-    private static final String DEFAULT_PUBKEY = System.getProperty("user.home") + File.separator + ".proactive" +
-                                                 File.separator + "security" + File.separator + "pub.key";
-
     /** Java property describing the path to the public key on the local drive */
     public static final String pubkeyPathProperty = "pa.common.auth.pubkey";
-
-    static {
-        File home = new File(DEFAULT_CREDS).getParentFile();
-        if (!home.isDirectory()) {
-            home.mkdirs();
-        }
-        home = new File(DEFAULT_PUBKEY).getParentFile();
-        if (!home.isDirectory()) {
-            home.mkdirs();
-        }
-    }
 
     /** key generation algorithm */
     private String algorithm;
@@ -471,6 +456,18 @@ public class Credentials implements Serializable {
     public static String getPubKeyPath() {
         String path = System.getProperty(pubkeyPathProperty);
         if (path == null) {
+            /** Default pubkey location */
+            String DEFAULT_PUBKEY = System.getProperty("user.home") + File.separator + ".proactive" + File.separator +
+                                    "security" + File.separator + "pub.key";
+
+            File home = new File(DEFAULT_CREDS).getParentFile();
+            if (!home.isDirectory()) {
+                home.mkdirs();
+            }
+            home = new File(DEFAULT_PUBKEY).getParentFile();
+            if (!home.isDirectory()) {
+                home.mkdirs();
+            }
             path = DEFAULT_PUBKEY;
         }
         return path;
