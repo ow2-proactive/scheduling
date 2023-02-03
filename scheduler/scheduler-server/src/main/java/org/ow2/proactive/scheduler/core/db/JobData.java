@@ -461,7 +461,7 @@ public class JobData implements Serializable {
 
     @Column(name = "PARENT_JOB_ID", nullable = true)
     public Long getParentId() {
-        return parentId;
+        return parentId == null ? 0L : parentId;
     }
 
     public void setParentId(Long parentId) {
