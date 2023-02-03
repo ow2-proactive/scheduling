@@ -268,6 +268,7 @@ public class SignalApiImpl implements SignalApi {
         init();
         try {
             synchronization.waitUntilAny(SIGNALS_CHANNEL + jobId, signalsSubSet, "{k, x -> x != null }");
+            logger.info("One of " + signalsSubSet + " received on job " + jobId);
             Map<String, Signal> signals = getJobSignals();
             Map.Entry<String, Signal> signalEntry = signals.entrySet()
                                                            .stream()
