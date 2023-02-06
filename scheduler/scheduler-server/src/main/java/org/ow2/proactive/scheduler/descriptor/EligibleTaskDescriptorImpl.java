@@ -25,10 +25,12 @@
  */
 package org.ow2.proactive.scheduler.descriptor;
 
+import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -66,6 +68,15 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     /** Number of attempt to start the task (number of rm.getAtMostNode() called for this task) */
     private int attempt = 0;
 
+    /** inherited generic information **/
+    private Map<String, String> genericInformation;
+
+    /** owner of this task **/
+    private String owner;
+
+    /** task owner credentials **/
+    private Credentials credentials;
+
     /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
     @XmlTransient
     private transient Vector<TaskDescriptor> parents;
@@ -82,8 +93,11 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      */
     public EligibleTaskDescriptorImpl(InternalTask td) {
         this.internalTask = td;
-        this.taskId = getInternal().getId();
-        this.numberOfNodesNeeded = getInternal().getNumberOfNodesNeeded();
+        this.taskId = td.getId();
+        this.numberOfNodesNeeded = td.getNumberOfNodesNeeded();
+        this.genericInformation = td.getRuntimeGenericInformation();
+        this.owner = td.getOwner();
+        this.credentials = td.getCredentials();
     }
 
     /**
@@ -194,6 +208,21 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      */
     public int getAttempt() {
         return attempt;
+    }
+
+    @Override
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    @Override
+    public String getOwner() {
+        return owner;
+    }
+
+    @Override
+    public Credentials getCredentials() {
+        return credentials;
     }
 
     /**

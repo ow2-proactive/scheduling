@@ -59,7 +59,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     @Configurable(description = "url used to contact the scheduler, e.g. pnp://, pamr://", sectionSelector = 3, important = true)
     protected String schedulerUrl = "";
 
-    @Configurable(credential = true, description = "credentials used when contacting the scheduler", sectionSelector = 3)
+    @Configurable(credential = true, description = "credentials used when contacting the scheduler. The user account needs to be a scheduler administrator.", sectionSelector = 3)
     protected File schedulerCredentialsPath;
 
     @Configurable(description = "Delay in ms for the resource manger to recover broken node source in scheduler aware policy", sectionSelector = 4)

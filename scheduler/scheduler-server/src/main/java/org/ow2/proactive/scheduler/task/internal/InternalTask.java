@@ -49,6 +49,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -158,6 +159,14 @@ public abstract class InternalTask extends TaskState {
 
     @XmlTransient
     private transient TaskResult taskResult = null;
+
+    public String getOwner() {
+        return internalJob.getOwner();
+    }
+
+    public Credentials getCredentials() {
+        return internalJob.getCredentials();
+    }
 
     public TaskResult getTaskResult() {
         return taskResult;

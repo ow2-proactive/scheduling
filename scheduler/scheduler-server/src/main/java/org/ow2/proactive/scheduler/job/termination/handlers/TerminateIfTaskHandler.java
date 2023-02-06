@@ -118,7 +118,7 @@ public class TerminateIfTaskHandler {
             changesInfo.taskSkipped(it);
             internalJob.setNumberOfPendingTasks(internalJob.getNumberOfPendingTasks() - 1);
             internalJob.setNumberOfFinishedTasks(internalJob.getNumberOfFinishedTasks() + 1);
-            LOGGER.info("Task " + it.getId() + " will not be executed");
+            LOGGER.info("Task " + it.getId() + " is skipped and will not be executed");
         }
 
         // plug the branch in the descriptor

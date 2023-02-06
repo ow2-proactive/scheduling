@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -100,6 +101,12 @@ public class JobDescriptorImpl implements JobDescriptor {
     /** All tasks with their children */
     private final Map<InternalTask, TaskDescriptor> allTasksWithTheirChildren = new HashMap<>();
 
+    private Map<String, String> genericInformation;
+
+    private String owner;
+
+    private Credentials credentials;
+
     /**
      * Create a new instance of job descriptor using an internal job.
      * Just make a mapping between some fields of the two type of job in order to
@@ -112,6 +119,9 @@ public class JobDescriptorImpl implements JobDescriptor {
         this.internalJob = job;
         this.jobPriority = getInternal().getPriority();
         this.jobId = getInternal().getId();
+        this.genericInformation = job.getRuntimeGenericInformation();
+        this.owner = job.getOwner();
+        this.credentials = job.getCredentials();
         if (job.getType() == JobType.TASKSFLOW) {
             //build dependence tree
             makeTree(job);
@@ -123,6 +133,21 @@ public class JobDescriptorImpl implements JobDescriptor {
                 }
             }
         }
+    }
+
+    @Override
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    @Override
+    public String getOwner() {
+        return owner;
+    }
+
+    @Override
+    public Credentials getCredentials() {
+        return credentials;
     }
 
     /**

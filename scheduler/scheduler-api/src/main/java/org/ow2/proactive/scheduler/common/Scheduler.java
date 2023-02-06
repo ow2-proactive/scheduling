@@ -1504,17 +1504,17 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     String getCurrentPolicy() throws NotConnectedException, PermissionException;
 
     /**
-     *  get job Descriptor Map with eligible jobs (running and pending)
+     * Returns a job Descriptor Map with eligible jobs (running and pending)
      * @return a Map of eligible jobs.
      */
-    @RoleRead
+    @RoleAdmin
     Map<JobId, JobDescriptor> getJobsToSchedule() throws NotConnectedException, PermissionException;
 
     /**
-     *  get task descriptor list with eligible tasks (running)
+     * Returns a task descriptor list with eligible tasks (ready for execution)
      * @return a List of eligible task descriptor.
      */
-    @RoleRead
+    @RoleAdmin
     List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException;
 
     /**

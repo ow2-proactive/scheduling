@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -72,6 +73,27 @@ public interface JobDescriptor extends Serializable, Comparable<JobDescriptor> {
      * @return the job priority
      */
     JobPriority getJobPriority();
+
+    /**
+     * Returns the job generic information
+     *
+     * @return generic information map
+     */
+    Map<String, String> getGenericInformation();
+
+    /**
+     * Returns the job owner name
+     *
+     * @return job owner
+     */
+    String getOwner();
+
+    /**
+     * Return the job owner encrypted credentials
+     *
+     * @return encrypted credentials
+     */
+    Credentials getCredentials();
 
     /**
      * Return the list of running tasks
