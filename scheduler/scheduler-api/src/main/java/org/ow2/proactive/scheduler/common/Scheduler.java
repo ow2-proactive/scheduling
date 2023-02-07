@@ -1668,7 +1668,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
 
     @RoleRead
     List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException;
+            Boolean myJobs, long startDate, long endDate, Boolean inParallel)
+            throws NotConnectedException, PermissionException;
 
     @RoleRead
     List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,

@@ -172,6 +172,8 @@ public abstract class InternalJob extends JobState {
                                                                                  .expireAfterWrite(5, TimeUnit.MINUTES)
                                                                                  .build();
 
+    public int numberOfCurrentNodesUsed = 0;
+
     /**
      * Hibernate default constructor
      */
@@ -1084,6 +1086,17 @@ public abstract class InternalJob extends JobState {
 
     public synchronized void increaseNumberOfNodes(int numberOfNodes) {
         jobInfo.setNumberOfNodes(jobInfo.getNumberOfNodes() + numberOfNodes);
+    }
+
+    public synchronized void increaseNumberOfNodesInParallel(int numberOfNodes) {
+        numberOfCurrentNodesUsed = numberOfCurrentNodesUsed + numberOfNodes;
+    }
+
+    public synchronized void decreaseNumberOfNodesInParallel(int numberOfNodes) {
+        if (jobInfo.getNumberOfNodesInParallel() < numberOfCurrentNodesUsed) {
+            jobInfo.setNumberOfNodesInParallel(numberOfCurrentNodesUsed);
+        }
+        numberOfCurrentNodesUsed = numberOfCurrentNodesUsed - numberOfNodes;
     }
 
     @Override

@@ -2674,7 +2674,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName) throws RestException {
+            @QueryParam("workflowName") String workflowName,
+            @QueryParam("inParallel") @DefaultValue("false") boolean inParallel) throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
@@ -2682,7 +2683,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                               workflowName,
                                                               myJobs,
                                                               startDate,
-                                                              endDate),
+                                                              endDate,
+                                                              inParallel),
                        FilteredTopWorkflowsNumberOfNodesData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);

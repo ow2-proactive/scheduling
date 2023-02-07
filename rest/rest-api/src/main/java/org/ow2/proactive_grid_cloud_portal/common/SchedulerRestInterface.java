@@ -2171,7 +2171,8 @@ public interface SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("inParallel") @DefaultValue("false") boolean inParallel) throws RestException;
 
     /**
      * Returns an object containing the top workflows with the longest execution time based on the given filters
