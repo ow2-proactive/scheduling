@@ -89,7 +89,7 @@ public abstract class Job extends CommonAttribute {
     protected String projectName = "";
 
     /**
-     * Project name for this job
+     * Bucket name for this job
      */
     protected String bucketName = "";
 
@@ -245,7 +245,7 @@ public abstract class Job extends CommonAttribute {
     }
 
     /**
-     * Sets the bucket nale to the given bucketName value.
+     * Sets the bucket name to the given bucketName value.
      *
      * @param bucketName the bucket name to set.
      */
