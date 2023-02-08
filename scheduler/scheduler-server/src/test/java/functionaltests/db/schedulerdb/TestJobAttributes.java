@@ -70,6 +70,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         job.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.setDescription("desc");
         job.setProjectName("project");
+        job.setBucketName("bucket");
         job.setName("name");
         job.setInputSpace("input");
         job.setOutputSpace("output");
@@ -89,6 +90,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         Assert.assertEquals("name", jobData.getName());
         Assert.assertEquals("desc", jobData.getDescription());
         Assert.assertEquals("project", jobData.getProjectName());
+        Assert.assertEquals("bucket", jobData.getBucketName());
         Assert.assertEquals("input", jobData.getInputSpace());
         Assert.assertEquals("output", jobData.getOutputSpace());
         Assert.assertEquals(JobPriority.HIGHEST, jobData.getPriority());

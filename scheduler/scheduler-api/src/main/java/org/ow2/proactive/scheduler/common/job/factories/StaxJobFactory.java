@@ -667,6 +667,7 @@ public class StaxJobFactory extends JobFactory {
                 job.setName(commonPropertiesHolder.getName());
                 job.setPriority(commonPropertiesHolder.getPriority());
                 job.setProjectName(commonPropertiesHolder.getProjectName());
+                job.setBucketName(commonPropertiesHolder.getBucketName());
                 job.setWorkflowTags(commonPropertiesHolder.getWorkflowTags());
                 job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
                 job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
@@ -766,6 +767,9 @@ public class StaxJobFactory extends JobFactory {
             } else if (XMLAttributes.JOB_PROJECT_NAME.matches(attributeName)) {
                 commonPropertiesHolder.setProjectName(replace(attributeValue,
                                                               commonPropertiesHolder.getVariablesAsReplacementMap()));
+            } else if (XMLAttributes.JOB_BUCKET_NAME.matches(attributeName)) {
+                commonPropertiesHolder.setBucketName(replace(attributeValue,
+                                                             commonPropertiesHolder.getVariablesAsReplacementMap()));
             } else if (XMLAttributes.JOB_TAGS.matches(attributeName)) {
                 commonPropertiesHolder.setWorkflowTags(new HashSet<>(Arrays.asList(attributeValue.split("\\s*,\\s*"))));
             }

@@ -40,6 +40,7 @@ public enum XMLAttributes {
     // JOBS
     JOB_PRIORITY("priority"),
     JOB_PROJECT_NAME("projectName"),
+    JOB_BUCKET_NAME("bucketName"),
     JOB_TAGS("tags"),
 
     // COMMON

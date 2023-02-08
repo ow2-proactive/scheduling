@@ -241,6 +241,8 @@ public class JobData implements Serializable {
 
     private String projectName;
 
+    private String bucketName;
+
     private List<JobContent> jobContent = Lists.newArrayList();
 
     private Map<Integer, Boolean> attachedServices;
@@ -259,6 +261,7 @@ public class JobData implements Serializable {
         jobInfo.setJobOwner(getOwner());
         jobInfo.setTenant(getTenant());
         jobInfo.setProjectName(getProjectName());
+        jobInfo.setBucketName(getBucketName());
         jobInfo.setStatus(getStatus());
         jobInfo.setParentId(getParentId());
         jobInfo.setChildrenCount(getChildrenCount());
@@ -335,6 +338,7 @@ public class JobData implements Serializable {
         internalJob.setGenericInformation(getGenericInformation());
         internalJob.setVariables(variablesToJobVariables());
         internalJob.setProjectName(getProjectName());
+        internalJob.setBucketName(getBucketName());
         internalJob.setCumulatedCoreTime(getCumulatedCoreTime());
         internalJob.setOwner(getOwner());
         internalJob.setTenant(getTenant());
@@ -401,6 +405,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setJobName(job.getName());
         jobRuntimeData.setDescription(job.getDescription());
         jobRuntimeData.setProjectName(job.getProjectName());
+        jobRuntimeData.setBucketName(job.getBucketName());
         jobRuntimeData.setInputSpace(job.getInputSpace());
         jobRuntimeData.setOutputSpace(job.getOutputSpace());
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
@@ -614,6 +619,15 @@ public class JobData implements Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Column(name = "BUCKET_NAME", updatable = false)
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     @OneToMany(mappedBy = "jobData", fetch = FetchType.LAZY)

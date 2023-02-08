@@ -61,6 +61,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String projectName;
 
+    private String bucketName;
+
     private int totalNumberOfTasks = 0;
 
     private int numberOfPendingTasks = 0;
@@ -152,6 +154,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public String getProjectName() {
         return projectName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    @Override
+    public String getBucketName() {
+        return bucketName;
     }
 
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {

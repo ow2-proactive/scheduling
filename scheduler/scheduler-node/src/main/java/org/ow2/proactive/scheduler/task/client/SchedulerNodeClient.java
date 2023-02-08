@@ -879,10 +879,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, long startDate, long endDate,
-            int numberOfIntervals) throws NotConnectedException, PermissionException {
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
+            long endDate, int numberOfIntervals) throws NotConnectedException, PermissionException {
         renewSession();
-        return client.getCompletedJobs(myJobs, workflowName, startDate, endDate, numberOfIntervals);
+        return client.getCompletedJobs(myJobs, workflowName, bucketName, startDate, endDate, numberOfIntervals);
     }
 
     @Override

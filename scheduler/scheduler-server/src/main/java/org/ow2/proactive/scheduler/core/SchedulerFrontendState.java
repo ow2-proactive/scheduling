@@ -539,6 +539,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         job.setTenant(ident.getTenant());
         // route project name inside job info
         job.setProjectName(job.getProjectName());
+        job.setBucketName(job.getBucketName());
 
         fillParentJobIdIfExistsInGenInfo(userJob, job);
 

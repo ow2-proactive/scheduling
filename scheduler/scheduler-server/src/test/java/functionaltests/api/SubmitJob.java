@@ -56,6 +56,8 @@ public class SubmitJob implements SchedulerEventListener {
 
     private String projectName;
 
+    private String bucketName;
+
     public void begin() {
         //non blocking method to use futur management
         try {
@@ -82,6 +84,10 @@ public class SubmitJob implements SchedulerEventListener {
         return projectName;
     }
 
+    public String getBucketName() {
+        return bucketName;
+    }
+
     public void setJobId(JobId id) {
         myJobId = id;
     }
@@ -90,6 +96,7 @@ public class SubmitJob implements SchedulerEventListener {
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         if (myJobId.equals(notification.getData().getJobId())) {
             projectName = notification.getData().getProjectName();
+            bucketName = notification.getData().getBucketName();
             //test if it is my job
             System.out.print("Job " + myJobId + " terminated in ");
             //get the job result

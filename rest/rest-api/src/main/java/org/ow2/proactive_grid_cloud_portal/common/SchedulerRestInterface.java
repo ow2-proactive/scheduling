@@ -2223,6 +2223,7 @@ public interface SchedulerRestInterface {
      * @param sessionId id of a session
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param workflowName the workflow name of the filtered jobs
+     * @param bucketName the bucket name of the filtered jobs
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs, default value represents the current date
      * @param numberOfIntervals number of time intervals
@@ -2235,6 +2236,7 @@ public interface SchedulerRestInterface {
     CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("-1") long endDate,
             @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException;

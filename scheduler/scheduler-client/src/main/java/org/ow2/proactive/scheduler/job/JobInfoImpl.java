@@ -65,6 +65,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String projectName;
 
+    private String bucketName = null;
+
     /** job submitted time */
     private long submittedTime = -1;
 
@@ -173,6 +175,7 @@ public class JobInfoImpl implements JobInfo {
         this.owner = jobInfo.owner;
         this.tenant = jobInfo.tenant;
         this.projectName = jobInfo.getProjectName();
+        this.bucketName = jobInfo.getBucketName();
         this.submittedTime = jobInfo.getSubmittedTime();
         this.startTime = jobInfo.getStartTime();
         this.inErrorTime = jobInfo.getInErrorTime();
@@ -239,6 +242,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Override
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     /**

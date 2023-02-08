@@ -89,6 +89,11 @@ public abstract class Job extends CommonAttribute {
     protected String projectName = "";
 
     /**
+     * Project name for this job
+     */
+    protected String bucketName = "";
+
+    /**
      * Tags of this job
      */
     protected Set<String> workflowTags = new HashSet<>();
@@ -228,6 +233,24 @@ public abstract class Job extends CommonAttribute {
      */
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    /**
+     * Returns the bucket name
+     *
+     * @return the bucket name
+     */
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    /**
+     * Sets the bucket nale to the given bucketName value.
+     *
+     * @param bucketName the bucket name to set.
+     */
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     /**

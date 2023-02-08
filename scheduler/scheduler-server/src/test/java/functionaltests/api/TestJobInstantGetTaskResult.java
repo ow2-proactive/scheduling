@@ -60,6 +60,7 @@ public class TestJobInstantGetTaskResult extends SchedulerFunctionalTestNoRestar
         //create job
         TaskFlowJob job = new TaskFlowJob();
         job.setProjectName("My project");
+        job.setBucketName("My bucket");
 
         for (int i = 0; i < 50; i++) {
             JavaTask t = new JavaTask();
@@ -73,7 +74,9 @@ public class TestJobInstantGetTaskResult extends SchedulerFunctionalTestNoRestar
 
         schedulerHelper.waitForEventJobRemoved(id);
         String projectName = client.getProjectName();
+        String bucketName = client.getBucketName();
         Assert.assertEquals("My project", projectName);
+        Assert.assertEquals("My bucket", bucketName);
     }
 
     @After

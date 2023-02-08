@@ -2746,13 +2746,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName, @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("-1") long endDate,
             @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
-            return mapper.map(scheduler.getCompletedJobs(myJobs, workflowName, startDate, endDate, numberOfIntervals),
+            return mapper.map(scheduler.getCompletedJobs(myJobs,
+                                                         workflowName,
+                                                         bucketName,
+                                                         startDate,
+                                                         endDate,
+                                                         numberOfIntervals),
                               CompletedJobsCountData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
