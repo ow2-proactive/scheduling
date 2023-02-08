@@ -2084,7 +2084,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     @RoleRead
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate, Boolean inParallel)
+            String workflowName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();

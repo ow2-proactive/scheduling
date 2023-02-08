@@ -542,7 +542,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate, Boolean inParallel)
+            String workflowName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws NotConnectedException, PermissionException {
 
         try {

@@ -37,11 +37,11 @@ public class FilteredTopWorkflowsNumberOfNodes implements Serializable {
 
     private final String projectName;
 
-    private final double numberOfNodes;
+    private final int numberOfNodes;
 
     private final int numberOfExecutions;
 
-    public FilteredTopWorkflowsNumberOfNodes(String workflowName, String projectName, double numberOfNodes,
+    public FilteredTopWorkflowsNumberOfNodes(String workflowName, String projectName, int numberOfNodes,
             int numberOfExecutions) {
         this.workflowName = workflowName;
         this.projectName = projectName;
@@ -57,7 +57,7 @@ public class FilteredTopWorkflowsNumberOfNodes implements Serializable {
         return projectName;
     }
 
-    public double getNumberOfNodes() {
+    public int getNumberOfNodes() {
         return numberOfNodes;
     }
 

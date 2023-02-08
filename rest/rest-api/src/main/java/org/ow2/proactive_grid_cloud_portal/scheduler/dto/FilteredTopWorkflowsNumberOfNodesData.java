@@ -31,7 +31,7 @@ public class FilteredTopWorkflowsNumberOfNodesData {
 
     private String projectName;
 
-    private double numberOfNodes;
+    private int numberOfNodes;
 
     private int numberOfExecutions;
 
@@ -51,11 +51,11 @@ public class FilteredTopWorkflowsNumberOfNodesData {
         this.projectName = projectName;
     }
 
-    public double getNumberOfNodes() {
+    public int getNumberOfNodes() {
         return numberOfNodes;
     }
 
-    public void setNumberOfNodes(double numberOfNodes) {
+    public void setNumberOfNodes(int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
     }
 

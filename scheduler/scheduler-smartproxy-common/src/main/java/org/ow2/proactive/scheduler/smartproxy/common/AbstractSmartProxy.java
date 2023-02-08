@@ -264,7 +264,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate, Boolean inParallel)
+            String workflowName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws PermissionException, NotConnectedException {
         return getScheduler().getTopWorkflowsNumberOfNodes(numberOfWorkflows,
                                                            workflowName,

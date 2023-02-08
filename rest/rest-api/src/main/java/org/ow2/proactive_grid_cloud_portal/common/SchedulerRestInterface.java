@@ -2160,6 +2160,7 @@ public interface SchedulerRestInterface {
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
      * @param workflowName the workflow name of the filtered jobs
+     * @param inParallel fetch only the jobs that use the most nodes in parallel
      * @return {@link FilteredTopWorkflowsNumberOfNodesData}
      * @throws RestException if an error occurs or the session is invalid
      */

@@ -1042,7 +1042,7 @@ public class SchedulerDBManager {
 
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
             final String workflowName, String user, String tenant, final long startTime, final long endTime,
-            Boolean inParallel) {
+            boolean inParallel) {
 
         return executeReadOnlyTransaction(session -> {
 
@@ -1065,7 +1065,7 @@ public class SchedulerDBManager {
                        .map(nameAndCount -> new FilteredTopWorkflowsNumberOfNodes(nameAndCount[0].toString(),
                                                                                   nameAndCount[1] != null ? nameAndCount[1].toString()
                                                                                                           : null,
-                                                                                  Double.parseDouble(nameAndCount[2].toString()),
+                                                                                  (int) Math.round(Double.parseDouble(nameAndCount[2].toString())),
                                                                                   Integer.parseInt(nameAndCount[3].toString())))
                        .collect(Collectors.toList());
         });
@@ -1797,7 +1797,6 @@ public class SchedulerDBManager {
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("cumulatedCoreTime", jobInfo.getCumulatedCoreTime())
                    .setParameter("numberOfNodes", jobInfo.getNumberOfNodes())
-                   .setParameter("numberOfNodesInParallel", jobInfo.getNumberOfNodesInParallel())
                    .setParameter("numberOfNodesInParallel", jobInfo.getNumberOfNodesInParallel())
                    .setParameter("lastUpdatedTime", new Date().getTime())
                    .setParameter("jobId", jobId)
