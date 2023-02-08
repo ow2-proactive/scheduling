@@ -1089,14 +1089,14 @@ public abstract class InternalJob extends JobState {
     }
 
     public synchronized void increaseNumberOfNodesInParallel(int numberOfNodes) {
-        currentNumberOfNodesUsedInParallel = currentNumberOfNodesUsedInParallel + numberOfNodes;
+        currentNumberOfNodesUsedInParallel += numberOfNodes;
         if (jobInfo.getNumberOfNodesInParallel() < currentNumberOfNodesUsedInParallel) {
             jobInfo.setNumberOfNodesInParallel(currentNumberOfNodesUsedInParallel);
         }
     }
 
     public synchronized void decreaseNumberOfNodesInParallel(int numberOfNodes) {
-        currentNumberOfNodesUsedInParallel = currentNumberOfNodesUsedInParallel - numberOfNodes;
+        currentNumberOfNodesUsedInParallel -= numberOfNodes;
     }
 
     @Override
