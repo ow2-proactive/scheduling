@@ -422,7 +422,6 @@ class LiveJobs {
         if (!timingLogger.isHierarchical()) {
             timingLogger.printTimings(Level.DEBUG);
         }
-        job.setBucketName(job.getGenericInformation().get("bucketName"));
     }
 
     Map<JobId, JobDescriptor> lockJobsToSchedule(boolean isSchedulerPausedOrStopped) {
