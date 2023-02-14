@@ -580,6 +580,7 @@ class LiveJobs {
 
         tlogger.info(task.getId(), String.format("wait [%d] milliseconds before restart task on error.", waitTime));
         terminationData.addRestartData(task.getId(), waitTime);
+        job.decreaseNumberOfNodesInParallel(task.getExecuterInformation().getNodes().getTotalNumberOfNodes());
 
         logger.info("END restartTaskOnError");
     }
@@ -641,6 +642,7 @@ class LiveJobs {
         // set the different informations on task
         job.startTask(task);
         jobData.job.increaseNumberOfNodes(task.getExecuterInformation().getNodes().getTotalNumberOfNodes());
+        job.increaseNumberOfNodesInParallel(task.getExecuterInformation().getNodes().getTotalNumberOfNodes());
         dbManager.jobTaskStarted(job, task, firstTaskStarted, taskLauncherNodeUrl);
 
         listener.taskStateUpdated(job.getOwner(),
@@ -1260,7 +1262,7 @@ class LiveJobs {
         }
 
         jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() - task.getTaskInfo().getStartTime());
-
+        job.decreaseNumberOfNodesInParallel(task.getExecuterInformation().getNodes().getTotalNumberOfNodes());
         task.setTaskResult(result);
 
         // Update database

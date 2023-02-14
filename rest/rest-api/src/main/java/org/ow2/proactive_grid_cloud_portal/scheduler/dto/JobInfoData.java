@@ -103,6 +103,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private int numberOfNodes = 0;
 
+    private int numberOfNodesInParallel = 0;
+
     public void setToBeRemoved() {
         toBeRemoved = true;
     }
@@ -375,6 +377,14 @@ public class JobInfoData implements java.io.Serializable {
         this.numberOfNodes = numberOfNodes;
     }
 
+    public int getNumberOfNodesInParallel() {
+        return numberOfNodesInParallel;
+    }
+
+    public void setNumberOfNodesInParallel(int numberOfNodesInParallel) {
+        this.numberOfNodesInParallel = numberOfNodesInParallel;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{ " + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
@@ -387,7 +397,8 @@ public class JobInfoData implements java.io.Serializable {
                projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" + genericInformation +
                ", variables=" + variables + ", signals=" + signals + ", detailedSignals=" + detailedSignals +
                ", attachedServices=" + attachedServices + ", externalEndpointUrls=" + externalEndpointUrls +
-               ", cumulatedCoreTime=" + cumulatedCoreTime + ", numberOfNodes=" + numberOfNodes + " }";
+               ", cumulatedCoreTime=" + cumulatedCoreTime + ", numberOfNodes=" + numberOfNodes +
+               ", numberOfNodesInParallel=" + numberOfNodesInParallel + " }";
     }
 
 }
