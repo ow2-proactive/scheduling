@@ -53,6 +53,8 @@ public class JobInfoImpl implements JobInfo {
 
     private int numberOfNodes = 0;
 
+    private int numberOfNodesInParallel = 0;
+
     private JobId jobId;
 
     private String jobOwner;
@@ -288,6 +290,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setNumberOfNodes(int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
+    }
+
+    @Override
+    public int getNumberOfNodesInParallel() {
+        return numberOfNodesInParallel;
+    }
+
+    public void setNumberOfNodesInParallel(int numberOfNodesInParallel) {
+        this.numberOfNodesInParallel = numberOfNodesInParallel;
     }
 
     public void setLastUpdatedTime(long lastUpdatedTime) {
