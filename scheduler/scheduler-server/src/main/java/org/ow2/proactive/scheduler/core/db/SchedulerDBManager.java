@@ -229,8 +229,8 @@ public class SchedulerDBManager {
 
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final String tenant,
             final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
-            final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName, Long parentId,
-            final List<SortParameter<JobSortParameter>> sortParameters) {
+            final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
+            String bucketName, Long parentId, final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -248,6 +248,7 @@ public class SchedulerDBManager {
                                                              childJobs,
                                                              jobName,
                                                              projectName,
+                                                             bucketName,
                                                              parentId,
                                                              sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
@@ -277,6 +278,9 @@ public class SchedulerDBManager {
             }
             if (projectName != null && !projectName.isEmpty()) {
                 predicates.add(cb.like(root.get("projectName"), projectName + "%"));
+            }
+            if (bucketName != null && !bucketName.isEmpty()) {
+                predicates.add(cb.like(root.get("bucketName"), bucketName + "%"));
             }
             if (childJobs && parentId != null && parentId > 0L) {
                 predicates.add(cb.equal(root.get("parentId"), parentId));
@@ -572,6 +576,10 @@ public class SchedulerDBManager {
                     queryString.append("and projectName like :projectName ");
                 }
 
+                if (params.getBucketName() != null && !params.getBucketName().isEmpty()) {
+                    queryString.append("and bucketName like :bucketName ");
+                }
+
                 if (params.isChildJobs() && params.getParentId() != null && params.getParentId() > 0) {
                     queryString.append("and parentId = :parentId ");
                 }
@@ -590,6 +598,10 @@ public class SchedulerDBManager {
 
                 if (params.getProjectName() != null && !params.getProjectName().isEmpty()) {
                     query.setParameter("projectName", params.getProjectName() + '%');
+                }
+
+                if (params.getBucketName() != null && !params.getBucketName().isEmpty()) {
+                    query.setParameter("bucketName", params.getBucketName() + '%');
                 }
 
                 if (params.isChildJobs() && params.getParentId() != null && params.getParentId() > 0) {

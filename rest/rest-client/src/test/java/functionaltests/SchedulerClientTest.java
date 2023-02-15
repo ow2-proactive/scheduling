@@ -340,6 +340,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                   "",
                                                                   "",
                                                                   "",
+                                                                  "",
                                                                   null,
                                                                   new Long(-1));
         List defaultSortOrder = Collections.singletonList(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
@@ -398,6 +399,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                   "",
                                                                   "",
                                                                   "",
+                                                                  "",
                                                                   null,
                                                                   new Long(-1));
         SortParameter jobNameDescOrder = new SortParameter<>(JobSortParameter.NAME, SortOrder.DESC);
@@ -426,6 +428,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                                       false,
                                                                                       "",
                                                                                       "myProjectB",
+                                                                                      "",
                                                                                       "",
                                                                                       null,
                                                                                       new Long(-1));

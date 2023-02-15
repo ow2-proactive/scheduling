@@ -338,6 +338,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                            criteria.isChildJobs(),
                                                                                                            criteria.getJobName(),
                                                                                                            criteria.getProjectName(),
+                                                                                                           criteria.getBucketName(),
                                                                                                            criteria.getUserName(),
                                                                                                            criteria.getTenant(),
                                                                                                            criteria.getParentId(),
