@@ -187,13 +187,13 @@ public interface SchedulerRestInterface {
      * @param childJobs
      *             fetch childJobs (submitted by parent job(s))
      * @param jobName
-     *             Include only jobs with a name that starts with jobName (case in-sensitive)
+     *             Include only jobs with a name that starts with jobName (case sensitive)
      * @param projectName
-     *             Include only jobs with a project name that starts with projectName (case in-sensitive)
+     *             Include only jobs with a project name that starts with projectName (case sensitive)
      * @param bucketName
-     *             Include only jobs with a bucket name that starts with bucketName (case in-sensitive)
+     *             Include only jobs with a bucket name that starts with bucketName (case sensitive)
      * @param userName
-     *             Include only jobs with a user name that matches exactly with userName (case in-sensitive)
+     *             Include only jobs with a user name that matches exactly with userName (case sensitive)
      * @param parentId
      *             Include only children jobs of the given parent job id. This parameter is ignored if childJobs is set to false
      * @param sortParams

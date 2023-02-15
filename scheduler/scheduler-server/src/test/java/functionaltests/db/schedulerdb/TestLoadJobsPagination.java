@@ -65,11 +65,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         } else {
             job.setProjectName(this.getClass().getSimpleName() + " project");
         }
-        if (bucketName != null) {
-            job.setBucketName(bucketName);
-        } else {
-            job.setBucketName(this.getClass().getSimpleName());
-        }
+        job.setBucketName(bucketName);
         if (priority != null) {
             job.setPriority(priority);
         } else {
