@@ -156,7 +156,10 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_PARENT_RANK_ID", columnList = "PARENT_JOB_ID,STATUS_RANK DESC,ID DESC"),
                                       @Index(name = "JOB_DATA_OWNER_PARENT_RANK_ID", columnList = "OWNER,PARENT_JOB_ID,STATUS_RANK DESC,ID DESC"),
                                       @Index(name = "JOB_DATA_FAILED_TASKS", columnList = "FAILED_TASKS"),
-                                      @Index(name = "JOB_DATA_FAULTY_TASKS", columnList = "FAULTY_TASKS") })
+                                      @Index(name = "JOB_DATA_FAULTY_TASKS", columnList = "FAULTY_TASKS"),
+                                      @Index(name = "JOB_DATA_BUCKET_NAME", columnList = "BUCKET_NAME"),
+                                      @Index(name = "JOB_DATA_JOB_NAME", columnList = "JOB_NAME"),
+                                      @Index(name = "JOB_DATA_PROJECT_NAME", columnList = "PROJECT_NAME"), })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
@@ -241,6 +244,8 @@ public class JobData implements Serializable {
 
     private String projectName;
 
+    private String bucketName;
+
     private List<JobContent> jobContent = Lists.newArrayList();
 
     private Map<Integer, Boolean> attachedServices;
@@ -261,6 +266,7 @@ public class JobData implements Serializable {
         jobInfo.setJobOwner(getOwner());
         jobInfo.setTenant(getTenant());
         jobInfo.setProjectName(getProjectName());
+        jobInfo.setBucketName(getBucketName());
         jobInfo.setStatus(getStatus());
         jobInfo.setParentId(getParentId());
         jobInfo.setChildrenCount(getChildrenCount());
@@ -338,6 +344,7 @@ public class JobData implements Serializable {
         internalJob.setGenericInformation(getGenericInformation());
         internalJob.setVariables(variablesToJobVariables());
         internalJob.setProjectName(getProjectName());
+        internalJob.setBucketName(getBucketName());
         internalJob.setCumulatedCoreTime(getCumulatedCoreTime());
         internalJob.setOwner(getOwner());
         internalJob.setTenant(getTenant());
@@ -404,6 +411,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setJobName(job.getName());
         jobRuntimeData.setDescription(job.getDescription());
         jobRuntimeData.setProjectName(job.getProjectName());
+        jobRuntimeData.setBucketName(job.getBucketName());
         jobRuntimeData.setInputSpace(job.getInputSpace());
         jobRuntimeData.setOutputSpace(job.getOutputSpace());
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
@@ -618,6 +626,15 @@ public class JobData implements Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Column(name = "BUCKET_NAME", updatable = false)
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     @OneToMany(mappedBy = "jobData", fetch = FetchType.LAZY)

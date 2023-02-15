@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import static org.ow2.proactive.permissions.RoleUtils.findRole;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.BUCKET_NAME;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.PARENT_JOB_ID;
 import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE;
 
@@ -539,7 +540,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         job.setTenant(ident.getTenant());
         // route project name inside job info
         job.setProjectName(job.getProjectName());
-
+        fillBucketNameIdIfExistsInGenInfo(userJob, job);
         fillParentJobIdIfExistsInGenInfo(userJob, job);
 
         return job;
@@ -554,6 +555,13 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             } catch (NumberFormatException e) {
                 logger.error("Cannot parse '" + PARENT_JOB_ID + "' in the generic info: " + parentJobIdString);
             }
+        }
+    }
+
+    private void fillBucketNameIdIfExistsInGenInfo(Job userJob, InternalJob job) {
+        if (userJob.getGenericInformation() != null && userJob.getGenericInformation().containsKey(BUCKET_NAME)) {
+            String bucketName = userJob.getGenericInformation().get(BUCKET_NAME);
+            job.setBucketName(bucketName);
         }
     }
 

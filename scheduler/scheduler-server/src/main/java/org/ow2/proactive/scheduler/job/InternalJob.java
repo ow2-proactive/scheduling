@@ -1100,6 +1100,12 @@ public abstract class InternalJob extends JobState {
     }
 
     @Override
+    public void setBucketName(String bucketName) {
+        super.setBucketName(bucketName);
+        jobInfo.setBucketName(bucketName);
+    }
+
+    @Override
     public void setProjectName(String projectName) {
         super.setProjectName(projectName);
         jobInfo.setProjectName(projectName);

@@ -64,6 +64,8 @@ public class DBJobDataParameters {
 
     private final String projectName;
 
+    private final String bucketName;
+
     private final Long parentId;
 
     private final List<SortParameter<JobSortParameter>> sortParameters;
@@ -72,7 +74,8 @@ public class DBJobDataParameters {
 
     DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
             boolean pending, boolean running, boolean finished, boolean withIssuesOnly, boolean childJobs,
-            String jobName, String projectName, Long parentId, List<SortParameter<JobSortParameter>> sortParameters) {
+            String jobName, String projectName, String bucketName, Long parentId,
+            List<SortParameter<JobSortParameter>> sortParameters) {
         this.offset = offset;
         this.limit = limit;
         this.user = user;
@@ -85,6 +88,7 @@ public class DBJobDataParameters {
         this.childJobs = childJobs;
         this.jobName = jobName;
         this.projectName = projectName;
+        this.bucketName = bucketName;
         this.parentId = parentId;
         this.sortParameters = sortParameters;
 
@@ -132,6 +136,10 @@ public class DBJobDataParameters {
 
     public String getProjectName() {
         return projectName;
+    }
+
+    public String getBucketName() {
+        return bucketName;
     }
 
     public Long getParentId() {

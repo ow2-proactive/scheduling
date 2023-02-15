@@ -814,9 +814,9 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, long startDate, long endDate,
-            int numberOfIntervals) throws NotConnectedException, PermissionException {
-        return uischeduler.getCompletedJobs(myJobs, workflowName, startDate, endDate, numberOfIntervals);
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
+            long endDate, int numberOfIntervals) throws NotConnectedException, PermissionException {
+        return uischeduler.getCompletedJobs(myJobs, workflowName, bucketName, startDate, endDate, numberOfIntervals);
     }
 
     @Override

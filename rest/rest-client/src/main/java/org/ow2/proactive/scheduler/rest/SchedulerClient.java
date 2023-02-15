@@ -338,6 +338,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                            criteria.isChildJobs(),
                                                                                                            criteria.getJobName(),
                                                                                                            criteria.getProjectName(),
+                                                                                                           criteria.getBucketName(),
                                                                                                            criteria.getUserName(),
                                                                                                            criteria.getTenant(),
                                                                                                            criteria.getParentId(),
@@ -597,13 +598,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, long startDate, long endDate,
-            int numberOfIntervals) throws NotConnectedException, PermissionException {
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
+            long endDate, int numberOfIntervals) throws NotConnectedException, PermissionException {
 
         try {
             CompletedJobsCountData completedJob = restApi().getCompletedJobs(sid,
                                                                              myJobs,
                                                                              workflowName,
+                                                                             bucketName,
                                                                              startDate,
                                                                              endDate,
                                                                              numberOfIntervals);
@@ -1484,7 +1486,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setJobOwner(jobInfoData.getJobOwner());
         jobInfoImpl.setTenant(jobInfoData.getTenant());
         jobInfoImpl.setProjectName(jobInfoData.getProjectName());
-        jobInfoImpl.setFinishedTime(jobInfoData.getFinishedTime());
+        jobInfoImpl.setProjectName(jobInfoData.getProjectName());
+        jobInfoImpl.setBucketName(jobInfoData.getBucketName());
+        jobInfoImpl.setCumulatedCoreTime(jobInfoData.getCumulatedCoreTime());
+        jobInfoImpl.setNumberOfNodes(jobInfoData.getNumberOfNodes());
+        jobInfoImpl.setNumberOfNodesInParallel(jobInfoData.getNumberOfNodesInParallel());
         jobInfoImpl.setRemovedTime(jobInfoData.getRemovedTime());
         jobInfoImpl.setStartTime(jobInfoData.getStartTime());
         jobInfoImpl.setInErrorTime(jobInfoData.getInErrorTime());

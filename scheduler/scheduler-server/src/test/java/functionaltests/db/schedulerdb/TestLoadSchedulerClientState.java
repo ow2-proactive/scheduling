@@ -176,6 +176,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         job1.setName(this.getClass().getSimpleName());
         job1.setDescription("desc1");
         job1.setProjectName("p1");
+        job1.setBucketName("b1");
         job1.setInputSpace("is1");
         job1.setOutputSpace("os1");
         job1.setMaxNumberOfExecution(22);
@@ -274,6 +275,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
                 Assert.assertEquals(DEFAULT_USER_NAME, state.getOwner());
                 Assert.assertEquals(job.getDescription(), Objects.toString(state.getDescription(), ""));
                 Assert.assertEquals(job.getProjectName(), Objects.toString(state.getProjectName(), ""));
+                Assert.assertEquals(job.getBucketName(), Objects.toString(state.getBucketName(), ""));
                 Assert.assertEquals(job.getInputSpace(), state.getInputSpace());
                 Assert.assertEquals(job.getOutputSpace(), state.getOutputSpace());
                 Assert.assertEquals(job.getOnTaskErrorProperty().getValue(), state.getOnTaskErrorProperty().getValue());

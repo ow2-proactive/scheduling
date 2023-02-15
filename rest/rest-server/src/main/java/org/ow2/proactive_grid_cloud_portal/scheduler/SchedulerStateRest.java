@@ -243,6 +243,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                  null,
                                                                  null,
                                                                  null,
+                                                                 null,
                                                                  null),
                                            DEFAULT_JOB_SORT_PARAMS);
 
@@ -340,6 +341,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                  null,
                                                                  null,
                                                                  null,
+                                                                 null,
                                                                  null),
                                            DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<>(page.getList().size());
@@ -374,8 +376,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
             boolean myJobs, boolean pending, boolean running, boolean finished, boolean withIssuesOnly,
-            boolean childJobs, String jobName, String projectName, String userName, String tenant, Long parentId,
-            String sortParams) throws RestException {
+            boolean childJobs, String jobName, String projectName, String bucketName, String userName, String tenant,
+            Long parentId, String sortParams) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
@@ -403,6 +405,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                  childJobs,
                                                                  jobName,
                                                                  projectName,
+                                                                 bucketName,
                                                                  userName,
                                                                  tenant,
                                                                  parentId),
@@ -2748,13 +2751,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName, @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("-1") long endDate,
             @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
-            return mapper.map(scheduler.getCompletedJobs(myJobs, workflowName, startDate, endDate, numberOfIntervals),
+            return mapper.map(scheduler.getCompletedJobs(myJobs,
+                                                         workflowName,
+                                                         bucketName,
+                                                         startDate,
+                                                         endDate,
+                                                         numberOfIntervals),
                               CompletedJobsCountData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);

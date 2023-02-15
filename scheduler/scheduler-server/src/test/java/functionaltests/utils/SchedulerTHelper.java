@@ -1364,6 +1364,7 @@ public class SchedulerTHelper {
                                                            null,
                                                            null,
                                                            null,
+                                                           null,
                                                            null);
         List<JobInfo> jobs = userInt.getJobs(0,
                                              1000,

@@ -229,8 +229,8 @@ public class SchedulerDBManager {
 
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final String tenant,
             final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
-            final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName, Long parentId,
-            final List<SortParameter<JobSortParameter>> sortParameters) {
+            final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
+            String bucketName, Long parentId, final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -248,6 +248,7 @@ public class SchedulerDBManager {
                                                              childJobs,
                                                              jobName,
                                                              projectName,
+                                                             bucketName,
                                                              parentId,
                                                              sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
@@ -277,6 +278,9 @@ public class SchedulerDBManager {
             }
             if (projectName != null && !projectName.isEmpty()) {
                 predicates.add(cb.like(root.get("projectName"), projectName + "%"));
+            }
+            if (bucketName != null && !bucketName.isEmpty()) {
+                predicates.add(cb.like(root.get("bucketName"), bucketName + "%"));
             }
             if (childJobs && parentId != null && parentId > 0L) {
                 predicates.add(cb.equal(root.get("parentId"), parentId));
@@ -376,8 +380,8 @@ public class SchedulerDBManager {
         return new Page<>(lJobs, totalNbJobs);
     }
 
-    public int getNumberOfFilteredJobs(final String workflowName, String user, String tenant, final long startTime,
-            final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
+    public int getNumberOfFilteredJobs(final String workflowName, String bucketName, String user, String tenant,
+            final long startTime, final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
 
         return executeReadOnlyTransaction(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -393,6 +397,9 @@ public class SchedulerDBManager {
             }
             if (StringUtils.isNotEmpty(workflowName)) {
                 predicates.add(cb.like(root.get("jobName"), workflowName + "%"));
+            }
+            if (StringUtils.isNotEmpty(bucketName)) {
+                predicates.add(cb.like(root.get("bucketName"), bucketName + "%"));
             }
             if (startTime > 0) {
                 predicates.add(cb.ge(root.get("finishedTime"), startTime));
@@ -569,6 +576,10 @@ public class SchedulerDBManager {
                     queryString.append("and projectName like :projectName ");
                 }
 
+                if (params.getBucketName() != null && !params.getBucketName().isEmpty()) {
+                    queryString.append("and bucketName like :bucketName ");
+                }
+
                 if (params.isChildJobs() && params.getParentId() != null && params.getParentId() > 0) {
                     queryString.append("and parentId = :parentId ");
                 }
@@ -587,6 +598,10 @@ public class SchedulerDBManager {
 
                 if (params.getProjectName() != null && !params.getProjectName().isEmpty()) {
                     query.setParameter("projectName", params.getProjectName() + '%');
+                }
+
+                if (params.getBucketName() != null && !params.getBucketName().isEmpty()) {
+                    query.setParameter("bucketName", params.getBucketName() + '%');
                 }
 
                 if (params.isChildJobs() && params.getParentId() != null && params.getParentId() > 0) {
@@ -1178,6 +1193,7 @@ public class SchedulerDBManager {
             final long startTime, final long endTime) {
 
         long runningJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                null,
                                                                 user,
                                                                 tenant,
                                                                 0,
@@ -1185,6 +1201,7 @@ public class SchedulerDBManager {
                                                                 Collections.singletonList(JobStatus.RUNNING),
                                                                 false);
         long stalledJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                null,
                                                                 user,
                                                                 tenant,
                                                                 0,
@@ -1192,6 +1209,7 @@ public class SchedulerDBManager {
                                                                 Collections.singletonList(JobStatus.STALLED),
                                                                 false);
         long pausedJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                               null,
                                                                user,
                                                                tenant,
                                                                0,
@@ -1199,6 +1217,7 @@ public class SchedulerDBManager {
                                                                Collections.singletonList(JobStatus.PAUSED),
                                                                false);
         long pendingJobs = getNumberOfFilteredJobs(workflowName,
+                                                   null,
                                                    user,
                                                    tenant,
                                                    0,
@@ -1209,6 +1228,7 @@ public class SchedulerDBManager {
                                         pendingJobs;
 
         long inErrorJobs = getNumberOfFilteredJobs(workflowName,
+                                                   null,
                                                    user,
                                                    tenant,
                                                    0,
@@ -1216,6 +1236,7 @@ public class SchedulerDBManager {
                                                    Collections.singletonList(JobStatus.IN_ERROR),
                                                    null);
         long runningJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                             null,
                                                              user,
                                                              tenant,
                                                              0,
@@ -1223,6 +1244,7 @@ public class SchedulerDBManager {
                                                              Collections.singletonList(JobStatus.RUNNING),
                                                              true);
         long stalledJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                             null,
                                                              user,
                                                              tenant,
                                                              0,
@@ -1230,6 +1252,7 @@ public class SchedulerDBManager {
                                                              Collections.singletonList(JobStatus.STALLED),
                                                              true);
         long pausedJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                            null,
                                                             user,
                                                             tenant,
                                                             0,
@@ -1239,6 +1262,7 @@ public class SchedulerDBManager {
         long currentJobsWithIssues = inErrorJobs + runningJobsWithIssues + stalledJobsWithIssues + pausedJobsWithIssues;
 
         long canceledJobs = getNumberOfFilteredJobs(workflowName,
+                                                    null,
                                                     user,
                                                     tenant,
                                                     startTime,
@@ -1246,6 +1270,7 @@ public class SchedulerDBManager {
                                                     Collections.singletonList(JobStatus.CANCELED),
                                                     null);
         long failedJobs = getNumberOfFilteredJobs(workflowName,
+                                                  null,
                                                   user,
                                                   tenant,
                                                   startTime,
@@ -1253,6 +1278,7 @@ public class SchedulerDBManager {
                                                   Collections.singletonList(JobStatus.FAILED),
                                                   null);
         long killedJobs = getNumberOfFilteredJobs(workflowName,
+                                                  null,
                                                   user,
                                                   tenant,
                                                   startTime,
@@ -1260,6 +1286,7 @@ public class SchedulerDBManager {
                                                   Collections.singletonList(JobStatus.KILLED),
                                                   null);
         long finishedJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                              null,
                                                               user,
                                                               tenant,
                                                               startTime,
@@ -1269,6 +1296,7 @@ public class SchedulerDBManager {
         long pastJobsWithIssues = canceledJobs + failedJobs + killedJobs + finishedJobsWithIssues;
 
         long successfulJobs = getNumberOfFilteredJobs(workflowName,
+                                                      null,
                                                       user,
                                                       tenant,
                                                       startTime,
@@ -1308,8 +1336,8 @@ public class SchedulerDBManager {
 
     }
 
-    public CompletedJobsCount getCompletedJobs(String user, String tenant, final String workflowName, long startDate,
-            long endDate, int numberOfIntervals) {
+    public CompletedJobsCount getCompletedJobs(String user, String tenant, final String workflowName, String bucketName,
+            long startDate, long endDate, int numberOfIntervals) {
 
         Map<Integer, Integer> jobsWithoutIssuesCount = new TreeMap<>();
         Map<Integer, Integer> jobsWithIssuesCount = new TreeMap<>();
@@ -1318,6 +1346,7 @@ public class SchedulerDBManager {
         for (int interval = 0; interval < numberOfIntervals && startDate < endDate; interval++) {
             long endTimeInterval = startDate + intervalTime;
             Integer nrOfJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                    bucketName,
                                                                     user,
                                                                     tenant,
                                                                     startDate,
@@ -1326,6 +1355,7 @@ public class SchedulerDBManager {
                                                                     false);
             jobsWithoutIssuesCount.put(interval, nrOfJobsWithoutIssues);
             Integer nrOfJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                                 null,
                                                                  user,
                                                                  tenant,
                                                                  startDate,
@@ -1333,6 +1363,7 @@ public class SchedulerDBManager {
                                                                  Collections.singletonList(JobStatus.FINISHED),
                                                                  true);
             Integer nrOfFailedJobs = getNumberOfFilteredJobs(workflowName,
+                                                             null,
                                                              user,
                                                              tenant,
                                                              startDate,

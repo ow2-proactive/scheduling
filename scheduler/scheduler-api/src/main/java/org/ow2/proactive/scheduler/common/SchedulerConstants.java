@@ -136,6 +136,9 @@ public class SchedulerConstants {
     /** Generic information containing the parent job id */
     public static final String PARENT_JOB_ID = "PARENT_JOB_ID";
 
+    /** Generic information containing the bucket name */
+    public static final String BUCKET_NAME = "bucketName";
+
     /**
      * The variable name to access results from dependent tasks (an array).
      */

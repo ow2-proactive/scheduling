@@ -187,11 +187,13 @@ public interface SchedulerRestInterface {
      * @param childJobs
      *             fetch childJobs (submitted by parent job(s))
      * @param jobName
-     *             Include only jobs with a name that starts with jobName (case in-sensitive)
+     *             Include only jobs with a name that starts with jobName (case sensitive)
      * @param projectName
-     *             Include only jobs with a project name that starts with projectName (case in-sensitive)
+     *             Include only jobs with a project name that starts with projectName (case sensitive)
+     * @param bucketName
+     *             Include only jobs with a bucket name that starts with bucketName (case sensitive)
      * @param userName
-     *             Include only jobs with a user name that matches exactly with userName (case in-sensitive)
+     *             Include only jobs with a user name that matches exactly with userName (case sensitive)
      * @param parentId
      *             Include only children jobs of the given parent job id. This parameter is ignored if childJobs is set to false
      * @param sortParams
@@ -217,6 +219,7 @@ public interface SchedulerRestInterface {
             @QueryParam("childJobs") @DefaultValue("true") boolean childJobs,
             @QueryParam("jobName") @DefaultValue("") String jobName,
             @QueryParam("projectName") @DefaultValue("") String projectName,
+            @QueryParam("bucketName") @DefaultValue("") String bucketName,
             @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("tenant") String tenant,
             @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams)
             throws RestException;
@@ -2225,6 +2228,7 @@ public interface SchedulerRestInterface {
      * @param sessionId id of a session
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param workflowName the workflow name of the filtered jobs
+     * @param bucketName the bucket name of the filtered jobs
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs, default value represents the current date
      * @param numberOfIntervals number of time intervals
@@ -2237,6 +2241,7 @@ public interface SchedulerRestInterface {
     CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("-1") long endDate,
             @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException;

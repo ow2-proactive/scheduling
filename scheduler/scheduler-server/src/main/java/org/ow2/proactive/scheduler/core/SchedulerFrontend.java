@@ -1897,6 +1897,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.isChildJobs(),
                                                    filterCriteria.getJobName(),
                                                    filterCriteria.getProjectName(),
+                                                   filterCriteria.getBucketName(),
                                                    filterCriteria.getParentId(),
                                                    sortParameters);
         /**
@@ -2151,8 +2152,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     @RoleRead
-    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, long startDate, long endDate,
-            int numberOfIntervals) throws NotConnectedException, PermissionException {
+    public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
+            long endDate, int numberOfIntervals) throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
@@ -2168,6 +2169,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         return dbManager.getCompletedJobs(myJobs ? ident.getUsername() : null,
                                           tenant,
                                           workflowName,
+                                          bucketName,
                                           startDate,
                                           endDate,
                                           numberOfIntervals);
