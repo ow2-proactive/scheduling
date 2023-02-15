@@ -121,19 +121,19 @@ import com.google.common.collect.Lists;
                                                                              "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                              "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                              "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
+                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, numberOfNodesInParallel = :numberOfNodesInParallel, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                                      "finishedTime = :finishedTime, inErrorTime = :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                                      "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                                      "numberOfRunningTasks = :numberOfRunningTasks, totalNumberOfTasks =:totalNumberOfTasks, " +
                                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, " +
+                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, numberOfNodesInParallel = :numberOfNodesInParallel, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, " +
                                                                                      "preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskRestarted", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                          "numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                          "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                          "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                         "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                                                                         "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, numberOfNodesInParallel = :numberOfNodesInParallel, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskStarted", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                        "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                        "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
@@ -256,6 +256,8 @@ public class JobData implements Serializable {
 
     private Integer numberOfNodes;
 
+    private Integer numberOfNodesInParallel;
+
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
@@ -283,6 +285,7 @@ public class JobData implements Serializable {
         jobInfo.setLastUpdatedTime(getLastUpdatedTime());
         jobInfo.setCumulatedCoreTime(getCumulatedCoreTime());
         jobInfo.setNumberOfNodes(getNumberOfNodes());
+        jobInfo.setNumberOfNodesInParallel(getNumberOfNodesInParallel());
         if (isToBeRemoved()) {
             jobInfo.setToBeRemoved();
         }
@@ -434,6 +437,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
         jobRuntimeData.setCumulatedCoreTime(job.getCumulatedCoreTime());
         jobRuntimeData.setNumberOfNodes(job.getNumberOfNodes());
+        jobRuntimeData.setNumberOfNodesInParallel(job.getNumberOfNodesInParallel());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
         jobRuntimeData.setPreciousTasks(job.getPreciousTasksFinished());
         jobRuntimeData.setParentId(job.getParentId());
@@ -865,6 +869,15 @@ public class JobData implements Serializable {
 
     public void setNumberOfNodes(Integer numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
+    }
+
+    @Column(name = "NUMBER_OF_NODES_IN_PARALLEL")
+    public int getNumberOfNodesInParallel() {
+        return numberOfNodesInParallel != null ? numberOfNodesInParallel : 0;
+    }
+
+    public void setNumberOfNodesInParallel(Integer numberOfNodesInParallel) {
+        this.numberOfNodesInParallel = numberOfNodesInParallel;
     }
 
     @Column(name = "ATTACHED_SERVICES", length = Integer.MAX_VALUE)

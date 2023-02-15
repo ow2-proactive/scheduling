@@ -2163,6 +2163,7 @@ public interface SchedulerRestInterface {
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
      * @param workflowName the workflow name of the filtered jobs
+     * @param inParallel if true, returns the maximum number of nodes used in parallel instead of the total number of nodes
      * @return {@link FilteredTopWorkflowsNumberOfNodesData}
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2174,7 +2175,8 @@ public interface SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("inParallel") @DefaultValue("false") boolean inParallel) throws RestException;
 
     /**
      * Returns an object containing the top workflows with the longest execution time based on the given filters

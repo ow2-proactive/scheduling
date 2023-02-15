@@ -143,6 +143,12 @@ public interface JobInfo extends Serializable {
     int getNumberOfNodes();
 
     /**
+     * Returns the number of nodes in parallel used by the job since the beginning of its execution
+     * @return number of nodes in parallel used by the job
+     */
+    int getNumberOfNodesInParallel();
+
+    /**
      * Returns the number of tasks managed by the Job.
      *
      * @return the number of tasks managed by the Job.

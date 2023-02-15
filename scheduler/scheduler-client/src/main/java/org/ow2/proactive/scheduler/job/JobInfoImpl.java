@@ -97,6 +97,8 @@ public class JobInfoImpl implements JobInfo {
 
     private int numberOfNodes = 0;
 
+    private int numberOfNodesInParallel = 0;
+
     /** total number of tasks */
     private int totalNumberOfTasks = 0;
 
@@ -355,6 +357,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setNumberOfNodes(int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
+    }
+
+    @Override
+    public int getNumberOfNodesInParallel() {
+        return numberOfNodesInParallel;
+    }
+
+    public void setNumberOfNodesInParallel(int numberOfNodesInParallel) {
+        this.numberOfNodesInParallel = numberOfNodesInParallel;
     }
 
     /**
