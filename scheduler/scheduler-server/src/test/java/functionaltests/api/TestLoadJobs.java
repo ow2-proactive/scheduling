@@ -46,6 +46,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobFilterCriteriaBuilder;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -322,35 +323,30 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
             boolean childJobs) {
-        return new JobFilterCriteria(myJobsOnly,
-                                     pending,
-                                     running,
-                                     finished,
-                                     false,
-                                     childJobs,
-                                     null,
-                                     null,
-                                     null,
-                                     null,
-                                     null,
-                                     null);
+        return new JobFilterCriteriaBuilder().myJobsOnly(myJobsOnly)
+                                             .pending(pending)
+                                             .running(running)
+                                             .finished(finished)
+                                             .withIssuesOnly(false)
+                                             .childJobs(childJobs)
+                                             .build();
     }
 
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
             boolean withIssuesOnly, boolean childJobs, String jobName, String projectName, String bucketName,
             String userName, Long parentId) {
-        return new JobFilterCriteria(myJobsOnly,
-                                     pending,
-                                     running,
-                                     finished,
-                                     withIssuesOnly,
-                                     childJobs,
-                                     jobName,
-                                     projectName,
-                                     bucketName,
-                                     userName,
-                                     null,
-                                     parentId);
+        return new JobFilterCriteriaBuilder().myJobsOnly(myJobsOnly)
+                                             .pending(pending)
+                                             .running(running)
+                                             .finished(finished)
+                                             .withIssuesOnly(withIssuesOnly)
+                                             .childJobs(childJobs)
+                                             .jobName(jobName)
+                                             .projectName(projectName)
+                                             .userName(userName)
+                                             .bucketName(bucketName)
+                                             .parentId(parentId)
+                                             .build();
     }
 
 }
