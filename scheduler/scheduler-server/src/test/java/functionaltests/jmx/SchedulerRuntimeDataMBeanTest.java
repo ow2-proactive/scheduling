@@ -41,7 +41,7 @@ import javax.management.remote.JMXServiceURL;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobFilterCriteriaBuilder;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -95,18 +95,13 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
         List<JobInfo> existingFinishedJobs = schedulerHelper.getSchedulerInterface()
                                                             .getJobs(0,
                                                                      1000,
-                                                                     new JobFilterCriteria(false,
-                                                                                           false,
-                                                                                           true,
-                                                                                           true,
-                                                                                           false,
-                                                                                           true,
-                                                                                           null,
-                                                                                           null,
-                                                                                           null,
-                                                                                           null,
-                                                                                           null,
-                                                                                           null),
+                                                                     new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                                                   .pending(false)
+                                                                                                   .running(true)
+                                                                                                   .finished(true)
+                                                                                                   .withIssuesOnly(false)
+                                                                                                   .childJobs(true)
+                                                                                                   .build(),
                                                                      null)
                                                             .getList();
 

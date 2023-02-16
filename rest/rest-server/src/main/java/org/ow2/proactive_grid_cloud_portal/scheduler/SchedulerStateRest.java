@@ -233,18 +233,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(false,
-                                                                 true,
-                                                                 true,
-                                                                 true,
-                                                                 false,
-                                                                 true,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null),
+                                           new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                         .pending(true)
+                                                                         .running(true)
+                                                                         .finished(true)
+                                                                         .withIssuesOnly(false)
+                                                                         .childJobs(true)
+                                                                         .build(),
                                            DEFAULT_JOB_SORT_PARAMS);
 
             List<String> ids = new ArrayList<>(page.getList().size());
@@ -331,18 +326,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(false,
-                                                                 true,
-                                                                 true,
-                                                                 true,
-                                                                 false,
-                                                                 true,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null),
+                                           new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                         .pending(true)
+                                                                         .running(true)
+                                                                         .finished(true)
+                                                                         .withIssuesOnly(false)
+                                                                         .childJobs(true)
+                                                                         .build(),
                                            DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<>(page.getList().size());
             for (JobInfo jobInfo : page.getList()) {
@@ -397,18 +387,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(onlyUserJobs,
-                                                                 pending,
-                                                                 running,
-                                                                 finished,
-                                                                 withIssuesOnly,
-                                                                 childJobs,
-                                                                 jobName,
-                                                                 projectName,
-                                                                 bucketName,
-                                                                 userName,
-                                                                 tenant,
-                                                                 parentId),
+                                           new JobFilterCriteriaBuilder().myJobsOnly(onlyUserJobs)
+                                                                         .pending(pending)
+                                                                         .running(running)
+                                                                         .finished(finished)
+                                                                         .withIssuesOnly(withIssuesOnly)
+                                                                         .childJobs(childJobs)
+                                                                         .jobName(jobName)
+                                                                         .projectName(projectName)
+                                                                         .userName(userName)
+                                                                         .tenant(tenant)
+                                                                         .bucketName(bucketName)
+                                                                         .parentId(parentId)
+                                                                         .build(),
                                            sortParameterList);
             List<JobInfo> jobsInfo = page.getList();
             ArrayList<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
