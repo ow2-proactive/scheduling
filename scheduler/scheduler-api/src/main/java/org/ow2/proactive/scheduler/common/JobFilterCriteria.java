@@ -74,23 +74,6 @@ public class JobFilterCriteria implements Serializable {
         this.parentId = parentId;
     }
 
-    public JobFilterCriteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
-            boolean withIssuesOnly, boolean childJobs, String jobName, String projectName, String userName,
-            String tenant, Long parentId) {
-        this(myJobsOnly,
-             pending,
-             running,
-             finished,
-             withIssuesOnly,
-             childJobs,
-             jobName,
-             projectName,
-             null,
-             userName,
-             tenant,
-             parentId);
-    }
-
     public boolean isMyJobsOnly() {
         return myJobsOnly;
     }
