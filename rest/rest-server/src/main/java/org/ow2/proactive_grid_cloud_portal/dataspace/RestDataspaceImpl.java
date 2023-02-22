@@ -492,9 +492,11 @@ public class RestDataspaceImpl implements RestDataspace {
         }
 
         Subject subject;
+        String userName;
 
         try {
             subject = session.getScheduler().getSubject();
+            userName = session.getScheduler().getCurrentUser();
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException("User not authenticated or session timeout.");
         }
@@ -514,9 +516,20 @@ public class RestDataspaceImpl implements RestDataspace {
         if (System.getSecurityManager() != null) {
             try {
                 checkPermission(subject, deniedMethodCallPermission, permissionMsg);
-                throw new DeniedMethodCallException(permissionMsg);
+                // double-check that this method call has previously been denied for this user. If not, ignore it.
+                if (DeniedMethodCallPermissionRepository.getInstance()
+                                                        .checkAndSetDeniedMethodCall(userName, fullMethodName, true)) {
+                    logger.trace("Denied method access : " + fullMethodName);
+                    throw new DeniedMethodCallException(permissionMsg);
+                }
             } catch (PermissionRestException ex) {
                 // ok, the check should throw an exception unless it is denied
+                // double-check that this method call has previously been denied for this user. If yes, throw an exception.
+                if (DeniedMethodCallPermissionRepository.getInstance()
+                                                        .checkAndSetDeniedMethodCall(userName, fullMethodName, false)) {
+                    logger.trace("Denied method access : " + fullMethodName);
+                    throw new PermissionRestException(permissionMsg);
+                }
             } catch (DeniedMethodCallException e) {
                 throw new PermissionRestException(permissionMsg);
             }

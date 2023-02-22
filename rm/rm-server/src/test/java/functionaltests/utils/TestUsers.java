@@ -31,6 +31,7 @@ public enum TestUsers {
     USER("user", "pwd"),
     TEST("test_executor", "pwd"),
     RADMIN("radmin", "pwd"),
+    SUBADMIN("subadmin", "pwd"),
     NSADMIN("nsadmin", "pwd"),
     NSADMIN2("nsadmin2", "pwd"),
     ADMIN("admin", "admin"),

@@ -36,12 +36,19 @@ import java.util.stream.Stream;
 import org.ow2.proactive.permissions.ClientPermission;
 
 
+/**
+ * This permission allows handling Jobs that contain a specific 'group' in Generic Information
+ */
 public class HandleJobsWithGroupNamePermission extends ClientPermission {
-    private final static String DESCRIPTION = "Handle Jobs that contain specific 'group' in Generic Information";
+    private final static String DESCRIPTION = "HandleJobsWithGroupNamePermission";
 
     public final static String GROUP = "group";
 
     private Set<String> allowedGroups = new HashSet<>();
+
+    public HandleJobsWithGroupNamePermission() {
+        super(DESCRIPTION);
+    }
 
     // permission created by the security file
     public HandleJobsWithGroupNamePermission(String groupsCommaSeparated) {
