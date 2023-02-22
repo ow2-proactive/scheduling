@@ -42,9 +42,13 @@ import org.ow2.proactive.permissions.ClientPermission;
  */
 public class HandleJobsWithGenericInformationPermission extends ClientPermission {
 
-    private final static String DESCRIPTION = "Handle Jobs that contains this specific Generic Information";
+    private final static String DESCRIPTION = "HandleJobsWithGenericInformationPermission";
 
     private Map<String, String> genericInformation = new HashMap<String, String>();
+
+    public HandleJobsWithGenericInformationPermission() {
+        super(DESCRIPTION);
+    }
 
     /**
      * Construct the permission with specified authorization string.

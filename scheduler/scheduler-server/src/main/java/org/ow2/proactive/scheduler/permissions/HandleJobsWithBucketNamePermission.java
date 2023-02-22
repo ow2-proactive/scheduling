@@ -36,12 +36,19 @@ import java.util.stream.Stream;
 import org.ow2.proactive.permissions.ClientPermission;
 
 
+/**
+ * This permission allows handling Jobs that contain a specific 'bucket_name' in Generic Information
+ */
 public class HandleJobsWithBucketNamePermission extends ClientPermission {
-    private final static String DESCRIPTION = "Handle Jobs that contain specific 'bucket_name' in Generic Information";
+    private final static String DESCRIPTION = "HandleJobsWithBucketNamePermission";
 
     public final static String BUCKET_NAME = "bucketName";
 
     private Set<String> allowedBuckets = new HashSet<>();
+
+    public HandleJobsWithBucketNamePermission() {
+        super(DESCRIPTION);
+    }
 
     // permission created by the security file
     public HandleJobsWithBucketNamePermission(String bucketsCommaSeparated) {
