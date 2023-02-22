@@ -25,6 +25,8 @@
  */
 package functionaltests.api;
 
+import java.util.Collections;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,6 +62,7 @@ public class TestJobInstantGetTaskResult extends SchedulerFunctionalTestNoRestar
         //create job
         TaskFlowJob job = new TaskFlowJob();
         job.setProjectName("My project");
+        job.setGenericInformation(Collections.singletonMap("bucketName", "My bucket"));
 
         for (int i = 0; i < 50; i++) {
             JavaTask t = new JavaTask();
@@ -73,7 +76,9 @@ public class TestJobInstantGetTaskResult extends SchedulerFunctionalTestNoRestar
 
         schedulerHelper.waitForEventJobRemoved(id);
         String projectName = client.getProjectName();
+        String bucketName = client.getBucketName();
         Assert.assertEquals("My project", projectName);
+        Assert.assertEquals("My bucket", bucketName);
     }
 
     @After

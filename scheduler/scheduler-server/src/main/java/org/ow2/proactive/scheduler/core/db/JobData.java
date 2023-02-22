@@ -121,19 +121,19 @@ import com.google.common.collect.Lists;
                                                                              "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                              "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                              "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
+                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, numberOfNodesInParallel = :numberOfNodesInParallel, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                                      "finishedTime = :finishedTime, inErrorTime = :inErrorTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                                      "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                                      "numberOfRunningTasks = :numberOfRunningTasks, totalNumberOfTasks =:totalNumberOfTasks, " +
                                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, " +
+                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, numberOfNodesInParallel = :numberOfNodesInParallel, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap, " +
                                                                                      "preciousTasks = :preciousTasks where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskRestarted", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                          "numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                          "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                          "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                         "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                                                                         "numberOfInErrorTasks = :numberOfInErrorTasks, cumulatedCoreTime = :cumulatedCoreTime, numberOfNodes = :numberOfNodes, numberOfNodesInParallel = :numberOfNodesInParallel, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskStarted", query = "update JobData set status = :status, statusRank = :statusRank, " +
                                                                        "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                        "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
@@ -156,7 +156,10 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_PARENT_RANK_ID", columnList = "PARENT_JOB_ID,STATUS_RANK DESC,ID DESC"),
                                       @Index(name = "JOB_DATA_OWNER_PARENT_RANK_ID", columnList = "OWNER,PARENT_JOB_ID,STATUS_RANK DESC,ID DESC"),
                                       @Index(name = "JOB_DATA_FAILED_TASKS", columnList = "FAILED_TASKS"),
-                                      @Index(name = "JOB_DATA_FAULTY_TASKS", columnList = "FAULTY_TASKS") })
+                                      @Index(name = "JOB_DATA_FAULTY_TASKS", columnList = "FAULTY_TASKS"),
+                                      @Index(name = "JOB_DATA_BUCKET_NAME", columnList = "BUCKET_NAME"),
+                                      @Index(name = "JOB_DATA_JOB_NAME", columnList = "JOB_NAME"),
+                                      @Index(name = "JOB_DATA_PROJECT_NAME", columnList = "PROJECT_NAME"), })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
@@ -241,6 +244,8 @@ public class JobData implements Serializable {
 
     private String projectName;
 
+    private String bucketName;
+
     private List<JobContent> jobContent = Lists.newArrayList();
 
     private Map<Integer, Boolean> attachedServices;
@@ -253,12 +258,15 @@ public class JobData implements Serializable {
 
     private Integer numberOfNodes;
 
+    private Integer numberOfNodesInParallel;
+
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
         jobInfo.setJobOwner(getOwner());
         jobInfo.setTenant(getTenant());
         jobInfo.setProjectName(getProjectName());
+        jobInfo.setBucketName(getBucketName());
         jobInfo.setStatus(getStatus());
         jobInfo.setParentId(getParentId());
         jobInfo.setChildrenCount(getChildrenCount());
@@ -279,6 +287,7 @@ public class JobData implements Serializable {
         jobInfo.setLastUpdatedTime(getLastUpdatedTime());
         jobInfo.setCumulatedCoreTime(getCumulatedCoreTime());
         jobInfo.setNumberOfNodes(getNumberOfNodes());
+        jobInfo.setNumberOfNodesInParallel(getNumberOfNodesInParallel());
         if (isToBeRemoved()) {
             jobInfo.setToBeRemoved();
         }
@@ -335,6 +344,7 @@ public class JobData implements Serializable {
         internalJob.setGenericInformation(getGenericInformation());
         internalJob.setVariables(variablesToJobVariables());
         internalJob.setProjectName(getProjectName());
+        internalJob.setBucketName(getBucketName());
         internalJob.setCumulatedCoreTime(getCumulatedCoreTime());
         internalJob.setOwner(getOwner());
         internalJob.setTenant(getTenant());
@@ -401,6 +411,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setJobName(job.getName());
         jobRuntimeData.setDescription(job.getDescription());
         jobRuntimeData.setProjectName(job.getProjectName());
+        jobRuntimeData.setBucketName(job.getBucketName());
         jobRuntimeData.setInputSpace(job.getInputSpace());
         jobRuntimeData.setOutputSpace(job.getOutputSpace());
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
@@ -428,6 +439,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
         jobRuntimeData.setCumulatedCoreTime(job.getCumulatedCoreTime());
         jobRuntimeData.setNumberOfNodes(job.getNumberOfNodes());
+        jobRuntimeData.setNumberOfNodesInParallel(job.getNumberOfNodesInParallel());
         jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
         jobRuntimeData.setPreciousTasks(job.getPreciousTasksFinished());
         jobRuntimeData.setParentId(job.getParentId());
@@ -614,6 +626,15 @@ public class JobData implements Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Column(name = "BUCKET_NAME", updatable = false)
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     @OneToMany(mappedBy = "jobData", fetch = FetchType.LAZY)
@@ -850,6 +871,15 @@ public class JobData implements Serializable {
 
     public void setNumberOfNodes(Integer numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
+    }
+
+    @Column(name = "NUMBER_OF_NODES_IN_PARALLEL")
+    public int getNumberOfNodesInParallel() {
+        return numberOfNodesInParallel != null ? numberOfNodesInParallel : 0;
+    }
+
+    public void setNumberOfNodesInParallel(Integer numberOfNodesInParallel) {
+        this.numberOfNodesInParallel = numberOfNodesInParallel;
     }
 
     @Column(name = "ATTACHED_SERVICES", length = Integer.MAX_VALUE)

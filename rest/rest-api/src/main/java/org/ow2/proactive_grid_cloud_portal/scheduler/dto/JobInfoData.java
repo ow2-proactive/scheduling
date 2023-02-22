@@ -71,6 +71,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private String projectName;
 
+    private String bucketName;
+
     private boolean toBeRemoved = false;
 
     private Map<String, String> genericInformation;
@@ -102,6 +104,8 @@ public class JobInfoData implements java.io.Serializable {
     private long cumulatedCoreTime = 0;
 
     private int numberOfNodes = 0;
+
+    private int numberOfNodesInParallel = 0;
 
     public void setToBeRemoved() {
         toBeRemoved = true;
@@ -197,6 +201,14 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     public JobIdData getJobId() {
@@ -375,6 +387,14 @@ public class JobInfoData implements java.io.Serializable {
         this.numberOfNodes = numberOfNodes;
     }
 
+    public int getNumberOfNodesInParallel() {
+        return numberOfNodesInParallel;
+    }
+
+    public void setNumberOfNodesInParallel(int numberOfNodesInParallel) {
+        this.numberOfNodesInParallel = numberOfNodesInParallel;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{ " + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
@@ -384,10 +404,11 @@ public class JobInfoData implements java.io.Serializable {
                numberOfRunningTasks + ", numberOfFinishedTasks=" + numberOfFinishedTasks + ", numberOfFailedTasks=" +
                numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks + ", numberOfInErrorTasks=" +
                numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner + "', projectName='" +
-               projectName + "', toBeRemoved=" + toBeRemoved + ", genericInformation=" + genericInformation +
-               ", variables=" + variables + ", signals=" + signals + ", detailedSignals=" + detailedSignals +
-               ", attachedServices=" + attachedServices + ", externalEndpointUrls=" + externalEndpointUrls +
-               ", cumulatedCoreTime=" + cumulatedCoreTime + ", numberOfNodes=" + numberOfNodes + " }";
+               projectName + "', bucketName='" + bucketName + "', toBeRemoved=" + toBeRemoved +
+               ", genericInformation=" + genericInformation + ", variables=" + variables + ", signals=" + signals +
+               ", detailedSignals=" + detailedSignals + ", attachedServices=" + attachedServices +
+               ", externalEndpointUrls=" + externalEndpointUrls + ", cumulatedCoreTime=" + cumulatedCoreTime +
+               ", numberOfNodes=" + numberOfNodes + ", numberOfNodesInParallel=" + numberOfNodesInParallel + " }";
     }
 
 }

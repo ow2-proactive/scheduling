@@ -49,26 +49,27 @@ public class JobFilterCriteria implements Serializable {
 
     private final String projectName;
 
+    private final String bucketName;
+
     private final String userName;
 
     private final String tenant;
 
     private final Long parentId;
 
-    public JobFilterCriteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished,
-            boolean withIssuesOnly, boolean childJobs, String jobName, String projectName, String userName,
-            String tenant, Long parentId) {
-        this.myJobsOnly = myJobsOnly;
-        this.pending = pending;
-        this.running = running;
-        this.finished = finished;
-        this.withIssuesOnly = withIssuesOnly;
-        this.childJobs = childJobs;
-        this.jobName = jobName;
-        this.projectName = projectName;
-        this.userName = userName;
-        this.tenant = tenant;
-        this.parentId = parentId;
+    public JobFilterCriteria(JobFilterCriteriaBuilder builder) {
+        this.myJobsOnly = builder.isMyJobsOnly();
+        this.pending = builder.isPending();
+        this.running = builder.isRunning();
+        this.finished = builder.isFinished();
+        this.withIssuesOnly = builder.isWithIssuesOnly();
+        this.childJobs = builder.isChildJobs();
+        this.jobName = builder.getJobName();
+        this.projectName = builder.getProjectName();
+        this.bucketName = builder.getBucketName();
+        this.userName = builder.getUserName();
+        this.tenant = builder.getTenant();
+        this.parentId = builder.getParentId();
     }
 
     public boolean isMyJobsOnly() {
@@ -101,6 +102,10 @@ public class JobFilterCriteria implements Serializable {
 
     public String getProjectName() {
         return projectName;
+    }
+
+    public String getBucketName() {
+        return bucketName;
     }
 
     public String getUserName() {

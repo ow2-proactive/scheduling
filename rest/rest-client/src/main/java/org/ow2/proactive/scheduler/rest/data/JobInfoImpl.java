@@ -53,6 +53,8 @@ public class JobInfoImpl implements JobInfo {
 
     private int numberOfNodes = 0;
 
+    private int numberOfNodesInParallel = 0;
+
     private JobId jobId;
 
     private String jobOwner;
@@ -60,6 +62,8 @@ public class JobInfoImpl implements JobInfo {
     private String tenant;
 
     private String projectName;
+
+    private String bucketName;
 
     private int totalNumberOfTasks = 0;
 
@@ -152,6 +156,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public String getProjectName() {
         return projectName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    @Override
+    public String getBucketName() {
+        return bucketName;
     }
 
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {
@@ -288,6 +301,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setNumberOfNodes(int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
+    }
+
+    @Override
+    public int getNumberOfNodesInParallel() {
+        return numberOfNodesInParallel;
+    }
+
+    public void setNumberOfNodesInParallel(int numberOfNodesInParallel) {
+        this.numberOfNodesInParallel = numberOfNodesInParallel;
     }
 
     public void setLastUpdatedTime(long lastUpdatedTime) {

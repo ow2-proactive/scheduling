@@ -331,17 +331,18 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     private boolean removeAllJobs(ISchedulerClient client) throws NotConnectedException, PermissionException {
-        JobFilterCriteria allJobsCriteria = new JobFilterCriteria(false,
-                                                                  true,
-                                                                  true,
-                                                                  true,
-                                                                  false,
-                                                                  true,
-                                                                  "",
-                                                                  "",
-                                                                  "",
-                                                                  null,
-                                                                  new Long(-1));
+        JobFilterCriteria allJobsCriteria = new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                          .pending(true)
+                                                                          .running(true)
+                                                                          .finished(true)
+                                                                          .withIssuesOnly(false)
+                                                                          .childJobs(true)
+                                                                          .jobName("")
+                                                                          .projectName("")
+                                                                          .userName("")
+                                                                          .bucketName("")
+                                                                          .parentId((long) -1)
+                                                                          .build();
         List defaultSortOrder = Collections.singletonList(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
         List<JobInfo> allJobInfos = client.getJobs(0, 1000, allJobsCriteria, defaultSortOrder).getList();
         List<JobId> allJobIds = allJobInfos.stream().map(x -> x.getJobId()).collect(Collectors.toList());
@@ -389,17 +390,18 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertEquals(JobStatus.FINISHED, job3Result.getJobInfo().getStatus());
 
         // Test sorts
-        JobFilterCriteria allJobsCriteria = new JobFilterCriteria(false,
-                                                                  true,
-                                                                  true,
-                                                                  true,
-                                                                  false,
-                                                                  true,
-                                                                  "",
-                                                                  "",
-                                                                  "",
-                                                                  null,
-                                                                  new Long(-1));
+        JobFilterCriteria allJobsCriteria = new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                          .pending(true)
+                                                                          .running(true)
+                                                                          .finished(true)
+                                                                          .withIssuesOnly(false)
+                                                                          .childJobs(true)
+                                                                          .jobName("")
+                                                                          .projectName("")
+                                                                          .userName("")
+                                                                          .bucketName("")
+                                                                          .parentId((long) -1)
+                                                                          .build();
         SortParameter jobNameDescOrder = new SortParameter<>(JobSortParameter.NAME, SortOrder.DESC);
         SortParameter jobIdAscOrder = new SortParameter<>(JobSortParameter.ID, SortOrder.ASC);
         List<SortParameter<JobSortParameter>> sortParameterList1 = new ArrayList<>();
@@ -418,17 +420,18 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertEquals(jobsList2.get(1).getJobId().value(), job4Id.value());
 
         // Test filters
-        JobFilterCriteria allJobsFinishedInMyProjectBCriteria = new JobFilterCriteria(false,
-                                                                                      false,
-                                                                                      false,
-                                                                                      true,
-                                                                                      false,
-                                                                                      false,
-                                                                                      "",
-                                                                                      "myProjectB",
-                                                                                      "",
-                                                                                      null,
-                                                                                      new Long(-1));
+        JobFilterCriteria allJobsFinishedInMyProjectBCriteria = new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                                              .pending(false)
+                                                                                              .running(false)
+                                                                                              .finished(true)
+                                                                                              .withIssuesOnly(false)
+                                                                                              .childJobs(false)
+                                                                                              .jobName("")
+                                                                                              .projectName("myProjectB")
+                                                                                              .userName("")
+                                                                                              .bucketName("")
+                                                                                              .parentId((long) -1)
+                                                                                              .build();
         List<JobInfo> jobsList3 = client.getJobs(0,
                                                  4,
                                                  allJobsFinishedInMyProjectBCriteria,

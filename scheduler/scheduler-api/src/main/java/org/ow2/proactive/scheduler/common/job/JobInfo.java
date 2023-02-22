@@ -75,6 +75,12 @@ public interface JobInfo extends Serializable {
     String getProjectName();
 
     /**
+     * Returns the bucket name associated with this job
+     * @return bucket name
+     */
+    String getBucketName();
+
+    /**
      * Returns the time at which the Job has finished.
      *
      * @return the time at which the Job has finished
@@ -135,6 +141,12 @@ public interface JobInfo extends Serializable {
      * @return number of nodes used by the job
      */
     int getNumberOfNodes();
+
+    /**
+     * Returns the number of nodes in parallel used by the job since the beginning of its execution
+     * @return number of nodes in parallel used by the job
+     */
+    int getNumberOfNodesInParallel();
 
     /**
      * Returns the number of tasks managed by the Job.

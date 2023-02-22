@@ -56,6 +56,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobFilterCriteriaBuilder;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -1354,17 +1355,13 @@ public class SchedulerTHelper {
 
     public void cleanJobs() throws Exception {
         Scheduler userInt = getSchedulerInterface();
-        JobFilterCriteria criteria = new JobFilterCriteria(false,
-                                                           true,
-                                                           true,
-                                                           true,
-                                                           false,
-                                                           true,
-                                                           null,
-                                                           null,
-                                                           null,
-                                                           null,
-                                                           null);
+        JobFilterCriteria criteria = new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                   .pending(true)
+                                                                   .running(true)
+                                                                   .finished(true)
+                                                                   .withIssuesOnly(false)
+                                                                   .childJobs(true)
+                                                                   .build();
         List<JobInfo> jobs = userInt.getJobs(0,
                                              1000,
                                              criteria,

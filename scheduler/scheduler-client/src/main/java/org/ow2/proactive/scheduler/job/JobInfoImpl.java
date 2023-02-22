@@ -65,6 +65,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String projectName;
 
+    private String bucketName = null;
+
     /** job submitted time */
     private long submittedTime = -1;
 
@@ -94,6 +96,8 @@ public class JobInfoImpl implements JobInfo {
     private long cumulatedCoreTime = 0L;
 
     private int numberOfNodes = 0;
+
+    private int numberOfNodesInParallel = 0;
 
     /** total number of tasks */
     private int totalNumberOfTasks = 0;
@@ -173,6 +177,7 @@ public class JobInfoImpl implements JobInfo {
         this.owner = jobInfo.owner;
         this.tenant = jobInfo.tenant;
         this.projectName = jobInfo.getProjectName();
+        this.bucketName = jobInfo.getBucketName();
         this.submittedTime = jobInfo.getSubmittedTime();
         this.startTime = jobInfo.getStartTime();
         this.inErrorTime = jobInfo.getInErrorTime();
@@ -239,6 +244,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Override
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     /**
@@ -343,6 +357,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setNumberOfNodes(int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
+    }
+
+    @Override
+    public int getNumberOfNodesInParallel() {
+        return numberOfNodesInParallel;
+    }
+
+    public void setNumberOfNodesInParallel(int numberOfNodesInParallel) {
+        this.numberOfNodesInParallel = numberOfNodesInParallel;
     }
 
     /**

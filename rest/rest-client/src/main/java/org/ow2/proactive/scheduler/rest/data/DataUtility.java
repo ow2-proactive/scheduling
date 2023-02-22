@@ -71,6 +71,7 @@ public class DataUtility {
         impl.setFinishedTime(d.getFinishedTime());
         impl.setJobOwner(d.getJobOwner());
         impl.setTenant(d.getTenant());
+        impl.setBucketName(d.getBucketName());
         impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());
         impl.setNumberOfPendingTasks(d.getNumberOfPendingTasks());
         impl.setNumberOfRunningTasks(d.getNumberOfRunningTasks());

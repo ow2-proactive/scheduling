@@ -233,17 +233,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(false,
-                                                                 true,
-                                                                 true,
-                                                                 true,
-                                                                 false,
-                                                                 true,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null),
+                                           new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                         .pending(true)
+                                                                         .running(true)
+                                                                         .finished(true)
+                                                                         .withIssuesOnly(false)
+                                                                         .childJobs(true)
+                                                                         .build(),
                                            DEFAULT_JOB_SORT_PARAMS);
 
             List<String> ids = new ArrayList<>(page.getList().size());
@@ -330,17 +326,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(false,
-                                                                 true,
-                                                                 true,
-                                                                 true,
-                                                                 false,
-                                                                 true,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null,
-                                                                 null),
+                                           new JobFilterCriteriaBuilder().myJobsOnly(false)
+                                                                         .pending(true)
+                                                                         .running(true)
+                                                                         .finished(true)
+                                                                         .withIssuesOnly(false)
+                                                                         .childJobs(true)
+                                                                         .build(),
                                            DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<>(page.getList().size());
             for (JobInfo jobInfo : page.getList()) {
@@ -374,8 +366,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
             boolean myJobs, boolean pending, boolean running, boolean finished, boolean withIssuesOnly,
-            boolean childJobs, String jobName, String projectName, String userName, String tenant, Long parentId,
-            String sortParams) throws RestException {
+            boolean childJobs, String jobName, String projectName, String bucketName, String userName, String tenant,
+            Long parentId, String sortParams) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
@@ -395,17 +387,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteria(onlyUserJobs,
-                                                                 pending,
-                                                                 running,
-                                                                 finished,
-                                                                 withIssuesOnly,
-                                                                 childJobs,
-                                                                 jobName,
-                                                                 projectName,
-                                                                 userName,
-                                                                 tenant,
-                                                                 parentId),
+                                           new JobFilterCriteriaBuilder().myJobsOnly(onlyUserJobs)
+                                                                         .pending(pending)
+                                                                         .running(running)
+                                                                         .finished(finished)
+                                                                         .withIssuesOnly(withIssuesOnly)
+                                                                         .childJobs(childJobs)
+                                                                         .jobName(jobName)
+                                                                         .projectName(projectName)
+                                                                         .userName(userName)
+                                                                         .tenant(tenant)
+                                                                         .bucketName(bucketName)
+                                                                         .parentId(parentId)
+                                                                         .build(),
                                            sortParameterList);
             List<JobInfo> jobsInfo = page.getList();
             ArrayList<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
@@ -2674,7 +2668,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName) throws RestException {
+            @QueryParam("workflowName") String workflowName,
+            @QueryParam("inParallel") @DefaultValue("false") boolean inParallel) throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
@@ -2682,7 +2677,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                               workflowName,
                                                               myJobs,
                                                               startDate,
-                                                              endDate),
+                                                              endDate,
+                                                              inParallel),
                        FilteredTopWorkflowsNumberOfNodesData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
@@ -2746,13 +2742,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public CompletedJobsCountData getCompletedJobs(@HeaderParam("sessionid") String sessionId,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName, @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("-1") long endDate,
             @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
-            return mapper.map(scheduler.getCompletedJobs(myJobs, workflowName, startDate, endDate, numberOfIntervals),
+            return mapper.map(scheduler.getCompletedJobs(myJobs,
+                                                         workflowName,
+                                                         bucketName,
+                                                         startDate,
+                                                         endDate,
+                                                         numberOfIntervals),
                               CompletedJobsCountData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
