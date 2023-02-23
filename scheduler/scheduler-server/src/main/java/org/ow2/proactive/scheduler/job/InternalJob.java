@@ -1106,6 +1106,12 @@ public abstract class InternalJob extends JobState {
     }
 
     @Override
+    public void setSubmissionMode(String submissionMode) {
+        super.setSubmissionMode(submissionMode);
+        jobInfo.setSubmissionMode(submissionMode);
+    }
+
+    @Override
     public void setProjectName(String projectName) {
         super.setProjectName(projectName);
         jobInfo.setProjectName(projectName);

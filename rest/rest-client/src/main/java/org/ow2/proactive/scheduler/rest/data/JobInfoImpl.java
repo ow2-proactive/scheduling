@@ -65,6 +65,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String bucketName;
 
+    private String submissionMode;
+
     private int totalNumberOfTasks = 0;
 
     private int numberOfPendingTasks = 0;
@@ -165,6 +167,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public String getBucketName() {
         return bucketName;
+    }
+
+    public void setSubmissionMode(String submissionMode) {
+        this.submissionMode = submissionMode;
+    }
+
+    @Override
+    public String getSubmissionMode() {
+        return submissionMode;
     }
 
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {

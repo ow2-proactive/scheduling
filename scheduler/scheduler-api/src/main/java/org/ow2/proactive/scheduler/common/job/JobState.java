@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.common.job;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -454,6 +453,15 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      */
     public int getNumberOfNodesInParallel() {
         return getJobInfo().getNumberOfNodesInParallel();
+    }
+
+    /**
+     * Returns the portal name via the job was submitted
+     *
+     * @return the portal name
+     */
+    public String getSubmissionMode() {
+        return getJobInfo().getSubmissionMode();
     }
 
     /**

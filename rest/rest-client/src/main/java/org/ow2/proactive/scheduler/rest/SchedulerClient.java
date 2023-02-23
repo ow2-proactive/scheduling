@@ -933,6 +933,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
         try {
+            job.setGenericInformation(DataUtility.setSubmissionModeToGenericInfo(job.getGlobalGenericInformation()));
             InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
             jobIdData = restApiClient().submitXml(sid, is);
         } catch (Exception e) {
@@ -946,6 +947,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         List<JobIdDataAndError> jobIdDataAndErrors = new ArrayList<>(jobs.size());
         for (Job job : jobs) {
             try {
+                job.setGenericInformation(DataUtility.setSubmissionModeToGenericInfo(job.getGlobalGenericInformation()));
                 InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
                 JobIdData jobIdData = restApiClient().submitXml(sid, is);
                 jobIdDataAndErrors.add(new JobIdDataAndError(jobIdData.getId(), jobIdData.getReadableName()));
@@ -960,8 +962,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public JobId submit(File job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
+        Map<String, String> genericInfos = DataUtility.setSubmissionModeToGenericInfo(null);
         try (InputStream is = new FileInputStream(job)) {
-            jobIdData = restApiClient().submitXml(sid, is);
+            jobIdData = restApiClient().submitXml(sid, is, null, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
@@ -973,6 +976,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             String sessionId) throws NotConnectedException {
         final JobIdData jobIdData;
         try {
+            jobGenericInfos = DataUtility.setSubmissionModeToGenericInfo(jobGenericInfos);
             jobIdData = restApiClient().reSubmit(sid, currentJobId.value(), jobVariables, jobGenericInfos);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
@@ -990,6 +994,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public JobId submit(File job, Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
+        genericInfos = DataUtility.setSubmissionModeToGenericInfo(genericInfos);
         try (InputStream is = new FileInputStream(job)) {
             jobIdData = restApiClient().submitXml(sid, is, variables, genericInfos);
         } catch (Exception e) {
@@ -1036,6 +1041,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                 }
             }
             InputStream is = urlConnection.getInputStream();
+            genericInfos = DataUtility.setSubmissionModeToGenericInfo(genericInfos);
             jobIdData = restApiClient().submitXml(sid, is, variables, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
@@ -1111,6 +1117,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, PermissionException {
         List<JobIdDataAndError> answer = null;
         try {
+            workflowUrlDataList.forEach(workflowUrlData -> workflowUrlData.setGenericInformation(DataUtility.setSubmissionModeToGenericInfo(workflowUrlData.getGenericInformation())));
             answer = restApiClient().submitMultipleUrl(sid, workflowUrlDataList);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -1806,7 +1813,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         JobIdData jobIdData = null;
 
         try {
-
+            genericInfos = DataUtility.setSubmissionModeToGenericInfo(genericInfos);
             jobIdData = restApiClient().submitUrl(sid, objectUrl, variables, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);

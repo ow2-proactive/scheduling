@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -159,7 +158,8 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_FAULTY_TASKS", columnList = "FAULTY_TASKS"),
                                       @Index(name = "JOB_DATA_BUCKET_NAME", columnList = "BUCKET_NAME"),
                                       @Index(name = "JOB_DATA_JOB_NAME", columnList = "JOB_NAME"),
-                                      @Index(name = "JOB_DATA_PROJECT_NAME", columnList = "PROJECT_NAME"), })
+                                      @Index(name = "JOB_DATA_PROJECT_NAME", columnList = "PROJECT_NAME"),
+                                      @Index(name = "JOB_DATA_SUBMISSION_MODE", columnList = "SUBMISSION_MODE"), })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
@@ -260,6 +260,8 @@ public class JobData implements Serializable {
 
     private Integer numberOfNodesInParallel;
 
+    private String submissionMode;
+
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
@@ -300,6 +302,7 @@ public class JobData implements Serializable {
         jobInfo.setResultMapPresent(resultMap != null && resultMap.size() > 0);
         List<String> pTasks = getPreciousTasks();
         jobInfo.setPreciousTasks(pTasks);
+        jobInfo.setSubmissionMode(getSubmissionMode());
         return jobInfo;
     }
 
@@ -445,6 +448,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setParentId(job.getParentId());
         jobRuntimeData.setAttachedServices(job.getAttachedServices());
         jobRuntimeData.setExternalEndpointUrls(job.getExternalEndpointUrls());
+        jobRuntimeData.setSubmissionMode(job.getSubmissionMode());
 
         return jobRuntimeData;
     }
@@ -880,6 +884,15 @@ public class JobData implements Serializable {
 
     public void setNumberOfNodesInParallel(Integer numberOfNodesInParallel) {
         this.numberOfNodesInParallel = numberOfNodesInParallel;
+    }
+
+    @Column(name = "SUBMISSION_MODE")
+    public String getSubmissionMode() {
+        return submissionMode;
+    }
+
+    public void setSubmissionMode(String submissionMode) {
+        this.submissionMode = submissionMode;
     }
 
     @Column(name = "ATTACHED_SERVICES", length = Integer.MAX_VALUE)

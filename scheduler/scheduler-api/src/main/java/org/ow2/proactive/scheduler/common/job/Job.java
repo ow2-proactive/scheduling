@@ -144,6 +144,11 @@ public abstract class Job extends CommonAttribute {
     private Long parentId = null;
 
     /**
+     * Returns the portal name via the job was submitted
+     */
+    protected String submissionMode = "";
+
+    /**
      * ProActive Empty Constructor
      */
     public Job() {
@@ -511,5 +516,13 @@ public abstract class Job extends CommonAttribute {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public String getSubmissionMode() {
+        return submissionMode;
+    }
+
+    public void setSubmissionMode(String submissionMode) {
+        this.submissionMode = submissionMode;
     }
 }

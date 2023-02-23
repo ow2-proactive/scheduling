@@ -160,6 +160,8 @@ public class JobInfoImpl implements JobInfo {
 
     private int childrenCount = 0;
 
+    private String submissionMode = null;
+
     public JobInfoImpl() {
     }
 
@@ -193,6 +195,7 @@ public class JobInfoImpl implements JobInfo {
         this.priority = jobInfo.getPriority();
         this.status = jobInfo.getStatus();
         this.toBeRemoved = jobInfo.toBeRemoved;
+        this.submissionMode = jobInfo.getSubmissionMode();
 
         if (jobInfo.getTasksSkipped() != null) {
             this.tasksSkipped = new HashSet<>(jobInfo.getTasksSkipped());
@@ -253,6 +256,14 @@ public class JobInfoImpl implements JobInfo {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getSubmissionMode() {
+        return submissionMode;
+    }
+
+    public void setSubmissionMode(String submissionMode) {
+        this.submissionMode = submissionMode;
     }
 
     /**

@@ -29,7 +29,9 @@ import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.job.*;
@@ -281,6 +283,15 @@ public class DataUtility {
                                       jobsReportData.getSuccessfulJobs(),
                                       jobsReportData.getTotalJobs(),
                                       jobsReportData.getSuccessfulRate());
+    }
+
+    public static Map<String, String> setSubmissionModeToGenericInfo(Map<String, String> genericInformation) {
+        if (genericInformation != null) {
+            genericInformation.put("submission.mode", "scheduler-api");
+        } else {
+            genericInformation = Collections.singletonMap("submission.mode", "scheduler-api");
+        }
+        return genericInformation;
     }
 
     public static UserIdentification userIdentification(SchedulerUserData d) {
