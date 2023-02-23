@@ -88,6 +88,7 @@ import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Lambda;
 import org.ow2.proactive.utils.Lambda.RunnableThatThrows3Exceptions;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
@@ -704,9 +705,26 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         if (System.getSecurityManager() != null) {
             try {
                 userSessionInfo.getRight().checkPermission(deniedMethodCallPermission, permissionMsg);
-                throw new DeniedMethodCallException(permissionMsg);
+                // double-check that this method call has previously been denied for this user. If not, ignore it.
+                if (DeniedMethodCallPermissionRepository.getInstance()
+                                                        .checkAndSetDeniedMethodCall(userSessionInfo.getRight()
+                                                                                                    .getUsername(),
+                                                                                     fullMethodName,
+                                                                                     true)) {
+                    logger.trace("Denied method access : " + fullMethodName);
+                    throw new DeniedMethodCallException(permissionMsg);
+                }
             } catch (PermissionException ex) {
                 // ok, the check should throw an exception unless it is denied
+                // double-check that this method call has previously been denied for this user. If yes, throw an exception.
+                if (DeniedMethodCallPermissionRepository.getInstance()
+                                                        .checkAndSetDeniedMethodCall(userSessionInfo.getRight()
+                                                                                                    .getUsername(),
+                                                                                     fullMethodName,
+                                                                                     false)) {
+                    logger.trace("Denied method access : " + fullMethodName);
+                    throw new PermissionException(permissionMsg);
+                }
             } catch (DeniedMethodCallException e) {
                 throw new PermissionException(permissionMsg, e);
             }
