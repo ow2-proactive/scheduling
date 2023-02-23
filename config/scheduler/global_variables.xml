@@ -20,7 +20,7 @@
         </filter>
         <filter>
             <select>
-                <xpath><![CDATA[(/job/genericInformation/info[@name='bucketName' and (@value='ai-auto-ml-optimization' or @value='ai-machine-learning' or @value='ai-machine-learning-workflows' or @value='ai-deep-learning' or @value='ai-deep-learning-workflows' or @value='ai-federated-learning' or @value='ai-model-as-a-service' or @value='ai-data-visualization')])]]></xpath>
+                <xpath><![CDATA[(/job/genericInformation/info[@name='bucketName' and (@value='ai-mlops-dashboard' or @value='ai-auto-ml-optimization' or @value='ai-machine-learning' or @value='ai-machine-learning-workflows' or @value='ai-deep-learning' or @value='ai-deep-learning-workflows' or @value='ai-federated-learning' or @value='ai-model-as-a-service' or @value='ai-data-visualization')])]]></xpath>
             </select>
             <variables>
                 <variable name="NATIVE_SCHEDULER" value="" advanced="true" description="Name of the Native Scheduler node source to use when the workflow tasks must be deployed inside a cluster such as SLURM, LSF, etc." group="Resource Management" hidden="false" model="PA:MODEL_FROM_URL(${PA_SCHEDULER_REST_PUBLIC_URL}/rm/model/nodesources)"/>
@@ -38,7 +38,7 @@
         </filter>
         <filter>
             <select>
-                <xpath><![CDATA[(/job/genericInformation/info[@name='bucketName' and @value='service-automation']) and (/job/genericInformation/info[@name='pca.states' and @value='(VOID,RUNNING)'])]]></xpath>
+                <xpath><![CDATA[(/job/genericInformation/info[@name='bucketName' and (@value='ai-mlops-dashboard' or @value='service-automation')]) and (/job/genericInformation/info[@name='pca.states' and @value='(VOID,RUNNING)'])]]></xpath>
             </select>
             <variables>
                 <variable name="NATIVE_SCHEDULER" value="" advanced="true" description="Name of the Native Scheduler node source to use when the workflow tasks must be deployed inside a cluster such as SLURM, LSF, etc." group="Resource Management" hidden="false" model="PA:MODEL_FROM_URL(${PA_SCHEDULER_REST_PUBLIC_URL}/rm/model/nodesources)"/>
