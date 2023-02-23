@@ -2780,7 +2780,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         // check if the current client is a super admin
         if (isSuperAdmin(client)) {
-            logger.trace("permission " + method.getName() + " from " + client.getName() + " -> authorized");
+            logger.trace("permission " + method.getName() + " from " + client.getName() +
+                         " -> authorized (super admin)");
             return client;
         }
 
@@ -2815,7 +2816,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             checkDeniedMethodCallPermission(client, fullMethodName, deniedMethodCallPermission, permissionMsg);
         }
         checkMethodCallOrRolePermission(client, methodCallPermission, serviceRolePermission, permissionMsg);
-        logger.trace("permission " + methodName + " from " + client.getName() + " -> authorized");
+        logger.trace("permission " + methodName + " from " + client.getName() + " -> authorized (role permission)");
     }
 
     private Client getLocalClient(UniqueID clientId) {
@@ -2849,10 +2850,23 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             DeniedMethodCallPermission deniedMethodCallPermission, String permissionMsg) {
         try {
             client.checkPermission(deniedMethodCallPermission, permissionMsg);
-            logger.trace("Denied method access : " + fullMethodName);
-            throw new DeniedMethodCallException(permissionMsg);
+            // double-check that this method call has previously been denied for this user. If not, ignore it.
+            if (DeniedMethodCallPermissionRepository.getInstance().checkAndSetDeniedMethodCall(client.getName(),
+                                                                                               fullMethodName,
+                                                                                               true)) {
+                logger.trace("Denied method access : " + fullMethodName);
+                throw new DeniedMethodCallException(permissionMsg);
+            }
         } catch (SecurityException ex) {
             // ok, the check should throw an exception unless it is denied
+            // double-check that this method call has previously been denied for this user. If yes, throw an exception.
+            if (DeniedMethodCallPermissionRepository.getInstance().checkAndSetDeniedMethodCall(client.getName(),
+                                                                                               fullMethodName,
+                                                                                               false)) {
+                logger.trace("Denied method access : " + fullMethodName);
+                throw new SecurityException(permissionMsg);
+            }
+
         } catch (DeniedMethodCallException e) {
             throw new SecurityException(permissionMsg, e);
         }
