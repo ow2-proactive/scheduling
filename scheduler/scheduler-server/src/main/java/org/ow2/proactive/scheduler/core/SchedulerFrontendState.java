@@ -540,7 +540,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         job.setTenant(ident.getTenant());
         // route project name inside job info
         job.setProjectName(job.getProjectName());
-        job.setSubmissionMode(job.getGenericInformation().get("submission.mode"));
+        if (job.getGenericInformation() != null) {
+            job.setSubmissionMode(job.getGenericInformation().get("submission.mode"));
+        }
         fillBucketNameIdIfExistsInGenInfo(userJob, job);
         fillParentJobIdIfExistsInGenInfo(userJob, job);
 
