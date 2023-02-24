@@ -98,6 +98,7 @@ public class DataUtility {
         impl.setPreciousTasks(d.getPreciousTasks());
         impl.setCumulatedCoreTime(d.getCumulatedCoreTime());
         impl.setNumberOfNodes(d.getNumberOfNodes());
+        impl.setSubmissionMode(d.getSubmissionMode());
         return impl;
     }
 
