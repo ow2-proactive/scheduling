@@ -27,7 +27,8 @@ package org.ow2.proactive.scheduler.rest;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SCHEDULER_API;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SCHEDULER_API;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.statusesToString;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
@@ -1854,7 +1855,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public static Map<String, String> setSubmissionModeToGenericInfo(Map<String, String> genericInformation) {
         Map<String, String> newGenericInformation = genericInformation == null ? new LinkedHashMap<>()
                                                                                : new LinkedHashMap<>(genericInformation);
-        newGenericInformation.put("submission.mode", SCHEDULER_API);
+        newGenericInformation.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_API);
         return newGenericInformation;
     }
 
