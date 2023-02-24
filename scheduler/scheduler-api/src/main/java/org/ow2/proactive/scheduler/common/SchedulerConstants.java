@@ -183,4 +183,9 @@ public class SchedulerConstants {
      */
     public static String TASK_WALLTIME_GENERIC_INFO = "WALLTIME";
 
+    /**
+     * This generic information can be used to set the portal name via the job was submitted
+     */
+    public static String SCHEDULER_API = "scheduler-api";
+
 }

@@ -610,7 +610,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         assertTrue(jobContent1.contains("<variables>"));
         assertTrue(jobContent1.contains("myvar"));
         assertTrue(jobContent1.contains("myvalue"));
-        assertFalse(jobContent1.contains("<genericInformation>"));
+        assertTrue(jobContent1.contains("<genericInformation>"));
     }
 
     @Test
@@ -654,7 +654,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         assertTrue(jobContent1.contains("originalVar"));
         assertTrue(jobContent1.contains("newValue"));
         assertFalse(jobContent1.contains("originalValue"));
-        assertFalse(jobContent1.contains("<genericInformation>"));
+        assertTrue(jobContent1.contains("<genericInformation>"));
     }
 
     @Test
@@ -707,7 +707,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         assertTrue(jobContent1.contains("originalValue"));
         assertTrue(jobContent1.contains("newVar"));
         assertTrue(jobContent1.contains("newValue"));
-        assertFalse(jobContent1.contains("<genericInformation>"));
+        assertTrue(jobContent1.contains("<genericInformation>"));
     }
 
     @Test
