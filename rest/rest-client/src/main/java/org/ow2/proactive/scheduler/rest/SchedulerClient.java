@@ -1855,7 +1855,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public static Map<String, String> setSubmissionModeToGenericInfo(Map<String, String> genericInformation) {
         Map<String, String> newGenericInformation = genericInformation == null ? new LinkedHashMap<>()
                                                                                : new LinkedHashMap<>(genericInformation);
-        newGenericInformation.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_API);
+        if (!newGenericInformation.containsKey(SUBMISSION_MODE)) {
+            newGenericInformation.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_API);
+        }
         return newGenericInformation;
     }
 
