@@ -107,6 +107,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private int numberOfNodesInParallel = 0;
 
+    private String submissionMode;
+
     public void setToBeRemoved() {
         toBeRemoved = true;
     }
@@ -209,6 +211,14 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getSubmissionMode() {
+        return submissionMode;
+    }
+
+    public void setSubmissionMode(String submissionMode) {
+        this.submissionMode = submissionMode;
     }
 
     public JobIdData getJobId() {
@@ -408,7 +418,8 @@ public class JobInfoData implements java.io.Serializable {
                ", genericInformation=" + genericInformation + ", variables=" + variables + ", signals=" + signals +
                ", detailedSignals=" + detailedSignals + ", attachedServices=" + attachedServices +
                ", externalEndpointUrls=" + externalEndpointUrls + ", cumulatedCoreTime=" + cumulatedCoreTime +
-               ", numberOfNodes=" + numberOfNodes + ", numberOfNodesInParallel=" + numberOfNodesInParallel + " }";
+               ", numberOfNodes=" + numberOfNodes + ", numberOfNodesInParallel=" + numberOfNodesInParallel +
+               ", submissionMode=" + submissionMode + " }";
     }
 
 }

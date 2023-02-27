@@ -81,6 +81,12 @@ public interface JobInfo extends Serializable {
     String getBucketName();
 
     /**
+     * Returns the portal name via the job was submitted
+     * @return portal name
+     */
+    String getSubmissionMode();
+
+    /**
      * Returns the time at which the Job has finished.
      *
      * @return the time at which the Job has finished

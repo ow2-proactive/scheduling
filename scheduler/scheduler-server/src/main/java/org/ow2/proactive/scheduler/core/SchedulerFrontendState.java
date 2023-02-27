@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.core;
 import static org.ow2.proactive.permissions.RoleUtils.findRole;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.BUCKET_NAME;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.PARENT_JOB_ID;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
 import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE;
 
 import java.lang.reflect.Method;
@@ -541,6 +542,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         job.setTenant(ident.getTenant());
         // route project name inside job info
         job.setProjectName(job.getProjectName());
+        if (job.getGenericInformation() != null) {
+            job.setSubmissionMode(job.getGenericInformation().get(SUBMISSION_MODE));
+        }
         fillBucketNameIdIfExistsInGenInfo(userJob, job);
         fillParentJobIdIfExistsInGenInfo(userJob, job);
 

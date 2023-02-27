@@ -183,4 +183,14 @@ public class SchedulerConstants {
      */
     public static String TASK_WALLTIME_GENERIC_INFO = "WALLTIME";
 
+    /**
+     * Scheduler api portal name
+     */
+    public static String SUBMISSION_MODE_SCHEDULER_API = "scheduler-api";
+
+    /**
+     * This generic information can be used to set the portal name via the job was submitted
+     */
+    public static String SUBMISSION_MODE = "submission.mode";
+
 }

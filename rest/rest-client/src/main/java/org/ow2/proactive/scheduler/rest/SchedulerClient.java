@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.rest;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SCHEDULER_API;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.statusesToString;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
@@ -62,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -933,6 +936,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
         try {
+            job.setGenericInformation(new LinkedHashMap<>(setSubmissionModeToGenericInfo(job.getGenericInformation())));
             InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
             jobIdData = restApiClient().submitXml(sid, is);
         } catch (Exception e) {
@@ -946,6 +950,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         List<JobIdDataAndError> jobIdDataAndErrors = new ArrayList<>(jobs.size());
         for (Job job : jobs) {
             try {
+                job.setGenericInformation(new LinkedHashMap<>(setSubmissionModeToGenericInfo(job.getGenericInformation())));
                 InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
                 JobIdData jobIdData = restApiClient().submitXml(sid, is);
                 jobIdDataAndErrors.add(new JobIdDataAndError(jobIdData.getId(), jobIdData.getReadableName()));
@@ -960,8 +965,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public JobId submit(File job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
+        Map<String, String> genericInfos = setSubmissionModeToGenericInfo(null);
         try (InputStream is = new FileInputStream(job)) {
-            jobIdData = restApiClient().submitXml(sid, is);
+            jobIdData = restApiClient().submitXml(sid, is, null, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
@@ -973,6 +979,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             String sessionId) throws NotConnectedException {
         final JobIdData jobIdData;
         try {
+            jobGenericInfos = new LinkedHashMap<>(setSubmissionModeToGenericInfo(jobGenericInfos));
             jobIdData = restApiClient().reSubmit(sid, currentJobId.value(), jobVariables, jobGenericInfos);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
@@ -990,6 +997,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public JobId submit(File job, Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
+        genericInfos = new LinkedHashMap<>(setSubmissionModeToGenericInfo(genericInfos));
         try (InputStream is = new FileInputStream(job)) {
             jobIdData = restApiClient().submitXml(sid, is, variables, genericInfos);
         } catch (Exception e) {
@@ -1036,6 +1044,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                 }
             }
             InputStream is = urlConnection.getInputStream();
+            genericInfos = new LinkedHashMap<>(setSubmissionModeToGenericInfo(genericInfos));
             jobIdData = restApiClient().submitXml(sid, is, variables, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
@@ -1111,6 +1120,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, PermissionException {
         List<JobIdDataAndError> answer = null;
         try {
+            workflowUrlDataList.forEach(workflowUrlData -> workflowUrlData.setGenericInformation(new LinkedHashMap<>(setSubmissionModeToGenericInfo(workflowUrlData.getGenericInformation()))));
             answer = restApiClient().submitMultipleUrl(sid, workflowUrlDataList);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -1806,7 +1816,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         JobIdData jobIdData = null;
 
         try {
-
+            genericInfos = new LinkedHashMap<>(setSubmissionModeToGenericInfo(genericInfos));
             jobIdData = restApiClient().submitUrl(sid, objectUrl, variables, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
@@ -1840,6 +1850,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         } catch (Exception e) {
             return Optional.empty();
         }
+    }
+
+    public static Map<String, String> setSubmissionModeToGenericInfo(Map<String, String> genericInformation) {
+        Map<String, String> newGenericInformation = genericInformation == null ? new LinkedHashMap<>()
+                                                                               : new LinkedHashMap<>(genericInformation);
+        if (!newGenericInformation.containsKey(SUBMISSION_MODE)) {
+            newGenericInformation.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_API);
+        }
+        return newGenericInformation;
     }
 
     @Override
