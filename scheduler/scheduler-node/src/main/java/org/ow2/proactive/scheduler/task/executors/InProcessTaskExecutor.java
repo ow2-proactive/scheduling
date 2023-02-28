@@ -68,6 +68,7 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.proactive.utils.ObjectByteConverter;
 import org.ow2.proactive.utils.PAProperties;
 
 import com.google.common.base.Stopwatch;
@@ -201,6 +202,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
             executeFlowScript(taskContext.getControlFlowScript(), scriptHandler, output, error, taskResult);
 
             taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables.getPropagatedVariables()));
+            try {
+                ObjectByteConverter.mapOfSerializableToByteArray(resultMap);
+            } catch (Throwable serializationException) {
+                throw new RuntimeException("Error during resultMap serialization", serializationException);
+            }
             taskResult.setResultMap(resultMap);
             taskResult.setMetadata(resultMetadata);
 
