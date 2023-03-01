@@ -684,6 +684,7 @@ public class StaxJobFactory extends JobFactory {
                 job.setUnresolvedVariables(commonPropertiesHolder.getUnresolvedVariables());
                 job.setVisualization(commonPropertiesHolder.getVisualization());
                 job.setJobContent(jobContent);
+                job.setSubmissionMode(commonPropertiesHolder.getSubmissionMode());
 
             }
             return job;
