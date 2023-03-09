@@ -62,11 +62,12 @@ public class ReSubmitJobCommand extends AbstractCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
 
         try {
-            JobIdData newJobId = currentContext.getRestClient()
-                                               .reSubmit(currentContext.getSessionId(),
-                                                         jobId,
-                                                         JobKeyValueTransformer.transformJsonStringToMap(variables),
-                                                         JobKeyValueTransformer.transformJsonStringToMap(genericInfos));
+            Map<String, String> genericInfosMap = JobKeyValueTransformer.transformJsonStringToMap(this.genericInfos);
+            genericInfosMap.put("submission.mode", "rest-cli");
+            JobIdData newJobId = currentContext.getRestClient().reSubmit(currentContext.getSessionId(),
+                                                                         jobId,
+                                                                         JobKeyValueTransformer.transformJsonStringToMap(variables),
+                                                                         genericInfosMap);
             writeLine(currentContext, "Job('%s') successfully re-submitted as Job('%d')", jobId, newJobId.getId());
             resultStack(currentContext).push(jobId);
         } catch (Exception e) {

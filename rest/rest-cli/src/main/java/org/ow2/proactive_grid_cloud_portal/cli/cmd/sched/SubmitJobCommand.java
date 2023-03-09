@@ -83,17 +83,18 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
             JobIdData jobId;
             try (FileInputStream inputStream = new FileInputStream(jobFile)) {
+                Map<String, String> genericInfosMap = map(this.genericInfos);
+                genericInfosMap.put("submission.mode", "rest-cli");
                 if (APPLICATION_XML.getMimeType().equals(contentType)) {
                     jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
                                                                      inputStream,
                                                                      map(this.variables),
-                                                                     map(this.genericInfos));
+                                                                     genericInfosMap);
                 } else {
-                    jobId = currentContext.getRestClient()
-                                          .submitJobArchive(currentContext.getSessionId(),
-                                                            inputStream,
-                                                            map(this.variables),
-                                                            map(this.genericInfos));
+                    jobId = currentContext.getRestClient().submitJobArchive(currentContext.getSessionId(),
+                                                                            inputStream,
+                                                                            map(this.variables),
+                                                                            genericInfosMap);
                 }
             }
             writeLine(currentContext, "Job('%s') successfully submitted: job('%d')", pathname, jobId.getId());
