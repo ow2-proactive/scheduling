@@ -1801,6 +1801,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Scheduler scheduler = checkAccess(sessionId, "submit");
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
+        logger.error("contextInfos is null " + (contextInfos == null));
+        logger.error("contextInfos" + contextInfos.getQueryParameters());
         try {
             // In multipart, we can find the "variables" key for job variables, AND/OR ...
             // ... "job.xml" for a job submitted from the studio OR "file" for a job submitted by job planner
