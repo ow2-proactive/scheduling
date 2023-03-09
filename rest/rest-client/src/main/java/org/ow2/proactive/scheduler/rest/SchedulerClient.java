@@ -936,9 +936,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
         try {
-            job.setGenericInformation(new LinkedHashMap<>(setSubmissionModeToGenericInfo(job.getGenericInformation())));
+            Map<String, String> genericInformation = setSubmissionModeToGenericInfo(job.getGenericInformation());
             InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
-            jobIdData = restApiClient().submitXml(sid, is);
+            jobIdData = restApiClient().submitXml(sid, is, null, genericInformation);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }

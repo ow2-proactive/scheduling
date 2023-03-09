@@ -39,7 +39,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.security.auth.login.LoginException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -284,10 +286,10 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobIdData submit(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart)
-            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+    public JobIdData submit(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart,
+            UriInfo contextInfos) throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
             SubmissionClosedRestException, IOException {
-        return scheduler().submit(sessionId, pathSegment, multipart, null);
+        return scheduler().submit(sessionId, pathSegment, multipart, contextInfos);
     }
 
     @Override
