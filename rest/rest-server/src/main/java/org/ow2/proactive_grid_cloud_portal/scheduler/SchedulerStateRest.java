@@ -31,6 +31,7 @@ import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_CON
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_FILE_EXTENSION;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_FILE_NAME;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SCHEDULER_DEFAULT;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -1849,7 +1850,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     genericInfos = new LinkedHashMap<>();
                 }
                 if (!genericInfos.containsKey(SUBMISSION_MODE)) {
-                    genericInfos.put(SUBMISSION_MODE, "rest-api");
+                    genericInfos.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_DEFAULT);
                 }
                 WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
                 jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);

@@ -26,6 +26,8 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SCHEDULER_REST_CLI;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_FILE_EMPTY;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.JobKeyValueTransformer.transformJsonStringToMap;
@@ -84,7 +86,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             JobIdData jobId;
             try (FileInputStream inputStream = new FileInputStream(jobFile)) {
                 Map<String, String> genericInfosMap = map(this.genericInfos);
-                genericInfosMap.put("submission.mode", "rest-cli");
+                genericInfosMap.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_REST_CLI);
                 if (APPLICATION_XML.getMimeType().equals(contentType)) {
                     jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
                                                                      inputStream,

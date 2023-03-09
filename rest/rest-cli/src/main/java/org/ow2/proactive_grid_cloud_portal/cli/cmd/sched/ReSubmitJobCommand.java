@@ -25,16 +25,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import java.util.Collections;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SCHEDULER_REST_CLI;
+
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 
 
@@ -63,7 +63,7 @@ public class ReSubmitJobCommand extends AbstractCommand implements Command {
 
         try {
             Map<String, String> genericInfosMap = JobKeyValueTransformer.transformJsonStringToMap(this.genericInfos);
-            genericInfosMap.put("submission.mode", "rest-cli");
+            genericInfosMap.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_REST_CLI);
             JobIdData newJobId = currentContext.getRestClient().reSubmit(currentContext.getSessionId(),
                                                                          jobId,
                                                                          JobKeyValueTransformer.transformJsonStringToMap(variables),
