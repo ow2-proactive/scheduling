@@ -188,6 +188,10 @@ public class SchedulerConstants {
      */
     public static String SUBMISSION_MODE_SCHEDULER_API = "scheduler-api";
 
+    public static String SUBMISSION_MODE_SCHEDULER_REST_CLI = "rest-cli";
+
+    public static String SUBMISSION_MODE_SCHEDULER_DEFAULT = "rest-api";
+
     /**
      * This generic information can be used to set the portal name via the job was submitted
      */
