@@ -447,6 +447,8 @@ createStartScripts('org.ow2.proactive.scheduler.authentication.ManageUsers', 'pr
 createStartScripts('org.ow2.proactive.scheduler.util.EncryptCommand', 'encrypt', 'tools')
 createStartScripts('org.ow2.proactive.scheduler.util.ChangeHttpConfiguration', 'configure-http', 'tools')
 createStartScripts('org.ow2.proactive.scheduler.util.ChangeDBConfiguration', 'configure-db', 'tools')
+createStartScripts('org.ow2.proactive.scheduler.authentication.ChangeLDAPConfiguration', 'configure-ldap', 'tools')
+createStartScripts('org.ow2.proactive.scheduler.authentication.CopyRBACRole', 'copy-role', 'tools')
 createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-router', 'bin')
 
 subprojects {
