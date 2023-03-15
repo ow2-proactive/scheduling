@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.utils.OperatingSystem;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.web.WebProperties;
 
@@ -109,6 +110,16 @@ public class ChangeHttpConfiguration {
             if (changeHttpConfiguration(args)) {
                 log("Applied configuration: scheme=" + (isHttps ? "https" : "http") + " hostname=" +
                     configuredHostname + " port=" + port);
+                switch (OperatingSystem.resolveOrError(System.getProperty("os.name")).getFamily()) {
+                    case LINUX:
+                    case UNIX:
+                        log(newline +
+                            "NOTE: if ProActive is installed as a service under /etc/init.d/proactive-scheduler,");
+                        log("1) Edit this file and set PROTOCOL=" + (isHttps ? "https" : "http") + ", PORT=" + port +
+                            ", and eventually ALIAS=" + configuredHostname);
+                        log("2) Run the command \"sudo systemctl daemon-reload\"");
+                }
+
             }
         } catch (ChangeHttpConfigurationException e) {
             System.err.println("ERROR : " + e.getMessage());
