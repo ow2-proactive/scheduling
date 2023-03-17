@@ -59,6 +59,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.common.job.JobsSubmissionMode;
 import org.ow2.proactive.scheduler.common.job.WorkflowDuration;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -1678,6 +1679,10 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     @RoleRead
     List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException;
+
+    @RoleRead
+    JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs, long startDate,
+            long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
     CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,

@@ -28,7 +28,7 @@ package org.ow2.proactive.scheduler.rest;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SCHEDULER_API;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_WORKFLOW_API;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.statusesToString;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
@@ -342,6 +342,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                            criteria.getJobName(),
                                                                                                            criteria.getProjectName(),
                                                                                                            criteria.getBucketName(),
+                                                                                                           criteria.getSubmissionMode(),
                                                                                                            criteria.getUserName(),
                                                                                                            criteria.getTenant(),
                                                                                                            criteria.getParentId(),
@@ -594,6 +595,24 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                 myJobs,
                                                                                                 workflowName);
             return new ArrayList<>(DataUtility.toWorkflowsDuration(filteredWorkflows));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
+
+        try {
+            JobsSubmissionModeData jobsSubmissionModeData = restApi().getSubmissionModeCount(sid,
+                                                                                             startDate,
+                                                                                             endDate,
+                                                                                             myJobs,
+                                                                                             workflowName,
+                                                                                             bucketName);
+            return DataUtility.toJobsSubmissionMode(jobsSubmissionModeData);
         } catch (RestException e) {
             throwNCEOrPE(e);
         }
@@ -1856,7 +1875,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         Map<String, String> newGenericInformation = genericInformation == null ? new LinkedHashMap<>()
                                                                                : new LinkedHashMap<>(genericInformation);
         if (!newGenericInformation.containsKey(SUBMISSION_MODE)) {
-            newGenericInformation.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_API);
+            newGenericInformation.put(SUBMISSION_MODE, SUBMISSION_MODE_WORKFLOW_API);
         }
         return newGenericInformation;
     }

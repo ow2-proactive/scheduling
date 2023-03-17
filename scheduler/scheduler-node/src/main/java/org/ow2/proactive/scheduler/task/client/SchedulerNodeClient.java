@@ -884,6 +884,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.getSubmissionModeCount(workflowName, bucketName, myJobs, startDate, endDate);
+    }
+
+    @Override
     public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
             long endDate, int numberOfIntervals) throws NotConnectedException, PermissionException {
         renewSession();

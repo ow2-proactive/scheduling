@@ -814,6 +814,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
+    public JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
+        return uischeduler.getSubmissionModeCount(workflowName, bucketName, myJobs, startDate, endDate);
+    }
+
+    @Override
+    @ImmediateService
     public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
             long endDate, int numberOfIntervals) throws NotConnectedException, PermissionException {
         return uischeduler.getCompletedJobs(myJobs, workflowName, bucketName, startDate, endDate, numberOfIntervals);

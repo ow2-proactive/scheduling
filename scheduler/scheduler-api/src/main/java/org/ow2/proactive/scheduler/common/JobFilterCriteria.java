@@ -57,6 +57,8 @@ public class JobFilterCriteria implements Serializable {
 
     private final Long parentId;
 
+    private final String submissionMode;
+
     public JobFilterCriteria(JobFilterCriteriaBuilder builder) {
         this.myJobsOnly = builder.isMyJobsOnly();
         this.pending = builder.isPending();
@@ -70,6 +72,7 @@ public class JobFilterCriteria implements Serializable {
         this.userName = builder.getUserName();
         this.tenant = builder.getTenant();
         this.parentId = builder.getParentId();
+        this.submissionMode = builder.getSubmissionMode();
     }
 
     public boolean isMyJobsOnly() {
@@ -118,5 +121,9 @@ public class JobFilterCriteria implements Serializable {
 
     public Long getParentId() {
         return parentId;
+    }
+
+    public String getSubmissionMode() {
+        return submissionMode;
     }
 }

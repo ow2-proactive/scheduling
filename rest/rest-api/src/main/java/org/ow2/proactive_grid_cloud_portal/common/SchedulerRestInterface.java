@@ -192,6 +192,8 @@ public interface SchedulerRestInterface {
      *             Include only jobs with a project name that starts with projectName (case sensitive)
      * @param bucketName
      *             Include only jobs with a bucket name that starts with bucketName (case sensitive)
+     * @param submissionMode
+     *             Include only jobs with a submission mode that starts with submissionMode (case sensitive)
      * @param userName
      *             Include only jobs with a user name that matches exactly with userName (case sensitive)
      * @param parentId
@@ -220,6 +222,7 @@ public interface SchedulerRestInterface {
             @QueryParam("jobName") @DefaultValue("") String jobName,
             @QueryParam("projectName") @DefaultValue("") String projectName,
             @QueryParam("bucketName") @DefaultValue("") String bucketName,
+            @QueryParam("submissionMode") @DefaultValue("") String submissionMode,
             @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("tenant") String tenant,
             @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams)
             throws RestException;
@@ -2221,6 +2224,28 @@ public interface SchedulerRestInterface {
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+
+    /**
+     * Returns an object containing the number of jobs submitted via each portal
+     *
+     * @param sessionId id of a session
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the jobs
+     * @param endDate end date of the jobs
+     * @param workflowName the workflow name of the jobs
+     * @param bucketName the bucket name of the filtered jobs
+     * @return {@link JobsSubmissionModeData}
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("stats/submittedFromCount")
+    @Produces(MediaType.APPLICATION_JSON)
+    JobsSubmissionModeData getSubmissionModeCount(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException;
 
     /**
      * Returns an object containing a map of number of finished jobs with issues by time interval and a map of number of finished jobs without issues by time interval

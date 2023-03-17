@@ -1899,6 +1899,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.getProjectName(),
                                                    filterCriteria.getBucketName(),
                                                    filterCriteria.getParentId(),
+                                                   filterCriteria.getSubmissionMode(),
                                                    sortParameters);
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
@@ -2147,6 +2148,28 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                     tenant,
                                                     startDate,
                                                     endDate);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleRead
+    public JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to get submission mode count");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        return dbManager.getNumberOfJobsSubmittedViaPortals(workflowName,
+                                                            bucketName,
+                                                            myJobs ? ident.getUsername() : null,
+                                                            tenant,
+                                                            startDate,
+                                                            endDate);
     }
 
     @Override

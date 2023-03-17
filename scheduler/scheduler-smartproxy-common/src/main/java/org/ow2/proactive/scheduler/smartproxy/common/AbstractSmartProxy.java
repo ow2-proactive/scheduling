@@ -287,6 +287,12 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
+    public JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws PermissionException, NotConnectedException {
+        return getScheduler().getSubmissionModeCount(workflowName, bucketName, myJobs, startDate, endDate);
+    }
+
+    @Override
     public CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
             long endDate, int numberOfIntervals) throws PermissionException, NotConnectedException {
         return getScheduler().getCompletedJobs(myJobs, workflowName, bucketName, startDate, endDate, numberOfIntervals);

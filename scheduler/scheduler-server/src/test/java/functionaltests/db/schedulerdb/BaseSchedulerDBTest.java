@@ -29,6 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_REST_API;
 
 import java.io.File;
 import java.io.Serializable;
@@ -431,6 +432,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
         InternalJob internalJob = InternalJobFactory.createJob(job, getDefaultCredentials());
         internalJob.setOwner(userName);
         internalJob.submitAction();
+        internalJob.setSubmissionMode(SUBMISSION_MODE_REST_API);
         if (submittedTime > 0) {
             internalJob.setSubmittedTime(submittedTime);
         }

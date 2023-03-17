@@ -184,13 +184,54 @@ public class SchedulerConstants {
     public static String TASK_WALLTIME_GENERIC_INFO = "WALLTIME";
 
     /**
-     * Scheduler api portal name
+     * Submission mode for workflows submitted from scheduler api
      */
-    public static String SUBMISSION_MODE_SCHEDULER_API = "scheduler-api";
+    public static String SUBMISSION_MODE_WORKFLOW_API = "workflow-api";
 
-    public static String SUBMISSION_MODE_SCHEDULER_REST_CLI = "rest-cli";
+    /**
+     * Submission mode for workflows submitted from cli
+     */
+    public static String SUBMISSION_MODE_CLI = "cli";
 
-    public static String SUBMISSION_MODE_SCHEDULER_DEFAULT = "rest-api";
+    /**
+     * Submission mode for workflows submitted from scheduler portal
+     */
+    public static String SUBMISSION_MODE_SCHEDULER_PORTAL = "scheduler-portal";
+
+    /**
+     * Submission mode for workflows submitted from job planner
+     */
+    public static String SUBMISSION_MODE_JOB_PLANNER = "job-planner";
+
+    /**
+     * Submission mode for workflows submitted from studio
+     */
+    public static String SUBMISSION_MODE_STUDIO = "studio";
+
+    /**
+     * Submission mode for workflows submitted from catalog
+     */
+    public static String SUBMISSION_MODE_CATALOG = "catalog";
+
+    /**
+     * Submission mode for workflows submitted from workflow execution
+     */
+    public static String SUBMISSION_MODE_WORKFLOW_EXECUTION = "workflow-execution";
+
+    /**
+     * Submission mode for workflows submitted from service automation
+     */
+    public static String SUBMISSION_MODE_SERVICE_AUTOMATION = "service-automation";
+
+    /**
+     * Submission mode for workflows submitted from event orchestration
+     */
+    public static String SUBMISSION_MODE_EVENT_ORCHESTRATION = "event-orchestration";
+
+    /**
+     * Default submission mode
+     */
+    public static String SUBMISSION_MODE_REST_API = "rest-api";
 
     /**
      * This generic information can be used to set the portal name via the job was submitted

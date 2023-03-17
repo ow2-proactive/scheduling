@@ -51,6 +51,8 @@ public class JobFilterCriteriaBuilder {
 
     private Long parentId;
 
+    private String submissionMode;
+
     public JobFilterCriteriaBuilder() {
     }
 
@@ -100,6 +102,10 @@ public class JobFilterCriteriaBuilder {
 
     public Long getParentId() {
         return parentId;
+    }
+
+    public String getSubmissionMode() {
+        return submissionMode;
     }
 
     public JobFilterCriteriaBuilder myJobsOnly(boolean myJobsOnly) {
@@ -159,6 +165,11 @@ public class JobFilterCriteriaBuilder {
 
     public JobFilterCriteriaBuilder parentId(Long parentId) {
         this.parentId = parentId;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder submissionMode(String submissionMode) {
+        this.submissionMode = submissionMode;
         return this;
     }
 
