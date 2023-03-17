@@ -2158,7 +2158,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
-                                                                     "You don't have permissions to get submission mode count");
+                                                                     "You don't have permissions to get submission from count");
         String tenant = null;
         if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
             // overwrite tenant filter if the user only has access to his own tenant

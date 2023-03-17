@@ -2226,7 +2226,7 @@ public interface SchedulerRestInterface {
             @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
 
     /**
-     * Returns an object containing the number of jobs submitted via each portal
+     * Returns an object containing the number of jobs submitted from each portal
      *
      * @param sessionId id of a session
      * @param myJobs fetch only the jobs owned by the user making the request
