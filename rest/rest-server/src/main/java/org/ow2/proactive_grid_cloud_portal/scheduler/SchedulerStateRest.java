@@ -2827,6 +2827,20 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @GET
+    @Path("submissionModeValues")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Set<String> getSubmissionModeValues(@HeaderParam("sessionid") String sessionId) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return scheduler.getSubmissionModeValues();
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
     @Path("usage/account")
     @Produces("application/json")
     @Override

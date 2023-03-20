@@ -1433,6 +1433,15 @@ public class SchedulerDBManager {
         return new CompletedJobsCount(jobsWithIssuesCount, jobsWithoutIssuesCount);
     }
 
+    public Set<String> getSubmissionModeValues() {
+        return executeReadOnlyTransaction(session -> {
+            String selectQuery = "select distinct submissionMode from JobData";
+            Query query = session.createQuery(selectQuery);
+            List<String> list = query.list();
+            return (Set<String>) new HashSet<>(list);
+        });
+    }
+
     public CompletedTasksCount getCompletedTasks(String user, String tenant, final String taskName, long startDate,
             long endDate, int numberOfIntervals) {
 

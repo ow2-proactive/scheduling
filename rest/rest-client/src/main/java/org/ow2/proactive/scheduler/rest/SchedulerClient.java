@@ -660,6 +660,17 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException {
+
+        try {
+            return restApi().getSubmissionModeValues(sid);
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
     public boolean isConnected() {
         boolean isConnected = false;
         if (initialized) {

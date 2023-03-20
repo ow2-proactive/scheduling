@@ -1691,6 +1691,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
             int numberOfIntervals) throws NotConnectedException, PermissionException;
 
+    @RoleRead
+    Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException;
+
     /**
      * Retrieve a tasks names list from the scheduler.
      *

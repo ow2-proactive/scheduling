@@ -2301,6 +2301,18 @@ public interface SchedulerRestInterface {
             @QueryParam("numberOfIntervals") @DefaultValue("1") int numberOfIntervals) throws RestException;
 
     /**
+     * Returns all the submissionMode values stored in the database
+     *
+     * @param sessionId id of a session
+     * @return a set of submissionMode values
+     * @throws RestException if an error occurs or the session is invalid
+     */
+    @GET
+    @Path("submissionModeValues")
+    @Produces(MediaType.APPLICATION_JSON)
+    Set<String> getSubmissionModeValues(@HeaderParam("sessionid") String sessionId) throws RestException;
+
+    /**
      * Returns details on job and task execution times for the caller's
      * executions.
      * <p>

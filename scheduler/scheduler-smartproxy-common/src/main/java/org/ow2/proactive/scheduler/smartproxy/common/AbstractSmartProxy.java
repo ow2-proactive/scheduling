@@ -324,6 +324,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         return getScheduler().getCompletedTasks(myTasks, taskName, startDate, endDate, numberOfIntervals);
     }
 
+    @Override
+    public Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException {
+        return getScheduler().getSubmissionModeValues();
+    }
+
     /**
      * Reconnects this smart proxy to the scheduler
      * @throws SchedulerException

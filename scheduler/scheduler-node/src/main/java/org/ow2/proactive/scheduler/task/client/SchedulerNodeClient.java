@@ -929,6 +929,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.getSubmissionModeValues();
+    }
+
+    @Override
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, Set<TaskStatus> taskStatuses,
             int offset, int limit) throws SchedulerException {
         renewSession();

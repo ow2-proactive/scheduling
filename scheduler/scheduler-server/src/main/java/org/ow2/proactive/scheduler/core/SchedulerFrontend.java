@@ -2232,6 +2232,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                            numberOfIntervals);
     }
 
+    @Override
+    @ImmediateService
+    @RoleRead
+    public Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to get submission mode values");
+        return dbManager.getSubmissionModeValues();
+    }
+
     /**
      * {@inheritDoc}
      */

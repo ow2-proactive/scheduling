@@ -855,6 +855,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
+    public Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException {
+        return uischeduler.getSubmissionModeValues();
+    }
+
+    @Override
+    @ImmediateService
     public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
         return uischeduler.getMyAccountUsage(startDate, endDate);
