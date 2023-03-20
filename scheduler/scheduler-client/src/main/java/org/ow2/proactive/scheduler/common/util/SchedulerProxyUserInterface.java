@@ -761,25 +761,32 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     @ImmediateService
-    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws NotConnectedException, PermissionException {
-        return uischeduler.getFilteredStatistics(workflowName, myJobs, startDate, endDate);
+    public FilteredStatistics getFilteredStatistics(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
+        return uischeduler.getFilteredStatistics(workflowName, bucketName, myJobs, startDate, endDate);
     }
 
     @Override
     @ImmediateService
     public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
-        return uischeduler.getTopWorkflowsWithIssues(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
+        return uischeduler.getTopWorkflowsWithIssues(numberOfWorkflows,
+                                                     workflowName,
+                                                     bucketName,
+                                                     myJobs,
+                                                     startDate,
+                                                     endDate);
     }
 
     @Override
     @ImmediateService
     public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
+            String workflowName, String bucketName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException {
         return uischeduler.getTopWorkflowsCumulatedCoreTime(numberOfWorkflows,
                                                             workflowName,
+                                                            bucketName,
                                                             myJobs,
                                                             startDate,
                                                             endDate);
@@ -788,10 +795,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @Override
     @ImmediateService
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            String workflowName, boolean myJobs, long startDate, long endDate, boolean inParallel)
+            String workflowName, String bucketName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws NotConnectedException, PermissionException {
         return uischeduler.getTopWorkflowsNumberOfNodes(numberOfWorkflows,
                                                         workflowName,
+                                                        bucketName,
                                                         myJobs,
                                                         startDate,
                                                         endDate,
@@ -801,20 +809,32 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @Override
     @ImmediateService
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
-        return uischeduler.getTopExecutionTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
+        return uischeduler.getTopExecutionTimeWorkflows(numberOfWorkflows,
+                                                        workflowName,
+                                                        bucketName,
+                                                        myJobs,
+                                                        startDate,
+                                                        endDate);
     }
 
     @Override
     @ImmediateService
-    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
-            long startDate, long endDate) throws NotConnectedException, PermissionException {
-        return uischeduler.getTopPendingTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName,
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
+        return uischeduler.getTopPendingTimeWorkflows(numberOfWorkflows,
+                                                      workflowName,
+                                                      bucketName,
+                                                      myJobs,
+                                                      startDate,
+                                                      endDate);
     }
 
     @Override
     @ImmediateService
-    public JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+    public Map<String, Integer> getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException {
         return uischeduler.getSubmissionModeCount(workflowName, bucketName, myJobs, startDate, endDate);
     }

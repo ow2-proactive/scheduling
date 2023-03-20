@@ -25,16 +25,6 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_CATALOG;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_CLI;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_EVENT_ORCHESTRATION;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_JOB_PLANNER;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_REST_API;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SCHEDULER_PORTAL;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SERVICE_AUTOMATION;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_STUDIO;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_WORKFLOW_API;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_WORKFLOW_EXECUTION;
 import static org.ow2.proactive.scheduler.util.HsqldbServer.PROP_HIBERNATE_CONNECTION_PASSWORD;
 
 import java.io.File;
@@ -84,7 +74,6 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.JobsSubmissionMode;
 import org.ow2.proactive.scheduler.common.job.WorkflowDuration;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -396,23 +385,8 @@ public class SchedulerDBManager {
         return new Page<>(lJobs, totalNbJobs);
     }
 
-    public int getNumberOfStatsFilteredJobs(final String workflowName, String bucketName, String user, String tenant,
-            final long startTime, final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
-
-        return getNumberOfFilteredJobs(workflowName,
-                                       bucketName,
-                                       user,
-                                       tenant,
-                                       startTime,
-                                       endTime,
-                                       statuses,
-                                       withFailedTasks,
-                                       null);
-    }
-
     public int getNumberOfFilteredJobs(final String workflowName, String bucketName, String user, String tenant,
-            final long startTime, final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks,
-            String submissionMode) {
+            final long startTime, final long endTime, Collection<JobStatus> statuses, Boolean withFailedTasks) {
 
         return executeReadOnlyTransaction(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -433,9 +407,6 @@ public class SchedulerDBManager {
             }
             if (StringUtils.isNotEmpty(bucketName)) {
                 predicates.add(cb.like(root.get("bucketName"), bucketName + "%"));
-            }
-            if (StringUtils.isNotEmpty(submissionMode)) {
-                predicates.add(cb.like(root.get("submissionMode"), submissionMode + "%"));
             }
             if (startTime > 0) {
                 predicates.add(cb.ge(root.get("finishedTime"), startTime));
@@ -1043,7 +1014,7 @@ public class SchedulerDBManager {
     }
 
     public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, final String workflowName,
-            String user, String tenant, final long startTime, final long endTime) {
+            String bucketName, String user, String tenant, final long startTime, final long endTime) {
 
         return executeReadOnlyTransaction(session -> {
 
@@ -1051,6 +1022,7 @@ public class SchedulerDBManager {
             String subQueryGroupByStatement = "group by jobName, projectName order by errorCount desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
+                                               bucketName,
                                                user,
                                                tenant,
                                                startTime,
@@ -1070,8 +1042,35 @@ public class SchedulerDBManager {
         });
     }
 
+    public Map<String, Integer> getNumberOfJobsSubmittedFromEachPortals(final String workflowName, String bucketName,
+            String user, String tenant, final long startTime, final long endTime) {
+
+        return executeReadOnlyTransaction(session -> {
+
+            String selectSubQuery = "select submissionMode, count(*) as numberOfJobs FROM JobData where startTime > 0 and finishedTime > 0  ";
+            String subQueryGroupByStatement = "group by submissionMode order by numberOfJobs desc";
+            Query query = getTopWorkflowsQuery(session,
+                                               workflowName,
+                                               bucketName,
+                                               user,
+                                               tenant,
+                                               startTime,
+                                               endTime,
+                                               0,
+                                               selectSubQuery,
+                                               subQueryGroupByStatement);
+
+            List<Object[]> list = query.list();
+            Map<String, Integer> jobsPerPortal = new LinkedHashMap<>();
+            list.forEach(nameAndCount -> jobsPerPortal.put(nameAndCount[0].toString(),
+                                                           Integer.parseInt(nameAndCount[1].toString())));
+            return jobsPerPortal;
+        });
+    }
+
     public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsMostConsumingNodes(int numberOfWorkflows,
-            final String workflowName, String user, String tenant, final long startTime, final long endTime) {
+            final String workflowName, String bucketName, String user, String tenant, final long startTime,
+            final long endTime) {
 
         return executeReadOnlyTransaction(session -> {
 
@@ -1079,6 +1078,7 @@ public class SchedulerDBManager {
             String subQueryGroupByStatement = "group by jobName, projectName order by totalCumulatedCoreTime desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
+                                               bucketName,
                                                user,
                                                tenant,
                                                startTime,
@@ -1100,8 +1100,8 @@ public class SchedulerDBManager {
     }
 
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            final String workflowName, String user, String tenant, final long startTime, final long endTime,
-            boolean inParallel) {
+            final String workflowName, String bucketName, String user, String tenant, final long startTime,
+            final long endTime, boolean inParallel) {
 
         return executeReadOnlyTransaction(session -> {
 
@@ -1111,6 +1111,7 @@ public class SchedulerDBManager {
             String subQueryGroupByStatement = "group by jobName, projectName order by totalNumberOfNodes desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
+                                               bucketName,
                                                user,
                                                tenant,
                                                startTime,
@@ -1131,7 +1132,7 @@ public class SchedulerDBManager {
     }
 
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, final String workflowName,
-            String user, String tenant, final long startTime, final long endTime) {
+            String bucketName, String user, String tenant, final long startTime, final long endTime) {
 
         return executeReadOnlyTransaction(session -> {
 
@@ -1139,6 +1140,7 @@ public class SchedulerDBManager {
             String subQueryGroupByStatement = "group by jobName, projectName order by executionTime desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
+                                               bucketName,
                                                user,
                                                tenant,
                                                startTime,
@@ -1159,7 +1161,7 @@ public class SchedulerDBManager {
     }
 
     public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, final String workflowName,
-            String user, String tenant, final long startTime, final long endTime) {
+            String bucketName, String user, String tenant, final long startTime, final long endTime) {
 
         return executeReadOnlyTransaction(session -> {
 
@@ -1167,6 +1169,7 @@ public class SchedulerDBManager {
             String subQueryGroupByStatement = "group by jobName, projectName order by pendingTime desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
+                                               bucketName,
                                                user,
                                                tenant,
                                                startTime,
@@ -1186,130 +1189,21 @@ public class SchedulerDBManager {
         });
     }
 
-    public JobsSubmissionMode getNumberOfJobsSubmittedViaPortals(final String workflowName, String bucketName,
-            String user, String tenant, final long startTime, final long endTime) {
-        int nrOfSubmittedViaWorkflowApi = getNumberOfFilteredJobs(workflowName,
-                                                                  bucketName,
-                                                                  user,
-                                                                  tenant,
-                                                                  startTime,
-                                                                  endTime,
-                                                                  null,
-                                                                  null,
-                                                                  SUBMISSION_MODE_WORKFLOW_API);
-
-        int nrOfSubmittedViaCli = getNumberOfFilteredJobs(workflowName,
-                                                          bucketName,
-                                                          user,
-                                                          tenant,
-                                                          startTime,
-                                                          endTime,
-                                                          null,
-                                                          null,
-                                                          SUBMISSION_MODE_CLI);
-
-        int nrOfSubmittedViaRestApi = getNumberOfFilteredJobs(workflowName,
-                                                              bucketName,
-                                                              user,
-                                                              tenant,
-                                                              startTime,
-                                                              endTime,
-                                                              null,
-                                                              null,
-                                                              SUBMISSION_MODE_REST_API);
-
-        int nrOfSubmittedViaSchedulerPortal = getNumberOfFilteredJobs(workflowName,
-                                                                      bucketName,
-                                                                      user,
-                                                                      tenant,
-                                                                      startTime,
-                                                                      endTime,
-                                                                      null,
-                                                                      null,
-                                                                      SUBMISSION_MODE_SCHEDULER_PORTAL);
-
-        int nrOfSubmittedViaJobPlanner = getNumberOfFilteredJobs(workflowName,
-                                                                 bucketName,
-                                                                 user,
-                                                                 tenant,
-                                                                 startTime,
-                                                                 endTime,
-                                                                 null,
-                                                                 null,
-                                                                 SUBMISSION_MODE_JOB_PLANNER);
-
-        int nrOfSubmittedViaStudio = getNumberOfFilteredJobs(workflowName,
-                                                             bucketName,
-                                                             user,
-                                                             tenant,
-                                                             startTime,
-                                                             endTime,
-                                                             null,
-                                                             null,
-                                                             SUBMISSION_MODE_STUDIO);
-
-        int nrOfSubmittedViaCatalog = getNumberOfFilteredJobs(workflowName,
-                                                              bucketName,
-                                                              user,
-                                                              tenant,
-                                                              startTime,
-                                                              endTime,
-                                                              null,
-                                                              null,
-                                                              SUBMISSION_MODE_CATALOG);
-
-        int nrOfSubmittedViaWorkflowExecution = getNumberOfFilteredJobs(workflowName,
-                                                                        bucketName,
-                                                                        user,
-                                                                        tenant,
-                                                                        startTime,
-                                                                        endTime,
-                                                                        null,
-                                                                        null,
-                                                                        SUBMISSION_MODE_WORKFLOW_EXECUTION);
-
-        int nrOfSubmittedViaServiceAutomation = getNumberOfFilteredJobs(workflowName,
-                                                                        bucketName,
-                                                                        user,
-                                                                        tenant,
-                                                                        startTime,
-                                                                        endTime,
-                                                                        null,
-                                                                        null,
-                                                                        SUBMISSION_MODE_SERVICE_AUTOMATION);
-
-        int nrOfSubmittedViaEventOrchestration = getNumberOfFilteredJobs(workflowName,
-                                                                         bucketName,
-                                                                         user,
-                                                                         tenant,
-                                                                         startTime,
-                                                                         endTime,
-                                                                         null,
-                                                                         null,
-                                                                         SUBMISSION_MODE_EVENT_ORCHESTRATION);
-
-        return new JobsSubmissionMode(nrOfSubmittedViaJobPlanner,
-                                      nrOfSubmittedViaStudio,
-                                      nrOfSubmittedViaCatalog,
-                                      nrOfSubmittedViaWorkflowApi,
-                                      nrOfSubmittedViaSchedulerPortal,
-                                      nrOfSubmittedViaWorkflowExecution,
-                                      nrOfSubmittedViaCli,
-                                      nrOfSubmittedViaServiceAutomation,
-                                      nrOfSubmittedViaRestApi,
-                                      nrOfSubmittedViaEventOrchestration);
-    }
-
-    private Query getTopWorkflowsQuery(Session session, String workflowName, String user, String tenant, long startTime,
-            long endTime, int numberOfWorkflows, String selectSubQuery, String subQueryGroupByStatement) {
+    private Query getTopWorkflowsQuery(Session session, String workflowName, String bucketName, String user,
+            String tenant, long startTime, long endTime, int numberOfWorkflows, String selectSubQuery,
+            String subQueryGroupByStatement) {
         StringBuilder queryString = new StringBuilder(selectSubQuery);
 
         boolean hasWorkflowName = !Strings.isNullOrEmpty(workflowName);
+        boolean hasBucketName = !Strings.isNullOrEmpty(bucketName);
         boolean hasUser = !Strings.isNullOrEmpty(user);
         boolean hasTenant = !Strings.isNullOrEmpty(tenant);
 
         if (hasWorkflowName) {
             queryString.append("and jobName like :workflowName ");
+        }
+        if (hasBucketName) {
+            queryString.append("and bucketName like :bucketName ");
         }
         if (hasUser) {
             queryString.append("and owner = :user ");
@@ -1332,6 +1226,9 @@ public class SchedulerDBManager {
         if (hasWorkflowName) {
             query.setParameter("workflowName", workflowName);
         }
+        if (hasBucketName) {
+            query.setParameter("bucketName", bucketName);
+        }
         if (hasUser) {
             query.setParameter("user", user);
             if (hasTenant) {
@@ -1347,120 +1244,120 @@ public class SchedulerDBManager {
         return query;
     }
 
-    public FilteredStatistics getFilteredStatistics(final String workflowName, String user, String tenant,
-            final long startTime, final long endTime) {
+    public FilteredStatistics getFilteredStatistics(final String workflowName, String bucketName, String user,
+            String tenant, final long startTime, final long endTime) {
 
-        long runningJobsWithoutIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                     null,
-                                                                     user,
-                                                                     tenant,
-                                                                     0,
-                                                                     0,
-                                                                     Collections.singletonList(JobStatus.RUNNING),
-                                                                     false);
-        long stalledJobsWithoutIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                     null,
-                                                                     user,
-                                                                     tenant,
-                                                                     0,
-                                                                     0,
-                                                                     Collections.singletonList(JobStatus.STALLED),
-                                                                     false);
-        long pausedJobsWithoutIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                    null,
-                                                                    user,
-                                                                    tenant,
-                                                                    0,
-                                                                    0,
-                                                                    Collections.singletonList(JobStatus.PAUSED),
-                                                                    false);
-        long pendingJobs = getNumberOfStatsFilteredJobs(workflowName,
-                                                        null,
-                                                        user,
-                                                        tenant,
-                                                        0,
-                                                        0,
-                                                        Collections.singletonList(JobStatus.PENDING),
-                                                        null);
+        long runningJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                bucketName,
+                                                                user,
+                                                                tenant,
+                                                                0,
+                                                                0,
+                                                                Collections.singletonList(JobStatus.RUNNING),
+                                                                false);
+        long stalledJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                bucketName,
+                                                                user,
+                                                                tenant,
+                                                                0,
+                                                                0,
+                                                                Collections.singletonList(JobStatus.STALLED),
+                                                                false);
+        long pausedJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                               bucketName,
+                                                               user,
+                                                               tenant,
+                                                               0,
+                                                               0,
+                                                               Collections.singletonList(JobStatus.PAUSED),
+                                                               false);
+        long pendingJobs = getNumberOfFilteredJobs(workflowName,
+                                                   bucketName,
+                                                   user,
+                                                   tenant,
+                                                   0,
+                                                   0,
+                                                   Collections.singletonList(JobStatus.PENDING),
+                                                   null);
         long currentJobsWithoutIssues = runningJobsWithoutIssues + stalledJobsWithoutIssues + pausedJobsWithoutIssues +
                                         pendingJobs;
 
-        long inErrorJobs = getNumberOfStatsFilteredJobs(workflowName,
-                                                        null,
-                                                        user,
-                                                        tenant,
-                                                        0,
-                                                        0,
-                                                        Collections.singletonList(JobStatus.IN_ERROR),
-                                                        null);
-        long runningJobsWithIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                  null,
-                                                                  user,
-                                                                  tenant,
-                                                                  0,
-                                                                  0,
-                                                                  Collections.singletonList(JobStatus.RUNNING),
-                                                                  true);
-        long stalledJobsWithIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                  null,
-                                                                  user,
-                                                                  tenant,
-                                                                  0,
-                                                                  0,
-                                                                  Collections.singletonList(JobStatus.STALLED),
-                                                                  true);
-        long pausedJobsWithIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                 null,
-                                                                 user,
-                                                                 tenant,
-                                                                 0,
-                                                                 0,
-                                                                 Collections.singletonList(JobStatus.PAUSED),
-                                                                 true);
+        long inErrorJobs = getNumberOfFilteredJobs(workflowName,
+                                                   bucketName,
+                                                   user,
+                                                   tenant,
+                                                   0,
+                                                   0,
+                                                   Collections.singletonList(JobStatus.IN_ERROR),
+                                                   null);
+        long runningJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                             bucketName,
+                                                             user,
+                                                             tenant,
+                                                             0,
+                                                             0,
+                                                             Collections.singletonList(JobStatus.RUNNING),
+                                                             true);
+        long stalledJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                             bucketName,
+                                                             user,
+                                                             tenant,
+                                                             0,
+                                                             0,
+                                                             Collections.singletonList(JobStatus.STALLED),
+                                                             true);
+        long pausedJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                            bucketName,
+                                                            user,
+                                                            tenant,
+                                                            0,
+                                                            0,
+                                                            Collections.singletonList(JobStatus.PAUSED),
+                                                            true);
         long currentJobsWithIssues = inErrorJobs + runningJobsWithIssues + stalledJobsWithIssues + pausedJobsWithIssues;
 
-        long canceledJobs = getNumberOfStatsFilteredJobs(workflowName,
-                                                         null,
-                                                         user,
-                                                         tenant,
-                                                         startTime,
-                                                         endTime,
-                                                         Collections.singletonList(JobStatus.CANCELED),
-                                                         null);
-        long failedJobs = getNumberOfStatsFilteredJobs(workflowName,
-                                                       null,
-                                                       user,
-                                                       tenant,
-                                                       startTime,
-                                                       endTime,
-                                                       Collections.singletonList(JobStatus.FAILED),
-                                                       null);
-        long killedJobs = getNumberOfStatsFilteredJobs(workflowName,
-                                                       null,
-                                                       user,
-                                                       tenant,
-                                                       startTime,
-                                                       endTime,
-                                                       Collections.singletonList(JobStatus.KILLED),
-                                                       null);
-        long finishedJobsWithIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                   null,
-                                                                   user,
-                                                                   tenant,
-                                                                   startTime,
-                                                                   endTime,
-                                                                   Collections.singletonList(JobStatus.FINISHED),
-                                                                   true);
+        long canceledJobs = getNumberOfFilteredJobs(workflowName,
+                                                    bucketName,
+                                                    user,
+                                                    tenant,
+                                                    startTime,
+                                                    endTime,
+                                                    Collections.singletonList(JobStatus.CANCELED),
+                                                    null);
+        long failedJobs = getNumberOfFilteredJobs(workflowName,
+                                                  bucketName,
+                                                  user,
+                                                  tenant,
+                                                  startTime,
+                                                  endTime,
+                                                  Collections.singletonList(JobStatus.FAILED),
+                                                  null);
+        long killedJobs = getNumberOfFilteredJobs(workflowName,
+                                                  bucketName,
+                                                  user,
+                                                  tenant,
+                                                  startTime,
+                                                  endTime,
+                                                  Collections.singletonList(JobStatus.KILLED),
+                                                  null);
+        long finishedJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                              bucketName,
+                                                              user,
+                                                              tenant,
+                                                              startTime,
+                                                              endTime,
+                                                              Collections.singletonList(JobStatus.FINISHED),
+                                                              true);
         long pastJobsWithIssues = canceledJobs + failedJobs + killedJobs + finishedJobsWithIssues;
 
-        long successfulJobs = getNumberOfStatsFilteredJobs(workflowName,
-                                                           null,
-                                                           user,
-                                                           tenant,
-                                                           startTime,
-                                                           endTime,
-                                                           Collections.singletonList(JobStatus.FINISHED),
-                                                           false);
+        long successfulJobs = getNumberOfFilteredJobs(workflowName,
+                                                      bucketName,
+                                                      user,
+                                                      tenant,
+                                                      startTime,
+                                                      endTime,
+                                                      Collections.singletonList(JobStatus.FINISHED),
+                                                      false);
         long currentJobs = currentJobsWithoutIssues + currentJobsWithIssues;
         long runningJobs = runningJobsWithoutIssues + runningJobsWithIssues;
         long pausedJobs = pausedJobsWithoutIssues + pausedJobsWithIssues;
@@ -1503,33 +1400,33 @@ public class SchedulerDBManager {
 
         for (int interval = 0; interval < numberOfIntervals && startDate < endDate; interval++) {
             long endTimeInterval = startDate + intervalTime;
-            Integer nrOfJobsWithoutIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                         bucketName,
-                                                                         user,
-                                                                         tenant,
-                                                                         startDate,
-                                                                         endTimeInterval,
-                                                                         Collections.singletonList(JobStatus.FINISHED),
-                                                                         false);
+            Integer nrOfJobsWithoutIssues = getNumberOfFilteredJobs(workflowName,
+                                                                    bucketName,
+                                                                    user,
+                                                                    tenant,
+                                                                    startDate,
+                                                                    endTimeInterval,
+                                                                    Collections.singletonList(JobStatus.FINISHED),
+                                                                    false);
             jobsWithoutIssuesCount.put(interval, nrOfJobsWithoutIssues);
-            Integer nrOfJobsWithIssues = getNumberOfStatsFilteredJobs(workflowName,
-                                                                      bucketName,
-                                                                      user,
-                                                                      tenant,
-                                                                      startDate,
-                                                                      endTimeInterval,
-                                                                      Collections.singletonList(JobStatus.FINISHED),
-                                                                      true);
-            Integer nrOfFailedJobs = getNumberOfStatsFilteredJobs(workflowName,
-                                                                  bucketName,
-                                                                  user,
-                                                                  tenant,
-                                                                  startDate,
-                                                                  endTimeInterval,
-                                                                  ImmutableSet.of(JobStatus.CANCELED,
-                                                                                  JobStatus.FAILED,
-                                                                                  JobStatus.KILLED),
-                                                                  null);
+            Integer nrOfJobsWithIssues = getNumberOfFilteredJobs(workflowName,
+                                                                 bucketName,
+                                                                 user,
+                                                                 tenant,
+                                                                 startDate,
+                                                                 endTimeInterval,
+                                                                 Collections.singletonList(JobStatus.FINISHED),
+                                                                 true);
+            Integer nrOfFailedJobs = getNumberOfFilteredJobs(workflowName,
+                                                             bucketName,
+                                                             user,
+                                                             tenant,
+                                                             startDate,
+                                                             endTimeInterval,
+                                                             ImmutableSet.of(JobStatus.CANCELED,
+                                                                             JobStatus.FAILED,
+                                                                             JobStatus.KILLED),
+                                                             null);
             jobsWithIssuesCount.put(interval, nrOfJobsWithIssues + nrOfFailedJobs);
             startDate = endTimeInterval;
         }

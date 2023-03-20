@@ -492,15 +492,16 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws NotConnectedException, PermissionException {
+    public FilteredStatistics getFilteredStatistics(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
 
         try {
             FilteredStatisticsData usersWithJobs = restApi().getFilteredStatistics(sid,
                                                                                    startDate,
                                                                                    endDate,
                                                                                    myJobs,
-                                                                                   workflowName);
+                                                                                   workflowName,
+                                                                                   bucketName);
             return toFilteredStatistics(usersWithJobs);
         } catch (RestException e) {
             throwNCEOrPE(e);
@@ -510,7 +511,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
 
         try {
             List<FilteredTopWorkflowData> filteredWorkflows = restApi().getTopWorkflowsWithIssues(sid,
@@ -518,7 +520,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                   startDate,
                                                                                                   endDate,
                                                                                                   myJobs,
-                                                                                                  workflowName);
+                                                                                                  workflowName,
+                                                                                                  bucketName);
             return new ArrayList<>(DataUtility.toFilteredTopWorkflowsWithIssues(filteredWorkflows));
         } catch (RestException e) {
             throwNCEOrPE(e);
@@ -528,7 +531,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
+            String workflowName, String bucketName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException {
 
         try {
@@ -537,7 +540,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                                            startDate,
                                                                                                                            endDate,
                                                                                                                            myJobs,
-                                                                                                                           workflowName);
+                                                                                                                           workflowName,
+                                                                                                                           bucketName);
             return new ArrayList<>(DataUtility.toFilteredTopCumulatedCoreTime(filteredWorkflows));
         } catch (RestException e) {
             throwNCEOrPE(e);
@@ -547,7 +551,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            String workflowName, boolean myJobs, long startDate, long endDate, boolean inParallel)
+            String workflowName, String bucketName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws NotConnectedException, PermissionException {
 
         try {
@@ -557,6 +561,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                                    endDate,
                                                                                                                    myJobs,
                                                                                                                    workflowName,
+                                                                                                                   bucketName,
                                                                                                                    inParallel);
             return new ArrayList<>(DataUtility.tFilteredTopWorkflowsNumberOfNodes(filteredWorkflows));
         } catch (RestException e) {
@@ -567,7 +572,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
 
         try {
             List<WorkflowDurationData> filteredWorkflows = restApi().getTopExecutionTimeWorkflows(sid,
@@ -575,7 +581,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                   startDate,
                                                                                                   endDate,
                                                                                                   myJobs,
-                                                                                                  workflowName);
+                                                                                                  workflowName,
+                                                                                                  bucketName);
             return new ArrayList<>(DataUtility.toWorkflowsDuration(filteredWorkflows));
         } catch (RestException e) {
             throwNCEOrPE(e);
@@ -584,8 +591,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
-            long startDate, long endDate) throws NotConnectedException, PermissionException {
+    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName,
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
 
         try {
             List<WorkflowDurationData> filteredWorkflows = restApi().getTopPendingTimeWorkflows(sid,
@@ -593,7 +601,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                 startDate,
                                                                                                 endDate,
                                                                                                 myJobs,
-                                                                                                workflowName);
+                                                                                                workflowName,
+                                                                                                bucketName);
             return new ArrayList<>(DataUtility.toWorkflowsDuration(filteredWorkflows));
         } catch (RestException e) {
             throwNCEOrPE(e);
@@ -602,17 +611,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+    public Map<String, Integer> getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException {
 
         try {
-            JobsSubmissionModeData jobsSubmissionModeData = restApi().getSubmissionModeCount(sid,
-                                                                                             startDate,
-                                                                                             endDate,
-                                                                                             myJobs,
-                                                                                             workflowName,
-                                                                                             bucketName);
-            return DataUtility.toJobsSubmissionMode(jobsSubmissionModeData);
+            return restApi().getSubmissionModeCount(sid, startDate, endDate, myJobs, workflowName, bucketName);
         } catch (RestException e) {
             throwNCEOrPE(e);
         }

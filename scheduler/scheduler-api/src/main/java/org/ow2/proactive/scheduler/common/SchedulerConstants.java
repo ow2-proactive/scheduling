@@ -194,41 +194,6 @@ public class SchedulerConstants {
     public static String SUBMISSION_MODE_CLI = "cli";
 
     /**
-     * Submission mode for workflows submitted from scheduler portal
-     */
-    public static String SUBMISSION_MODE_SCHEDULER_PORTAL = "scheduler-portal";
-
-    /**
-     * Submission mode for workflows submitted from job planner
-     */
-    public static String SUBMISSION_MODE_JOB_PLANNER = "job-planner";
-
-    /**
-     * Submission mode for workflows submitted from studio
-     */
-    public static String SUBMISSION_MODE_STUDIO = "studio";
-
-    /**
-     * Submission mode for workflows submitted from catalog
-     */
-    public static String SUBMISSION_MODE_CATALOG = "catalog";
-
-    /**
-     * Submission mode for workflows submitted from workflow execution
-     */
-    public static String SUBMISSION_MODE_WORKFLOW_EXECUTION = "workflow-execution";
-
-    /**
-     * Submission mode for workflows submitted from service automation
-     */
-    public static String SUBMISSION_MODE_SERVICE_AUTOMATION = "service-automation";
-
-    /**
-     * Submission mode for workflows submitted from event orchestration
-     */
-    public static String SUBMISSION_MODE_EVENT_ORCHESTRATION = "event-orchestration";
-
-    /**
      * Default submission mode
      */
     public static String SUBMISSION_MODE_REST_API = "rest-api";

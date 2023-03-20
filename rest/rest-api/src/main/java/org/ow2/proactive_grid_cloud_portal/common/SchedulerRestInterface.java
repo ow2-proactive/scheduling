@@ -2111,7 +2111,8 @@ public interface SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException;
 
     /**
      * Returns an object containing the top workflows with issues based on the given filters
@@ -2133,7 +2134,8 @@ public interface SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException;
 
     /**
      * Returns an object containing the top workflows that consumes the most CPU
@@ -2144,6 +2146,7 @@ public interface SchedulerRestInterface {
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
      * @param workflowName the workflow name of the filtered jobs
+     * @param bucketName the bucket name of the filtered jobs
      * @return {@link FilteredTopWorkflowsCumulatedCoreTimeData}
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2155,7 +2158,8 @@ public interface SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException;
 
     /**
      * Returns an object containing the top workflows that use most nodes
@@ -2179,6 +2183,7 @@ public interface SchedulerRestInterface {
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName,
             @QueryParam("inParallel") @DefaultValue("false") boolean inParallel) throws RestException;
 
     /**
@@ -2201,7 +2206,8 @@ public interface SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException;
 
     /**
      * Returns an object containing the top workflows with the longest pending time based on the given filters
@@ -2223,7 +2229,8 @@ public interface SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") @DefaultValue("null") String workflowName) throws RestException;
+            @QueryParam("workflowName") @DefaultValue("null") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException;
 
     /**
      * Returns an object containing the number of jobs submitted from each portal
@@ -2234,13 +2241,13 @@ public interface SchedulerRestInterface {
      * @param endDate end date of the jobs
      * @param workflowName the workflow name of the jobs
      * @param bucketName the bucket name of the filtered jobs
-     * @return {@link JobsSubmissionModeData}
+     * @return a map
      * @throws RestException if an error occurs or the session is invalid
      */
     @GET
     @Path("stats/submittedFromCount")
     @Produces(MediaType.APPLICATION_JSON)
-    JobsSubmissionModeData getSubmissionModeCount(@HeaderParam("sessionid") String sessionId,
+    Map<String, Integer> getSubmissionModeCount(@HeaderParam("sessionid") String sessionId,
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,

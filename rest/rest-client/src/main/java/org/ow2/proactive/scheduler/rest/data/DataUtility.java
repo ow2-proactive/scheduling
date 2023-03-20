@@ -107,19 +107,6 @@ public class DataUtility {
                                       completedJobsCountData.getJobsWithoutIssues());
     }
 
-    public static JobsSubmissionMode toJobsSubmissionMode(JobsSubmissionModeData jobsSubmissionModeData) {
-        return new JobsSubmissionMode(jobsSubmissionModeData.getSubmittedFromJP(),
-                                      jobsSubmissionModeData.getSubmittedFromStudio(),
-                                      jobsSubmissionModeData.getSubmittedFromCatalog(),
-                                      jobsSubmissionModeData.getSubmittedFromWorkflowApi(),
-                                      jobsSubmissionModeData.getSubmittedFromSchedulerPortal(),
-                                      jobsSubmissionModeData.getSubmittedFromWorkflowExecution(),
-                                      jobsSubmissionModeData.getSubmittedFromCli(),
-                                      jobsSubmissionModeData.getSubmittedFromServiceAutomation(),
-                                      jobsSubmissionModeData.getSubmittedFromRestApi(),
-                                      jobsSubmissionModeData.getSubmittedFromEventOrchestration());
-    }
-
     public static CompletedTasksCount toCompletedTasksCount(CompletedTasksCountData completedTasksCountData) {
         return new CompletedTasksCount(completedTasksCountData.getTasksWithIssues(),
                                        completedTasksCountData.getTasksWithoutIssues());

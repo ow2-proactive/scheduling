@@ -835,34 +835,46 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws NotConnectedException, PermissionException {
+    public FilteredStatistics getFilteredStatistics(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
         renewSession();
-        return client.getFilteredStatistics(workflowName, myJobs, startDate, endDate);
+        return client.getFilteredStatistics(workflowName, bucketName, myJobs, startDate, endDate);
     }
 
     @Override
     public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
         renewSession();
-        return client.getTopWorkflowsWithIssues(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+        return client.getTopWorkflowsWithIssues(numberOfWorkflows,
+                                                workflowName,
+                                                bucketName,
+                                                myJobs,
+                                                startDate,
+                                                endDate);
     }
 
     @Override
     public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
+            String workflowName, String bucketName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException {
         renewSession();
-        return client.getTopWorkflowsCumulatedCoreTime(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+        return client.getTopWorkflowsCumulatedCoreTime(numberOfWorkflows,
+                                                       workflowName,
+                                                       bucketName,
+                                                       myJobs,
+                                                       startDate,
+                                                       endDate);
     }
 
     @Override
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            String workflowName, boolean myJobs, long startDate, long endDate, boolean inParallel)
+            String workflowName, String bucketName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws NotConnectedException, PermissionException {
         renewSession();
         return client.getTopWorkflowsNumberOfNodes(numberOfWorkflows,
                                                    workflowName,
+                                                   bucketName,
                                                    myJobs,
                                                    startDate,
                                                    endDate,
@@ -871,20 +883,32 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     @Override
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
         renewSession();
-        return client.getTopExecutionTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+        return client.getTopExecutionTimeWorkflows(numberOfWorkflows,
+                                                   workflowName,
+                                                   bucketName,
+                                                   myJobs,
+                                                   startDate,
+                                                   endDate);
     }
 
     @Override
-    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
-            long startDate, long endDate) throws NotConnectedException, PermissionException {
+    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName,
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
         renewSession();
-        return client.getTopPendingTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+        return client.getTopPendingTimeWorkflows(numberOfWorkflows,
+                                                 workflowName,
+                                                 bucketName,
+                                                 myJobs,
+                                                 startDate,
+                                                 endDate);
     }
 
     @Override
-    public JobsSubmissionMode getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+    public Map<String, Integer> getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
             long startDate, long endDate) throws NotConnectedException, PermissionException {
         renewSession();
         return client.getSubmissionModeCount(workflowName, bucketName, myJobs, startDate, endDate);
