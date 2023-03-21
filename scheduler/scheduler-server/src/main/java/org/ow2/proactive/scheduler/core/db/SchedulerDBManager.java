@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import static org.ow2.proactive.scheduler.core.db.types.FilterJobsMode.FINISHED_AND_STARTED;
+import static org.ow2.proactive.scheduler.core.db.types.FilterJobsMode.SUBMITTED_ONLY;
 import static org.ow2.proactive.scheduler.util.HsqldbServer.PROP_HIBERNATE_CONNECTION_PASSWORD;
 
 import java.io.File;
@@ -86,6 +88,7 @@ import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
+import org.ow2.proactive.scheduler.core.db.types.FilterJobsMode;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
@@ -1029,7 +1032,8 @@ public class SchedulerDBManager {
                                                endTime,
                                                numberOfWorkflows,
                                                selectSubQuery,
-                                               subQueryGroupByStatement);
+                                               subQueryGroupByStatement,
+                                               FINISHED_AND_STARTED);
 
             List<Object[]> list = query.list();
             return list.stream()
@@ -1047,7 +1051,7 @@ public class SchedulerDBManager {
 
         return executeReadOnlyTransaction(session -> {
 
-            String selectSubQuery = "select submissionMode, count(*) as numberOfJobs FROM JobData where startTime > 0 and finishedTime > 0  ";
+            String selectSubQuery = "select submissionMode, count(*) as numberOfJobs FROM JobData where submissionMode is not null ";
             String subQueryGroupByStatement = "group by submissionMode order by numberOfJobs desc";
             Query query = getTopWorkflowsQuery(session,
                                                workflowName,
@@ -1058,7 +1062,8 @@ public class SchedulerDBManager {
                                                endTime,
                                                0,
                                                selectSubQuery,
-                                               subQueryGroupByStatement);
+                                               subQueryGroupByStatement,
+                                               SUBMITTED_ONLY);
 
             List<Object[]> list = query.list();
             Map<String, Integer> jobsPerPortal = new LinkedHashMap<>();
@@ -1085,7 +1090,8 @@ public class SchedulerDBManager {
                                                endTime,
                                                numberOfWorkflows,
                                                selectSubQuery,
-                                               subQueryGroupByStatement);
+                                               subQueryGroupByStatement,
+                                               FINISHED_AND_STARTED);
 
             List<Object[]> list = query.list();
             return list.stream()
@@ -1118,7 +1124,8 @@ public class SchedulerDBManager {
                                                endTime,
                                                numberOfWorkflows,
                                                selectSubQuery,
-                                               subQueryGroupByStatement);
+                                               subQueryGroupByStatement,
+                                               FINISHED_AND_STARTED);
 
             List<Object[]> list = query.list();
             return list.stream()
@@ -1147,7 +1154,8 @@ public class SchedulerDBManager {
                                                endTime,
                                                numberOfWorkflows,
                                                selectSubQuery,
-                                               subQueryGroupByStatement);
+                                               subQueryGroupByStatement,
+                                               FINISHED_AND_STARTED);
 
             List<Object[]> list = query.list();
             return list.stream()
@@ -1176,7 +1184,8 @@ public class SchedulerDBManager {
                                                endTime,
                                                numberOfWorkflows,
                                                selectSubQuery,
-                                               subQueryGroupByStatement);
+                                               subQueryGroupByStatement,
+                                               FINISHED_AND_STARTED);
 
             List<Object[]> list = query.list();
             return list.stream()
@@ -1191,7 +1200,7 @@ public class SchedulerDBManager {
 
     private Query getTopWorkflowsQuery(Session session, String workflowName, String bucketName, String user,
             String tenant, long startTime, long endTime, int numberOfWorkflows, String selectSubQuery,
-            String subQueryGroupByStatement) {
+            String subQueryGroupByStatement, FilterJobsMode mode) {
         StringBuilder queryString = new StringBuilder(selectSubQuery);
 
         boolean hasWorkflowName = !Strings.isNullOrEmpty(workflowName);
@@ -1211,11 +1220,22 @@ public class SchedulerDBManager {
                 queryString.append("and (tenant = :tenant or tenant = null) ");
             }
         }
-        if (startTime > 0) {
-            queryString.append("and finishedTime >= :startTime ");
-        }
-        if (endTime > 0) {
-            queryString.append("and finishedTime < :endTime ");
+        switch (mode) {
+            case FINISHED_AND_STARTED:
+                if (startTime > 0) {
+                    queryString.append("and finishedTime >= :startTime ");
+                }
+                if (endTime > 0) {
+                    queryString.append("and finishedTime < :endTime ");
+                }
+                break;
+            case SUBMITTED_ONLY:
+                if (startTime > 0) {
+                    queryString.append("and submittedTime >= :startTime ");
+                }
+                if (endTime > 0) {
+                    queryString.append("and submittedTime < :endTime ");
+                }
         }
         queryString.append(subQueryGroupByStatement);
 
