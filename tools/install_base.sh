@@ -480,6 +480,9 @@ if [[ "$OLD_PADIR" == "" ]]; then
         ldconfig | grep libjli
     fi
 
+    read -e -p "Protocol used by the ProActive server when communicating with ProActive Nodes. Can either be pnp (point-to-point) or pamr (using a router) [pnp/pamr] " -i "pnp" PA_PROTOCOL
+    PA_PROTOCOL=$(trim "$PA_PROTOCOL")
+
 
     read -e -p "Number of ProActive nodes to start on the server machine: " -i "4" NB_NODES
     NB_NODES=$(trim "$NB_NODES")
@@ -523,6 +526,11 @@ if [[ "$OLD_PADIR" == "" ]]; then
             sed -e "s/^#web\.https\.allow_any_hostname=.*/web.https.allow_any_hostname=true/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
             sed -e "s/^#web\.https\.allow_any_certificate=.*/web.https.allow_any_certificate=true/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
         fi
+    fi
+
+    if [[ "$PA_PROTOCOL" == "pamr" ]]; then
+        sed -e "s/^proactive\.communication\.protocol=.*/proactive.communication.protocol=pamr/g" -i "$PA_ROOT/default/config/network/server.ini"
+        sed -e "s/^proactive\.communication\.protocol=.*/proactive.communication.protocol=pamr/g" -i "$PA_ROOT/default/config/network/node.ini"
     fi
 
     sed -e "s/^PORT=.*/PORT=$PORT/g" -i "$PA_ROOT/default/tools/proactive-scheduler"
@@ -717,6 +725,17 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
     echo ""
 
     ls -l $PA_ROOT/default/addons/*.jar
+fi
+
+if [[ "$OLD_PADIR" != "" ]]; then
+  NEW_JAVA_VERSION=$($PA_ROOT/default/jre/bin/java -version 2>&1 >/dev/null | head -n 1 | cut -d ' ' -f 3 | cut -d '"' -f 2)
+  OLD_JAVA_VERSION=$($PA_ROOT/previous/jre/bin/java -version 2>&1 >/dev/null | head -n 1 | cut -d ' ' -f 3 | cut -d '"' -f 2)
+  if [[ "$NEW_JAVA_VERSION" == "$OLD_JAVA_VERSION" ]]; then
+      /bin/cp $PA_ROOT/previous/jre/lib/security/cacerts $PA_ROOT/default/jre/lib/security/
+  else
+      echo "New ProActive installation contains a Java Runtime Environment (JRE) with a different version $NEW_JAVA_VERSION from the previous one $OLD_JAVA_VERSION."
+      echo "If the ProActive server is configured in https and certificates have been added to the java truststore jre/lib/security/cacerts, these certificates must be manually re-installed to the new JRE."
+  fi
 fi
 
 chown -R $USER:$GROUP $PA_ROOT/$PA_FOLDER_NAME
