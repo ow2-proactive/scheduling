@@ -240,23 +240,30 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws PermissionException, NotConnectedException {
-        return getScheduler().getFilteredStatistics(workflowName, myJobs, startDate, endDate);
+    public FilteredStatistics getFilteredStatistics(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws PermissionException, NotConnectedException {
+        return getScheduler().getFilteredStatistics(workflowName, bucketName, myJobs, startDate, endDate);
     }
 
     @Override
     public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws PermissionException, NotConnectedException {
-        return getScheduler().getTopWorkflowsWithIssues(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws PermissionException, NotConnectedException {
+        return getScheduler().getTopWorkflowsWithIssues(numberOfWorkflows,
+                                                        workflowName,
+                                                        bucketName,
+                                                        myJobs,
+                                                        startDate,
+                                                        endDate);
     }
 
     @Override
     public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
+            String workflowName, String bucketName, Boolean myJobs, long startDate, long endDate)
             throws PermissionException, NotConnectedException {
         return getScheduler().getTopWorkflowsCumulatedCoreTime(numberOfWorkflows,
                                                                workflowName,
+                                                               bucketName,
                                                                myJobs,
                                                                startDate,
                                                                endDate);
@@ -264,10 +271,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            String workflowName, boolean myJobs, long startDate, long endDate, boolean inParallel)
+            String workflowName, String bucketName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws PermissionException, NotConnectedException {
         return getScheduler().getTopWorkflowsNumberOfNodes(numberOfWorkflows,
                                                            workflowName,
+                                                           bucketName,
                                                            myJobs,
                                                            startDate,
                                                            endDate,
@@ -276,14 +284,32 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws PermissionException, NotConnectedException {
-        return getScheduler().getTopExecutionTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws PermissionException, NotConnectedException {
+        return getScheduler().getTopExecutionTimeWorkflows(numberOfWorkflows,
+                                                           workflowName,
+                                                           bucketName,
+                                                           myJobs,
+                                                           startDate,
+                                                           endDate);
     }
 
     @Override
-    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
+    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName,
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws PermissionException, NotConnectedException {
+        return getScheduler().getTopPendingTimeWorkflows(numberOfWorkflows,
+                                                         workflowName,
+                                                         bucketName,
+                                                         myJobs,
+                                                         startDate,
+                                                         endDate);
+    }
+
+    @Override
+    public Map<String, Integer> getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
             long startDate, long endDate) throws PermissionException, NotConnectedException {
-        return getScheduler().getTopPendingTimeWorkflows(numberOfWorkflows, workflowName, myJobs, startDate, endDate);
+        return getScheduler().getSubmissionModeCount(workflowName, bucketName, myJobs, startDate, endDate);
     }
 
     @Override
@@ -296,6 +322,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     public CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
             int numberOfIntervals) throws PermissionException, NotConnectedException {
         return getScheduler().getCompletedTasks(myTasks, taskName, startDate, endDate, numberOfIntervals);
+    }
+
+    @Override
+    public Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException {
+        return getScheduler().getSubmissionModeValues();
     }
 
     /**

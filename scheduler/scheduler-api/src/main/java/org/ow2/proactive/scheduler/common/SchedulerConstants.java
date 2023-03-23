@@ -184,13 +184,19 @@ public class SchedulerConstants {
     public static String TASK_WALLTIME_GENERIC_INFO = "WALLTIME";
 
     /**
-     * Scheduler api portal name
+     * Submission mode for workflows submitted from scheduler api
      */
-    public static String SUBMISSION_MODE_SCHEDULER_API = "scheduler-api";
+    public static String SUBMISSION_MODE_WORKFLOW_API = "workflow-api";
 
-    public static String SUBMISSION_MODE_SCHEDULER_REST_CLI = "rest-cli";
+    /**
+     * Submission mode for workflows submitted from cli
+     */
+    public static String SUBMISSION_MODE_CLI = "cli";
 
-    public static String SUBMISSION_MODE_SCHEDULER_DEFAULT = "rest-api";
+    /**
+     * Default submission mode
+     */
+    public static String SUBMISSION_MODE_REST_API = "rest-api";
 
     /**
      * This generic information can be used to set the portal name via the job was submitted

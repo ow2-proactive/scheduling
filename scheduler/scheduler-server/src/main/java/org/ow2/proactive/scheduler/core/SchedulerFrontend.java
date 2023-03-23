@@ -1899,6 +1899,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.getProjectName(),
                                                    filterCriteria.getBucketName(),
                                                    filterCriteria.getParentId(),
+                                                   filterCriteria.getSubmissionMode(),
                                                    sortParameters);
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
@@ -2018,8 +2019,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     @RoleRead
-    public FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws NotConnectedException, PermissionException {
+    public FilteredStatistics getFilteredStatistics(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
@@ -2030,6 +2031,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             tenant = ident.getTenant();
         }
         return dbManager.getFilteredStatistics(workflowName,
+                                               bucketName,
                                                myJobs ? ident.getUsername() : null,
                                                tenant,
                                                startDate,
@@ -2040,7 +2042,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     @RoleRead
     public List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
@@ -2052,6 +2055,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }
         return dbManager.getTopWorkflowsWithIssues(numberOfWorkflows,
                                                    workflowName,
+                                                   bucketName,
                                                    myJobs ? ident.getUsername() : null,
                                                    tenant,
                                                    startDate,
@@ -2062,7 +2066,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     @RoleRead
     public List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
+            String workflowName, String bucketName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
@@ -2075,6 +2079,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }
         return dbManager.getTopWorkflowsMostConsumingNodes(numberOfWorkflows,
                                                            workflowName,
+                                                           bucketName,
                                                            myJobs ? ident.getUsername() : null,
                                                            tenant,
                                                            startDate,
@@ -2085,7 +2090,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     @RoleRead
     public List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows,
-            String workflowName, boolean myJobs, long startDate, long endDate, boolean inParallel)
+            String workflowName, String bucketName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
@@ -2098,6 +2103,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }
         return dbManager.getTopWorkflowsNumberOfNodes(numberOfWorkflows,
                                                       workflowName,
+                                                      bucketName,
                                                       myJobs ? ident.getUsername() : null,
                                                       tenant,
                                                       startDate,
@@ -2109,7 +2115,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     @RoleRead
     public List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName,
-            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException {
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
@@ -2121,6 +2128,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }
         return dbManager.getTopExecutionTimeWorkflows(numberOfWorkflows,
                                                       workflowName,
+                                                      bucketName,
                                                       myJobs ? ident.getUsername() : null,
                                                       tenant,
                                                       startDate,
@@ -2130,8 +2138,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     @RoleRead
-    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
-            long startDate, long endDate) throws NotConnectedException, PermissionException {
+    public List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName,
+            String bucketName, Boolean myJobs, long startDate, long endDate)
+            throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
@@ -2143,10 +2152,33 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }
         return dbManager.getTopPendingTimeWorkflows(numberOfWorkflows,
                                                     workflowName,
+                                                    bucketName,
                                                     myJobs ? ident.getUsername() : null,
                                                     tenant,
                                                     startDate,
                                                     endDate);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleRead
+    public Map<String, Integer> getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs,
+            long startDate, long endDate) throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to get submission from count");
+        String tenant = null;
+        if (PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean() && !ident.isAllTenantPermission()) {
+            // overwrite tenant filter if the user only has access to his own tenant
+            tenant = ident.getTenant();
+        }
+        return dbManager.getNumberOfJobsSubmittedFromEachPortals(workflowName,
+                                                                 bucketName,
+                                                                 myJobs ? ident.getUsername() : null,
+                                                                 tenant,
+                                                                 startDate,
+                                                                 endDate);
     }
 
     @Override
@@ -2198,6 +2230,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                            startDate,
                                            endDate,
                                            numberOfIntervals);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleRead
+    public Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to get submission mode values");
+        return dbManager.getSubmissionModeValues();
     }
 
     /**

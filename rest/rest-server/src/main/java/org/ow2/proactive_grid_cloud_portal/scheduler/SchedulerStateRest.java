@@ -31,7 +31,7 @@ import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_CON
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_FILE_EXTENSION;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.METADATA_FILE_NAME;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
-import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_SCHEDULER_DEFAULT;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_REST_API;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -368,8 +368,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
             boolean myJobs, boolean pending, boolean running, boolean finished, boolean withIssuesOnly,
-            boolean childJobs, String jobName, String projectName, String bucketName, String userName, String tenant,
-            Long parentId, String sortParams) throws RestException {
+            boolean childJobs, String jobName, String projectName, String bucketName, String submissionMode,
+            String userName, String tenant, Long parentId, String sortParams) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
@@ -400,6 +400,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                          .userName(userName)
                                                                          .tenant(tenant)
                                                                          .bucketName(bucketName)
+                                                                         .submissionMode(submissionMode)
                                                                          .parentId(parentId)
                                                                          .build(),
                                            sortParameterList);
@@ -1850,7 +1851,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     genericInfos = new LinkedHashMap<>();
                 }
                 if (!genericInfos.containsKey(SUBMISSION_MODE)) {
-                    genericInfos.put(SUBMISSION_MODE, SUBMISSION_MODE_SCHEDULER_DEFAULT);
+                    genericInfos.put(SUBMISSION_MODE, SUBMISSION_MODE_REST_API);
                 }
                 WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
                 jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
@@ -2610,11 +2611,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName) throws RestException {
+            @QueryParam("workflowName") String workflowName,
+            @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
-            return mapper.map(scheduler.getFilteredStatistics(workflowName, myJobs, startDate, endDate),
+            return mapper.map(scheduler.getFilteredStatistics(workflowName, bucketName, myJobs, startDate, endDate),
                               FilteredStatisticsData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
@@ -2631,11 +2633,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName) throws RestException {
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName)
+            throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
-            return map(scheduler.getTopWorkflowsWithIssues(numberOfWorkflows, workflowName, myJobs, startDate, endDate),
+            return map(scheduler.getTopWorkflowsWithIssues(numberOfWorkflows,
+                                                           workflowName,
+                                                           bucketName,
+                                                           myJobs,
+                                                           startDate,
+                                                           endDate),
                        FilteredTopWorkflowData.class);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
@@ -2652,12 +2660,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName) throws RestException {
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName)
+            throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getTopWorkflowsCumulatedCoreTime(numberOfWorkflows,
                                                                   workflowName,
+                                                                  bucketName,
                                                                   myJobs,
                                                                   startDate,
                                                                   endDate),
@@ -2677,13 +2687,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName,
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName,
             @QueryParam("inParallel") @DefaultValue("false") boolean inParallel) throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getTopWorkflowsNumberOfNodes(numberOfWorkflows,
                                                               workflowName,
+                                                              bucketName,
                                                               myJobs,
                                                               startDate,
                                                               endDate,
@@ -2704,12 +2715,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName) throws RestException {
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName)
+            throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getTopExecutionTimeWorkflows(numberOfWorkflows,
                                                               workflowName,
+                                                              bucketName,
                                                               myJobs,
                                                               startDate,
                                                               endDate),
@@ -2729,16 +2742,38 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName) throws RestException {
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName)
+            throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getTopPendingTimeWorkflows(numberOfWorkflows,
                                                             workflowName,
+                                                            bucketName,
                                                             myJobs,
                                                             startDate,
                                                             endDate),
                        WorkflowDurationData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
+    @Path("stats/submittedFromCount")
+    @Produces("application/json")
+    @Override
+    public Map<String, Integer> getSubmissionModeCount(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("startdate") @DefaultValue("0") long startDate,
+            @QueryParam("enddate") @DefaultValue("0") long endDate,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName)
+            throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return scheduler.getSubmissionModeCount(workflowName, bucketName, myJobs, startDate, endDate);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }
@@ -2785,6 +2820,20 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler scheduler = checkAccess(sessionId);
             return mapper.map(scheduler.getCompletedTasks(myTasks, taskName, startDate, endDate, numberOfIntervals),
                               CompletedTasksCountData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @GET
+    @Path("submissionModeValues")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Set<String> getSubmissionModeValues(@HeaderParam("sessionid") String sessionId) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return scheduler.getSubmissionModeValues();
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }

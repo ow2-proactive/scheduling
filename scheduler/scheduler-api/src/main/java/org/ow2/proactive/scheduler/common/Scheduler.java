@@ -1654,30 +1654,34 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException;
 
     @RoleRead
-    FilteredStatistics getFilteredStatistics(String workflowName, Boolean myJobs, long startDate, long endDate)
-            throws NotConnectedException, PermissionException;
+    FilteredStatistics getFilteredStatistics(String workflowName, String bucketName, Boolean myJobs, long startDate,
+            long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
-    List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName, Boolean myJobs,
-            long startDate, long endDate) throws NotConnectedException, PermissionException;
+    List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName, String bucketName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
     List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
-            String workflowName, Boolean myJobs, long startDate, long endDate)
+            String workflowName, String bucketName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException;
 
     @RoleRead
     List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows, String workflowName,
-            boolean myJobs, long startDate, long endDate, boolean inParallel)
+            String bucketName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws NotConnectedException, PermissionException;
 
     @RoleRead
-    List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
-            long startDate, long endDate) throws NotConnectedException, PermissionException;
+    List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, String bucketName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
-    List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, Boolean myJobs,
-            long startDate, long endDate) throws NotConnectedException, PermissionException;
+    List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, String bucketName,
+            Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException;
+
+    @RoleRead
+    Map<String, Integer> getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs, long startDate,
+            long endDate) throws NotConnectedException, PermissionException;
 
     @RoleRead
     CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
@@ -1686,6 +1690,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     @RoleRead
     CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
             int numberOfIntervals) throws NotConnectedException, PermissionException;
+
+    @RoleRead
+    Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException;
 
     /**
      * Retrieve a tasks names list from the scheduler.
