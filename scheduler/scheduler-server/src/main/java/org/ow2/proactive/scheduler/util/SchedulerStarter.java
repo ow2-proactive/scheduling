@@ -64,6 +64,7 @@ import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
@@ -214,6 +215,8 @@ public class SchedulerStarter {
         }
 
         LOGGER.info("Activeeon ProActive version " + getSchedulerVersion());
+        // force initialize the property decrypter to avoid conflicts with microservices
+        PropertyDecrypter.encryptData("dummy");
 
         hsqldbServer = new SchedulerHsqldbStarter();
         hsqldbServer.startIfNeeded();
