@@ -1417,6 +1417,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     @Override
     public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
+        boolean sendNotification = false;
         ClientJobState jobState = getClientJobState(notification.getData().getJobId());
         if (jobState != null) {
             try {
@@ -1430,7 +1431,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     case TASK_SKIPPED:
                     case TASK_REPLICATED:
                     case TASK_IN_ERROR_TO_FINISHED:
-                        dispatchTaskStateUpdated(owner, notification);
+                        sendNotification = true;
                         break;
                     case TASK_PROGRESS:
                     case TASK_VISU_ACTIVATED:
@@ -1439,7 +1440,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // already finished.
                         // so if task is not finished, send event
                         if (notification.getData().getFinishedTime() <= 0) {
-                            dispatchTaskStateUpdated(owner, notification);
+                            sendNotification = true;
                         }
                         break;
                     default:
@@ -1449,6 +1450,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             } finally {
                 jobState.writeUnlock();
             }
+        }
+        if (sendNotification) {
+            dispatchTaskStateUpdated(owner, notification);
         }
     }
 
