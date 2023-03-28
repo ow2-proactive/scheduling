@@ -40,12 +40,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.addons.email.exception.EmailException;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -63,6 +65,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.EmailConfiguration;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SendMail;
+import org.ow2.proactive.utils.PAExecutors;
 
 import com.google.common.io.Files;
 
@@ -85,18 +88,18 @@ public class JobEmailNotification {
 
     private SendMail sender;
 
-    private final ExecutorService asyncMailSender;
+    private static ExecutorService asyncMailSender;
 
     private SchedulerDBManager dbManager = null;
 
     private JobInfo jobInfo;
 
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification, SendMail sender) {
-        this.asyncMailSender = Executors.newCachedThreadPool();
         this.jobState = js;
         this.eventType = notification.getEventType();
         this.sender = sender;
         this.jobInfo = notification.getData();
+        initAsyncMailSender();
     }
 
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification) {
@@ -106,6 +109,18 @@ public class JobEmailNotification {
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification, SchedulerDBManager dbManager) {
         this(js, notification);
         this.dbManager = dbManager;
+    }
+
+    private static synchronized void initAsyncMailSender() {
+        if (asyncMailSender == null) {
+            asyncMailSender = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                     PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
+                                                                     120L,
+                                                                     TimeUnit.SECONDS,
+                                                                     new NamedThreadFactory("JobEmailNotification",
+                                                                                            true,
+                                                                                            2));
+        }
     }
 
     public boolean doCheckAndSend(boolean withAttachment)
@@ -250,7 +265,7 @@ public class JobEmailNotification {
             try {
                 boolean sent = doCheckAndSend(withAttachment);
                 if (sent) {
-                    jlogger.info(jobState.getId(), "sent notification email for finished job to " + getTo());
+                    jlogger.info(jobState.getId(), "sent notification email to " + getTo());
                 }
             } catch (JobEmailNotificationException e) {
                 jlogger.warn(jobState.getId(),
