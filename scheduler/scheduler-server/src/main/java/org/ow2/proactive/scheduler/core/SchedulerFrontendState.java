@@ -1387,6 +1387,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             schedulerState.update(storedJobState);
         });
         dispatchJobSubmitted(job);
+        if (PASchedulerProperties.EMAIL_NOTIFICATIONS_ENABLED.getValueAsBoolean()) {
+            new JobEmailNotification(job,
+                                     new NotificationData<>(SchedulerEvent.JOB_SUBMITTED, job.getJobInfo()),
+                                     dbManager).checkAndSendAsync(false);
+        }
     }
 
     @Override
@@ -1445,7 +1450,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                                         notification.getEventType());
                             return;
                     }
-                    new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
+                    if (PASchedulerProperties.EMAIL_NOTIFICATIONS_ENABLED.getValueAsBoolean()) {
+                        new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
+                    }
                 } finally {
                     js.writeUnlock();
                 }
