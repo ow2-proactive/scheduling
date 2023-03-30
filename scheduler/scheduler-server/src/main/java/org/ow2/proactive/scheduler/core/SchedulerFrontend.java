@@ -1919,13 +1919,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
         if (checkJobPermissionMethod(jobid, "enableRemoteVisualization")) {
             try {
-                JobInfo jobInfoState = frontendState.getJobState(jobInfo.getJobId()).getJobInfo();
+                JobInfo jobInfoState = frontendState.getJobInfo(jobInfo.getJobId());
                 jobInfo.setVisualizationConnectionStrings(jobInfoState.getVisualizationConnectionStrings());
                 jobInfo.setVisualizationIcons(jobInfoState.getVisualizationIcons());
-            } catch (PermissionException e) {
-                logger.debug("Could not add visualization info for job " + jobInfo.getJobId(), e);
-            } catch (UnknownJobException | NotConnectedException e1) {
-                logger.warn("Could not add visualization info for job " + jobInfo.getJobId(), e1);
+            } catch (UnknownJobException e) {
+                logger.warn("Could not add visualization info for job " + jobInfo.getJobId(), e);
             }
         }
         return jobInfo;

@@ -887,6 +887,28 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         });
     }
 
+    JobInfo getJobInfo(JobId jobId) throws UnknownJobException {
+        return Lambda.withLock(stateReadLock, () -> {
+            ClientJobState jobState = getClientJobState(jobId);
+            if (jobState == null) {
+                throw new UnknownJobException(jobId);
+            }
+            JobInfo jobInfoCopy;
+            try {
+                jobState.readLock();
+                try {
+                    jobInfoCopy = (JobInfo) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(jobState.getJobInfo());
+                } catch (Exception e) {
+                    logger.error("Error when copying job state", e);
+                    throw new IllegalStateException(e);
+                }
+            } finally {
+                jobState.readUnlock();
+            }
+            return jobInfoCopy;
+        });
+    }
+
     JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
