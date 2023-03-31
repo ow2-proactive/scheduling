@@ -2611,8 +2611,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("startdate") @DefaultValue("0") long startDate,
             @QueryParam("enddate") @DefaultValue("0") long endDate,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-            @QueryParam("workflowName") String workflowName,
-            @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException {
+            @QueryParam("workflowName") String workflowName, @QueryParam("bucketName") String bucketName)
+            throws RestException {
 
         try {
             Scheduler scheduler = checkAccess(sessionId);
