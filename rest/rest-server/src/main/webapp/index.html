@@ -47,15 +47,6 @@
         <small>&copy; 2007-<div id="current-year"></div>, Activeeon, All rights reserved</small>
     </div>
 </div>
-<script>
-    var url = document.location.href;
-    url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
-    url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
-    url = url.substring(0, url.lastIndexOf("/"));
-    var restApiEndpoint = url;
-    document.getElementById('restUrlCli').innerHTML = restApiEndpoint;
-    var date = document.getElementById("current-year");
-    date.innerText = (new Date()).getFullYear();
-</script>
+<script src="assets/js/sanitizeUrl.js"></script>
 </body>
 </html>
