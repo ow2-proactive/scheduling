@@ -373,6 +373,16 @@ public class JettyStarter {
                     if (!WebProperties.WEB_REFERRER_POLICY.getValueAsString().isEmpty()) {
                         response.setHeader("Referrer-Policy", WebProperties.WEB_REFERRER_POLICY.getValueAsString());
                     }
+                    if (WebProperties.WEB_CONTENT_SECURITY_POLICY.isSet() &&
+                        !WebProperties.WEB_CONTENT_SECURITY_POLICY.getValueAsString().isEmpty()) {
+                        response.setHeader("Content-Security-Policy",
+                                           WebProperties.WEB_CONTENT_SECURITY_POLICY.getValueAsString());
+                    }
+                    if (WebProperties.WEB_CONTENT_SECURITY_POLICY_REPORT_ONLY.isSet() &&
+                        !WebProperties.WEB_CONTENT_SECURITY_POLICY_REPORT_ONLY.getValueAsString().isEmpty()) {
+                        response.setHeader("Content-Security-Policy-Report-Only",
+                                           WebProperties.WEB_CONTENT_SECURITY_POLICY_REPORT_ONLY.getValueAsString());
+                    }
                 }
                 return null;
             }
