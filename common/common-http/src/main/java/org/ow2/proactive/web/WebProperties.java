@@ -126,6 +126,10 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_REFERRER_POLICY("web.referrer_policy", PropertyType.STRING, "strict-origin-when-cross-origin"),
 
+    WEB_CONTENT_SECURITY_POLICY("web.content.security.policy", PropertyType.STRING),
+
+    WEB_CONTENT_SECURITY_POLICY_REPORT_ONLY("web.content.security.policy.report.only", PropertyType.STRING),
+
     WEB_PCA_PROXY_REWRITE_ENABLED("web.pca.proxy.rewrite.enabled", PropertyType.BOOLEAN, "true"),
 
     WEB_PCA_PROXY_REWRITE_REFERER_CACHE_SIZE("web.pca.proxy.rewrite.referer.cache.size", PropertyType.INTEGER, "10000"),
