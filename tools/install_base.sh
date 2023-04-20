@@ -196,7 +196,7 @@ init_and_ignores()
     cd "$PA_DIR"
     git init
     # necessary for recent git versions
-    git config --global --add safe-directory "$PA_DIR" || true
+    git config --system --add safe.directory '*' || true
     git config user.email "support@activeeon.com"
     git config user.name "proactive"
     echo '
@@ -659,6 +659,9 @@ if which git > /dev/null 2>&1; then
         if confirm "Do you want to port all configuration changes to the new version (do not do this from a version prior to 8.4.0 before executing the patch)? [Y/n] " ; then
             echo  "Porting configuration into new installation..."
             echo ""
+
+            # copy custom logo
+            /bin/cp $OLD_PADIR/dist/war/getstarted/assets/image/custom-logo.png $PA_ROOT/default/dist/war/getstarted/assets/image/
 
             OLD_PADIR_NAME="$(basename "$OLD_PADIR")"
 
