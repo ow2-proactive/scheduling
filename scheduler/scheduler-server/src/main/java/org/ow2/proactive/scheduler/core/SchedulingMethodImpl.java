@@ -637,9 +637,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     criteria.setAcceptableNodesUrls(freeResources);
                 }
                 criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0, schedulingService));
-                if (internalTask0.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
-                    criteria.setNodeAccessToken(internalTask0.getRuntimeGenericInformation()
-                                                             .get(SchedulerConstants.NODE_ACCESS_TOKEN));
+                Map<String, String> runtimeGenericInfo = internalTask0.getRuntimeGenericInformation();
+                if (runtimeGenericInfo.containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
+                    criteria.setNodeAccessToken(runtimeGenericInfo.get(SchedulerConstants.NODE_ACCESS_TOKEN));
+                }
+                if (runtimeGenericInfo.containsKey(SchedulerConstants.NODE_SOURCE_GENERIC_INFO)) {
+                    criteria.setNodeSourceRestriction(runtimeGenericInfo.get(SchedulerConstants.NODE_SOURCE_GENERIC_INFO));
                 }
 
                 Collection<String> computationDescriptors = new ArrayList<>(tasksToSchedule.size());
