@@ -134,18 +134,28 @@ public class SchedulingTaskComparator {
         //if the parallel environment is specified for any of tasks => not equal
         boolean isParallel = task.isParallel() || tcomp.task.isParallel();
 
-        String tokenA = task.getRuntimeGenericInformation().get(SchedulerConstants.NODE_ACCESS_TOKEN);
-        String tokenB = tcomp.task.getRuntimeGenericInformation().get(SchedulerConstants.NODE_ACCESS_TOKEN);
+        Map<String, String> taskGenericInfoA = task.getRuntimeGenericInformation();
+        Map<String, String> taskGenericInfoB = tcomp.task.getRuntimeGenericInformation();
+
+        String tokenA = taskGenericInfoA.get(SchedulerConstants.NODE_ACCESS_TOKEN);
+        String tokenB = taskGenericInfoB.get(SchedulerConstants.NODE_ACCESS_TOKEN);
 
         boolean sameToken = (Strings.isNullOrEmpty(tokenA) && Strings.isNullOrEmpty(tokenB)) ||
                             (!Strings.isNullOrEmpty(tokenA) && !Strings.isNullOrEmpty(tokenB) && tokenA.equals(tokenB));
+
+        String nsA = taskGenericInfoA.get(SchedulerConstants.NODE_SOURCE_GENERIC_INFO);
+        String nsB = taskGenericInfoB.get(SchedulerConstants.NODE_SOURCE_GENERIC_INFO);
+
+        boolean sameNodeSourceGI = (Strings.isNullOrEmpty(nsA) && Strings.isNullOrEmpty(nsB)) ||
+                                   (!Strings.isNullOrEmpty(nsA) && !Strings.isNullOrEmpty(nsB) &&
+                                    nsA.equalsIgnoreCase(nsB));
 
         // if topology is specified for any of task => not equal
         // for now topology is allowed only for parallel tasks which is
         // checked before
 
         //add the 6 tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && !isParallel && sameToken;
+        return sameSsHash && sameNodeEx && sameOwner && !isParallel && sameToken && sameNodeSourceGI;
     }
 
 }

@@ -60,6 +60,8 @@ import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.PAExecutors;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
 
+import com.google.common.base.Strings;
+
 
 /**
  * An interface of selection manager which is responsible for nodes selection
@@ -537,8 +539,7 @@ public abstract class SelectionManager {
         NodeSet exclusion = criteria.getBlackList();
 
         // Is a token specified at the task level ?
-        boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
-                                         !criteria.getNodeAccessToken().isEmpty();
+        boolean nodeWithTokenRequested = !Strings.isNullOrEmpty(criteria.getNodeAccessToken());
 
         // If yes, add it to the client Principals list as TokenPrincipal object
         TokenPrincipal tokenPrincipal = null;
@@ -553,6 +554,12 @@ public abstract class SelectionManager {
         List<RMNode> filteredList = new ArrayList<>();
         HashSet<Permission> clientPermissions = new HashSet<>();
         for (RMNode node : freeNodes) {
+            if (!Strings.isNullOrEmpty(criteria.getNodeSourceRestriction()) &&
+                !node.getNodeSource().getName().equalsIgnoreCase(criteria.getNodeSourceRestriction())) {
+                logger.debug("Node " + node.getNodeURL() + " does not belong to node source " +
+                             criteria.getNodeSourceRestriction());
+                continue;
+            }
             try {
                 if (node.isProtectedByToken() && !nodeWithTokenRequested && !isClientNodeUserAllPermission(client)) {
                     logger.debug("Node " + node.getNodeURL() + " is protected by token");

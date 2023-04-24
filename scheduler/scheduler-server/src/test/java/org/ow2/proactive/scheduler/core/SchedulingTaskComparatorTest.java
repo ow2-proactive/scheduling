@@ -208,4 +208,53 @@ public class SchedulingTaskComparatorTest extends ProActiveTestClean {
                                                                                                     null)));
     }
 
+    @Test
+    public void testAnyRequiresNodeSource() throws Exception {
+        // no NS on both
+        Mockito.when(task1.getRuntimeGenericInformation()).thenReturn(new HashMap<>());
+        Mockito.when(task2.getRuntimeGenericInformation()).thenReturn(new HashMap<>());
+        Assert.assertTrue((new SchedulingTaskComparator(task1, job1, null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                                job2,
+                                                                                                                null)));
+
+        // same NS on both
+        Mockito.when(task1.getRuntimeGenericInformation())
+               .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_SOURCE_GENERIC_INFO, "NS1"));
+        Mockito.when(task2.getRuntimeGenericInformation())
+               .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_SOURCE_GENERIC_INFO, "NS1"));
+        Assert.assertTrue((new SchedulingTaskComparator(task1, job1, null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                                job2,
+                                                                                                                null)));
+
+        // different tokens
+        Mockito.when(task1.getRuntimeGenericInformation())
+               .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_SOURCE_GENERIC_INFO, "NS1"));
+        Mockito.when(task2.getRuntimeGenericInformation())
+               .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_SOURCE_GENERIC_INFO, "NS2"));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
+
+        // one token only
+        Mockito.when(task1.getRuntimeGenericInformation())
+               .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_SOURCE_GENERIC_INFO, "NS1"));
+        Mockito.when(task2.getRuntimeGenericInformation()).thenReturn(new HashMap<>());
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
+
+        Mockito.when(task1.getRuntimeGenericInformation()).thenReturn(new HashMap<>());
+        Mockito.when(task2.getRuntimeGenericInformation())
+               .thenReturn(ImmutableMap.of(SchedulerConstants.NODE_SOURCE_GENERIC_INFO, "NS2"));
+        Assert.assertFalse((new SchedulingTaskComparator(task1,
+                                                         job1,
+                                                         null)).equals(new SchedulingTaskComparator(task2,
+                                                                                                    job2,
+                                                                                                    null)));
+    }
+
 }
