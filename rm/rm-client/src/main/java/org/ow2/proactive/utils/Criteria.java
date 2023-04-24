@@ -73,6 +73,9 @@ public class Criteria implements Serializable {
     // token for accessing nodes
     private String nodeAccessToken;
 
+    // restrict nodes to a specific node source
+    private String nodeSourceRestriction;
+
     // optional set of nodes urls which are acceptable
     private Set<String> setOfAcceptableNodesUrls;
 
@@ -218,6 +221,23 @@ public class Criteria implements Serializable {
      */
     public void setNodeAccessToken(String nodeAccessToken) {
         this.nodeAccessToken = nodeAccessToken;
+    }
+
+    /**
+     * If a node source is specified, the resource manager only looks for nodes which belong to the specified node source
+     * @return nodeSourceRestriction
+     */
+    public String getNodeSourceRestriction() {
+        return nodeSourceRestriction;
+    }
+
+    /**
+     * If a node source is specified, the resource manager only looks for nodes which belong to the specified node source
+     *
+     * @param nodeSourceRestriction
+     */
+    public void setNodeSourceRestriction(String nodeSourceRestriction) {
+        this.nodeSourceRestriction = nodeSourceRestriction;
     }
 
     public List<Map<String, String>> getListUsageInfo() {

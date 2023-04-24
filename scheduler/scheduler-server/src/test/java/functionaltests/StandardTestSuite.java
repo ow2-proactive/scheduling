@@ -118,6 +118,7 @@ import functionaltests.rm.TestRMProxy;
 import functionaltests.rm.TestRMProxyRebind;
 import functionaltests.rm.TestRMReconnectionWhileRunning;
 import functionaltests.rm.nodesource.TestJobNodeAccessToken;
+import functionaltests.rm.nodesource.TestJobNodeSourceGenericInfo;
 import functionaltests.runasme.TestRunAsMeLinuxKey;
 import functionaltests.runasme.TestRunAsMeLinuxNone;
 import functionaltests.runasme.TestRunAsMeLinuxPwd;
@@ -209,11 +210,11 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestGlobalSpace.class, TestJobAborted.class, TestJobCanceledWithReplication.class,
                       TestJobCanceledWithReplicationSchema33.class, TestJobCleaningScriptVariables.class,
                       TestJobCoverage.class, TestJobDataspaceSubmission.class, TestJobMultiNodesWalltime.class,
-                      TestJobNativeSubmission.class, TestJobNodeAccessToken.class, TestJobRemoved.class,
-                      TestJobSchedulerHome.class, TestJobSelScriptSubmission.class, TestJobSelScriptVariables.class,
-                      TestJobServerLogs.class, TestJobWalltime.class, TestJobWithInvalidSelectionScript.class,
-                      TestKilledJobResult.class, TestLoadJobs.class, TestLoggers.class,
-                      TestVariablesPatternLateBindings.class, TestModifyPropagatedVariables.class,
+                      TestJobNativeSubmission.class, TestJobNodeAccessToken.class, TestJobNodeSourceGenericInfo.class,
+                      TestJobRemoved.class, TestJobSchedulerHome.class, TestJobSelScriptSubmission.class,
+                      TestJobSelScriptVariables.class, TestJobServerLogs.class, TestJobWalltime.class,
+                      TestJobWithInvalidSelectionScript.class, TestKilledJobResult.class, TestLoadJobs.class,
+                      TestLoggers.class, TestVariablesPatternLateBindings.class, TestModifyPropagatedVariables.class,
                       TestMultipleHostsRequest.class, TestNativeTaskPaths.class, TestPauseJob.class,
                       TestPauseResumeMany.class, TestResumeJob.class, TestPreciousLogs.class,
                       TestPropagatedVariables.class, TestPropagatedVariablesWalltime.class,
