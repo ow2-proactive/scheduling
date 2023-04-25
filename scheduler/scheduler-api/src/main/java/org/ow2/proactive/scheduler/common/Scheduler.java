@@ -1653,44 +1653,186 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     @RoleAdmin
     List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves an object containing jobs count-by-state and statistics based on the given filters
+     *
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @return an object containing jobs count-by-state based on the given filters
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     FilteredStatistics getFilteredStatistics(String workflowName, String bucketName, Boolean myJobs, long startDate,
             long endDate) throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves an object containing the top workflows with issues based on the given filters
+     *
+     * @param numberOfWorkflows number of workflows to show
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @return an object containing the top workflows with issues
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     List<FilteredTopWorkflow> getTopWorkflowsWithIssues(int numberOfWorkflows, String workflowName, String bucketName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves an object containing the top workflows that consumes the most CPU
+     *
+     * @param numberOfWorkflows number of workflows to show
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @return an object containing the top workflows that consumes the most CPU
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     List<FilteredTopWorkflowsCumulatedCoreTime> getTopWorkflowsCumulatedCoreTime(int numberOfWorkflows,
             String workflowName, String bucketName, Boolean myJobs, long startDate, long endDate)
             throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves an object containing the top workflows that use most nodes
+     *
+     * @param numberOfWorkflows number of workflows to show
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @param inParallel if true, returns the maximum number of nodes used in parallel instead of the total number of nodes
+     * @return an object containing the top workflows that use most nodes
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     List<FilteredTopWorkflowsNumberOfNodes> getTopWorkflowsNumberOfNodes(int numberOfWorkflows, String workflowName,
             String bucketName, boolean myJobs, long startDate, long endDate, boolean inParallel)
             throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves an object containing the top workflows with the longest execution time based on the given filters
+     *
+     * @param numberOfWorkflows number of workflows to show
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @return an object containing the top workflows with the longest execution time based on the given filters
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     List<WorkflowDuration> getTopExecutionTimeWorkflows(int numberOfWorkflows, String workflowName, String bucketName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves an object containing the top workflows with the longest pending time based on the given filters
+     *
+     * @param numberOfWorkflows number of workflows to show
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs
+     * @return an object containing the top workflows with the longest pending time based on the given filters
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     List<WorkflowDuration> getTopPendingTimeWorkflows(int numberOfWorkflows, String workflowName, String bucketName,
             Boolean myJobs, long startDate, long endDate) throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves a map containing the number of jobs submitted from each portal
+     *
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param startDate start date of the jobs
+     * @param endDate end date of the jobs
+     * @return a map containing the number of jobs submitted from each portal
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     Map<String, Integer> getSubmissionModeCount(String workflowName, String bucketName, Boolean myJobs, long startDate,
             long endDate) throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves an object containing a map of number of finished jobs with issues by time interval and a map of number of finished jobs without issues by time interval
+     *
+     * @param myJobs fetch only the jobs owned by the user making the request
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
+     * @param startDate start date of the filtered jobs
+     * @param endDate end date of the filtered jobs, default value represents the current date
+     * @param numberOfIntervals number of time intervals
+     * @return an object containing a map of number of finished jobs
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     CompletedJobsCount getCompletedJobs(Boolean myJobs, String workflowName, String bucketName, long startDate,
             long endDate, int numberOfIntervals) throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves an object containing a map of number of completed tasks with issues by time interval and a map of number of finished tasks without issues by time interval
+     *
+     * @param myTasks fetch only the tasks owned by the user making the request
+     * @param taskName the task name of the filtered tasks
+     * @param startDate start date of the filtered tasks
+     * @param endDate end date of the filtered tasks, default value represents the current date
+     * @param numberOfIntervals number of time intervals
+     * @return an object containing a map of number of completed tasks
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     CompletedTasksCount getCompletedTasks(Boolean myTasks, String taskName, long startDate, long endDate,
             int numberOfIntervals) throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieves all the submissionMode values stored in the database
+     *
+     * @return a set of submissionMode values
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
     @RoleRead
     Set<String> getSubmissionModeValues() throws NotConnectedException, PermissionException;
 
