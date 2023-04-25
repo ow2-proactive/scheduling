@@ -1244,10 +1244,10 @@ public class SchedulerDBManager {
             query.setMaxResults(numberOfWorkflows);
         }
         if (hasWorkflowName) {
-            query.setParameter("workflowName", workflowName);
+            query.setParameter("workflowName", "%" + workflowName + "%");
         }
         if (hasBucketName) {
-            query.setParameter("bucketName", bucketName);
+            query.setParameter("bucketName", "%" + bucketName + "%");
         }
         if (hasUser) {
             query.setParameter("user", user);
