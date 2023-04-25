@@ -2100,7 +2100,8 @@ public interface SchedulerRestInterface {
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
-     * @param workflowName the workflow name of the filtered jobs
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
      * @return {@link FilteredStatisticsData}
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2122,7 +2123,8 @@ public interface SchedulerRestInterface {
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
-     * @param workflowName the workflow name of the filtered jobs
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
      * @return {@link FilteredTopWorkflowData}
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2145,8 +2147,8 @@ public interface SchedulerRestInterface {
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
-     * @param workflowName the workflow name of the filtered jobs
-     * @param bucketName the bucket name of the filtered jobs
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
      * @return {@link FilteredTopWorkflowsCumulatedCoreTimeData}
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2169,7 +2171,8 @@ public interface SchedulerRestInterface {
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
-     * @param workflowName the workflow name of the filtered jobs
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
      * @param inParallel if true, returns the maximum number of nodes used in parallel instead of the total number of nodes
      * @return {@link FilteredTopWorkflowsNumberOfNodesData}
      * @throws RestException if an error occurs or the session is invalid
@@ -2194,7 +2197,8 @@ public interface SchedulerRestInterface {
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
-     * @param workflowName the workflow name of the filtered jobs
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
      * @return {@link WorkflowDurationData}
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2217,7 +2221,8 @@ public interface SchedulerRestInterface {
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs
-     * @param workflowName the workflow name of the filtered jobs
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
      * @return {@link WorkflowDurationData}
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2233,14 +2238,14 @@ public interface SchedulerRestInterface {
             @QueryParam("bucketName") @DefaultValue("null") String bucketName) throws RestException;
 
     /**
-     * Returns an object containing the number of jobs submitted from each portal
+     * Returns a map containing the number of jobs submitted from each portal
      *
      * @param sessionId id of a session
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param startDate start date of the jobs
      * @param endDate end date of the jobs
-     * @param workflowName the workflow name of the jobs
-     * @param bucketName the bucket name of the filtered jobs
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
      * @return a map
      * @throws RestException if an error occurs or the session is invalid
      */
@@ -2259,8 +2264,8 @@ public interface SchedulerRestInterface {
      *
      * @param sessionId id of a session
      * @param myJobs fetch only the jobs owned by the user making the request
-     * @param workflowName the workflow name of the filtered jobs
-     * @param bucketName the bucket name of the filtered jobs
+     * @param workflowName filter job by workflow name (or part of its name)
+     * @param bucketName filter job by bucket name (or part of its name)
      * @param startDate start date of the filtered jobs
      * @param endDate end date of the filtered jobs, default value represents the current date
      * @param numberOfIntervals number of time intervals
