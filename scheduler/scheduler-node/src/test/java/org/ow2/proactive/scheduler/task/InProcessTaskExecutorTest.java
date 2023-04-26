@@ -113,6 +113,35 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
     }
 
     @Test
+    public void postScriptAsResult() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setPreScript(new SimpleScript("println('pre')", "groovy"));
+        initializer.setPostScript(new SimpleScript("println('post'); result = result + ' world'", "groovy"));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
+
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("println('hello'); java.lang.Thread.sleep(5); result='hello'",
+                                                                                                                                                  "groovy"))),
+                                                                                    initializer,
+                                                                                    null,
+                                                                                    new NodeDataSpacesURIs("",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           ""),
+                                                                                    "",
+                                                                                    new NodeInfo("", "", "", "")),
+                                                                    taskOutput.outputStream,
+                                                                    taskOutput.error);
+
+        assertEquals(String.format("pre%nhello%npost%n"), taskOutput.output());
+        assertEquals("hello world", result.value());
+        assertTrue("Task duration should be at least 5", result.getTaskDuration() >= 5);
+    }
+
+    @Test
     public void storePreScriptAbsolute() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 

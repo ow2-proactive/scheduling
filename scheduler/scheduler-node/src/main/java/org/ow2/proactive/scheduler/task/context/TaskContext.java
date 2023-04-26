@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.ClasspathUtils;
 
 
@@ -129,7 +130,7 @@ public class TaskContext implements Serializable {
         return initializer.getPreScript();
     }
 
-    public Script<?> getPostScript() {
+    public TaskScript getPostScript() {
         return initializer.getPostScript();
     }
 

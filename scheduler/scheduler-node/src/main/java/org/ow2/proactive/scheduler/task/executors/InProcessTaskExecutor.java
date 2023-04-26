@@ -342,11 +342,14 @@ public class InProcessTaskExecutor implements TaskExecutor {
             } catch (Throwable throwable) {
                 scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, throwable);
             }
-            ScriptResult postScriptResult = scriptHandler.handle(taskContext.getPostScript(), output, error);
+            ScriptResult<Serializable> postScriptResult = scriptHandler.handle(taskContext.getPostScript(),
+                                                                               output,
+                                                                               error);
             if (postScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute post script: " +
                                         postScriptResult.getException().getMessage(), postScriptResult.getException());
             }
+            return postScriptResult.getResult();
         }
         return scriptResult.getResult();
     }
