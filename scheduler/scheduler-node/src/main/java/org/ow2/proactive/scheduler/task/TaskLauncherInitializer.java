@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.signal.SignalApi;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -67,7 +68,7 @@ public class TaskLauncherInitializer implements Serializable {
     private Script<?> pre;
 
     /** The script executed after the task */
-    private Script<?> post;
+    private TaskScript post;
 
     /** The script executed after the task */
     private FlowScript flowScript;
@@ -175,7 +176,7 @@ public class TaskLauncherInitializer implements Serializable {
      *
      * @return the post-script
      */
-    public Script<?> getPostScript() {
+    public TaskScript getPostScript() {
         return post;
     }
 
@@ -218,7 +219,7 @@ public class TaskLauncherInitializer implements Serializable {
      * @param post the post-script to set
      */
     public void setPostScript(Script<?> post) {
-        this.post = new SimpleScript(post);
+        this.post = new TaskScript(post);
     }
 
     /**
