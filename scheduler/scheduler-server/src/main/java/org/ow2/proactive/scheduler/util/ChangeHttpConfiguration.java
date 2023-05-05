@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.OperatingSystem;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.web.WebProperties;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 import com.google.common.base.Strings;
 
@@ -61,6 +62,12 @@ public class ChangeHttpConfiguration {
     public static final String HOSTNAME_OPTION = "H";
 
     public static final String HOSTNAME_OPTION_NAME = "hostname";
+
+    public static final String PUBLIC_SCHEME_OPTION_NAME = "public-scheme";
+
+    public static final String PUBLIC_HOSTNAME_OPTION_NAME = "public-hostname";
+
+    public static final String PUBLIC_PORT_OPTION_NAME = "public-port";
 
     public static final String PORT_OPTION = "P";
 
@@ -98,6 +105,16 @@ public class ChangeHttpConfiguration {
 
     private static String configuredHostname = null;
 
+    private static boolean publicUrlConfigured = false;
+
+    private static String configuredPublicScheme = null;
+
+    private static String configuredPublicHostname = null;
+
+    private static String configuredPublicPort = null;
+
+    private static String configuredPublicUrl = null;
+
     /**
      * Entry point
      *
@@ -109,7 +126,8 @@ public class ChangeHttpConfiguration {
         try {
             if (changeHttpConfiguration(args)) {
                 log("Applied configuration: scheme=" + (isHttps ? "https" : "http") + " hostname=" +
-                    configuredHostname + " port=" + port);
+                    configuredHostname + " port=" + port +
+                    (publicUrlConfigured ? " publicUrl=" + configuredPublicUrl : ""));
                 switch (OperatingSystem.resolveOrError(System.getProperty("os.name")).getFamily()) {
                     case LINUX:
                     case UNIX:
@@ -163,12 +181,31 @@ public class ChangeHttpConfiguration {
             }
         }
 
+        if (cmd.hasOption(PUBLIC_SCHEME_OPTION_NAME)) {
+            configuredPublicScheme = cmd.getOptionValue(PUBLIC_SCHEME_OPTION_NAME).trim();
+            if (!"http".equals(configuredPublicScheme) && !"https".equals(configuredPublicScheme)) {
+                exitWithErrorMessage(PUBLIC_SCHEME_OPTION_NAME + " must be either http or https.", null, null);
+            }
+        }
+
         if (cmd.hasOption(HOSTNAME_OPTION_NAME)) {
             hostname = cmd.getOptionValue(HOSTNAME_OPTION_NAME).trim();
             Matcher hostnameMatcher = hostnamePattern.matcher(hostname);
             Matcher ipMatcher = ipPattern.matcher(hostname);
             if (!hostnameMatcher.find() && !ipMatcher.find()) {
                 exitWithErrorMessage(HOSTNAME_OPTION_NAME + " must be either a valid hostname or ip address.",
+                                     null,
+                                     null);
+            }
+
+        }
+
+        if (cmd.hasOption(PUBLIC_HOSTNAME_OPTION_NAME)) {
+            configuredPublicHostname = cmd.getOptionValue(PUBLIC_HOSTNAME_OPTION_NAME).trim();
+            Matcher hostnameMatcher = hostnamePattern.matcher(configuredPublicHostname);
+            Matcher ipMatcher = ipPattern.matcher(configuredPublicHostname);
+            if (!hostnameMatcher.find() && !ipMatcher.find()) {
+                exitWithErrorMessage(PUBLIC_HOSTNAME_OPTION_NAME + " must be either a valid hostname or ip address.",
                                      null,
                                      null);
             }
@@ -190,8 +227,35 @@ public class ChangeHttpConfiguration {
             }
         }
 
+        if (cmd.hasOption(PUBLIC_PORT_OPTION_NAME)) {
+            configuredPublicPort = cmd.getOptionValue(PUBLIC_PORT_OPTION_NAME).trim();
+            try {
+                int portValue = Integer.parseInt(configuredPublicPort);
+                if (portValue < 0 || portValue > 65353) {
+                    throw new IllegalArgumentException();
+                }
+            } catch (Exception e) {
+                exitWithErrorMessage(PUBLIC_PORT_OPTION_NAME + " must be a valid port value.", null, null);
+            }
+        }
+
         if (cmd.hasOption(DEBUG_OPTION_NAME)) {
             isDebug = true;
+        }
+
+        if (!Strings.isNullOrEmpty(configuredPublicScheme) || !Strings.isNullOrEmpty(configuredPublicHostname) ||
+            !Strings.isNullOrEmpty(configuredPublicPort)) {
+            if (Strings.isNullOrEmpty(configuredPublicScheme) || Strings.isNullOrEmpty(configuredPublicHostname) ||
+                Strings.isNullOrEmpty(configuredPublicPort)) {
+                exitWithErrorMessage("When either " + PUBLIC_SCHEME_OPTION_NAME + ", " + PUBLIC_HOSTNAME_OPTION_NAME +
+                                     " or " + PUBLIC_PORT_OPTION_NAME +
+                                     " is configured, all three options must be configured.", null, null);
+            } else {
+                publicUrlConfigured = true;
+                configuredPublicUrl = configuredPublicScheme + "://" + configuredPublicHostname + ":" +
+                                      configuredPublicPort;
+            }
+
         }
 
         if (Strings.isNullOrEmpty(scheme) && Strings.isNullOrEmpty(hostname) && Strings.isNullOrEmpty(port)) {
@@ -201,6 +265,10 @@ public class ChangeHttpConfiguration {
         setCurrentConfiguration(scheme, port);
         // update the config/web/settings.ini file
         changeWebPropertiesConfiguration();
+        if (publicUrlConfigured) {
+            // update the config/scheduler/settings.ini file
+            changeSchedulerPropertiesConfiguration();
+        }
         // update all application.properties files in dist/war
         changeAllApplicationPropertiesConfiguration(hostname);
         return true;
@@ -221,9 +289,19 @@ public class ChangeHttpConfiguration {
         opt = new Option(SCHEME_OPTION,
                          SCHEME_OPTION_NAME,
                          false,
-                         "Http protocol to use (http or https). When this option is not provided, the currently configured scheme will remain unchanged.");
+                         "Http protocol to use (http or https). When this option is not provided, the currently configured protocol will remain unchanged.");
         opt.setRequired(false);
         opt.setArgName(SCHEME_OPTION_NAME.toUpperCase());
+        opt.setArgs(1);
+        options.addOption(opt);
+
+        opt = new Option(null,
+                         PUBLIC_SCHEME_OPTION_NAME,
+                         false,
+                         "Public protocol used (http or https). This setting should be used when the ProActive server is deployed behind a reverse proxy or inside a cloud instance. This option must be defined when any of " +
+                                PUBLIC_HOSTNAME_OPTION_NAME + " or " + PUBLIC_PORT_OPTION_NAME + " is set.");
+        opt.setRequired(false);
+        opt.setArgName(PUBLIC_SCHEME_OPTION_NAME.toUpperCase());
         opt.setArgs(1);
         options.addOption(opt);
 
@@ -236,12 +314,32 @@ public class ChangeHttpConfiguration {
         opt.setArgs(1);
         options.addOption(opt);
 
+        opt = new Option(null,
+                         PUBLIC_HOSTNAME_OPTION_NAME,
+                         true,
+                         "Public Hostname used (e.g. myserver.mydomain) or IP address (e.g. 192.168.12.1). This setting should be used when the ProActive server is deployed behind a reverse proxy or inside a cloud instance. This option must be defined when any of " +
+                               PUBLIC_SCHEME_OPTION_NAME + " or " + PUBLIC_PORT_OPTION_NAME + " is set.");
+        opt.setRequired(false);
+        opt.setArgName(PUBLIC_HOSTNAME_OPTION_NAME.toUpperCase());
+        opt.setArgs(1);
+        options.addOption(opt);
+
         opt = new Option(PORT_OPTION,
                          PORT_OPTION_NAME,
                          true,
                          "Port used (e.g. 8080, 8443). When this option is not provided, the port configured for the current scheme (http or https) will be used.");
         opt.setRequired(false);
         opt.setArgName(PORT_OPTION_NAME.toUpperCase());
+        opt.setArgs(1);
+        options.addOption(opt);
+
+        opt = new Option(null,
+                         PUBLIC_PORT_OPTION_NAME,
+                         true,
+                         "Public port used (e.g. 8080, 8443). This setting should be used when the ProActive server is deployed behind a reverse proxy or inside a cloud instance. This option must be defined when any of " +
+                               PUBLIC_SCHEME_OPTION_NAME + " or " + PUBLIC_HOSTNAME_OPTION_NAME + " is set.");
+        opt.setRequired(false);
+        opt.setArgName(PUBLIC_PORT_OPTION_NAME.toUpperCase());
         opt.setArgs(1);
         options.addOption(opt);
 
@@ -273,6 +371,9 @@ public class ChangeHttpConfiguration {
         footer += "configure-http -S https -P 8444 -d" + newline;
         footer += "# Configure scheme to http with default port and specific hostname" + newline;
         footer += "configure-http -S http -H myserver" + newline;
+        footer += "# Configure public address to use the server behind a reverse-proxy" + newline;
+        footer += "configure-http --public-scheme=https --public-hostname=myproxy.mycompany.com --public-port=8443" +
+                  newline;
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(135);
         hf.printHelp("configure-http" + Tools.shellExtension(), header, options, footer, true);
@@ -296,6 +397,10 @@ public class ChangeHttpConfiguration {
      */
     private static File getWebPropertiesFile() {
         return getSchedulerFile(WebProperties.PA_WEB_PROPERTIES_RELATIVE_FILEPATH);
+    }
+
+    private static File getSchedulerPropertiesFile() {
+        return getSchedulerFile(PASchedulerProperties.PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
     }
 
     /**
@@ -357,6 +462,27 @@ public class ChangeHttpConfiguration {
             outputLines.add(analyseLineInWebPropertiesFile(line));
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(webPropertiesFile))) {
+            IOUtils.writeLines(outputLines, null, writer);
+        }
+    }
+
+    /**
+     * Apply the current configuration to config/web/settings.ini
+     */
+    private static void changeSchedulerPropertiesConfiguration() throws IOException {
+        File schedPropertiesFile = getSchedulerPropertiesFile();
+        if (isDebug) {
+            log("Checking " + schedPropertiesFile);
+        }
+        List<String> inputLines;
+        try (BufferedReader reader = new BufferedReader(new FileReader(schedPropertiesFile))) {
+            inputLines = IOUtils.readLines(reader);
+        }
+        List<String> outputLines = new ArrayList<>(inputLines.size());
+        for (String line : inputLines) {
+            outputLines.add(analyseLineInSchedulerPropertiesFile(line));
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(schedPropertiesFile))) {
             IOUtils.writeLines(outputLines, null, writer);
         }
     }
@@ -441,6 +567,10 @@ public class ChangeHttpConfiguration {
         if (isHttps && line.startsWith(WebProperties.WEB_HTTPS_PORT.getKey())) {
             return answerAndLog(WebProperties.WEB_HTTPS_PORT.getKey() + "=" + port);
         }
+        if (publicUrlConfigured && line.contains(PortalConfiguration.NOVNC_URL.getKey() + "=")) {
+            return answerAndLog(PortalConfiguration.NOVNC_URL.getKey() + "=" + configuredPublicScheme + "://" +
+                                configuredPublicHostname + ":" + PortalConfiguration.NOVNC_PORT.getValueAsString());
+        }
         Pattern webHttpsAllowAnyCertificatePattern = Pattern.compile(WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE.getKey() +
                                                                      "\\s*=");
         Matcher webHttpsAllowAnyCertificateMatcher = webHttpsAllowAnyCertificatePattern.matcher(line);
@@ -457,6 +587,29 @@ public class ChangeHttpConfiguration {
         Matcher webHttpsMatcher = webHttpsPattern.matcher(line);
         if (webHttpsMatcher.find()) {
             return answerAndLog(WebProperties.WEB_HTTPS.getKey() + "=" + isHttps);
+        }
+        return line;
+    }
+
+    /**
+     * Analyse a line inside the config/scheduler/settings.ini file
+     * Return a modified line if a parameter needs to be updated
+     * @param line input line
+     * @return a modified or identical line
+     */
+    private static String analyseLineInSchedulerPropertiesFile(String line) {
+        line = line.trim();
+        if (line.contains(PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.getKey() + "=")) {
+            return answerAndLog(PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.getKey() + "=" + configuredPublicUrl +
+                                "/rest");
+        }
+        if (line.contains(PASchedulerProperties.CATALOG_REST_PUBLIC_URL.getKey() + "=")) {
+            return answerAndLog(PASchedulerProperties.CATALOG_REST_PUBLIC_URL.getKey() + "=" + configuredPublicUrl +
+                                "/catalog");
+        }
+        if (line.contains(PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.getKey() + "=")) {
+            return answerAndLog(PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.getKey() + "=" +
+                                configuredPublicUrl + "/cloud-automation-service");
         }
         return line;
     }
