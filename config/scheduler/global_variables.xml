@@ -36,7 +36,7 @@
         </filter>
         <filter>
             <select>
-                <xpath><![CDATA[(/job/genericInformation/info[@name='bucketName' and (@value='ai-mlops-dashboard' or @value='service-automation')]) and (/job/genericInformation/info[@name='pca.states' and @value='(VOID,RUNNING)'])]]></xpath>
+                <xpath><![CDATA[(/job/genericInformation/info[@name='bucketName' and @value='service-automation']) and (/job/genericInformation/info[@name='pca.states' and contains(@value,'(VOID,RUNNING)')])]]></xpath>
             </select>
             <variables>
                 <variable name="NODE_SOURCE" value="" advanced="true" description="If not empty, the workflow tasks will be run only on nodes belonging to the specified node source." group="Resource Management" hidden="false" model="PA:MODEL_FROM_URL(${PA_SCHEDULER_REST_PUBLIC_URL}/rm/model/nodesources)"/>
@@ -52,7 +52,7 @@
         </filter>
         <filter>
             <select>
-                <xpath><![CDATA[/job/genericInformation/info[@name='pca.states' and @value!='(VOID,RUNNING)']]]></xpath>
+                <xpath><![CDATA[/job/genericInformation/info[@name='pca.states' and not(contains(@value,'(VOID,RUNNING)'))]]]></xpath>
             </select>
             <variables>
             </variables>
