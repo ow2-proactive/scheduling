@@ -2341,7 +2341,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                        owner,
                                        usageInfoCriteriaSize);
         }
-        for (int i = 0; i < nodeUrlList.size(); i++) {
+        for (int i = 0; i < rmNodeList.size(); i++) {
             RMNode rmNode = rmNodeList.get(i);
             NodeState previousNodeState = previousNodeStateList.get(i);
             this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
