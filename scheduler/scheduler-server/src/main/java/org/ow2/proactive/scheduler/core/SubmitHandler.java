@@ -91,7 +91,11 @@ class SubmitHandler implements Runnable {
         for (InternalJob job : jobs) {
             if (job != null) {
                 service.getJobs().jobSubmitted(job, timingLogger);
-                frontendState.jobSubmitted(job, ident);
+
+                if (frontendState != null) {
+                    frontendState.jobSubmitted(job, ident);
+                }
+
                 Long parentId = job.getParentId();
                 if (parentId != null) {
                     if (childrenCountIncrease.containsKey(parentId)) {
