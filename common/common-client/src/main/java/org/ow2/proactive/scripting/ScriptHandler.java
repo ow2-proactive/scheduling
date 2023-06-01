@@ -107,6 +107,13 @@ public class ScriptHandler implements Serializable {
         additionalBindings.put(name, value);
     }
 
+    public Object getBinding(String name) {
+        if (additionalBindings != null) {
+            return additionalBindings.get(name);
+        }
+        return null;
+    }
+
     /**
      * Add multiple bindings to the script that will be handle by this handler.
      * @param bindings as a map
