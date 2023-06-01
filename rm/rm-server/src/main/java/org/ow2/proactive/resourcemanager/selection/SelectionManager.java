@@ -391,7 +391,7 @@ public abstract class SelectionManager {
         } catch (NotConnectedException e) {
             // client has disconnected during getNodes request
             logger.warn(e.getMessage(), e);
-            return null;
+            return new NodeSet();
         }
 
         if (logger.isInfoEnabled()) {
