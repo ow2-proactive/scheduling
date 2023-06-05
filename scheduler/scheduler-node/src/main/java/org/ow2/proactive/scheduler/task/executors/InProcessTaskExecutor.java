@@ -49,12 +49,14 @@ import javax.script.ScriptEngineManager;
 
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
@@ -358,9 +360,16 @@ public class InProcessTaskExecutor implements TaskExecutor {
             PrintStream error, TaskResultImpl taskResult) {
         if (flowScript != null) {
             try {
+                // value() throws an exception if an error occurred in the task
                 scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, taskResult.value());
+                ((VariablesMap) scriptHandler.getBinding(SchedulerConstants.VARIABLES_BINDING_NAME)).getScopeMap()
+                                                                                                    .put(SchedulerVars.PA_TASK_SUCCESS.name(),
+                                                                                                         true);
             } catch (Throwable throwable) {
                 scriptHandler.addBinding(TaskScript.RESULT_VARIABLE, throwable);
+                ((VariablesMap) scriptHandler.getBinding(SchedulerConstants.VARIABLES_BINDING_NAME)).getScopeMap()
+                                                                                                    .put(SchedulerVars.PA_TASK_SUCCESS.name(),
+                                                                                                         false);
             }
 
             ScriptResult<FlowAction> flowScriptResult = scriptHandler.handle(flowScript, output, error);
