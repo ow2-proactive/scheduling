@@ -2921,22 +2921,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     @RoleWrite
     public void setLabelOnJobs(String labelId, List<String> jobIds)
-            throws NotConnectedException, PermissionException, LabelNotFoundException {
+            throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         frontendState.checkPermission(currentMethod, "You don't have permissions to set label on jobs");
-
+        for (String jobId : jobIds) {
+            frontendState.checkPermissions(currentMethod,
+                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_SET_LABEL_FOR_THIS_JOB);
+        }
         dbManager.setLabelOnJobIds(labelId, jobIds);
     }
 
     @Override
     @ImmediateService
     @RoleWrite
-    public void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException {
+    public void removeJobLabels(List<String> jobIds)
+            throws NotConnectedException, PermissionException, UnknownJobException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         frontendState.checkPermission(currentMethod, "You don't have permissions to remove labels from jobs");
-
+        for (String jobId : jobIds) {
+            frontendState.checkPermissions(currentMethod,
+                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_LABEL_FOR_THIS_JOB);
+        }
         dbManager.removeJobLabels(jobIds);
     }
 

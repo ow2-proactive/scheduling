@@ -1253,13 +1253,14 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     @Override
     public void setLabelOnJobs(String labelId, List<String> jobIds)
-            throws NotConnectedException, PermissionException, LabelNotFoundException {
+            throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException {
         renewSession();
         client.setLabelOnJobs(labelId, jobIds);
     }
 
     @Override
-    public void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException {
+    public void removeJobLabels(List<String> jobIds)
+            throws NotConnectedException, PermissionException, UnknownJobException {
         renewSession();
         client.removeJobLabels(jobIds);
     }

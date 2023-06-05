@@ -1405,12 +1405,13 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public void setLabelOnJobs(String labelId, List<String> jobIds)
-            throws NotConnectedException, PermissionException, LabelNotFoundException {
+            throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException {
         getScheduler().setLabelOnJobs(labelId, jobIds);
     }
 
     @Override
-    public void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException {
+    public void removeJobLabels(List<String> jobIds)
+            throws NotConnectedException, PermissionException, UnknownJobException {
         getScheduler().removeJobLabels(jobIds);
     }
 

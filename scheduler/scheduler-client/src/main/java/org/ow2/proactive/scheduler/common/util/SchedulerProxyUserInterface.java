@@ -1092,14 +1092,15 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @Override
     @ImmediateService
     public void setLabelOnJobs(String labelId, List<String> jobIds)
-            throws NotConnectedException, PermissionException, LabelNotFoundException {
+            throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException {
         checkSchedulerConnection();
         uischeduler.setLabelOnJobs(labelId, jobIds);
     }
 
     @Override
     @ImmediateService
-    public void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException {
+    public void removeJobLabels(List<String> jobIds)
+            throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
         uischeduler.removeJobLabels(jobIds);
     }

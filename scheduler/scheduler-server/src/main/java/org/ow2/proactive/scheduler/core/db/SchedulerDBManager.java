@@ -3254,10 +3254,13 @@ public class SchedulerDBManager {
         jobIds.forEach(jobId -> {
             List<Long> longIds = new ArrayList<>();
             jobIds.forEach(id -> longIds.add(Long.parseLong(id)));
-            executeReadWriteTransaction(session -> session.getNamedQuery("updateJobLabel")
-                                                          .setParameter("label", label)
-                                                          .setParameter("jobIdList", longIds)
-                                                          .executeUpdate());
+            List<List<Long>> jobIdSubSets = Lists.partition(longIds, MAX_ITEMS_IN_LIST);
+            jobIdSubSets.forEach(jobIdSubList -> executeReadWriteTransaction(session -> session.getNamedQuery("updateJobLabel")
+                                                                                               .setParameter("label",
+                                                                                                             label)
+                                                                                               .setParameter("jobIdList",
+                                                                                                             jobIdSubList)
+                                                                                               .executeUpdate()));
         });
     }
 
@@ -3267,10 +3270,13 @@ public class SchedulerDBManager {
             List<String> ids = Arrays.asList(jobId.split("[\\s,]+"));
             List<Long> longIds = new ArrayList<>();
             ids.forEach(id -> longIds.add(Long.parseLong(id)));
-            executeReadWriteTransaction(session -> session.getNamedQuery("updateJobLabel")
-                                                          .setParameter("label", null)
-                                                          .setParameter("jobIdList", longIds)
-                                                          .executeUpdate());
+            List<List<Long>> jobIdSubSets = Lists.partition(longIds, MAX_ITEMS_IN_LIST);
+            jobIdSubSets.forEach(jobIdSubList -> executeReadWriteTransaction(session -> session.getNamedQuery("updateJobLabel")
+                                                                                               .setParameter("label",
+                                                                                                             null)
+                                                                                               .setParameter("jobIdList",
+                                                                                                             longIds)
+                                                                                               .executeUpdate()));
         });
     }
 }

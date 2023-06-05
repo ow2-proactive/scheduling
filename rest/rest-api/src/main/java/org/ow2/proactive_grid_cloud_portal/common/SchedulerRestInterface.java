@@ -2864,6 +2864,7 @@ public interface SchedulerRestInterface {
      *
      * @param sessionId
      *            current session
+     * @return a list of {@link JobLabelInfoData}
      */
     @GET
     @Path("labels")
@@ -2879,6 +2880,7 @@ public interface SchedulerRestInterface {
      *            current session
      * @param labels
      *            a list of labels to create
+     * @return a list of {@link JobLabelInfoData}, representing the newly added labels
      */
     @POST
     @Path("labels")
@@ -2895,6 +2897,7 @@ public interface SchedulerRestInterface {
      *            current session
      * @param labels
      *           the list of labels to set
+     * @return a list of {@link JobLabelInfoData}, representing the updated list of labels
      */
     @POST
     @Path("labels/set")
@@ -2913,6 +2916,7 @@ public interface SchedulerRestInterface {
      *            the new label name
      * @param labelId
      *            the id of the label to update
+     * @return an object of type {@link JobLabelInfoData}, representing the updated label
      */
     @PUT
     @Path("labels/{labelId}")

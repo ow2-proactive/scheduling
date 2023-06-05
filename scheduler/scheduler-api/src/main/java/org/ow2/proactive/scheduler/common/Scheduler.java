@@ -2140,7 +2140,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
      */
     @RoleWrite
     void setLabelOnJobs(String labelId, List<String> jobIds)
-            throws NotConnectedException, PermissionException, LabelNotFoundException;
+            throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException;
 
     /**
      * Removes label from jobs
@@ -2151,6 +2151,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
      *             if you have not enough permission to access this method.
      */
     @RoleWrite
-    void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException;
+    void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException, UnknownJobException;
 
 }

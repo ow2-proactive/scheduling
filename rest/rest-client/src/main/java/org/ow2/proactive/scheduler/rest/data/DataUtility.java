@@ -306,7 +306,7 @@ public class DataUtility {
     }
 
     public static List<JobLabelInfo> toJobLabelsInfo(List<JobLabelInfoData> jobLabel) {
-        List<JobLabelInfo> jobLabelInfo = new LinkedList<>();
+        List<JobLabelInfo> jobLabelInfo = new ArrayList<>(jobLabel.size());
         jobLabel.forEach(jobLabelInfoData -> jobLabelInfo.add(toJobLabelInfo(jobLabelInfoData)));
         return jobLabelInfo;
     }
