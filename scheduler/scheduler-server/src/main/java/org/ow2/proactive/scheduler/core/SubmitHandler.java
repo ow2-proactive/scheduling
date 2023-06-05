@@ -91,6 +91,11 @@ class SubmitHandler implements Runnable {
         for (InternalJob job : jobs) {
             if (job != null) {
                 service.getJobs().jobSubmitted(job, timingLogger);
+
+                if (frontendState != null) {
+                    frontendState.jobSubmitted(job, ident);
+                }
+
                 Long parentId = job.getParentId();
                 if (parentId != null) {
                     if (childrenCountIncrease.containsKey(parentId)) {
@@ -106,16 +111,6 @@ class SubmitHandler implements Runnable {
             service.getJobs().increaseJobDataChildrenCount(entry.getKey(), entry.getValue().getValue());
         }
         timingLogger.end("increaseJobDataChildrenCount");
-
-        timingLogger.start("frontendStateJobSubmitted");
-        for (InternalJob job : jobs) {
-            if (job != null) {
-                if (frontendState != null) {
-                    frontendState.jobSubmitted(job, ident);
-                }
-            }
-        }
-        timingLogger.end("frontendStateJobSubmitted");
 
         service.wakeUpSchedulingThread();
     }
