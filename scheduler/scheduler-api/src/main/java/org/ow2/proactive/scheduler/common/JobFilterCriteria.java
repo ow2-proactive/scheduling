@@ -51,6 +51,8 @@ public class JobFilterCriteria implements Serializable {
 
     private final String bucketName;
 
+    private final String label;
+
     private final String userName;
 
     private final String tenant;
@@ -69,6 +71,7 @@ public class JobFilterCriteria implements Serializable {
         this.jobName = builder.getJobName();
         this.projectName = builder.getProjectName();
         this.bucketName = builder.getBucketName();
+        this.label = builder.getLabel();
         this.userName = builder.getUserName();
         this.tenant = builder.getTenant();
         this.parentId = builder.getParentId();
@@ -109,6 +112,10 @@ public class JobFilterCriteria implements Serializable {
 
     public String getBucketName() {
         return bucketName;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public String getUserName() {

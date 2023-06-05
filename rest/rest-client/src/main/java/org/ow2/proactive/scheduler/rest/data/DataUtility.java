@@ -29,6 +29,7 @@ import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,6 +100,7 @@ public class DataUtility {
         impl.setCumulatedCoreTime(d.getCumulatedCoreTime());
         impl.setNumberOfNodes(d.getNumberOfNodes());
         impl.setSubmissionMode(d.getSubmissionMode());
+        impl.setLabel(d.getLabel());
         return impl;
     }
 
@@ -297,6 +299,16 @@ public class DataUtility {
 
     public static TaskId taskId(JobId jobId, TaskIdData taskIdData) {
         return createTaskId(jobId, taskIdData.getReadableName(), taskIdData.getId());
+    }
+
+    public static JobLabelInfo toJobLabelInfo(JobLabelInfoData jobLabel) {
+        return new JobLabelInfo(jobLabel.getId(), jobLabel.getLabel());
+    }
+
+    public static List<JobLabelInfo> toJobLabelsInfo(List<JobLabelInfoData> jobLabel) {
+        List<JobLabelInfo> jobLabelInfo = new LinkedList<>();
+        jobLabel.forEach(jobLabelInfoData -> jobLabelInfo.add(toJobLabelInfo(jobLabelInfoData)));
+        return jobLabelInfo;
     }
 
 }

@@ -57,6 +57,8 @@ import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
+import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
+import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -1216,4 +1218,50 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
             throws NotConnectedException, PermissionException, UnknownJobException {
         client.removeExternalEndpointUrl(jobId, endpointName);
     }
+
+    @Override
+    public List<JobLabelInfo> getLabels() throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.getLabels();
+    }
+
+    @Override
+    public List<JobLabelInfo> createLabels(List<String> labels)
+            throws NotConnectedException, PermissionException, LabelConflictException {
+        renewSession();
+        return client.createLabels(labels);
+    }
+
+    @Override
+    public List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.setLabels(labels);
+    }
+
+    @Override
+    public JobLabelInfo updateLabel(String labelId, String newLabel)
+            throws NotConnectedException, PermissionException, LabelConflictException, LabelNotFoundException {
+        renewSession();
+        return client.updateLabel(labelId, newLabel);
+    }
+
+    @Override
+    public void deleteLabel(String labelId) throws NotConnectedException, PermissionException, LabelNotFoundException {
+        renewSession();
+        client.deleteLabel(labelId);
+    }
+
+    @Override
+    public void setLabelOnJobs(String labelId, List<String> jobIds)
+            throws NotConnectedException, PermissionException, LabelNotFoundException {
+        renewSession();
+        client.setLabelOnJobs(labelId, jobIds);
+    }
+
+    @Override
+    public void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException {
+        renewSession();
+        client.removeJobLabels(jobIds);
+    }
+
 }

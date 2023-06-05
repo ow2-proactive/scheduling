@@ -27,6 +27,8 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
+import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -66,6 +68,10 @@ public class RestException extends Exception {
             return new UnknownTaskRestException(schedulerException);
         } else if (schedulerException instanceof SignalApiException) {
             return new SignalApiRestException(schedulerException);
+        } else if (schedulerException instanceof LabelConflictException) {
+            return new LabelConflictRestException(schedulerException);
+        } else if (schedulerException instanceof LabelNotFoundException) {
+            return new LabelNotFoundRestException(schedulerException);
         }
         return new UnknownJobRestException(schedulerException);
     }

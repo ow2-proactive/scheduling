@@ -94,6 +94,11 @@ public abstract class Job extends CommonAttribute {
     protected String bucketName = "";
 
     /**
+     * Label for this job
+     */
+    protected String label = "";
+
+    /**
      * Tags of this job
      */
     protected Set<String> workflowTags = new HashSet<>();
@@ -250,12 +255,30 @@ public abstract class Job extends CommonAttribute {
     }
 
     /**
+     * Returns the label
+     *
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
      * Sets the bucket name to the given bucketName value.
      *
      * @param bucketName the bucket name to set.
      */
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    /**
+     * Sets the label of the job.
+     *
+     * @param label the label to set.
+     */
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     /**
