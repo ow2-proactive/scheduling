@@ -10,10 +10,14 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl);
 
 importClass(org.ow2.proactive_grid_cloud_portal.cli.CLIException);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand);
 
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand);
@@ -96,6 +100,14 @@ var currentContext = ApplicationContextImpl.currentContext();
 
 function url(url) {
     execute(new SetUrlCommand('' + url));
+}
+
+function setSessionId(sessionId) {
+    execute(new SetSessionCommand(sessionId));
+}
+
+function setSessionIdFile(sessionIdFile) {
+    execute(new SetSessionFileCommand(sessionIdFile));
 }
 
 function silent() {
@@ -196,6 +208,14 @@ function login(user) {
 function loginwithcredentials(pathname) {
     currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, true);
     execute(new LoginWithCredentialsCommand('' + pathname));
+}
+
+function cacerts(storePath) {
+    execute(new SetCaCertsCommand(storePath));
+}
+
+function cacertspass(storePassword) {
+    execute(new SetCaCertsPassCommand(storePassword));
 }
 
 // scheduler
