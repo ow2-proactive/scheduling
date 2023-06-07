@@ -3174,13 +3174,15 @@ public class SchedulerDBManager {
             if (checkIfLabelExists(label)) {
                 throw new LabelConflictException(label);
             }
+        }
+        labels.forEach(label -> {
             JobLabel jobLabel = executeReadWriteTransaction(session -> {
                 JobLabel labelData = JobLabel.createJobLabel(label);
                 session.save(labelData);
                 return labelData;
             });
             jobLabelsInfo.add(jobLabel.toJobLabelInfo());
-        }
+        });
         return jobLabelsInfo;
     }
 
