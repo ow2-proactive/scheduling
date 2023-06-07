@@ -81,6 +81,12 @@ public interface JobInfo extends Serializable {
     String getBucketName();
 
     /**
+     * Returns the label associated with this job
+     * @return label
+     */
+    String getLabel();
+
+    /**
      * Returns the portal name via the job was submitted
      * @return portal name
      */

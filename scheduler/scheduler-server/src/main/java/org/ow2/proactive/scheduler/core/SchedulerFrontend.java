@@ -93,6 +93,8 @@ import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
+import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
+import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
@@ -2856,4 +2858,95 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                     currentUser);
         schedulingService.removeExternalEndpointUrl(jobIdObject, endpointName);
     }
+
+    @Override
+    @ImmediateService
+    @RoleBasic
+    public List<JobLabelInfo> getLabels() throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to get labels");
+
+        return dbManager.getLabels();
+    }
+
+    @Override
+    @ImmediateService
+    @RoleAdmin
+    public List<JobLabelInfo> createLabels(List<String> labels)
+            throws NotConnectedException, PermissionException, LabelConflictException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to create labels");
+
+        return dbManager.newLabels(labels);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleAdmin
+    public List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to set the labels list");
+
+        return dbManager.setLabels(labels);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleAdmin
+    public JobLabelInfo updateLabel(String labelId, String newLabel)
+            throws NotConnectedException, PermissionException, LabelConflictException, LabelNotFoundException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to update labels");
+
+        return dbManager.updateLabel(labelId, newLabel);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleAdmin
+    public void deleteLabel(String labelId) throws NotConnectedException, PermissionException, LabelNotFoundException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to delete labels");
+
+        dbManager.deleteLabel(labelId);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleWrite
+    public void setLabelOnJobs(String labelId, List<String> jobIds)
+            throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to set label on jobs");
+        for (String jobId : jobIds) {
+            frontendState.checkPermissions(currentMethod,
+                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_SET_LABEL_FOR_THIS_JOB);
+        }
+        dbManager.setLabelOnJobIds(labelId, jobIds);
+    }
+
+    @Override
+    @ImmediateService
+    @RoleWrite
+    public void removeJobLabels(List<String> jobIds)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        frontendState.checkPermission(currentMethod, "You don't have permissions to remove labels from jobs");
+        for (String jobId : jobIds) {
+            frontendState.checkPermissions(currentMethod,
+                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_LABEL_FOR_THIS_JOB);
+        }
+        dbManager.removeJobLabels(jobIds);
+    }
+
 }

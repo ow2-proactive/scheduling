@@ -55,6 +55,8 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
+import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -1373,4 +1375,44 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             throws NotConnectedException, UnknownJobException {
         return getScheduler().checkJobsPermissionMethods(jobIds, methods);
     }
+
+    @Override
+    public List<JobLabelInfo> getLabels() throws NotConnectedException, PermissionException {
+        return getScheduler().getLabels();
+    }
+
+    @Override
+    public List<JobLabelInfo> createLabels(List<String> labels)
+            throws NotConnectedException, PermissionException, LabelConflictException {
+        return getScheduler().createLabels(labels);
+    }
+
+    @Override
+    public List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException {
+        return getScheduler().setLabels(labels);
+    }
+
+    @Override
+    public JobLabelInfo updateLabel(String labelId, String newLabel)
+            throws NotConnectedException, PermissionException, LabelConflictException, LabelNotFoundException {
+        return getScheduler().updateLabel(labelId, newLabel);
+    }
+
+    @Override
+    public void deleteLabel(String labelId) throws NotConnectedException, PermissionException, LabelNotFoundException {
+        getScheduler().deleteLabel(labelId);
+    }
+
+    @Override
+    public void setLabelOnJobs(String labelId, List<String> jobIds)
+            throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException {
+        getScheduler().setLabelOnJobs(labelId, jobIds);
+    }
+
+    @Override
+    public void removeJobLabels(List<String> jobIds)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        getScheduler().removeJobLabels(jobIds);
+    }
+
 }

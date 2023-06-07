@@ -65,6 +65,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String bucketName;
 
+    private String label;
+
     private String submissionMode;
 
     private int totalNumberOfTasks = 0;
@@ -167,6 +169,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public String getBucketName() {
         return bucketName;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public void setSubmissionMode(String submissionMode) {

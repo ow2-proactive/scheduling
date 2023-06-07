@@ -225,7 +225,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
                       Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class, TestTaskSynchronization.class,
                       TestMarkedAsFinished.class, RestartAllInErrorTasksTest.class, TestJobWhenSchedulerPaused.class,
-                      TestTaskForkParameter.class,
+                      TestTaskForkParameter.class, TestJobLabels.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,

@@ -65,6 +65,8 @@ import org.ow2.proactive.db.TransactionHelper;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
+import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
 import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
 import org.ow2.proactive.scheduler.common.job.CompletedTasksCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
@@ -73,6 +75,7 @@ import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsCumulatedCoreT
 import org.ow2.proactive.scheduler.common.job.FilteredTopWorkflowsNumberOfNodes;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobLabelInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -194,6 +197,7 @@ public class SchedulerDBManager {
             configuration.addAnnotatedClass(EnvironmentModifierData.class);
             configuration.addAnnotatedClass(SelectorData.class);
             configuration.addAnnotatedClass(ThirdPartyCredentialData.class);
+            configuration.addAnnotatedClass(JobLabel.class);
             if (drop) {
                 configuration.setProperty("hibernate.hbm2ddl.auto", "create");
             }
@@ -3148,5 +3152,133 @@ public class SchedulerDBManager {
             }));
         }
         return answer;
+    }
+
+    public List<JobLabelInfo> getLabels() {
+        return executeReadOnlyTransaction(session -> {
+            logger.info("Loading JobLabels from database");
+
+            Query query = session.getNamedQuery("getTotalJobsLabels").setReadOnly(true);
+            List<Object[]> jobLabelInfoList = query.list();
+            logger.info(jobLabelInfoList.size() + " JobLabels to fetch from database");
+            return jobLabelInfoList.stream()
+                                   .map(label -> new JobLabelInfo(Long.parseLong(label[0].toString()),
+                                                                  label[1].toString()))
+                                   .collect(Collectors.toList());
+        });
+    }
+
+    public List<JobLabelInfo> newLabels(List<String> labels) throws LabelConflictException {
+        List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
+        for (String label : labels) {
+            if (checkIfLabelExists(label)) {
+                throw new LabelConflictException(label);
+            }
+        }
+        labels.forEach(label -> {
+            JobLabel jobLabel = executeReadWriteTransaction(session -> {
+                JobLabel labelData = JobLabel.createJobLabel(label);
+                session.save(labelData);
+                return labelData;
+            });
+            jobLabelsInfo.add(jobLabel.toJobLabelInfo());
+        });
+        return jobLabelsInfo;
+    }
+
+    public List<JobLabelInfo> setLabels(List<String> labels) {
+        executeReadWriteTransaction(session -> session.getNamedQuery("deleteAllLabel").executeUpdate());
+        List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
+        labels.forEach(label -> {
+            JobLabel jobLabel = executeReadWriteTransaction(session -> {
+                JobLabel labelData = JobLabel.createJobLabel(label);
+                session.save(labelData);
+                return labelData;
+            });
+            jobLabelsInfo.add(jobLabel.toJobLabelInfo());
+        });
+        return jobLabelsInfo;
+    }
+
+    private boolean checkIfLabelExists(String label) {
+        Long foundLabelId = executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getLabelIdByLabel").setParameter("label", label);
+            return (Long) query.uniqueResult();
+        });
+        return foundLabelId != null;
+    }
+
+    private boolean checkIfLabelIdExists(long labelId) {
+        String foundLabel = executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getLabelById").setParameter("labelId", labelId);
+            return query.uniqueResult() == null ? null : query.uniqueResult().toString();
+        });
+        return foundLabel != null;
+    }
+
+    private String getLabelById(long labelId) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getLabelById").setParameter("labelId", labelId);
+
+            return query.uniqueResult().toString();
+        });
+    }
+
+    public JobLabelInfo updateLabel(String labelId, String newLabel)
+            throws LabelConflictException, LabelNotFoundException {
+        if (checkIfLabelExists(newLabel)) {
+            throw new LabelConflictException(newLabel);
+        }
+        if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
+            throw new LabelNotFoundException(labelId);
+        }
+        executeReadWriteTransaction(session -> session.getNamedQuery("updateLabel")
+                                                      .setParameter("newLabel", newLabel)
+                                                      .setParameter("labelId", Long.parseLong(labelId))
+                                                      .executeUpdate());
+        return new JobLabelInfo(Long.parseLong(labelId), newLabel);
+    }
+
+    public void deleteLabel(String labelId) throws LabelNotFoundException {
+        if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
+            throw new LabelNotFoundException(labelId);
+        }
+        executeReadWriteTransaction(session -> session.getNamedQuery("deleteLabel")
+                                                      .setParameter("labelId", Long.parseLong(labelId))
+                                                      .executeUpdate());
+    }
+
+    public void setLabelOnJobIds(String labelId, List<String> jobIds) throws LabelNotFoundException {
+        if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
+            throw new LabelNotFoundException(labelId);
+        }
+        String label = getLabelById(Long.parseLong(labelId));
+        jobIds.forEach(jobId -> {
+            List<Long> longIds = new ArrayList<>();
+            jobIds.forEach(id -> longIds.add(Long.parseLong(id)));
+            List<List<Long>> jobIdSubSets = Lists.partition(longIds, MAX_ITEMS_IN_LIST);
+            jobIdSubSets.forEach(jobIdSubList -> executeReadWriteTransaction(session -> session.getNamedQuery("updateJobLabel")
+                                                                                               .setParameter("label",
+                                                                                                             label)
+                                                                                               .setParameter("jobIdList",
+                                                                                                             jobIdSubList)
+                                                                                               .executeUpdate()));
+        });
+    }
+
+    public void removeJobLabels(List<String> jobIds) {
+
+        jobIds.forEach(jobId -> {
+            List<String> ids = Arrays.asList(jobId.split("[\\s,]+"));
+            List<Long> longIds = new ArrayList<>();
+            ids.forEach(id -> longIds.add(Long.parseLong(id)));
+            List<List<Long>> jobIdSubSets = Lists.partition(longIds, MAX_ITEMS_IN_LIST);
+            jobIdSubSets.forEach(jobIdSubList -> executeReadWriteTransaction(session -> session.getNamedQuery("updateJobLabel")
+                                                                                               .setParameter("label",
+                                                                                                             null)
+                                                                                               .setParameter("jobIdList",
+                                                                                                             longIds)
+                                                                                               .executeUpdate()));
+        });
     }
 }

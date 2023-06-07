@@ -1410,4 +1410,44 @@ public class SchedulerTHelper {
     public void checkNodesAreClean() throws Exception {
         checkNodesAreClean(50000);
     }
+
+    public List<JobLabelInfo> createLabels(List<String> labels) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.createLabels(labels);
+    }
+
+    public JobLabelInfo updateLabel(String label, String newLabel) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.updateLabel(label, newLabel);
+    }
+
+    public void deleteLabel(String labelId) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        userInt.deleteLabel(labelId);
+    }
+
+    public List<JobLabelInfo> getLabels() throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.getLabels();
+    }
+
+    public List<JobLabelInfo> setLabels(List<String> labels) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.setLabels(labels);
+    }
+
+    public void setLabelOnJob(String label, List<String> jobIds) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        userInt.setLabelOnJobs(label, jobIds);
+    }
+
+    public void removeLabelFromJob(List<String> jobIds) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        userInt.removeJobLabels(jobIds);
+    }
+
+    public JobInfo getJobInfo(String jobId) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.getJobInfo(jobId);
+    }
 }

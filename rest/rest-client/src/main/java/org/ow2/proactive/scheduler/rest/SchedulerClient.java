@@ -93,6 +93,8 @@ import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
+import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -1934,4 +1936,72 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throwUJEOrNCEOrPE(e);
         }
     }
+
+    @Override
+    public List<JobLabelInfo> getLabels() throws PermissionException, NotConnectedException {
+        try {
+            return DataUtility.toJobLabelsInfo(restApi().getLabels(sid));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<JobLabelInfo> createLabels(List<String> labels) throws NotConnectedException, PermissionException {
+        try {
+            return DataUtility.toJobLabelsInfo(restApi().createLabels(sid, labels));
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException {
+        try {
+            return DataUtility.toJobLabelsInfo(restApi().setLabels(sid, labels));
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public JobLabelInfo updateLabel(String labelId, String newLabel) throws NotConnectedException, PermissionException {
+        try {
+            return DataUtility.toJobLabelInfo(restApi().updateLabel(sid, labelId, newLabel));
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteLabel(String labelId) throws NotConnectedException, PermissionException {
+        try {
+            restApi().deleteLabel(sid, labelId);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+    }
+
+    @Override
+    public void setLabelOnJobs(String labelId, List<String> jobIds) throws NotConnectedException, PermissionException {
+        try {
+            restApi().setLabelOnJobs(sid, labelId, jobIds);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+    }
+
+    @Override
+    public void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException {
+        try {
+            restApi().removeJobLabels(sid, jobIds);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+    }
+
 }

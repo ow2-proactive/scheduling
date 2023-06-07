@@ -45,6 +45,8 @@ public class JobFilterCriteriaBuilder {
 
     private String bucketName;
 
+    private String label;
+
     private String userName;
 
     private String tenant;
@@ -90,6 +92,10 @@ public class JobFilterCriteriaBuilder {
 
     public String getBucketName() {
         return bucketName;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public String getUserName() {
@@ -150,6 +156,11 @@ public class JobFilterCriteriaBuilder {
 
     public JobFilterCriteriaBuilder bucketName(String bucketName) {
         this.bucketName = bucketName;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder label(String label) {
+        this.label = label;
         return this;
     }
 

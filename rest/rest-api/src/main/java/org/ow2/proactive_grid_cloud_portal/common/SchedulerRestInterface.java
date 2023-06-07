@@ -2825,4 +2825,120 @@ public interface SchedulerRestInterface {
     void removeExternalEndpointUrl(@HeaderParam("sessionid") String sessionId, @PathParam("jobid")
     final String jobId, String externalEndpointUrl) throws RestException;
 
+    /**
+     *
+     * Sets label on jobs
+     *
+     * @param sessionId
+     *            current session
+     * @param labelId
+     *            the id of the label to be set
+     * @param jobIds
+     *            the list of job ids
+     */
+    @PUT
+    @Path("labels/jobs/setlabel")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    void setLabelOnJobs(@HeaderParam("sessionid") String sessionId, @QueryParam("labelId") String labelId,
+            List<String> jobIds) throws RestException;
+
+    /**
+     *
+     * Removes label from jobs
+     *
+     * @param sessionId
+     *            current session
+     * @param jobIds
+     *            the list of job ids
+     */
+    @PUT
+    @Path("labels/jobs/removelabel")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    void removeJobLabels(@HeaderParam("sessionid") String sessionId, List<String> jobIds) throws RestException;
+
+    /**
+     *
+     * Gets all labels.
+     *
+     * @param sessionId
+     *            current session
+     * @return a list of {@link JobLabelInfoData}
+     */
+    @GET
+    @Path("labels")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    List<JobLabelInfoData> getLabels(@HeaderParam("sessionid") String sessionId) throws RestException;
+
+    /**
+     *
+     * Creates new labels
+     *
+     * @param sessionId
+     *            current session
+     * @param labels
+     *            a list of labels to create
+     * @return a list of {@link JobLabelInfoData}, representing the newly added labels
+     */
+    @POST
+    @Path("labels")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    List<JobLabelInfoData> createLabels(@HeaderParam("sessionid") String sessionId, List<String> labels)
+            throws RestException;
+
+    /**
+     *
+     * Sets the list of labels.
+     *
+     * @param sessionId
+     *            current session
+     * @param labels
+     *           the list of labels to set
+     * @return a list of {@link JobLabelInfoData}, representing the updated list of labels
+     */
+    @POST
+    @Path("labels/set")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    List<JobLabelInfoData> setLabels(@HeaderParam("sessionid") String sessionId, List<String> labels)
+            throws RestException;
+
+    /**
+     *
+     * Update the given label
+     *
+     * @param sessionId
+     *            current session
+     * @param newLabel
+     *            the new label name
+     * @param labelId
+     *            the id of the label to update
+     * @return an object of type {@link JobLabelInfoData}, representing the updated label
+     */
+    @PUT
+    @Path("labels/{labelId}")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    JobLabelInfoData updateLabel(@HeaderParam("sessionid") String sessionId, @PathParam("labelId")
+    final String labelId, @QueryParam("newLabel") String newLabel) throws RestException;
+
+    /**
+     *
+     * Remove the given label
+     *
+     * @param sessionId
+     *            current session
+     * @param labelId
+     *            the id of the label to remove
+     */
+    @DELETE
+    @Path("labels/{labelId}")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    void deleteLabel(@HeaderParam("sessionid") String sessionId, @PathParam("labelId")
+    final String labelId) throws RestException;
+
 }

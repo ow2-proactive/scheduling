@@ -137,6 +137,7 @@ import com.google.common.collect.Lists;
                                                                        "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                        "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAttachedServices", query = "update JobData set attachedServices = :attachedServices where id = :jobId"),
+                @NamedQuery(name = "updateJobLabel", query = "update JobData set label = :label where id in (:jobIdList)"),
                 @NamedQuery(name = "updateJobDataExternalEndpointUrls", query = "update JobData set externalEndpointUrls = :externalEndpointUrls where id = :jobId"),
                 @NamedQuery(name = "countJobDataStatusRankNull", query = "select count (*) from JobData where statusRank is null"),
                 @NamedQuery(name = "setStatusRankInJobDataIfNull", query = "update JobData job set job.statusRank = case when status = 0 then 2 when status in (1,2,4,8) then 1 else 0 end"), })
@@ -159,7 +160,8 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_BUCKET_NAME", columnList = "BUCKET_NAME"),
                                       @Index(name = "JOB_DATA_JOB_NAME", columnList = "JOB_NAME"),
                                       @Index(name = "JOB_DATA_PROJECT_NAME", columnList = "PROJECT_NAME"),
-                                      @Index(name = "JOB_DATA_SUBMISSION_MODE", columnList = "SUBMISSION_MODE"), })
+                                      @Index(name = "JOB_DATA_SUBMISSION_MODE", columnList = "SUBMISSION_MODE"),
+                                      @Index(name = "JOB_DATA_LABEL", columnList = "LABEL"), })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
@@ -246,6 +248,8 @@ public class JobData implements Serializable {
 
     private String bucketName;
 
+    private String label;
+
     private List<JobContent> jobContent = Lists.newArrayList();
 
     private Map<Integer, Boolean> attachedServices;
@@ -269,6 +273,7 @@ public class JobData implements Serializable {
         jobInfo.setTenant(getTenant());
         jobInfo.setProjectName(getProjectName());
         jobInfo.setBucketName(getBucketName());
+        jobInfo.setLabel(getLabel());
         jobInfo.setStatus(getStatus());
         jobInfo.setParentId(getParentId());
         jobInfo.setChildrenCount(getChildrenCount());
@@ -449,6 +454,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setAttachedServices(job.getAttachedServices());
         jobRuntimeData.setExternalEndpointUrls(job.getExternalEndpointUrls());
         jobRuntimeData.setSubmissionMode(job.getSubmissionMode());
+        jobRuntimeData.setLabel(job.getLabel());
 
         return jobRuntimeData;
     }
@@ -639,6 +645,15 @@ public class JobData implements Serializable {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    @Column(name = "LABEL", updatable = false)
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     @OneToMany(mappedBy = "jobData", fetch = FetchType.LAZY)

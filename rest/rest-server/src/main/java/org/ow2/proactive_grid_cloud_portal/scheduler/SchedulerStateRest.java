@@ -3416,4 +3416,80 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    @Override
+    public void setLabelOnJobs(String sessionId, @QueryParam("labelId") String labelId, List<String> jobIds)
+            throws RestException {
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            scheduler.setLabelOnJobs(labelId, jobIds);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
+    public void removeJobLabels(String sessionId, List<String> jobIds) throws RestException {
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            scheduler.removeJobLabels(jobIds);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
+    public List<JobLabelInfoData> getLabels(String sessionId) throws RestException {
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.getLabels(), JobLabelInfoData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @Override
+    public List<JobLabelInfoData> createLabels(String sessionId, List<String> labels) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.createLabels(labels), JobLabelInfoData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
+    public List<JobLabelInfoData> setLabels(String sessionId, List<String> labels) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.setLabels(labels), JobLabelInfoData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
+    public JobLabelInfoData updateLabel(String sessionId, String labelId, String newLabel) throws RestException {
+
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return mapper.map(scheduler.updateLabel(labelId, newLabel), JobLabelInfoData.class);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+
+    }
+
+    @Override
+    public void deleteLabel(String sessionId, final String labelId) throws RestException {
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            scheduler.deleteLabel(labelId);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
 }

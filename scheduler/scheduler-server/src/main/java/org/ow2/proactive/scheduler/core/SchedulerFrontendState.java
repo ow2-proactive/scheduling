@@ -156,6 +156,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB = "You do not have permission to get the task result of this job !";
 
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_SET_LABEL_FOR_THIS_JOB = "You do not have permission to set label for this job !";
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_LABEL_FOR_THIS_JOB = "You do not have permission to remove label for this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB = "You do not have permission to remove this job !";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB = "You do not have permission to resume this job !";

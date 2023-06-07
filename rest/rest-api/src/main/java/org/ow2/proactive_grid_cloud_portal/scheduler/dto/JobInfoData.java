@@ -73,6 +73,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private String bucketName;
 
+    private String label;
+
     private boolean toBeRemoved = false;
 
     private Map<String, String> genericInformation;
@@ -211,6 +213,14 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getSubmissionMode() {
@@ -414,7 +424,7 @@ public class JobInfoData implements java.io.Serializable {
                numberOfRunningTasks + ", numberOfFinishedTasks=" + numberOfFinishedTasks + ", numberOfFailedTasks=" +
                numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks + ", numberOfInErrorTasks=" +
                numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner + "', projectName='" +
-               projectName + "', bucketName='" + bucketName + "', toBeRemoved=" + toBeRemoved +
+               projectName + "', bucketName='" + bucketName + "', label='" + label + "', toBeRemoved=" + toBeRemoved +
                ", genericInformation=" + genericInformation + ", variables=" + variables + ", signals=" + signals +
                ", detailedSignals=" + detailedSignals + ", attachedServices=" + attachedServices +
                ", externalEndpointUrls=" + externalEndpointUrls + ", cumulatedCoreTime=" + cumulatedCoreTime +

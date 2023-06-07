@@ -39,6 +39,8 @@ import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
+import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
+import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -55,6 +57,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobIdDataAndError;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobLabelInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -2058,4 +2061,96 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     @RoleWrite
     void removeExternalEndpointUrl(String jobId, String endpointName)
             throws NotConnectedException, PermissionException, UnknownJobException;
+
+    /**
+     * Gets all labels.
+     *
+     * @return a list of labels
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
+    @RoleBasic
+    List<JobLabelInfo> getLabels() throws NotConnectedException, PermissionException;
+
+    /**
+     * Creates new labels
+     *
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     * @throws LabelConflictException
+     *             if the given labels already exist.
+     */
+    @RoleAdmin
+    List<JobLabelInfo> createLabels(List<String> labels)
+            throws NotConnectedException, PermissionException, LabelConflictException;
+
+    /**
+     * Sets the list of labels.
+     *
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
+    @RoleAdmin
+    List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException;
+
+    /**
+     * Update the given label
+     *
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     * @throws LabelConflictException
+     *             if the new given labels name already exist.
+     * @throws LabelNotFoundException
+     *             if the given label id is not found.
+     */
+    @RoleAdmin
+    JobLabelInfo updateLabel(String labelId, String newLabel)
+            throws NotConnectedException, PermissionException, LabelConflictException, LabelNotFoundException;
+
+    /**
+     * Remove the given label
+     *
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     * @throws LabelNotFoundException
+     *             if the given label id is not found.
+     */
+    @RoleAdmin
+    void deleteLabel(String labelId) throws NotConnectedException, PermissionException, LabelNotFoundException;
+
+    /**
+     * Sets label on jobs
+     *
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     * @throws LabelNotFoundException
+     *             if the given label id is not found
+     */
+    @RoleWrite
+    void setLabelOnJobs(String labelId, List<String> jobIds)
+            throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException;
+
+    /**
+     * Removes label from jobs
+     *
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
+    @RoleWrite
+    void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException, UnknownJobException;
+
 }
