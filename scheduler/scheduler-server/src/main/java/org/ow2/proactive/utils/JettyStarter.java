@@ -28,9 +28,7 @@ package org.ow2.proactive.utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +53,8 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlets.QoSFilter;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -557,8 +557,21 @@ public class JettyStarter {
         }
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);
+        if (WebProperties.WEB_QOS_FILTER_ENABLED.getValueAsBoolean() &&
+            contextPath.equals(WebProperties.WEB_QOS_FILTER_CONTEXT.getValueAsString())) {
+            addQOSFilter(webApp);
+        }
         webApp.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         return webApp;
+    }
+
+    private void addQOSFilter(WebAppContext webApp) {
+        for (String path : WebProperties.WEB_QOS_FILTER_PATHS.getValueAsList(",")) {
+            FilterHolder holder = new FilterHolder(QoSFilter.class);
+            holder.setInitParameter("maxRequests", WebProperties.WEB_QOS_FILTER_MAX_REQUESTS.getValueAsString());
+            holder.setInitParameter("waitMs", WebProperties.WEB_IDLE_TIMEOUT.getValueAsString());
+            webApp.addFilter(holder, path, EnumSet.of(DispatcherType.REQUEST));
+        }
     }
 
     private void ensureServerClasses(WebAppContext webApp, String... packages) {
