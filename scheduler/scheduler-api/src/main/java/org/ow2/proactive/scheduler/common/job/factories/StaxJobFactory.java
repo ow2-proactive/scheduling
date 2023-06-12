@@ -25,6 +25,10 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.NEXT_EXECUTION;
+import static org.ow2.proactive.scheduler.common.SchedulerConstants.PARENT_JOB_ID;
+import static org.ow2.proactive.scheduler.common.job.Job.JOB_DDL;
+import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_INFO_START_AT_KEY;
 import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
 import java.io.ByteArrayInputStream;
@@ -141,6 +145,10 @@ public class StaxJobFactory extends JobFactory {
     private GetJobContentGenerator getJobContentFactory = new GetJobContentGenerator();
 
     private boolean handleGlobalVariables;
+
+    // generic info that are (most likely) varying upon each job execution
+    private static final String[] VARYING_GENERIC_INFO = { GENERIC_INFO_START_AT_KEY, JOB_DDL, NEXT_EXECUTION,
+                                                           PARENT_JOB_ID };
 
     /**
      * Create a new instance of StaxJobFactory.
@@ -275,7 +283,8 @@ public class StaxJobFactory extends JobFactory {
         byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
         String md5Job = DigestUtils.md5Hex(bytes);
         String md5Variables = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementVariables));
-        String md5GenericInfo = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(replacementGenericInfos));
+        Map<String, String> filteredReplacementGenericInfo = excludeVaryingGenericInfo(replacementGenericInfos);
+        String md5GenericInfo = DigestUtils.md5Hex(Object2ByteConverter.convertObject2Byte(filteredReplacementGenericInfo));
         String md5GlobalVariables = "";
         if (handleGlobalVariables) {
             md5GlobalVariables = GlobalVariablesParser.getInstance().getMD5();
@@ -306,7 +315,11 @@ public class StaxJobFactory extends JobFactory {
             Map<String, ArrayList<String>> dependencies = new LinkedHashMap<>();
             try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
                 XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
-                job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies, new String(bytes));
+                job = createJob(xmlsr,
+                                replacementVariables,
+                                filteredReplacementGenericInfo,
+                                dependencies,
+                                new String(bytes));
                 xmlsr.close();
             }
             t3 = System.currentTimeMillis();
@@ -319,6 +332,8 @@ public class StaxJobFactory extends JobFactory {
         }
         long t4 = System.currentTimeMillis();
         validate((TaskFlowJob) job, scheduler, space, sessionId);
+        // we insert back the varying generic information
+        insertVaryingGenericInfo(replacementGenericInfos, (TaskFlowJob) job);
         // as the value of variables can change after the validation (due to variable inferences), we must regenerate generic info values
         updateGenericInformation((TaskFlowJob) job, replacementGenericInfos);
 
@@ -342,6 +357,28 @@ public class StaxJobFactory extends JobFactory {
         //debug mode only
         displayJobInfo(job);
         return job;
+    }
+
+    private Map<String, String> excludeVaryingGenericInfo(Map<String, String> replacementGenericInfos) {
+        if (replacementGenericInfos == null) {
+            return new LinkedHashMap<>();
+        }
+        Map<String, String> filteredGenericInfo = new LinkedHashMap<>(replacementGenericInfos);
+        for (String genericInfoKey : VARYING_GENERIC_INFO) {
+            filteredGenericInfo.remove(genericInfoKey);
+        }
+        return filteredGenericInfo;
+    }
+
+    private void insertVaryingGenericInfo(Map<String, String> replacementGenericInfos, TaskFlowJob job) {
+        if (replacementGenericInfos != null) {
+            // we add filtered varying generic info back
+            for (String genericInfoKey : VARYING_GENERIC_INFO) {
+                if (replacementGenericInfos.containsKey(genericInfoKey)) {
+                    job.addGenericInformation(genericInfoKey, replacementGenericInfos.get(genericInfoKey));
+                }
+            }
+        }
     }
 
     private void updateGenericInformation(TaskFlowJob job, Map<String, String> replacementGenericInfo)
