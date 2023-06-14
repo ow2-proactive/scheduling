@@ -27,7 +27,6 @@ package org.ow2.proactive.scheduler.core.db;
 
 import static org.ow2.proactive.scheduler.core.db.types.FilterJobsMode.FINISHED_AND_STARTED;
 import static org.ow2.proactive.scheduler.core.db.types.FilterJobsMode.SUBMITTED_ONLY;
-import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.LABEL_MAX_LENGTH;
 import static org.ow2.proactive.scheduler.util.HsqldbServer.PROP_HIBERNATE_CONNECTION_PASSWORD;
 
 import java.io.File;
@@ -3170,14 +3169,18 @@ public class SchedulerDBManager {
         });
     }
 
+    private boolean isLabelValid(String label) {
+        return label.length() <= PASchedulerProperties.LABEL_MAX_LENGTH.getValueAsInt() &&
+               label.matches(PASchedulerProperties.LABEL_REGEX.getValueAsString());
+    }
+
     public List<JobLabelInfo> newLabels(List<String> labels) throws LabelConflictException, LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
             if (checkIfLabelExists(label)) {
                 throw new LabelConflictException(label);
             }
-            if (label.length() > PASchedulerProperties.LABEL_MAX_LENGTH.getValueAsInt() ||
-                !label.matches(PASchedulerProperties.LABEL_REGEX.getValueAsString())) {
+            if (!isLabelValid(label)) {
                 throw new LabelValidationException(label);
             }
         }
@@ -3195,8 +3198,7 @@ public class SchedulerDBManager {
     public List<JobLabelInfo> setLabels(List<String> labels) throws LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
-            if (label.length() > PASchedulerProperties.LABEL_MAX_LENGTH.getValueAsInt() ||
-                !label.matches(PASchedulerProperties.LABEL_REGEX.getValueAsString())) {
+            if (!isLabelValid(label)) {
                 throw new LabelValidationException(label);
             }
         }
@@ -3244,8 +3246,7 @@ public class SchedulerDBManager {
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
         }
-        if (newLabel.length() > PASchedulerProperties.LABEL_MAX_LENGTH.getValueAsInt() ||
-            !newLabel.matches(PASchedulerProperties.LABEL_REGEX.getValueAsString())) {
+        if (!isLabelValid(newLabel)) {
             throw new LabelValidationException(newLabel);
         }
         executeReadWriteTransaction(session -> session.getNamedQuery("updateLabel")
