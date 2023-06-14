@@ -555,7 +555,14 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_PORTAL_CONFIGURATION(
             "pa.scheduler.portal.configuration",
             PropertyType.STRING,
-            "config/portal/scheduler-portal-display.conf");
+            "config/portal/scheduler-portal-display.conf"),
+
+    /* ***************************************************************** */
+    /* ***************** LABEL PROPERTIES ********** */
+    /* ***************************************************************** */
+
+    LABEL_REGEX("pa.scheduler.label.regex", PropertyType.STRING, "^[a-zA-Z0-9_/-]*$"),
+    LABEL_MAX_LENGTH("pa.scheduler.label.max.length", PropertyType.INTEGER, "20");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -563,10 +570,6 @@ public enum PASchedulerProperties implements PACommonProperties {
     public static final String PA_SCHEDULER_PROPERTIES_FILEPATH = "pa.scheduler.properties.filepath";
 
     public static final String PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH = "config/scheduler/settings.ini";
-
-    public static final String LABEL_REGEX = "^[a-zA-Z0-9_/-]*$";
-
-    public static final int LABEL_MAX_LENGTH = 20;
 
     /** memory entity of the properties file. */
     private static PAPropertiesLazyLoader propertiesLoader;

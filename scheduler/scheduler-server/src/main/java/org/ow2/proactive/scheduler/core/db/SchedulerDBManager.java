@@ -3177,7 +3177,7 @@ public class SchedulerDBManager {
             if (checkIfLabelExists(label)) {
                 throw new LabelConflictException(label);
             }
-            if (label.length() > LABEL_MAX_LENGTH || !label.matches(LABEL_REGEX)) {
+            if (label.length() > LABEL_MAX_LENGTH.getValueAsInt() || !label.matches(LABEL_REGEX.getValueAsString())) {
                 throw new LabelValidationException(label);
             }
         }
@@ -3193,13 +3193,13 @@ public class SchedulerDBManager {
     }
 
     public List<JobLabelInfo> setLabels(List<String> labels) throws LabelValidationException {
-        executeReadWriteTransaction(session -> session.getNamedQuery("deleteAllLabel").executeUpdate());
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
-            if (label.length() > LABEL_MAX_LENGTH || !label.matches(LABEL_REGEX)) {
+            if (label.length() > LABEL_MAX_LENGTH.getValueAsInt() || !label.matches(LABEL_REGEX.getValueAsString())) {
                 throw new LabelValidationException(label);
             }
         }
+        executeReadWriteTransaction(session -> session.getNamedQuery("deleteAllLabel").executeUpdate());
         labels.forEach(label -> {
             JobLabel jobLabel = executeReadWriteTransaction(session -> {
                 JobLabel labelData = JobLabel.createJobLabel(label);
@@ -3243,7 +3243,7 @@ public class SchedulerDBManager {
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
         }
-        if (newLabel.length() > LABEL_MAX_LENGTH || !newLabel.matches(LABEL_REGEX)) {
+        if (newLabel.length() > LABEL_MAX_LENGTH.getValueAsInt() || !newLabel.matches(LABEL_REGEX.getValueAsString())) {
             throw new LabelValidationException(newLabel);
         }
         executeReadWriteTransaction(session -> session.getNamedQuery("updateLabel")
