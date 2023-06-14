@@ -47,6 +47,7 @@ import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJso
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelConflictRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelNotFoundRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelValidationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
@@ -224,6 +225,13 @@ public class ExceptionMappers {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_CONFLICT;
+        }
+    }
+
+    public static class LabelValidationRestExceptionMapper extends BaseExceptionMapper<LabelValidationRestException> {
+        @Override
+        protected int getErrorCode() {
+            return HttpURLConnection.HTTP_BAD_REQUEST;
         }
     }
 }

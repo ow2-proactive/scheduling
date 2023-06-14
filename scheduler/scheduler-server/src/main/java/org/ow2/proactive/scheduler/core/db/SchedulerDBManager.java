@@ -67,6 +67,7 @@ import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
 import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
+import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
 import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
 import org.ow2.proactive.scheduler.common.job.CompletedTasksCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
@@ -3168,11 +3169,14 @@ public class SchedulerDBManager {
         });
     }
 
-    public List<JobLabelInfo> newLabels(List<String> labels) throws LabelConflictException {
+    public List<JobLabelInfo> newLabels(List<String> labels) throws LabelConflictException, LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
             if (checkIfLabelExists(label)) {
                 throw new LabelConflictException(label);
+            }
+            if (label.length() > 20 || !label.matches("^[a-zA-Z0-9_/-]*$")) {
+                throw new LabelValidationException(label);
             }
         }
         labels.forEach(label -> {
@@ -3186,9 +3190,14 @@ public class SchedulerDBManager {
         return jobLabelsInfo;
     }
 
-    public List<JobLabelInfo> setLabels(List<String> labels) {
+    public List<JobLabelInfo> setLabels(List<String> labels) throws LabelValidationException {
         executeReadWriteTransaction(session -> session.getNamedQuery("deleteAllLabel").executeUpdate());
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
+        for (String label : labels) {
+            if (label.length() > 20 || !label.matches("^[a-zA-Z0-9_/-]*$")) {
+                throw new LabelValidationException(label);
+            }
+        }
         labels.forEach(label -> {
             JobLabel jobLabel = executeReadWriteTransaction(session -> {
                 JobLabel labelData = JobLabel.createJobLabel(label);
@@ -3225,12 +3234,15 @@ public class SchedulerDBManager {
     }
 
     public JobLabelInfo updateLabel(String labelId, String newLabel)
-            throws LabelConflictException, LabelNotFoundException {
+            throws LabelConflictException, LabelNotFoundException, LabelValidationException {
         if (checkIfLabelExists(newLabel)) {
             throw new LabelConflictException(newLabel);
         }
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
+        }
+        if (newLabel.length() > 20 || !newLabel.matches("^[a-zA-Z0-9_/-]*$")) {
+            throw new LabelValidationException(newLabel);
         }
         executeReadWriteTransaction(session -> session.getNamedQuery("updateLabel")
                                                       .setParameter("newLabel", newLabel)

@@ -57,6 +57,7 @@ import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
 import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
+import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -1383,18 +1384,19 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public List<JobLabelInfo> createLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelConflictException {
+            throws NotConnectedException, PermissionException, LabelConflictException, LabelValidationException {
         return getScheduler().createLabels(labels);
     }
 
     @Override
-    public List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException {
+    public List<JobLabelInfo> setLabels(List<String> labels)
+            throws NotConnectedException, PermissionException, LabelValidationException {
         return getScheduler().setLabels(labels);
     }
 
     @Override
-    public JobLabelInfo updateLabel(String labelId, String newLabel)
-            throws NotConnectedException, PermissionException, LabelConflictException, LabelNotFoundException {
+    public JobLabelInfo updateLabel(String labelId, String newLabel) throws NotConnectedException, PermissionException,
+            LabelConflictException, LabelNotFoundException, LabelValidationException {
         return getScheduler().updateLabel(labelId, newLabel);
     }
 

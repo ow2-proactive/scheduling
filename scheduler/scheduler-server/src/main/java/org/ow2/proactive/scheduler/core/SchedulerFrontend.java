@@ -95,6 +95,7 @@ import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
 import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
+import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
@@ -2875,7 +2876,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     @RoleAdmin
     public List<JobLabelInfo> createLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelConflictException {
+            throws NotConnectedException, PermissionException, LabelConflictException, LabelValidationException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         frontendState.checkPermission(currentMethod, "You don't have permissions to create labels");
@@ -2886,7 +2887,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     @RoleAdmin
-    public List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException {
+    public List<JobLabelInfo> setLabels(List<String> labels)
+            throws NotConnectedException, PermissionException, LabelValidationException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         frontendState.checkPermission(currentMethod, "You don't have permissions to set the labels list");
@@ -2897,8 +2899,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @Override
     @ImmediateService
     @RoleAdmin
-    public JobLabelInfo updateLabel(String labelId, String newLabel)
-            throws NotConnectedException, PermissionException, LabelConflictException, LabelNotFoundException {
+    public JobLabelInfo updateLabel(String labelId, String newLabel) throws NotConnectedException, PermissionException,
+            LabelConflictException, LabelNotFoundException, LabelValidationException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         frontendState.checkPermission(currentMethod, "You don't have permissions to update labels");
