@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.core.db;
 
 import static org.ow2.proactive.scheduler.core.db.types.FilterJobsMode.FINISHED_AND_STARTED;
 import static org.ow2.proactive.scheduler.core.db.types.FilterJobsMode.SUBMITTED_ONLY;
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.LABEL_MAX_LENGTH;
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.LABEL_REGEX;
 import static org.ow2.proactive.scheduler.util.HsqldbServer.PROP_HIBERNATE_CONNECTION_PASSWORD;
 
 import java.io.File;
@@ -3175,7 +3177,7 @@ public class SchedulerDBManager {
             if (checkIfLabelExists(label)) {
                 throw new LabelConflictException(label);
             }
-            if (label.length() > 20 || !label.matches("^[a-zA-Z0-9_/-]*$")) {
+            if (label.length() > LABEL_MAX_LENGTH || !label.matches(LABEL_REGEX)) {
                 throw new LabelValidationException(label);
             }
         }
@@ -3194,7 +3196,7 @@ public class SchedulerDBManager {
         executeReadWriteTransaction(session -> session.getNamedQuery("deleteAllLabel").executeUpdate());
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
-            if (label.length() > 20 || !label.matches("^[a-zA-Z0-9_/-]*$")) {
+            if (label.length() > LABEL_MAX_LENGTH || !label.matches(LABEL_REGEX)) {
                 throw new LabelValidationException(label);
             }
         }
@@ -3241,7 +3243,7 @@ public class SchedulerDBManager {
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
         }
-        if (newLabel.length() > 20 || !newLabel.matches("^[a-zA-Z0-9_/-]*$")) {
+        if (newLabel.length() > LABEL_MAX_LENGTH || !newLabel.matches(LABEL_REGEX)) {
             throw new LabelValidationException(newLabel);
         }
         executeReadWriteTransaction(session -> session.getNamedQuery("updateLabel")

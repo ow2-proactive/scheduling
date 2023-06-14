@@ -564,6 +564,10 @@ public enum PASchedulerProperties implements PACommonProperties {
 
     public static final String PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH = "config/scheduler/settings.ini";
 
+    public static final String LABEL_REGEX = "^[a-zA-Z0-9_/-]*$";
+
+    public static final int LABEL_MAX_LENGTH = 20;
+
     /** memory entity of the properties file. */
     private static PAPropertiesLazyLoader propertiesLoader;
 
