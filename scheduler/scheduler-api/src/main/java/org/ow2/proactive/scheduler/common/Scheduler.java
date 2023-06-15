@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
 import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
+import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -2086,7 +2087,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
      */
     @RoleAdmin
     List<JobLabelInfo> createLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelConflictException;
+            throws NotConnectedException, PermissionException, LabelConflictException, LabelValidationException;
 
     /**
      * Sets the list of labels.
@@ -2097,7 +2098,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
      *             if you have not enough permission to access this method.
      */
     @RoleAdmin
-    List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException;
+    List<JobLabelInfo> setLabels(List<String> labels)
+            throws NotConnectedException, PermissionException, LabelValidationException;
 
     /**
      * Update the given label
@@ -2112,8 +2114,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
      *             if the given label id is not found.
      */
     @RoleAdmin
-    JobLabelInfo updateLabel(String labelId, String newLabel)
-            throws NotConnectedException, PermissionException, LabelConflictException, LabelNotFoundException;
+    JobLabelInfo updateLabel(String labelId, String newLabel) throws NotConnectedException, PermissionException,
+            LabelConflictException, LabelNotFoundException, LabelValidationException;
 
     /**
      * Remove the given label

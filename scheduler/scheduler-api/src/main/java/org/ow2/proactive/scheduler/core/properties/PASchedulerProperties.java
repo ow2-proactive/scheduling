@@ -555,7 +555,14 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_PORTAL_CONFIGURATION(
             "pa.scheduler.portal.configuration",
             PropertyType.STRING,
-            "config/portal/scheduler-portal-display.conf");
+            "config/portal/scheduler-portal-display.conf"),
+
+    /* ***************************************************************** */
+    /* ***************** LABEL PROPERTIES ********** */
+    /* ***************************************************************** */
+
+    LABEL_REGEX("pa.scheduler.label.regex", PropertyType.STRING, "^[a-zA-Z0-9_/-]*$"),
+    LABEL_MAX_LENGTH("pa.scheduler.label.max.length", PropertyType.INTEGER, "20");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

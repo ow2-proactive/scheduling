@@ -64,6 +64,7 @@ import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
 import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
+import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -1062,22 +1063,23 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @Override
     @ImmediateService
     public List<JobLabelInfo> createLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelConflictException {
+            throws NotConnectedException, PermissionException, LabelConflictException, LabelValidationException {
         checkSchedulerConnection();
         return uischeduler.createLabels(labels);
     }
 
     @Override
     @ImmediateService
-    public List<JobLabelInfo> setLabels(List<String> labels) throws NotConnectedException, PermissionException {
+    public List<JobLabelInfo> setLabels(List<String> labels)
+            throws NotConnectedException, PermissionException, LabelValidationException {
         checkSchedulerConnection();
         return uischeduler.setLabels(labels);
     }
 
     @Override
     @ImmediateService
-    public JobLabelInfo updateLabel(String labelId, String newLabel)
-            throws NotConnectedException, PermissionException, LabelConflictException, LabelNotFoundException {
+    public JobLabelInfo updateLabel(String labelId, String newLabel) throws NotConnectedException, PermissionException,
+            LabelConflictException, LabelNotFoundException, LabelValidationException {
         checkSchedulerConnection();
         return uischeduler.updateLabel(labelId, newLabel);
     }
