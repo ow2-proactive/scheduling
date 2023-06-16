@@ -197,7 +197,7 @@ public class TestReadSchedulerAccount extends BaseSchedulerDBTest {
 
         InternalTask task = job.getTask(taskName);
         TaskResultImpl res = new TaskResultImpl(null, "ok", null, 0);
-        job.terminateTask(false, task.getId(), null, null, res);
+        job.terminateTask(InternalJob.FinishTaskStatus.NORMAL, task.getId(), null, null, res);
         if (job.isFinished()) {
             job.terminate();
         }

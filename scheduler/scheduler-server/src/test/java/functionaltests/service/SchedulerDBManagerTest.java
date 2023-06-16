@@ -632,7 +632,11 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         for (InternalTask task : finishedJob.getITasks()) {
             TaskResultImpl result = new TaskResultImpl(task.getId(), "ok", null, 0);
             FlowAction action = new FlowAction(FlowActionType.CONTINUE);
-            ChangedTasksInfo changesInfo = finishedJob.terminateTask(false, task.getId(), null, action, result);
+            ChangedTasksInfo changesInfo = finishedJob.terminateTask(InternalJob.FinishTaskStatus.NORMAL,
+                                                                     task.getId(),
+                                                                     null,
+                                                                     action,
+                                                                     result);
             task.setFinishedTime(finishedTime);
             dbManager.updateAfterWorkflowTaskFinished(finishedJob, changesInfo, result);
         }
