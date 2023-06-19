@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.helpers.StartAtUpdater;
 import org.ow2.proactive.scheduler.core.helpers.TaskResultCreator;
@@ -342,18 +343,6 @@ class LiveJobs {
                 jlogger.info(jobId, "has just been paused.");
                 dbManager.pauseJobAndTasks(job);
                 updateTasksInSchedulerState(job, updatedTasks);
-                long additionalCoreTime = 0;
-
-                for (Iterator<RunningTaskData> i = runningTasksData.values().iterator(); i.hasNext();) {
-                    RunningTaskData taskData = i.next();
-                    if (taskData.getTask().getJobId().equals(jobId)) {
-                        // remove previous read progress
-                        i.remove();
-                        additionalCoreTime += System.currentTimeMillis() -
-                                              taskData.getTask().getTaskInfo().getStartTime();
-                    }
-                }
-                jobData.job.increaseCumulatedCoreTime(additionalCoreTime);
             }
 
             // update tasks events list and send it to front-end
@@ -703,11 +692,16 @@ class LiveJobs {
                                                                            jobData.job,
                                                                            TerminationData.TerminationStatus.NORMAL);
 
-            boolean errorOccurred = result.hadException();
+            InternalJob.FinishTaskStatus finishTaskStatus = InternalJob.FinishTaskStatus.NORMAL;
+            if (result.hadException()) {
+                finishTaskStatus = InternalJob.FinishTaskStatus.ERROR;
+            }
 
-            tlogger.info(taskId, "finished with" + (errorOccurred ? "" : "out") + " errors");
+            tlogger.info(taskId,
+                         "finished with" + (finishTaskStatus == InternalJob.FinishTaskStatus.ERROR ? "" : "out") +
+                                 " errors");
 
-            if (errorOccurred) {
+            if (finishTaskStatus == InternalJob.FinishTaskStatus.ERROR) {
                 tlogger.error(taskId, "task has terminated with an error", result.getException());
                 task.decreaseNumberOfExecutionLeft();
 
@@ -803,7 +797,7 @@ class LiveJobs {
                 task.setInErrorTime(-1);
             }
 
-            terminateTask(jobData, task, errorOccurred, result, terminationData);
+            terminateTask(jobData, task, finishTaskStatus, result, terminationData);
 
             return terminationData;
         } finally {
@@ -941,7 +935,6 @@ class LiveJobs {
                                                                        new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
                 listener.jobUpdatedFullData(job);
             }
-            jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() - task.getTaskInfo().getStartTime());
 
             return terminationData;
         } finally {
@@ -1013,7 +1006,7 @@ class LiveJobs {
                 return terminationData;
             }
 
-            terminateTask(jobData, task, true, taskResult, terminationData);
+            terminateTask(jobData, task, InternalJob.FinishTaskStatus.ABORTED, taskResult, terminationData);
 
             return terminationData;
         } finally {
@@ -1170,7 +1163,7 @@ class LiveJobs {
             long waitTime = restartDelay * 1000L;
             jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() - task.getTaskInfo().getStartTime());
 
-            restartTaskOnError(jobData, task, TaskStatus.SUBMITTED, taskResult, waitTime, terminationData);
+            restartTaskOnError(jobData, task, TaskStatus.WAITING_ON_ERROR, taskResult, waitTime, terminationData);
 
             return terminationData;
         } finally {
@@ -1220,7 +1213,7 @@ class LiveJobs {
                        message + " The job was configured to be cancelled automatically in this situation.",
                        JobStatus.CANCELED);
             } else {
-                terminateTask(jobData, task, true, taskResult, terminationData);
+                terminateTask(jobData, task, InternalJob.FinishTaskStatus.ABORTED, taskResult, terminationData);
             }
 
             return terminationData;
@@ -1229,8 +1222,8 @@ class LiveJobs {
         }
     }
 
-    private void terminateTask(JobData jobData, InternalTask task, boolean errorOccurred, TaskResultImpl result,
-            TerminationData terminationData) {
+    private void terminateTask(JobData jobData, InternalTask task, InternalJob.FinishTaskStatus status,
+            TaskResultImpl result, TerminationData terminationData) {
         InternalJob job = jobData.job;
         TaskId taskId = task.getId();
 
@@ -1240,7 +1233,11 @@ class LiveJobs {
         job.getRunningTaskDescriptor(taskId);
         //merge task map result to job map result
         job.getResultMap().putAll(result.getResultMap());
-        ChangedTasksInfo changesInfo = job.terminateTask(errorOccurred, taskId, listener, result.getAction(), result);
+        if (task.getFlowScript() != null && status == InternalJob.FinishTaskStatus.ABORTED ||
+            status == InternalJob.FinishTaskStatus.SKIPPED) {
+            result.setAction(FlowAction.getDefaultAction(task.getFlowScript()));
+        }
+        ChangedTasksInfo changesInfo = job.terminateTask(status, taskId, listener, result.getAction(), result);
         ((JobInfoImpl) job.getJobInfo()).setPreciousTasks(job.getPreciousTasksFinished());
 
         boolean jobFinished = job.isFinished();
@@ -1261,8 +1258,12 @@ class LiveJobs {
             jobs.remove(job.getId());
         }
 
-        jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() - task.getTaskInfo().getStartTime());
-        job.decreaseNumberOfNodesInParallel(task.getExecuterInformation().getNodes().getTotalNumberOfNodes());
+        if (task.getTaskInfo().getStartTime() > 0) {
+            jobData.job.increaseCumulatedCoreTime(System.currentTimeMillis() - task.getTaskInfo().getStartTime());
+        }
+        if (task.getExecuterInformation() != null && task.getExecuterInformation().getNodes() != null) {
+            job.decreaseNumberOfNodesInParallel(task.getExecuterInformation().getNodes().getTotalNumberOfNodes());
+        }
         task.setTaskResult(result);
 
         // Update database

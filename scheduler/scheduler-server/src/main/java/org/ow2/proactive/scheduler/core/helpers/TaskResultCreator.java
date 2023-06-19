@@ -92,7 +92,10 @@ public class TaskResultCreator {
     }
 
     public TaskResultImpl getEmptyTaskResult(InternalTask task, Throwable exception, TaskLogs output) {
-        return new TaskResultImpl(task.getId(), exception, output, System.currentTimeMillis() - task.getStartTime());
+        return new TaskResultImpl(task.getId(),
+                                  exception,
+                                  output,
+                                  task.getStartTime() > 0 ? System.currentTimeMillis() - task.getStartTime() : 0);
     }
 
     private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager,

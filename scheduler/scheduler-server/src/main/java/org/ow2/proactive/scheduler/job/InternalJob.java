@@ -99,6 +99,13 @@ public abstract class InternalJob extends JobState {
 
     protected static final Logger LOGGER = Logger.getLogger(InternalJob.class);
 
+    public enum FinishTaskStatus {
+        NORMAL,
+        ERROR,
+        ABORTED,
+        SKIPPED
+    }
+
     /**
      * List of every tasks in this job.
      */
@@ -412,7 +419,7 @@ public abstract class InternalJob extends JobState {
      * Also, apply a Control Flow Action if provided. This may alter the number
      * of tasks in the job, events have to be sent accordingly.
      *
-     * @param errorOccurred has an error occurred for this termination
+     * @param status        status of the termination (normal, error, aborted)
      * @param taskId        the task to terminate.
      * @param frontend      Used to notify all listeners of the replication of tasks,
      *                      triggered by the FlowAction
@@ -420,11 +427,11 @@ public abstract class InternalJob extends JobState {
      *                      inside the job
      * @return the taskDescriptor that has just been terminated.
      */
-    public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId, SchedulerStateUpdate frontend,
-            FlowAction action, TaskResultImpl result) {
+    public ChangedTasksInfo terminateTask(InternalJob.FinishTaskStatus status, TaskId taskId,
+            SchedulerStateUpdate frontend, FlowAction action, TaskResultImpl result) {
         //merge task map result to job map result
         resultMap.putAll(result.getResultMap());
-        return terminateTask(errorOccurred, taskId, frontend, action, result, false);
+        return terminateTask(status, taskId, frontend, action, result, false);
     }
 
     /**
@@ -433,7 +440,7 @@ public abstract class InternalJob extends JobState {
      * Also, apply a Control Flow Action if provided. This may alter the number
      * of tasks in the job, events have to be sent accordingly.
      *
-     * @param errorOccurred has an error occurred for this termination
+     * @param status        status of the termination (normal, error, aborted)
      * @param taskId        the task to terminate.
      * @param frontend      Used to notify all listeners of the replication of tasks,
      *                      triggered by the FlowAction
@@ -443,16 +450,33 @@ public abstract class InternalJob extends JobState {
      * @param taskIsInError If the task is in in-error state
      * @return the taskDescriptor that has just been terminated.
      */
-    public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId, SchedulerStateUpdate frontend,
-            FlowAction action, TaskResultImpl result, boolean taskIsInError) {
+    public ChangedTasksInfo terminateTask(InternalJob.FinishTaskStatus status, TaskId taskId,
+            SchedulerStateUpdate frontend, FlowAction action, TaskResultImpl result, boolean taskIsInError) {
         final InternalTask descriptor = tasks.get(taskId);
 
-        if (!errorOccurred) {
+        if (status == FinishTaskStatus.NORMAL) {
             decreaseNumberOfFaultyTasks(taskId);
         }
 
-        descriptor.setFinishedTime(System.currentTimeMillis());
-        descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
+        long finishTime = System.currentTimeMillis();
+        if (descriptor.getStartTime() < 0) {
+            descriptor.setStartTime(finishTime);
+        }
+        descriptor.setFinishedTime(finishTime);
+        switch (status) {
+            case NORMAL:
+                descriptor.setStatus(TaskStatus.FINISHED);
+                break;
+            case ERROR:
+                descriptor.setStatus(TaskStatus.FAULTY);
+                break;
+            case ABORTED:
+                descriptor.setStatus(TaskStatus.ABORTED);
+                break;
+            case SKIPPED:
+                descriptor.setStatus(TaskStatus.SKIPPED);
+                break;
+        }
         descriptor.setExecutionDuration(result.getTaskDuration());
 
         if (taskIsInError) {
@@ -958,7 +982,12 @@ public abstract class InternalJob extends JobState {
     public ChangedTasksInfo finishInErrorTask(TaskId taskId, TaskResultImpl result, SchedulerStateUpdate frontend) {
 
         FlowAction action = result.getAction();
-        ChangedTasksInfo changedTasksInfo = terminateTask(false, taskId, frontend, action, result, true);
+        ChangedTasksInfo changedTasksInfo = terminateTask(FinishTaskStatus.NORMAL,
+                                                          taskId,
+                                                          frontend,
+                                                          action,
+                                                          result,
+                                                          true);
         setUnPause();
         return changedTasksInfo;
 

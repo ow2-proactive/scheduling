@@ -61,7 +61,11 @@ public class TestRestoreWorkflowJobs2 extends BaseSchedulerDBTest {
         action.setDupNumber(1);
         action.setTarget("B");
         action.setTargetElse("C");
-        ChangedTasksInfo changesInfo = job.terminateTask(false, mainTask.getId(), null, action, result);
+        ChangedTasksInfo changesInfo = job.terminateTask(InternalJob.FinishTaskStatus.NORMAL,
+                                                         mainTask.getId(),
+                                                         null,
+                                                         action,
+                                                         result);
 
         dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, result);
 

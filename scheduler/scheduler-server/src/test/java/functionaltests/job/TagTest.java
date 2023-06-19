@@ -125,7 +125,11 @@ public class TagTest extends ProActiveTest {
         if (script != null) {
             action = task.getFlowScript().execute().getResult();
         }
-        job.terminateTask(false, task.getId(), schedulerStateUpdateMock, action, resultMock);
+        job.terminateTask(InternalJob.FinishTaskStatus.NORMAL,
+                          task.getId(),
+                          schedulerStateUpdateMock,
+                          action,
+                          resultMock);
         System.out.println("executed " + task.getName() + " -> " + getTaskNameList(true));
     }
 

@@ -338,7 +338,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         task = startTask(job, job.getITasks().get(0));
         dbManager.jobTaskStarted(job, task, true, null);
         TaskResultImpl result = new TaskResultImpl(null, new TestResult(0, "result"), null, 0);
-        job.terminateTask(false, task.getId(), null, null, result);
+        job.terminateTask(InternalJob.FinishTaskStatus.NORMAL, task.getId(), null, null, result);
         job.terminate();
         dbManager.updateAfterTaskFinished(job, task, new TaskResultImpl(null, new TestResult(0, "result"), null, 0));
 

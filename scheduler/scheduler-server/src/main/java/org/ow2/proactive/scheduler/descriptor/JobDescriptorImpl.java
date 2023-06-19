@@ -270,6 +270,10 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
 
         EligibleTaskDescriptorImpl oldEnd = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
+        if (oldEnd == null) {
+            // can occur if a task is killed
+            oldEnd = (EligibleTaskDescriptorImpl) eligibleTasks.get(initiator);
+        }
         EligibleTaskDescriptorImpl newStart = acc.get(target.getId());
         EligibleTaskDescriptorImpl newEnd = acc.get(newInit.getId());
 
@@ -362,6 +366,10 @@ public class JobDescriptorImpl implements JobDescriptor {
     public void doIf(TaskId initiator, TaskId branchStart, TaskId branchEnd, TaskId ifJoin, TaskId elseTarget,
             List<InternalTask> elseTasks) {
         EligibleTaskDescriptorImpl init = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
+        if (init == null) {
+            // can occur if a task is killed
+            init = (EligibleTaskDescriptorImpl) eligibleTasks.get(initiator);
+        }
         EligibleTaskDescriptorImpl start = (EligibleTaskDescriptorImpl) branchTasks.get(branchStart);
         EligibleTaskDescriptorImpl end = null;
         EligibleTaskDescriptorImpl join = null;
@@ -571,6 +579,13 @@ public class JobDescriptorImpl implements JobDescriptor {
 
         if (getInternal().getType() == JobType.TASKSFLOW) {
             TaskDescriptor taskToTerminate = currentTasks.get(taskId);
+            if (taskToTerminate == null && !inErrorTask) {
+                // occurs when a task is killed in pending state
+                taskToTerminate = eligibleTasks.remove(taskId);
+                if (taskToTerminate != null) {
+                    runningTasks.put(taskId, taskToTerminate);
+                }
+            }
 
             if (taskToTerminate != null) {
 
