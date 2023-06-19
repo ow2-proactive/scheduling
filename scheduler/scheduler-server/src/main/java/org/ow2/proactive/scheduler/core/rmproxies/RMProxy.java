@@ -101,11 +101,15 @@ public class RMProxy {
         if (proxyActiveObject != null) {
             try {
                 proxyActiveObject.disconnect();
+            } catch (Exception e) {
+                logger.debug("Could not disconnect from resource manager, ignoring ", e);
+            }
+            try {
                 proxyActiveObject.terminateProxy();
-                proxyActiveObject = null;
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 logger.warn("Cannot properly shutdown rm proxy ", e);
             }
+            proxyActiveObject = null;
         }
     }
 
