@@ -223,6 +223,7 @@ public interface SchedulerRestInterface {
             @QueryParam("projectName") @DefaultValue("") String projectName,
             @QueryParam("bucketName") @DefaultValue("") String bucketName,
             @QueryParam("submissionMode") @DefaultValue("") String submissionMode,
+            @QueryParam("label") @DefaultValue("") String label,
             @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("tenant") String tenant,
             @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams)
             throws RestException;

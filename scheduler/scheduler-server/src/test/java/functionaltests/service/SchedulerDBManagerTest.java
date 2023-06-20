@@ -258,6 +258,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
+                                          null,
                                           null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
@@ -272,6 +273,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           false,
                                           false,
                                           true,
+                                          null,
                                           null,
                                           null,
                                           null,
@@ -296,6 +298,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
+                                          null,
                                           null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
@@ -311,6 +314,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           false,
                                           true,
                                           "testGetTotalJobsCount-Job",
+                                          null,
                                           null,
                                           null,
                                           null,
@@ -334,6 +338,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
+                                          null,
                                           null);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
@@ -349,6 +354,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           false,
                                           true,
                                           "invalid_job_name",
+                                          null,
                                           null,
                                           null,
                                           null,
@@ -372,6 +378,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
+                                          null,
                                           null);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
@@ -386,6 +393,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           true,
                                           false,
                                           true,
+                                          null,
                                           null,
                                           null,
                                           null,
@@ -544,6 +552,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                                true,
                                                false,
                                                true,
+                                               null,
                                                null,
                                                null,
                                                null,
