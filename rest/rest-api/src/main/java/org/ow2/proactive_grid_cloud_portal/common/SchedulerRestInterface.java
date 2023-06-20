@@ -194,6 +194,8 @@ public interface SchedulerRestInterface {
      *             Include only jobs with a bucket name that starts with bucketName (case sensitive)
      * @param submissionMode
      *             Include only jobs with a submission mode that starts with submissionMode (case sensitive)
+     * @param label
+     *             Include only jobs with a label that starts with label (case sensitive)
      * @param userName
      *             Include only jobs with a user name that matches exactly with userName (case sensitive)
      * @param parentId
@@ -223,6 +225,7 @@ public interface SchedulerRestInterface {
             @QueryParam("projectName") @DefaultValue("") String projectName,
             @QueryParam("bucketName") @DefaultValue("") String bucketName,
             @QueryParam("submissionMode") @DefaultValue("") String submissionMode,
+            @QueryParam("label") @DefaultValue("") String label,
             @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("tenant") String tenant,
             @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams)
             throws RestException;

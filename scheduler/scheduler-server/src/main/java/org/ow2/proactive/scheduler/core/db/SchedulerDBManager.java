@@ -238,7 +238,7 @@ public class SchedulerDBManager {
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final String tenant,
             final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
             final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
-            String bucketName, Long parentId, String submissionMode,
+            String bucketName, Long parentId, String submissionMode, String label,
             final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
@@ -260,6 +260,7 @@ public class SchedulerDBManager {
                                                              bucketName,
                                                              parentId,
                                                              submissionMode,
+                                                             label,
                                                              sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<Integer> statusRanks = params.getStatusRanks();
@@ -294,6 +295,9 @@ public class SchedulerDBManager {
             }
             if (submissionMode != null && !submissionMode.isEmpty()) {
                 predicates.add(cb.like(root.get("submissionMode"), submissionMode + "%"));
+            }
+            if (label != null && !label.isEmpty()) {
+                predicates.add(cb.like(root.get("label"), label + "%"));
             }
             if (childJobs && parentId != null && parentId > 0L) {
                 predicates.add(cb.equal(root.get("parentId"), parentId));

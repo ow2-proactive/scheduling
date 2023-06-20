@@ -70,13 +70,15 @@ public class DBJobDataParameters {
 
     private final String submissionMode;
 
+    private final String label;
+
     private final List<SortParameter<JobSortParameter>> sortParameters;
 
     private final Set<Integer> statusRanks;
 
     DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
             boolean pending, boolean running, boolean finished, boolean withIssuesOnly, boolean childJobs,
-            String jobName, String projectName, String bucketName, Long parentId, String submissionMode,
+            String jobName, String projectName, String bucketName, Long parentId, String submissionMode, String label,
             List<SortParameter<JobSortParameter>> sortParameters) {
         this.offset = offset;
         this.limit = limit;
@@ -92,6 +94,7 @@ public class DBJobDataParameters {
         this.projectName = projectName;
         this.bucketName = bucketName;
         this.submissionMode = submissionMode;
+        this.label = label;
         this.parentId = parentId;
         this.sortParameters = sortParameters;
 
@@ -163,5 +166,9 @@ public class DBJobDataParameters {
 
     public String getSubmissionMode() {
         return submissionMode;
+    }
+
+    public String getLabel() {
+        return label;
     }
 }
