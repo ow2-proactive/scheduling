@@ -37,6 +37,7 @@ import java.security.KeyException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -57,6 +58,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -290,35 +292,82 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public String getModelHosts() throws PermissionRestException {
+    public String getModelHosts(String name) throws PermissionRestException {
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
         return String.format("PA:LIST(,%s)", state.getNodesEvents()
                                                   .stream()
                                                   .map(RMNodeEvent::getHostName)
                                                   .distinct()
-                                                  .filter(hostName -> !hostName.isEmpty())
+                                                  .filter(hostName -> !hostName.isEmpty() &&
+                                                                      (name != null ? hostName.matches(name) : true))
                                                   .collect(Collectors.joining(",")));
     }
 
     @Override
-    public String getModelNodeSources() throws PermissionRestException {
+    public String getModelNodeSources(String name, String infrastructure, String policy)
+            throws PermissionRestException {
+        return String.format("PA:LIST(,%s)", getFilteredNodeSources(name, infrastructure, policy).stream()
+                                                                                                 .distinct()
+                                                                                                 .collect(Collectors.joining(",")));
+    }
+
+    private List<String> getFilteredNodeSources(String name, String infrastructure, String policy)
+            throws PermissionRestException {
+        Map<String, Pair<String, String>> nodeSources = new LinkedHashMap<>();
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
-        return String.format("PA:LIST(,%s,%s)", RMConstants.DEFAULT_STATIC_SOURCE_NAME, state.getNodeSource()
-                                                                                             .stream()
-                                                                                             .map(RMNodeSourceEvent::getNodeSourceName)
-                                                                                             .distinct()
-                                                                                             .filter(nodeSourceName -> !nodeSourceName.isEmpty() &&
-                                                                                                                       !nodeSourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME))
-                                                                                             .collect(Collectors.joining(",")));
+        nodeSources.put(RMConstants.DEFAULT_STATIC_SOURCE_NAME,
+                        Pair.of("org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager",
+                                "org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy"));
+        state.getNodeSource()
+             .stream()
+             .filter(event -> !event.getNodeSourceName().isEmpty() &&
+                              "DEPLOYED".equalsIgnoreCase(event.getNodeSourceStatus()))
+             .forEach(event -> {
+                 nodeSources.put(event.getNodeSourceName(),
+                                 Pair.of(event.getInfrastructureType(), event.getPolicyType()));
+             });
+        if (infrastructure != null) {
+            for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
+                                                                                   .iterator(); it.hasNext();) {
+                Map.Entry<String, Pair<String, String>> entry = it.next();
+                if (!entry.getValue().getLeft().toLowerCase().contains(infrastructure.toLowerCase())) {
+                    it.remove();
+                }
+
+            }
+        }
+        if (policy != null) {
+            for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
+                                                                                   .iterator(); it.hasNext();) {
+                Map.Entry<String, Pair<String, String>> entry = it.next();
+                if (!entry.getValue().getRight().toLowerCase().contains(policy.toLowerCase())) {
+                    it.remove();
+                }
+
+            }
+        }
+        if (name != null) {
+            for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
+                                                                                   .iterator(); it.hasNext();) {
+                Map.Entry<String, Pair<String, String>> entry = it.next();
+                if (!entry.getKey().matches(name)) {
+                    it.remove();
+                }
+            }
+        }
+        return new ArrayList<>(nodeSources.keySet());
     }
 
     @Override
-    public String getModelTokens() throws PermissionRestException {
+    public String getModelTokens(String name) throws PermissionRestException {
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
         Set<String> tokens = new LinkedHashSet<>();
         state.getNodesEvents().forEach(event -> {
             if (event.getTokens() != null) {
-                tokens.addAll(event.getTokens());
+                tokens.addAll(event.getTokens()
+                                   .stream()
+                                   .filter(token -> (name != null ? token.matches(name) : true))
+                                   .collect(Collectors.toList()));
             }
         });
         if (tokens.isEmpty()) {
