@@ -3161,11 +3161,8 @@ public class SchedulerDBManager {
 
     public List<JobLabelInfo> getLabels() {
         return executeReadOnlyTransaction(session -> {
-            logger.info("Loading JobLabels from database");
-
             Query query = session.getNamedQuery("getTotalJobsLabels").setReadOnly(true);
             List<Object[]> jobLabelInfoList = query.list();
-            logger.info(jobLabelInfoList.size() + " JobLabels to fetch from database");
             return jobLabelInfoList.stream()
                                    .map(label -> new JobLabelInfo(Long.parseLong(label[0].toString()),
                                                                   label[1].toString()))
@@ -3192,6 +3189,7 @@ public class SchedulerDBManager {
             JobLabel jobLabel = executeReadWriteTransaction(session -> {
                 JobLabel labelData = JobLabel.createJobLabel(label);
                 session.save(labelData);
+                logger.info("Label " + label + " has been created");
                 return labelData;
             });
             jobLabelsInfo.add(jobLabel.toJobLabelInfo());
@@ -3211,6 +3209,7 @@ public class SchedulerDBManager {
             JobLabel jobLabel = executeReadWriteTransaction(session -> {
                 JobLabel labelData = JobLabel.createJobLabel(label);
                 session.save(labelData);
+                logger.info("Label " + label + " set been set");
                 return labelData;
             });
             jobLabelsInfo.add(jobLabel.toJobLabelInfo());
@@ -3257,6 +3256,7 @@ public class SchedulerDBManager {
                                                       .setParameter("newLabel", newLabel)
                                                       .setParameter("labelId", Long.parseLong(labelId))
                                                       .executeUpdate());
+        logger.info("Label " + newLabel + " set been updated");
         return new JobLabelInfo(Long.parseLong(labelId), newLabel);
     }
 
@@ -3264,9 +3264,11 @@ public class SchedulerDBManager {
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
         }
+        String label = getLabelById(Long.parseLong(labelId));
         executeReadWriteTransaction(session -> session.getNamedQuery("deleteLabel")
                                                       .setParameter("labelId", Long.parseLong(labelId))
                                                       .executeUpdate());
+        logger.info("Label " + label + " set been deleted");
     }
 
     public void setLabelOnJobIds(String labelId, List<String> jobIds) throws LabelNotFoundException {
@@ -3284,6 +3286,7 @@ public class SchedulerDBManager {
                                                                                                .setParameter("jobIdList",
                                                                                                              jobIdSubList)
                                                                                                .executeUpdate()));
+            logger.info("Label " + label + " set been set of jobs " + jobIds);
         });
     }
 
@@ -3300,6 +3303,7 @@ public class SchedulerDBManager {
                                                                                                .setParameter("jobIdList",
                                                                                                              longIds)
                                                                                                .executeUpdate()));
+            logger.info("Label set been removed from jobs " + jobIds);
         });
     }
 }
