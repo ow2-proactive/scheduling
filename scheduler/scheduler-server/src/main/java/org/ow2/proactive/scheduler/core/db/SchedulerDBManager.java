@@ -3161,11 +3161,8 @@ public class SchedulerDBManager {
 
     public List<JobLabelInfo> getLabels() {
         return executeReadOnlyTransaction(session -> {
-            logger.info("Loading JobLabels from database");
-
             Query query = session.getNamedQuery("getTotalJobsLabels").setReadOnly(true);
             List<Object[]> jobLabelInfoList = query.list();
-            logger.info(jobLabelInfoList.size() + " JobLabels to fetch from database");
             return jobLabelInfoList.stream()
                                    .map(label -> new JobLabelInfo(Long.parseLong(label[0].toString()),
                                                                   label[1].toString()))
@@ -3178,7 +3175,8 @@ public class SchedulerDBManager {
                label.matches(PASchedulerProperties.LABEL_REGEX.getValueAsString());
     }
 
-    public List<JobLabelInfo> newLabels(List<String> labels) throws LabelConflictException, LabelValidationException {
+    public List<JobLabelInfo> newLabels(List<String> labels, String username)
+            throws LabelConflictException, LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
             if (checkIfLabelExists(label)) {
@@ -3196,10 +3194,11 @@ public class SchedulerDBManager {
             });
             jobLabelsInfo.add(jobLabel.toJobLabelInfo());
         });
+        logger.info("Labels " + labels + " have been created by " + username);
         return jobLabelsInfo;
     }
 
-    public List<JobLabelInfo> setLabels(List<String> labels) throws LabelValidationException {
+    public List<JobLabelInfo> setLabels(List<String> labels, String username) throws LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
             if (!isLabelValid(label)) {
@@ -3215,6 +3214,7 @@ public class SchedulerDBManager {
             });
             jobLabelsInfo.add(jobLabel.toJobLabelInfo());
         });
+        logger.info("Label list " + labels + " has been set by " + username);
         return jobLabelsInfo;
     }
 
@@ -3242,7 +3242,7 @@ public class SchedulerDBManager {
         });
     }
 
-    public JobLabelInfo updateLabel(String labelId, String newLabel)
+    public JobLabelInfo updateLabel(String labelId, String newLabel, String username)
             throws LabelConflictException, LabelNotFoundException, LabelValidationException {
         if (checkIfLabelExists(newLabel)) {
             throw new LabelConflictException(newLabel);
@@ -3257,19 +3257,22 @@ public class SchedulerDBManager {
                                                       .setParameter("newLabel", newLabel)
                                                       .setParameter("labelId", Long.parseLong(labelId))
                                                       .executeUpdate());
+        logger.info("Label " + newLabel + " has been updated by " + username);
         return new JobLabelInfo(Long.parseLong(labelId), newLabel);
     }
 
-    public void deleteLabel(String labelId) throws LabelNotFoundException {
+    public void deleteLabel(String labelId, String username) throws LabelNotFoundException {
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
         }
+        String label = getLabelById(Long.parseLong(labelId));
         executeReadWriteTransaction(session -> session.getNamedQuery("deleteLabel")
                                                       .setParameter("labelId", Long.parseLong(labelId))
                                                       .executeUpdate());
+        logger.info("Label " + label + " has been deleted by " + username);
     }
 
-    public void setLabelOnJobIds(String labelId, List<String> jobIds) throws LabelNotFoundException {
+    public void setLabelOnJobIds(String labelId, List<String> jobIds, String username) throws LabelNotFoundException {
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
         }
@@ -3285,9 +3288,10 @@ public class SchedulerDBManager {
                                                                                                              jobIdSubList)
                                                                                                .executeUpdate()));
         });
+        logger.info("Label " + label + " has been set on jobs " + jobIds + "  by " + username);
     }
 
-    public void removeJobLabels(List<String> jobIds) {
+    public void removeJobLabels(List<String> jobIds, String username) {
 
         jobIds.forEach(jobId -> {
             List<String> ids = Arrays.asList(jobId.split("[\\s,]+"));
@@ -3301,5 +3305,6 @@ public class SchedulerDBManager {
                                                                                                              longIds)
                                                                                                .executeUpdate()));
         });
+        logger.info("Label has been removed from jobs " + jobIds + "  by " + username);
     }
 }

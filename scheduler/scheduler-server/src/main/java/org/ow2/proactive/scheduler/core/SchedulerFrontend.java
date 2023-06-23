@@ -2880,9 +2880,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, PermissionException, LabelConflictException, LabelValidationException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermission(currentMethod, "You don't have permissions to create labels");
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to create labels");
 
-        return dbManager.newLabels(labels);
+        return dbManager.newLabels(labels, ident.getUsername());
     }
 
     @Override
@@ -2892,9 +2893,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, PermissionException, LabelValidationException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermission(currentMethod, "You don't have permissions to set the labels list");
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to set the labels list");
 
-        return dbManager.setLabels(labels);
+        return dbManager.setLabels(labels, ident.getUsername());
     }
 
     @Override
@@ -2904,9 +2906,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             LabelConflictException, LabelNotFoundException, LabelValidationException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermission(currentMethod, "You don't have permissions to update labels");
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to update labels");
 
-        return dbManager.updateLabel(labelId, newLabel);
+        return dbManager.updateLabel(labelId, newLabel, ident.getUsername());
     }
 
     @Override
@@ -2915,9 +2918,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public void deleteLabel(String labelId) throws NotConnectedException, PermissionException, LabelNotFoundException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermission(currentMethod, "You don't have permissions to delete labels");
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to delete labels");
 
-        dbManager.deleteLabel(labelId);
+        dbManager.deleteLabel(labelId, ident.getUsername());
     }
 
     @Override
@@ -2927,13 +2931,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, PermissionException, LabelNotFoundException, UnknownJobException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermission(currentMethod, "You don't have permissions to set label on jobs");
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to set label on jobs");
         for (String jobId : jobIds) {
             frontendState.checkPermissions(currentMethod,
                                            frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
                                            YOU_DO_NOT_HAVE_PERMISSION_TO_SET_LABEL_FOR_THIS_JOB);
         }
-        dbManager.setLabelOnJobIds(labelId, jobIds);
+        dbManager.setLabelOnJobIds(labelId, jobIds, ident.getUsername());
     }
 
     @Override
@@ -2943,13 +2948,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, PermissionException, UnknownJobException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermission(currentMethod, "You don't have permissions to remove labels from jobs");
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to remove labels from jobs");
         for (String jobId : jobIds) {
             frontendState.checkPermissions(currentMethod,
                                            frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
                                            YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_LABEL_FOR_THIS_JOB);
         }
-        dbManager.removeJobLabels(jobIds);
+        dbManager.removeJobLabels(jobIds, ident.getUsername());
     }
 
 }
