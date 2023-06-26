@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.webapp;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.security.KeyException;
+import java.util.regex.PatternSyntaxException;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.NotFoundException;
@@ -229,6 +230,13 @@ public class ExceptionMappers {
     }
 
     public static class LabelValidationRestExceptionMapper extends BaseExceptionMapper<LabelValidationRestException> {
+        @Override
+        protected int getErrorCode() {
+            return HttpURLConnection.HTTP_BAD_REQUEST;
+        }
+    }
+
+    public static class PatternSyntaxRestExceptionMapper extends BaseExceptionMapper<PatternSyntaxException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_BAD_REQUEST;

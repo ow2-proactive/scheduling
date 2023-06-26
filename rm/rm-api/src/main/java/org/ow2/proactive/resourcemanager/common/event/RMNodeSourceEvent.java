@@ -66,6 +66,10 @@ public class RMNodeSourceEvent extends RMEvent {
     /** string representation of the status of node source */
     private String nodeSourceStatus;
 
+    private String infrastructureType;
+
+    private String policyType;
+
     /**
      * ProActive Empty constructor.
      */
@@ -77,19 +81,23 @@ public class RMNodeSourceEvent extends RMEvent {
      * Used to represent the resource manager state @see RMInitialState.
      */
     public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription,
-            LinkedHashMap<String, String> additionalInformation, String nodeSourceAdmin, String nodeSourceStatus) {
+            LinkedHashMap<String, String> additionalInformation, String nodeSourceAdmin, String nodeSourceStatus,
+            String infrastructureType, String policyType) {
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
         this.additionalInformation = new LinkedHashMap<>(additionalInformation);
         this.nodeSourceAdmin = nodeSourceAdmin;
         this.nodeSourceStatus = nodeSourceStatus;
+        this.infrastructureType = infrastructureType;
+        this.policyType = policyType;
     }
 
     /**
      * Creates an RMNodesourceEvent object.
      */
     public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName, String nodeSourceDescription,
-            LinkedHashMap<String, String> additionalInformation, String nodeSourceAdmin, String nodeSourceStatus) {
+            LinkedHashMap<String, String> additionalInformation, String nodeSourceAdmin, String nodeSourceStatus,
+            String infrastructureType, String policyType) {
         super(type);
         this.initiator = initiator;
         this.nodeSourceName = nodeSourceName;
@@ -97,6 +105,8 @@ public class RMNodeSourceEvent extends RMEvent {
         this.additionalInformation = new LinkedHashMap<>(additionalInformation);
         this.nodeSourceAdmin = nodeSourceAdmin;
         this.nodeSourceStatus = nodeSourceStatus;
+        this.infrastructureType = infrastructureType;
+        this.policyType = policyType;
     }
 
     // for testing purpose RMinitialStateTest
@@ -192,5 +202,13 @@ public class RMNodeSourceEvent extends RMEvent {
     // for the sake of resteasy mapping
     public String getNodeSourceDescription() {
         return nodeSourceDescription;
+    }
+
+    public String getInfrastructureType() {
+        return infrastructureType;
+    }
+
+    public String getPolicyType() {
+        return policyType;
     }
 }
