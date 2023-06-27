@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.synchronization;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
@@ -1163,13 +1162,23 @@ public class AOSynchronization implements RunActive, InitActive, EndActive, Sync
     private synchronized Script getClosureScript(String closureDefinition) {
         String md5Closure = DigestUtils.md5Hex(closureDefinition);
         if (!closureCache.containsKey(md5Closure)) {
+            limitGroovyClassCacheSize();
             String newName = CLOSURE_NAME_BASE + closureIndex++;
-
             Script script = shell.parse(closureDefinition, newName);
             closureCache.put(md5Closure, script);
             return script;
         }
         return closureCache.get(md5Closure);
+    }
+
+    private void limitGroovyClassCacheSize() {
+        if (shell.getClassLoader()
+                 .getLoadedClasses().length > PASchedulerProperties.SCHEDULER_STAX_JOB_CACHE.getValueAsInt() * 2) {
+            // some workflows may use closure definitions that vary based on jobid or other temporal information
+            // to ensure that the groovy class cache does not explode, we force a reset once reaching a threshold size
+            shell.resetLoadedClasses();
+            closureCache.clear();
+        }
     }
 
     /**
