@@ -406,8 +406,9 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters,
-                        DateTime.now().plusMinutes(1).getMillis(),
-                        DateTime.now().minusMinutes(1).getMillis())
+                                 DateTime.now().minusMinutes(1).getMillis(),
+                                 DateTime.now().plusMinutes(1).getMillis())
+
                         .getList();
         JobInfo jobInfo = jobs.get(0);
         Assert.assertEquals("6", jobInfo.getJobId().value());
@@ -422,25 +423,25 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         Assert.assertEquals(SUBMISSION_MODE_REST_API, jobInfo.getSubmissionMode());
 
         jobs = dbManager.getJobs(0,
-                        1,
-                        null,
-                        null,
-                        false,
-                        true,
-                        true,
-                        true,
-                        false,
-                        true,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        sortParameters,
-                        DateTime.now().minusHours(1).getMillis(),
-                        DateTime.now().minusHours(2).getMillis())
-                .getList();
+                                 1,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters,
+                                 DateTime.now().minusHours(2).getMillis(),
+                                 DateTime.now().minusHours(1).getMillis())
+                        .getList();
 
         Assert.assertEquals(jobs.size(), 0);
 

@@ -206,10 +206,10 @@ public interface SchedulerRestInterface {
      *            PENDING_TASKS,RUNNING_TASKS,FINISHED_TASKS,FAILED_TASKS,FAULTY_TASKS,IN_ERROR_TASKS
      *            Each parameter must end with _d for descending order or _a for ascending.
      *            Default value is: "STATE_a,ID_d"
-     * @param submittedTimeLessThan
-     *             Include only jobs with submittedTime less than submittedTimeLessThan
      * @param submittedTimeGreater
-     *             Include only jobs with submittedTime greater than submittedTimeGreater
+     *             Include only jobs with a submittedTime after the given EPOCh time
+     * @param submittedTimeLessThan
+     *             Include only jobs with a submittedTime earlier than the given EPOCH time
      * @return a map containing one entry with the revision id as key and the
      *         list of UserJobData as value.
      */
@@ -232,8 +232,8 @@ public interface SchedulerRestInterface {
             @QueryParam("label") @DefaultValue("") String label,
             @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("tenant") String tenant,
             @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams,
-            @QueryParam("submittedTimeLessThan") @DefaultValue("0") long submittedTimeLessThan,
-            @QueryParam("submittedTimeGreater") @DefaultValue("0") long submittedTimeGreater) throws RestException;
+            @QueryParam("submittedTimeGreater") @DefaultValue("0") long submittedTimeGreater,
+            @QueryParam("submittedTimeLessThan") @DefaultValue("0") long submittedTimeLessThan) throws RestException;
 
     /**
      * Returns the revision number of the scheduler state
