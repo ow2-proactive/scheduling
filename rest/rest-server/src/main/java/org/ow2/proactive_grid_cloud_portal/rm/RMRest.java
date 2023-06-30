@@ -294,21 +294,30 @@ public class RMRest implements RMRestInterface {
     @Override
     public String getModelHosts(String name) throws PermissionRestException {
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
-        return String.format("PA:LIST(,%s)", state.getNodesEvents()
-                                                  .stream()
-                                                  .map(RMNodeEvent::getHostName)
-                                                  .distinct()
-                                                  .filter(hostName -> !hostName.isEmpty() &&
-                                                                      (name != null ? hostName.matches(name) : true))
-                                                  .collect(Collectors.joining(",")));
+        List<String> filteredHosts = state.getNodesEvents()
+                                          .stream()
+                                          .map(RMNodeEvent::getHostName)
+                                          .distinct()
+                                          .filter(hostName -> !hostName.isEmpty() &&
+                                                              (name != null ? hostName.matches(name) : true))
+                                          .collect(Collectors.toList());
+        if (filteredHosts.isEmpty()) {
+            return "PA:LIST()";
+        } else {
+            return String.format("PA:LIST(,%s)", filteredHosts.stream().distinct().collect(Collectors.joining(",")));
+        }
     }
 
     @Override
     public String getModelNodeSources(String name, String infrastructure, String policy)
             throws PermissionRestException {
-        return String.format("PA:LIST(,%s)", getFilteredNodeSources(name, infrastructure, policy).stream()
-                                                                                                 .distinct()
-                                                                                                 .collect(Collectors.joining(",")));
+        List<String> filteredNodeSources = getFilteredNodeSources(name, infrastructure, policy);
+        if (filteredNodeSources.isEmpty()) {
+            return "PA:LIST()";
+        } else {
+            return String.format("PA:LIST(,%s)",
+                                 filteredNodeSources.stream().distinct().collect(Collectors.joining(",")));
+        }
     }
 
     private List<String> getFilteredNodeSources(String name, String infrastructure, String policy)
@@ -371,9 +380,10 @@ public class RMRest implements RMRestInterface {
             }
         });
         if (tokens.isEmpty()) {
-            return "PA:REGEXP(^$)";
+            return "PA:LIST()";
+        } else {
+            return String.format("PA:LIST(,%s)", String.join(",", tokens));
         }
-        return String.format("PA:LIST(,%s)", String.join(",", tokens));
     }
 
     @Override

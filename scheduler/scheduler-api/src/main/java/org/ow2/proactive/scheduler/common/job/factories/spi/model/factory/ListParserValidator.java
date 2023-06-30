@@ -42,7 +42,7 @@ public class ListParserValidator extends BaseParserValidator<String> {
     public static final String RIGHT_DELIMITER = ")";
 
     protected static final String LIST_REGEXP = "^" + ignoreCaseRegexp(ModelType.LIST.name()) + "\\" + LEFT_DELIMITER +
-                                                "([^)]+)" + "\\" + RIGHT_DELIMITER + "$";
+                                                "([^)]*)" + "\\" + RIGHT_DELIMITER + "$";
 
     public ListParserValidator(String model) throws ModelSyntaxException {
         super(model, ModelType.LIST, LIST_REGEXP);
