@@ -349,7 +349,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                                                                            criteria.getUserName(),
                                                                                                            criteria.getTenant(),
                                                                                                            criteria.getParentId(),
-                                                                                                           sortParams);
+                                                                                                           sortParams,
+                                                                                                           criteria.getSubmittedTimeLessThan(),
+                                                                                                           criteria.getSubmittedTimeGreater());
             List<UserJobData> userJobs = userJobsAllRevisions.getMap().values().iterator().next();
             jobInfos = new Page<JobInfo>(toJobInfos(userJobs), userJobs.size());
 

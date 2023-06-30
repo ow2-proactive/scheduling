@@ -55,6 +55,10 @@ public class JobFilterCriteriaBuilder {
 
     private String submissionMode;
 
+    private long submittedTimeLessThan;
+
+    private long submittedTimeGreater;
+
     public JobFilterCriteriaBuilder() {
     }
 
@@ -112,6 +116,14 @@ public class JobFilterCriteriaBuilder {
 
     public String getSubmissionMode() {
         return submissionMode;
+    }
+
+    public long getSubmittedTimeLessThan() {
+        return submittedTimeLessThan;
+    }
+
+    public long getSubmittedTimeGreater() {
+        return submittedTimeGreater;
     }
 
     public JobFilterCriteriaBuilder myJobsOnly(boolean myJobsOnly) {
@@ -181,6 +193,16 @@ public class JobFilterCriteriaBuilder {
 
     public JobFilterCriteriaBuilder submissionMode(String submissionMode) {
         this.submissionMode = submissionMode;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder submittedTimeLessThan(long submittedTimeLessThan) {
+        this.submittedTimeLessThan = submittedTimeLessThan;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder submittedTimeGreater(long submittedTimeGreater) {
+        this.submittedTimeGreater = submittedTimeGreater;
         return this;
     }
 

@@ -239,7 +239,8 @@ public class SchedulerDBManager {
             final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
             final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
             String bucketName, Long parentId, String submissionMode, String label,
-            final List<SortParameter<JobSortParameter>> sortParameters) {
+            final List<SortParameter<JobSortParameter>> sortParameters, long submittedTimeLessThan,
+            long submittedTimeGreater) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -261,7 +262,9 @@ public class SchedulerDBManager {
                                                              parentId,
                                                              submissionMode,
                                                              label,
-                                                             sortParameters);
+                                                             sortParameters,
+                                                             submittedTimeLessThan,
+                                                             submittedTimeGreater);
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<Integer> statusRanks = params.getStatusRanks();
         List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
@@ -298,6 +301,12 @@ public class SchedulerDBManager {
             }
             if (label != null && !label.isEmpty()) {
                 predicates.add(cb.like(root.get("label"), label + "%"));
+            }
+            if (submittedTimeLessThan != 0) {
+                predicates.add(cb.le(root.get("submittedTime"), submittedTimeLessThan));
+            }
+            if (submittedTimeGreater != 0) {
+                predicates.add(cb.ge(root.get("submittedTime"), submittedTimeGreater));
             }
             if (childJobs && parentId != null && parentId > 0L) {
                 predicates.add(cb.equal(root.get("parentId"), parentId));
@@ -607,6 +616,18 @@ public class SchedulerDBManager {
                     queryString.append("and parentId = :parentId ");
                 }
 
+                if (params.getLabel() != null && !params.getLabel().isEmpty()) {
+                    queryString.append("and label like :label ");
+                }
+
+                if (params.getSubmittedTimeLessThan() != 0) {
+                    queryString.append("and submittedTime <= :submittedTimeLessThan ");
+                }
+
+                if (params.getSubmittedTimeGreater() != 0) {
+                    queryString.append("and submittedTime >= :submittedTimeGreater ");
+                }
+
                 Query query = session.createQuery(queryString.toString());
                 query.setParameterList("statusRanks", statusRanks);
                 if (hasUser) {
@@ -633,6 +654,18 @@ public class SchedulerDBManager {
 
                 if (params.isChildJobs() && params.getParentId() != null && params.getParentId() > 0) {
                     query.setParameter("parentId", params.getParentId());
+                }
+
+                if (params.getLabel() != null && !params.getLabel().isEmpty()) {
+                    query.setParameter("label", params.getLabel());
+                }
+
+                if (params.getSubmittedTimeLessThan() != 0) {
+                    query.setParameter("submittedTimeLessThan", params.getSubmittedTimeLessThan());
+                }
+
+                if (params.getSubmittedTimeGreater() != 0) {
+                    query.setParameter("submittedTimeGreater", params.getSubmittedTimeGreater());
                 }
 
                 Long count = (Long) query.uniqueResult();

@@ -1904,7 +1904,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                    filterCriteria.getParentId(),
                                                    filterCriteria.getSubmissionMode(),
                                                    filterCriteria.getLabel(),
-                                                   sortParameters);
+                                                   sortParameters,
+                                                   filterCriteria.getSubmittedTimeLessThan(),
+                                                   filterCriteria.getSubmittedTimeGreater());
         /**
          * Add/inject to each JobInfo the list of signals used by the job, if they exist.
          */

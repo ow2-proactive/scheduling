@@ -227,8 +227,9 @@ public interface SchedulerRestInterface {
             @QueryParam("submissionMode") @DefaultValue("") String submissionMode,
             @QueryParam("label") @DefaultValue("") String label,
             @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("tenant") String tenant,
-            @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams)
-            throws RestException;
+            @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams,
+            @QueryParam("submittedTimeLessThan") @DefaultValue("0") long submittedTimeLessThan,
+            @QueryParam("submittedTimeGreater") @DefaultValue("0") long submittedTimeGreater) throws RestException;
 
     /**
      * Returns the revision number of the scheduler state
