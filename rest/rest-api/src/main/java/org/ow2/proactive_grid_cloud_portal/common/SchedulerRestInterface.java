@@ -206,6 +206,10 @@ public interface SchedulerRestInterface {
      *            PENDING_TASKS,RUNNING_TASKS,FINISHED_TASKS,FAILED_TASKS,FAULTY_TASKS,IN_ERROR_TASKS
      *            Each parameter must end with _d for descending order or _a for ascending.
      *            Default value is: "STATE_a,ID_d"
+     * @param submittedTimeLessThan
+     *             Include only jobs with submittedTime less than submittedTimeLessThan
+     * @param submittedTimeGreater
+     *             Include only jobs with submittedTime greater than submittedTimeGreater
      * @return a map containing one entry with the revision id as key and the
      *         list of UserJobData as value.
      */

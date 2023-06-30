@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.db.SortOrder;
@@ -405,8 +406,8 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters,
-                                 0,
-                                 0)
+                        DateTime.now().plusMinutes(1).getMillis(),
+                        DateTime.now().minusMinutes(1).getMillis())
                         .getList();
         JobInfo jobInfo = jobs.get(0);
         Assert.assertEquals("6", jobInfo.getJobId().value());
@@ -419,6 +420,29 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         Assert.assertEquals(JobPriority.NORMAL, jobInfo.getPriority());
         Assert.assertEquals(DEFAULT_USER_NAME, jobInfo.getJobOwner());
         Assert.assertEquals(SUBMISSION_MODE_REST_API, jobInfo.getSubmissionMode());
+
+        jobs = dbManager.getJobs(0,
+                        1,
+                        null,
+                        null,
+                        false,
+                        true,
+                        true,
+                        true,
+                        false,
+                        true,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        sortParameters,
+                        DateTime.now().minusHours(1).getMillis(),
+                        DateTime.now().minusHours(2).getMillis())
+                .getList();
+
+        Assert.assertEquals(jobs.size(), 0);
 
         jobs = dbManager.getJobs(0,
                                  10,

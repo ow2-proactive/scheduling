@@ -302,10 +302,10 @@ public class SchedulerDBManager {
             if (label != null && !label.isEmpty()) {
                 predicates.add(cb.like(root.get("label"), label + "%"));
             }
-            if (submittedTimeLessThan != 0) {
-                predicates.add(cb.le(root.get("submittedTime"), submittedTimeLessThan));
+            if (submittedTimeLessThan > 0) {
+                predicates.add(cb.lessThan(root.get("submittedTime"), submittedTimeLessThan));
             }
-            if (submittedTimeGreater != 0) {
+            if (submittedTimeGreater > 0) {
                 predicates.add(cb.ge(root.get("submittedTime"), submittedTimeGreater));
             }
             if (childJobs && parentId != null && parentId > 0L) {
@@ -620,11 +620,11 @@ public class SchedulerDBManager {
                     queryString.append("and label like :label ");
                 }
 
-                if (params.getSubmittedTimeLessThan() != 0) {
+                if (params.getSubmittedTimeLessThan() > 0) {
                     queryString.append("and submittedTime <= :submittedTimeLessThan ");
                 }
 
-                if (params.getSubmittedTimeGreater() != 0) {
+                if (params.getSubmittedTimeGreater() > 0) {
                     queryString.append("and submittedTime >= :submittedTimeGreater ");
                 }
 
