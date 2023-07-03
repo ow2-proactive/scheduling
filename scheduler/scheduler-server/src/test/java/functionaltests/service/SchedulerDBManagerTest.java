@@ -259,7 +259,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
-                                          null);
+                                          null,
+                                          0,
+                                          0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
         // no pagination, no user, no pending, no running, no finished
@@ -279,7 +281,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
-                                          null);
+                                          null,
+                                          0,
+                                          0);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
         // no pagination, user = "admin", pending, running, finished
@@ -299,7 +303,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
-                                          null);
+                                          null,
+                                          0,
+                                          0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
         // no pagination, user = "admin", pending, running, finished, jobName = "testGetTotalJobsCount-Job"
@@ -319,7 +325,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
-                                          null);
+                                          null,
+                                          0,
+                                          0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
         // no pagination, user = "admin", pending, running, finished, jobName = "testGetTotal"
@@ -339,7 +347,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
-                                          null);
+                                          null,
+                                          0,
+                                          0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
         // no pagination, user = "admin", pending, running, finished, jobName = "invalid_job_name"
@@ -359,7 +369,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
-                                          null);
+                                          null,
+                                          0,
+                                          0);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
         // no pagination, user = "invalid_user", pending, no running, finished
@@ -379,7 +391,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
-                                          null);
+                                          null,
+                                          0,
+                                          0);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
         // pagination [0,5[, user = "admin", pending, running, finished
@@ -399,7 +413,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
-                                          null);
+                                          null,
+                                          0,
+                                          0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
     }
 
@@ -558,7 +574,9 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                                null,
                                                null,
                                                null,
-                                               null);
+                                               null,
+                                               0,
+                                               0);
 
         assertThat(jobs.getSize()).isEqualTo(1);
 

@@ -76,10 +76,15 @@ public class DBJobDataParameters {
 
     private final Set<Integer> statusRanks;
 
+    private final long submittedTimeLessThan;
+
+    private final long submittedTimeGreater;
+
     DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
             boolean pending, boolean running, boolean finished, boolean withIssuesOnly, boolean childJobs,
             String jobName, String projectName, String bucketName, Long parentId, String submissionMode, String label,
-            List<SortParameter<JobSortParameter>> sortParameters) {
+            List<SortParameter<JobSortParameter>> sortParameters, long submittedTimeLessThan,
+            long submittedTimeGreater) {
         this.offset = offset;
         this.limit = limit;
         this.user = user;
@@ -97,6 +102,8 @@ public class DBJobDataParameters {
         this.label = label;
         this.parentId = parentId;
         this.sortParameters = sortParameters;
+        this.submittedTimeLessThan = submittedTimeLessThan;
+        this.submittedTimeGreater = submittedTimeGreater;
 
         Set<Integer> newStatusRanks = new HashSet<Integer>();
         if (pending) {
@@ -170,5 +177,13 @@ public class DBJobDataParameters {
 
     public String getLabel() {
         return label;
+    }
+
+    public long getSubmittedTimeLessThan() {
+        return submittedTimeLessThan;
+    }
+
+    public long getSubmittedTimeGreater() {
+        return submittedTimeGreater;
     }
 }
