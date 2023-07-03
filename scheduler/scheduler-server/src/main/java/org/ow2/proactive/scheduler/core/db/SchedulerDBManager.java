@@ -660,11 +660,11 @@ public class SchedulerDBManager {
                     query.setParameter("label", params.getLabel());
                 }
 
-                if (params.getSubmittedTimeGreater() != 0) {
+                if (params.getSubmittedTimeGreater() > 0) {
                     query.setParameter("submittedTimeGreater", params.getSubmittedTimeGreater());
                 }
 
-                if (params.getSubmittedTimeLessThan() != 0) {
+                if (params.getSubmittedTimeLessThan() > 0) {
                     query.setParameter("submittedTimeLessThan", params.getSubmittedTimeLessThan());
                 }
 
