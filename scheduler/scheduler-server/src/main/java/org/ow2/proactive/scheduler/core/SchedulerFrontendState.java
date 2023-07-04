@@ -260,6 +260,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     private final LinkedHashMap<JobId, ClientJobState> finishedJobsLRUCache;
 
+    private final LinkedHashMap<JobId, JobInfo> jobInfoLRUCache;
+
     private SchedulerDBManager dbManager = null;
 
     SchedulerFrontendState(SchedulerStateImpl schedulerState, SchedulerJMXHelper jmxHelper) {
@@ -268,6 +270,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         this.jmxHelper = jmxHelper;
         this.jobsMap = new HashMap<>();
         this.finishedJobsLRUCache = new LinkedHashMap<JobId, ClientJobState>(10, 0.75f, true) {
+            @Override
+            public boolean removeEldestEntry(Map.Entry eldest) {
+                return size() > SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE.getValueAsInt();
+            }
+        };
+        this.jobInfoLRUCache = new LinkedHashMap<JobId, JobInfo>(10, 0.75f, true) {
             @Override
             public boolean removeEldestEntry(Map.Entry eldest) {
                 return size() > SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE.getValueAsInt();
@@ -810,15 +818,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             IdentifiedJob identifiedJob = jobs.get(jobId);
 
             if (identifiedJob == null) {
-
-                ClientJobState clientJobState = getClientJobState(jobId);
-                if (clientJobState != null) {
-                    identifiedJob = toIdentifiedJob(clientJobState);
+                JobInfo jobInfo = getJobInfo(jobId);
+                if (jobInfo != null) {
+                    identifiedJob = toIdentifiedJob(jobInfo);
                     identifiedJob.setFinished(true); // because whenever there is job in jobsMap, but not in jobs, it is always finished
                 } else {
-                    String msg = "The job represented by this ID '" + jobId + "' is unknown !";
-                    logger.info(msg);
-                    throw new UnknownJobException(msg);
+                    throw new UnknownJobException(jobId);
                 }
             }
 
@@ -947,25 +952,22 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     JobInfo getJobInfo(JobId jobId) throws UnknownJobException {
-        return Lambda.withLock(stateReadLock, () -> {
-            ClientJobState jobState = getClientJobState(jobId);
-            if (jobState == null) {
-                throw new UnknownJobException(jobId);
-            }
-            JobInfo jobInfoCopy;
-            try {
-                jobState.readLock();
-                try {
-                    jobInfoCopy = (JobInfo) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(jobState.getJobInfo());
-                } catch (Exception e) {
-                    logger.error("Error when copying job state", e);
-                    throw new IllegalStateException(e);
+        return Lambda.withLockException1(stateReadLock, () -> {
+            if (!jobsMap.containsKey(jobId)) {
+                if (!jobInfoLRUCache.containsKey(jobId)) {
+                    List<JobInfo> jobInfoList = dbManager.getJobs(Collections.singletonList(jobId.value()));
+                    if (!jobInfoList.isEmpty()) {
+                        JobInfo jobInfo = jobInfoList.get(0);
+                        jobInfoLRUCache.put(jobId, jobInfo);
+                    } else {
+                        throw new UnknownJobException(jobId);
+                    }
                 }
-            } finally {
-                jobState.readUnlock();
+                return jobInfoLRUCache.get(jobId);
+            } else {
+                return jobsMap.get(jobId).getJobInfo();
             }
-            return jobInfoCopy;
-        });
+        }, UnknownJobException.class);
     }
 
     JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
@@ -1610,6 +1612,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner(),
                                                                    clientJobState.getTenant());
         return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
+    }
+
+    IdentifiedJob toIdentifiedJob(JobInfo jobInfo) {
+        UserIdentificationImpl uIdent = new UserIdentificationImpl(jobInfo.getJobOwner(), jobInfo.getTenant());
+        return new IdentifiedJob(jobInfo.getJobId(), uIdent, jobInfo.getGenericInformation());
     }
 
     TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit) throws UnknownJobException {
