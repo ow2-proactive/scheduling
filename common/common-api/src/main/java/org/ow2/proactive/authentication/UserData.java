@@ -55,6 +55,8 @@ public class UserData implements Serializable {
 
     private boolean handleOnlyMyJobsPermission;
 
+    private boolean otherUsersJobReadPermission;
+
     public boolean isAllJobPlannerPermission() {
         return allJobPlannerPermission;
     }
@@ -109,5 +111,13 @@ public class UserData implements Serializable {
 
     public void setHandleOnlyMyJobsPermission(boolean handleOnlyMyJobsPermission) {
         this.handleOnlyMyJobsPermission = handleOnlyMyJobsPermission;
+    }
+
+    public boolean isOtherUsersJobReadPermission() {
+        return otherUsersJobReadPermission;
+    }
+
+    public void setOtherUsersJobReadPermission(boolean otherUsersJobReadPermission) {
+        this.otherUsersJobReadPermission = otherUsersJobReadPermission;
     }
 }

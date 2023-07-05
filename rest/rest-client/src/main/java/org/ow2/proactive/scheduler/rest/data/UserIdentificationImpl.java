@@ -96,6 +96,11 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isOtherUsersJobReadPermission() {
+        return false;
+    }
+
+    @Override
     public int getSubmitNumber() {
         return submitNumber;
     }

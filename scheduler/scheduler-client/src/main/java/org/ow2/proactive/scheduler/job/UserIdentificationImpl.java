@@ -27,9 +27,7 @@ package org.ow2.proactive.scheduler.job;
 
 import java.security.Permission;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TimerTask;
 
@@ -43,6 +41,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
 import org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
+import org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission;
 import org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
 
 
@@ -169,6 +168,15 @@ public class UserIdentificationImpl extends UserIdentification {
             return false;
         } catch (PermissionException e) {
             return true;
+        }
+    }
+
+    @Override
+    public boolean isOtherUsersJobReadPermission() {
+        try {
+            return checkPermission(new OtherUsersJobReadPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
         }
     }
 
