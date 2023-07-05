@@ -207,7 +207,7 @@ public interface SchedulerRestInterface {
      *            Each parameter must end with _d for descending order or _a for ascending.
      *            Default value is: "STATE_a,ID_d"
      * @param status
-     *             Include only jobs with the given status
+     *             Include only jobs with the given status (Pending, Running, Stalled, Finished, Paused, Canceled, Failed, Killed, In-Error)
      * @param submittedTimeGreater
      *             Include only jobs with a submittedTime after the given EPOCh time
      * @param submittedTimeLessThan

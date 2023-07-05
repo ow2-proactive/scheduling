@@ -33,6 +33,7 @@ import java.util.Set;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 
 /**
@@ -80,12 +81,12 @@ public class DBJobDataParameters {
 
     private final long submittedTimeGreater;
 
-    private final String status;
+    private final JobStatus status;
 
     DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
             boolean pending, boolean running, boolean finished, boolean withIssuesOnly, boolean childJobs,
             String jobName, String projectName, String bucketName, Long parentId, String submissionMode, String label,
-            List<SortParameter<JobSortParameter>> sortParameters, String status, long submittedTimeLessThan,
+            List<SortParameter<JobSortParameter>> sortParameters, JobStatus status, long submittedTimeLessThan,
             long submittedTimeGreater) {
         this.offset = offset;
         this.limit = limit;
@@ -190,7 +191,7 @@ public class DBJobDataParameters {
         return submittedTimeGreater;
     }
 
-    public String getStatus() {
+    public JobStatus getStatus() {
         return status;
     }
 }

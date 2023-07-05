@@ -404,7 +404,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                          .submissionMode(submissionMode)
                                                                          .label(label)
                                                                          .parentId(parentId)
-                                                                         .status(status)
+                                                                         .status(JobStatus.valueOf(status.toUpperCase()))
                                                                          .submittedTimeGreater(submittedTimeGreater)
                                                                          .submittedTimeLessThan(submittedTimeLessThan)
                                                                          .build(),

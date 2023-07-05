@@ -498,7 +498,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters,
-                                 JobStatus.KILLED.toString(),
+                                 JobStatus.KILLED,
                                  0,
                                  0)
                         .getList();
@@ -522,7 +522,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters,
-                                 JobStatus.CANCELED.toString(),
+                                 JobStatus.CANCELED,
                                  0,
                                  0)
                         .getList();
@@ -546,7 +546,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters,
-                                 JobStatus.RUNNING.toString(),
+                                 JobStatus.RUNNING,
                                  0,
                                  0)
                         .getList();

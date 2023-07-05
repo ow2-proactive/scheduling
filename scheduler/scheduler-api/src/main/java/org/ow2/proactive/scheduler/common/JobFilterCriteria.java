@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.common;
 import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 
 @PublicAPI
@@ -65,7 +66,7 @@ public class JobFilterCriteria implements Serializable {
 
     private final long submittedTimeGreater;
 
-    private final String status;
+    private final JobStatus status;
 
     public JobFilterCriteria(JobFilterCriteriaBuilder builder) {
         this.myJobsOnly = builder.isMyJobsOnly();
@@ -151,7 +152,7 @@ public class JobFilterCriteria implements Serializable {
         return submittedTimeGreater;
     }
 
-    public String getStatus() {
+    public JobStatus getStatus() {
         return status;
     }
 }
