@@ -25,8 +25,9 @@ task setProjectVersion(dependsOn: classes)<< {
     if(settings.text.contains(versionPattern)) {
         if (schedulingVersion.contains("SNAPSHOT")) {
             settings.text = settings.text.replace(versionPattern, schedulingVersion + "-" + timestamp)
+        } else {
+            settings.text = settings.text.replace(versionPattern, schedulingVersion)
         }
-        settings.text = settings.text.replace(versionPattern, schedulingVersion)
     }
 }
 
