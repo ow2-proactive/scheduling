@@ -17,6 +17,7 @@ def getTimestamp() {
     return new Date().format('yyyy-MM-dd')
 }
 def timestamp = getTimestamp()
+
 //add or update the scheduling version in config/scheduler/settings.ini
 task setProjectVersion(dependsOn: classes)<< {
     logger.lifecycle("Adding version " + schedulingVersion)
