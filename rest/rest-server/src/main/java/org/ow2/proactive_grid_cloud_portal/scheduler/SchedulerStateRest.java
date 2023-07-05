@@ -369,7 +369,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
             boolean myJobs, boolean pending, boolean running, boolean finished, boolean withIssuesOnly,
             boolean childJobs, String jobName, String projectName, String bucketName, String submissionMode,
-            String label, String userName, String tenant, Long parentId, String sortParams) throws RestException {
+            String label, String userName, String tenant, Long parentId, String sortParams, String status,
+            long submittedTimeGreater, long submittedTimeLessThan) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
@@ -387,6 +388,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 }
             }
 
+            JobStatus jobStatus = status != null && !status.isEmpty() ? JobStatus.valueOf(status.toUpperCase()) : null;
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
                                            new JobFilterCriteriaBuilder().myJobsOnly(onlyUserJobs)
@@ -403,6 +405,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                          .submissionMode(submissionMode)
                                                                          .label(label)
                                                                          .parentId(parentId)
+                                                                         .status(jobStatus)
+                                                                         .submittedTimeGreater(submittedTimeGreater)
+                                                                         .submittedTimeLessThan(submittedTimeLessThan)
                                                                          .build(),
                                            sortParameterList);
             List<JobInfo> jobsInfo = page.getList();

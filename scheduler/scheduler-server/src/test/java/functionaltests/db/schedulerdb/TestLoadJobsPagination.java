@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.db.SortOrder;
@@ -125,7 +126,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                                 sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
@@ -145,7 +149,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)))
+                                 sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
@@ -166,7 +173,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters(new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
-                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 4, 2, 5, 3, 6);
 
@@ -187,7 +197,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters(new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
-                                                new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)))
+                                                new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 4, 1, 5, 2, 6, 3);
 
@@ -207,7 +220,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.ASC)))
+                                 sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.ASC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
@@ -227,7 +243,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.DESC)))
+                                 sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.DESC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
@@ -247,7 +266,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters(new SortParameter<>(JobSortParameter.PRIORITY, SortOrder.ASC)))
+                                 sortParameters(new SortParameter<>(JobSortParameter.PRIORITY, SortOrder.ASC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
@@ -267,7 +289,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters(new SortParameter<>(JobSortParameter.PRIORITY, SortOrder.DESC)))
+                                 sortParameters(new SortParameter<>(JobSortParameter.PRIORITY, SortOrder.DESC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
@@ -288,7 +313,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters(new SortParameter<>(JobSortParameter.STATE, SortOrder.DESC),
-                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 2, 4, 6, 3, 5, 1);
 
@@ -309,7 +337,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  sortParameters(new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
-                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)),
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 3, 5, 2, 4, 6);
     }
@@ -384,7 +415,11 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 DateTime.now().minusMinutes(1).getMillis(),
+                                 DateTime.now().plusMinutes(1).getMillis())
+
                         .getList();
         JobInfo jobInfo = jobs.get(0);
         Assert.assertEquals("6", jobInfo.getJobId().value());
@@ -397,6 +432,30 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         Assert.assertEquals(JobPriority.NORMAL, jobInfo.getPriority());
         Assert.assertEquals(DEFAULT_USER_NAME, jobInfo.getJobOwner());
         Assert.assertEquals(SUBMISSION_MODE_REST_API, jobInfo.getSubmissionMode());
+
+        jobs = dbManager.getJobs(0,
+                                 1,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters,
+                                 null,
+                                 DateTime.now().minusHours(2).getMillis(),
+                                 DateTime.now().minusHours(1).getMillis())
+                        .getList();
+
+        Assert.assertEquals(jobs.size(), 0);
 
         jobs = dbManager.getJobs(0,
                                  10,
@@ -414,10 +473,85 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
         Assert.assertEquals(2, jobs.get(0).getChildrenCount());
+
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters,
+                                 JobStatus.KILLED,
+                                 0,
+                                 0)
+                        .getList();
+
+        Assert.assertEquals(jobs.size(), 1);
+
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters,
+                                 JobStatus.CANCELED,
+                                 0,
+                                 0)
+                        .getList();
+
+        Assert.assertEquals(jobs.size(), 1);
+
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters,
+                                 JobStatus.RUNNING,
+                                 0,
+                                 0)
+                        .getList();
+
+        Assert.assertEquals(jobs.size(), 1);
 
         jobs = dbManager.getJobs(-1,
                                  -1,
@@ -435,7 +569,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
@@ -455,7 +592,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5);
 
@@ -475,7 +615,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 3, 4, 5, 6, 7);
 
@@ -495,7 +638,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
@@ -515,7 +661,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1);
 
@@ -535,7 +684,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 2, 3);
 
@@ -555,7 +707,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 2, 3, 4, 5, 6, 7);
 
@@ -575,7 +730,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 6, 7);
 
@@ -595,7 +753,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 7);
 
@@ -615,7 +776,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs);
 
@@ -635,7 +799,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 3, 4, 6, 7);
 
@@ -655,7 +822,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 2);
 
@@ -675,7 +845,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1);
 
@@ -695,7 +868,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 3);
 
@@ -715,7 +891,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 4, 6, 7);
 
@@ -735,7 +914,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 3, 4, 6, 7);
 
@@ -755,7 +937,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 4, 6, 7);
 
@@ -775,7 +960,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 3);
 
@@ -795,7 +983,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs);
 
@@ -815,7 +1006,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 2);
 
@@ -835,7 +1029,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  null,
                                  null,
                                  label,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 1, 3);
 
@@ -855,7 +1052,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  1L,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 2, 3);
 
@@ -875,7 +1075,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  1L,
                                  null,
                                  null,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 2);
 
@@ -895,7 +1098,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  1L,
                                  SUBMISSION_MODE_REST_API,
                                  label,
-                                 sortParameters)
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0)
                         .getList();
         checkJobs(jobs, 3);
     }

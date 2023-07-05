@@ -110,7 +110,10 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
-                                                                    null))
+                                                                    null,
+                                                                    null,
+                                                                    0,
+                                                                    0))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
@@ -133,7 +136,10 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
-                                    null);
+                                    null,
+                                    null,
+                                    0,
+                                    0);
     }
 
     @Test
@@ -167,7 +173,10 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
-                                                                    null))
+                                                                    null,
+                                                                    null,
+                                                                    0,
+                                                                    0))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
@@ -190,7 +199,10 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
-                                    null);
+                                    null,
+                                    null,
+                                    0,
+                                    0);
 
     }
 
@@ -225,7 +237,10 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
-                                                                    null))
+                                                                    null,
+                                                                    null,
+                                                                    0,
+                                                                    0))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
@@ -248,7 +263,10 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
-                                    null);
+                                    null,
+                                    null,
+                                    0,
+                                    0);
     }
 
     @Test
@@ -282,7 +300,10 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
-                                                                    null))
+                                                                    null,
+                                                                    null,
+                                                                    0,
+                                                                    0))
                .thenReturn(page);
 
         new ListJobCommand("limit=" + offset, "from=" + index).execute(currentContextMock);
@@ -305,7 +326,10 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
-                                    null);
+                                    null,
+                                    null,
+                                    0,
+                                    0);
 
     }
 
@@ -340,7 +364,10 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     null,
-                                                                    null))
+                                                                    null,
+                                                                    null,
+                                                                    0,
+                                                                    0))
                .thenReturn(page);
 
         new ListJobCommand().execute(currentContextMock);
@@ -363,7 +390,10 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
-                                    null);
+                                    null,
+                                    null,
+                                    0,
+                                    0);
     }
 
     @Test(expected = IllegalArgumentException.class)

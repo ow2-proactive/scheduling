@@ -33,6 +33,7 @@ import java.util.Set;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 
 /**
@@ -76,10 +77,17 @@ public class DBJobDataParameters {
 
     private final Set<Integer> statusRanks;
 
+    private final long submittedTimeLessThan;
+
+    private final long submittedTimeGreater;
+
+    private final JobStatus status;
+
     DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
             boolean pending, boolean running, boolean finished, boolean withIssuesOnly, boolean childJobs,
             String jobName, String projectName, String bucketName, Long parentId, String submissionMode, String label,
-            List<SortParameter<JobSortParameter>> sortParameters) {
+            List<SortParameter<JobSortParameter>> sortParameters, JobStatus status, long submittedTimeLessThan,
+            long submittedTimeGreater) {
         this.offset = offset;
         this.limit = limit;
         this.user = user;
@@ -97,6 +105,9 @@ public class DBJobDataParameters {
         this.label = label;
         this.parentId = parentId;
         this.sortParameters = sortParameters;
+        this.status = status;
+        this.submittedTimeLessThan = submittedTimeLessThan;
+        this.submittedTimeGreater = submittedTimeGreater;
 
         Set<Integer> newStatusRanks = new HashSet<Integer>();
         if (pending) {
@@ -170,5 +181,17 @@ public class DBJobDataParameters {
 
     public String getLabel() {
         return label;
+    }
+
+    public long getSubmittedTimeLessThan() {
+        return submittedTimeLessThan;
+    }
+
+    public long getSubmittedTimeGreater() {
+        return submittedTimeGreater;
+    }
+
+    public JobStatus getStatus() {
+        return status;
     }
 }

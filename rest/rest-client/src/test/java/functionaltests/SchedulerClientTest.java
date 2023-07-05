@@ -401,6 +401,9 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                           .userName("")
                                                                           .bucketName("")
                                                                           .parentId((long) -1)
+                                                                          .status(null)
+                                                                          .submittedTimeGreater(0)
+                                                                          .submittedTimeLessThan(0)
                                                                           .build();
         SortParameter jobNameDescOrder = new SortParameter<>(JobSortParameter.NAME, SortOrder.DESC);
         SortParameter jobIdAscOrder = new SortParameter<>(JobSortParameter.ID, SortOrder.ASC);
@@ -431,6 +434,9 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                                               .userName("")
                                                                                               .bucketName("")
                                                                                               .parentId((long) -1)
+                                                                                              .status(null)
+                                                                                              .submittedTimeGreater(0)
+                                                                                              .submittedTimeLessThan(0)
                                                                                               .build();
         List<JobInfo> jobsList3 = client.getJobs(0,
                                                  4,

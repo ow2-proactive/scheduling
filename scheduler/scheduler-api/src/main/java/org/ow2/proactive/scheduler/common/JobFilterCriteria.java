@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.common;
 import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 
 @PublicAPI
@@ -61,6 +62,12 @@ public class JobFilterCriteria implements Serializable {
 
     private final String submissionMode;
 
+    private final long submittedTimeLessThan;
+
+    private final long submittedTimeGreater;
+
+    private final JobStatus status;
+
     public JobFilterCriteria(JobFilterCriteriaBuilder builder) {
         this.myJobsOnly = builder.isMyJobsOnly();
         this.pending = builder.isPending();
@@ -76,6 +83,9 @@ public class JobFilterCriteria implements Serializable {
         this.tenant = builder.getTenant();
         this.parentId = builder.getParentId();
         this.submissionMode = builder.getSubmissionMode();
+        this.submittedTimeLessThan = builder.getSubmittedTimeLessThan();
+        this.submittedTimeGreater = builder.getSubmittedTimeGreater();
+        this.status = builder.getStatus();
     }
 
     public boolean isMyJobsOnly() {
@@ -132,5 +142,17 @@ public class JobFilterCriteria implements Serializable {
 
     public String getSubmissionMode() {
         return submissionMode;
+    }
+
+    public long getSubmittedTimeLessThan() {
+        return submittedTimeLessThan;
+    }
+
+    public long getSubmittedTimeGreater() {
+        return submittedTimeGreater;
+    }
+
+    public JobStatus getStatus() {
+        return status;
     }
 }
