@@ -23,8 +23,10 @@ task setProjectVersion(dependsOn: classes)<< {
     String versionPattern='$!VERSION!$'
     File settings = file("$buildDir/resources/main/org/ow2/proactive/utils/version.ini")
     if(settings.text.contains(versionPattern)) {
-        def versionWithTimestamp = schedulingVersion + "-" + timestamp
-        settings.text = settings.text.replace(versionPattern, versionWithTimestamp)
+        if (schedulingVersion.contains("SNAPSHOT")) {
+            settings.text = settings.text.replace(versionPattern, schedulingVersion + "-" + timestamp)
+        }
+        settings.text = settings.text.replace(versionPattern, schedulingVersion)
     }
 }
 
