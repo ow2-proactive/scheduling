@@ -388,6 +388,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 }
             }
 
+            JobStatus jobStatus = status != null && !status.isEmpty() ? JobStatus.valueOf(status.toUpperCase()) : null;
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
                                            new JobFilterCriteriaBuilder().myJobsOnly(onlyUserJobs)
@@ -404,7 +405,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                          .submissionMode(submissionMode)
                                                                          .label(label)
                                                                          .parentId(parentId)
-                                                                         .status(JobStatus.valueOf(status.toUpperCase()))
+                                                                         .status(jobStatus)
                                                                          .submittedTimeGreater(submittedTimeGreater)
                                                                          .submittedTimeLessThan(submittedTimeLessThan)
                                                                          .build(),
