@@ -78,18 +78,11 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
-import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
-import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
-import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
-import org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission;
-import org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission;
-import org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission;
-import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
+import org.ow2.proactive.scheduler.permissions.*;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Lambda;
 import org.ow2.proactive.utils.Lambda.RunnableThatThrows3Exceptions;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
@@ -430,6 +423,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                                                                    ")");
     }
 
+    void otherUsersJobReadPermission(UserIdentificationImpl ui, String errorMessage) throws PermissionException {
+        ui.checkPermission(new OtherUsersJobReadPermission(),
+                           ui.getUsername() + " does not have permissions to read other users jobs (" + errorMessage +
+                                                              ")");
+    }
+
     /**
      * Check if the given user can get the state as it is demanded (based on the
      * generic information content)
@@ -491,7 +490,20 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             currentState = getState(myEventsOnly, uIdent);
         } else {
             // check get state permission
-            handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
+            try {
+                handleOnlyMyJobsPermission(myEventsOnly,
+                                           uIdent.getUser(),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
+            } catch (PermissionException e) {
+                throw e;
+            }
+            if (!myEventsOnly) {
+                try {
+                    otherUsersJobReadPermission(uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
+                } catch (PermissionException e) {
+                    throw e;
+                }
+            }
         }
         // prepare user for receiving events
         uIdent.getUser().setUserEvents(events);
@@ -864,7 +876,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                              () -> checkTenantAccess(method, identifiedJob, errorMessage));
     }
 
-    void checkPermissions(Method method, IdentifiedJob identifiedJob, String errorMessage)
+    void checkPermissionsWrite(Method method, IdentifiedJob identifiedJob, String errorMessage)
             throws NotConnectedException, UnknownJobException, PermissionException {
 
         checkAccessPermissions(method, identifiedJob, errorMessage);
@@ -872,6 +884,34 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                              // if we are job owner
                              () -> checkJobOwner(method, identifiedJob, errorMessage),
                              // if it is 'only my jobs' permission
+                             () -> handleOnlyMyJobsPermission(false,
+                                                              checkPermission(method, errorMessage),
+                                                              errorMessage),
+                             // if generic info matches
+                             () -> handleJobsWithGenericInformationPermission(identifiedJob.getGenericInformation(),
+                                                                              checkPermission(method, errorMessage),
+                                                                              errorMessage),
+                             // if bucket name is allowed
+                             () -> handleJobBucketNameGenericInformationPermission(identifiedJob.getGenericInformation(),
+                                                                                   checkPermission(method,
+                                                                                                   errorMessage),
+                                                                                   errorMessage),
+                             // if group name is allows
+                             () -> handleJobGroupNameGenericInformationPermission(identifiedJob.getGenericInformation(),
+                                                                                  checkPermission(method, errorMessage),
+                                                                                  errorMessage));
+    }
+
+    void checkPermissionsRead(Method method, IdentifiedJob identifiedJob, String errorMessage)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+
+        checkAccessPermissions(method, identifiedJob, errorMessage);
+        checkPermissionChain(
+                             // if we are job owner
+                             () -> checkJobOwner(method, identifiedJob, errorMessage),
+                             // if the user has read access to other users jobs
+                             () -> otherUsersJobReadPermission(checkPermission(method, errorMessage), errorMessage),
+                             // if the user has full access to other users jobs
                              () -> handleOnlyMyJobsPermission(false,
                                                               checkPermission(method, errorMessage),
                                                               errorMessage),
@@ -1568,6 +1608,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         userData.setAllTenantPermission(userSessionInfo.getRight().isAllTenantPermission());
         userData.setAllJobPlannerPermission(userSessionInfo.getRight().isAllJobPlannerPermission());
         userData.setHandleOnlyMyJobsPermission(userSessionInfo.getRight().isHandleOnlyMyJobsPermission());
+        userData.setOtherUsersJobReadPermission(userSessionInfo.getRight().isOtherUsersJobReadPermission());
         return userData;
     }
 
@@ -1703,7 +1744,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case "getJobResult":
                 return YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
             default:
-                return null;
+                return YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION;
         }
     }
 }

@@ -679,7 +679,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
 
-        frontendState.checkPermissions(currentMethod, ij, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod, ij, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB);
 
         if (!ij.isFinished()) {
             logger.info("Job " + jobId + " is not finished");
@@ -791,9 +791,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         // checking permissions
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(jobId),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
 
         if (inc < 0) {
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
@@ -874,9 +874,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         // checking permissions
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(jobId),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
 
         logger.debug("Job " + jobId + ", trying to get all task results associated with task " + taskName +
                      " from job " + jobId);
@@ -901,9 +901,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         // checking permissions
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK);
         logger.info("Request to kill task " + taskName + " of job " + jobId + " received from " + currentUser);
         return schedulingService.killTask(jobId, taskName);
     }
@@ -931,9 +931,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         String currentUser = frontendState.getCurrentUser();
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
         logger.info("Request to restart task " + taskName + " of job " + jobId + " received from " + currentUser);
         return schedulingService.restartTask(jobId, taskName, restartDelay);
     }
@@ -962,9 +962,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
         logger.info("Request to finish in-error task " + taskName + " of job " + jobId + " received from " +
                     currentUser);
         return schedulingService.finishInErrorTask(jobIdObject, taskName);
@@ -983,9 +983,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
         logger.info("Request to restart in-error task " + taskName + " of job " + jobId + " received from " +
                     currentUser);
         return schedulingService.restartInErrorTask(jobIdObject, taskName);
@@ -1000,9 +1000,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_ENABLE_VISE_THIS_TASK);
         logger.info("Request to enable visualization on task " + taskName + " of job " + jobId + " received from " +
                     currentUser);
         schedulingService.enableRemoteVisualization(jobIdObject, taskName, connectionString);
@@ -1017,9 +1017,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_REGISTER_SERVICE_TO_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_REGISTER_SERVICE_TO_THIS_JOB);
         logger.info("Request to register service instance " + serviceInstanceid + " on job " + jobId +
                     " received from " + currentUser);
         schedulingService.registerService(jobIdObject, serviceInstanceid, enableActions);
@@ -1034,9 +1034,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_DETACH_SERVICE_TO_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_DETACH_SERVICE_TO_THIS_JOB);
         logger.info("Request to detach service instance " + serviceInstanceid + " on job " + jobId + " received from " +
                     currentUser);
         schedulingService.detachService(jobIdObject, serviceInstanceid);
@@ -1054,9 +1054,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         String currentUser = frontendState.getCurrentUser();
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK);
         logger.info("Request to preempt task " + taskName + " of job " + jobId + " received from " + currentUser);
         return schedulingService.preemptTask(jobId, taskName, restartDelay);
     }
@@ -1084,9 +1084,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         // checking permissions
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
         logger.info("Request to remove job " + jobId + " received from " + currentUser);
 
         // asking the scheduler for the result
@@ -1110,9 +1110,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         for (Iterator<JobId> it = jobIdsDup.iterator(); it.hasNext();) {
             JobId jobId = it.next();
             try {
-                frontendState.checkPermissions(currentMethod,
-                                               frontendState.getIdentifiedJob(jobId),
-                                               YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
+                frontendState.checkPermissionsWrite(currentMethod,
+                                                    frontendState.getIdentifiedJob(jobId),
+                                                    YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
             } catch (UnknownJobException e) {
                 logger.warn("Cannot remove job " + jobId, e);
                 it.remove();
@@ -1144,9 +1144,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         // checking permissions
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(jobId),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB);
 
         if (!schedulingService.getListenJobLogsSupport().isEnabled()) {
             throw new PermissionException("Listening to job logs is disabled by administrator");
@@ -1445,9 +1445,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         String currentUser = frontendState.getCurrentUser();
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB);
         logger.info("Request to pause job " + jobId + " received from " + currentUser);
         return schedulingService.pauseJob(jobId);
     }
@@ -1462,9 +1462,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         String currentUser = frontendState.getCurrentUser();
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB);
         logger.info("Request to resume job " + jobId + " received from " + currentUser);
         return schedulingService.resumeJob(jobId);
     }
@@ -1479,9 +1479,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         String currentUser = frontendState.getCurrentUser();
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
         logger.info("Request to kill job " + jobId + " received from " + currentUser);
         return schedulingService.killJob(jobId);
     }
@@ -1497,9 +1497,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         String currentUser = frontendState.getCurrentUser();
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB);
         frontendState.checkChangeJobPriority(jobId, priority);
         logger.info("Request to change job " + jobId + " priority to " + priority + " received from " + currentUser);
         schedulingService.changeJobPriority(jobId, priority);
@@ -1514,9 +1514,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(jobId),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return frontendState.getJobState(jobId);
     }
 
@@ -1526,9 +1526,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, UnknownJobException, PermissionException, UnknownTaskException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(jobId),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
         return frontendState.getTaskState(jobId, taskName);
     }
 
@@ -1542,9 +1542,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, UnknownJobException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), offset, limit);
     }
 
@@ -1555,9 +1555,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, UnknownJobException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), statusFilter, offset, limit);
     }
 
@@ -1568,9 +1568,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws NotConnectedException, PermissionException, UnknownJobException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         List<TaskState> taskStates = getJobState(jobId).getTasks()
                                                        .stream()
                                                        .filter(Task::isPreciousResult)
@@ -1601,9 +1601,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         for (String jobId : jobsId) {
-            frontendState.checkPermissions(currentMethod,
-                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
-                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+            frontendState.checkPermissionsRead(currentMethod,
+                                               frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                               YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         }
         return dbManager.getJobResultMaps(jobsId);
     }
@@ -1642,9 +1642,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }.getClass().getEnclosingMethod();
         for (JobId jobId : jobIdsConverted) {
             try {
-                frontendState.checkPermissions(currentMethod,
-                                               frontendState.getIdentifiedJob(jobId),
-                                               YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
+                frontendState.checkPermissionsWrite(currentMethod,
+                                                    frontendState.getIdentifiedJob(jobId),
+                                                    YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
             } catch (UnknownJobException e) {
                 logger.debug(e);
             }
@@ -1684,9 +1684,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         String currentUser = frontendState.getCurrentUser();
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB);
         logger.info("Request to restart all in-error tasks on job " + jobId + " received from " + currentUser);
         return schedulingService.restartAllInErrorTasks(jobIdObject);
     }
@@ -1813,9 +1813,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         JobId id = JobIdImpl.makeJobId(jobId);
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(id),
-                                       YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(id),
+                                           YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB);
 
         return ServerJobAndTaskLogs.getInstance().getJobLog(JobIdImpl.makeJobId(jobId), frontendState.getJobTasks(id));
     }
@@ -1829,9 +1829,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         JobId id = JobIdImpl.makeJobId(jobId);
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(id),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(id),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
 
         for (TaskId taskId : frontendState.getJobTasks(id)) {
             if (taskId.getReadableName().equals(taskName)) {
@@ -1850,9 +1850,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         JobId id = JobIdImpl.makeJobId(jobId);
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(id),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(id),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
         List<TaskState> lTaskState = frontendState.getJobState(id).getTasksByTag(taskTag);
         Set<TaskId> tasksIds = new HashSet<>(lTaskState.size());
         for (TaskState taskState : lTaskState) {
@@ -2489,9 +2489,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             throws UnknownJobException, NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_START_AT_VALUE_OF_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobId),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_START_AT_VALUE_OF_THIS_JOB);
         return schedulingService.changeStartAt(jobId, startAt);
     }
 
@@ -2501,9 +2501,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public String getJobContent(JobId jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobId),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB);
+        frontendState.checkPermissionsRead(currentMethod,
+                                           frontendState.getIdentifiedJob(jobId),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB);
         return updateJobSchemaVersionToLatest(dbManager.loadInitalJobContent(jobId));
     }
 
@@ -2589,9 +2589,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public boolean checkJobPermissionMethod(String jobId, String method) {
         try {
             JobId id = JobIdImpl.makeJobId(jobId);
-            frontendState.checkPermissions(findMethod(method),
-                                           frontendState.getIdentifiedJob(id),
-                                           YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION);
+            checkPermissionsReadOrWrite(method, id, getErrorMessageForMethodPermission(method));
         } catch (Exception p) {
             return false;
         }
@@ -2607,9 +2605,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             for (String jobId : jobIds) {
                 try {
                     JobId id = JobIdImpl.makeJobId(jobId);
-                    frontendState.checkPermissions(findMethod(method),
-                                                   frontendState.getIdentifiedJob(id),
-                                                   YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION);
+                    checkPermissionsReadOrWrite(method, id, getErrorMessageForMethodPermission(method));
                     answer.add(jobId);
                 } catch (Exception p) {
                     // not authorized
@@ -2617,6 +2613,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             }
         }
         return answer;
+    }
+
+    private void checkPermissionsReadOrWrite(String method, JobId id, String message)
+            throws PermissionException, NotConnectedException, UnknownJobException {
+        Method methodObject = findMethod(method);
+        String role = RoleUtils.findRole(methodObject);
+        if (RoleUtils.Role.read.name().equals(role)) {
+            frontendState.checkPermissionsRead(methodObject, frontendState.getIdentifiedJob(id), message);
+        } else {
+            // jobs method have only read and write roles
+            frontendState.checkPermissionsWrite(methodObject, frontendState.getIdentifiedJob(id), message);
+        }
     }
 
     @Override
@@ -2684,9 +2692,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }.getClass().getEnclosingMethod();
         logger.info("Request to send signalName " + signalName + " on job " + jobId + " received from " + currentUser);
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
         if (StringUtils.isBlank(signalName.trim())) {
             throw new SignalApiException("Empty signals are not allowed");
         }
@@ -2764,9 +2772,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         }.getClass().getEnclosingMethod();
         logger.debug("Request to validate signal " + signalName + " on job " + jobId + " received from " + currentUser);
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_SEND_SIGNALS_TO_THIS_JOB);
 
         String readyPrefix = SignalApiImpl.READY_PREFIX;
         if (StringUtils.isBlank(signalName.trim())) {
@@ -2814,9 +2822,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             for (String method : methods) {
                 boolean hasPermission = true;
                 try {
-                    frontendState.checkPermissions(findMethod(method),
-                                                   frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
-                                                   SchedulerFrontendState.getErrorMessageForMethodPermission(method));
+                    checkPermissionsReadOrWrite(method,
+                                                JobIdImpl.makeJobId(jobId),
+                                                SchedulerFrontendState.getErrorMessageForMethodPermission(method));
                 } catch (PermissionException e) {
                     hasPermission = false;
                 }
@@ -2836,9 +2844,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
         logger.info("Request to add external endpoint " + endpointName + " on job " + jobId + " received from " +
                     currentUser);
         schedulingService.addExternalEndpointUrl(jobIdObject, endpointName, externalEndpointUrl, endpointIconUri);
@@ -2853,9 +2861,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions(currentMethod,
-                                       frontendState.getIdentifiedJob(jobIdObject),
-                                       YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
+        frontendState.checkPermissionsWrite(currentMethod,
+                                            frontendState.getIdentifiedJob(jobIdObject),
+                                            YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_EXTERNAL_ENDPOINT_URL_TO_THIS_JOB);
         logger.info("Request to remove external endpoint " + endpointName + " on job " + jobId + " received from " +
                     currentUser);
         schedulingService.removeExternalEndpointUrl(jobIdObject, endpointName);
@@ -2934,9 +2942,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      "You don't have permissions to set label on jobs");
         for (String jobId : jobIds) {
-            frontendState.checkPermissions(currentMethod,
-                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
-                                           YOU_DO_NOT_HAVE_PERMISSION_TO_SET_LABEL_FOR_THIS_JOB);
+            frontendState.checkPermissionsWrite(currentMethod,
+                                                frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                                YOU_DO_NOT_HAVE_PERMISSION_TO_SET_LABEL_FOR_THIS_JOB);
         }
         dbManager.setLabelOnJobIds(labelId, jobIds, ident.getUsername());
     }
@@ -2951,9 +2959,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
                                                                      "You don't have permissions to remove labels from jobs");
         for (String jobId : jobIds) {
-            frontendState.checkPermissions(currentMethod,
-                                           frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
-                                           YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_LABEL_FOR_THIS_JOB);
+            frontendState.checkPermissionsWrite(currentMethod,
+                                                frontendState.getIdentifiedJob(JobIdImpl.makeJobId(jobId)),
+                                                YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_LABEL_FOR_THIS_JOB);
         }
         dbManager.removeJobLabels(jobIds, ident.getUsername());
     }
