@@ -239,7 +239,7 @@ public class SchedulerDBManager {
             final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
             final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
             String bucketName, Long parentId, String submissionMode, String label,
-            final List<SortParameter<JobSortParameter>> sortParameters, long submittedTimeGreater,
+            final List<SortParameter<JobSortParameter>> sortParameters, String status, long submittedTimeGreater,
             long submittedTimeLessThan) {
 
         if (!pending && !running && !finished) {
@@ -263,6 +263,7 @@ public class SchedulerDBManager {
                                                              submissionMode,
                                                              label,
                                                              sortParameters,
+                                                             status,
                                                              submittedTimeGreater,
                                                              submittedTimeLessThan);
         int totalNbJobs = getTotalNumberOfJobs(params);
@@ -301,6 +302,9 @@ public class SchedulerDBManager {
             }
             if (label != null && !label.isEmpty()) {
                 predicates.add(cb.like(root.get("label"), label + "%"));
+            }
+            if (status != null && !status.isEmpty()) {
+                predicates.add(cb.equal(root.get("status"), JobStatus.valueOf(status.toUpperCase())));
             }
             if (submittedTimeGreater > 0) {
                 predicates.add(cb.ge(root.get("submittedTime"), submittedTimeGreater));
@@ -620,6 +624,10 @@ public class SchedulerDBManager {
                     queryString.append("and label like :label ");
                 }
 
+                if (params.getStatus() != null && !params.getStatus().isEmpty()) {
+                    queryString.append("and status like :status ");
+                }
+
                 if (params.getSubmittedTimeGreater() > 0) {
                     queryString.append("and submittedTime >= :submittedTimeGreater ");
                 }
@@ -658,6 +666,10 @@ public class SchedulerDBManager {
 
                 if (params.getLabel() != null && !params.getLabel().isEmpty()) {
                     query.setParameter("label", params.getLabel());
+                }
+
+                if (params.getStatus() != null && !params.getStatus().isEmpty()) {
+                    query.setParameter("status", JobStatus.valueOf(params.getStatus().toUpperCase()));
                 }
 
                 if (params.getSubmittedTimeGreater() > 0) {

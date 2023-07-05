@@ -206,6 +206,8 @@ public interface SchedulerRestInterface {
      *            PENDING_TASKS,RUNNING_TASKS,FINISHED_TASKS,FAILED_TASKS,FAULTY_TASKS,IN_ERROR_TASKS
      *            Each parameter must end with _d for descending order or _a for ascending.
      *            Default value is: "STATE_a,ID_d"
+     * @param status
+     *             Include only jobs with the given status
      * @param submittedTimeGreater
      *             Include only jobs with a submittedTime after the given EPOCh time
      * @param submittedTimeLessThan
@@ -232,6 +234,7 @@ public interface SchedulerRestInterface {
             @QueryParam("label") @DefaultValue("") String label,
             @QueryParam("userName") @DefaultValue("") String userName, @QueryParam("tenant") String tenant,
             @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams,
+            @QueryParam("status") @DefaultValue("") String status,
             @QueryParam("submittedTimeGreater") @DefaultValue("0") long submittedTimeGreater,
             @QueryParam("submittedTimeLessThan") @DefaultValue("0") long submittedTimeLessThan) throws RestException;
 

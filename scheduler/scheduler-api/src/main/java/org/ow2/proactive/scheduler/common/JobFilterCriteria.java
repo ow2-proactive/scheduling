@@ -65,6 +65,8 @@ public class JobFilterCriteria implements Serializable {
 
     private final long submittedTimeGreater;
 
+    private final String status;
+
     public JobFilterCriteria(JobFilterCriteriaBuilder builder) {
         this.myJobsOnly = builder.isMyJobsOnly();
         this.pending = builder.isPending();
@@ -82,6 +84,7 @@ public class JobFilterCriteria implements Serializable {
         this.submissionMode = builder.getSubmissionMode();
         this.submittedTimeLessThan = builder.getSubmittedTimeLessThan();
         this.submittedTimeGreater = builder.getSubmittedTimeGreater();
+        this.status = builder.getStatus();
     }
 
     public boolean isMyJobsOnly() {
@@ -146,5 +149,9 @@ public class JobFilterCriteria implements Serializable {
 
     public long getSubmittedTimeGreater() {
         return submittedTimeGreater;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

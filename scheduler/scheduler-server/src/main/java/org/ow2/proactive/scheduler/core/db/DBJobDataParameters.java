@@ -80,10 +80,12 @@ public class DBJobDataParameters {
 
     private final long submittedTimeGreater;
 
+    private final String status;
+
     DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
             boolean pending, boolean running, boolean finished, boolean withIssuesOnly, boolean childJobs,
             String jobName, String projectName, String bucketName, Long parentId, String submissionMode, String label,
-            List<SortParameter<JobSortParameter>> sortParameters, long submittedTimeLessThan,
+            List<SortParameter<JobSortParameter>> sortParameters, String status, long submittedTimeLessThan,
             long submittedTimeGreater) {
         this.offset = offset;
         this.limit = limit;
@@ -102,6 +104,7 @@ public class DBJobDataParameters {
         this.label = label;
         this.parentId = parentId;
         this.sortParameters = sortParameters;
+        this.status = status;
         this.submittedTimeLessThan = submittedTimeLessThan;
         this.submittedTimeGreater = submittedTimeGreater;
 
@@ -185,5 +188,9 @@ public class DBJobDataParameters {
 
     public long getSubmittedTimeGreater() {
         return submittedTimeGreater;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

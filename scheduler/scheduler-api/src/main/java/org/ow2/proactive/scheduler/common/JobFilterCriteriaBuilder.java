@@ -59,6 +59,8 @@ public class JobFilterCriteriaBuilder {
 
     private long submittedTimeGreater;
 
+    private String status;
+
     public JobFilterCriteriaBuilder() {
     }
 
@@ -124,6 +126,10 @@ public class JobFilterCriteriaBuilder {
 
     public long getSubmittedTimeGreater() {
         return submittedTimeGreater;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public JobFilterCriteriaBuilder myJobsOnly(boolean myJobsOnly) {
@@ -203,6 +209,11 @@ public class JobFilterCriteriaBuilder {
 
     public JobFilterCriteriaBuilder submittedTimeGreater(long submittedTimeGreater) {
         this.submittedTimeGreater = submittedTimeGreater;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder status(String status) {
+        this.status = status;
         return this;
     }
 
