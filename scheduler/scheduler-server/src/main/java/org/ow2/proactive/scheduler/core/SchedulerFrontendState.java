@@ -468,7 +468,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
             ListeningUser uIdent, SchedulerEvent... events) throws PermissionException {
-        // checking permissions
 
         // check if listener is not null
         if (sel == null) {
@@ -483,27 +482,22 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throw new IllegalArgumentException(msg);
         }
 
+        // checking permissions
+        try {
+            handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
+        } catch (PermissionException e) {
+            // check read-only permission if the previous permission failed
+            try {
+                otherUsersJobReadPermission(uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
+            } catch (PermissionException e1) {
+                throw e1;
+            }
+        }
+
         // get the scheduler State
         SchedulerState currentState = null;
         if (getCurrentState) {
-            // check get state permission is checked in getState method
             currentState = getState(myEventsOnly, uIdent);
-        } else {
-            // check get state permission
-            try {
-                handleOnlyMyJobsPermission(myEventsOnly,
-                                           uIdent.getUser(),
-                                           YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
-            } catch (PermissionException e) {
-                throw e;
-            }
-            if (!myEventsOnly) {
-                try {
-                    otherUsersJobReadPermission(uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
-                } catch (PermissionException e) {
-                    throw e;
-                }
-            }
         }
         // prepare user for receiving events
         uIdent.getUser().setUserEvents(events);
