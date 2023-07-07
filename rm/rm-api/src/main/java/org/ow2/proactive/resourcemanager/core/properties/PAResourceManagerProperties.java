@@ -364,7 +364,22 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /**
      * Defines the log4j pattern used for all file appenders (used by the scheduler for job/task log files
      */
-    LO4J_FILE_APPENDER_PATTERN("pa.log4j.file.appender.pattern", PropertyType.STRING, "%d{ISO8601} %-5p [%c{1.}] %m%n");
+    LO4J_FILE_APPENDER_PATTERN("pa.log4j.file.appender.pattern", PropertyType.STRING, "%d{ISO8601} %-5p [%c{1.}] %m%n"),
+
+    /**
+     * Ciphers added to jsch defaults in order to support legacy SSH servers
+     */
+    JSCH_ADDITIONAL_CIPHERS("pa.jsch.additional.ciphers", PropertyType.LIST, "aes128-cbc,aes192-cbc,aes256-cbc,3des-cbc"),
+
+    /**
+     * Key exchange algorithms added to jsch defaults in order to support legacy SSH servers
+     */
+    JSCH_ADDITIONAL_KEX_ALGORITHMS("pa.jsch.additional.kexalgorithms", PropertyType.LIST, "diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1"),
+
+    /**
+     * Key exchange algorithms added to jsch defaults in order to support legacy SSH servers
+     */
+    JSCH_ADDITIONAL_MACS("pa.jsch.additional.macs", PropertyType.LIST);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
