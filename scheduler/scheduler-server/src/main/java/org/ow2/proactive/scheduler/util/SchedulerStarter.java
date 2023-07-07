@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import static org.ow2.proactive.resourcemanager.RMFactory.configureJSch;
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 import java.io.ByteArrayOutputStream;
@@ -39,7 +40,10 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
@@ -92,6 +96,8 @@ import org.ow2.proactive.utils.SecurityPolicyLoader;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.Version;
 import org.ow2.proactive.web.WebProperties;
+
+import com.jcraft.jsch.JSch;
 
 
 /**
@@ -213,6 +219,8 @@ public class SchedulerStarter {
         if (!commandLine.hasOption(OPTION_NO_ROUTER)) {
             startRouter();
         }
+
+        configureJSch();
 
         LOGGER.info("Activeeon ProActive version " + getSchedulerVersion());
         // force initialize the property decrypter to avoid conflicts with microservices
