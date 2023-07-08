@@ -379,7 +379,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /**
      * Key exchange algorithms added to jsch defaults in order to support legacy SSH servers
      */
-    JSCH_ADDITIONAL_MACS("pa.jsch.additional.macs", PropertyType.LIST);
+    JSCH_ADDITIONAL_MACS("pa.jsch.additional.macs", PropertyType.LIST),
+
+    /**
+     * Server Host Key algorithms added to jsch defaults in order to support legacy SSH servers
+     */
+    JSCH_ADDITIONAL_SERVER_HOST_KEYS("pa.jsch.additional.host.keys", PropertyType.LIST, "ssh-rsa"),;
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
