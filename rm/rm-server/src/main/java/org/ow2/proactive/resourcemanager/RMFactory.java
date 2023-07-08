@@ -149,6 +149,18 @@ public class RMFactory {
                 }
             }
         }
+        if (PAResourceManagerProperties.JSCH_ADDITIONAL_SERVER_HOST_KEYS.isSet()) {
+            Set<String> defaultHostKeySet = new HashSet(Arrays.asList(JSch.getConfig("server_host_key").split(",")));
+            for (String hostKey : PAResourceManagerProperties.JSCH_ADDITIONAL_SERVER_HOST_KEYS.getValueAsList(",")) {
+                if (!hostKey.isEmpty() && !defaultHostKeySet.contains(hostKey)) {
+                    JSch.setConfig("server_host_key", JSch.getConfig("server_host_key") + "," + hostKey);
+                    JSch.setConfig("PubkeyAcceptedAlgorithms",
+                                   JSch.getConfig("PubkeyAcceptedAlgorithms") + "," + hostKey);
+                    defaultHostKeySet.add(hostKey);
+                }
+            }
+        }
+
     }
 
     /**
