@@ -633,7 +633,7 @@ public class SchedulerDBManager {
                 }
 
                 if (params.getSubmittedTimeLessThan() > 0) {
-                    queryString.append("and submittedTime <= :submittedTimeLessThan ");
+                    queryString.append("and submittedTime < :submittedTimeLessThan ");
                 }
 
                 Query query = session.createQuery(queryString.toString());
