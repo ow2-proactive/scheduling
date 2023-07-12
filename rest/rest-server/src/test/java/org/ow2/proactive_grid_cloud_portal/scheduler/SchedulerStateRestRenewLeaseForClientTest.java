@@ -83,7 +83,8 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
                                                       "login",
                                                       "loginWithCredential",
                                                       "validate",
-                                                      "getUrl");
+                                                      "getUrl",
+                                                      "getDomains");
 
         Method[] methodsToTest = SchedulerRestInterface.class.getMethods();
         Object[][] data = new Object[methodsToTest.length][2];

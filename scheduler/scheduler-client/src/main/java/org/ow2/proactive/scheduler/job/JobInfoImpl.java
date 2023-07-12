@@ -63,6 +63,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String tenant;
 
+    private String domain;
+
     private String projectName;
 
     private String bucketName = null;
@@ -241,6 +243,14 @@ public class JobInfoImpl implements JobInfo {
 
     public void setTenant(String tenant) {
         this.tenant = tenant;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     @Override

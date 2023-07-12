@@ -96,6 +96,11 @@ public interface StudioInterface {
     UserData currentUserData(@HeaderParam("sessionid") String sessionId);
 
     @GET
+    @Path("domains")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<String> getDomains();
+
+    @GET
     @Path("workflows")
     List<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedRestException, IOException;

@@ -47,6 +47,8 @@ public class UserData implements Serializable {
 
     private String tenant;
 
+    private String domain;
+
     private boolean filterByTenant;
 
     private boolean allTenantPermission;
@@ -87,6 +89,14 @@ public class UserData implements Serializable {
 
     public void setTenant(String tenant) {
         this.tenant = tenant;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public boolean isFilterByTenant() {

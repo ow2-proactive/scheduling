@@ -55,6 +55,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -191,6 +192,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
+            String domain = (String) params.get("domain");
+            if (domain != null) {
+                domain = domain.toLowerCase();
+            }
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -200,7 +205,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            succeeded = logUser(username, password);
+            succeeded = logUser(username, password, domain);
             return succeeded;
 
         } catch (java.io.IOException ioe) {
@@ -216,22 +221,23 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      *
      * @param username user's login
      * @param password user's password
+     * @param domain user's domain
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication and group membership fails.
      */
-    protected boolean logUser(String username, String password) throws LoginException {
+    protected boolean logUser(String username, String password, String domain) throws LoginException {
         if (ldapDomainConfiguration.isFallbackUserAuth()) {
             try {
-                return super.logUser(username, password, false);
+                return super.logUser(username, password, domain, false);
             } catch (LoginException ex) {
-                return internalLogUser(username, password);
+                return internalLogUser(username, password, domain);
             }
         } else {
-            return internalLogUser(username, password);
+            return internalLogUser(username, password, domain);
         }
     }
 
-    private boolean internalLogUser(String username, String password) throws LoginException {
+    private boolean internalLogUser(String username, String password, String domain) throws LoginException {
 
         removeOldFailedAttempts(username);
         if (tooManyFailedAttempts(username)) {
@@ -266,6 +272,14 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 logger.debug("authentication succeeded, checking group");
             }
             resetFailedAttempt(username);
+
+            if (domain != null) {
+                if (!getConfiguredDomains().contains(domain.toLowerCase())) {
+                    throw new FailedLoginException("Invalid domain used: " + domain.toLowerCase() +
+                                                   " is not a member of " + getConfiguredDomains());
+                }
+                subject.getPrincipals().add(new DomainNamePrincipal(domain));
+            }
 
             if (ldapDomainConfiguration.isFallbackGroupMembership()) {
                 super.groupMembershipFromFile(username);

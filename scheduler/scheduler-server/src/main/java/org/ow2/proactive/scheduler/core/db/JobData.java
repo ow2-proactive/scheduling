@@ -188,6 +188,8 @@ public class JobData implements Serializable {
 
     private String tenant;
 
+    private String domain;
+
     private String jobName;
 
     private long submittedTime;
@@ -271,6 +273,7 @@ public class JobData implements Serializable {
         jobInfo.setJobId(jobId);
         jobInfo.setJobOwner(getOwner());
         jobInfo.setTenant(getTenant());
+        jobInfo.setDomain(getDomain());
         jobInfo.setProjectName(getProjectName());
         jobInfo.setBucketName(getBucketName());
         jobInfo.setLabel(getLabel());
@@ -356,6 +359,7 @@ public class JobData implements Serializable {
         internalJob.setCumulatedCoreTime(getCumulatedCoreTime());
         internalJob.setOwner(getOwner());
         internalJob.setTenant(getTenant());
+        internalJob.setDomain(getDomain());
         internalJob.setDescription(getDescription());
         internalJob.setInputSpace(getInputSpace());
         internalJob.setOutputSpace(getOutputSpace());
@@ -434,6 +438,9 @@ public class JobData implements Serializable {
         jobRuntimeData.setStatusRank(job.getStatus().getRank());
         jobRuntimeData.setOwner(job.getOwner());
         jobRuntimeData.setTenant(job.getTenant());
+        if (job.getDomain() != null) {
+            jobRuntimeData.setDomain(job.getDomain().toLowerCase());
+        }
         jobRuntimeData.setCredentials(job.getCredentials());
         jobRuntimeData.setPriority(job.getPriority());
         jobRuntimeData.setNumberOfPendingTasks(job.getNumberOfPendingTasks());
@@ -845,6 +852,15 @@ public class JobData implements Serializable {
 
     public void setTenant(String tenant) {
         this.tenant = tenant;
+    }
+
+    @Column(name = "DOMAIN", nullable = true)
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     // NOTE: the jobData and jobContent is basically a one to one association,

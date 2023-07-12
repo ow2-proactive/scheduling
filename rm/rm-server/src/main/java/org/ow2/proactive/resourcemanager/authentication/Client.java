@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -141,6 +142,14 @@ public class Client implements Serializable {
         } else {
             return null;
         }
+    }
+
+    public String getDomain() {
+        Set<DomainNamePrincipal> domains = subject.getPrincipals(DomainNamePrincipal.class);
+        if (domains == null || domains.size() == 0) {
+            return null;
+        }
+        return domains.iterator().next().getName();
     }
 
     /**

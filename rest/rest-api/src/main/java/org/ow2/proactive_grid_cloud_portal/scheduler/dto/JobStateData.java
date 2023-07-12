@@ -40,6 +40,8 @@ public class JobStateData {
 
     private String tenant;
 
+    private String domain;
+
     private JobInfoData jobInfo;
 
     private String projectName;
@@ -78,6 +80,14 @@ public class JobStateData {
 
     public void setTenant(String tenant) {
         this.tenant = tenant;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public JobInfoData getJobInfo() {

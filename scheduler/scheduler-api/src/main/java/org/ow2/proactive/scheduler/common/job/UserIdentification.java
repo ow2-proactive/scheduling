@@ -113,6 +113,13 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract String getTenant();
 
     /**
+     * Return the domain name associated with the current user, or null if no domain is associated
+     *
+     * @return user domain
+     */
+    public abstract String getDomain();
+
+    /**
      * Get the number of submit for this user.
      * 
      * @return the number of submit for this user.

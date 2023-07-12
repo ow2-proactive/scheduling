@@ -203,6 +203,11 @@ public class ClientJobStateTest {
             }
 
             @Override
+            public String getDomain() {
+                return null;
+            }
+
+            @Override
             public JobType getType() {
                 return null;
             }
@@ -245,6 +250,11 @@ public class ClientJobStateTest {
 
         @Override
         public String getTenant() {
+            return null;
+        }
+
+        @Override
+        public String getDomain() {
             return null;
         }
 

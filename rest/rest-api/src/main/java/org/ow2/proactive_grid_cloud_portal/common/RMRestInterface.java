@@ -98,6 +98,16 @@ public interface RMRestInterface {
     String getUrl();
 
     /**
+     * Returns the domains configured on the resource manager server.
+     *
+     * @return list of domains
+     */
+    @GET
+    @Path("domains")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<String> getDomains();
+
+    /**
      * Login with username/password.
      *
      * Log into the resource manager using an form containing 2 fields

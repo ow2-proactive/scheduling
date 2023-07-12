@@ -125,6 +125,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
 
 
 /**
@@ -226,6 +227,21 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public String getUrl() {
         return PortalConfiguration.SCHEDULER_URL.getValueAsString();
+    }
+
+    @Override
+    public List<String> getDomains() {
+        if (PASchedulerProperties.SCHEDULER_ALLOWED_DOMAINS.isSet()) {
+            return PASchedulerProperties.SCHEDULER_ALLOWED_DOMAINS.getValueAsList(",", true);
+        }
+
+        // windows current machine domain
+        String currentMachineDomain = System.getenv("USERDOMAIN");
+        if (currentMachineDomain != null) {
+            return ImmutableList.of("", currentMachineDomain.toLowerCase());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override

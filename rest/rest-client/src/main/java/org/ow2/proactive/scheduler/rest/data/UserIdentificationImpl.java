@@ -39,6 +39,8 @@ public class UserIdentificationImpl extends UserIdentification {
 
     private String tenant;
 
+    private String domain;
+
     private int submitNumber;
 
     private String hostName;
@@ -53,8 +55,8 @@ public class UserIdentificationImpl extends UserIdentification {
 
     }
 
-    public UserIdentificationImpl(String username, Set<String> groups, String tenant, int submitNumber, String hostName,
-            long connectionTime, long lastSubmitTime, boolean myEventsOnly) {
+    public UserIdentificationImpl(String username, Set<String> groups, String tenant, String domain, int submitNumber,
+            String hostName, long connectionTime, long lastSubmitTime, boolean myEventsOnly) {
         this.username = username;
         this.groups = groups;
         this.submitNumber = submitNumber;
@@ -63,6 +65,7 @@ public class UserIdentificationImpl extends UserIdentification {
         this.lastSubmitTime = lastSubmitTime;
         this.myEventsOnly = myEventsOnly;
         this.tenant = tenant;
+        this.domain = domain;
     }
 
     @Override
@@ -78,6 +81,11 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public String getTenant() {
         return tenant;
+    }
+
+    @Override
+    public String getDomain() {
+        return domain;
     }
 
     @Override

@@ -107,12 +107,23 @@ public interface PACommonProperties {
 
     /**
      * Returns the value of this property as a List of strings.
+     * equivalent of getValueAsList(separator, false)
      *
      * @param separator the separator to use
      *
      * @return the list of values of this property.
      */
     List<String> getValueAsList(String separator);
+
+    /**
+     * Returns the value of this property as a List of strings.
+     *
+     * @param separator the separator to use
+     * @param allowEmpty allow empty values in the list
+     *
+     * @return the list of values of this property.
+     */
+    List<String> getValueAsList(String separator, boolean allowEmpty);
 
     /**
      * Return the type of the given properties.

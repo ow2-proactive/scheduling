@@ -38,6 +38,8 @@ public class SchedulerUserData {
 
     private String tenant;
 
+    private String domain;
+
     private String username;
 
     private long connectionTime;
@@ -65,6 +67,10 @@ public class SchedulerUserData {
 
     public String getTenant() {
         return tenant;
+    }
+
+    public String getDomain() {
+        return domain;
     }
 
     public long getConnectionTime() {
@@ -95,6 +101,10 @@ public class SchedulerUserData {
         this.tenant = tenant;
     }
 
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
     public void setConnectionTime(long connectionTime) {
         this.connectionTime = connectionTime;
     }
@@ -118,7 +128,7 @@ public class SchedulerUserData {
     @Override
     public String toString() {
         return "SchedulerUserData{" + "hostName='" + hostName + '\'' + ", username='" + username + '\'' + ", groups='" +
-               groups + "\'" + ", tenant='" + tenant + "\'" + ", connectionTime=" + connectionTime +
-               ", lastSubmitTime=" + lastSubmitTime + ", submitNumber=" + submitNumber + '}';
+               groups + "\'" + ", tenant='" + tenant + "\'" + ", domain='" + domain + "\'" + ", connectionTime=" +
+               connectionTime + ", lastSubmitTime=" + lastSubmitTime + ", submitNumber=" + submitNumber + '}';
     }
 }
