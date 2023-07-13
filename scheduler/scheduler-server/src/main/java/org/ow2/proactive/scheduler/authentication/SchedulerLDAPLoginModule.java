@@ -28,6 +28,9 @@ package org.ow2.proactive.scheduler.authentication;
 import java.io.File;
 import java.security.KeyException;
 import java.security.PrivateKey;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.LDAPLoginModule;
@@ -64,14 +67,7 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
      */
     @Override
     protected String getLoginFileName() {
-        String loginFile = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME.getValueAsString();
-        //test that login file path is an absolute path or not
-        if (!(new File(loginFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the prefix RM_Home constant
-            loginFile = PASchedulerProperties.getAbsolutePath(loginFile);
-        }
-
-        return loginFile;
+        return SchedulerJaasConfigUtils.getLoginFileName();
     }
 
     /**
@@ -81,14 +77,7 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
      */
     @Override
     protected String getGroupFileName() {
-        String groupFile = PASchedulerProperties.SCHEDULER_GROUP_FILENAME.getValueAsString();
-        //test that group file path is an absolute path or not
-        if (!(new File(groupFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the prefix RM_Home constant
-            groupFile = PASchedulerProperties.getAbsolutePath(groupFile);
-        }
-
-        return groupFile;
+        return SchedulerJaasConfigUtils.getGroupFileName();
     }
 
     /**
@@ -98,14 +87,12 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
      */
     @Override
     protected String getTenantFileName() {
-        String tenantFile = PASchedulerProperties.SCHEDULER_TENANT_FILENAME.getValueAsString();
-        //test that group file path is an absolute path or not
-        if (!(new File(tenantFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the prefix RM_Home constant
-            tenantFile = PASchedulerProperties.getAbsolutePath(tenantFile);
-        }
+        return SchedulerJaasConfigUtils.getTenantFileName();
+    }
 
-        return tenantFile;
+    @Override
+    protected Set<String> getConfiguredDomains() {
+        return SchedulerJaasConfigUtils.getConfiguredDomains();
     }
 
     @Override

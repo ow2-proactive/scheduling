@@ -80,7 +80,7 @@ public class SchedulerFrontendStateTest extends ProActiveTestClean {
 
         // create a bunch of active sessions, they will be removed in 1s
         for (int i = 0; i < 100; i++) {
-            UserIdentificationImpl identification = new UserIdentificationImpl("john", (String) null);
+            UserIdentificationImpl identification = new UserIdentificationImpl("john", (String) null, (String) null);
             identification.setHostName("localhost");
             schedulerFrontendState.connect(new UniqueID("abc" + i), identification, null);
         }

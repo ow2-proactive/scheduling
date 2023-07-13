@@ -136,6 +136,8 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * Support for multi-ldap login configuration.
      * This property must be defined using a list of the following form:
      * domain1:path_to_domain1.cfg,domain2:path_to_domain2.cfg, etc
+     *
+     * domain names must be lowercase and must also be configured in pa.rm.allowed.domains
      */
     RM_MULTI_LDAP_CONFIG("pa.rm.multi.ldap.config", PropertyType.LIST),
 
@@ -147,6 +149,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
 
     /** Resource Manager tenant file name */
     RM_TENANT_FILE("pa.rm.defaulttenantfilename", PropertyType.STRING, "config/authentication/tenant.cfg"),
+
+    /** List of domain names that can be used during a login (can be a list of windows domain names or a list of tenants in Multi-LDAP configuration) **/
+    RM_ALLOWED_DOMAINS("pa.rm.allowed.domains", PropertyType.LIST),
 
     /** Name of the JMX MBean for the RM */
     RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PropertyType.STRING, "JMXRMAgent"),
@@ -559,7 +564,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
 
     @Override
     public List<String> getValueAsList(String separator) {
-        return propertiesHelper.getValueAsList(key, type, separator, defaultValue);
+        return propertiesHelper.getValueAsList(key, type, separator, false, defaultValue);
+    }
+
+    @Override
+    public List<String> getValueAsList(String separator, boolean allowEmpty) {
+        return propertiesHelper.getValueAsList(key, type, separator, allowEmpty, defaultValue);
     }
 
     @Override

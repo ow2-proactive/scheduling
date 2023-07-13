@@ -89,6 +89,16 @@ public interface SchedulerRestInterface {
     String getUrl();
 
     /**
+     * Returns the domains configured on the scheduler server.
+     *
+     * @return list of domains
+     */
+    @GET
+    @Path("domains")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<String> getDomains();
+
+    /**
      * Returns the ids of the current jobs under a list of string.
      *
      * @param sessionId

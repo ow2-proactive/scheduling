@@ -87,6 +87,7 @@ import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMListenerProxy;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
@@ -110,6 +111,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
+
+import com.google.common.collect.ImmutableList;
 
 
 public class RMRest implements RMRestInterface {
@@ -149,6 +152,21 @@ public class RMRest implements RMRestInterface {
     @Override
     public String getUrl() {
         return PortalConfiguration.RM_URL.getValueAsString();
+    }
+
+    @Override
+    public List<String> getDomains() {
+        if (PAResourceManagerProperties.RM_ALLOWED_DOMAINS.isSet()) {
+            return PAResourceManagerProperties.RM_ALLOWED_DOMAINS.getValueAsList(",", true);
+        }
+
+        // windows current machine domain
+        String currentMachineDomain = System.getenv("USERDOMAIN");
+        if (currentMachineDomain != null) {
+            return ImmutableList.of("", currentMachineDomain.toLowerCase());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override

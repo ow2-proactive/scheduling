@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.authentication;
 import java.io.File;
 import java.security.KeyException;
 import java.security.PrivateKey;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.LDAPLoginModule;
@@ -65,15 +66,7 @@ public class RMLDAPLoginModule extends LDAPLoginModule {
      */
     @Override
     protected String getLoginFileName() {
-
-        String loginFile = PAResourceManagerProperties.RM_LOGIN_FILE.getValueAsString();
-        //test that login file path is an absolute path or not
-        if (!(new File(loginFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the prefix RM_Home constant
-            loginFile = PAResourceManagerProperties.getAbsolutePath(loginFile);
-        }
-
-        return loginFile;
+        return RMJaasConfigUtils.getLoginFileName();
     }
 
     /**
@@ -83,14 +76,7 @@ public class RMLDAPLoginModule extends LDAPLoginModule {
      */
     @Override
     protected String getGroupFileName() {
-        String groupFile = PAResourceManagerProperties.RM_GROUP_FILE.getValueAsString();
-        //test that group file path is an absolute path or not
-        if (!(new File(groupFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the prefix RM_Home constant
-            groupFile = PAResourceManagerProperties.getAbsolutePath(groupFile);
-        }
-
-        return groupFile;
+        return RMJaasConfigUtils.getGroupFileName();
     }
 
     /**
@@ -98,14 +84,12 @@ public class RMLDAPLoginModule extends LDAPLoginModule {
      */
     @Override
     protected String getTenantFileName() {
-        String tenantFile = PAResourceManagerProperties.RM_TENANT_FILE.getValueAsString();
-        //test that group file path is an absolute path or not
-        if (!(new File(tenantFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the prefix RM_Home constant
-            tenantFile = PAResourceManagerProperties.getAbsolutePath(tenantFile);
-        }
+        return RMJaasConfigUtils.getTenantFileName();
+    }
 
-        return tenantFile;
+    @Override
+    protected Set<String> getConfiguredDomains() {
+        return RMJaasConfigUtils.getConfiguredDomains();
     }
 
     @Override

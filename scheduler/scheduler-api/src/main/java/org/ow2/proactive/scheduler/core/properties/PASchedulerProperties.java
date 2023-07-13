@@ -176,6 +176,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_AUTH_PUBKEY_PATH("pa.scheduler.auth.pubkey.path", PropertyType.STRING, "config/authentication/keys/pub.key"),
 
     /** a domain name (windows active directory) which can be configured globally at the scheduler level **/
+    /** Deprecated: consider using pa.scheduler.allowed.domains instead **/
     SCHEDULER_AUTH_GLOBAL_DOMAIN("pa.scheduler.auth.global.domain", PropertyType.STRING),
 
     /** 
@@ -190,6 +191,8 @@ public enum PASchedulerProperties implements PACommonProperties {
      * Support for multi-ldap login configuration.
      * This property must be defined using a list of the following form:
      * domain1:path_to_domain1.cfg,domain2:path_to_domain2.cfg, etc
+     *
+     * domain names must be lowercase and must also be configured in pa.scheduler.allowed.domains
      */
     SCHEDULER_MULTI_LDAP_CONFIG("pa.scheduler.multi.ldap.config", PropertyType.LIST),
 
@@ -201,6 +204,9 @@ public enum PASchedulerProperties implements PACommonProperties {
 
     /** Tenant default filename */
     SCHEDULER_TENANT_FILENAME("pa.scheduler.core.defaulttenantfilename", PropertyType.STRING, "config/authentication/tenant.cfg"),
+
+    /** List of domain names that can be used during a login (can be a list of windows domain names or a list of tenants in Multi-LDAP configuration) **/
+    SCHEDULER_ALLOWED_DOMAINS("pa.scheduler.allowed.domains", PropertyType.LIST),
 
     /** If enabled, filter jobs according to user tenant */
     SCHEDULER_TENANT_FILTER("pa.scheduler.core.tenant.filter", PropertyType.BOOLEAN, "false"),
@@ -720,7 +726,12 @@ public enum PASchedulerProperties implements PACommonProperties {
 
     @Override
     public List<String> getValueAsList(String separator) {
-        return propertiesHelper.getValueAsList(key, type, separator, defaultValue);
+        return propertiesHelper.getValueAsList(key, type, separator, false, defaultValue);
+    }
+
+    @Override
+    public List<String> getValueAsList(String separator, boolean allowEmpty) {
+        return propertiesHelper.getValueAsList(key, type, separator, allowEmpty, defaultValue);
     }
 
     /**

@@ -558,6 +558,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         // setting the job properties
         job.setOwner(ident.getUsername());
         job.setTenant(ident.getTenant());
+        job.setDomain(ident.getDomain());
         // route project name inside job info
         job.setProjectName(job.getProjectName());
         if (job.getGenericInformation() != null) {
@@ -1598,6 +1599,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         userData.setUserName(userSessionInfo.getRight().getUsername());
         userData.setGroups(userSessionInfo.getRight().getGroups());
         userData.setTenant(userSessionInfo.getRight().getTenant());
+        userData.setDomain(userSessionInfo.getRight().getDomain());
         userData.setFilterByTenant(PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean());
         userData.setAllTenantPermission(userSessionInfo.getRight().isAllTenantPermission());
         userData.setAllJobPlannerPermission(userSessionInfo.getRight().isAllJobPlannerPermission());
@@ -1645,12 +1647,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
         UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner(),
-                                                                   clientJobState.getTenant());
+                                                                   clientJobState.getTenant(),
+                                                                   clientJobState.getDomain());
         return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
     }
 
     IdentifiedJob toIdentifiedJob(JobInfo jobInfo) {
-        UserIdentificationImpl uIdent = new UserIdentificationImpl(jobInfo.getJobOwner(), jobInfo.getTenant());
+        UserIdentificationImpl uIdent = new UserIdentificationImpl(jobInfo.getJobOwner(),
+                                                                   jobInfo.getTenant(),
+                                                                   jobInfo.getDomain());
         return new IdentifiedJob(jobInfo.getJobId(), uIdent, jobInfo.getGenericInformation());
     }
 

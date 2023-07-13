@@ -257,6 +257,8 @@ public final class StringUtility {
               .append(jobState.getOwner())
               .append("\tTENANT: ")
               .append(jobState.getTenant())
+              .append("\tDOMAIN: ")
+              .append(jobState.getDomain())
               .append("\tSTATUS: ")
               .append(jobState.getJobInfo().getStatus())
               .append("\t#TASKS: ")

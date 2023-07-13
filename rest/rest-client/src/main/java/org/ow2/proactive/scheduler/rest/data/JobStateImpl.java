@@ -87,6 +87,11 @@ public class JobStateImpl extends JobState {
     }
 
     @Override
+    public String getDomain() {
+        return jobStateData.getDomain();
+    }
+
+    @Override
     public List<TaskState> getTasks() {
         Map<String, TaskStateData> taskStateMap = jobStateData.getTasks();
         List<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());

@@ -33,10 +33,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.KeyException;
 import java.security.PrivateKey;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
@@ -49,6 +46,7 @@ import javax.security.auth.spi.LoginModule;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
+import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -112,6 +110,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * @return the tenant file name
      */
     protected abstract String getTenantFileName();
+
+    protected abstract Set<String> getConfiguredDomains();
 
     /**
      * Defines private key
@@ -182,6 +182,10 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
+            String domain = (String) params.get("domain");
+            if (domain != null) {
+                domain = domain.toLowerCase();
+            }
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -191,7 +195,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            succeeded = logUser(username, password, true);
+            succeeded = logUser(username, password, domain, true);
             return succeeded;
 
         } catch (java.io.IOException ioe) {
@@ -213,7 +217,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication or group membership fails.
      */
-    protected boolean logUser(String username, String password, boolean isNotFallbackAuthentication)
+    protected boolean logUser(String username, String password, String domain, boolean isNotFallbackAuthentication)
             throws LoginException {
 
         if (isNotFallbackAuthentication) {
@@ -243,6 +247,13 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         }
 
         subject.getPrincipals().add(new UserNamePrincipal(username));
+        if (domain != null) {
+            if (!getConfiguredDomains().contains(domain.toLowerCase())) {
+                throw new FailedLoginException("Invalid domain used: " + domain.toLowerCase() + " is not a member of " +
+                                               getConfiguredDomains());
+            }
+            subject.getPrincipals().add(new DomainNamePrincipal(domain));
+        }
         groupMembershipFromFile(username);
         tenantMembershipFromFile(username);
         logger.debug("authentication succeeded for user '" + username + "'");

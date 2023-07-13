@@ -72,6 +72,7 @@ public class DataUtility {
         impl.setFinishedTime(d.getFinishedTime());
         impl.setJobOwner(d.getJobOwner());
         impl.setTenant(d.getTenant());
+        impl.setDomain(d.getDomain());
         impl.setBucketName(d.getBucketName());
         impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());
         impl.setNumberOfPendingTasks(d.getNumberOfPendingTasks());
@@ -290,6 +291,7 @@ public class DataUtility {
         return new UserIdentificationImpl(d.getUsername(),
                                           d.getGroups(),
                                           d.getTenant(),
+                                          d.getDomain(),
                                           d.getSubmitNumber(),
                                           d.getHostName(),
                                           d.getConnectionTime(),

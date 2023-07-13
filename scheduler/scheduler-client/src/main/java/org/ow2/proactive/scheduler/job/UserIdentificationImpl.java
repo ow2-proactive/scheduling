@@ -33,6 +33,7 @@ import java.util.TimerTask;
 
 import javax.security.auth.Subject;
 
+import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -87,13 +88,16 @@ public class UserIdentificationImpl extends UserIdentification {
      * @param username the user name.
      * @param tenant user tenant
      */
-    public UserIdentificationImpl(String username, String tenant) {
+    public UserIdentificationImpl(String username, String tenant, String domain) {
         this.username = username;
         this.connectionTime = System.currentTimeMillis();
         this.subject = new Subject();
         this.subject.getPrincipals().add(new UserNamePrincipal(username));
         if (tenant != null) {
             this.subject.getPrincipals().add(new TenantPrincipal(tenant));
+        }
+        if (domain != null) {
+            this.subject.getPrincipals().add(new DomainNamePrincipal(domain));
         }
     }
 
@@ -141,6 +145,15 @@ public class UserIdentificationImpl extends UserIdentification {
             return null;
         }
         return tenants.iterator().next().getName();
+    }
+
+    @Override
+    public String getDomain() {
+        Set<DomainNamePrincipal> domains = subject.getPrincipals(DomainNamePrincipal.class);
+        if (domains == null || domains.size() == 0) {
+            return null;
+        }
+        return domains.iterator().next().getName();
     }
 
     @Override

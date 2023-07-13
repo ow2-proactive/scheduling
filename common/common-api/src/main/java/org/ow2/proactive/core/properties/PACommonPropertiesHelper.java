@@ -185,7 +185,7 @@ public class PACommonPropertiesHelper {
      *
      * @return the list of values of this property.
      */
-    public synchronized List<String> getValueAsList(String key, PropertyType type, String separator,
+    public synchronized List<String> getValueAsList(String key, PropertyType type, String separator, boolean allowEmpty,
             String defaultValue) {
         if (type != PropertyType.LIST) {
             throw new IllegalArgumentException("Property " + key + " is not a " + PropertyType.LIST);
@@ -195,7 +195,7 @@ public class PACommonPropertiesHelper {
         if (valueString != null) {
             for (String val : valueString.split(Pattern.quote(separator))) {
                 val = val.trim();
-                if (val.length() > 0) {
+                if (allowEmpty || val.length() > 0) {
                     valueList.add(val);
                 }
             }

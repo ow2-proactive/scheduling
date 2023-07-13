@@ -1307,6 +1307,23 @@ public abstract class InternalJob extends JobState {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.job.JobState#getDomain()
+     */
+    @Override
+    public String getDomain() {
+        return jobInfo.getDomain();
+    }
+
+    /**
+     * To set the domain name of this job owner.
+     *
+     * @param domain the domain to set.
+     */
+    public void setDomain(String domain) {
+        this.jobInfo.setDomain(domain);
+    }
+
+    /**
      * Get the credentials for this job
      *
      * @return the credentials for this job

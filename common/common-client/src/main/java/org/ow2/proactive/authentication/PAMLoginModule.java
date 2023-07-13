@@ -142,7 +142,7 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
      */
     protected boolean logUser(String username, String password) throws LoginException {
         try {
-            return super.logUser(username, password, false);
+            return super.logUser(username, password, null, false);
         } catch (LoginException ex) {
             return pamLogUser(username, password);
         }
