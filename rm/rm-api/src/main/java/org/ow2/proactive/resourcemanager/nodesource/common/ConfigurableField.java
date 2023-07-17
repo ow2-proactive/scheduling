@@ -46,6 +46,9 @@ public class ConfigurableField implements Serializable {
     @XmlJavaTypeAdapter(ConfigurableAdapter.class)
     private Configurable meta;
 
+    public ConfigurableField() {
+    }
+
     public ConfigurableField(String name, String value, Configurable configurable) {
         this.name = name;
         this.value = value;

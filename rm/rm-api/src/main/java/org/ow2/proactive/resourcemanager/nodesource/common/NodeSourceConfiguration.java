@@ -50,6 +50,9 @@ public class NodeSourceConfiguration implements Serializable {
 
     private PluginDescriptor policyPluginDescriptor;
 
+    public NodeSourceConfiguration() {
+    }
+
     public NodeSourceConfiguration(String nodeSourceName, boolean nodesRecoverable,
             PluginDescriptor infrastructurePluginDescriptor, PluginDescriptor policyPluginDescriptor) {
         this.nodeSourceName = nodeSourceName;
