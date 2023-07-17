@@ -1262,7 +1262,7 @@ public class RMRest implements RMRestInterface {
 
     private <T> T orThrowRpe(T future) throws PermissionRestException {
         try {
-            PAFuture.getFutureValue(future);
+            future = PAFuture.getFutureValue(future);
             return future;
         } catch (SecurityException e) {
             throw new PermissionRestException(e);

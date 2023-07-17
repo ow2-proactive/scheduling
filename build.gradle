@@ -510,6 +510,7 @@ def exportedProjects= [
         ":rest:rest-api",
         ":rest:rest-client",
         ":rest:rest-smartproxy",
+        ":rm:rm-api",
         ":rm:rm-client",
         ":rm:rm-server"
 ]
