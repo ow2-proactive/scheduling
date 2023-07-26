@@ -25,7 +25,10 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
@@ -70,6 +73,8 @@ public class RMNodeSourceEvent extends RMEvent {
 
     private String policyType;
 
+    private List<String> accessTokens;
+
     /**
      * ProActive Empty constructor.
      */
@@ -82,7 +87,7 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription,
             LinkedHashMap<String, String> additionalInformation, String nodeSourceAdmin, String nodeSourceStatus,
-            String infrastructureType, String policyType) {
+            String infrastructureType, String policyType, String[] accessTokens) {
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
         this.additionalInformation = new LinkedHashMap<>(additionalInformation);
@@ -90,6 +95,7 @@ public class RMNodeSourceEvent extends RMEvent {
         this.nodeSourceStatus = nodeSourceStatus;
         this.infrastructureType = infrastructureType;
         this.policyType = policyType;
+        this.accessTokens = accessTokens != null ? Arrays.asList(accessTokens) : Collections.emptyList();
     }
 
     /**
@@ -97,7 +103,7 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName, String nodeSourceDescription,
             LinkedHashMap<String, String> additionalInformation, String nodeSourceAdmin, String nodeSourceStatus,
-            String infrastructureType, String policyType) {
+            String infrastructureType, String policyType, String[] accessTokens) {
         super(type);
         this.initiator = initiator;
         this.nodeSourceName = nodeSourceName;
@@ -107,6 +113,7 @@ public class RMNodeSourceEvent extends RMEvent {
         this.nodeSourceStatus = nodeSourceStatus;
         this.infrastructureType = infrastructureType;
         this.policyType = policyType;
+        this.accessTokens = accessTokens != null ? Arrays.asList(accessTokens) : Collections.emptyList();
     }
 
     // for testing purpose RMinitialStateTest
@@ -210,5 +217,9 @@ public class RMNodeSourceEvent extends RMEvent {
 
     public String getPolicyType() {
         return policyType;
+    }
+
+    public List<String> getAccessTokens() {
+        return accessTokens;
     }
 }

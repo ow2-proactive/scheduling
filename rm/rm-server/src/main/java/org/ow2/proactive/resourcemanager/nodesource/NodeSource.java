@@ -645,7 +645,8 @@ public class NodeSource implements InitActive, RunActive {
                                                                   this.administrator.getName(),
                                                                   this.getStatus().toString(),
                                                                   this.getDescriptor().getInfrastructureType(),
-                                                                  this.getDescriptor().getPolicyType()));
+                                                                  this.getDescriptor().getPolicyType(),
+                                                                  this.nodeUserAccessType.getTokens()));
         }
     }
 
@@ -1101,6 +1102,7 @@ public class NodeSource implements InitActive, RunActive {
                                      this.administrator.getName(),
                                      this.getStatus().toString(),
                                      this.descriptor.getInfrastructureType(),
-                                     this.descriptor.getPolicyType());
+                                     this.descriptor.getPolicyType(),
+                                     this.nodeUserAccessType.getTokens());
     }
 }

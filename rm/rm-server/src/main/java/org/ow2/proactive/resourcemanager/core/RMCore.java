@@ -1744,7 +1744,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                             nodeSourceToRemove.getAdministrator().getName(),
                                                             NodeSourceStatus.NODES_UNDEPLOYED.toString(),
                                                             nodeSourceToRemove.getDescriptor().getInfrastructureType(),
-                                                            nodeSourceToRemove.getDescriptor().getPolicyType()));
+                                                            nodeSourceToRemove.getDescriptor().getPolicyType(),
+                                                            nodeSourceToRemove.getNodeUserAccessType().getTokens()));
 
             // asynchronously delegate the removal process to the node source
             nodeSourceToRemove.shutdown(this.caller);
@@ -1821,7 +1822,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               descriptor.getProvider().getName(),
                                                               nodeSource.getStatus().toString(),
                                                               descriptor.getInfrastructureType(),
-                                                              descriptor.getPolicyType()));
+                                                              descriptor.getPolicyType(),
+                                                              nodeSource.getNodeUserAccessType().getTokens()));
     }
 
     // ----------------------------------------------------------------------
@@ -2239,7 +2241,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                        nodeSourceStatus.toString(),
                                                                        nodeSource.getDescriptor()
                                                                                  .getInfrastructureType(),
-                                                                       nodeSource.getDescriptor().getPolicyType());
+                                                                       nodeSource.getDescriptor().getPolicyType(),
+                                                                       nodeSource.getNodeUserAccessType().getTokens());
 
                 if (nodeSourceCanBeRemoved(nodeSourceName)) {
                     logger.info(NODE_SOURCE_STRING + nodeSourceName + HAS_BEEN_SUCCESSFULLY +
@@ -2573,7 +2576,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                   nodeSourceToRemove.getStatus().toString(),
                                                                   nodeSourceToRemove.getDescriptor()
                                                                                     .getInfrastructureType(),
-                                                                  nodeSourceToRemove.getDescriptor().getPolicyType()));
+                                                                  nodeSourceToRemove.getDescriptor().getPolicyType(),
+                                                                  nodeSourceToRemove.getNodeUserAccessType()
+                                                                                    .getTokens()));
         }
     }
 
@@ -2597,7 +2602,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                             nodeSourceToRemove.getAdministrator().getName(),
                                                             status.toString(),
                                                             nodeSourceToRemove.getDescriptor().getInfrastructureType(),
-                                                            nodeSourceToRemove.getDescriptor().getPolicyType()));
+                                                            nodeSourceToRemove.getDescriptor().getPolicyType(),
+                                                            nodeSourceToRemove.getNodeUserAccessType().getTokens()));
 
             // asynchronously delegate the removal process to the node source
             nodeSourceToRemove.shutdown(this.caller);
