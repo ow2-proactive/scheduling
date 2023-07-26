@@ -397,6 +397,14 @@ public class RMRest implements RMRestInterface {
                                    .collect(Collectors.toList()));
             }
         });
+        state.getNodeSource().forEach(event -> {
+            if (event.getAccessTokens() != null && !event.getAccessTokens().isEmpty()) {
+                tokens.addAll(event.getAccessTokens()
+                                   .stream()
+                                   .filter(token -> (name != null ? token.matches(name) : true))
+                                   .collect(Collectors.toList()));
+            }
+        });
         if (tokens.isEmpty()) {
             return "PA:LIST()";
         } else {
