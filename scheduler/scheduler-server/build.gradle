@@ -46,7 +46,7 @@ dependencies {
 
     testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
 
-    testCompile 'org.jvnet.winp:winp:1.24'
+    testCompile 'org.jvnet.winp:winp:1.28'
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
     testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes

@@ -27,7 +27,7 @@ package org.ow2.proactive.scheduler.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -80,7 +80,7 @@ public class SchedulerFrontendStateTest extends ProActiveTestClean {
 
         // create a bunch of active sessions, they will be removed in 1s
         for (int i = 0; i < 100; i++) {
-            UserIdentificationImpl identification = new UserIdentificationImpl("john", (String) null);
+            UserIdentificationImpl identification = new UserIdentificationImpl("john", (String) null, (String) null);
             identification.setHostName("localhost");
             schedulerFrontendState.connect(new UniqueID("abc" + i), identification, null);
         }
@@ -163,14 +163,16 @@ public class SchedulerFrontendStateTest extends ProActiveTestClean {
         doReturn(jobInfo).when(internalJob).getJobInfo();
         doReturn(clientJobState0.getId()).when(jobInfo).getJobId();
         doReturn(clientJobState0.getId()).when(internalJob).getId();
-        doReturn(Collections.singletonList(internalJob)).when(dbManager).loadInternalJob(10l);
+        doReturn(Collections.singletonList(internalJob.getJobInfo())).when(dbManager)
+                                                                     .getJobs(Collections.singletonList("" + 10));
 
         InternalJob internalJob1 = spy(new InternalTaskFlowJob());
         JobInfoImpl jobInfo1 = mock(JobInfoImpl.class);
         doReturn(jobInfo1).when(internalJob1).getJobInfo();
         doReturn(clientJobState01.getId()).when(jobInfo1).getJobId();
         doReturn(clientJobState01.getId()).when(internalJob1).getId();
-        doReturn(Collections.singletonList(internalJob1)).when(dbManager).loadInternalJob(11l);
+        doReturn(Collections.singletonList(internalJob1.getJobInfo())).when(dbManager)
+                                                                      .getJobs(Collections.singletonList("" + 11));
 
         assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState0.getId()).getJobId(),
                      clientJobState0.getId());
@@ -189,6 +191,6 @@ public class SchedulerFrontendStateTest extends ProActiveTestClean {
         assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState0.getId()).getJobId(),
                      clientJobState0.getId());
 
-        verify(dbManager, times(3)).loadInternalJob(anyLong());
+        verify(dbManager, times(3)).getJobs(anyList());
     }
 }

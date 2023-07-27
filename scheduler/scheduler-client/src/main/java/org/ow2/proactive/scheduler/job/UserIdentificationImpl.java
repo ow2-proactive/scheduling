@@ -27,14 +27,13 @@ package org.ow2.proactive.scheduler.job;
 
 import java.security.Permission;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TimerTask;
 
 import javax.security.auth.Subject;
 
+import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -43,6 +42,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
 import org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
+import org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission;
 import org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
 
 
@@ -88,13 +88,16 @@ public class UserIdentificationImpl extends UserIdentification {
      * @param username the user name.
      * @param tenant user tenant
      */
-    public UserIdentificationImpl(String username, String tenant) {
+    public UserIdentificationImpl(String username, String tenant, String domain) {
         this.username = username;
         this.connectionTime = System.currentTimeMillis();
         this.subject = new Subject();
         this.subject.getPrincipals().add(new UserNamePrincipal(username));
         if (tenant != null) {
             this.subject.getPrincipals().add(new TenantPrincipal(tenant));
+        }
+        if (domain != null) {
+            this.subject.getPrincipals().add(new DomainNamePrincipal(domain));
         }
     }
 
@@ -145,6 +148,15 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public String getDomain() {
+        Set<DomainNamePrincipal> domains = subject.getPrincipals(DomainNamePrincipal.class);
+        if (domains == null || domains.size() == 0) {
+            return null;
+        }
+        return domains.iterator().next().getName();
+    }
+
+    @Override
     public boolean isAllTenantPermission() {
         try {
             return checkPermission(new TenantAllAccessPermission(), "N/A");
@@ -169,6 +181,15 @@ public class UserIdentificationImpl extends UserIdentification {
             return false;
         } catch (PermissionException e) {
             return true;
+        }
+    }
+
+    @Override
+    public boolean isOtherUsersJobReadPermission() {
+        try {
+            return checkPermission(new OtherUsersJobReadPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
         }
     }
 

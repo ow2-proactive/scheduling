@@ -25,7 +25,10 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
-import java.util.List;
+import static org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl.NODE_TOKENS_BINDING;
+
+import java.io.Serializable;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
@@ -82,7 +85,11 @@ public class ScriptExecutor implements Callable<Node> {
         if (selectionScriptSpecified) {
             // initializing parallel script execution
             for (SelectionScript script : selectionScriptList) {
-                if (manager.isPassed(script, criteria.getBindings(), rmnode)) {
+                Map<String, Serializable> criteriaBindings = criteria != null &&
+                                                             criteria.getBindings() != null ? new LinkedHashMap<>(criteria.getBindings())
+                                                                                            : new LinkedHashMap<>();
+                criteriaBindings.put(NODE_TOKENS_BINDING, new ArrayList(rmnode.getNodeTokens()));
+                if (manager.isPassed(script, criteriaBindings, rmnode)) {
                     // already executed static script
                     logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " skipping script execution");
                     continue;
@@ -91,7 +98,7 @@ public class ScriptExecutor implements Callable<Node> {
                 logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " executing");
                 try {
                     atLeastOneScriptExecuted = true;
-                    ScriptResult<Boolean> scriptResult = rmnode.executeScript(script, criteria.getBindings());
+                    ScriptResult<Boolean> scriptResult = rmnode.executeScript(script, criteriaBindings);
 
                     // processing the results
                     if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {

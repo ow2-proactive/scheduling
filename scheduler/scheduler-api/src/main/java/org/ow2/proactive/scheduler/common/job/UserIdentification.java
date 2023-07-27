@@ -26,7 +26,6 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 import java.util.TimerTask;
 
@@ -102,11 +101,23 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract boolean isHandleOnlyMyJobsPermission();
 
     /**
+     * Check if the user has permission to read other users' jobs
+     */
+    public abstract boolean isOtherUsersJobReadPermission();
+
+    /**
      * Return the tenant associated with the current user, or null if no tenant is associated
      *
      * @return user tenant
      */
     public abstract String getTenant();
+
+    /**
+     * Return the domain name associated with the current user, or null if no domain is associated
+     *
+     * @return user domain
+     */
+    public abstract String getDomain();
 
     /**
      * Get the number of submit for this user.

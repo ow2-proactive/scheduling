@@ -69,6 +69,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private String tenant;
 
+    private String domain;
+
     private String projectName;
 
     private String bucketName;
@@ -197,6 +199,14 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setTenant(String tenant) {
         this.tenant = tenant;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public String getProjectName() {

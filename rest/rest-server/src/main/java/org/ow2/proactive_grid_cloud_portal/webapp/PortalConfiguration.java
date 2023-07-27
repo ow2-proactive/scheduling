@@ -258,7 +258,12 @@ public enum PortalConfiguration implements PACommonProperties {
 
     @Override
     public List<String> getValueAsList(String separator) {
-        return propertiesHelper.getValueAsList(key, type, separator, defaultValue);
+        return propertiesHelper.getValueAsList(key, type, separator, false, defaultValue);
+    }
+
+    @Override
+    public List<String> getValueAsList(String separator, boolean allowEmpty) {
+        return propertiesHelper.getValueAsList(key, type, separator, allowEmpty, defaultValue);
     }
 
     @Override

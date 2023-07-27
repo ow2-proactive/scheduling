@@ -71,6 +71,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
+import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeHelper;
@@ -130,6 +131,9 @@ public class RMCoreTest {
     @Mock
     private NodeSourceDescriptor nodeSourceDescriptor;
 
+    @Mock
+    private AccessType mockedAccessType;
+
     private NodesLockRestorationManager nodesLockRestorationManager;
 
     private NodesRecoveryManager nodesRecoveryManager;
@@ -140,6 +144,8 @@ public class RMCoreTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         when(mockedNodeSource.getDescriptor()).thenReturn(nodeSourceDescriptor);
+        when(mockedNodeSource.getNodeUserAccessType()).thenReturn(mockedAccessType);
+        when(mockedAccessType.getTokens()).thenReturn(null);
         when(nodeSourceDescriptor.getStatus()).thenReturn(NodeSourceStatus.NODES_DEPLOYED);
         when(mockedNodeSource.getStatus()).thenReturn(NodeSourceStatus.NODES_DEPLOYED);
         when(mockedNodeSource.getAdministrator()).thenReturn(mockedAdministrator);

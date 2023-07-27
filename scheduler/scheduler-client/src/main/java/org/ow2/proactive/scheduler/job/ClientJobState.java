@@ -68,6 +68,8 @@ public class ClientJobState extends JobState {
 
     private String tenant;
 
+    private String domain;
+
     private JobType type;
 
     private Map<TaskId, TaskState> tasks;
@@ -89,6 +91,7 @@ public class ClientJobState extends JobState {
         jobInfo = (JobInfoImpl) jobState.getJobInfo();
         owner = jobState.getOwner();
         tenant = jobState.getTenant();
+        domain = jobState.getDomain();
         type = jobState.getType();
 
         this.name = jobState.getName();
@@ -211,6 +214,11 @@ public class ClientJobState extends JobState {
     @Override
     public String getTenant() {
         return tenant;
+    }
+
+    @Override
+    public String getDomain() {
+        return domain;
     }
 
     @Override

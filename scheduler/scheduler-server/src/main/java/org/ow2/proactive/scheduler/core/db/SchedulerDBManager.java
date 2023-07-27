@@ -239,7 +239,8 @@ public class SchedulerDBManager {
             final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
             final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
             String bucketName, Long parentId, String submissionMode, String label,
-            final List<SortParameter<JobSortParameter>> sortParameters) {
+            final List<SortParameter<JobSortParameter>> sortParameters, JobStatus status, long submittedTimeGreater,
+            long submittedTimeLessThan) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -261,7 +262,10 @@ public class SchedulerDBManager {
                                                              parentId,
                                                              submissionMode,
                                                              label,
-                                                             sortParameters);
+                                                             sortParameters,
+                                                             status,
+                                                             submittedTimeGreater,
+                                                             submittedTimeLessThan);
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<Integer> statusRanks = params.getStatusRanks();
         List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
@@ -298,6 +302,15 @@ public class SchedulerDBManager {
             }
             if (label != null && !label.isEmpty()) {
                 predicates.add(cb.like(root.get("label"), label + "%"));
+            }
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            if (submittedTimeGreater > 0) {
+                predicates.add(cb.ge(root.get("submittedTime"), submittedTimeGreater));
+            }
+            if (submittedTimeLessThan > 0) {
+                predicates.add(cb.lessThan(root.get("submittedTime"), submittedTimeLessThan));
             }
             if (childJobs && parentId != null && parentId > 0L) {
                 predicates.add(cb.equal(root.get("parentId"), parentId));
@@ -607,6 +620,22 @@ public class SchedulerDBManager {
                     queryString.append("and parentId = :parentId ");
                 }
 
+                if (params.getLabel() != null && !params.getLabel().isEmpty()) {
+                    queryString.append("and label like :label ");
+                }
+
+                if (params.getStatus() != null) {
+                    queryString.append("and status = :status ");
+                }
+
+                if (params.getSubmittedTimeGreater() > 0) {
+                    queryString.append("and submittedTime >= :submittedTimeGreater ");
+                }
+
+                if (params.getSubmittedTimeLessThan() > 0) {
+                    queryString.append("and submittedTime < :submittedTimeLessThan ");
+                }
+
                 Query query = session.createQuery(queryString.toString());
                 query.setParameterList("statusRanks", statusRanks);
                 if (hasUser) {
@@ -633,6 +662,22 @@ public class SchedulerDBManager {
 
                 if (params.isChildJobs() && params.getParentId() != null && params.getParentId() > 0) {
                     query.setParameter("parentId", params.getParentId());
+                }
+
+                if (params.getLabel() != null && !params.getLabel().isEmpty()) {
+                    query.setParameter("label", params.getLabel());
+                }
+
+                if (params.getStatus() != null) {
+                    query.setParameter("status", params.getStatus());
+                }
+
+                if (params.getSubmittedTimeGreater() > 0) {
+                    query.setParameter("submittedTimeGreater", params.getSubmittedTimeGreater());
+                }
+
+                if (params.getSubmittedTimeLessThan() > 0) {
+                    query.setParameter("submittedTimeLessThan", params.getSubmittedTimeLessThan());
                 }
 
                 Long count = (Long) query.uniqueResult();
@@ -3161,11 +3206,8 @@ public class SchedulerDBManager {
 
     public List<JobLabelInfo> getLabels() {
         return executeReadOnlyTransaction(session -> {
-            logger.info("Loading JobLabels from database");
-
             Query query = session.getNamedQuery("getTotalJobsLabels").setReadOnly(true);
             List<Object[]> jobLabelInfoList = query.list();
-            logger.info(jobLabelInfoList.size() + " JobLabels to fetch from database");
             return jobLabelInfoList.stream()
                                    .map(label -> new JobLabelInfo(Long.parseLong(label[0].toString()),
                                                                   label[1].toString()))
@@ -3178,7 +3220,8 @@ public class SchedulerDBManager {
                label.matches(PASchedulerProperties.LABEL_REGEX.getValueAsString());
     }
 
-    public List<JobLabelInfo> newLabels(List<String> labels) throws LabelConflictException, LabelValidationException {
+    public List<JobLabelInfo> newLabels(List<String> labels, String username)
+            throws LabelConflictException, LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
             if (checkIfLabelExists(label)) {
@@ -3196,10 +3239,11 @@ public class SchedulerDBManager {
             });
             jobLabelsInfo.add(jobLabel.toJobLabelInfo());
         });
+        logger.info("Labels " + labels + " have been created by " + username);
         return jobLabelsInfo;
     }
 
-    public List<JobLabelInfo> setLabels(List<String> labels) throws LabelValidationException {
+    public List<JobLabelInfo> setLabels(List<String> labels, String username) throws LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
             if (!isLabelValid(label)) {
@@ -3215,6 +3259,7 @@ public class SchedulerDBManager {
             });
             jobLabelsInfo.add(jobLabel.toJobLabelInfo());
         });
+        logger.info("Label list " + labels + " has been set by " + username);
         return jobLabelsInfo;
     }
 
@@ -3242,7 +3287,7 @@ public class SchedulerDBManager {
         });
     }
 
-    public JobLabelInfo updateLabel(String labelId, String newLabel)
+    public JobLabelInfo updateLabel(String labelId, String newLabel, String username)
             throws LabelConflictException, LabelNotFoundException, LabelValidationException {
         if (checkIfLabelExists(newLabel)) {
             throw new LabelConflictException(newLabel);
@@ -3257,19 +3302,22 @@ public class SchedulerDBManager {
                                                       .setParameter("newLabel", newLabel)
                                                       .setParameter("labelId", Long.parseLong(labelId))
                                                       .executeUpdate());
+        logger.info("Label " + newLabel + " has been updated by " + username);
         return new JobLabelInfo(Long.parseLong(labelId), newLabel);
     }
 
-    public void deleteLabel(String labelId) throws LabelNotFoundException {
+    public void deleteLabel(String labelId, String username) throws LabelNotFoundException {
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
         }
+        String label = getLabelById(Long.parseLong(labelId));
         executeReadWriteTransaction(session -> session.getNamedQuery("deleteLabel")
                                                       .setParameter("labelId", Long.parseLong(labelId))
                                                       .executeUpdate());
+        logger.info("Label " + label + " has been deleted by " + username);
     }
 
-    public void setLabelOnJobIds(String labelId, List<String> jobIds) throws LabelNotFoundException {
+    public void setLabelOnJobIds(String labelId, List<String> jobIds, String username) throws LabelNotFoundException {
         if (!checkIfLabelIdExists(Long.parseLong(labelId))) {
             throw new LabelNotFoundException(labelId);
         }
@@ -3285,9 +3333,10 @@ public class SchedulerDBManager {
                                                                                                              jobIdSubList)
                                                                                                .executeUpdate()));
         });
+        logger.info("Label " + label + " has been set on jobs " + jobIds + "  by " + username);
     }
 
-    public void removeJobLabels(List<String> jobIds) {
+    public void removeJobLabels(List<String> jobIds, String username) {
 
         jobIds.forEach(jobId -> {
             List<String> ids = Arrays.asList(jobId.split("[\\s,]+"));
@@ -3301,5 +3350,6 @@ public class SchedulerDBManager {
                                                                                                              longIds)
                                                                                                .executeUpdate()));
         });
+        logger.info("Label has been removed from jobs " + jobIds + "  by " + username);
     }
 }

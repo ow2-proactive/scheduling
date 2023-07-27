@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.selection.statistics;
 
+import static org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl.*;
+
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -45,6 +47,8 @@ import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+
+import com.google.common.collect.ImmutableSet;
 
 
 /**
@@ -79,6 +83,11 @@ public class ProbablisticSelectionManager extends SelectionManager {
     //    the system will be too CPU consuming working on the limit
     // 3. Removed the oldest added script. For this we have this queue. 
     private LinkedList<String> digestQueue = new LinkedList<>();
+
+    private Set<String> excludedBindings = ImmutableSet.of(NODE_URL_BINDING,
+                                                           NODE_NAME_BINDING,
+                                                           NODE_HOST_BINDING,
+                                                           NODE_TOKENS_BINDING);
 
     public ProbablisticSelectionManager() {
     }
@@ -121,8 +130,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
                 } catch (NoSuchAlgorithmException e) {
                     logger.error(e.getMessage(), e);
                 }
-                if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
-                    double probability = probabilities.get(digest).get(rmnode.getNodeURL()).value();
+                if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(getNodeKey(rmnode))) {
+                    double probability = probabilities.get(digest).get(getNodeKey(rmnode)).value();
                     if (Math.abs(probability - 0) < 0.0001) {
                         intersection = false;
                         break;
@@ -177,8 +186,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
         }
         try {
             digest = new String(scriptWithReplacedBindings.digest());
-            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
-                Probability p = probabilities.get(digest).get(rmnode.getNodeURL());
+            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(getNodeKey(rmnode))) {
+                Probability p = probabilities.get(digest).get(getNodeKey(rmnode));
                 String scriptType = scriptWithReplacedBindings.isDynamic() ? "dynamic" : "static";
                 if (logger.isDebugEnabled())
                     logger.debug(rmnode.getNodeURL() + " : " + digest.hashCode() + " known " + scriptType + " script");
@@ -213,8 +222,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
         try {
             String digest = new String(scriptWithReplacedBindings.digest());
             Probability probability = new Probability(Probability.defaultValue());
-            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
-                probability = probabilities.get(digest).get(rmnode.getNodeURL());
+            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(getNodeKey(rmnode))) {
+                probability = probabilities.get(digest).get(getNodeKey(rmnode));
                 assert (probability.value() >= 0 && probability.value() <= 1);
             }
 
@@ -256,7 +265,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
                              ", probability " + probability);
             }
 
-            probabilities.get(digest).put(rmnode.getNodeURL().intern(), probability);
+            probabilities.get(digest).put(getNodeKey(rmnode).intern(), probability);
 
         } catch (NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);
@@ -277,12 +286,15 @@ public class ProbablisticSelectionManager extends SelectionManager {
         if (scriptContent != null && bindings != null) {
             for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
                 String reservedKeyword = entry.getKey();
-                Serializable binding = entry.getValue();
-                if (binding instanceof Map) {
-                    scriptContent = replaceBindingKeysByTheirValue(scriptContent, (Map<String, Serializable>) binding);
-                } else {
-                    if (binding != null) {
-                        scriptContent = scriptContent.replace(reservedKeyword, binding.toString());
+                if (!excludedBindings.contains(reservedKeyword)) {
+                    Serializable binding = entry.getValue();
+                    if (binding instanceof Map) {
+                        scriptContent = replaceBindingKeysByTheirValue(scriptContent,
+                                                                       (Map<String, Serializable>) binding);
+                    } else {
+                        if (binding != null) {
+                            scriptContent = scriptContent.replace(reservedKeyword, binding.toString());
+                        }
                     }
                 }
             }
@@ -301,6 +313,11 @@ public class ProbablisticSelectionManager extends SelectionManager {
                         System.lineSeparator() + script.toString(), e);
             return script;
         }
+    }
+
+    private String getNodeKey(RMNode rmNode) {
+        // return the node url, appending node tokens to materialize the potential token state changes of the node
+        return rmNode.getNodeURL() + (!rmNode.getNodeTokens().isEmpty() ? "_" + rmNode.getNodeTokens() : "");
     }
 
     private String replaceBindingKeysByTheirValue(String scriptContent, Map<String, Serializable> binding) {

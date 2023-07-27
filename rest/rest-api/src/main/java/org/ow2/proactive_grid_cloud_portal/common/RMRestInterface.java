@@ -98,6 +98,16 @@ public interface RMRestInterface {
     String getUrl();
 
     /**
+     * Returns the domains configured on the resource manager server.
+     *
+     * @return list of domains
+     */
+    @GET
+    @Path("domains")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<String> getDomains();
+
+    /**
      * Login with username/password.
      *
      * Log into the resource manager using an form containing 2 fields
@@ -253,34 +263,45 @@ public interface RMRestInterface {
      * List of registered node hosts as variable model.
      *
      * Returns a workflow variable model string containing the list of registered hosts in the resource manager
+     * @param name a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> which will accept hosts based on their name. Example: <code>host.*</code>
      * @return a model containing the list of hosts, including an empty name. e.g. PA:LIST(,hostname1,hostname2)
      */
     @GET
     @Path("model/hosts")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    String getModelHosts() throws PermissionRestException;
+    String getModelHosts(@QueryParam("name") String name) throws PermissionRestException;
 
     /**
      * list of node sources as variable model.
      *
-     * Returns a workflow variable model string containing the list of registered node sources in the resource manager
+     * Returns a workflow variable model string containing the list of deployed node sources in the resource manager
+     *
+     * @param name a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> which will accept node sources based on their name. Example: <code>Internal_.*</code>
+     *
+     * @param infrastructure node source infrastructure type. All node sources whose infrastructure name contains the given type will be returned.
+     *             For example: <code>Local</code> will return all node sources with a <i>LocalInfrastructure</i>, <code>Azure</code> will return all node sources with <i>AzureInfrastructure</i> or <i>AzureVMScaleSetInfrastructure</i> types. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_infrastructures">Node Source Infrastructures</a> for a complete list of infrastructure types.
+     * @param policy node source policy type. All node sources whose policy name contains the given type will be returned.
+     *             For example: <code>Static</code> will return all node sources with a <i>StaticPolicy</i>, <code>Dynamic</code> will return all node sources with <i>DynamicPolicy</i>. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_policies">Node Source Policies</a> for a complete list of policy types.
+     *
      * @return a model containing the list of node sources name, including an empty name and the default node source e.g. PA:LIST(,Default,LocalNodes)
      */
     @GET
     @Path("model/nodesources")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    String getModelNodeSources() throws PermissionRestException;
+    String getModelNodeSources(@QueryParam("name") String name, @QueryParam("infrastructure") String infrastructure,
+            @QueryParam("policy") String policy) throws PermissionRestException;
 
     /**
      * List of registered tokens as variable model.
      *
      * Returns a workflow variable model string containing the list of registered tokens in the resource manager
+     * @param name a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> which will accept tokens based on their name. Example: <code>token.*</code>
      * @return a model containing the list of tokens, including an empty name. e.g. PA:LIST(,token1,token2)
      */
     @GET
     @Path("model/tokens")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    String getModelTokens() throws PermissionRestException;
+    String getModelTokens(@QueryParam("name") String name) throws PermissionRestException;
 
     /**
      * Check Resource Manager availability.

@@ -112,6 +112,8 @@ public class RMNodeImpl extends AbstractRMNode {
 
     public static final String NODE_HOST_BINDING = "nodehost";
 
+    public static final String NODE_TOKENS_BINDING = "nodeTokens";
+
     /**
      * Constructs a new instance. Initial state is set to {@link NodeState#FREE}.
      *

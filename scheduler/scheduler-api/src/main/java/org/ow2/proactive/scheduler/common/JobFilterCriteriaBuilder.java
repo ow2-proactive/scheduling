@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+
+
 public class JobFilterCriteriaBuilder {
 
     private boolean myJobsOnly;
@@ -54,6 +57,12 @@ public class JobFilterCriteriaBuilder {
     private Long parentId;
 
     private String submissionMode;
+
+    private long submittedTimeLessThan;
+
+    private long submittedTimeGreater;
+
+    private JobStatus status;
 
     public JobFilterCriteriaBuilder() {
     }
@@ -112,6 +121,18 @@ public class JobFilterCriteriaBuilder {
 
     public String getSubmissionMode() {
         return submissionMode;
+    }
+
+    public long getSubmittedTimeLessThan() {
+        return submittedTimeLessThan;
+    }
+
+    public long getSubmittedTimeGreater() {
+        return submittedTimeGreater;
+    }
+
+    public JobStatus getStatus() {
+        return status;
     }
 
     public JobFilterCriteriaBuilder myJobsOnly(boolean myJobsOnly) {
@@ -181,6 +202,21 @@ public class JobFilterCriteriaBuilder {
 
     public JobFilterCriteriaBuilder submissionMode(String submissionMode) {
         this.submissionMode = submissionMode;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder submittedTimeLessThan(long submittedTimeLessThan) {
+        this.submittedTimeLessThan = submittedTimeLessThan;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder submittedTimeGreater(long submittedTimeGreater) {
+        this.submittedTimeGreater = submittedTimeGreater;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder status(JobStatus status) {
+        this.status = status;
         return this;
     }
 

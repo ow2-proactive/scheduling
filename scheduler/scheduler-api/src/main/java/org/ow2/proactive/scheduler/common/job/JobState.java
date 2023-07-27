@@ -481,11 +481,18 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     public abstract String getOwner();
 
     /**
-     * To get the owner of the job.
+     * To get the tenant of the job owner.
      *
-     * @return the owner of the job.
+     * @return the tenant of the job owner.
      */
     public abstract String getTenant();
+
+    /**
+     * To get the domain name of the job.
+     *
+     * @return the domain name of the job owner.
+     */
+    public abstract String getDomain();
 
     /**
      * Get the toBeRemoved property.

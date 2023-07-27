@@ -347,7 +347,7 @@ dependencies {
     distLib project(':rest:rest-smartproxy')
     distLib project(':scheduler:scheduler-smartproxy')
 
-    nativeBundle 'org.jvnet.winp:winp:1.23-proactive:native'
+    nativeBundle 'org.jvnet.winp:winp:1.28-proactive:native'
     nativeBundle 'sigar:sigar:1.7.0-proactive:native'
     nativeBundle 'net.sf.jpam:libjpam:1.1-proactive:native'
     nativeBundle 'jsr223:jsr223-powershell:0.2.3:native'
@@ -510,6 +510,7 @@ def exportedProjects= [
         ":rest:rest-api",
         ":rest:rest-client",
         ":rest:rest-smartproxy",
+        ":rm:rm-api",
         ":rm:rm-client",
         ":rm:rm-server"
 ]

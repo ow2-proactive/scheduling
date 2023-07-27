@@ -136,6 +136,8 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * Support for multi-ldap login configuration.
      * This property must be defined using a list of the following form:
      * domain1:path_to_domain1.cfg,domain2:path_to_domain2.cfg, etc
+     *
+     * domain names must be lowercase and must also be configured in pa.rm.allowed.domains
      */
     RM_MULTI_LDAP_CONFIG("pa.rm.multi.ldap.config", PropertyType.LIST),
 
@@ -147,6 +149,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
 
     /** Resource Manager tenant file name */
     RM_TENANT_FILE("pa.rm.defaulttenantfilename", PropertyType.STRING, "config/authentication/tenant.cfg"),
+
+    /** List of domain names that can be used during a login (can be a list of windows domain names or a list of tenants in Multi-LDAP configuration) **/
+    RM_ALLOWED_DOMAINS("pa.rm.allowed.domains", PropertyType.LIST),
 
     /** Name of the JMX MBean for the RM */
     RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PropertyType.STRING, "JMXRMAgent"),
@@ -364,7 +369,27 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /**
      * Defines the log4j pattern used for all file appenders (used by the scheduler for job/task log files
      */
-    LO4J_FILE_APPENDER_PATTERN("pa.log4j.file.appender.pattern", PropertyType.STRING, "%d{ISO8601} %-5p [%c{1.}] %m%n");
+    LO4J_FILE_APPENDER_PATTERN("pa.log4j.file.appender.pattern", PropertyType.STRING, "%d{ISO8601} %-5p [%c{1.}] %m%n"),
+
+    /**
+     * Ciphers added to jsch defaults in order to support legacy SSH servers
+     */
+    JSCH_ADDITIONAL_CIPHERS("pa.jsch.additional.ciphers", PropertyType.LIST, "aes128-cbc,aes192-cbc,aes256-cbc,3des-cbc"),
+
+    /**
+     * Key exchange algorithms added to jsch defaults in order to support legacy SSH servers
+     */
+    JSCH_ADDITIONAL_KEX_ALGORITHMS("pa.jsch.additional.kexalgorithms", PropertyType.LIST, "diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1"),
+
+    /**
+     * Key exchange algorithms added to jsch defaults in order to support legacy SSH servers
+     */
+    JSCH_ADDITIONAL_MACS("pa.jsch.additional.macs", PropertyType.LIST),
+
+    /**
+     * Server Host Key algorithms added to jsch defaults in order to support legacy SSH servers
+     */
+    JSCH_ADDITIONAL_SERVER_HOST_KEYS("pa.jsch.additional.host.keys", PropertyType.LIST, "ssh-rsa"),;
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -539,7 +564,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
 
     @Override
     public List<String> getValueAsList(String separator) {
-        return propertiesHelper.getValueAsList(key, type, separator, defaultValue);
+        return propertiesHelper.getValueAsList(key, type, separator, false, defaultValue);
+    }
+
+    @Override
+    public List<String> getValueAsList(String separator, boolean allowEmpty) {
+        return propertiesHelper.getValueAsList(key, type, separator, allowEmpty, defaultValue);
     }
 
     @Override

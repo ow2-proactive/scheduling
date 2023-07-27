@@ -52,6 +52,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -163,9 +164,12 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
             // gets the user name, password, group Membership, and group Hierarchy from call back handler
             callbackHandler.handle(callbacks);
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
-            String domain = (String) params.get("domain");
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
+            String domain = (String) params.get("domain");
+            if (domain != null) {
+                domain = domain.toLowerCase();
+            }
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -196,7 +200,7 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
      */
     protected boolean logUser(String domain, String username, String password) throws LoginException {
         if (domain == null) {
-            return super.logUser(username, password, false);
+            return super.logUser(username, password, null, false);
         } else {
             if (ldapDomainConfigurations.containsKey(domain)) {
                 return internalLogUser(domain, username, password);
@@ -242,6 +246,14 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
                 logger.debug("authentication succeeded, checking group");
             }
             resetFailedAttempt(username);
+
+            if (domain != null) {
+                if (!getConfiguredDomains().contains(domain.toLowerCase())) {
+                    throw new FailedLoginException("Invalid domain used: " + domain.toLowerCase() +
+                                                   " is not a member of " + getConfiguredDomains());
+                }
+                subject.getPrincipals().add(new DomainNamePrincipal(domain));
+            }
 
             if (ldapDomainConfigurations.get(domain).isFallbackGroupMembership()) {
                 super.groupMembershipFromFile(username);

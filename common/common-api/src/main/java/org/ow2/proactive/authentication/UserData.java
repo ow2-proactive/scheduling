@@ -47,6 +47,8 @@ public class UserData implements Serializable {
 
     private String tenant;
 
+    private String domain;
+
     private boolean filterByTenant;
 
     private boolean allTenantPermission;
@@ -54,6 +56,8 @@ public class UserData implements Serializable {
     private boolean allJobPlannerPermission;
 
     private boolean handleOnlyMyJobsPermission;
+
+    private boolean otherUsersJobReadPermission;
 
     public boolean isAllJobPlannerPermission() {
         return allJobPlannerPermission;
@@ -87,6 +91,14 @@ public class UserData implements Serializable {
         this.tenant = tenant;
     }
 
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
     public boolean isFilterByTenant() {
         return filterByTenant;
     }
@@ -109,5 +121,13 @@ public class UserData implements Serializable {
 
     public void setHandleOnlyMyJobsPermission(boolean handleOnlyMyJobsPermission) {
         this.handleOnlyMyJobsPermission = handleOnlyMyJobsPermission;
+    }
+
+    public boolean isOtherUsersJobReadPermission() {
+        return otherUsersJobReadPermission;
+    }
+
+    public void setOtherUsersJobReadPermission(boolean otherUsersJobReadPermission) {
+        this.otherUsersJobReadPermission = otherUsersJobReadPermission;
     }
 }

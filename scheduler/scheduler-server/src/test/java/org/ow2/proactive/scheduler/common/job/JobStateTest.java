@@ -114,6 +114,11 @@ public class JobStateTest extends ProActiveTestClean {
             }
 
             @Override
+            public String getDomain() {
+                return null;
+            }
+
+            @Override
             public JobType getType() {
                 return null;
             }

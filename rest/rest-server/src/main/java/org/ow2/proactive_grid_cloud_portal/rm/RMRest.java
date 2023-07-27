@@ -37,6 +37,7 @@ import java.security.KeyException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -57,6 +58,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -85,6 +87,7 @@ import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMListenerProxy;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
@@ -108,6 +111,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
+
+import com.google.common.collect.ImmutableList;
 
 
 public class RMRest implements RMRestInterface {
@@ -147,6 +152,21 @@ public class RMRest implements RMRestInterface {
     @Override
     public String getUrl() {
         return PortalConfiguration.RM_URL.getValueAsString();
+    }
+
+    @Override
+    public List<String> getDomains() {
+        if (PAResourceManagerProperties.RM_ALLOWED_DOMAINS.isSet()) {
+            return PAResourceManagerProperties.RM_ALLOWED_DOMAINS.getValueAsList(",", true);
+        }
+
+        // windows current machine domain
+        String currentMachineDomain = System.getenv("USERDOMAIN");
+        if (currentMachineDomain != null) {
+            return ImmutableList.of("", currentMachineDomain.toLowerCase());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -290,41 +310,106 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public String getModelHosts() throws PermissionRestException {
+    public String getModelHosts(String name) throws PermissionRestException {
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
-        return String.format("PA:LIST(,%s)", state.getNodesEvents()
-                                                  .stream()
-                                                  .map(RMNodeEvent::getHostName)
-                                                  .distinct()
-                                                  .filter(hostName -> !hostName.isEmpty())
-                                                  .collect(Collectors.joining(",")));
+        List<String> filteredHosts = state.getNodesEvents()
+                                          .stream()
+                                          .map(RMNodeEvent::getHostName)
+                                          .distinct()
+                                          .filter(hostName -> !hostName.isEmpty() &&
+                                                              (name != null ? hostName.matches(name) : true))
+                                          .collect(Collectors.toList());
+        if (filteredHosts.isEmpty()) {
+            return "PA:LIST()";
+        } else {
+            return String.format("PA:LIST(,%s)", filteredHosts.stream().distinct().collect(Collectors.joining(",")));
+        }
     }
 
     @Override
-    public String getModelNodeSources() throws PermissionRestException {
+    public String getModelNodeSources(String name, String infrastructure, String policy)
+            throws PermissionRestException {
+        List<String> filteredNodeSources = getFilteredNodeSources(name, infrastructure, policy);
+        if (filteredNodeSources.isEmpty()) {
+            return "PA:LIST()";
+        } else {
+            return String.format("PA:LIST(,%s)",
+                                 filteredNodeSources.stream().distinct().collect(Collectors.joining(",")));
+        }
+    }
+
+    private List<String> getFilteredNodeSources(String name, String infrastructure, String policy)
+            throws PermissionRestException {
+        Map<String, Pair<String, String>> nodeSources = new LinkedHashMap<>();
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
-        return String.format("PA:LIST(,%s,%s)", RMConstants.DEFAULT_STATIC_SOURCE_NAME, state.getNodeSource()
-                                                                                             .stream()
-                                                                                             .map(RMNodeSourceEvent::getNodeSourceName)
-                                                                                             .distinct()
-                                                                                             .filter(nodeSourceName -> !nodeSourceName.isEmpty() &&
-                                                                                                                       !nodeSourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME))
-                                                                                             .collect(Collectors.joining(",")));
+        nodeSources.put(RMConstants.DEFAULT_STATIC_SOURCE_NAME,
+                        Pair.of("org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager",
+                                "org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy"));
+        state.getNodeSource()
+             .stream()
+             .filter(event -> !event.getNodeSourceName().isEmpty() &&
+                              "DEPLOYED".equalsIgnoreCase(event.getNodeSourceStatus()))
+             .forEach(event -> {
+                 nodeSources.put(event.getNodeSourceName(),
+                                 Pair.of(event.getInfrastructureType(), event.getPolicyType()));
+             });
+        if (infrastructure != null) {
+            for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
+                                                                                   .iterator(); it.hasNext();) {
+                Map.Entry<String, Pair<String, String>> entry = it.next();
+                if (!entry.getValue().getLeft().toLowerCase().contains(infrastructure.toLowerCase())) {
+                    it.remove();
+                }
+
+            }
+        }
+        if (policy != null) {
+            for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
+                                                                                   .iterator(); it.hasNext();) {
+                Map.Entry<String, Pair<String, String>> entry = it.next();
+                if (!entry.getValue().getRight().toLowerCase().contains(policy.toLowerCase())) {
+                    it.remove();
+                }
+
+            }
+        }
+        if (name != null) {
+            for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
+                                                                                   .iterator(); it.hasNext();) {
+                Map.Entry<String, Pair<String, String>> entry = it.next();
+                if (!entry.getKey().matches(name)) {
+                    it.remove();
+                }
+            }
+        }
+        return new ArrayList<>(nodeSources.keySet());
     }
 
     @Override
-    public String getModelTokens() throws PermissionRestException {
+    public String getModelTokens(String name) throws PermissionRestException {
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
         Set<String> tokens = new LinkedHashSet<>();
         state.getNodesEvents().forEach(event -> {
             if (event.getTokens() != null) {
-                tokens.addAll(event.getTokens());
+                tokens.addAll(event.getTokens()
+                                   .stream()
+                                   .filter(token -> (name != null ? token.matches(name) : true))
+                                   .collect(Collectors.toList()));
+            }
+        });
+        state.getNodeSource().forEach(event -> {
+            if (event.getAccessTokens() != null && !event.getAccessTokens().isEmpty()) {
+                tokens.addAll(event.getAccessTokens()
+                                   .stream()
+                                   .filter(token -> (name != null ? token.matches(name) : true))
+                                   .collect(Collectors.toList()));
             }
         });
         if (tokens.isEmpty()) {
-            return "PA:REGEXP(^$)";
+            return "PA:LIST()";
+        } else {
+            return String.format("PA:LIST(,%s)", String.join(",", tokens));
         }
-        return String.format("PA:LIST(,%s)", String.join(",", tokens));
     }
 
     @Override
@@ -1185,7 +1270,7 @@ public class RMRest implements RMRestInterface {
 
     private <T> T orThrowRpe(T future) throws PermissionRestException {
         try {
-            PAFuture.getFutureValue(future);
+            future = PAFuture.getFutureValue(future);
             return future;
         } catch (SecurityException e) {
             throw new PermissionRestException(e);

@@ -23,52 +23,14 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.nodesource.common;
+package org.ow2.proactive.scheduler.permissions;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ow2.proactive.permissions.ClientPermission;
 
 
 /**
- *
- * Encapsulation of field name, value and its meta data.
- *
+ * allows the user to have read access on other users' jobs
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-public class ConfigurableField implements Serializable {
-    private String name;
-
-    private String value;
-
-    @XmlJavaTypeAdapter(ConfigurableAdapter.class)
-    private Configurable meta;
-
-    public ConfigurableField() {
-    }
-
-    public ConfigurableField(String name, String value, Configurable configurable) {
-        this.name = name;
-        this.value = value;
-        this.meta = configurable;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public Configurable getMeta() {
-        return meta;
-    }
-
+public class OtherUsersJobReadPermission extends ClientPermission {
+    private static final long serialVersionUID = 1L;
 }

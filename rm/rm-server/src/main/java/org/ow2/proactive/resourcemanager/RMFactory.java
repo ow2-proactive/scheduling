@@ -28,6 +28,9 @@ package org.ow2.proactive.resourcemanager;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -48,6 +51,8 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.utils.FileUtils;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
+
+import com.jcraft.jsch.JSch;
 
 
 /**
@@ -96,6 +101,8 @@ public class RMFactory {
 
             configureLog4j();
 
+            configureJSch();
+
             Node nodeRM = NodeFactory.createLocalNode(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(),
                                                       false,
                                                       null,
@@ -110,6 +117,50 @@ public class RMFactory {
         } else {
             throw new RMException("RM Core already running locally");
         }
+    }
+
+    public static void configureJSch() {
+        if (PAResourceManagerProperties.JSCH_ADDITIONAL_CIPHERS.isSet()) {
+            Set<String> defaultCipherSet = new HashSet(Arrays.asList(JSch.getConfig("cipher.s2c").split(",")));
+            for (String cipher : PAResourceManagerProperties.JSCH_ADDITIONAL_CIPHERS.getValueAsList(",")) {
+                if (!cipher.isEmpty() && !defaultCipherSet.contains(cipher)) {
+                    JSch.setConfig("cipher.s2c", JSch.getConfig("cipher.s2c") + "," + cipher);
+                    JSch.setConfig("cipher.c2s", JSch.getConfig("cipher.c2s") + "," + cipher);
+                    defaultCipherSet.add(cipher);
+                }
+            }
+        }
+        if (PAResourceManagerProperties.JSCH_ADDITIONAL_KEX_ALGORITHMS.isSet()) {
+            Set<String> defaultKexSet = new HashSet(Arrays.asList(JSch.getConfig("kex").split(",")));
+            for (String kex : PAResourceManagerProperties.JSCH_ADDITIONAL_KEX_ALGORITHMS.getValueAsList(",")) {
+                if (!kex.isEmpty() && !defaultKexSet.contains(kex)) {
+                    JSch.setConfig("kex", JSch.getConfig("kex") + "," + kex);
+                    defaultKexSet.add(kex);
+                }
+            }
+        }
+        if (PAResourceManagerProperties.JSCH_ADDITIONAL_MACS.isSet()) {
+            Set<String> defaultMacSet = new HashSet(Arrays.asList(JSch.getConfig("mac.s2c").split(",")));
+            for (String mac : PAResourceManagerProperties.JSCH_ADDITIONAL_MACS.getValueAsList(",")) {
+                if (!mac.isEmpty() && !defaultMacSet.contains(mac)) {
+                    JSch.setConfig("mac.s2c", JSch.getConfig("mac.s2c") + "," + mac);
+                    JSch.setConfig("mac.c2s", JSch.getConfig("mac.c2s") + "," + mac);
+                    defaultMacSet.add(mac);
+                }
+            }
+        }
+        if (PAResourceManagerProperties.JSCH_ADDITIONAL_SERVER_HOST_KEYS.isSet()) {
+            Set<String> defaultHostKeySet = new HashSet(Arrays.asList(JSch.getConfig("server_host_key").split(",")));
+            for (String hostKey : PAResourceManagerProperties.JSCH_ADDITIONAL_SERVER_HOST_KEYS.getValueAsList(",")) {
+                if (!hostKey.isEmpty() && !defaultHostKeySet.contains(hostKey)) {
+                    JSch.setConfig("server_host_key", JSch.getConfig("server_host_key") + "," + hostKey);
+                    JSch.setConfig("PubkeyAcceptedAlgorithms",
+                                   JSch.getConfig("PubkeyAcceptedAlgorithms") + "," + hostKey);
+                    defaultHostKeySet.add(hostKey);
+                }
+            }
+        }
+
     }
 
     /**

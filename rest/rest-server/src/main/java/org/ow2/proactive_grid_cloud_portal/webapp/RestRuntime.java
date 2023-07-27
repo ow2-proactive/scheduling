@@ -124,6 +124,7 @@ public class RestRuntime {
         dispatcher.registerProvider(ExceptionMappers.LabelNotFoundRestExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.LabelConflictRestExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.LabelValidationRestExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.PatternSyntaxRestExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.SchedulerRestExceptionExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.NotFoundExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.SubmissionClosedRestExceptionExceptionMapper.class);

@@ -141,6 +141,11 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
+    public List<String> getDomains() {
+        return scheduler().getDomains();
+    }
+
+    @Override
     public List<Workflow> getWorkflows(String sessionId) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Reading workflows as " + userName);

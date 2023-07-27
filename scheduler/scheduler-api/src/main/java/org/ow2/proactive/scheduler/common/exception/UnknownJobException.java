@@ -51,7 +51,7 @@ public class UnknownJobException extends SchedulerException {
     }
 
     public UnknownJobException(JobId jobId) {
-        super("The job " + jobId + " does not exist !");
+        super("The job represented by this ID '" + jobId + "' is unknown !");
         this.jobId = jobId;
     }
 
