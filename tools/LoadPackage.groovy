@@ -169,6 +169,7 @@ class LoadPackage {
             def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage") + " (" + SCHEDULER_VERSION + ")", "UTF-8")
             def contentType = metadata_map.get("contentType")
             def projectName = metadata_map.get("projectName")
+            def tags = metadata_map.get("tags")
 
 
             // For POST queries
@@ -179,6 +180,9 @@ class LoadPackage {
             def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&objectContentType=" + contentType
             if(projectName != null) {
                 query_push_obj_query = query_push_obj_query + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
+            }
+            if(tags != null) {
+                query_push_obj_query = query_push_obj_query + "&tags=" +  java.net.URLEncoder.encode(tags, "UTF-8")
             }
             createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, object_file)
             writeToOutput(" " + object_file.getName() + " created!")
