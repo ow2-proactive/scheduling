@@ -137,7 +137,7 @@ public class SpelValidatorTest {
 
     @Test
     public void testSpelJSONOK() throws ValidationException {
-        SpelValidator validator = new SpelValidator("new org.codehaus.jackson.map.ObjectMapper().readTree('{\"var\": \"value\"}').get('var').getTextValue() instanceof T(String)");
+        SpelValidator validator = new SpelValidator("new com.fasterxml.jackson.databind.ObjectMapper().readTree('{\"var\": \"value\"}').get('var').asText() instanceof T(String)");
         String value = "value";
         Assert.assertEquals(value, validator.validate(value, validatorContext, false));
     }

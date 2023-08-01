@@ -30,11 +30,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
-import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 
 /**
@@ -51,8 +52,8 @@ public class JacksonProvider implements ContextResolver<ObjectMapper> {
     public JacksonProvider() {
         AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
         AnnotationIntrospector secondary = new JacksonAnnotationIntrospector();
-        mapper.setAnnotationIntrospector(new AnnotationIntrospector.Pair(introspector, secondary));
-        mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.setAnnotationIntrospector(new AnnotationIntrospectorPair(introspector, secondary));
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
     @Override

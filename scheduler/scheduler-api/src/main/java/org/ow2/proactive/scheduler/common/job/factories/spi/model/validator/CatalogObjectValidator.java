@@ -32,8 +32,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive.http.CommonHttpResourceDownloader;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -42,6 +40,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BaseParserValidator;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.UrlEscapers;
 
 

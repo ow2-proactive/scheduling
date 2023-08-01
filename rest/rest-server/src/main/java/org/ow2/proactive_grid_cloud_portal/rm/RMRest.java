@@ -60,9 +60,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -112,6 +109,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 
 
@@ -693,7 +693,7 @@ public class RMRest implements RMRestInterface {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> nodeConfig;
         try {
-            nodeConfig = mapper.readValue(nodeConfigJson, new TypeReference<Map<String, ?>>() {
+            nodeConfig = mapper.readValue(nodeConfigJson, new TypeReference<Map<String, Object>>() {
             });
         } catch (Exception e) {
             throw new IllegalArgumentException("Error during parsing the node configuration: " + nodeConfigJson, e);

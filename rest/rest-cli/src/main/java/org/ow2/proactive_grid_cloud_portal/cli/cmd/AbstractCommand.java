@@ -40,7 +40,6 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive.http.CommonHttpClientBuilder;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
@@ -51,6 +50,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 
 public abstract class AbstractCommand implements Command {

@@ -35,14 +35,15 @@ import javax.ws.rs.NotFoundException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class RestRuntimeExceptionMappingTest extends RestTestServer {
@@ -69,7 +70,7 @@ public class RestRuntimeExceptionMappingTest extends RestTestServer {
 
     private ExceptionToJson readResponse(GetMethod httpGetMethod) throws IOException {
         ObjectMapper jsonMapper = new ObjectMapper();
-        jsonMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         InputStream is = httpGetMethod.getResponseBodyAsStream();
         return jsonMapper.readValue(is, ExceptionToJson.class);
