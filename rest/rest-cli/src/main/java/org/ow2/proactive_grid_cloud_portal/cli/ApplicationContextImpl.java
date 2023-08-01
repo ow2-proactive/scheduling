@@ -34,13 +34,14 @@ import java.util.Stack;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.ow2.proactive.http.CommonHttpClientBuilder;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class ApplicationContextImpl implements ApplicationContext {

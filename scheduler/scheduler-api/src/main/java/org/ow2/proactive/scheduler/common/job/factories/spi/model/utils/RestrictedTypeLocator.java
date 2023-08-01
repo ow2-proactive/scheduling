@@ -57,7 +57,7 @@ public class RestrictedTypeLocator extends StandardTypeLocator {
                                                                 "java.lang.Float",
                                                                 "Math",
                                                                 "java.lang.Math",
-                                                                "org.codehaus.jackson.map.ObjectMapper",
+                                                                "com.fasterxml.jackson.databind.ObjectMapper",
                                                                 "ObjectMapper",
                                                                 "javax.xml.parsers.DocumentBuilderFactory",
                                                                 "DocumentBuilderFactory",

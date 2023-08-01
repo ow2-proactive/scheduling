@@ -535,6 +535,7 @@ public class JettyStarter {
         webApp.setParentLoaderPriority(true);
         // The following setting allows to load the given packages inside the web app classloader and not from the system class loader.
         ensureServerClasses(webApp,
+                            "com.fasterxml.jackson.",
                             "com.google.gson.",
                             "org.slf4j.",
                             "org.apache.log4j.",

@@ -37,8 +37,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**

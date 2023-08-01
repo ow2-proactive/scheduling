@@ -40,8 +40,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @Provider

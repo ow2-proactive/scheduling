@@ -37,8 +37,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class OctetStreamReader implements MessageBodyReader<ExceptionToJson> {

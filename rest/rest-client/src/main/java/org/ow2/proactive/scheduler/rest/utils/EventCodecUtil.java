@@ -27,22 +27,23 @@ package org.ow2.proactive.scheduler.rest.utils;
 
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.deser.std.StdDeserializer;
-import org.codehaus.jackson.map.module.SimpleModule;
-import org.codehaus.jackson.node.ObjectNode;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification.Action;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 public class EventCodecUtil {
@@ -54,7 +55,7 @@ public class EventCodecUtil {
         module.addDeserializer(EventNotification.class, deserializer);
         mapper = new ObjectMapper();
         mapper.registerModule(module);
-        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     private EventCodecUtil() {
@@ -88,24 +89,24 @@ public class EventCodecUtil {
             EventNotification notification = new EventNotification();
             ObjectMapper mapper = (ObjectMapper) jp.getCodec();
             ObjectNode root = (ObjectNode) mapper.readTree(jp);
-            String actionString = root.get("action").getTextValue();
+            String actionString = root.get("action").asText();
             notification.setAction(Action.valueOf(actionString));
             JsonNode data = root.get("data");
             switch (notification.getAction()) {
                 case JOB_SUBMITTED:
-                    notification.setData(mapper.readValue(data, JobStateData.class));
+                    notification.setData(mapper.readValue(data.toString(), JobStateData.class));
                     break;
                 case JOB_STATE_UPDATED:
-                    notification.setData(mapper.readValue(data, JobInfoData.class));
+                    notification.setData(mapper.readValue(data.toString(), JobInfoData.class));
                     break;
                 case JOB_FULL_DATA_UPDATED:
-                    notification.setData(mapper.readValue(data, JobStateData.class));
+                    notification.setData(mapper.readValue(data.toString(), JobStateData.class));
                     break;
                 case TASK_STATE_UPDATED:
-                    notification.setData(mapper.readValue(data, TaskInfoData.class));
+                    notification.setData(mapper.readValue(data.toString(), TaskInfoData.class));
                     break;
                 case USERS_UPDATED:
-                    notification.setData(mapper.readValue(data, SchedulerUserData.class));
+                    notification.setData(mapper.readValue(data.toString(), SchedulerUserData.class));
                     break;
                 default:
                     break;

@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpGet;
-import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
@@ -47,6 +46,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 
 public class SetInfrastructureCommand extends AbstractCommand implements Command {

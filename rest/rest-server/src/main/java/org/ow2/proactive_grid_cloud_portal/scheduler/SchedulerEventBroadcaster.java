@@ -30,9 +30,6 @@ import javax.servlet.ServletContext;
 import org.apache.log4j.Logger;
 import org.atmosphere.cpr.BroadcasterFactory;
 import org.atmosphere.util.ServletContextFactory;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.dozer.DozerBeanMapperSingletonWrapper;
 import org.dozer.Mapper;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -45,6 +42,10 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import com.google.common.base.Throwables;
 
 
@@ -62,7 +63,7 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
     static {
         mapper = new ObjectMapper();
         mapper.setAnnotationIntrospector(new JaxbAnnotationIntrospector());
-        mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
     private String broadcasterUUID;
