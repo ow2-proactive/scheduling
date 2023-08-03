@@ -33,7 +33,7 @@ dependencies {
     compile 'org.rrd4j:rrd4j:2.2.1'
     compile 'net.sf.dozer:dozer:5.5.1'
     compile 'commons-io:commons-io:2.7'
-    compile 'commons-codec:commons-codec:1.10'
+    compile 'commons-codec:commons-codec:1.13'
 
     compile 'com.netiq:websockify:1.7-proactive'
     compile 'io.netty:netty:3.10.6.Final'
