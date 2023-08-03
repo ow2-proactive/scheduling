@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -42,6 +43,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.net.UrlEscapers;
 
 
@@ -166,7 +169,7 @@ public class CatalogObjectValidator implements Validator<String> {
 
         if (StringUtils.isNotEmpty(expectedKind)) {
             String catalogObjKind = jsonNode.path("kind").asText();
-            String kindPattern = "^" + BaseParserValidator.ignoreCaseRegexp(expectedKind) + ".*$";
+            String kindPattern = "^" + BaseParserValidator.ignoreCaseQuotedRegexp(expectedKind) + ".*$";
             if (!catalogObjKind.matches(kindPattern)) {
                 throw new ValidationException(String.format("Catalog object [%s] does not match the expected kind [%s].",
                                                             catalogObjectValue,
@@ -175,7 +178,7 @@ public class CatalogObjectValidator implements Validator<String> {
         }
         if (StringUtils.isNotEmpty(expectedContentType)) {
             String catalogObjContentType = jsonNode.path("content_type").asText();
-            String contentTypePattern = "^" + BaseParserValidator.ignoreCaseRegexp(expectedContentType) + ".*$";
+            String contentTypePattern = "^" + BaseParserValidator.ignoreCaseQuotedRegexp(expectedContentType) + ".*$";
             if (!catalogObjContentType.matches(contentTypePattern)) {
                 throw new ValidationException(String.format("Catalog object [%s] does not match the expected content type [%s].",
                                                             catalogObjectValue,
@@ -213,10 +216,17 @@ public class CatalogObjectValidator implements Validator<String> {
     }
 
     static boolean matchExpectedName(String name, String expectedName) {
-        return (name.contains(expectedName.replace("%", "")) &&
-                !(expectedName.startsWith("%") && !expectedName.endsWith("%") &&
-                  !name.endsWith(expectedName.replace("%", ""))) &&
-                !(expectedName.endsWith("%") && !expectedName.startsWith("%") &&
-                  !name.startsWith(expectedName.replace("%", ""))));
+        String regexp;
+        if (expectedName.contains("%")) {
+            regexp = expectedName.replaceAll("%+", "%");
+
+            regexp = Lists.newArrayList(Splitter.on("%").split(regexp))
+                          .stream()
+                          .map(element -> element.isEmpty() ? "" : BaseParserValidator.ignoreCaseQuotedRegexp(element))
+                          .collect(Collectors.joining(".*"));
+            return name.matches(regexp);
+        } else {
+            return name.toLowerCase().contains(expectedName.toLowerCase());
+        }
     }
 }
