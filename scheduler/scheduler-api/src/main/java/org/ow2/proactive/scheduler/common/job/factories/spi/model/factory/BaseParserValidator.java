@@ -174,4 +174,8 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
     public static String ignoreCaseRegexp(String matcher) {
         return String.format("(?i:%s)", matcher);
     }
+
+    public static String ignoreCaseQuotedRegexp(String matcher) {
+        return String.format("(?i:%s)", Pattern.quote(matcher));
+    }
 }

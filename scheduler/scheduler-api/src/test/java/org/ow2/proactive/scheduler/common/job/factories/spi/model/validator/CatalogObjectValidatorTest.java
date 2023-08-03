@@ -113,42 +113,42 @@ public class CatalogObjectValidatorTest {
     @Test
     public void testMatchExpectedNameWithEndingName() {
         String value = "tata_toto";
-        String expectedValue = "%toto";
+        String expectedValue = "%TOTO";
         Assert.assertTrue(CatalogObjectValidator.matchExpectedName(value, expectedValue));
     }
 
     @Test
     public void testMatchExpectedNameKOWithEndingName() {
         String value = "tata_toto1";
-        String expectedValue = "%toto";
+        String expectedValue = "%ToTo";
         Assert.assertFalse(CatalogObjectValidator.matchExpectedName(value, expectedValue));
     }
 
     @Test
     public void testMatchExpectedNameWithStartingName() {
         String value = "toto_tata";
-        String expectedValue = "toto%";
+        String expectedValue = "ToTo%";
         Assert.assertTrue(CatalogObjectValidator.matchExpectedName(value, expectedValue));
     }
 
     @Test
     public void testMatchExpectedNameKOWithStartingName() {
         String value = "Ttoto_tata";
-        String expectedValue = "toto%";
+        String expectedValue = "ToTo%";
         Assert.assertFalse(CatalogObjectValidator.matchExpectedName(value, expectedValue));
     }
 
     @Test
     public void testMatchExpectedNameWithBothSided() {
         String value = "tata_toto_tata";
-        String expectedValue = "%toto%";
+        String expectedValue = "%ToTo%";
         Assert.assertTrue(CatalogObjectValidator.matchExpectedName(value, expectedValue));
     }
 
     @Test
     public void testMatchExpectedNameKOWithBothSided() {
         String value = "tata_to_to_tata";
-        String expectedValue = "%toto%";
+        String expectedValue = "%ToTo%";
         Assert.assertFalse(CatalogObjectValidator.matchExpectedName(value, expectedValue));
     }
 }
