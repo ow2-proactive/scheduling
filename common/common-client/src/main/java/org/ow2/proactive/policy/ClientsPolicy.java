@@ -26,14 +26,7 @@
 package org.ow2.proactive.policy;
 
 import java.lang.reflect.Constructor;
-import java.security.AllPermission;
-import java.security.CodeSource;
-import java.security.Permission;
-import java.security.PermissionCollection;
-import java.security.Policy;
-import java.security.Principal;
-import java.security.ProtectionDomain;
-import java.security.UnresolvedPermission;
+import java.security.*;
 import java.util.Enumeration;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -93,7 +86,22 @@ public class ClientsPolicy extends Policy {
 
     @Override
     public PermissionCollection getPermissions(CodeSource codesource) {
-        return original.getPermissions(codesource);
+        try {
+            readLock.lock();
+            return original.getPermissions(codesource);
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    @Override
+    public boolean implies(ProtectionDomain domain, Permission permission) {
+        try {
+            readLock.lock();
+            return super.implies(domain, permission);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @Override
