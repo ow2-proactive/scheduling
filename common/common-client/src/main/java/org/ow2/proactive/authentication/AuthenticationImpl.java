@@ -172,7 +172,7 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
             }
             //Nature of exception is hidden for user, we don't want to inform
             //user about the reason of non authentication
-            throw new LoginException("Authentication failed" + e.getMessage());
+            throw new LoginException("Authentication failed " + e.getMessage());
         }
     }
 
