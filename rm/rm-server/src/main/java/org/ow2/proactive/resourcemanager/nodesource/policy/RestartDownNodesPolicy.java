@@ -156,6 +156,14 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
         return "Static nodes acquisition. If node becomes down policy tries to restart it.";
     }
 
+    /**
+     * Policy string representation.
+     */
+    @Override
+    public String toString() {
+        return super.toString() + ", checkNodeStateEach: [" + this.checkNodeStateEach + "]";
+    }
+
     @Override
     public Map<Integer, String> getSectionDescriptions() {
         Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();

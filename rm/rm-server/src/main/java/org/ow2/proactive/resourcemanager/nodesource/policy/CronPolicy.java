@@ -171,9 +171,8 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public String toString() {
-        return super.toString() + " acquisition at [" + this.nodeAcquision + "]" + ", removal at [" + this.nodeRemoval +
-               "], preemptive: " + this.preemptive;
-
+        return super.toString() + ", nodeAcquision: [" + this.nodeAcquision + "], nodeRemoval: [" + this.nodeRemoval +
+               "], preemptive: [" + this.preemptive + "]";
     }
 
     @Override

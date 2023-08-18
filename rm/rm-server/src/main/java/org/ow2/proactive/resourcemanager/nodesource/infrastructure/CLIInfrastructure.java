@@ -261,15 +261,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
      */
     @Override
     public String getDescription() {
-        return this.getClass().getSimpleName() + " creates remote runtimes using custom scripts";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return getDescription();
+        return "Creates remote runtimes using custom scripts.";
     }
 
     /**

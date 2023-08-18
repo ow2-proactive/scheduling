@@ -110,7 +110,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy
 
     @Override
     public String toString() {
-        return super.toString() + " [idle time: " + idleTime + " ms]";
+        return super.toString() + ", idleTime= " + idleTime + "ms]";
     }
 
     @Override

@@ -117,7 +117,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public String toString() {
-        return getDescription();
+        return this.getClass().getSimpleName();
     }
 
     /**
@@ -125,7 +125,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public String getDescription() {
-        return this.getClass().getSimpleName();
+        return "A default infrastructure manager.";
     }
 
     /**

@@ -267,8 +267,8 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
      */
     @Override
     public String toString() {
-        return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " user access type [" + userAccessType +
-               "]" + ", provider access type [" + providerAccessType + "]";
+        return this.getClass().getSimpleName() + ", userAccessType: [" + userAccessType + "]" +
+               ", providerAccessType: [" + providerAccessType + "]";
     }
 
     @Override
