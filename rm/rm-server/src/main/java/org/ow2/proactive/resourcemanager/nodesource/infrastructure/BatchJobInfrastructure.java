@@ -669,7 +669,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      */
     @Override
     public String toString() {
-        return getBatchinJobSystemName() + ", maxNodes: [" + this.maxNodes + "], nodeTimeOut: [" + nodeTimeOut + "]";
+        return String.format("%s maxNodes: [%s], nodeTimeout: [%s]",getBatchinJobSystemName(), this.maxNodes, this.nodeTimeOut);
     }
 
     @Override

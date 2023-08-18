@@ -416,7 +416,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ", nodeTimeout: [" + nodeTimeout + "], maxNodes: [" + maxNodes + "]";
+        return String.format("%s nodeTimeout: [%s], maxNodes: [%s]", this.getClass().getSimpleName(), nodeTimeout, maxNodes);
     }
 
     @Override

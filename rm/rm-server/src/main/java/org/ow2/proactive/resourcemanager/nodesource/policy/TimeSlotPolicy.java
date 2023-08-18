@@ -238,8 +238,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public String toString() {
-        return super.toString() + ", acquireTime: [" + this.acquireTime + "], releaseTime: [" + this.releaseTime +
-               "], period: [" + this.period + "ms]";
+        return String.format("%s , acquireTime: [%s], releaseTime: [%s], period: [%sms]", super.toString(), acquireTime, releaseTime, period);
     }
 
     /**

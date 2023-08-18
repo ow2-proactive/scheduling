@@ -594,7 +594,6 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ", nodeTimeOut: [" + nodeTimeOut + "], maxDeploymentFailure: [" +
-               maxDeploymentFailure + "]" + ", waitBetweenDeploymentFailures: [" + waitBetweenDeploymentFailures + "]";
+        return String.format("%s nodeTimeOut: [%s], maxDeploymentFailure: [%s], waitBetweenDeploymentFailures: [%s]", this.getClass().getSimpleName(), nodeTimeOut, maxDeploymentFailure, waitBetweenDeploymentFailures);
     }
 }
