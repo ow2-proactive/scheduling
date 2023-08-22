@@ -370,7 +370,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      */
     @Override
     public String toString() {
-        return super.toString() + ", targetOs: [" + targetOs + "]";
+        return String.format("%s, targetOs: [%s]", super.toString(), this.targetOs);
     }
 
     @Override

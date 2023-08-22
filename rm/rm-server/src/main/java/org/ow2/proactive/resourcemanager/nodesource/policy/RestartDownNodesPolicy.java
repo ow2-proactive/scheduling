@@ -161,7 +161,7 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
      */
     @Override
     public String toString() {
-        return super.toString() + ", checkNodeStateEach: [" + this.checkNodeStateEach + "]";
+        return String.format("%s, checkNodeStateEach: [%s]", super.toString(), this.checkNodeStateEach);
     }
 
     @Override
