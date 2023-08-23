@@ -62,4 +62,11 @@ public class StaticPolicy extends NodeSourcePolicy {
         return "Static nodes acquisition.";
     }
 
+    /**
+     * Policy string representation.
+     */
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

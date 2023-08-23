@@ -114,7 +114,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public String getDescription() {
-        return this.getClass().getSimpleName() + " deploys nodes on Resource Manager's machine";
+        return "Deploys nodes on Resource Manager's machine.";
     }
 
     @Override
@@ -416,7 +416,10 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public String toString() {
-        return getDescription();
+        return String.format("%s nodeTimeout: [%s], maxNodes: [%s]",
+                             this.getClass().getSimpleName(),
+                             nodeTimeout,
+                             maxNodes);
     }
 
     @Override
