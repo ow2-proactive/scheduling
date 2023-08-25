@@ -267,7 +267,7 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
      */
     @Override
     public String toString() {
-        return String.format("%s userAccessType: [%s], providerAccessType:[%s]",
+        return String.format("%s userAccessType: [%s], providerAccessType: [%s]",
                              this.getClass().getSimpleName(),
                              userAccessType,
                              providerAccessType);
