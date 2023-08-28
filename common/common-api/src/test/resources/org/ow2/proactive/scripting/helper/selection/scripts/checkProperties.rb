@@ -14,8 +14,8 @@ conditions = Conditions.new
 conditions.add(condition1)
 conditions.add(condition2)
 
-if SelectionUtils.checkProperties($propertiesFile,conditions)
-    $selected = true;
+if SelectionUtils.checkProperties(propertiesFile,conditions)
+    selected = true;
 else
-    $selected = false;
+    selected = false;
 end

@@ -6,7 +6,7 @@ expectedMemorySize = 1073741824
 
 #check if free memory is at least 1Go
 if SelectionUtils.checkFreeMemory(expectedMemorySize)
-    $selected = true;
+    selected = true;
 else
-    $selected = false;
+    selected = false;
 end
