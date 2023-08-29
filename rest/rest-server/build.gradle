@@ -50,13 +50,15 @@ dependencies {
     compile project(':rest:rest-api')
     compile project(':common:common-http')
 
+    def jettyVersion = "9.4.51.v20230217"
+
     testCompile functionalTestDependencies
 
     testCompile 'org.apache.httpcomponents:httpmime:4.5.13'
     testCompile 'org.jboss.resteasy:tjws:3.0.26.Final'
 
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'org.eclipse.jetty:jetty-client:9.4.50.v20221201'
+    testCompile "org.eclipse.jetty:jetty-client:${jettyVersion}"
     testCompile 'org.zeroturnaround:zt-zip:1.13'
 
     testCompile 'com.fasterxml.jackson.core:jackson-core:2.7.9'
@@ -64,11 +66,13 @@ dependencies {
 
     testCompile project (':common:common-api').sourceSets.test.output
 
-    runtime 'org.eclipse.jetty.websocket:websocket-server:9.4.50.v20221201'
-    runtime 'org.eclipse.jetty:jetty-webapp:9.4.50.v20221201'
-    runtime 'org.eclipse.jetty:jetty-util:9.4.50.v20221201'
-    runtime 'org.eclipse.jetty:jetty-client:9.4.50.v20221201'
-    runtime 'org.eclipse.jetty:jetty-rewrite:9.4.50.v20221201'
+
+
+    runtime "org.eclipse.jetty.websocket:websocket-server:${jettyVersion}"
+    runtime "org.eclipse.jetty:jetty-webapp:${jettyVersion}"
+    runtime "org.eclipse.jetty:jetty-util:${jettyVersion}"
+    runtime "org.eclipse.jetty:jetty-client:${jettyVersion}"
+    runtime "org.eclipse.jetty:jetty-rewrite:${jettyVersion}"
 
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 }

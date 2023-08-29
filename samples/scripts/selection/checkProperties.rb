@@ -18,8 +18,8 @@ conditions.add(condition1)
 conditions.add(condition2)
 
 if SelectionUtils.checkProperties("samples/scripts/selection/samplePropertiesFile.txt", conditions)
-    $selected = true;
+    selected = true;
 else
-    $selected = false;
+    selected = false;
 end
 

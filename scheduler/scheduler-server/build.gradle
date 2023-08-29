@@ -18,10 +18,12 @@ dependencies {
 
     compile 'com.github.spyhunter99:install-cert:1.0.12'
 
-    compile 'org.eclipse.jetty:jetty-webapp:9.4.50.v20221201'
-    compile 'org.eclipse.jetty:jetty-rewrite:9.4.50.v20221201'
-    compile 'org.eclipse.jetty:jetty-util:9.4.50.v20221201'
-    compile 'org.eclipse.jetty:jetty-servlets:9.4.50.v20221201'
+    def jettyVersion = "9.4.51.v20230217"
+
+    compile "org.eclipse.jetty:jetty-webapp:${jettyVersion}"
+    compile "org.eclipse.jetty:jetty-rewrite:${jettyVersion}"
+    compile "org.eclipse.jetty:jetty-util:${jettyVersion}"
+    compile "org.eclipse.jetty:jetty-servlets:${jettyVersion}"
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
     compile project(':common:common-api')
