@@ -713,6 +713,7 @@ class LiveJobs {
                     tlogger.info(taskId, "no retry left and task is tagged with cancel job on error");
 
                     jobData.job.increaseNumberOfFaultyTasks(taskId);
+                    jobData.job.getResultMap().putAll(result.getResultMap());
                     endJob(jobData,
                            terminationData,
                            task,
