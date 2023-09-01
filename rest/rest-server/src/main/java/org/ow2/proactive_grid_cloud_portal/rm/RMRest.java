@@ -357,7 +357,7 @@ public class RMRest implements RMRestInterface {
             for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
                                                                                    .iterator(); it.hasNext();) {
                 Map.Entry<String, Pair<String, String>> entry = it.next();
-                if (!entry.getValue().getLeft().toLowerCase().contains(infrastructure.toLowerCase())) {
+                if (!entry.getValue().getLeft().matches(infrastructure)) {
                     it.remove();
                 }
 
@@ -367,7 +367,7 @@ public class RMRest implements RMRestInterface {
             for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
                                                                                    .iterator(); it.hasNext();) {
                 Map.Entry<String, Pair<String, String>> entry = it.next();
-                if (!entry.getValue().getRight().toLowerCase().contains(policy.toLowerCase())) {
+                if (!entry.getValue().getRight().matches(policy)) {
                     it.remove();
                 }
 

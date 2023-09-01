@@ -278,10 +278,10 @@ public interface RMRestInterface {
      *
      * @param name a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> which will accept node sources based on their name. Example: <code>Internal_.*</code>
      *
-     * @param infrastructure node source infrastructure type. All node sources whose infrastructure name contains the given type will be returned.
-     *             For example: <code>Local</code> will return all node sources with a <i>LocalInfrastructure</i>, <code>Azure</code> will return all node sources with <i>AzureInfrastructure</i> or <i>AzureVMScaleSetInfrastructure</i> types. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_infrastructures">Node Source Infrastructures</a> for a complete list of infrastructure types.
-     * @param policy node source policy type. All node sources whose policy name contains the given type will be returned.
-     *             For example: <code>Static</code> will return all node sources with a <i>StaticPolicy</i>, <code>Dynamic</code> will return all node sources with <i>DynamicPolicy</i>. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_policies">Node Source Policies</a> for a complete list of policy types.
+     * @param infrastructure node source infrastructure regexp. All node sources whose infrastructure name matches the given <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> will be returned.
+     *             For example: <code>Local.*</code> will return all node sources with a <i>LocalInfrastructure</i>, <code>Azure</code> will return all node sources with <i>AzureInfrastructure</i> or <i>AzureVMScaleSetInfrastructure</i> types. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_infrastructures">Node Source Infrastructures</a> for a complete list of infrastructure types.
+     * @param policy node source policy regexp. All node sources whose policy name matches the given <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> will be returned.
+     *             For example: <code>Static.*</code> will return all node sources with a <i>StaticPolicy</i>, <code>Dynamic.*</code> will return all node sources with <i>DynamicPolicy</i>. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_policies">Node Source Policies</a> for a complete list of policy types.
      *
      * @return a model containing the list of node sources name, including an empty name and the default node source e.g. PA:LIST(,Default,LocalNodes)
      */
