@@ -343,15 +343,16 @@ public class RMRest implements RMRestInterface {
         Map<String, Pair<String, String>> nodeSources = new LinkedHashMap<>();
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
         nodeSources.put(RMConstants.DEFAULT_STATIC_SOURCE_NAME,
-                        Pair.of("org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager",
-                                "org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy"));
+                        Pair.of("DefaultInfrastructureManager", "StaticPolicy"));
         state.getNodeSource()
              .stream()
              .filter(event -> !event.getNodeSourceName().isEmpty() &&
                               "DEPLOYED".equalsIgnoreCase(event.getNodeSourceStatus()))
              .forEach(event -> {
                  nodeSources.put(event.getNodeSourceName(),
-                                 Pair.of(event.getInfrastructureType(), event.getPolicyType()));
+                                 Pair.of(event.getInfrastructureType()
+                                              .substring(event.getInfrastructureType().lastIndexOf(".") + 1),
+                                         event.getPolicyType().substring(event.getPolicyType().lastIndexOf(".") + 1)));
              });
         if (infrastructure != null) {
             for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
