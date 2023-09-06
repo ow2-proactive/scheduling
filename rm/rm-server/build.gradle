@@ -15,7 +15,7 @@ dependencies {
             project(':rm:rm-node'),
     )
 
-    compile 'com.google.guava:guava:19.0'
+    compile 'com.google.guava:guava:32.0.1-jre'
 
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     testCompile "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"

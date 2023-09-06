@@ -95,14 +95,12 @@ public class InitScriptGenerator {
 
     /**
      * Get a template of the Standard Linux startup script from {@link NodeCommandLineProperties}
-     * @retun a string of the Standard Linux startup script
      **/
     @Getter
     public static String defaultLinuxStandardCommand = nsConfig.getString(NodeCommandLineProperties.LINUX_Standard_STARTUP_COMMAND);
 
     /**
      * Get a template of the NodeJar Linux startup script from {@link NodeCommandLineProperties}
-     * @retun a string of the NodeJar Linux startup script
      **/
     @Getter
     public static String defaultLinuxNodeJarCommand = nsConfig.getString(NodeCommandLineProperties.LINUX_NODE_JAR_STARTUP_COMMAND);
@@ -120,7 +118,7 @@ public class InitScriptGenerator {
      * @param credentials the RM credentials or an obfuscated credentials String .
      * @param detached if set to true, the node will ignore the RM termination signal.
      * @param numberOfNodesPerInstance number of ProActive nodes to start on the instance.
-     * @retun a string of the default Linux startup script
+     * @return a string of the default Linux startup script
      */
     public static String fillInStandardScriptProperties(String startupScript, String javaPath, String schedulingPath,
             String rmUrl, String fileEncoding, String javaOptions, String nodeName, String nodeSourceName,
@@ -152,7 +150,7 @@ public class InitScriptGenerator {
      * @param credentials the RM credentials or an obfuscated credentials String.
      * @param detached if set to true, the node will ignore the RM termination signal.
      * @param numberOfNodesPerInstance number of ProActive nodes to start on the instance.
-     * @retun a string of the default Linux startup script
+     * @return a string of the default Linux startup script
      */
 
     public static String fillInNodeJarScriptProperties(String startupScript, String nodeJarUrl, String rmUrl,

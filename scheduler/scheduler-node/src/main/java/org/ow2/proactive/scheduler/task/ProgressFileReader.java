@@ -33,8 +33,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -72,6 +71,8 @@ public class ProgressFileReader implements ProgressFileReaderInterface {
     private Thread watchServiceThread;
 
     private Set<Listener> observers;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public ProgressFileReader() {
         // mainly for test purposes
@@ -153,12 +154,13 @@ public class ProgressFileReader implements ProgressFileReaderInterface {
                 logger.error(e);
             } finally {
                 removeProgressFileDir();
+                executor.shutdownNow();
             }
         }
     }
 
     private void closeWatchService() throws Exception {
-        TimeLimiter timeLimiter = new SimpleTimeLimiter();
+        TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor);
         timeLimiter.callWithTimeout(new Callable<Boolean>() {
 
             @Override
@@ -167,7 +169,7 @@ public class ProgressFileReader implements ProgressFileReaderInterface {
                 watchServiceThread.join();
                 return true;
             }
-        }, 2, TimeUnit.SECONDS, true);
+        }, 2L, TimeUnit.SECONDS);
     }
 
     private void removeProgressFileDir() {
