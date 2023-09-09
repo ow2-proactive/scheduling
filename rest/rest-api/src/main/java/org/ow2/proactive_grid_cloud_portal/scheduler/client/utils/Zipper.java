@@ -132,7 +132,7 @@ public class Zipper {
         }
 
         private static ImmutableList<File> filterEmpty(File root) {
-            FluentIterable<File> fi = Files.fileTreeTraverser().postOrderTraversal(root);
+            FluentIterable<File> fi = FluentIterable.from(Files.fileTraverser().depthFirstPostOrder(root));
             return fi.filter(new FilesOnlyPredicate()).toList();
         }
 

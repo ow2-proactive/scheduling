@@ -41,8 +41,7 @@ import org.apache.log4j.Logger;
  *  the PrintWriter and do their own log4j logging.
  *
  * @author     <a href="mailto:d_jencks@users.sourceforge.net">David Jencks</a>
- *      .
- * @created    August 19, 2001
+ *
  * @version    $$
  */
 public class LoggerWriter extends PrintWriter {
