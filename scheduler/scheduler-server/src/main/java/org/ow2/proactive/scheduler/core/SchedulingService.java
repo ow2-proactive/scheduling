@@ -467,6 +467,12 @@ public class SchedulingService {
         }
     }
 
+    public void taskVariablesUpdated(InternalTask task) {
+        listener.taskStateUpdated(task.getOwner(),
+                                  new NotificationData<TaskInfo>(SchedulerEvent.TASK_VARIABLES_UPDATED,
+                                                                 new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+    }
+
     public SchedulingInfrastructure getInfrastructure() {
         return infrastructure;
     }

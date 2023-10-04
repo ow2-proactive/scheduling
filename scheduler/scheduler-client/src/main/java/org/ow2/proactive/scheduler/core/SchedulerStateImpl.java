@@ -358,6 +358,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
+            case TASK_VARIABLES_UPDATED:
                 updateTaskInfo((NotificationData<TaskInfo>) notification);
                 break;
             case USERS_UPDATE:

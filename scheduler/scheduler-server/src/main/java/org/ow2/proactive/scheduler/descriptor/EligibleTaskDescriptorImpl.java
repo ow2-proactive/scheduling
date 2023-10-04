@@ -215,6 +215,10 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
         return genericInformation;
     }
 
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = genericInformation;
+    }
+
     @Override
     public String getOwner() {
         return owner;

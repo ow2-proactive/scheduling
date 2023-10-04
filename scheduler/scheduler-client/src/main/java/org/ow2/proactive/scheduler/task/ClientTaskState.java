@@ -105,7 +105,12 @@ public final class ClientTaskState extends TaskState {
 
     @Override
     public void update(TaskInfo taskInfo) {
-        this.taskInfo = taskInfo;
+        if (taskInfo != null) {
+            if (this.taskInfo != null && this.taskInfo.getVariables() != null && taskInfo.getVariables() == null) {
+                ((TaskInfoImpl) taskInfo).setVariables(this.taskInfo.getVariables());
+            }
+            this.taskInfo = taskInfo;
+        }
     }
 
     @Override

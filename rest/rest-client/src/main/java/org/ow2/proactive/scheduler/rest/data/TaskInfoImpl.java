@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
+import java.util.Map;
+
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -63,6 +65,8 @@ public class TaskInfoImpl implements TaskInfo {
     private boolean visualizationActivated = false;
 
     private String visualizationConnectionString = null;
+
+    private Map<String, String> variables = null;
 
     private TaskStatus status = TaskStatus.SUBMITTED;
 
@@ -212,5 +216,14 @@ public class TaskInfoImpl implements TaskInfo {
 
     public void setVisualizationConnectionString(String visualizationConnectionString) {
         this.visualizationConnectionString = visualizationConnectionString;
+    }
+
+    @Override
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 }

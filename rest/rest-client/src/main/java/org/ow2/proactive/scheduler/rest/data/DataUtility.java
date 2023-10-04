@@ -136,6 +136,7 @@ public class DataUtility {
         impl.setProgress(d.getProgress());
         impl.setVisualizationActivated(d.isVisualizationActivated());
         impl.setVisualizationConnectionString(d.getVisualizationConnectionString());
+        impl.setVariables(d.getVariables());
         return impl;
     }
 
