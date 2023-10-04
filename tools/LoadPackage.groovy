@@ -18,7 +18,7 @@ class LoadPackage {
     private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/admin_user.cred"
     private final String LOAD_PACKAGE_SCRIPT_NAME = "LoadPackage.groovy"
     private String BUCKET_OWNER = "GROUP:public-objects"
-    private final String TMP_DIR_PREFIX = "package_temp_dir"
+    private final String TMP_DIR_PREFIX = "packageTempDir"
 
     private final String GLOBAL_SPACE_PATH
     private final String SCHEDULER_REST_URL
@@ -85,42 +85,41 @@ class LoadPackage {
         }
     }
 
-    def unzipPackage(package_dir) {
+    def unzipPackage(packageDir) {
       // Create a temporary dir
-      def package_temp_dir = Files.createTempDirectory(TMP_DIR_PREFIX).toFile()
-      package_temp_dir.deleteOnExit()
+      def packageTempDir = Files.createTempDirectory(TMP_DIR_PREFIX).toFile()
+      packageTempDir.deleteOnExit()
       // Unzip the package into it
-      unzipFile(package_dir, package_temp_dir.getPath())
-      writeToOutput(" " + package_dir + " extracted!")
+      unzipFile(packageDir, packageTempDir.getPath())
+      writeToOutput(" " + packageDir + " extracted!")
       // Return the unzipped package
-      def package_dir_name_no_ext = FilenameUtils.removeExtension(package_dir.name)
-      return new File(package_temp_dir, package_dir_name_no_ext)
+      def packageDirNameNoExt = FilenameUtils.removeExtension(packageDir.name)
+      return new File(packageTempDir, packageDirNameNoExt)
     }
 
 
-    void populateDataspace(dataspace_map, package_dir) {
+    void populateDataspace(packageDataspaceMap, packageDir) {
 
         // Do nothing if there is nothing to copy into the dataspaces
-        if (dataspace_map == null)
+        if (packageDataspaceMap == null)
             return
 
         // Retrieve the targeted directory path
-        def target_dir_path = ""
-        def target = dataspace_map.get("target")
+        def targetDirPath = ""
+        def target = packageDataspaceMap.get("target")
         if (target == "global")
-            target_dir_path = this.GLOBAL_SPACE_PATH
+            targetDirPath = this.GLOBAL_SPACE_PATH
 
         // Copy all files into the targeted directory
-        dataspace_map.get("files").each { file_relative_path ->
-            def file_src = new File(package_dir.absolutePath, file_relative_path)
-            def file_src_path = file_src.absolutePath
-            def file_name = file_src.getName()
-            def file_dest = file_relative_path.replace("resources/dataspace/", "")
-            def file_dest_path = Paths.get(target_dir_path,file_dest).toString()
+        packageDataspaceMap.get("files").each { fileRelativePath ->
+            def fileSrc = new File(packageDir.absolutePath, fileRelativePath)
+            def fileSrcPath = fileSrc.absolutePath
+            def fileDest = fileRelativePath.replace("resources/dataspace/", "")
+            def fileDestPath = Paths.get(targetDirPath, fileDest).toString()
             // Create nonexistent parent directories
-            FileUtils.forceMkdirParent(new File(file_dest_path))
-            Files.copy(Paths.get(file_src_path), Paths.get(file_dest_path), StandardCopyOption.REPLACE_EXISTING)
-            writeToOutput(file_src_path + " copied to " + file_dest_path + "!")
+            FileUtils.forceMkdirParent(new File(fileDestPath))
+            Files.copy(Paths.get(fileSrcPath), Paths.get(fileDestPath), StandardCopyOption.REPLACE_EXISTING)
+            writeToOutput(fileSrcPath + " copied to " + fileDestPath + "!")
         }
     }
 
@@ -128,15 +127,13 @@ class LoadPackage {
     def getHttpClientBuilder() {
         SSLContextBuilder builder = new SSLContextBuilder();
         builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        return HttpClients.custom().setSSLSocketFactory(
-                sslsf);
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        return HttpClients.custom().setSSLSocketFactory(sslsf);
     }
 
 
-    def createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, File object_file) {
-        def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
+    def createAndExecuteQueryWithFileAttachment(pushObjectQuery, boundary, File objectFile) {
+        def post = new org.apache.http.client.methods.HttpPost(pushObjectQuery)
         post.addHeader("Accept", "application/json")
         post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)
         post.addHeader("sessionId", this.sessionId)
@@ -144,66 +141,74 @@ class LoadPackage {
         def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
         builder.setBoundary(boundary);
         builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
-        builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file))
+        builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(objectFile))
         post.setEntity(builder.build())
 
         return getHttpClientBuilder().build().execute(post)
     }
 
-    def pushObject(object, package_dir, bucket_resources_list, bucket_name) {
-        def metadata_map = object.get("metadata")
-
-        // OBJECT SECTION /////////////////////////////
+    def pushObject(object, packageDir, catalogBucketResourcesList, bucketName) {
+        def packageMetadataMap = object.get("metadata")
 
         // Does the object already exist in the catalog ? -------------
-        def object_name = java.net.URLEncoder.encode(object.get("name"), "UTF-8")
-        def object_found = bucket_resources_list.find { resource -> resource.name == object_name }
-        writeToOutput(" " + object_name + " found? " + (object_found != null))
+        def objectName = java.net.URLEncoder.encode(object.get("name"), "UTF-8")
+        def objectFound = catalogBucketResourcesList.find { resource -> resource.name == objectName }
+        writeToOutput(" " + objectName + " found? " + (objectFound != null))
 
-        // Push the object to the bucket if it not exists
-        def object_relative_path = object.get("file")
-        def object_file = new File(package_dir.absolutePath, object_relative_path)
-        if (!object_found) {
+        // Create the object file
+        def objectRelativePath = object.get("file")
+        def objectFile = new File(packageDir.absolutePath, objectRelativePath)
+
+        // Commit message
+        def commitMessageStarting = packageMetadataMap.get("commitMessage")
+        def commitMessageEnding  = " (" + SCHEDULER_VERSION + ")"
+
+        // If the object does not exist in the catalog bucket
+        if (!objectFound) {
+
             // Retrieve object metadata
-            def kind = metadata_map.get("kind")
-            def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage") + " (" + SCHEDULER_VERSION + ")", "UTF-8")
-            def contentType = metadata_map.get("contentType")
-            def projectName = metadata_map.get("projectName")
-            def tags = metadata_map.get("tags")
-
+            def kind = packageMetadataMap.get("kind")
+            def commitMessageEncoded = java.net.URLEncoder.encode(commitMessageStarting + commitMessageEnding, "UTF-8")
+            def contentType = packageMetadataMap.get("contentType")
+            def projectName = packageMetadataMap.get("projectName")
+            def tags = packageMetadataMap.get("tags")
 
             // For POST queries
             this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.13.jar").absolutePath);
             def boundary = "---------------" + UUID.randomUUID().toString();
 
-            // POST QUERY
-            def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&objectContentType=" + contentType
+            // Create part of the POST query
+            def pushObjectQuery = this.CATALOG_URL + "/buckets/" + bucketName + "/resources?name=" + objectName + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&objectContentType=" + contentType
             if(projectName != null) {
-                query_push_obj_query = query_push_obj_query + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
+                pushObjectQuery = pushObjectQuery + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
             }
             if(tags != null) {
-                query_push_obj_query = query_push_obj_query + "&tags=" +  java.net.URLEncoder.encode(tags, "UTF-8")
+                pushObjectQuery = pushObjectQuery + "&tags=" +  java.net.URLEncoder.encode(tags, "UTF-8")
             }
-            createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, object_file)
-            writeToOutput(" " + object_file.getName() + " created!")
-        } else {
-            // Retrieve object metadata
-            def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage") + " (" + SCHEDULER_VERSION + ")", "UTF-8")
-            def projectName = metadata_map.get("projectName")
 
-            // For POST queries
+            // Create the POST query and execute it
+            createAndExecuteQueryWithFileAttachment(pushObjectQuery, boundary, objectFile)
+            writeToOutput(" " + objectFile.getName() + " created!")
+
+            // If the object exists in the catalog and its last commit is not a user commit
+        } else if (objectFound.commit_message.startsWith(commitMessageStarting)){
+
+            // Retrieve object metadata
+            def commitMessageEncoded = java.net.URLEncoder.encode(commitMessageStarting + commitMessageEnding, "UTF-8")
+            def projectName = packageMetadataMap.get("projectName")
+
+            // Create part of the POST query
             this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.13.jar").absolutePath);
             def boundary = "---------------" + UUID.randomUUID().toString();
-
-            // POST QUERY
-            def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources/"+ object_name + "/revisions?commitMessage=" + commitMessageEncoded
+            def pushObjectQuery = this.CATALOG_URL + "/buckets/" + bucketName + "/resources/"+ objectName + "/revisions?commitMessage=" + commitMessageEncoded
             if(projectName != null) {
-                query_push_obj_query = query_push_obj_query + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
+                pushObjectQuery = pushObjectQuery + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
             }
-            createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, object_file)
-            writeToOutput(" " + object_file.getName() + " updated!")
+
+            // Create the POST query and execute it
+            createAndExecuteQueryWithFileAttachment(pushObjectQuery, boundary, objectFile)
+            writeToOutput(" " + objectFile.getName() + " updated!")
         }
-        return object_file
     }
 
 
@@ -212,8 +217,8 @@ class LoadPackage {
 
         // Does the bucket already exist? -------------
         // GET QUERY
-        def list_buckets_rest_query = this.CATALOG_URL + "/buckets"
-        def get = new org.apache.http.client.methods.HttpGet(list_buckets_rest_query)
+        def listBucketsQuery = this.CATALOG_URL + "/buckets"
+        def get = new org.apache.http.client.methods.HttpGet(listBucketsQuery)
         get.addHeader("sessionid", this.sessionId)
         def response = getHttpClientBuilder().build().execute(get)
         def bis = new BufferedInputStream(response.getEntity().getContent())
@@ -221,42 +226,42 @@ class LoadPackage {
         bis.close()
         def responseStatusLine = response.getStatusLine()
         if (responseStatusLine.getStatusCode() >= 400) {
-            writeToOutput("Result of " + list_buckets_rest_query + ":")
+            writeToOutput("Result of " + listBucketsQuery + ":")
             writeToOutput(result)
-            throw new IllegalStateException("Invalid response status from " + list_buckets_rest_query + ": " + responseStatusLine)
+            throw new IllegalStateException("Invalid response status from " + listBucketsQuery + ": " + responseStatusLine)
         }
         def buckets = slurper.parseText(result)
-        def bucket_found = buckets.find { object -> object.name == bucket }
+        def bucketFound = buckets.find { object -> object.name == bucket }
 
-        writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
+        writeToOutput(" bucket " + bucket + " found? " + (bucketFound != null))
 
         // Create a bucket if needed -------------
-        if (bucket_found) {
+        if (bucketFound) {
             if(!this.BUCKET_OWNER.equals("GROUP:public-objects")){
                 writeToOutput("Bucket to update: "+bucket)
-                def update_bucket_query = this.CATALOG_URL + "/buckets/" + bucket + "?owner=" + this.BUCKET_OWNER
-                def put = new org.apache.http.client.methods.HttpPut(update_bucket_query)
+                def updateBucketQuery = this.CATALOG_URL + "/buckets/" + bucket + "?owner=" + this.BUCKET_OWNER
+                def put = new org.apache.http.client.methods.HttpPut(updateBucketQuery)
                 put.addHeader("sessionId", this.sessionId)
                 put.addHeader("Accept", "application/json")
                 put.addHeader("Content-Type", "application/json")
                 def putResponse = getHttpClientBuilder().build().execute(put)
                 def putResponseStatusLine = putResponse.getStatusLine()
                 if (putResponseStatusLine.getStatusCode() >= 400) {
-                    writeToOutput("Result of " + update_bucket_query + ":")
+                    writeToOutput("Result of " + updateBucketQuery + ":")
                     writeToOutput(result)
-                    throw new IllegalStateException("Invalid response status from " + update_bucket_query + ": " + putResponseStatusLine)
+                    throw new IllegalStateException("Invalid response status from " + updateBucketQuery + ": " + putResponseStatusLine)
                 }
                 def putRes = new BufferedInputStream(putResponse.getEntity().getContent())
                 result = org.apache.commons.io.IOUtils.toString(putRes, "UTF-8")
-                def bucket_name = slurper.parseText(result.toString()).get("name")
+                def bucketName = slurper.parseText(result.toString()).get("name")
                 putRes.close();
-                writeToOutput("The user group of " + bucket_name + " is updated!")
+                writeToOutput("The user group of " + bucketName + " is updated!")
             }
-            return bucket_found.name
+            return bucketFound.name
         } else {
             // POST QUERY
-            def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
-            def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
+            def createBucketQuery = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
+            def post = new org.apache.http.client.methods.HttpPost(createBucketQuery)
             post.addHeader("Accept", "application/json")
             post.addHeader("Content-Type", "application/json")
             post.addHeader("sessionId", this.sessionId)
@@ -264,121 +269,126 @@ class LoadPackage {
             response = getHttpClientBuilder().build().execute(post)
             responseStatusLine = response.getStatusLine()
             if (responseStatusLine.getStatusCode() >= 400) {
-                writeToOutput("Result of " + create_bucket_query + ":")
+                writeToOutput("Result of " + createBucketQuery + ":")
                 writeToOutput(result)
-                throw new IllegalStateException("Invalid response status from " + create_bucket_query + ": " + responseStatusLine)
+                throw new IllegalStateException("Invalid response status from " + createBucketQuery + ": " + responseStatusLine)
             }
             bis = new BufferedInputStream(response.getEntity().getContent())
             result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
-            def bucket_name = slurper.parseText(result.toString()).get("name")
+            def bucketName = slurper.parseText(result.toString()).get("name")
             bis.close();
             writeToOutput(" " + bucket + " created!")
-            return bucket_name
+            return bucketName
         }
     }
 
 
-    void populateBucket(catalog_map, package_dir) {
+    void populateBucket(packageCatalogMap, packageDir) {
 
         // Do nothing if there is no workflow to push
-        if (catalog_map == null)
+        if (packageCatalogMap == null)
             return
 
-        def buckets_list
+        def packageBucketsList
         //Transform a String to a List of String
-        if (catalog_map.get("bucket") instanceof String) {
-            buckets_list = [catalog_map.get("bucket")]
+        if (packageCatalogMap.get("bucket") instanceof String) {
+            packageBucketsList = [packageCatalogMap.get("bucket")]
 
         } else {
-            buckets_list = catalog_map.get("bucket")
+            packageBucketsList = packageCatalogMap.get("bucket")
         }
-        buckets_list.each { bucket ->
 
-            // BUCKET SECTION /////////////////////////////
+        // BUCKETS SECTION /////////////////////////////
+
+        packageBucketsList.each { bucket ->
 
             // Check user group
-
-            if(catalog_map.containsKey("userGroup") && !catalog_map.get("userGroup").isEmpty()){
-                this.BUCKET_OWNER = "GROUP:"+catalog_map.get("userGroup")
+            if (packageCatalogMap.containsKey("userGroup") && !packageCatalogMap.get("userGroup").isEmpty()) {
+                this.BUCKET_OWNER = "GROUP:" + packageCatalogMap.get("userGroup")
             }
 
-            def bucket_name = createBucketIfNotExist(bucket)
+            def bucketName = createBucketIfNotExist(bucket)
 
-            // OBJECTS SECTION /////////////////////////////
-
-            // GET QUERY
-            def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources"
-            def get = new org.apache.http.client.methods.HttpGet(list_bucket_resources_rest_query)
+            // GET the bucket resources from the catalog
+            // Create part of the GET query
+            def listBucketResourcesQuery = this.CATALOG_URL + "/buckets/" + bucketName + "/resources"
+            def get = new org.apache.http.client.methods.HttpGet(listBucketResourcesQuery)
             get.addHeader("sessionid", this.sessionId)
+
+            // Build the GET query and execute it
             def response = getHttpClientBuilder().build().execute(get)
             def responseStatusLine = response.getStatusLine()
             if (responseStatusLine.getStatusCode() >= 400) {
-                writeToOutput("Result of " + list_bucket_resources_rest_query + ":")
+                writeToOutput("Result of " + listBucketResourcesQuery + ":")
                 writeToOutput(result)
-                throw new IllegalStateException("Invalid response status from " + list_bucket_resources_rest_query + ": " + responseStatusLine)
+                throw new IllegalStateException("Invalid response status from " + listBucketResourcesQuery + ": " + responseStatusLine)
             }
+
+            // Parse the result of the GET query
             def bis = new BufferedInputStream(response.getEntity().getContent())
             def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
             bis.close()
-            def bucket_resources_list = slurper.parseText(result)
+            def catalogBucketResourcesList = slurper.parseText(result)
 
-            catalog_map.get("objects").each { object ->
+            // OBJECTS SECTION /////////////////////////////
+
+            packageCatalogMap.get("objects").each { object ->
                 //push object in the catalog
-                def object_file = pushObject(object, package_dir,bucket_resources_list, bucket_name)
+                pushObject(object, packageDir, catalogBucketResourcesList, bucketName)
             }
         }
     }
 
 
-    void run(package_dir, load_dependencies) {
+    void run(packageDir, loadDependencies) {
 
         // Connect to the scheduler
         loginAdminUserCredToSchedulerAndGetSessionId()
 
         // If the package dir is a zip file, create a temporary directory that contains the unzipped package dir
-        writeToOutput(" Loading " + package_dir)
-        def package_dir_ext = FilenameUtils.getExtension(package_dir.name)
-        def unzipped_package_dir
-        if (package_dir_ext == "zip"){
-            unzipped_package_dir = unzipPackage(package_dir)
-            package_dir_ext = "." + package_dir_ext
+        writeToOutput(" Loading " + packageDir)
+        def packageDirExt = FilenameUtils.getExtension(packageDir.name)
+        def unzippedPackageDir
+        if (packageDirExt == "zip"){
+            unzippedPackageDir = unzipPackage(packageDir)
+            packageDirExt = "." + packageDirExt
         }
-        else if (package_dir_ext.isEmpty())
-            unzipped_package_dir = package_dir
+        else if (packageDirExt.isEmpty())
+            unzippedPackageDir = packageDir
         else {
             writeToOutput(" package dir extension not supported")
             throw new Exception(" package dir extension not supported")
         }
 
         // Parse the metadata json file
-        def metadata_file = new File(unzipped_package_dir, "METADATA.json")
-        writeToOutput(" Parsing " + metadata_file.absolutePath)
-        def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
+        def packageMetadataFile = new File(unzippedPackageDir, "METADATA.json")
+        writeToOutput(" Parsing " + packageMetadataFile.absolutePath)
+        def packageMetadataMap = (Map) slurper.parseText(packageMetadataFile.text)
 
         // LOAD PACKAGE DEPENDENCIES RECURSIVELY ////////////////////////////
 
-        if (load_dependencies) {
-            def dependencies_list = metadata_file_map.get("dependencies")
+        if (loadDependencies) {
+            def dependenciesList = packageMetadataMap.get("dependencies")
 
-            if (dependencies_list != null)
+            if (dependenciesList != null)
             {
-                def parent_package_dir = package_dir.getAbsoluteFile().getParentFile()
-                dependencies_list.each { package_name ->
+                def parentPackageDir = packageDir.getAbsoluteFile().getParentFile()
+                dependenciesList.each { packageName ->
 
-                    this.run( new File(parent_package_dir, package_name + package_dir_ext), load_dependencies)
+                    this.run( new File(parentPackageDir, packageName + packageDirExt), loadDependencies)
                 }
             }
         }
 
         // POPULATE DATASPACE ////////////////////////////
 
-        def dataspace_map = metadata_file_map.get("dataspace")
-        populateDataspace(dataspace_map, unzipped_package_dir)
+        def packageDataspaceMap = packageMetadataMap.get("dataspace")
+        populateDataspace(packageDataspaceMap, unzippedPackageDir)
 
         // POPULATE BUCKETS /////////////////////////////
 
-        def catalog_map = metadata_file_map.get("catalog")
-        populateBucket(catalog_map, unzipped_package_dir)
+        def packageCatalogMap = packageMetadataMap.get("catalog")
+        populateBucket(packageCatalogMap, unzippedPackageDir)
 
     }
 }
