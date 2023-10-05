@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -163,5 +164,11 @@ public interface TaskInfo extends Serializable {
      * @return visualization connection string
      */
     String getVisualizationConnectionString();
+
+    /**
+     * Return the up-to-date variables associated with this task, in String format
+     * @return variables
+     */
+    Map<String, String> getVariables();
 
 }

@@ -26,6 +26,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -57,6 +58,8 @@ public class TaskInfoData implements Serializable {
     private boolean visualizationActivated = false;
 
     private String visualizationConnectionString = null;
+
+    private Map<String, String> variables = null;
 
     private int progress;
 
@@ -170,5 +173,13 @@ public class TaskInfoData implements Serializable {
 
     public void setVisualizationConnectionString(String visualizationConnectionString) {
         this.visualizationConnectionString = visualizationConnectionString;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 }

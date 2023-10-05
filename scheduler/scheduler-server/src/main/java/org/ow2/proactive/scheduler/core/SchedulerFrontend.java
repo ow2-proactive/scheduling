@@ -128,6 +128,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -1415,6 +1416,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                 return eligibleTasks;
             }
             eligibleTasks = (List) taskRetrievedFromPolicy;
+            for (TaskDescriptor descriptor : eligibleTasks) {
+                InternalTask internalTask = ((EligibleTaskDescriptorImpl) descriptor).getInternal();
+                ((EligibleTaskDescriptorImpl) descriptor).setGenericInformation(internalTask.getRuntimeGenericInformation());
+            }
+
         } catch (Exception e) {
             logger.error("Error Loading Current Policy:", e);
         }

@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -95,6 +97,8 @@ public class TaskInfoImpl implements TaskInfo {
     /** connection string used for visualization **/
     private String visualizationConnectionString = null;
 
+    private Map<String, String> variables = null;
+
     public TaskInfoImpl() {
     }
 
@@ -118,6 +122,7 @@ public class TaskInfoImpl implements TaskInfo {
         this.numberOfExecutionOnFailureLeft = taskInfo.getNumberOfExecutionOnFailureLeft();
         this.visualizationActivated = taskInfo.isVisualizationActivated();
         this.visualizationConnectionString = taskInfo.getVisualizationConnectionString();
+        this.variables = taskInfo.getVariables();
     }
 
     /**
@@ -394,6 +399,15 @@ public class TaskInfoImpl implements TaskInfo {
 
     public void setVisualizationConnectionString(String visualizationConnectionString) {
         this.visualizationConnectionString = visualizationConnectionString;
+    }
+
+    @Override
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 
     /**

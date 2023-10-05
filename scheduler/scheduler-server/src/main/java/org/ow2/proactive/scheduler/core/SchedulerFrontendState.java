@@ -1546,6 +1546,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     case TASK_SKIPPED:
                     case TASK_REPLICATED:
                     case TASK_IN_ERROR_TO_FINISHED:
+                    case TASK_VARIABLES_UPDATED:
                         sendNotification = true;
                         break;
                     case TASK_PROGRESS:

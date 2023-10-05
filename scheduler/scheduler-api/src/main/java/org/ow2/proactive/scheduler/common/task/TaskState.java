@@ -467,6 +467,10 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     public Map<String, Serializable> getRuntimeVariables() {
         Map<String, Serializable> runtimeVariables = new HashMap<>();
         runtimeVariables.putAll(getScopeVariables());
+        TaskInfo taskInfo = getTaskInfo();
+        if (taskInfo != null && taskInfo.getVariables() != null) {
+            runtimeVariables.putAll(taskInfo.getVariables());
+        }
         runtimeVariables.putAll(getSystemVariables());
         return runtimeVariables;
     }

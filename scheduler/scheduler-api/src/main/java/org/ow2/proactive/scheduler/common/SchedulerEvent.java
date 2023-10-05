@@ -121,7 +121,9 @@ public enum SchedulerEvent {
      * */
     JOB_ABORTED("Job aborted"),
     /** when the visualization is activated on a task*/
-    TASK_VISU_ACTIVATED("Task visualization activated");
+    TASK_VISU_ACTIVATED("Task visualization activated"),
+    /** A task variables have been updated */
+    TASK_VARIABLES_UPDATED("Task variables updated");
     /** Name of the method */
     private String methodName;
 

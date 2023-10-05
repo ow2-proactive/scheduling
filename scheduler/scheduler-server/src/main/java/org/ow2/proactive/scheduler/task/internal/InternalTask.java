@@ -39,6 +39,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -53,13 +54,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
@@ -587,6 +582,9 @@ public abstract class InternalTask extends TaskState {
             throw new IllegalArgumentException("This task info is not applicable for this task. (expected id is '" +
                                                getId() + "' but was '" + taskInfo.getTaskId() + "'");
         }
+        if (taskInfo.getVariables() == null && this.taskInfo.getVariables() != null) {
+            ((TaskInfoImpl) taskInfo).setVariables(this.taskInfo.getVariables());
+        }
         this.taskInfo = (TaskInfoImpl) taskInfo;
         this.taskInfo.setJobId(internalJob.getId());
     }
@@ -664,6 +662,19 @@ public abstract class InternalTask extends TaskState {
 
     public void setNumberOfExecutionOnFailureLeft(int numberOfExecutionOnFailureLeft) {
         this.taskInfo.setNumberOfExecutionOnFailureLeft(numberOfExecutionOnFailureLeft);
+    }
+
+    @Override
+    public void setVariables(Map<String, TaskVariable> variables) {
+        super.setVariables(variables);
+        this.taskInfo.setVariables(variables.entrySet()
+                                            .stream()
+                                            .collect(HashMap::new,
+                                                     (m, v) -> m.put(v.getKey(),
+                                                                     v.getValue() != null ? v.getValue().getValue()
+                                                                                          : ""),
+                                                     HashMap::putAll));
+
     }
 
     /**
@@ -1328,6 +1339,14 @@ public abstract class InternalTask extends TaskState {
             updatedVariables.putAll(getSystemVariables());
 
             updatedVariables = VariableSubstitutor.resolveVariables(updatedVariables, updatedVariables);
+            this.taskInfo.setVariables(updatedVariables.entrySet().stream().collect(HashMap::new,
+                                                                                    (m, v) -> m.put(v.getKey(),
+                                                                                                    v.getValue() != null ? v.getValue()
+                                                                                                                            .toString()
+                                                                                                                         : ""),
+                                                                                    HashMap::putAll));
+            schedulingService.taskVariablesUpdated(this);
+
         }
     }
 
