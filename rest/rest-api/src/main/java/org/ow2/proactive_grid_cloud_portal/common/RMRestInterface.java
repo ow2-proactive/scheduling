@@ -296,12 +296,14 @@ public interface RMRestInterface {
      *
      * Returns a workflow variable model string containing the list of registered tokens in the resource manager
      * @param name a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> which will accept tokens based on their name. Example: <code>token.*</code>
+     * @param nodeSource the name of a node source considered for the token list. Only tokens defined for this node source or for any node which belongs to this node source will be returned.
      * @return a model containing the list of tokens, including an empty name. e.g. PA:LIST(,token1,token2)
      */
     @GET
     @Path("model/tokens")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    String getModelTokens(@QueryParam("name") String name) throws PermissionRestException;
+    String getModelTokens(@QueryParam("name") String name, @QueryParam("nodeSource") String nodeSource)
+            throws PermissionRestException;
 
     /**
      * Check Resource Manager availability.

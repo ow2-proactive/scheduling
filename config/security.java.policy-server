@@ -77,7 +77,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
     // if HandleOnlyMyJobsPermission is true, it is also possible to enable read-only access to other users' jobs.
     // Uncomment the following line to enable it
-    // permission org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission
+    // permission org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission;
 
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
@@ -424,7 +424,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
     // if HandleOnlyMyJobsPermission is true, it is also possible to enable read-only access to other users' jobs.
     // Uncomment the following line to enable it
-    // permission org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission
+    // permission org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission;
 
     //required to set job priority to normal
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
@@ -474,7 +474,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
     // if HandleOnlyMyJobsPermission is true, it is also possible to enable read-only access to other users' jobs.
     // Uncomment the following line to enable it
-    // permission org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission
+    // permission org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission;
 
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "0,1,2,3,4";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
