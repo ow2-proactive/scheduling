@@ -159,7 +159,10 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                                    CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP,
                                    CentralPAPropertyRepository.PA_NET_USE_IP_ADDRESS);
 
-        forwardOtherProperties(jvmArguments, createNodeSourceProperty());
+        forwardOtherProperties(jvmArguments,
+                               createPAPropertyString("proactive.node.nodesource", "Default", false),
+                               createPAPropertyString("java.io.tmpdir", "", true),
+                               createPAPropertyString("file.encoding", "UTF-8", true));
 
         List<String> prefixes = javaPrefixCommandExtractor.extractJavaPrefixCommandToCommandListFromScriptResult(forkEnvironmentScriptResult);
         if (prefixes.isEmpty() && forkEnvironment != null) {
@@ -194,14 +197,14 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                                .getFamily() == OperatingSystemFamily.WINDOWS ? ".exe" : "");
     }
 
-    private PAPropertyString createNodeSourceProperty() {
-        PAPropertyString nodeSourceNameProperty = new PAPropertyString("proactive.node.nodesource", false, "Default");
+    private PAPropertyString createPAPropertyString(String name, String defaultValue, boolean isSystemProp) {
+        PAPropertyString paProperty = new PAPropertyString(name, isSystemProp, defaultValue);
         try {
-            nodeSourceNameProperty.setValue(System.getProperty("proactive.node.nodesource"));
+            paProperty.setValue(System.getProperty(name));
         } catch (NullPointerException npe) {
-            logger.warn("System property proactive.node.nodesource can't be found.");
+            logger.warn("System property " + name + " can't be found.");
         }
-        return nodeSourceNameProperty;
+        return paProperty;
     }
 
     private String convertToLinuxPathIfNeeded(boolean isDockerWindowsToLinux, String serializedContextAbsolutePath,
