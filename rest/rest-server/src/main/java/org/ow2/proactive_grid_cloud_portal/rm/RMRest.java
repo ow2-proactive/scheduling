@@ -58,6 +58,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -112,6 +113,7 @@ import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 
@@ -387,20 +389,35 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public String getModelTokens(String name) throws PermissionRestException {
+    public String getModelTokens(String name, String nodeSource) throws PermissionRestException {
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
         Set<String> tokens = new LinkedHashSet<>();
-        state.getNodesEvents().forEach(event -> {
-            if (event.getTokens() != null) {
-                tokens.addAll(event.getTokens()
+        final MutableBoolean allowEmptyToken = new MutableBoolean(name == null);
+        state.getNodeSource().forEach(event -> {
+            if (event.getAccessTokens() != null && !event.getAccessTokens().isEmpty()) {
+                if (!Strings.isNullOrEmpty(nodeSource)) {
+                    if (!event.getNodeSourceName().equals(nodeSource)) {
+                        return;
+                    } else {
+                        // if the nodeSource parameter is used and this nodeSource is globally protected by a token,
+                        // then the model should not return an empty token choice
+                        allowEmptyToken.setValue(event.getAccessTokens().isEmpty());
+                    }
+                }
+                tokens.addAll(event.getAccessTokens()
                                    .stream()
                                    .filter(token -> (name != null ? token.matches(name) : true))
                                    .collect(Collectors.toList()));
             }
         });
-        state.getNodeSource().forEach(event -> {
-            if (event.getAccessTokens() != null && !event.getAccessTokens().isEmpty()) {
-                tokens.addAll(event.getAccessTokens()
+        state.getNodesEvents().forEach(event -> {
+            if (event.getTokens() != null) {
+                if (!Strings.isNullOrEmpty(nodeSource)) {
+                    if (!event.getNodeSource().equals(nodeSource)) {
+                        return;
+                    }
+                }
+                tokens.addAll(event.getTokens()
                                    .stream()
                                    .filter(token -> (name != null ? token.matches(name) : true))
                                    .collect(Collectors.toList()));
@@ -409,7 +426,8 @@ public class RMRest implements RMRestInterface {
         if (tokens.isEmpty()) {
             return "PA:LIST()";
         } else {
-            return String.format("PA:LIST(,%s)", String.join(",", tokens));
+            return String.format("PA:LIST(" + (allowEmptyToken.booleanValue() ? "," : "") + "%s)",
+                                 String.join(",", tokens));
         }
     }
 
