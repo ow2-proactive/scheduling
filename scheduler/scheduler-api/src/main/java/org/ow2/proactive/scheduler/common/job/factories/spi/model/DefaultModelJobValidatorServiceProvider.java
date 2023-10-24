@@ -122,16 +122,12 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
             updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
         });
 
-        Map<String, Serializable> updatedVariablesModel = new LinkedHashMap<>();
+        Map<String, String> updatedModels = new LinkedHashMap<>();
         addGlobalVariables(variableReplacement);
         variableList.forEach(jobVariable -> {
             jobVariable.setModel(VariableSubstitutor.filterAndUpdate(jobVariable.getModel(), variableReplacement));
-            updatedVariablesModel.put(jobVariable.getName(), jobVariable.getModel());
+            updatedModels.put(jobVariable.getName(), jobVariable.getModel());
         });
-        Map<String, String> updatedModels = new LinkedHashMap<>();
-        updatedVariablesModel.keySet()
-                             .forEach(variable -> updatedModels.put(variable,
-                                                                    (String) updatedVariablesModel.get(variable)));
         ModelValidatorContext context = new ModelValidatorContext(updatedVariables,
                                                                   updatedModels,
                                                                   groupNames,
