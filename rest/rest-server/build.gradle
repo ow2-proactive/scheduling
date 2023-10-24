@@ -50,7 +50,7 @@ dependencies {
     compile project(':rest:rest-api')
     compile project(':common:common-http')
 
-    def jettyVersion = "9.4.51.v20230217"
+    def jettyVersion = "9.4.53.v20231009"
 
     testCompile functionalTestDependencies
 

@@ -18,7 +18,7 @@ dependencies {
 
     compile 'com.github.spyhunter99:install-cert:1.0.12'
 
-    def jettyVersion = "9.4.51.v20230217"
+    def jettyVersion = "9.4.53.v20231009"
 
     compile "org.eclipse.jetty:jetty-webapp:${jettyVersion}"
     compile "org.eclipse.jetty:jetty-rewrite:${jettyVersion}"
