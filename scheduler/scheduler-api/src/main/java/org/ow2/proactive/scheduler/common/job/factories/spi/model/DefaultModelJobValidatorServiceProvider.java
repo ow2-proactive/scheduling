@@ -44,6 +44,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Mode
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 
 import com.google.common.base.Strings;
 
@@ -119,8 +121,19 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
                                                                                                                      variableReplacement));
             updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
         });
+
+        Map<String, Serializable> updatedVariablesModel = new LinkedHashMap<>();
+        addGlobalVariables(variableReplacement);
+        variableList.forEach(jobVariable -> {
+            jobVariable.setModel(VariableSubstitutor.filterAndUpdate(jobVariable.getModel(), variableReplacement));
+            updatedVariablesModel.put(jobVariable.getName(), jobVariable.getModel());
+        });
+        Map<String, String> updatedModels = new LinkedHashMap<>();
+        updatedVariablesModel.keySet()
+                             .forEach(variable -> updatedModels.put(variable,
+                                                                    (String) updatedVariablesModel.get(variable)));
         ModelValidatorContext context = new ModelValidatorContext(updatedVariables,
-                                                                  models,
+                                                                  updatedModels,
                                                                   groupNames,
                                                                   scheduler,
                                                                   space,
@@ -129,6 +142,31 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
             checkVariableFormat(null, jobVariable, context);
         }
         context.updateJobVariablesWithContext(variableList);
+    }
+
+    private void addGlobalVariables(Map<String, Serializable> replacements) {
+        // Include useful "global" scheduler variables
+        replacements.put(SchedulerVars.PA_CATALOG_REST_URL.toString(),
+                         PASchedulerProperties.CATALOG_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_SCHEDULER_REST_URL.toString(),
+                         PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_CLOUD_AUTOMATION_REST_URL.toString(),
+                         PASchedulerProperties.CLOUD_AUTOMATION_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_JOB_PLANNER_REST_URL.toString(),
+                         PASchedulerProperties.JOB_PLANNER_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_NOTIFICATION_SERVICE_REST_URL.toString(),
+                         PASchedulerProperties.NOTIFICATION_SERVICE_REST_URL.getValueAsString());
+
+        replacements.put(SchedulerVars.PA_SCHEDULER_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_CATALOG_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.CATALOG_REST_PUBLIC_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_CLOUD_AUTOMATION_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.CLOUD_AUTOMATION_REST_PUBLIC_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_JOB_PLANNER_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.JOB_PLANNER_REST_PUBLIC_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_NOTIFICATION_SERVICE_REST_PUBLIC_URL.toString(),
+                         PASchedulerProperties.NOTIFICATION_SERVICE_REST_PUBLIC_URL.getValueAsString());
     }
 
     protected void checkVariableFormat(Task task, JobVariable variable, ModelValidatorContext context)
