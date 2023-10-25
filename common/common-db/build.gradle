@@ -15,7 +15,7 @@ dependencies {
      *
      * The exclusion is required in order to use Javassist 3.18.2.
      */
-    compile('org.hibernate:hibernate-core:5.2.18.Final') {
+    compile('org.hibernate:hibernate-core:5.3.32.Final') {
         exclude group: 'org.javassist', module: 'javassist'
     }
     compile 'com.sun.xml.bind:jaxb-impl:2.2.11'
@@ -23,7 +23,7 @@ dependencies {
     compile 'com.sun.xml.bind:jaxb-osgi:2.2.11'
     compile 'javax.xml.bind:jaxb-api:2.2.12'
     // custom hibernate-hikaricp version to use HikariCP 4.0
-    runtime('org.hibernate:hibernate-hikaricp:5.2.18.PA') {
+    runtime('org.hibernate:hibernate-hikaricp:5.3.32.PA') {
         exclude group: 'org.javassist', module: 'javassist'
         exclude group: 'org.slf4j', module:'slf4j-api'
     }
