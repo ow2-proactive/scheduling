@@ -522,8 +522,9 @@ task alljavadoc(type: org.gradle.api.tasks.javadoc.Javadoc) {
     configure(options) {
         links = [
                 'https://docs.oracle.com/javase/8/docs/api/',
-                'https://docs.jboss.org/hibernate/orm/5.2/javadocs/',
-                'https://docs.jboss.org/hibernate/jpa/2.1/api/'
+                'https://docs.jboss.org/hibernate/orm/5.3/javadocs/',
+                'https://docs.jboss.org/hibernate/jpa/2.1/api/',
+                'https://docs.jboss.org/hibernate/jpa/2.2/api/'
                 ]
     }
 
