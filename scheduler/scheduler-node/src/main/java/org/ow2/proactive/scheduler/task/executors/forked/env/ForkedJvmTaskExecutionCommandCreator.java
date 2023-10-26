@@ -45,10 +45,12 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.command.JavaPrefixCommandExtractor;
 import org.ow2.proactive.scripting.ForkEnvironmentScriptResult;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.OneJar;
 import org.ow2.proactive.utils.OperatingSystem;
@@ -164,6 +166,18 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                                createPAPropertyString("java.io.tmpdir", "", true),
                                createPAPropertyString("file.encoding", "UTF-8", true));
 
+        addPropertiesForGrabAnnotation(jvmArguments,
+                                       taskContext,
+                                       createPAPropertyString("javax.xml.validation.SchemaFactory",
+                                                              "http://www.w3.org/2001/XMLSchema=com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory",
+                                                              false),
+                                       createPAPropertyString("javax.xml.parsers.SAXParserFactory",
+                                                              "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+                                                              false),
+                                       createPAPropertyString("javax.xml.parsers.DocumentBuilderFactory",
+                                                              "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
+                                                              false));
+
         List<String> prefixes = javaPrefixCommandExtractor.extractJavaPrefixCommandToCommandListFromScriptResult(forkEnvironmentScriptResult);
         if (prefixes.isEmpty() && forkEnvironment != null) {
             prefixes.addAll(forkEnvironment.getPreJavaCommand());
@@ -241,6 +255,37 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                 jvmArguments.add(property.getCmdLine() + property.getValueAsString());
             }
         }
+    }
+
+    private void addPropertiesForGrabAnnotation(List<String> jvmArguments, TaskContext context,
+            PAProperty... propertiesToForward) throws IOException {
+        if (context != null && context.getExecutableContainer() != null) {
+            if (isScriptUsingGrabAnnotation(((ScriptExecutableContainer) context.getExecutableContainer()).getScript()) ||
+                isScriptUsingGrabAnnotation(context.getPreScript()) ||
+                isScriptUsingGrabAnnotation(context.getPostScript()) ||
+                isScriptUsingGrabAnnotation(context.getControlFlowScript())) {
+                for (PAProperty property : propertiesToForward) {
+                    if (property.getDefaultValueAsString() != null &&
+                        !propertyDefinedByScript(jvmArguments, property)) {
+                        jvmArguments.add(property.getCmdLine() + property.getDefaultValueAsString());
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isScriptUsingGrabAnnotation(Script<?> script) throws IOException {
+        if (script == null) {
+            return false;
+        }
+        script.fetchUrlIfNeeded();
+        if (!"groovy".equals(script.getEngineName())) {
+            return false;
+        }
+        if (script.getScript() == null || !script.getScript().contains("@Grab")) {
+            return false;
+        }
+        return true;
     }
 
     private boolean propertyDefinedByScript(List<String> jvmArguments, PAProperty property) {
