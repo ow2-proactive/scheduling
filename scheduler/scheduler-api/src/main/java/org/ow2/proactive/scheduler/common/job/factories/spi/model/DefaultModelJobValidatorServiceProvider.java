@@ -27,11 +27,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -96,8 +92,6 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
         if (variableList == null || variableList.isEmpty() || userValues == null || userValues.isEmpty()) {
             return;
         }
-        Map<String, String> models = variableList.stream().collect(Collectors.toMap(JobVariable::getName,
-                                                                                    JobVariable::getModel));
         Set<String> groupNames = new LinkedHashSet<>();
         variableList.forEach(e -> {
             if (!Strings.isNullOrEmpty(e.getGroup())) {
@@ -107,6 +101,8 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
 
         Map<String, Serializable> variableReplacement = new LinkedHashMap<>();
         Map<String, Serializable> updatedVariables = new LinkedHashMap<>();
+        Map<String, String> updatedModels = new LinkedHashMap<>();
+        addGlobalVariables(variableReplacement);
         variableList.forEach(jobVariable -> {
             if (userValues.containsKey(jobVariable.getName())) {
                 variableReplacement.put(jobVariable.getName(), userValues.get(jobVariable.getName()));
@@ -122,8 +118,6 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
             updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
         });
 
-        Map<String, String> updatedModels = new LinkedHashMap<>();
-        addGlobalVariables(variableReplacement);
         variableList.forEach(jobVariable -> {
             jobVariable.setModel(VariableSubstitutor.filterAndUpdate(jobVariable.getModel(), variableReplacement));
             updatedModels.put(jobVariable.getName(), jobVariable.getModel());
@@ -134,8 +128,33 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
                                                                   scheduler,
                                                                   space,
                                                                   null);
-        for (JobVariable jobVariable : variableList) {
-            checkVariableFormat(null, jobVariable, context);
+        try {
+            for (JobVariable jobVariable : variableList) {
+                checkVariableFormat(null, jobVariable, context);
+            }
+        } catch (JobValidationException e) {
+            HashMap<String, String> updatedVariablesAfterValidation = new HashMap<>();
+            HashMap<String, String> updatedModelsAfterValidation = new HashMap<>();
+            HashMap<String, String> updatedDescriptions = new HashMap<>();
+            HashMap<String, String> updatedGroups = new HashMap<>();
+            HashMap<String, Boolean> updatedAdvanced = new HashMap<>();
+            HashMap<String, Boolean> updatedHidden = new HashMap<>();
+            for (JobVariable jobVariable : variableList) {
+                updatedVariablesAfterValidation.put(jobVariable.getName(), jobVariable.getValue());
+                updatedModelsAfterValidation.put(jobVariable.getName(), jobVariable.getModel());
+                updatedDescriptions.put(jobVariable.getName(), jobVariable.getDescription());
+                updatedGroups.put(jobVariable.getName(), jobVariable.getGroup());
+                updatedAdvanced.put(jobVariable.getName(), jobVariable.isAdvanced());
+                updatedHidden.put(jobVariable.getName(), jobVariable.isHidden());
+            }
+            e.setUpdatedVariables(updatedVariablesAfterValidation);
+            e.setUpdatedModels(updatedModelsAfterValidation);
+            e.setUpdatedAdvanced(updatedAdvanced);
+            e.setUpdatedGroups(updatedGroups);
+            e.setUpdatedDescriptions(updatedDescriptions);
+            e.setUpdatedHidden(updatedHidden);
+            throw e;
+
         }
         context.updateJobVariablesWithContext(variableList);
     }
