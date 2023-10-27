@@ -149,11 +149,13 @@ configure(javaSubprojects) {
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
 
     dependencies {
-        compile 'log4j:log4j:1.2.17'
-        compile 'log4j:apache-log4j-extras:1.2.17'
+        compile 'ch.qos.reload4j:reload4j:1.2.25'
+        compile ('log4j:apache-log4j-extras:1.2.17') {
+            exclude group: 'log4j', module: 'log4j'
+        }
         compile 'com.google.guava:guava:32.0.1-jre'
 
-        runtime 'org.slf4j:slf4j-log4j12:1.7.25'
+        runtime 'org.slf4j:slf4j-reload4j:1.7.36'
 
         testCompile 'com.google.truth:truth:0.30'
         testCompile 'junit:junit:4.12'

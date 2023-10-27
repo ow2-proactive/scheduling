@@ -6,7 +6,7 @@ dependencies {
     compile ('com.zaxxer:HikariCP:4.0.3') {
         exclude group: 'org.slf4j', module:'slf4j-api'
     }
-    runtime 'org.slf4j:slf4j-api:1.7.25'
+    runtime 'org.slf4j:slf4j-api:1.7.36'
     runtime group: 'org.bouncycastle', name: 'bcutil-jdk15to18', version: '1.74'
     runtime group: 'org.bouncycastle', name: 'bctls-jdk15to18', version: '1.74'
     runtime group: 'org.bouncycastle', name: 'bcpg-jdk15to18', version: '1.74'
