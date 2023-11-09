@@ -34,9 +34,7 @@ import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Priority;
 import javax.net.ssl.*;
@@ -151,11 +149,20 @@ public class SchedulerRestClient {
         if (!providerFactory.isRegistered(AcceptEncodingGZIPFilter.class)) {
             providerFactory.registerProvider(AcceptEncodingGZIPFilter.class);
         }
-        // Because of a bad deisgn in rest easy GZIPDecodingInterceptor, the following code ensures :
+        // Because of a bad design in rest easy GZIPDecodingInterceptor, the following code ensures :
         // - To remove the existing default GZIPDecodingInterceptor
-        // - instanciate a GZIPDecodingInterceptor with the appropriate max value
+        // (unfortunately the upgrade to RestEasy 3.15.6 changed the returned set to unmodifiable, making it necessary to use reflection
+        // - instantiate a GZIPDecodingInterceptor with the appropriate max value
         if (!providerFactory.isRegistered(gzipDecodingInterceptor)) {
-            providerFactory.getClasses().remove(GZIPDecodingInterceptor.class);
+            Set<Class<?>> classes = providerFactory.getClasses();
+            try {
+                Field cField = classes.getClass().getSuperclass().getDeclaredField("c");
+                cField.setAccessible(true);
+                Collection collection = (Collection) cField.get(classes);
+                collection.remove(GZIPDecodingInterceptor.class);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new IllegalStateException("Cannot access field in providerFactory.getClasses()", e);
+            }
             providerFactory.registerProviderInstance(gzipDecodingInterceptor);
         }
         if (!providerFactory.isRegistered(GZIPEncodingInterceptor.class)) {

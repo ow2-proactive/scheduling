@@ -26,8 +26,8 @@ miredot {
 }
 
 dependencies {
-    compile 'org.jboss.resteasy:resteasy-jackson2-provider:3.0.26.Final'
-    compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.26.Final'
+    compile 'org.jboss.resteasy:resteasy-jackson2-provider:3.15.6.Final'
+    compile 'org.jboss.resteasy:resteasy-multipart-provider:3.15.6.Final'
     compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.13.4'
 
     compile 'org.rrd4j:rrd4j:2.2.1'
@@ -55,7 +55,7 @@ dependencies {
     testCompile functionalTestDependencies
 
     testCompile 'org.apache.httpcomponents:httpmime:4.5.13'
-    testCompile 'org.jboss.resteasy:tjws:3.0.26.Final'
+    testCompile 'org.jboss.resteasy:tjws:3.15.6.Final'
 
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile "org.eclipse.jetty:jetty-client:${jettyVersion}"

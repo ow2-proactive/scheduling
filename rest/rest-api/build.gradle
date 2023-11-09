@@ -1,6 +1,6 @@
 dependencies {
-    compile 'org.jboss.resteasy:resteasy-jackson2-provider:3.0.26.Final'
-    compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.26.Final'
+    compile 'org.jboss.resteasy:resteasy-jackson2-provider:3.15.6.Final'
+    compile 'org.jboss.resteasy:resteasy-multipart-provider:3.15.6.Final'
     compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.13.4'
     compile "org.objectweb.proactive:programming-util:${programmingVersion}"
     compile project(':scheduler:scheduler-api')
