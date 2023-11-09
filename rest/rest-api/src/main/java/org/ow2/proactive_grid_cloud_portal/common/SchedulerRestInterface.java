@@ -676,6 +676,24 @@ public interface SchedulerRestInterface {
             @PathParam("jobid") String jobId) throws RestException;
 
     /**
+     * Returns a list of task states aggregated for displaying the workflow live graph
+     *
+     * task states are aggregated according to replications or iterations blocks
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the job id
+     * @return a list of task' summary states of the job <code>jobId</code>
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/aggregated")
+    @Produces(MediaType.APPLICATION_JSON)
+    RestPage<TaskStateSummaryData> getJobTaskStatesAggregated(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId) throws RestException;
+
+    /**
      * Returns a list of taskStates, only tasks with visualization activated
      *
      * @param sessionId
