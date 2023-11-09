@@ -890,6 +890,85 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public RestPage<TaskStateSummaryData> getJobTaskStatesAggregated(String sessionId, String jobId)
+            throws RestException {
+        List<TaskStateSummaryData> answer = new ArrayList<>();
+        LinkedHashMap<String, TaskStateSummaryData> taskSummaryMap = new LinkedHashMap<>();
+        try {
+            Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/aggregated");
+            int currentOffset = 0;
+            int totalNbTasks = 0;
+
+            do {
+                TaskStatesPage page = scheduler.getTaskPaginated(jobId,
+                                                                 currentOffset,
+                                                                 Pagination.TASKS_MAXIMUM_PAGE_SIZE);
+                totalNbTasks = page.getSize();
+                for (TaskState taskState : page.getTaskStates()) {
+                    String baseName = taskState.getName();
+                    if (baseName.contains(TaskId.REPLICATION_SEPARATOR)) {
+                        baseName = baseName.substring(0, baseName.indexOf(TaskId.REPLICATION_SEPARATOR));
+                    }
+                    if (baseName.contains(TaskId.ITERATION_SEPARATOR)) {
+                        baseName = baseName.substring(0, baseName.indexOf(TaskId.ITERATION_SEPARATOR));
+                    }
+                    if (taskSummaryMap.containsKey(baseName)) {
+                        TaskStateSummaryData taskStateSummaryData = taskSummaryMap.get(baseName);
+                        taskStateSummaryData.setCount(taskStateSummaryData.getCount() + 1);
+                        TaskStatus status = taskState.getTaskInfo().getStatus();
+                        taskStateSummaryData.setTaskStatus(TaskStatusData.valueOf(status.name()));
+                        if (TaskStatus.ERROR_TASKS.contains(status)) {
+                            taskStateSummaryData.setCountErrors(taskStateSummaryData.getCountErrors() + 1);
+                        }
+                        int previousFinishedCount = taskStateSummaryData.getCountFinished();
+                        if (TaskStatus.FINISHED_TASKS.contains(status)) {
+                            taskStateSummaryData.setCountFinished(taskStateSummaryData.getCountFinished() + 1);
+                            if (taskState.getFinishedTime() > 0) {
+                                long duration = taskState.getFinishedTime() - taskState.getStartTime();
+
+                                if (taskStateSummaryData.getAvgExecutionTime() > 0) {
+                                    long previousAverage = taskStateSummaryData.getAvgExecutionTime();
+                                    long newAverage = Long.divideUnsigned((previousAverage * previousFinishedCount) +
+                                                                          duration,
+                                                                          taskStateSummaryData.getCountFinished());
+                                    taskStateSummaryData.setAvgExecutionTime(newAverage);
+                                } else {
+                                    taskStateSummaryData.setAvgExecutionTime(duration);
+
+                                }
+                            }
+                        }
+                    } else {
+                        TaskStatus status = taskState.getTaskInfo().getStatus();
+                        TaskStateSummaryData taskStateSummaryData = new TaskStateSummaryData(baseName,
+                                                                                             1,
+                                                                                             TaskStatusData.valueOf(status.name()));
+                        if (TaskStatus.ERROR_TASKS.contains(status)) {
+                            taskStateSummaryData.setCountErrors(1);
+                        }
+                        if (taskState.getFinishedTime() > 0) {
+                            taskStateSummaryData.setAvgExecutionTime(taskState.getFinishedTime() -
+                                                                     taskState.getStartTime());
+                            taskStateSummaryData.setCountFinished(1);
+                        }
+
+                        taskSummaryMap.put(baseName, taskStateSummaryData);
+                    }
+                }
+                currentOffset += Pagination.TASKS_MAXIMUM_PAGE_SIZE;
+            } while (currentOffset < totalNbTasks);
+
+            for (Map.Entry<String, TaskStateSummaryData> entry : taskSummaryMap.entrySet()) {
+                answer.add(entry.getValue());
+            }
+
+            return new RestPage<>(answer, answer.size());
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
     public List<TaskStateData> getJobTaskStatesWithVisualization(String sessionId, String jobId) throws RestException {
         List<TaskStateData> answer = new ArrayList<>();
         try {
