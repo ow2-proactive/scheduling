@@ -22,7 +22,7 @@ dependencies {
 
     // script engines
     runtime 'org.jruby:jruby-complete:9.4.3.0'
-    runtime 'org.python:jython-standalone:2.7.3'
+    runtime files("$rootDir/lib/jython-standalone-2.7.3.jar")
 
     // ivy is used in groovy for the @Grab annotation
     runtime 'org.apache.ivy:ivy:2.5.2'

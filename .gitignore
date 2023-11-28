@@ -17,7 +17,7 @@ gradle/ext/
 dist/war/*.war
 /data
 /logs
-/lib
+!lib/*.jar
 /bin
 **/bin
 out
