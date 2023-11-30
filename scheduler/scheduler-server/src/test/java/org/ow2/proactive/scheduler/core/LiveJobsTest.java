@@ -67,7 +67,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.tests.ProActiveTestClean;
-import org.python.google.common.collect.ImmutableSet;
+
+import com.google.common.collect.ImmutableSet;
 
 
 public class LiveJobsTest extends ProActiveTestClean {

@@ -39,12 +39,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scripting.InvalidScriptException;
-import org.python.icu.impl.Assert;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -106,7 +106,7 @@ public class SelectionScriptSamplesTest {
         try {
             evaluateSelectionScript(selectionScript);
         } catch (ScriptEvaluationException e) {
-            Assert.fail(e);
+            Assert.fail(e.getMessage());
         }
     }
 

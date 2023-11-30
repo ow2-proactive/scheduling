@@ -42,7 +42,8 @@ import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.PAProperties;
-import org.python.google.common.collect.ImmutableSet;
+
+import com.google.common.collect.ImmutableSet;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;

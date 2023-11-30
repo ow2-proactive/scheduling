@@ -54,8 +54,8 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.tests.ProActiveTestClean;
-import org.python.google.common.collect.Lists;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 

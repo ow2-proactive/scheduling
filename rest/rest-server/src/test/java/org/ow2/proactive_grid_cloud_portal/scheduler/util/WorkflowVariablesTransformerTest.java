@@ -39,8 +39,8 @@ import javax.ws.rs.core.PathSegment;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.python.google.common.collect.Lists;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 
