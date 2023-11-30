@@ -39,8 +39,9 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.tests.ProActiveTestClean;
-import org.python.google.common.collect.ImmutableList;
-import org.python.google.common.collect.ImmutableMap;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 
 public class SchedulingTaskComparatorTest extends ProActiveTestClean {

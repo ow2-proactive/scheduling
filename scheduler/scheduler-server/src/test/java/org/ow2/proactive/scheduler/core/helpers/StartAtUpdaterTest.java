@@ -44,9 +44,9 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.python.google.common.collect.Maps;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 
 public class StartAtUpdaterTest {

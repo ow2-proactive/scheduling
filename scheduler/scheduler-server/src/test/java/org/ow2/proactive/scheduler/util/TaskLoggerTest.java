@@ -36,6 +36,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -46,7 +47,6 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.utils.appenders.FileAppender;
 import org.ow2.proactive.utils.appenders.SynchFileAppender;
 import org.ow2.tests.ProActiveTestClean;
-import org.python.icu.impl.Assert;
 
 
 public class TaskLoggerTest extends ProActiveTestClean {
@@ -74,7 +74,7 @@ public class TaskLoggerTest extends ProActiveTestClean {
             appender.append(TaskLogger.getTaskLogRelativePath(taskId),
                             new LoggingEvent("mylogger", Logger.getRootLogger(), Level.INFO, "HelloWorld", null));
         } catch (Exception e) {
-            Assert.fail(e);
+            Assert.fail(e.getMessage());
         }
         Thread.sleep(1000);
         assertTrue(FileUtils.readFileToString(logFile, Charset.defaultCharset()).contains("HelloWorld"));

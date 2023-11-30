@@ -38,7 +38,8 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.python.google.common.collect.ImmutableMap;
+
+import com.google.common.collect.ImmutableMap;
 
 import functionaltests.utils.SchedulerFunctionalTestLicensePolicy;
 

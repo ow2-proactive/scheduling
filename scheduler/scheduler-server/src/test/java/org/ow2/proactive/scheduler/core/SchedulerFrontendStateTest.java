@@ -63,7 +63,8 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.tests.ProActiveTestClean;
-import org.python.google.common.collect.Lists;
+
+import com.google.common.collect.Lists;
 
 
 public class SchedulerFrontendStateTest extends ProActiveTestClean {
