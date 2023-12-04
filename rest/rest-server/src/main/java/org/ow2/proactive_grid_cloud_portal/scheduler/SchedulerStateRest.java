@@ -1736,11 +1736,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
+    private String replaceCatalogUrl(String url) {
+        if (PASchedulerProperties.CATALOG_REST_PUBLIC_URL.isSet() && PASchedulerProperties.CATALOG_REST_URL.isSet()) {
+            return url.replace(PASchedulerProperties.CATALOG_REST_PUBLIC_URL.getValueAsString(),
+                               PASchedulerProperties.CATALOG_REST_URL.getValueAsString());
+        } else {
+            return url;
+        }
+    }
+
     @Override
     public JobIdData submitFromUrl(String sessionId, String url, PathSegment pathSegment, UriInfo contextInfos)
             throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
             SubmissionClosedRestException, IOException {
         Scheduler scheduler = checkAccess(sessionId, "jobs");
+
+        url = replaceCatalogUrl(url);
+
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
         String jobXml = downloadWorkflowContent(sessionId, url);
@@ -1767,6 +1779,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             MultipartFormDataInput multipart, UriInfo contextInfos) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
         Scheduler scheduler = checkAccess(sessionId, "jobs");
+
+        url = replaceCatalogUrl(url);
+
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
         String jobXml = downloadWorkflowContent(sessionId, url);
@@ -1802,6 +1817,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             UriInfo contextInfos) throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
             SubmissionClosedRestException, IOException {
         Scheduler scheduler = checkAccess(sessionId, "jobs");
+
+        url = replaceCatalogUrl(url);
+
         SchedulerSpaceInterface space = getSpaceInterface(sessionId);
 
         String jobXml = downloadWorkflowContent(sessionId, url);
@@ -1852,7 +1870,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             for (int i = 0; i < jsonBody.size(); i++) {
                 WorkflowUrlData workflowUrlData = jsonBody.get(i);
                 try {
-                    String jobXml = downloadWorkflowContent(sessionId, workflowUrlData.getWorkflowUrl());
+                    String jobXml = downloadWorkflowContent(sessionId,
+                                                            replaceCatalogUrl(workflowUrlData.getWorkflowUrl()));
                     workflowContents.add(jobXml);
                     workflowsVariables.add(workflowUrlData.getVariables());
                     workflowsGenericInfo.add(workflowUrlData.getGenericInformation());
@@ -3048,6 +3067,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         File tmpWorkflowFile = null;
         try {
             Scheduler scheduler = checkAccess(sessionId);
+            url = replaceCatalogUrl(url);
             SchedulerSpaceInterface space = getSpaceInterface(sessionId);
             String jobXml = downloadWorkflowContent(sessionId, url);
             tmpWorkflowFile = File.createTempFile("job", "d");
@@ -3084,6 +3104,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         File tmpWorkflowFile = null;
         try {
             Scheduler scheduler = checkAccess(sessionId);
+
+            url = replaceCatalogUrl(url);
             SchedulerSpaceInterface space = getSpaceInterface(sessionId);
             String jobXml = downloadWorkflowContent(sessionId, url);
             tmpWorkflowFile = File.createTempFile("job", "d");
@@ -3113,6 +3135,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         File tmpWorkflowFile = null;
         try {
             Scheduler scheduler = checkAccess(sessionId);
+
+            url = replaceCatalogUrl(url);
             SchedulerSpaceInterface space = getSpaceInterface(sessionId);
             String jobXml = downloadWorkflowContent(sessionId, url);
             tmpWorkflowFile = File.createTempFile("job", "d");
