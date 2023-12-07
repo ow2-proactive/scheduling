@@ -231,6 +231,7 @@ public class Session {
         terminateActiveObject(rm);
         terminateActiveObject(scheduler);
         jobsOutputController.terminate();
+        logger.debug("Session " + sessionId + " of user " + userName + " terminated");
     }
 
     private void terminateActiveObject(Object activeObject) {

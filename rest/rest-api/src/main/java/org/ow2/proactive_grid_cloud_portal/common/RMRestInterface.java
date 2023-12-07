@@ -282,6 +282,7 @@ public interface RMRestInterface {
      *             For example: <code>Local.*</code> will return all node sources with a <i>LocalInfrastructure</i>, <code>Azure</code> will return all node sources with <i>AzureInfrastructure</i> or <i>AzureVMScaleSetInfrastructure</i> types. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_infrastructures">Node Source Infrastructures</a> for a complete list of infrastructure types.
      * @param policy node source policy regexp. All node sources whose policy name matches the given <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> will be returned.
      *             For example: <code>Static.*</code> will return all node sources with a <i>StaticPolicy</i>, <code>Dynamic.*</code> will return all node sources with <i>DynamicPolicy</i>. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_policies">Node Source Policies</a> for a complete list of policy types.
+     * @param noDefault if 'true' the Default node source (which is automatically defined by the Resource Manager) will be excluded from the result.
      *
      * @return a model containing the list of node sources name, including an empty name and the default node source e.g. PA:LIST(,Default,LocalNodes)
      */
@@ -289,7 +290,8 @@ public interface RMRestInterface {
     @Path("model/nodesources")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getModelNodeSources(@QueryParam("name") String name, @QueryParam("infrastructure") String infrastructure,
-            @QueryParam("policy") String policy) throws PermissionRestException;
+            @QueryParam("policy") String policy, @QueryParam("noDefault") String noDefault)
+            throws PermissionRestException;
 
     /**
      * List of registered tokens as variable model.

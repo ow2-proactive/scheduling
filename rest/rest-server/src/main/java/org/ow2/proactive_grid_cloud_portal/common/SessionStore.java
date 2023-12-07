@@ -29,12 +29,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 
 public class SessionStore {
+
+    private static final Logger logger = ProActiveLogger.getLogger(SessionStore.class);
 
     public static final String YOU_ARE_NOT_CONNECTED_TO_THE_SERVER_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the server, you should log on first";
 
@@ -54,6 +58,7 @@ public class SessionStore {
     public Session create(String username) {
         Session session = createUnnamedSession();
         session.setUserName(username);
+        logger.debug("Created session " + session.getSessionId() + " for user " + username);
         return session;
     }
 
@@ -67,6 +72,7 @@ public class SessionStore {
         }
         Session session = sessions.get(sessionId);
         if (session == null) {
+            logger.debug("Session " + sessionId + " not found");
             throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SERVER_YOU_SHOULD_LOG_ON_FIRST);
         }
         return session;
@@ -83,6 +89,7 @@ public class SessionStore {
     }
 
     public void terminate(String sessionId) {
+        logger.debug("Terminating session " + sessionId);
         Session sessionToRemove = sessions.remove(sessionId);
         if (sessionToRemove != null) {
             sessionToRemove.terminate();
@@ -107,6 +114,8 @@ public class SessionStore {
                 Map.Entry<String, Session> sessionEntry = iterator.next();
                 Session session = sessionEntry.getValue();
                 if (session.isExpired(timeoutDelay)) {
+                    logger.debug("Terminating expired session " + session.getSessionId() + " of user " +
+                                 session.getUserName());
                     session.terminate();
                     iterator.remove();
                     terminatedSessionCounter++;
@@ -124,6 +133,7 @@ public class SessionStore {
         Session session = sessions.get(sessionId);
 
         if (session != null) {
+            logger.trace("Renewing session " + sessionId + " of user " + session.getUserName());
             session.renewSession();
         } else {
             throw new NotConnectedException(SchedulerStateRest.YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);

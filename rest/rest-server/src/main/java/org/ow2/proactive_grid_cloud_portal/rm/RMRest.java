@@ -329,9 +329,9 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public String getModelNodeSources(String name, String infrastructure, String policy)
+    public String getModelNodeSources(String name, String infrastructure, String policy, String noDefault)
             throws PermissionRestException {
-        List<String> filteredNodeSources = getFilteredNodeSources(name, infrastructure, policy);
+        List<String> filteredNodeSources = getFilteredNodeSources(name, infrastructure, policy, noDefault);
         if (filteredNodeSources.isEmpty()) {
             return "PA:LIST()";
         } else {
@@ -340,7 +340,7 @@ public class RMRest implements RMRestInterface {
         }
     }
 
-    private List<String> getFilteredNodeSources(String name, String infrastructure, String policy)
+    private List<String> getFilteredNodeSources(String name, String infrastructure, String policy, String noDefault)
             throws PermissionRestException {
         Map<String, Pair<String, String>> nodeSources = new LinkedHashMap<>();
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
@@ -385,6 +385,16 @@ public class RMRest implements RMRestInterface {
                 }
             }
         }
+        if ("true".equalsIgnoreCase(noDefault)) {
+            for (Iterator<Map.Entry<String, Pair<String, String>>> it = nodeSources.entrySet()
+                                                                                   .iterator(); it.hasNext();) {
+                Map.Entry<String, Pair<String, String>> entry = it.next();
+                if (entry.getKey().equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME)) {
+                    it.remove();
+                }
+            }
+        }
+
         return new ArrayList<>(nodeSources.keySet());
     }
 
