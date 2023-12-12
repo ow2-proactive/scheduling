@@ -890,9 +890,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // creating the default node source
             createNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME,
                              DefaultInfrastructureManager.class.getName(),
-                             null,
+                             new Object[0],
                              StaticPolicy.class.getName(),
-                             null,
+                             new String[] { "ALL", "ALL" },
                              NodeSource.DEFAULT_RECOVERABLE).getBooleanValue();
         }
 
