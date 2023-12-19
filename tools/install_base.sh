@@ -8,6 +8,7 @@ PA_FOLDER_NAME="$(basename "$INSTALL_PADIR")"
 OLD_PADIR=
 OS=
 PKG_TOOL=
+SERVICE_DIR=/etc/init.d
 
 if which dnf > /dev/null 2>&1; then
    OS="RedHat"
@@ -20,6 +21,13 @@ elif which apt-get > /dev/null 2>&1; then
    PKG_TOOL="apt-get"
 else
     echo "This operating system is not supported by the ProActive installer."; exit 1 ;
+fi
+
+if [ ! -d "$SERVICE_DIR" ]; then
+   SERVICE_DIR=/etc/rc.d/init.d
+   if [ ! -d "$SERVICE_DIR" ]; then
+      echo "Cannot find a SystemV service directory in either /etc/init.d or /etc/rc.d/init.d. Installation cannot continue"; exit 1;
+   fi
 fi
 
 RSYNC_VER=$( rsync --version|grep "protocol version"|awk '{print $6}' )
@@ -49,13 +57,13 @@ confirm() {
 # Escape functions for sed
 escape_rhs_sed ()
 {
-        echo $(printf '%s\n' "$1" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
+    echo $(printf '%s\n' "$1" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
 
 }
 
 escape_lhs_sed ()
 {
-        echo $(printf '%s\n' "$1" | sed 's:[][\/.^$*]:\\&:g')
+    echo $(printf '%s\n' "$1" | sed 's:[][\/.^$*]:\\&:g')
 
 }
 
@@ -262,6 +270,17 @@ install_binaries()
             echo "Installation aborted."; exit 1 ;
         fi
     fi
+
+    if [[ "$OS" == "RedHat" ]]; then
+        if ! which chkconfig > /dev/null 2>&1; then
+            echo "chkconfig is not installed on this computer and is required by the ProActive installation."
+            if confirm "Do you want to install it? [Y/n] " ; then
+                $PKG_TOOL -y install chkconfig
+            else
+                echo "Installation aborted."; exit 1 ;
+            fi
+        fi
+    fi
 }
 
 initial_commit()
@@ -306,7 +325,7 @@ install_binaries
 
 # stopping service
 
-if [ -f /etc/init.d/proactive-scheduler ]; then
+if [ -f $SERVICE_DIR/proactive-scheduler ]; then
     service proactive-scheduler stop
 fi
 
@@ -404,9 +423,9 @@ elif confirm "Do you want to regenerate the internal accounts ? [Y/n]" ; then
     generate_new_accounts
 fi
 
-if [ -f /etc/init.d/proactive-scheduler ] && [[ "$OLD_PADIR" != "" ]]; then
+if [ -f $SERVICE_DIR/proactive-scheduler ] && [[ "$OLD_PADIR" != "" ]]; then
     # backup previous service file
-    /bin/cp /etc/init.d/proactive-scheduler "$OLD_PADIR/tools/"
+    /bin/cp $SERVICE_DIR/proactive-scheduler "$OLD_PADIR/tools/"
 fi
 
 if [[ "$OLD_PADIR" == "" ]]; then
@@ -617,9 +636,17 @@ if [[ "$OLD_PADIR" == "" ]]; then
 
     # installation of the proactive-scheduler service
 
-    cp "$PA_ROOT/default/tools/proactive-scheduler" /etc/init.d/
+    cp "$PA_ROOT/default/tools/proactive-scheduler" $SERVICE_DIR/
 
-    chmod 700 /etc/init.d/proactive-scheduler
+    chmod 700 $SERVICE_DIR/proactive-scheduler
+
+    if [[ "$OS" == "RedHat" ]]; then
+      if chcon --reference=$SERVICE_DIR/README $SERVICE_DIR/proactive-scheduler &> /dev/null; then
+        echo "SELinux security context set on $SERVICE_DIR/proactive-scheduler"
+      else
+        echo "SELinux security context absent"
+      fi
+    fi
 
     mkdir -p /var/log/proactive
     touch /var/log/proactive/scheduler
@@ -706,14 +733,14 @@ if which git > /dev/null 2>&1; then
                     echo "A conflict occurred, cd to $PA_ROOT/default/ and follow the instructions displayed by Git to resolve the issues."
                     echo "Additionally, if a conflict occurred on the file $PA_ROOT/default/tools/proactive-scheduler,"
                     echo "you will need to manually copy the modified file after conflicts have been resolved by using the command:"
-                    echo "cp $PA_ROOT/default/tools/proactive-scheduler /etc/init.d/"
+                    echo "cp $PA_ROOT/default/tools/proactive-scheduler $SERVICE_DIR/"
                     CONFLICT=true
                     read -n 1 -s -r -p "Press any key to continue"
                 fi
             fi
 
             # copy merged changes on the service (if ever a conflict occurs, the user will have to manually copy the merge)
-            cp "$PA_ROOT/default/tools/proactive-scheduler" /etc/init.d/
+            cp "$PA_ROOT/default/tools/proactive-scheduler" $SERVICE_DIR/
         fi
     fi
     cd $OLD_PWD
