@@ -26,6 +26,7 @@
 package functionaltests.nodesource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,10 +44,7 @@ import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.scp.ScpCommandFactory;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.shell.ProcessShellFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -81,6 +79,12 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
     public static int NB_NODES = 3;
 
     private ResourceManager resourceManager;
+
+    @Before
+    public void disableTestOnWindows() throws Exception {
+        // ignore test on windows, the windows command spawned from the ssh server fails (without any possibility to make it work)
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
+    }
 
     @Test
     public void testSSHInfrastructureV2() throws Exception {

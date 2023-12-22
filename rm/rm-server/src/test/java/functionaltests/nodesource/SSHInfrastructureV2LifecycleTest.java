@@ -26,10 +26,12 @@
 package functionaltests.nodesource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
@@ -56,6 +58,8 @@ public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
 
     @Before
     public void setup() throws Exception {
+        // ignore test on windows, the windows command spawned from the ssh server fails (without any possibility to make it work)
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
         TestSSHInfrastructureV2.startSSHServer();
         this.resourceManager = this.rmHelper.getResourceManager();
         this.monitor = this.rmHelper.getMonitorsHandler();
