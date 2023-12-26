@@ -26,11 +26,13 @@
 package functionaltests.nodesource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -56,6 +58,8 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
 
     @Before
     public void setup() throws Exception {
+        // ignore test on windows, the windows command spawned from the ssh server fails (without any possibility to make it work)
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
         TestSSHInfrastructureV2.startSSHServer();
     }
 
