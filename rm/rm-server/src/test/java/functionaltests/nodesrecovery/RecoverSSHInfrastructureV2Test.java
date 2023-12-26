@@ -27,6 +27,7 @@ package functionaltests.nodesrecovery;
 
 import static com.google.common.truth.Truth.assertThat;
 import static functionaltests.nodesrecovery.RecoverInfrastructureTestHelper.NODES_RECOVERABLE;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.util.HashSet;
@@ -37,6 +38,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -68,6 +70,8 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
     @Before
     public void setup() throws Exception {
+        // ignore test on windows, the windows command spawned from the ssh server fails (without any possibility to make it work)
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
         TestSSHInfrastructureV2.startSSHServer();
         RMTHelper.log("SSH server started");
     }

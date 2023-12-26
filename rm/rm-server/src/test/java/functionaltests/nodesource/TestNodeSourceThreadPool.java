@@ -26,6 +26,7 @@
 package functionaltests.nodesource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -72,6 +73,8 @@ public class TestNodeSourceThreadPool extends RMFunctionalTest {
 
     @Before
     public void setup() throws Exception {
+        // ignore test on windows, the windows command spawned from the ssh server fails (without any possibility to make it work)
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
         TestSSHInfrastructureV2.startSSHServer();
     }
 
