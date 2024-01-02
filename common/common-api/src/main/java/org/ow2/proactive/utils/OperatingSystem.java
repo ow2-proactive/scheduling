@@ -52,6 +52,7 @@ public enum OperatingSystem {
     AIX("AIX", OperatingSystemFamily.UNIX),
     OS_390("OS/390", OperatingSystemFamily.UNIX),
     zOS("z/OS", OperatingSystemFamily.UNIX),
+    AS_400("OS/400", OperatingSystemFamily.UNIX),
     FREEBSD("FreeBSD", OperatingSystemFamily.UNIX),
     IRIX("Irix", OperatingSystemFamily.UNIX),
     DIGITAL_UNIX("Digital Unix", OperatingSystemFamily.UNIX),
