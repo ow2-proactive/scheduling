@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 import java.util.TimerTask;
 
@@ -94,6 +95,27 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
      * Check if the user has all job planner permission
      */
     public abstract boolean isAllJobPlannerPermission();
+
+    /**
+     * Check if the user has all Service Automation permissions
+     */
+    public abstract boolean isPcaAdminPermission();
+
+    /**
+     * Check if the user has all Notification Service permissions;
+     */
+    public abstract boolean isNotificationAdminPermission();
+
+    /**
+     * Check if the user has all Resource Manager permissions
+     */
+    public abstract boolean isRMCoreAllPermission();
+
+    /**
+     * Check if the user has all Scheduler permissions
+     * @return
+     */
+    public abstract boolean isSchedulerAdminPermission();
 
     /**
      * Check if the user has permission to handle only its jobs

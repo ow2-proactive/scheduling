@@ -25,10 +25,15 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TimerTask;
 
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 
 public class UserIdentificationImpl extends UserIdentification {
@@ -105,6 +110,26 @@ public class UserIdentificationImpl extends UserIdentification {
 
     @Override
     public boolean isOtherUsersJobReadPermission() {
+        return false;
+    }
+
+    @Override
+    public boolean isPcaAdminPermission() {
+        return false;
+    }
+
+    @Override
+    public boolean isNotificationAdminPermission() {
+        return false;
+    }
+
+    @Override
+    public boolean isRMCoreAllPermission() {
+        return false;
+    }
+
+    @Override
+    public boolean isSchedulerAdminPermission() {
         return false;
     }
 

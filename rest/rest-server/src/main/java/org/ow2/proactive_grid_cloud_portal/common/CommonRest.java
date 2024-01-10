@@ -55,6 +55,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 
+import com.google.common.collect.ImmutableMap;
+
 
 public class CommonRest implements CommonRestInterface {
 
@@ -63,6 +65,36 @@ public class CommonRest implements CommonRestInterface {
     public static final String YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the scheduler, you should log on first";
 
     public static final String YOU_ARE_NOT_CONNECTED_TO_THE_RM_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the resource manager, you should log on first";
+
+    private static final Map<String, String> PORTAL_NAMES = new ImmutableMap.Builder().put("rm", "Resource Manager")
+                                                                                      .put("scheduler", "Scheduler")
+                                                                                      .put("studio", "Studio")
+                                                                                      .put("automation-dashboard",
+                                                                                           "Automation Dashboard")
+                                                                                      .put("workflow-execution",
+                                                                                           "Workflow Execution")
+                                                                                      .put("catalog", "Catalog")
+                                                                                      .put("health-dashboard",
+                                                                                           "Health Dashboard")
+                                                                                      .put("job-analytics",
+                                                                                           "Job Analytics")
+                                                                                      .put("job-gantt", "Job Gantt")
+                                                                                      .put("node-gantt", "Node Gantt")
+                                                                                      .put("job-planner-calendar-def",
+                                                                                           "Calendar Definition")
+                                                                                      .put("job-planner-calendar-def-workflows",
+                                                                                           "Calendar Associations")
+                                                                                      .put("job-planner-execution-planning",
+                                                                                           "Execution Planning")
+                                                                                      .put("job-planner-gantt-chart",
+                                                                                           "Gantt Chart")
+                                                                                      .put("event-orchestration",
+                                                                                           "Event Orchestration")
+                                                                                      .put("service-automation",
+                                                                                           "Service Automation")
+                                                                                      .put("notification-portal",
+                                                                                           "Notifications")
+                                                                                      .build();
 
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
@@ -125,7 +157,34 @@ public class CommonRest implements CommonRestInterface {
 
     @Override
     public UserData currentUserData(String sessionId) {
-        return scheduler().getUserDataFromSessionId(sessionId);
+        UserData answer = scheduler().getUserDataFromSessionId(sessionId);
+        try {
+            List<String> portalPermissions = portalsAccesses(sessionId, new ArrayList<>(PORTAL_NAMES.keySet()));
+            answer.setPortalAccessPermission(portalPermissions);
+            answer.setPortalAccessPermissionDisplay(portalPermissions.stream()
+                                                                     .map(el -> PORTAL_NAMES.get(el))
+                                                                     .collect(toList()));
+            List<String> adminRoles = new ArrayList<>();
+            if (answer.isRmCoreAllPermission()) {
+                adminRoles.add("Resource Manager");
+            }
+            if (answer.isSchedulerAdminPermission()) {
+                adminRoles.add("Scheduler");
+            }
+            if (answer.isAllJobPlannerPermission()) {
+                adminRoles.add("Job Planner");
+            }
+            if (answer.isPcaAdminPermission()) {
+                adminRoles.add("Service Automation");
+            }
+            if (answer.isNotificationAdminPermission()) {
+                adminRoles.add("Notifications");
+            }
+            answer.setAdminRoles(adminRoles);
+        } catch (RestException e) {
+            // ignore
+        }
+        return answer;
     }
 
     @Override
@@ -139,7 +198,7 @@ public class CommonRest implements CommonRestInterface {
             try {
                 checkPermission(scheduler.getSubject(),
                                 new PortalAccessPermission(portal),
-                                "Acess to portal " + portal + " is disabled");
+                                "Access to portal " + portal + " is disabled");
                 answer.add(portal);
             } catch (PermissionException e) {
                 // access to portal is disabled, thus the answer will not contain it.
