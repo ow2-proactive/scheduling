@@ -27,9 +27,7 @@ package org.ow2.proactive.scheduler.job;
 
 import java.security.Permission;
 import java.security.PrivilegedAction;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TimerTask;
+import java.util.*;
 
 import javax.security.auth.Subject;
 
@@ -37,6 +35,10 @@ import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.permissions.NotificationAdminPermission;
+import org.ow2.proactive.permissions.PcaAdminPermission;
+import org.ow2.proactive.permissions.RMCoreAllPermission;
+import org.ow2.proactive.permissions.ServiceRolePermission;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -169,6 +171,43 @@ public class UserIdentificationImpl extends UserIdentification {
     public boolean isAllJobPlannerPermission() {
         try {
             return checkPermission(new JobPlannerAllAccessPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isPcaAdminPermission() {
+        try {
+            return checkPermission(new PcaAdminPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isNotificationAdminPermission() {
+        try {
+            return checkPermission(new NotificationAdminPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isRMCoreAllPermission() {
+        try {
+            return checkPermission(new RMCoreAllPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isSchedulerAdminPermission() {
+        try {
+            return checkPermission(new ServiceRolePermission("org.ow2.proactive.scheduler.core.SchedulerFrontend.*"),
+                                   "N/A");
         } catch (PermissionException e) {
             return false;
         }

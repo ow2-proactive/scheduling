@@ -26,6 +26,8 @@
 package org.ow2.proactive.authentication;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 
@@ -55,17 +57,23 @@ public class UserData implements Serializable {
 
     private boolean allJobPlannerPermission;
 
+    private boolean pcaAdminPermission;
+
+    private boolean notificationAdminPermission;
+
+    private boolean rmCoreAllPermission;
+
+    private boolean schedulerAdminPermission;
+
     private boolean handleOnlyMyJobsPermission;
 
     private boolean otherUsersJobReadPermission;
 
-    public boolean isAllJobPlannerPermission() {
-        return allJobPlannerPermission;
-    }
+    private List<String> portalAccessPermission = new ArrayList<>();
 
-    public void setAllJobPlannerPermission(boolean allJobPlannerPermission) {
-        this.allJobPlannerPermission = allJobPlannerPermission;
-    }
+    private List<String> portalAccessPermissionDisplay = new ArrayList<>();
+
+    private List<String> adminRoles = new ArrayList<>();
 
     public String getUserName() {
         return userName;
@@ -115,6 +123,46 @@ public class UserData implements Serializable {
         this.allTenantPermission = allTenantPermission;
     }
 
+    public boolean isAllJobPlannerPermission() {
+        return allJobPlannerPermission;
+    }
+
+    public void setAllJobPlannerPermission(boolean allJobPlannerPermission) {
+        this.allJobPlannerPermission = allJobPlannerPermission;
+    }
+
+    public boolean isPcaAdminPermission() {
+        return pcaAdminPermission;
+    }
+
+    public void setPcaAdminPermission(boolean pcaAdminPermission) {
+        this.pcaAdminPermission = pcaAdminPermission;
+    }
+
+    public boolean isNotificationAdminPermission() {
+        return notificationAdminPermission;
+    }
+
+    public void setNotificationAdminPermission(boolean notificationAdminPermission) {
+        this.notificationAdminPermission = notificationAdminPermission;
+    }
+
+    public boolean isRmCoreAllPermission() {
+        return rmCoreAllPermission;
+    }
+
+    public void setRmCoreAllPermission(boolean rmCoreAllPermission) {
+        this.rmCoreAllPermission = rmCoreAllPermission;
+    }
+
+    public boolean isSchedulerAdminPermission() {
+        return schedulerAdminPermission;
+    }
+
+    public void setSchedulerAdminPermission(boolean schedulerAdminPermission) {
+        this.schedulerAdminPermission = schedulerAdminPermission;
+    }
+
     public boolean isHandleOnlyMyJobsPermission() {
         return handleOnlyMyJobsPermission;
     }
@@ -129,5 +177,29 @@ public class UserData implements Serializable {
 
     public void setOtherUsersJobReadPermission(boolean otherUsersJobReadPermission) {
         this.otherUsersJobReadPermission = otherUsersJobReadPermission;
+    }
+
+    public List<String> getPortalAccessPermission() {
+        return portalAccessPermission;
+    }
+
+    public void setPortalAccessPermission(List<String> portalAccessPermission) {
+        this.portalAccessPermission = portalAccessPermission;
+    }
+
+    public List<String> getPortalAccessPermissionDisplay() {
+        return portalAccessPermissionDisplay;
+    }
+
+    public void setPortalAccessPermissionDisplay(List<String> portalAccessPermissionDisplay) {
+        this.portalAccessPermissionDisplay = portalAccessPermissionDisplay;
+    }
+
+    public List<String> getAdminRoles() {
+        return adminRoles;
+    }
+
+    public void setAdminRoles(List<String> adminRoles) {
+        this.adminRoles = adminRoles;
     }
 }
