@@ -347,7 +347,11 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
             File distLibShort = getPathForCurrentOperatingSystem(isDockerWindowsToLinux, processBuilder, distLib);
             if (distLib.exists()) {
                 File addons = new File(paHome, "addons").getCanonicalFile();
+                File addonsClient = new File(new File(paHome, "addons"), "client").getCanonicalFile();
                 File addonsShort = getPathForCurrentOperatingSystem(isDockerWindowsToLinux, processBuilder, addons);
+                File addonsClientShort = getPathForCurrentOperatingSystem(isDockerWindowsToLinux,
+                                                                          processBuilder,
+                                                                          addonsClient);
                 classpathEntries.append(distLibShort);
                 classpathEntries.append(File.pathSeparatorChar);
                 classpathEntries.append(new File(distLibShort, "*"));
@@ -355,6 +359,10 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                 classpathEntries.append(addonsShort);
                 classpathEntries.append(File.pathSeparatorChar);
                 classpathEntries.append(new File(addonsShort, "*"));
+                classpathEntries.append(File.pathSeparatorChar);
+                classpathEntries.append(addonsClientShort);
+                classpathEntries.append(File.pathSeparatorChar);
+                classpathEntries.append(new File(addonsClientShort, "*"));
             } else {
                 return getClassPathEntriesUsingJavaClassPath();
             }
