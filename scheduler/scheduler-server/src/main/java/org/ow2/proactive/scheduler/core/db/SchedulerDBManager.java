@@ -944,7 +944,11 @@ public class SchedulerDBManager {
     public void executeHousekeepingInDB(final List<Long> jobIdList, final boolean shouldRemoveFromDb) {
         List<List<Long>> jobIdSubSets = Lists.partition(jobIdList, MAX_ITEMS_IN_LIST);
         for (List<Long> jobIdSubList : jobIdSubSets) {
-            executeReadWriteTransaction(new HousekeepingSessionWork(jobIdSubList, shouldRemoveFromDb));
+            HousekeepingSessionWork housekeepingSessionWork = new HousekeepingSessionWork(jobIdSubList,
+                                                                                          shouldRemoveFromDb);
+            for (SessionWork<Integer> sessionWork : housekeepingSessionWork.getAllTransactions()) {
+                executeReadWriteTransaction(sessionWork);
+            }
         }
     }
 
