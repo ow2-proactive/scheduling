@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,7 @@ import org.ow2.proactive.db.SessionWork;
  * @author ActiveEon Team
  * @since 01/03/17
  */
-public class HousekeepingSessionWork implements SessionWork<Void> {
+public class HousekeepingSessionWork {
 
     private static List<Long> jobIdList;
 
@@ -58,78 +59,89 @@ public class HousekeepingSessionWork implements SessionWork<Void> {
         session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID not in (select ID from JOB_DATA)");
     }
 
-    private void removeJobScriptsInBulk(Session session, List<Long> jobIdList) {
-        session.getNamedQuery("updateTaskDataJobScriptsInBulk")
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-        session.getNamedQuery("deleteScriptDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
-        session.getNamedQuery("deleteSelectionScriptDataInBulk")
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-    }
-
-    private void removeFromDb(Session session) {
-        // when removing jobs, compute a list of all parent jobs, and for each parent, decrease the children count. A parent job id can appear several times in this list.
-        for (Long parentId : (List<Long>) session.getNamedQuery("getParentIds")
-                                                 .setParameterList("ids", jobIdList)
-                                                 .list()) {
-            session.getNamedQuery("decreaseJobDataChildrenCount")
-                   .setParameter("jobId", parentId)
-                   .setParameter("lastUpdatedTime", new Date().getTime())
-                   .executeUpdate();
-        }
-        session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-        session.getNamedQuery("deleteJobDataVariableInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
-        session.getNamedQuery("deleteTaskDataVariableInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
-        session.getNamedQuery("deleteSelectorDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
-        session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in :jobIdList")
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-        session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in :jobIdList")
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-        removeJobScriptsInBulk(session, jobIdList);
-        session.getNamedQuery("deleteSelectionScriptDataInBulk")
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-        session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID in :jobIdList")
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-        session.getNamedQuery("deleteTaskDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
-        session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in :jobIdList")
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-        session.getNamedQuery("deleteJobDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
-        deleteInconsistentData(session);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void updateAsRemoved(Session session) {
-        // when removing jobs, compute a list of all parent jobs, and for each parent, decrease the children count. A parent job id can appear several times in this list.
-        for (Long parentId : (List<Long>) session.getNamedQuery("getParentIds")
-                                                 .setParameterList("ids", jobIdList)
-                                                 .list()) {
-            session.getNamedQuery("decreaseJobDataChildrenCount")
-                   .setParameter("jobId", parentId)
-                   .setParameter("lastUpdatedTime", new Date().getTime())
-                   .executeUpdate();
-        }
-        session.getNamedQuery("updateJobDataRemovedTimeInBulk")
-               .setParameter("removedTime", System.currentTimeMillis())
-               .setParameter("lastUpdatedTime", new Date().getTime())
-               .setParameterList("jobIdList", jobIdList)
-               .executeUpdate();
-    }
-
-    @Override
-    public Void doInTransaction(Session session) {
+    public List<SessionWork<Integer>> getAllTransactions() {
         if (shouldRemoveFromDb) {
-            removeFromDb(session);
+            return getAllTransactionsRemoveFromDb();
         } else {
-            updateAsRemoved(session);
+            return getAllTransactionsUpdateAsRemoved();
         }
-        return null;
+    }
+
+    private List<SessionWork<Integer>> getAllTransactionsRemoveFromDb() {
+        List<SessionWork<Integer>> allTransactions = new ArrayList<>();
+        allTransactions.add(session -> ((List<Long>) session.getNamedQuery("getParentIds")
+                                                            .setParameterList("ids", jobIdList)
+                                                            .list()).stream()
+                                                                    .map(parentId -> session.getNamedQuery("decreaseJobDataChildrenCount")
+                                                                                            .setParameter("jobId",
+                                                                                                          parentId)
+                                                                                            .setParameter("lastUpdatedTime",
+                                                                                                          new Date().getTime())
+                                                                                            .executeUpdate())
+                                                                    .reduce(0, Integer::sum));
+
+        allTransactions.add(session -> session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.getNamedQuery("deleteJobDataVariableInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.getNamedQuery("deleteTaskDataVariableInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.getNamedQuery("deleteSelectorDataInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in :jobIdList")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in :jobIdList")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+
+        allTransactions.add(session -> session.getNamedQuery("updateTaskDataJobScriptsInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.getNamedQuery("deleteScriptDataInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.getNamedQuery("deleteSelectionScriptDataInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID in :jobIdList")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.getNamedQuery("deleteTaskDataInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+
+        allTransactions.add(session -> session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in :jobIdList")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        allTransactions.add(session -> session.getNamedQuery("deleteJobDataInBulk")
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+
+        return allTransactions;
+    }
+
+    private List<SessionWork<Integer>> getAllTransactionsUpdateAsRemoved() {
+        List<SessionWork<Integer>> allTransactions = new ArrayList<>();
+        allTransactions.add(session -> ((List<Long>) session.getNamedQuery("getParentIds")
+                                                            .setParameterList("ids", jobIdList)
+                                                            .list()).stream()
+                                                                    .map(parentId -> session.getNamedQuery("decreaseJobDataChildrenCount")
+                                                                                            .setParameter("jobId",
+                                                                                                          parentId)
+                                                                                            .setParameter("lastUpdatedTime",
+                                                                                                          new Date().getTime())
+                                                                                            .executeUpdate())
+                                                                    .reduce(0, Integer::sum));
+        allTransactions.add(session -> session.getNamedQuery("updateJobDataRemovedTimeInBulk")
+                                              .setParameter("removedTime", System.currentTimeMillis())
+                                              .setParameter("lastUpdatedTime", new Date().getTime())
+                                              .setParameterList("jobIdList", jobIdList)
+                                              .executeUpdate());
+        return allTransactions;
     }
 }
