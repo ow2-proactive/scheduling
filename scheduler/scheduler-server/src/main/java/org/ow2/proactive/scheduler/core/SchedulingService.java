@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -1354,6 +1355,8 @@ public class SchedulingService {
      */
     public class HousekeepingRunner implements Runnable {
 
+        private ReentrantLock lock = new ReentrantLock();
+
         private List<Long> removeFromContext(Map<JobId, String> jobIdList) {
             for (Map.Entry<JobId, String> jobIdStringEntry : jobIdList.entrySet()) {
                 JobId jobId = jobIdStringEntry.getKey();
@@ -1389,26 +1392,37 @@ public class SchedulingService {
 
         @Override
         public void run() {
-            long timeNow = System.currentTimeMillis();
             try {
-                Map<JobId, String> jobIdList = getInfrastructure().getDBManager().getJobsToRemove(timeNow);
+                logger.info("Waiting for previous scheduler HOUSEKEEPING execution to complete");
+                lock.lockInterruptibly();
+                logger.info("Previous scheduler HOUSEKEEPING is terminated, now performing a new housekeeping");
 
-                // remove from the memory context
-                long inMemoryTimeStart = System.currentTimeMillis();
-                List<Long> longJobIdList = removeFromContext(jobIdList);
-                long inMemoryTimeStop = System.currentTimeMillis();
+                long timeNow = System.currentTimeMillis();
+                try {
+                    Map<JobId, String> jobIdList = getInfrastructure().getDBManager().getJobsToRemove(timeNow);
 
-                // set the removedTime and also remove if required by the JOB_REMOVE_FROM_DB setting
-                long dbTimeStart = System.currentTimeMillis();
-                removeFromDB(longJobIdList);
-                long dbTimeStop = System.currentTimeMillis();
+                    // remove from the memory context
+                    long inMemoryTimeStart = System.currentTimeMillis();
+                    List<Long> longJobIdList = removeFromContext(jobIdList);
+                    long inMemoryTimeStop = System.currentTimeMillis();
 
-                logger.info("HOUSEKEEPING of jobs " + longJobIdList + " performed (Hibernate context removal took " +
-                            (inMemoryTimeStop - inMemoryTimeStart) + " ms" + " and db removal took " +
-                            (dbTimeStop - dbTimeStart) + " ms)");
-            } catch (Throwable e) {
-                logger.error("Error performing HOUSEKEEPING of jobs", e);
+                    // set the removedTime and also remove if required by the JOB_REMOVE_FROM_DB setting
+                    long dbTimeStart = System.currentTimeMillis();
+                    removeFromDB(longJobIdList);
+                    long dbTimeStop = System.currentTimeMillis();
+
+                    logger.info("HOUSEKEEPING of jobs " + longJobIdList +
+                                " performed (Hibernate context removal took " + (inMemoryTimeStop - inMemoryTimeStart) +
+                                " ms" + " and db removal took " + (dbTimeStop - dbTimeStart) + " ms)");
+                } catch (Throwable e) {
+                    logger.error("Error performing HOUSEKEEPING of jobs", e);
+                }
+            } catch (InterruptedException e) {
+                logger.warn("Interrupted while waiting for scheduler HousekeepingRunner lock", e);
+            } finally {
+                lock.unlock();
             }
+
         }
     }
 
