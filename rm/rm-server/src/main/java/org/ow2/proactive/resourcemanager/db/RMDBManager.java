@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -872,10 +873,21 @@ public class RMDBManager {
 
     private class HousekeepingRunner implements Runnable {
 
+        ReentrantLock lock = new ReentrantLock();
+
         @Override
         public void run() {
-            getInstance().deleteOldNodeHistory();
-            getInstance().deleteOldUserHistory();
+            try {
+                logger.info("Waiting for previous rm HOUSEKEEPING execution to complete");
+                lock.lockInterruptibly();
+                logger.info("Previous rm HOUSEKEEPING is terminated, now performing a new housekeeping");
+                getInstance().deleteOldNodeHistory();
+                getInstance().deleteOldUserHistory();
+            } catch (InterruptedException e) {
+                logger.warn("Interrupted while waiting for scheduler HousekeepingRunner lock", e);
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
