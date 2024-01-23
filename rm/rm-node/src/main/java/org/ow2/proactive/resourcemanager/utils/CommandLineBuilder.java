@@ -54,6 +54,8 @@ public final class CommandLineBuilder implements Cloneable {
 
     private static final String ADDONS_DIR = "addons";
 
+    private static final String ADDONS_CLIENT_DIR = "client";
+
     private String nodeName;
 
     private String sourceName;
@@ -334,11 +336,23 @@ public final class CommandLineBuilder implements Cloneable {
         command.add("-cp");
         final StringBuilder classpath = new StringBuilder(".");
 
+        classpath.append(os.ps).append(libRoot).append("*");
+
         // add the content of addons dir on the classpath
         classpath.append(os.ps).append(rmHome).append(ADDONS_DIR);
         // add jars inside the addons directory
         classpath.append(os.ps).append(rmHome).append(ADDONS_DIR).append(os.fs).append("*");
-        classpath.append(os.ps).append(libRoot).append("*");
+
+        // add the content of addons client dir on the classpath
+        classpath.append(os.ps).append(rmHome).append(ADDONS_DIR).append(os.fs).append(ADDONS_CLIENT_DIR);
+        // add jars inside the addons client directory
+        classpath.append(os.ps)
+                 .append(rmHome)
+                 .append(ADDONS_DIR)
+                 .append(os.fs)
+                 .append(ADDONS_CLIENT_DIR)
+                 .append(os.fs)
+                 .append("*");
 
         command.add(classpath.toString());
         command.add(RMNodeStarter.class.getName());
