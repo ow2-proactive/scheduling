@@ -1317,6 +1317,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @RoleNSAdmin
+    public Map<String, NodeSourceDescriptor> getDeployedNodeSources() {
+        return deployedNodeSources.entrySet()
+                                  .stream()
+                                  .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getDescriptor()));
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -2482,6 +2489,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @RoleRead
     public List<RMNode> getFreeNodes() {
         return eligibleNodes;
+    }
+
+    @RoleRead
+    public List<RMNode> getAllNodes() {
+        return new ArrayList<>(allNodes.values());
     }
 
     /**

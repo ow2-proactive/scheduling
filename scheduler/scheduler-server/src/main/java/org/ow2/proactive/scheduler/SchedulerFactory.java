@@ -238,7 +238,7 @@ public class SchedulerFactory {
             logger.debug("Scheduler is now ready to be started!");
             ServerJobAndTaskLogs.getInstance().configure();
         } catch (Exception e) {
-            logger.fatal(e);
+            logger.fatal("Error when creating the scheduler frontend", e);
             e.printStackTrace();
             throw new AdminSchedulerException(e.getMessage());
         }
