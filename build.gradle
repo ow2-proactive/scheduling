@@ -37,7 +37,7 @@ buildscript {
         classpath "org.ow2.proactive:coding-rules:1.0.0"
 
         classpath 'com.github.jk1:gradle-license-report:1.9'
-    classpath "gradle.plugin.net.ossindex:ossindex-gradle-plugin:0.4.11"
+        classpath "gradle.plugin.net.ossindex:ossindex-gradle-plugin:0.4.11"
 
         delete "gradle/ext"
         ant.unjar src: configurations.classpath.find { it.name.startsWith("coding-rules") }, dest: 'gradle/ext'
