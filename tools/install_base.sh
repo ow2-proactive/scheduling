@@ -654,7 +654,14 @@ if which git > /dev/null 2>&1; then
         echo  "Copying addons and data files from the previous installation..."
         echo ""
 
-        rsync $RSYNC_PROGRESS -a $OLD_PADIR/{addons,data,logs} $PA_ROOT/default/
+        if [[ -L $OLD_PADIR/logs ]]; then
+            ln -s $(readlink -f $OLD_PADIR/logs) $PA_ROOT/default/logs
+            rsync $RSYNC_PROGRESS -a $OLD_PADIR/{addons,data} $PA_ROOT/default/
+        else
+            rsync $RSYNC_PROGRESS -a $OLD_PADIR/{addons,data,logs} $PA_ROOT/default/
+        fi
+
+
 
         if confirm "Do you want to port all configuration changes to the new version (do not do this from a version prior to 8.4.0 before executing the patch)? [Y/n] " ; then
             echo  "Porting configuration into new installation..."
