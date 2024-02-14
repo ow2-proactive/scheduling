@@ -359,7 +359,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_JOB_LOGS_PATTERN(
             "pa.scheduler.job.task.output.logs.pattern",
             PropertyType.STRING,
-            "[%X{job.id}t%X{task.id}@%X{host};%d{HH:mm:ss}] %m %n"),
+            "[%X{job.id}t%X{task.id}@%X{host};%X{task.name};%d{HH:mm:ss}] %m %n"),
 
     /** Defines the cron expression for the db sizes polling */
     SCHEDULER_MEM_MONITORING_FREQ("pa.scheduler.mem.monitoring.freq", PropertyType.STRING),
