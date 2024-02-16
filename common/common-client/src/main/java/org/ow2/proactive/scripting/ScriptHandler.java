@@ -61,7 +61,14 @@ public class ScriptHandler implements Serializable {
      * @return a ScriptResult object containing the result.
      */
     public <T> ScriptResult<T> handle(Script<T> script, PrintStream outputSink, PrintStream errorSink) {
+        boolean isGroovy = false;
         try {
+            script.fetchUrlIfNeeded();
+            isGroovy = "groovy".equalsIgnoreCase(script.getEngineName());
+            if (isGroovy) {
+                GroovyClassInfoHandler.increaseGroovyScriptCount();
+            }
+
             return script.execute(additionalBindings, outputSink, errorSink);
         } catch (Throwable t) {
             ScriptException se;
@@ -82,6 +89,10 @@ public class ScriptHandler implements Serializable {
             }
 
             return new ScriptResult<>(se);
+        } finally {
+            if (isGroovy) {
+                GroovyClassInfoHandler.decreaseGroovyScriptCount();
+            }
         }
     }
 
@@ -91,7 +102,7 @@ public class ScriptHandler implements Serializable {
      * @return a ScriptResult object containing the result.
      */
     public <T> ScriptResult<T> handle(Script<T> script) {
-        return script.execute(additionalBindings, System.out, System.err);
+        return this.handle(script, System.out, System.err);
     }
 
     /**

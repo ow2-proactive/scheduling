@@ -6,6 +6,9 @@ dependencies {
     compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
 
     compile project(':common:common-api')
+
+    // this dependency is added to allow groovy class cleanup
+    compile 'org.codehaus.groovy:groovy-all:2.4.21'
 }
 
 task stub(type: StubTask) {
