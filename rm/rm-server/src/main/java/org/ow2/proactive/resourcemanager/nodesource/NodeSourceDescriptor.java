@@ -28,12 +28,16 @@ package org.ow2.proactive.resourcemanager.nodesource;
 import java.io.Serializable;
 import java.util.*;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.core.NodeSourceParameterHelper;
+import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 
 
 /**
  *
  */
+@PublicAPI
 public class NodeSourceDescriptor implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -58,6 +62,10 @@ public class NodeSourceDescriptor implements Serializable {
 
     private Map<String, Serializable> lastRecoveredInfrastructureVariables;
 
+    private transient PluginDescriptor infrastructurePluginDescriptor;
+
+    private transient PluginDescriptor policyPluginDescriptor;
+
     private NodeSourceDescriptor(String name, String infrastructureType, List<Serializable> infrastructureParameters,
             String policyType, List<Serializable> policyParameters, Client provider, boolean nodesRecoverable,
             NodeSourceStatus status, LinkedHashMap<String, String> additionalInformation) {
@@ -72,18 +80,34 @@ public class NodeSourceDescriptor implements Serializable {
         this.additionalInformation = Optional.ofNullable(additionalInformation).orElse(new LinkedHashMap<>());
     }
 
+    /**
+     * The name of this Node Source
+     * @return node source name
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * The class implementation of this Node Source's infrastructure
+     * @return fully qualified class name of the infrastructure class
+     */
     public String getInfrastructureType() {
         return this.infrastructureType;
     }
 
+    /**
+     * The infrastructure parameters as a list of serializable objects
+     * @return list of parameters
+     */
     public List<Serializable> getSerializableInfrastructureParameters() {
         return this.infrastructureParameters;
     }
 
+    /**
+     * The infrastructure parameters as an array
+     * @return array of parameters
+     */
     public Object[] getInfrastructureParameters() {
         if (this.infrastructureParameters != null) {
             return this.infrastructureParameters.toArray();
@@ -92,14 +116,48 @@ public class NodeSourceDescriptor implements Serializable {
         }
     }
 
+    /**
+     * The infrastructure parameters as a map
+     * @return a map where keys are parameter names, and values are parameter values
+     */
+    public Map<String, String> getInfrastructureNamedParameters() {
+        PluginDescriptor infrastructurePluginDescriptor = getInfrastructurePluginDescriptor();
+        Map<String, String> answer = new LinkedHashMap<>(infrastructureParameters.size());
+
+        infrastructurePluginDescriptor.getConfigurableFields()
+                                      .forEach(field -> answer.put(field.getName(), field.getValue()));
+        return answer;
+    }
+
+    /**
+     * Returns the value of a single infrastructure parameter
+     * @param name infrastructure parameter name
+     * @return infrastructure parameter value
+     */
+    public String getInfrastructureParameter(String name) {
+        return getInfrastructureNamedParameters().get(name);
+    }
+
+    /**
+     * The class implementation of this Node Source's policy
+     * @return fully qualified class name of the policy class
+     */
     public String getPolicyType() {
         return this.policyType;
     }
 
+    /**
+     * The policy parameters as a list of serializable objects
+     * @return list of parameters
+     */
     public List<Serializable> getSerializablePolicyParameters() {
         return this.policyParameters;
     }
 
+    /**
+     * The policy parameters as an array
+     * @return array of parameters
+     */
     public Object[] getPolicyParameters() {
         if (this.policyParameters != null) {
             return this.policyParameters.toArray();
@@ -108,22 +166,63 @@ public class NodeSourceDescriptor implements Serializable {
         }
     }
 
+    /**
+     * The policy parameters as a map
+     * @return a map where keys are parameter names, and values are parameter values
+     */
+    public Map<String, String> getPolicyNamedParameters() {
+        PluginDescriptor policyPluginDescriptor = getPolicyPluginDescriptor();
+        Map<String, String> answer = new LinkedHashMap<>(policyParameters.size());
+
+        policyPluginDescriptor.getConfigurableFields().forEach(field -> answer.put(field.getName(), field.getValue()));
+        return answer;
+    }
+
+    /**
+     * Returns the value of a single policy parameter
+     * @param name policy parameter name
+     * @return policy parameter value
+     */
+    public String getPolicyParameter(String name) {
+        return getPolicyNamedParameters().get(name);
+    }
+
+    /**
+     * Returns the owner of this Node Source
+     * @return node source owner
+     */
     public Client getProvider() {
         return this.provider;
     }
 
+    /**
+     * Are the nodes in this Node Source recoverable (e.g. stored in the database, and may be recovered in case of a server crash)
+     * @return recoverable configuration
+     */
     public boolean nodesRecoverable() {
         return this.nodesRecoverable;
     }
 
+    /**
+     * Returns this node source current status (deployed or un-deployed)
+     * @return a status
+     */
     public NodeSourceStatus getStatus() {
         return this.status;
     }
 
+    /**
+     * Returns additional information attached to this Node Source.
+     * This is used only by certain Node Source types (for example an Azure Node Source with billing monitoring  enabled)
+     * @return map of additional information
+     */
     public LinkedHashMap<String, String> getAdditionalInformation() {
         return this.additionalInformation;
     }
 
+    /**
+     * Only used internally
+     */
     public Map<String, Serializable> getLastRecoveredInfrastructureVariables() {
         return this.lastRecoveredInfrastructureVariables;
     }
@@ -138,6 +237,34 @@ public class NodeSourceDescriptor implements Serializable {
 
     public void setPolicyParameters(List<Serializable> policyParameters) {
         this.policyParameters = policyParameters;
+    }
+
+    /**
+     * Returns the infrastructure descriptor, which contains the definition of the infrastructure parameters (name, type, description, etc)
+     * @return infrastructure descriptor
+     */
+    public PluginDescriptor getInfrastructurePluginDescriptor() {
+        if (infrastructurePluginDescriptor == null) {
+            NodeSourceParameterHelper nodeSourceParameterHelper = new NodeSourceParameterHelper();
+            infrastructurePluginDescriptor = nodeSourceParameterHelper.getPluginDescriptor(infrastructureType,
+                                                                                           getInfrastructureParameters(),
+                                                                                           name);
+        }
+        return infrastructurePluginDescriptor;
+    }
+
+    /**
+     * Returns the policy descriptor, which contains the definition of the policy parameters (name, type, description, etc)
+     * @return policy descriptor
+     */
+    public PluginDescriptor getPolicyPluginDescriptor() {
+        if (policyPluginDescriptor == null) {
+            NodeSourceParameterHelper nodeSourceParameterHelper = new NodeSourceParameterHelper();
+            policyPluginDescriptor = nodeSourceParameterHelper.getPluginDescriptor(policyType,
+                                                                                   getPolicyParameters(),
+                                                                                   name);
+        }
+        return policyPluginDescriptor;
     }
 
     public static class Builder {
