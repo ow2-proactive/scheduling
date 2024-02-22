@@ -35,7 +35,7 @@ import com.google.common.base.Strings;
 
 public class LDAPDomainConfiguration {
 
-    Logger logger;
+    Logger logger = Logger.getLogger(LDAPDomainConfiguration.class);
 
     /** boolean defining whether connection polling has to be used */
     private final String ldapConnectionPooling;
@@ -155,10 +155,10 @@ public class LDAPDomainConfiguration {
      */
     private boolean alreadyDefined(String propertyName, String propertyValue) {
 
-        if (propertyName != null && propertyName.length() != 0) {
+        if (!Strings.isNullOrEmpty(propertyName)) {
             String definedPropertyValue = System.getProperty(propertyName);
 
-            if (System.getProperty(propertyName) != null && !definedPropertyValue.equals(propertyValue)) {
+            if (definedPropertyValue != null && !definedPropertyValue.equals(propertyValue)) {
                 logger.debug("Property " + propertyName + " is already defined");
                 logger.debug("Using old value " + propertyValue);
                 return true;
