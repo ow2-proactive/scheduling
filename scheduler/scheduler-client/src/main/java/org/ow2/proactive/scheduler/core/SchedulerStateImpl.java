@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -56,13 +59,13 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public final class SchedulerStateImpl<T extends JobState> implements SchedulerState<T> {
 
     /** Pending jobs */
-    private Set<T> pendingJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
+    private Set<T> pendingJobs;
 
     /** Running jobs */
-    private Set<T> runningJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
+    private Set<T> runningJobs;
 
     /** Finished jobs */
-    private Map<JobId, T> finishedJobs = Collections.synchronizedMap(new LinkedHashMap<JobId, T>());
+    private Map<JobId, T> finishedJobs;
 
     /**
      * Used to control the maximum size of finished jobs. This is mostly used for test compatibility,
@@ -97,6 +100,10 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      * ProActive Empty constructor.
      */
     public SchedulerStateImpl() {
+        pendingJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
+        runningJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
+        finishedJobs = Collections.synchronizedMap(new LinkedHashMap<JobId, T>());
+
         initMaxFinishedJobs();
     }
 
@@ -244,6 +251,16 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
             }
         }
         ssi.setFinishedJobs(tmp);
+        return ssi;
+    }
+
+    public SchedulerStateImpl copy() {
+        SchedulerStateImpl ssi = new SchedulerStateImpl();
+        ssi.setState(getStatus());
+        ssi.setUsers(getUsers());
+        ssi.setPendingJobs(getPendingJobs());
+        ssi.setRunningJobs(getRunningJobs());
+        ssi.setFinishedJobs(getFinishedJobs());
         return ssi;
     }
 
@@ -422,6 +439,26 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
                 }
             }
         }
+    }
+
+    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
+        setPendingJobs((Vector<T>) aInputStream.readObject());
+        setRunningJobs((Vector<T>) aInputStream.readObject());
+        setFinishedJobs((Vector<T>) aInputStream.readObject());
+        status = (SchedulerStatus) aInputStream.readObject();
+        setUsers((SchedulerUsers) aInputStream.readObject());
+        jobs = (Map<JobId, T>) aInputStream.readObject();
+        initialized = (boolean) aInputStream.readObject();
+    }
+
+    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
+        aOutputStream.writeObject(getPendingJobs());
+        aOutputStream.writeObject(getRunningJobs());
+        aOutputStream.writeObject(getFinishedJobs());
+        aOutputStream.writeObject(status);
+        aOutputStream.writeObject(sUsers);
+        aOutputStream.writeObject(new HashMap<>(jobs));
+        aOutputStream.writeObject(initialized);
     }
 
 }

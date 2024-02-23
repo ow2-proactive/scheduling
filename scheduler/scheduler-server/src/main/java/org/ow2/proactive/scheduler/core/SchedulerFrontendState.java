@@ -400,7 +400,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
         return Lambda.withLock(stateReadLock,
                                () -> myJobsOnly ? schedulerState.filterOnUser(ui.getUser().getUsername())
-                                                : schedulerState);
+                                                : schedulerState.copy());
 
     }
 
