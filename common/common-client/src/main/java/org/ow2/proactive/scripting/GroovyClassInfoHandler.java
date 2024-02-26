@@ -26,10 +26,7 @@
 package org.ow2.proactive.scripting;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -153,7 +150,7 @@ public class GroovyClassInfoHandler {
             int count = runningTasksCount.decrementAndGet();
             if (count == 0 && isLastCleanupNotDoneRecently()) {
                 lastGroovyClassCleanup.set(System.currentTimeMillis());
-                List<ClassInfo> classInfoList = new ArrayList(ClassInfo.getAllClassInfo());
+                List<ClassInfo> classInfoList = getAllClassInfo();
                 classInfoListReference.compareAndSet(null,
                                                      classInfoList.stream()
                                                                   .filter(ci -> checkClassInfoName(ci))
@@ -166,8 +163,24 @@ public class GroovyClassInfoHandler {
             }
         } catch (InterruptedException e) {
             logger.warn("GroovyClassInfoHandler increaseTaskCount interrupted");
+        } catch (Throwable e) {
+            logger.error("Error when analysing groovy classes", e);
         } finally {
             lock.unlock();
+        }
+    }
+
+    private static List<ClassInfo> getAllClassInfo() {
+        try {
+            Collection<ClassInfo> classInfo = ClassInfo.getAllClassInfo();
+            if (classInfo != null) {
+                return new ArrayList<>(classInfo);
+            } else {
+                return new ArrayList<>();
+            }
+        } catch (Throwable e) {
+            logger.error("Error when reading class info", e);
+            return new ArrayList<>();
         }
     }
 
@@ -175,7 +188,7 @@ public class GroovyClassInfoHandler {
         try {
             return classInfo.getTheClass().getName().startsWith(GROOVY_SCRIPT_CLASS_PREFIX);
         } catch (Throwable e) {
-            logger.debug("Error when reading class info", e);
+            logger.error("Error when reading class info", e);
             return false;
         }
     }
@@ -188,7 +201,7 @@ public class GroovyClassInfoHandler {
             ConcurrentHashMap<String, Object> parallelLockMap = (ConcurrentHashMap<String, Object>) parallelLockMapField.get(classLoader);
             return parallelLockMap;
         } catch (Throwable e) {
-            logger.debug("Error when reading parallel lock field", e);
+            logger.error("Error when reading parallel lock field", e);
             return new ConcurrentHashMap<>();
         }
     }
@@ -197,7 +210,7 @@ public class GroovyClassInfoHandler {
         try {
             ConcurrentHashMap<String, Object> parallelLockMap = getParallelLockField();
             Set<String> currentLockKeys = new HashSet<>(parallelLockMap.keySet());
-            return currentLockKeys.stream().filter(key -> isGroovyKey(key)).collect(Collectors.toSet());
+            return currentLockKeys.stream().filter(key -> key != null && isGroovyKey(key)).collect(Collectors.toSet());
         } catch (Throwable e) {
             logger.error("Error when analysing class loader", e);
             return new HashSet<>();
@@ -216,7 +229,7 @@ public class GroovyClassInfoHandler {
                 parallelLockMap.remove(key);
             }
         } catch (Exception e) {
-            logger.error("Error when removing parallel key", e);
+            logger.error("Error when removing parallel keys", e);
         }
     }
 
@@ -228,29 +241,35 @@ public class GroovyClassInfoHandler {
     private static void cleanClassInfo() {
         List<ClassInfo> classInfoList = classInfoListReference.getAndSet(null);
         if (classInfoList != null) {
-            int classesRemoved = 0;
-            long start = System.currentTimeMillis();
-            for (ClassInfo ci : classInfoList) {
-                Class clazz = ci.getTheClass();
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Removing class " + clazz.getName());
+            try {
+                int classesRemoved = 0;
+                long start = System.currentTimeMillis();
+                for (ClassInfo ci : classInfoList) {
+                    Class clazz = ci.getTheClass();
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Removing class " + clazz.getName());
+                    }
+                    try {
+                        InvokerHelper.removeClass(clazz);
+                        classesRemoved++;
+                    } catch (Throwable e) {
+                        logger.warn("Error when cleaning groovy classes", e);
+                    }
                 }
-                try {
-                    InvokerHelper.removeClass(clazz);
-                    classesRemoved++;
-                } catch (Throwable e) {
-                    logger.warn("Error when cleaning groovy classes", e);
+                if (classesRemoved > 0) {
+                    // this is very important, without calling it, the same classes will be detected again
+                    // note that System.gc() will likely be running asynchronously in a separate thread.
+                    System.gc();
+                    // removal of parallel lock keys is performed after System.gc() (in case these keys are used by the garbage collection).
+                    Set<String> keysToRemove = parallelLockKeysReference.getAndSet(null);
+                    if (keysToRemove != null) {
+                        removeGroovyKeys(keysToRemove);
+                    }
+                    logger.info("Removed " + classesRemoved + " groovy classes info and " + keysToRemove.size() +
+                                " groovy keys in " + (System.currentTimeMillis() - start) + " ms.");
                 }
-            }
-            if (classesRemoved > 0) {
-                // this is very important, without calling it, the same classes will be detected again
-                // note that System.gc() will likely be running asynchronously in a separate thread.
-                System.gc();
-                // removal of parallel lock keys is performed after System.gc() (in case these keys are used by the garbage collection).
-                Set<String> keysToRemove = parallelLockKeysReference.getAndSet(null);
-                removeGroovyKeys(keysToRemove);
-                logger.info("Removed " + classesRemoved + " groovy classes info and " + keysToRemove.size() +
-                            " groovy keys in " + (System.currentTimeMillis() - start) + " ms.");
+            } catch (Throwable e) {
+                logger.error("Error when cleaning groovy classes", e);
             }
         }
     }
