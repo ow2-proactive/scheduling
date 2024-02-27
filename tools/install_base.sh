@@ -84,8 +84,13 @@ reuse_accounts()
 
     echo "Retrieving keystore files from previous scheduler installation"
     /bin/cp $OLD_PADIR/config/web/keystore $PA_ROOT/default/config/web/
+
+    echo "Retrieving truststore files from previous scheduler installation"
     if [ -f $OLD_PADIR/config/web/truststore ]; then
         /bin/cp $OLD_PADIR/config/web/truststore $PA_ROOT/default/config/web/
+    fi
+    if [ -f $OLD_PADIR/config/authentication/truststore ]; then
+        /bin/cp $OLD_PADIR/config/authentication/truststore $PA_ROOT/default/config/authentication/
     fi
 
     update_node_jars
@@ -204,6 +209,7 @@ config/authentication/*.cred
 config/authentication/login.cfg
 config/authentication/group.cfg
 config/authentication/keys/*.key
+config/authentication/truststore
 config/web/keystore
 config/web/truststore
     ' > .gitignore
