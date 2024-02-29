@@ -39,7 +39,7 @@ import org.codehaus.groovy.reflection.ClassInfo;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 
-import com.sun.crypto.provider.Preconditions;
+import jdk.nashorn.api.scripting.NashornScriptEngine;
 
 
 /**
@@ -177,8 +177,8 @@ public class GroovyClassInfoHandler {
     }
 
     private static ClassLoader getExtClassLoader() {
-        // Preconditions is one of the rare classes loaded by the extension class loader.
-        return Preconditions.class.getClassLoader();
+        // NashornScriptEngine is one of the rare classes loaded by the extension class loader.
+        return NashornScriptEngine.class.getClassLoader();
     }
 
     private static List<ClassInfo> getAllClassInfo() {
