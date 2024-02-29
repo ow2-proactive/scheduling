@@ -39,6 +39,8 @@ import org.codehaus.groovy.reflection.ClassInfo;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 
+import com.sun.crypto.provider.Preconditions;
+
 
 /**
  * This class handles the cleanup of groovy classes in the system class loader
@@ -102,7 +104,9 @@ public class GroovyClassInfoHandler {
     // shared object between
     private static AtomicReference<List<ClassInfo>> classInfoListReference = new AtomicReference<>();
 
-    private static AtomicReference<Set<String>> parallelLockKeysReference = new AtomicReference<>();
+    private static AtomicReference<Set<String>> parallelLockKeysInAppClassLoaderReference = new AtomicReference<>();
+
+    private static AtomicReference<Set<String>> parallelLockKeysInExtClassLoaderReference = new AtomicReference<>();
 
     private static boolean ENABLED = false;
 
@@ -156,10 +160,12 @@ public class GroovyClassInfoHandler {
                                                                   .filter(ci -> checkClassInfoName(ci))
                                                                   .collect(Collectors.toList()));
                 logger.debug("All classes count: " + classInfoList.size());
-                Set<String> groovyKeys = readParallelLockKeys();
-                parallelLockKeysReference.compareAndSet(null, readParallelLockKeys());
+                Set<String> groovySystemKeys = readParallelLockKeys(ClassLoader.getSystemClassLoader());
+                parallelLockKeysInAppClassLoaderReference.compareAndSet(null, groovySystemKeys);
+                Set<String> groovyExtKeys = readParallelLockKeys(getExtClassLoader());
+                parallelLockKeysInExtClassLoaderReference.compareAndSet(null, groovyExtKeys);
 
-                logger.debug("Groovy keys count: " + groovyKeys.size());
+                logger.debug("Groovy keys count: " + groovySystemKeys.size() + groovyExtKeys.size());
             }
         } catch (InterruptedException e) {
             logger.warn("GroovyClassInfoHandler increaseTaskCount interrupted");
@@ -168,6 +174,11 @@ public class GroovyClassInfoHandler {
         } finally {
             lock.unlock();
         }
+    }
+
+    private static ClassLoader getExtClassLoader() {
+        // Preconditions is one of the rare classes loaded by the extension class loader.
+        return Preconditions.class.getClassLoader();
     }
 
     private static List<ClassInfo> getAllClassInfo() {
@@ -193,9 +204,8 @@ public class GroovyClassInfoHandler {
         }
     }
 
-    private static ConcurrentHashMap<String, Object> getParallelLockField() {
+    private static ConcurrentHashMap<String, Object> getParallelLockField(ClassLoader classLoader) {
         try {
-            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
             Field parallelLockMapField = ClassLoader.class.getDeclaredField(PARALLEL_LOCK_MAP_FIELD_NAME);
             parallelLockMapField.setAccessible(true);
             ConcurrentHashMap<String, Object> parallelLockMap = (ConcurrentHashMap<String, Object>) parallelLockMapField.get(classLoader);
@@ -206,11 +216,14 @@ public class GroovyClassInfoHandler {
         }
     }
 
-    private static Set<String> readParallelLockKeys() {
+    private static Set<String> readParallelLockKeys(ClassLoader classLoader) {
         try {
-            ConcurrentHashMap<String, Object> parallelLockMap = getParallelLockField();
+            ConcurrentHashMap<String, Object> parallelLockMap = getParallelLockField(classLoader);
             Set<String> currentLockKeys = new HashSet<>(parallelLockMap.keySet());
-            return currentLockKeys.stream().filter(key -> key != null && isGroovyKey(key)).collect(Collectors.toSet());
+            Set<String> groovyKeys = currentLockKeys.stream()
+                                                    .filter(key -> key != null && isGroovyKey(key))
+                                                    .collect(Collectors.toSet());
+            return groovyKeys;
         } catch (Throwable e) {
             logger.error("Error when analysing class loader", e);
             return new HashSet<>();
@@ -222,14 +235,16 @@ public class GroovyClassInfoHandler {
                key.matches(BEAN_INFO_REGEXP);
     }
 
-    private static void removeGroovyKeys(Set<String> keys) {
+    private static int removeGroovyKeys(Set<String> keys, ClassLoader classLoader) {
         try {
-            ConcurrentHashMap<String, Object> parallelLockMap = getParallelLockField();
+            ConcurrentHashMap<String, Object> parallelLockMap = getParallelLockField(classLoader);
             for (String key : keys) {
                 parallelLockMap.remove(key);
             }
+            return parallelLockMap.size();
         } catch (Exception e) {
             logger.error("Error when removing parallel keys", e);
+            return 0;
         }
     }
 
@@ -260,13 +275,25 @@ public class GroovyClassInfoHandler {
                     // this is very important, without calling it, the same classes will be detected again
                     // note that System.gc() will likely be running asynchronously in a separate thread.
                     System.gc();
+                    int remainingKeys = 0;
+                    int removedKeys = 0;
                     // removal of parallel lock keys is performed after System.gc() (in case these keys are used by the garbage collection).
-                    Set<String> keysToRemove = parallelLockKeysReference.getAndSet(null);
+                    Set<String> keysToRemove = parallelLockKeysInAppClassLoaderReference.getAndSet(null);
                     if (keysToRemove != null) {
-                        removeGroovyKeys(keysToRemove);
+                        removedKeys += keysToRemove.size();
+                        remainingKeys += removeGroovyKeys(keysToRemove, ClassLoader.getSystemClassLoader());
                     }
-                    logger.info("Removed " + classesRemoved + " groovy classes info and " + keysToRemove.size() +
-                                " groovy keys in " + (System.currentTimeMillis() - start) + " ms.");
+                    keysToRemove = parallelLockKeysInExtClassLoaderReference.getAndSet(null);
+                    if (keysToRemove != null) {
+                        removedKeys += keysToRemove.size();
+                        remainingKeys += removeGroovyKeys(keysToRemove, getExtClassLoader());
+                    }
+
+                    logger.info(String.format("Removed %d groovy classes info and %d groovy keys (with %d remaining) in %d ms.",
+                                              classesRemoved,
+                                              removedKeys,
+                                              remainingKeys,
+                                              (System.currentTimeMillis() - start)));
                 }
             } catch (Throwable e) {
                 logger.error("Error when cleaning groovy classes", e);
