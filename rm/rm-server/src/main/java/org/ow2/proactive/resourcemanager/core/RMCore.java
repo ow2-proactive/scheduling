@@ -352,8 +352,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public RMCore(String id, Node nodeRM) throws ActiveObjectCreationException, NodeException {
         this.id = id;
         this.nodeRM = nodeRM;
-        this.deployedNodeSources = new ConcurrentHashMap<>();
-        this.definedNodeSources = new ConcurrentHashMap<>();
+        this.deployedNodeSources = new HashMap<>();
+        this.definedNodeSources = new HashMap<>();
         this.allNodes = new ConcurrentHashMap<>();
         this.delayedNodeSourceRemovalEvents = new ConcurrentHashMap<>();
         this.delayedNodeSourceUndeploying = new ConcurrentHashMap<>();
@@ -767,9 +767,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return total number of alive nodes
      */
     @RoleRead
-    @ImmediateService
     public int getTotalAliveNodesNumber() {
-        checkPermissionAndGetClientIsSuccessful();
         return listAliveNodeUrls().size();
     }
 
@@ -835,9 +833,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @RoleRead
-    @ImmediateService
     public String getId() {
-        checkPermissionAndGetClientIsSuccessful();
         return this.id;
     }
 
@@ -1142,11 +1138,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodeUrl the tested node.
      * @return true if the node nodeUrl is registered.
      */
-    @Override
     @RoleRead
-    @ImmediateService
     public BooleanWrapper nodeIsAvailable(String nodeUrl) {
-        checkPermissionAndGetClientIsSuccessful();
         final RMNode node = this.allNodes.get(nodeUrl);
         return new BooleanWrapper(node != null && !node.isDown());
     }
@@ -1241,29 +1234,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @RoleRead
-    @ImmediateService
     public NodeState getNodeState(String nodeUrl) {
-        checkPermissionAndGetClientIsSuccessful();
         RMNode node = this.allNodes.get(nodeUrl);
         if (node == null) {
             throw new IllegalArgumentException("Unknown node " + nodeUrl);
         }
         return node.getState();
-    }
-
-    @RoleRead
-    @ImmediateService
-    public List<NodeState> getNodeStates(List<String> nodeUrlList) {
-        checkPermissionAndGetClientIsSuccessful();
-        List<NodeState> nodeStates = new ArrayList<>();
-        for (String nodeUrl : nodeUrlList) {
-            RMNode node = this.allNodes.get(nodeUrl);
-            if (node == null) {
-                throw new IllegalArgumentException("Unknown node " + nodeUrl);
-            }
-            nodeStates.add(node.getState());
-        }
-        return nodeStates;
     }
 
     /**
@@ -2086,9 +2062,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     @RoleRead
-    @ImmediateService
     public RMInitialState getRMInitialState() {
-        checkPermissionAndGetClientIsSuccessful();
 
         final Map<String, RMNodeEvent> nodeEvents = this.allNodes.values()
                                                                  .stream()
@@ -2133,11 +2107,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Gets RM monitoring stub
      */
-    @Override
-    @RoleRead
     @ImmediateService
+    @RoleRead
     public RMMonitoring getMonitoring() {
-        checkPermissionAndGetClientIsSuccessful();
         try {
             // return the stub on RMMonitoring interface to keep avoid using server class on client side
             return PAActiveObject.lookupActive(RMMonitoring.class, PAActiveObject.getUrl(monitoring));
@@ -2205,9 +2177,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Set<String> listAliveNodeUrls() {
-        checkPermissionAndGetClientIsSuccessful();
         HashSet<String> aliveNodes = new HashSet<>();
         for (RMNode node : this.allNodes.values()) {
             if (!node.isDown()) {
@@ -2219,9 +2189,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames) {
-        checkPermissionAndGetClientIsSuccessful();
         HashSet<String> aliveNodes = new HashSet<>();
         for (String nodeSource : nodeSourceNames) {
             if (this.deployedNodeSources.containsKey(nodeSource)) {
@@ -2235,9 +2203,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Set<String> listNodeUrls() {
-        checkPermissionAndGetClientIsSuccessful();
         return this.allNodes.keySet();
     }
 
@@ -2499,9 +2465,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @RoleRead
-    @ImmediateService
     public void registerAndEmitNodeEvent(final RMNodeEvent event) {
-        checkPermissionAndGetClientIsSuccessful();
         this.monitoring.nodeEvent(event);
     }
 
@@ -2523,40 +2487,20 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @RoleRead
-    @ImmediateService
     public List<RMNode> getFreeNodes() {
-        checkPermissionAndGetClientIsSuccessful();
-        return new ArrayList<>(eligibleNodes);
+        return eligibleNodes;
     }
 
     @RoleRead
-    @ImmediateService
-    public List<RMNode> getBusyNodes() {
-        checkPermissionAndGetClientIsSuccessful();
-        List<RMNode> busyNodesList = new ArrayList();
-        for (RMNode node : allNodes.values()) {
-            if (node.isBusy() || node.isToRemove()) {
-                busyNodesList.add(node);
-            }
-        }
-        return busyNodesList;
-    }
-
-    @RoleRead
-    @ImmediateService
     public List<RMNode> getAllNodes() {
-        checkPermissionAndGetClientIsSuccessful();
         return new ArrayList<>(allNodes.values());
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     @RoleRead
-    @ImmediateService
     public IntWrapper getNodeSourcePingFrequency(String sourceName) {
-        checkPermissionAndGetClientIsSuccessful();
         if (this.deployedNodeSources.containsKey(sourceName)) {
             return this.deployedNodeSources.get(sourceName).getPingFrequency();
         } else {
@@ -2582,11 +2526,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @return list of existing Node Sources
      */
-    @Override
     @RoleRead
-    @ImmediateService
     public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
-        checkPermissionAndGetClientIsSuccessful();
         return getRMInitialState().getNodeSourceEvents();
     }
 
@@ -2595,9 +2536,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Deprecated
     @RoleRead
-    @ImmediateService
     public List<RMNodeEvent> getNodesList() {
-        checkPermissionAndGetClientIsSuccessful();
         return getRMInitialState().getNodeEvents();
     }
 
@@ -2686,11 +2625,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    @Override
     @RoleRead
-    @ImmediateService
     public RMState getState() {
-        checkPermissionAndGetClientIsSuccessful();
         RMStateNodeUrls rmStateNodeUrls = new RMStateNodeUrls(nodesListToUrlsSet(eligibleNodes),
                                                               listAliveNodeUrls(),
                                                               nodesListToUrlsSet(allNodes.values()));
@@ -2699,9 +2635,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @RoleRead
-    @ImmediateService
     public List<String> getToBeRemovedUnavailableNodesUrls() {
-        checkPermissionAndGetClientIsSuccessful();
 
         List<String> unavailableNodesUrl = new LinkedList<>();
 
@@ -2748,12 +2682,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     protected Client checkPermissionAndGetClientIsSuccessful() {
         final Request currentRequest = PAActiveObject.getContext().getCurrentRequest();
-        if (currentRequest != null) {
-            return checkMethodCallPermission(currentRequest.getMethodCall().getReifiedMethod(),
-                                             currentRequest.getSourceBodyID());
-        } else {
-            return null;
-        }
+        return checkMethodCallPermission(currentRequest.getMethodCall().getReifiedMethod(),
+                                         currentRequest.getSourceBodyID());
     }
 
     /**
@@ -2804,22 +2734,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    @Override
     @RoleRead
-    @ImmediateService
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
-        checkPermissionAndGetClientIsSuccessful();
         return this.nodeSourceParameterHelper.getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     @RoleRead
-    @ImmediateService
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
-        checkPermissionAndGetClientIsSuccessful();
         return this.nodeSourceParameterHelper.getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
     }
 
@@ -2828,9 +2752,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Override
     @RoleRead
-    @ImmediateService
     public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName) {
-        checkPermissionAndGetClientIsSuccessful();
 
         NodeSource nodeSource = getDefinedNodeSourceOrFail(nodeSourceName);
 
@@ -2980,14 +2902,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    @Override
     @RoleRead
-    @ImmediateService
     public Topology getTopology() {
         if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             throw new TopologyException("Topology is disabled");
         }
-        checkPermissionAndGetClientIsSuccessful();
         return topologyManager.getTopology();
     }
 
@@ -3503,9 +3422,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public boolean areNodesKnown(NodeSet nodes) {
-        checkPermissionAndGetClientIsSuccessful();
         Set<String> nodesURL = nodes.getAllNodesUrls();
         if (logger.isDebugEnabled()) {
             logger.debug("Check whether RM knows nodes URL: " + Arrays.toString(nodesURL.toArray()));
@@ -3524,9 +3441,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Map<String, Boolean> areNodesRecoverable(NodeSet nodes) {
-        checkPermissionAndGetClientIsSuccessful();
         Map<String, Boolean> answer = new HashMap<>(nodes.size());
         Set<String> nodesURL = nodes.getAllNodesUrls();
 
@@ -3551,9 +3466,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Map<String, List<String>> getInfrasToPoliciesMapping() {
-        checkPermissionAndGetClientIsSuccessful();
         Map<String, List<String>> mapping = new HashMap<>();
         String fileName = null;
         try {
@@ -3580,9 +3493,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd) {
-        checkPermissionAndGetClientIsSuccessful();
         List<NodeHistory> nodesHistory = dbManager.getNodesHistory(windowStart, windowEnd);
 
         return nodesHistory.stream().map(nodeHistory -> {
@@ -3668,9 +3579,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public List<String> getNodeTokens(String nodeUrl) throws RMException {
-        checkPermissionAndGetClientIsSuccessful();
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
             return rmNode.getNodeTokens();
@@ -3681,9 +3590,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Map<String, List<String>> getAllNodesTokens() throws RMException {
-        checkPermissionAndGetClientIsSuccessful();
         Map<String, List<String>> allNodesTokens = new LinkedHashMap<>(allNodes.size());
         for (Map.Entry<String, RMNode> entry : allNodes.entrySet()) {
             allNodesTokens.put(entry.getKey(), entry.getValue().getNodeTokens());
@@ -3693,9 +3600,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Map<String, List<String>> getAllEligibleNodesTokens() throws RMException {
-        checkPermissionAndGetClientIsSuccessful();
         Map<String, List<String>> allNodesTokens = new LinkedHashMap<>(eligibleNodes.size());
         for (RMNode rmNode : eligibleNodes) {
             allNodesTokens.put(rmNode.getNodeURL(), rmNode.getNodeTokens());
@@ -3705,9 +3610,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Set<String> getNodeTags(String nodeUrl) throws RMException {
-        checkPermissionAndGetClientIsSuccessful();
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
             return rmNode.getNodeTags();
@@ -3718,9 +3621,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Set<String> getNodesByTag(String tag) {
-        checkPermissionAndGetClientIsSuccessful();
         Set<String> result = new HashSet<>();
         for (RMNode rmNode : this.allNodes.values()) {
             if (rmNode.getNodeTags().contains(tag)) {
@@ -3732,9 +3633,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleRead
-    @ImmediateService
     public Set<String> getNodesByTags(Set<String> tags, boolean all) {
-        checkPermissionAndGetClientIsSuccessful();
         Set<String> result = new HashSet<>();
         for (RMNode rmNode : this.allNodes.values()) {
             if (all) {
