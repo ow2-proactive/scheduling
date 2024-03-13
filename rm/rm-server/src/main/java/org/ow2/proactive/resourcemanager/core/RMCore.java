@@ -2496,6 +2496,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new ArrayList<>(allNodes.values());
     }
 
+    @RoleRead
+    public List<RMNode> getBusyNodes() {
+        List<RMNode> busyNodesList = new ArrayList();
+        for (RMNode node : allNodes.values()) {
+            if (node.isBusy() || node.isToRemove()) {
+                busyNodesList.add(node);
+            }
+        }
+        return busyNodesList;
+    }
+
     /**
      * {@inheritDoc}
      */
