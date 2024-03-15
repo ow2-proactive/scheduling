@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.FileObject;
@@ -83,6 +84,8 @@ public class DataSpaceServiceStarter implements Serializable {
     private static final String DEFAULT_LOCAL_SCRATCH = DEFAULT_LOCAL + File.separator + "scratch";
 
     private Map<String, HashSet<String>> spacesConfigurations = new ConcurrentHashMap<>();
+
+    private Map<String, ReentrantLock> userSpaceFolderLocks = new ConcurrentHashMap<>();
 
     /**
      * Naming service
@@ -356,12 +359,21 @@ public class DataSpaceServiceStarter implements Serializable {
         String[] urlsArray = Tools.dataSpaceConfigPropertyToUrls(urls);
 
         // create a local folder with the username
-
         if (localpath != null) {
             DefaultFileSystemManager manager = VFSFactory.createDefaultFileSystemManager(userCredentials);
             try {
-                FileObject folder = manager.resolveFile(urlsArray[0] + "/" + username);
-                folder.createFolder();
+                ReentrantLock tmpLock = new ReentrantLock();
+                ReentrantLock returnedLock = userSpaceFolderLocks.putIfAbsent(username, tmpLock);
+                ReentrantLock lock = returnedLock != null ? returnedLock : tmpLock;
+                try {
+                    lock.lockInterruptibly();
+                    FileObject folder = manager.resolveFile(urlsArray[0] + "/" + username);
+                    folder.createFolder();
+                } catch (InterruptedException e) {
+                    logger.warn("Interrupted while creating user space folder", e);
+                } finally {
+                    lock.unlock();
+                }
             } finally {
                 manager.close();
             }
