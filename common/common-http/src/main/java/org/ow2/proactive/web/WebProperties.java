@@ -103,7 +103,7 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER, "400"),
 
-    WEB_IDLE_TIMEOUT("web.idle_timeout", PropertyType.INTEGER, "120000"),
+    WEB_IDLE_TIMEOUT("web.idle_timeout", PropertyType.INTEGER, "240000"),
 
     WEB_REQUEST_HEADER_SIZE("web.request_header_size", PropertyType.INTEGER, "16384"),
 
@@ -117,7 +117,7 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_QOS_FILTER_PATHS("web.qos.filter.paths", PropertyType.LIST, "/node.jar"),
 
-    WEB_QOS_FILTER_MAX_REQUESTS("web.qos.filter.max.requests", PropertyType.INTEGER, "1"),
+    WEB_QOS_FILTER_MAX_REQUESTS("web.qos.filter.max.requests", PropertyType.INTEGER, "2"),
 
     WEB_X_FRAME_OPTIONS("web.x_frame_options", PropertyType.STRING, "SAMEORIGIN"),
 
