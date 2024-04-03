@@ -132,6 +132,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Resource Manager ldap configuration file */
     RM_LDAP_CONFIG("pa.rm.ldap.config.path", PropertyType.STRING, "config/authentication/ldap.cfg"),
 
+    /** Resource Manager Keycloak configuration file path */
+    RM_KEYCLOAK_CONFIG("pa.rm.keycloak.config.path", PropertyType.STRING, "config/authentication/keycloak.cfg"),
+
     /**
      * Support for multi-ldap login configuration.
      * This property must be defined using a list of the following form:
