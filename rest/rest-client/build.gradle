@@ -5,8 +5,8 @@ dependencies {
     compile 'commons-io:commons-io:2.7'
     compile 'jline:jline:2.14.2'
 
-    compile 'org.apache.httpcomponents:httpclient:4.5.13'
-    compile 'org.apache.httpcomponents:httpmime:4.5.13'
+    compile 'org.apache.httpcomponents:httpclient:4.5.14'
+    compile 'org.apache.httpcomponents:httpmime:4.5.14'
     compile 'org.atmosphere:wasync:2.1.7'
 
     compile project(":common:common-api")
