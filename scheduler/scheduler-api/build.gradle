@@ -7,9 +7,9 @@ dependencies {
     compile 'msv:msv:20050913'
     compile 'commons-io:commons-io:2.7'
     compile group: 'org.springframework', name: 'spring-expression', version: '4.3.30.RELEASE'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.4'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.4'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.16.1'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.16.1'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.1'
     compile 'com.googlecode.json-simple:json-simple:1.1'
 
     compile 'joda-time:joda-time:2.9.1'
