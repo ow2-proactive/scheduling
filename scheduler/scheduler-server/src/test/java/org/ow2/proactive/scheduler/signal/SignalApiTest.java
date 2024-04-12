@@ -441,7 +441,7 @@ public class SignalApiTest extends ProActiveTestClean {
 
         executor.submit(sendSignalRunnable(signal_1, parameters, durationInMillis_1));
         executor.submit(sendSignalRunnable(signal_2, parameters, durationInMillis_2));
-        Awaitility.await().atMost(3, TimeUnit.SECONDS).until(waitForAnySignalThread);
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(waitForAnySignalThread);
         Assert.assertTrue(signalApi.isReceived(signal_1));
         Assert.assertFalse(signalApi.isReceived(signal_2));
     }

@@ -174,7 +174,7 @@ class LoadPackage {
             def tags = packageMetadataMap.get("tags")
 
             // For POST queries
-            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.13.jar").absolutePath);
+            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.14.jar").absolutePath);
             def boundary = "---------------" + UUID.randomUUID().toString();
 
             // Create part of the POST query
@@ -198,7 +198,7 @@ class LoadPackage {
             def projectName = packageMetadataMap.get("projectName")
 
             // Create part of the POST query
-            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.13.jar").absolutePath);
+            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.14.jar").absolutePath);
             def boundary = "---------------" + UUID.randomUUID().toString();
             def pushObjectQuery = this.CATALOG_URL + "/buckets/" + bucketName + "/resources/"+ objectName + "/revisions?commitMessage=" + commitMessageEncoded
             if(projectName != null) {
