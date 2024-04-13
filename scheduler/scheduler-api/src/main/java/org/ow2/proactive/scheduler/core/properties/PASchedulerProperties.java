@@ -188,6 +188,14 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_LDAP_CONFIG_FILE_PATH("pa.scheduler.ldap.config.path", PropertyType.STRING, "config/authentication/ldap.cfg"),
 
     /**
+     * Keycloak configuration file path, used to set Keycloak configuration properties
+     * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
+     * with the variable defined below : pa.scheduler.home.
+     * else, the path is absolute, so the path is directly interpreted
+     */
+    SCHEDULER_KEYCLOAK_CONFIG_FILE_PATH("pa.scheduler.keycloak.config.path", PropertyType.STRING, "config/authentication/keycloak.cfg"),
+
+    /**
      * Support for multi-ldap login configuration.
      * This property must be defined using a list of the following form:
      * domain1:path_to_domain1.cfg,domain2:path_to_domain2.cfg, etc

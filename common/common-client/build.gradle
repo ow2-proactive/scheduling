@@ -5,6 +5,8 @@ dependencies {
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
 
+    compile "org.keycloak:keycloak-adapter-core:24.0.2"
+
     compile project(':common:common-api')
 
     // this dependency is added to allow groovy class cleanup
