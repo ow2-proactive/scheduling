@@ -468,9 +468,12 @@ public class RMNodeStarter {
         configureSecurityManager();
         configureRMAndProActiveHomes();
         configureProActiveDefaultConfigurationFile();
-        loadSigarIfRunningWithOneJar();
 
         String nodeName = parseCommandLine(args);
+
+        if (!disabledMonitoring) {
+            loadSigarIfRunningWithOneJar();
+        }
 
         configureLogging(nodeName);
 
