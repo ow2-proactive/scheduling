@@ -498,8 +498,8 @@ public class Job2XMLTransformer {
             setAttribute(taskE, XMLAttributes.TASK_RUN_AS_ME, "true");
         }
 
-        if (task.isFork() != null && task.isFork()) {
-            setAttribute(taskE, XMLAttributes.TASK_FORK, "true");
+        if (task.isFork() != null) {
+            setAttribute(taskE, XMLAttributes.TASK_FORK, "" + task.isFork());
         }
 
         if (task.isPreciousResult()) {
