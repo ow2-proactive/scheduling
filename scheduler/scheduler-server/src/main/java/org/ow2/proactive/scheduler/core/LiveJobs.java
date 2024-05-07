@@ -1536,13 +1536,6 @@ class LiveJobs {
             JobData jobData = lockJob(jobId);
             if (jobData != null) {
                 lockedJobs.add(jobData);
-            } else {
-                // we cannot lock at least one job
-                // we should abort this process, and unlock already locked jobs
-                lockedJobs.forEach(JobData::unlock);
-
-                // so we locked nothing
-                return null;
             }
         }
 
