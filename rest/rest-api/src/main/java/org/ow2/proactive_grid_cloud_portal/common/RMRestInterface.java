@@ -262,14 +262,16 @@ public interface RMRestInterface {
     /**
      * List of registered node hosts as variable model.
      *
-     * Returns a workflow variable model string containing the list of registered hosts in the resource manager
+     * Returns a workflow variable model string containing the list of registered hosts in the resource manager and an empty value.
      * @param name a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> which will accept hosts based on their name. Example: <code>host.*</code>
-     * @return a model containing the list of hosts, including an empty name. e.g. PA:LIST(,hostname1,hostname2)
+     * @param noEmpty if 'true', an empty value will not be included in the returned model.
+     * @return a model containing the list of hosts, including (or not) an empty name. e.g. PA:LIST(,hostname1,hostname2)
      */
     @GET
     @Path("model/hosts")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    String getModelHosts(@QueryParam("name") String name) throws PermissionRestException;
+    String getModelHosts(@QueryParam("name") String name, @QueryParam("noEmpty") String noEmpty)
+            throws PermissionRestException;
 
     /**
      * list of node sources as variable model.
@@ -283,15 +285,16 @@ public interface RMRestInterface {
      * @param policy node source policy regexp. All node sources whose policy name matches the given <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> will be returned.
      *             For example: <code>Static.*</code> will return all node sources with a <i>StaticPolicy</i>, <code>Dynamic.*</code> will return all node sources with <i>DynamicPolicy</i>. See <a href="https://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_node_source_policies">Node Source Policies</a> for a complete list of policy types.
      * @param noDefault if 'true' the Default node source (which is automatically defined by the Resource Manager) will be excluded from the result.
+     * @param noEmpty if 'true', an empty value will not be included in the returned model.
      *
-     * @return a model containing the list of node sources name, including an empty name and the default node source e.g. PA:LIST(,Default,LocalNodes)
+     * @return a model containing the list of node sources name, including (or not) an empty name and the default node source e.g. PA:LIST(,Default,LocalNodes)
      */
     @GET
     @Path("model/nodesources")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
     String getModelNodeSources(@QueryParam("name") String name, @QueryParam("infrastructure") String infrastructure,
-            @QueryParam("policy") String policy, @QueryParam("noDefault") String noDefault)
-            throws PermissionRestException;
+            @QueryParam("policy") String policy, @QueryParam("noDefault") String noDefault,
+            @QueryParam("noEmpty") String noEmpty) throws PermissionRestException;
 
     /**
      * List of registered tokens as variable model.
@@ -299,13 +302,14 @@ public interface RMRestInterface {
      * Returns a workflow variable model string containing the list of registered tokens in the resource manager
      * @param name a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">regular expression</a> which will accept tokens based on their name. Example: <code>token.*</code>
      * @param nodeSource the name of a node source considered for the token list. Only tokens defined for this node source or for any node which belongs to this node source will be returned.
-     * @return a model containing the list of tokens, including an empty name. e.g. PA:LIST(,token1,token2)
+     * * @param noEmpty if 'true', an empty value will not be included in the returned model.
+     * @return a model containing the list of tokens, including (or not) an empty name. e.g. PA:LIST(,token1,token2)
      */
     @GET
     @Path("model/tokens")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    String getModelTokens(@QueryParam("name") String name, @QueryParam("nodeSource") String nodeSource)
-            throws PermissionRestException;
+    String getModelTokens(@QueryParam("name") String name, @QueryParam("nodeSource") String nodeSource,
+            @QueryParam("noEmpty") String noEmpty) throws PermissionRestException;
 
     /**
      * Check Resource Manager availability.
