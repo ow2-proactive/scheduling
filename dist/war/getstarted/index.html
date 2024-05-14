@@ -45,11 +45,11 @@
            </a>
          </div>
          <div class="col-6 col-md-5 col-lg-6 pt-3 text-center">
-           <a href="/studio#presets/1" class="ae-portals-item">
+           <a href="/studio/#presets/1" class="ae-portals-item">
              <div class="border" style="height: 100%">
                <div class="p-3">
                  <h3 class="h5">ProActive AI <br />Orchestration (PAIO)</h3>
-                 <a class="btn btn-primary button-orange" href="/studio#presets/1">Login</a>
+                 <a class="btn btn-primary button-orange" href="/studio/#presets/1">Login</a>
                </div>
                <div class="ae-band"></div>
              </div>
@@ -210,5 +210,15 @@
 
 
 </body>
-
+<script>
+    const prefixURl = window.location.pathname;
+    document.querySelectorAll('a').forEach(function (link) {
+      var href = link.getAttribute("href");
+      if( href && href.includes('.html') && !href.startsWith('http') ){
+        link.setAttribute("href", prefixURl + href);
+      } else if(href && href.startsWith("/") ) {
+        link.setAttribute("href", prefixURl + href.substring(1) + '/');
+      }
+    })
+</script>
 </html>
