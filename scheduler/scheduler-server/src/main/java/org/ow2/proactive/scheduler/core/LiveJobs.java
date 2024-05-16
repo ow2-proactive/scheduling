@@ -1527,7 +1527,7 @@ class LiveJobs {
 
     /**
      * @param jobIds job ids to lock and return its data
-     * @return list of locked jobs for each job id provided, otherwise null
+     * @return list of locked jobs data for each job id provided
      */
     public List<JobData> lockJobs(List<JobId> jobIds) {
         List<JobData> lockedJobs = new ArrayList<>(jobIds.size());
