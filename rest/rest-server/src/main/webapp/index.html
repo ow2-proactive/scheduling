@@ -34,7 +34,7 @@
 
         <p class="lead">
             The REST API documentation can be found <a
-                href="/doc/rest/">here</a>
+                href="#" id="rest-link">here</a>
         </p>
         <hr>
         <p class="lead">Use the command line client via the REST API
@@ -49,4 +49,8 @@
 </div>
 <script src="assets/js/sanitizeUrl.js"></script>
 </body>
+<script>
+    const prefixURl = window.location.pathname.split("rest/")[0];
+    document.getElementById("rest-link").setAttribute("href", prefixURl + "doc/rest/")
+</script>
 </html>
