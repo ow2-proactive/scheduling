@@ -28,10 +28,9 @@ package org.ow2.proactive.scheduler.common.util;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
@@ -46,18 +45,7 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
-import org.ow2.proactive.scheduler.common.TaskDescriptor;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -72,16 +60,14 @@ import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
+import org.thavam.util.concurrent.blockingMap.BlockingHashMap;
+import org.thavam.util.concurrent.blockingMap.BlockingMap;
 
 
 /**
@@ -89,18 +75,24 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
  * You must init the proxy by calling the {@link #init(String, String, String)} method after having created it
  */
 @ActiveObject
-public class SchedulerProxyUserInterface implements Scheduler, Serializable {
+public class SchedulerProxyUserInterface implements Scheduler, Serializable, SchedulerEventListener {
 
-    protected Scheduler uischeduler;
+    protected transient Scheduler uischeduler;
 
-    protected MBeanInfoViewer mbeaninfoviewer;
+    protected transient MBeanInfoViewer mbeaninfoviewer;
 
     public static final Logger logger = Logger.getLogger(SchedulerProxyUserInterface.class);
 
     /*
      * a reference to a stub on this active object
      */
-    private static SchedulerProxyUserInterface activeInstance;
+    private static transient SchedulerProxyUserInterface activeInstance;
+
+    private volatile boolean sessionListenerAdded = false;
+
+    private transient BlockingMap<JobId, Boolean> finishedJobs = new BlockingHashMap<>();
+
+    private transient Set<JobId> waitedJobs = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * Default constructor demanded by ProActive.
@@ -196,6 +188,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
         return uischeduler.addEventListener(sel, myEventsOnly, true, events);
 
+    }
+
+    private void addSessionJobEventListener() throws NotConnectedException, PermissionException {
+        if (!sessionListenerAdded) {
+            checkSchedulerConnection();
+
+            uischeduler.addEventListener((SchedulerEventListener) PAActiveObject.getStubOnThis(),
+                                         true,
+                                         true,
+                                         new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED });
+            sessionListenerAdded = true;
+        }
     }
 
     @Override
@@ -1107,4 +1111,55 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         uischeduler.removeJobLabels(jobIds);
     }
 
+    @ImmediateService
+    public void waitForJobFinished(JobId jobId, Long timeout)
+            throws PermissionException, NotConnectedException, InterruptedException {
+        addSessionJobEventListener();
+        waitedJobs.add(jobId);
+        // see https://github.com/sarveswaran-m/blockingMap4j/
+        Boolean status;
+        if (timeout != null && timeout > 0) {
+            status = finishedJobs.take(jobId, timeout, TimeUnit.MILLISECONDS);
+        } else {
+            status = finishedJobs.take(jobId);
+        }
+        waitedJobs.remove(jobId);
+        finishedJobs.remove(jobId);
+        if (status == null) {
+            throw new InterruptedException("Job " + jobId + " is not finished after " + timeout + " milliseconds");
+        }
+    }
+
+    @Override
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+
+    }
+
+    @Override
+    public void jobSubmittedEvent(JobState job) {
+
+    }
+
+    @Override
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        JobId finishedJobId = notification.getData().getJobId();
+        if (waitedJobs.contains(notification.getData().getJobId())) {
+            finishedJobs.put(finishedJobId, true);
+        }
+    }
+
+    @Override
+    public void jobUpdatedFullDataEvent(JobState job) {
+
+    }
+
+    @Override
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+
+    }
+
+    @Override
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
+
+    }
 }
