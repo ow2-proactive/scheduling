@@ -1848,6 +1848,57 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public JobResultData submitFromUrlSync(String sessionId, String url, Long timeout, PathSegment pathSegment,
+            Map<String, String> jsonBody, UriInfo contextInfos) throws RestException, IOException {
+        SchedulerProxyUserInterface scheduler = checkAccess(sessionId, "jobs");
+
+        url = replaceCatalogUrl(url);
+
+        SchedulerSpaceInterface space = getSpaceInterface(sessionId);
+
+        String jobXml = downloadWorkflowContent(sessionId, url);
+        JobId jobId;
+        try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+
+            // Get the job submission variables from pathSegment
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            // Get job variables from json body
+            if (!MapUtils.isEmpty(jsonBody)) {
+                jobVariables = getAdditionalVariables(jobVariables,
+                                                      workflowVariablesTransformer.replaceNullValuesWithEmptyString(jsonBody));
+            }
+
+            // Get the job submission generic infos
+            Map<String, String> genericInfos = null;
+            if (contextInfos != null)
+                genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
+
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler, space, sessionId);
+            jobId = workflowSubmitter.submit(tmpWorkflowStream, jobVariables, genericInfos);
+
+        }
+
+        try {
+            scheduler.waitForJobFinished(jobId, timeout);
+            JobResult jobResult = PAFuture.getFutureValue(scheduler.getJobResult(jobId));
+            if (jobResult == null) {
+                return null;
+            }
+            return mapper.map(jobResult, JobResultData.class);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (InterruptedException e) {
+            throw new SchedulerRestException(e);
+        }
+
+    }
+
+    @Override
     public List<JobIdDataAndError> multipleSubmitFromUrls(String sessionId, List<WorkflowUrlData> jsonBody)
             throws NotConnectedRestException {
         Scheduler scheduler = checkAccess(sessionId, "jobs");

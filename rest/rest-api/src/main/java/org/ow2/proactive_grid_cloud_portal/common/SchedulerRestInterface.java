@@ -1645,6 +1645,39 @@ public interface SchedulerRestInterface {
             SubmissionClosedRestException, IOException;
 
     /**
+     * Submits a workflow synchronously to the scheduler from a workflow URL, creating hence a
+     * new job resource.
+     *
+     * This endpoint should be used for very fast jobs which must execute in less than the configured web.idle_timeout (default to 240 seconds), including the scheduling time.
+     * Otherwise, the REST server will return a timeout error.
+     *
+     * An optional timeout parameter allows this request to be interrupted internally after the timeout occurs.
+     *
+     * Please note as well that extensive usage of this submission method will hold threads dedicated to the REST server.
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param url
+     *            url to the workflow content
+     * @param timeout
+     *            timeout in milleseconds to wait for job completion
+     * @param pathSegment
+     *            variables of the workflow
+     * @param jsonBody
+     *            a json with the variables of the workflow
+     * @param contextInfos
+     *            the context informations (generic parameters,..)
+     * @return the <code>job result</code> of the job after termination
+     */
+    @POST
+    @Path("{path:jobs}/body/sync")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    JobResultData submitFromUrlSync(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
+            @HeaderParam("timeout") Long timeout, @PathParam("path") PathSegment pathSegment,
+            Map<String, String> jsonBody, @Context UriInfo contextInfos) throws RestException, IOException;
+
+    /**
      * Submits a list of workflows to the scheduler from a list of workflow URLs
      *
      * @param sessionId

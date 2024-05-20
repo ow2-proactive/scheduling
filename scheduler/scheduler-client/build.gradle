@@ -1,5 +1,6 @@
 dependencies {
     compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
+    compile files("$rootDir/lib/blockingMap-0.91.jar")
 
     compile project(':scheduler:scheduler-api')
     compile project(':common:common-client')
