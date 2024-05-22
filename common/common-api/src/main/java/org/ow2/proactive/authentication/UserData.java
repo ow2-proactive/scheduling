@@ -69,6 +69,8 @@ public class UserData implements Serializable {
 
     private boolean otherUsersJobReadPermission;
 
+    private List<String> prioritiesPermission;
+
     private List<String> portalAccessPermission = new ArrayList<>();
 
     private List<String> portalAccessPermissionDisplay = new ArrayList<>();
@@ -201,5 +203,13 @@ public class UserData implements Serializable {
 
     public void setAdminRoles(List<String> adminRoles) {
         this.adminRoles = adminRoles;
+    }
+
+    public List<String> getPrioritiesPermission() {
+        return prioritiesPermission;
+    }
+
+    public void setPrioritiesPermission(List<String> prioritiesPermission) {
+        this.prioritiesPermission = prioritiesPermission;
     }
 }

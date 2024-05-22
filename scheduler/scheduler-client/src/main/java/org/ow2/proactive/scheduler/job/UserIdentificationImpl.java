@@ -41,11 +41,9 @@ import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.permissions.ServiceRolePermission;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
-import org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
-import org.ow2.proactive.scheduler.permissions.OtherUsersJobReadPermission;
-import org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+import org.ow2.proactive.scheduler.permissions.*;
 
 
 /**
@@ -165,6 +163,18 @@ public class UserIdentificationImpl extends UserIdentification {
         } catch (PermissionException e) {
             return false;
         }
+    }
+
+    public Set<JobPriority> getPriorityPermission() {
+        Set<JobPriority> availablePriorities = new LinkedHashSet<>();
+        for (int i = 0; i <= JobPriority.HIGHEST.getPriority(); i++) {
+            try {
+                checkPermission(new ChangePriorityPermission(i), "N/A");
+                availablePriorities.add(JobPriority.findPriority(i));
+            } catch (PermissionException e) {
+            }
+        }
+        return availablePriorities;
     }
 
     @Override
