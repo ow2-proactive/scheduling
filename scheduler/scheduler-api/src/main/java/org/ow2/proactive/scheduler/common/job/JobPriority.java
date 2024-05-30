@@ -25,11 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -58,15 +53,6 @@ public enum JobPriority implements java.io.Serializable {
 
     /** Priority representing by an integer */
     private int priority;
-
-    /** Map storing the Priorities values as key and their JobPriorityValue */
-    private static final Map<Integer, JobPriority> priorityMap = new HashMap<>();
-
-    static {
-        for (JobPriority jobPriority : JobPriority.values()) {
-            priorityMap.put(jobPriority.getPriority(), jobPriority);
-        }
-    }
 
     /**
      * Implicit constructor of job priority.
@@ -112,10 +98,27 @@ public enum JobPriority implements java.io.Serializable {
      * @return the job priority corresponding to the string or the NORMAL priority if not found.
      */
     public static JobPriority findPriority(String name) {
-        return priorityMap.values().stream()
-                .filter(jobPriority -> name.equalsIgnoreCase(jobPriority.toString()))
-                .findFirst()
-                .orElse(NORMAL);
+        if (name.equalsIgnoreCase(IDLE.toString())) {
+            return IDLE;
+        }
+
+        if (name.equalsIgnoreCase(LOWEST.toString())) {
+            return LOWEST;
+        }
+
+        if (name.equalsIgnoreCase(LOW.toString())) {
+            return LOW;
+        }
+
+        if (name.equalsIgnoreCase(HIGH.toString())) {
+            return HIGH;
+        }
+
+        if (name.equalsIgnoreCase(HIGHEST.toString())) {
+            return HIGHEST;
+        }
+
+        return NORMAL;
     }
 
     /**
@@ -125,7 +128,27 @@ public enum JobPriority implements java.io.Serializable {
      * @return the job priority corresponding to the value or the NORMAL priority if not found.
      */
     public static JobPriority findPriority(int priorityValue) {
-        return Optional.of(priorityMap.get(priorityValue)).orElse(NORMAL);
+        if (priorityValue == IDLE.getPriority()) {
+            return IDLE;
+        }
+
+        if (priorityValue == LOWEST.getPriority()) {
+            return LOWEST;
+        }
+
+        if (priorityValue == LOW.getPriority()) {
+            return LOW;
+        }
+
+        if (priorityValue == HIGH.getPriority()) {
+            return HIGH;
+        }
+
+        if (priorityValue == HIGHEST.getPriority()) {
+            return HIGHEST;
+        }
+
+        return NORMAL;
     }
 
     /**
@@ -136,11 +159,11 @@ public enum JobPriority implements java.io.Serializable {
      * @throws IllegalArgumentException if the priorityValue doesn't match any available JobPriority.
      */
     public static JobPriority findPriorityExact(int priorityValue) {
-        JobPriority jobPriority = priorityMap.get(priorityValue);
-        if (jobPriority == null) {
-            throw new IllegalArgumentException("The priority with value " + priorityValue + " doesn't exist");
+        for (JobPriority priority : values()) {
+            if (priority.getPriority() == priorityValue) {
+                return priority;
+            }
         }
-        return jobPriority;
+        throw new IllegalArgumentException("Priority with value "+ priorityValue + " doesn't exist");
     }
-
 }
