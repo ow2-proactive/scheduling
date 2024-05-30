@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.common.job;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -111,27 +112,20 @@ public enum JobPriority implements java.io.Serializable {
      * @return the job priority corresponding to the string or the NORMAL priority if not found.
      */
     public static JobPriority findPriority(String name) {
-        if (name.equalsIgnoreCase(IDLE.toString())) {
-            return IDLE;
-        }
+        return priorityMap.values().stream()
+                .filter(jobPriority -> name.equalsIgnoreCase(jobPriority.toString()))
+                .findFirst()
+                .orElse(NORMAL);
+    }
 
-        if (name.equalsIgnoreCase(LOWEST.toString())) {
-            return LOWEST;
-        }
-
-        if (name.equalsIgnoreCase(LOW.toString())) {
-            return LOW;
-        }
-
-        if (name.equalsIgnoreCase(HIGH.toString())) {
-            return HIGH;
-        }
-
-        if (name.equalsIgnoreCase(HIGHEST.toString())) {
-            return HIGHEST;
-        }
-
-        return NORMAL;
+    /**
+     * Get the priority associated with the given priorityValue.
+     *
+     * @param priorityValue the priority value to find.
+     * @return the job priority corresponding to the value or the NORMAL priority if not found.
+     */
+    public static JobPriority findPriority(int priorityValue) {
+        return Optional.of(priorityMap.get(priorityValue)).orElse(NORMAL);
     }
 
     /**
