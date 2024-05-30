@@ -25,6 +25,10 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -53,6 +57,15 @@ public enum JobPriority implements java.io.Serializable {
 
     /** Priority representing by an integer */
     private int priority;
+
+    /** Map storing the Priorities values as key and their JobPriorityValue */
+    private static final Map<Integer, JobPriority> priorityMap = new HashMap<>();
+
+    static {
+        for (JobPriority jobPriority : JobPriority.values()) {
+            priorityMap.put(jobPriority.getPriority(), jobPriority);
+        }
+    }
 
     /**
      * Implicit constructor of job priority.
@@ -125,30 +138,15 @@ public enum JobPriority implements java.io.Serializable {
      * Get the priority associated with the given priorityValue.
      *
      * @param priorityValue the priority value to find.
-     * @return the job priority corresponding to the value or the NORMAL priority if not found.
+     * @return the JobPriority corresponding to the value.
+     * @throws IllegalArgumentException if the priorityValue doesn't match any available JobPriority.
      */
-    public static JobPriority findPriority(int priorityValue) {
-        if (priorityValue == IDLE.getPriority()) {
-            return IDLE;
+    public static JobPriority findPriorityExact(int priorityValue) {
+        JobPriority jobPriority = priorityMap.get(priorityValue);
+        if (jobPriority == null) {
+            throw new IllegalArgumentException("The priority with value " + priorityValue + " doesn't exist");
         }
-
-        if (priorityValue == LOWEST.getPriority()) {
-            return LOWEST;
-        }
-
-        if (priorityValue == LOW.getPriority()) {
-            return LOW;
-        }
-
-        if (priorityValue == HIGH.getPriority()) {
-            return HIGH;
-        }
-
-        if (priorityValue == HIGHEST.getPriority()) {
-            return HIGHEST;
-        }
-
-        return NORMAL;
+        return jobPriority;
     }
 
 }

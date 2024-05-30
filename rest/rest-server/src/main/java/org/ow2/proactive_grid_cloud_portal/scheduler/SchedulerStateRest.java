@@ -2488,13 +2488,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws RestException, JobAlreadyFinishedRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byvalue" + priorityValue);
-            JobPriority newPriority = Arrays.stream(JobPriority.values())
-                                            .filter(jobPriority -> jobPriority.getPriority() == Integer.parseInt(priorityValue))
-                                            .findFirst()
-                                            .orElseThrow(() -> new BadJobPriorityRestException("The priority with value " +
-                                                                                               priorityValue +
-                                                                                               " doesn't exist"));
-            s.changeJobPriority(jobId, newPriority);
+            s.changeJobPriority(jobId, JobPriority.findPriorityExact(Integer.parseInt(priorityValue)));
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         } catch (NumberFormatException e) {
