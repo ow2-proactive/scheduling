@@ -2475,9 +2475,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws RestException, JobAlreadyFinishedRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byname/" + priorityName);
-            s.changeJobPriority(jobId, JobPriority.findPriority(priorityName));
+            s.changeJobPriority(jobId, JobPriority.valueOf(priorityName.toUpperCase()));
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
+        } catch (IllegalArgumentException e) {
+            throw new BadJobPriorityRestException("The priority " + priorityName + " doesn't exist");
         }
     }
 
@@ -2486,11 +2488,25 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws RestException, JobAlreadyFinishedRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byvalue" + priorityValue);
-            s.changeJobPriority(jobId, JobPriority.findPriority(Integer.parseInt(priorityValue)));
+            JobPriority newPriority = Arrays.stream(JobPriority.values())
+                                            .filter(jobPriority -> jobPriority.getPriority() == Integer.parseInt(priorityValue))
+                                            .findFirst()
+                                            .orElseThrow(() -> new BadJobPriorityRestException("The priority with value " +
+                                                                                               priorityValue +
+                                                                                               " doesn't exist"));
+            s.changeJobPriority(jobId, newPriority);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
+        } catch (NumberFormatException e) {
+            List<Integer> jobPriorities = Arrays.stream(JobPriority.values())
+                                                .map(JobPriority::getPriority)
+                                                .sorted()
+                                                .collect(Collectors.toList());
+            String msg = String.format("The priority value must be an integer between %s and %s",
+                                       jobPriorities.get(0),
+                                       jobPriorities.get(jobPriorities.size() - 1));
+            throw new BadJobPriorityRestException(msg);
         }
-
     }
 
     @Override
