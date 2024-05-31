@@ -2472,7 +2472,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public void schedulerChangeJobPriorityByName(String sessionId, String jobId, String priorityName)
-            throws RestException, JobAlreadyFinishedRestException {
+            throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byname/" + priorityName);
             s.changeJobPriority(jobId, JobPriority.valueOf(priorityName.toUpperCase()));
@@ -2485,7 +2485,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public void schedulerChangeJobPriorityByValue(String sessionId, String jobId, String priorityValue)
-            throws RestException, JobAlreadyFinishedRestException {
+            throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byvalue" + priorityValue);
             s.changeJobPriority(jobId, JobPriority.findPriorityExact(Integer.parseInt(priorityValue)));

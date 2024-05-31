@@ -164,6 +164,6 @@ public enum JobPriority implements java.io.Serializable {
                 return priority;
             }
         }
-        throw new IllegalArgumentException("Priority with value "+ priorityValue + " doesn't exist");
+        throw new IllegalArgumentException("Priority with value " + priorityValue + " doesn't exist");
     }
 }
