@@ -151,4 +151,19 @@ public enum JobPriority implements java.io.Serializable {
         return NORMAL;
     }
 
+    /**
+     * Get the priority associated with the given priorityValue.
+     *
+     * @param priorityValue the priority value to find.
+     * @return the JobPriority corresponding to the value.
+     * @throws IllegalArgumentException if the priorityValue doesn't match any available JobPriority.
+     */
+    public static JobPriority findPriorityExact(int priorityValue) {
+        for (JobPriority priority : values()) {
+            if (priority.getPriority() == priorityValue) {
+                return priority;
+            }
+        }
+        throw new IllegalArgumentException("Priority with value " + priorityValue + " doesn't exist");
+    }
 }
