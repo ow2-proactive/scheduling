@@ -2472,25 +2472,35 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public void schedulerChangeJobPriorityByName(String sessionId, String jobId, String priorityName)
-            throws RestException, JobAlreadyFinishedRestException {
+            throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byname/" + priorityName);
-            s.changeJobPriority(jobId, JobPriority.findPriority(priorityName));
+            s.changeJobPriority(jobId, JobPriority.valueOf(priorityName.toUpperCase()));
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
+        } catch (IllegalArgumentException e) {
+            throw new BadJobPriorityRestException("The priority " + priorityName + " doesn't exist");
         }
     }
 
     @Override
     public void schedulerChangeJobPriorityByValue(String sessionId, String jobId, String priorityValue)
-            throws RestException, JobAlreadyFinishedRestException {
+            throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byvalue" + priorityValue);
-            s.changeJobPriority(jobId, JobPriority.findPriority(Integer.parseInt(priorityValue)));
+            s.changeJobPriority(jobId, JobPriority.findPriorityExact(Integer.parseInt(priorityValue)));
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
+        } catch (NumberFormatException e) {
+            List<Integer> jobPriorities = Arrays.stream(JobPriority.values())
+                                                .map(JobPriority::getPriority)
+                                                .sorted()
+                                                .collect(Collectors.toList());
+            String msg = String.format("The priority value must be an integer between %s and %s",
+                                       jobPriorities.get(0),
+                                       jobPriorities.get(jobPriorities.size() - 1));
+            throw new BadJobPriorityRestException(msg);
         }
-
     }
 
     @Override
