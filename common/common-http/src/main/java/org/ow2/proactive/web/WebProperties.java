@@ -138,6 +138,12 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_CONTENT_SECURITY_POLICY_REPORT_ONLY("web.content.security.policy.report.only", PropertyType.STRING),
 
+    /**
+     * Can be used when the server is receiving http requests relative to a base path. In that case incoming requests will be rewritten
+     * e.g. /base_path/resource/ will be rewritten to /resource/
+     */
+    WEB_BASE_PATH("web.base.path", PropertyType.STRING),
+
     WEB_PCA_PROXY_REWRITE_ENABLED("web.pca.proxy.rewrite.enabled", PropertyType.BOOLEAN, "true"),
 
     WEB_PCA_PROXY_REWRITE_REFERER_CACHE_SIZE("web.pca.proxy.rewrite.referer.cache.size", PropertyType.INTEGER, "10000"),

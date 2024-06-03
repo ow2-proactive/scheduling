@@ -38,7 +38,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
+import org.eclipse.jetty.rewrite.handler.RewriteRegexRule;
 import org.eclipse.jetty.rewrite.handler.Rule;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -136,6 +138,25 @@ public class JettyStarter {
                 redirectHandler.setVirtualHosts(httpVirtualHost);
                 topLevelHandlerList.addHandler(redirectHandler);
             }
+            RewriteHandler urlRewriteHandler = new RewriteHandler();
+            urlRewriteHandler.setRewriteRequestURI(true);
+            urlRewriteHandler.setRewritePathInfo(false);
+            urlRewriteHandler.setOriginalPathAttribute(PCAProxyRule.originalPathAttribute);
+            urlRewriteHandler.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ASYNC);
+
+            if (WebProperties.WEB_BASE_PATH.isSet() && !WebProperties.WEB_BASE_PATH.getValueAsString().isEmpty()) {
+                String basePath = WebProperties.WEB_BASE_PATH.getValueAsString();
+                String basePathWithoutSlash = basePath.endsWith("/") ? basePath.substring(0, basePath.length() - 1)
+                                                                     : basePath;
+                String basePathWithSlash = basePathWithoutSlash + "/";
+                RedirectPatternRule rootRedirect = new RedirectPatternRule(basePathWithoutSlash, basePathWithSlash);
+                rootRedirect.setTerminating(true);
+                urlRewriteHandler.addRule(rootRedirect);
+                RewriteRegexRule basePathRule = new RewriteRegexRule("^" +
+                                                                     WebProperties.WEB_BASE_PATH.getValueAsString() +
+                                                                     "?(.*)$", "$1");
+                urlRewriteHandler.addRule(basePathRule);
+            }
 
             topLevelHandlerList.addHandler(createSecurityHeadersHandler());
 
@@ -159,17 +180,18 @@ public class JettyStarter {
                 }
             }
 
-            RewriteHandler rewriteHandler = null;
             HandlerList contextHandlerList = null;
 
             if (WebProperties.WEB_PCA_PROXY_REWRITE_ENABLED.getValueAsBoolean()) {
-                rewriteHandler = new RewriteHandler();
                 PCAProxyRule proxyRule = new PCAProxyRule();
-                rewriteHandler.addRule(proxyRule);
-                rewriteHandler.setRewriteRequestURI(true);
-                rewriteHandler.setRewritePathInfo(false);
-                rewriteHandler.setOriginalPathAttribute(PCAProxyRule.originalPathAttribute);
-                rewriteHandler.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ASYNC);
+                urlRewriteHandler.addRule(proxyRule);
+            }
+
+            boolean isUrlRewriteHandlerEnabled = WebProperties.WEB_PCA_PROXY_REWRITE_ENABLED.getValueAsBoolean() ||
+                                                 WebProperties.WEB_BASE_PATH.isSet() && !WebProperties.WEB_BASE_PATH.getValueAsString()
+                                                                                                                    .isEmpty();
+
+            if (isUrlRewriteHandlerEnabled) {
                 contextHandlerList = new HandlerList();
             } else {
                 contextHandlerList = topLevelHandlerList;
@@ -177,9 +199,9 @@ public class JettyStarter {
 
             addWarsToHandlerList(contextHandlerList, defaultVirtualHost);
 
-            if (WebProperties.WEB_PCA_PROXY_REWRITE_ENABLED.getValueAsBoolean()) {
-                rewriteHandler.setHandler(contextHandlerList);
-                topLevelHandlerList.addHandler(rewriteHandler);
+            if (isUrlRewriteHandlerEnabled) {
+                urlRewriteHandler.setHandler(contextHandlerList);
+                topLevelHandlerList.addHandler(urlRewriteHandler);
             }
 
             server.setHandler(topLevelHandlerList);
