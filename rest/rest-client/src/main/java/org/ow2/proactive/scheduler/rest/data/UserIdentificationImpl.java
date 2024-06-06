@@ -99,6 +99,11 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isCanCreateAssociationPermission() {
+        return false;
+    }
+
+    @Override
     public boolean isAllJobPlannerPermission() {
         return false;
     }

@@ -208,6 +208,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
     permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
@@ -261,6 +262,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
     permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 

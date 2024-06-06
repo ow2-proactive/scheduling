@@ -187,6 +187,15 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isCanCreateAssociationPermission() {
+        try {
+            return checkPermission(new JPCanCreateAssociationPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
     public boolean isPcaAdminPermission() {
         try {
             return checkPermission(new PcaAdminPermission(), "N/A");
