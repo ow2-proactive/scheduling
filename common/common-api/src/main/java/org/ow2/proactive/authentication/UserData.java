@@ -57,6 +57,8 @@ public class UserData implements Serializable {
 
     private boolean allJobPlannerPermission;
 
+    private boolean canCreateAssociationPermission;
+
     private boolean pcaAdminPermission;
 
     private boolean notificationAdminPermission;
@@ -131,6 +133,14 @@ public class UserData implements Serializable {
 
     public void setAllJobPlannerPermission(boolean allJobPlannerPermission) {
         this.allJobPlannerPermission = allJobPlannerPermission;
+    }
+
+    public boolean isCanCreateAssociationPermission() {
+        return canCreateAssociationPermission;
+    }
+
+    public void setCanCreateAssociationPermission(boolean canCreateAssociationPermission) {
+        this.canCreateAssociationPermission = canCreateAssociationPermission;
     }
 
     public boolean isPcaAdminPermission() {

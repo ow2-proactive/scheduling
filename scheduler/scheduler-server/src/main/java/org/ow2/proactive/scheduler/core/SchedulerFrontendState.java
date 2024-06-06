@@ -1604,6 +1604,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         userData.setFilterByTenant(PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean());
         userData.setAllTenantPermission(userSessionInfo.getRight().isAllTenantPermission());
         userData.setAllJobPlannerPermission(userSessionInfo.getRight().isAllJobPlannerPermission());
+        userData.setCanCreateAssociationPermission(userSessionInfo.getRight().isCanCreateAssociationPermission());
         userData.setSchedulerAdminPermission(userSessionInfo.getRight().isSchedulerAdminPermission());
         userData.setRmCoreAllPermission(userSessionInfo.getRight().isRMCoreAllPermission());
         userData.setPcaAdminPermission(userSessionInfo.getRight().isPcaAdminPermission());

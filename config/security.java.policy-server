@@ -83,6 +83,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.write";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
@@ -213,6 +214,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
     permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
@@ -266,6 +268,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
     permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
@@ -323,6 +326,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
     permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
@@ -480,6 +484,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
 
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.write";
