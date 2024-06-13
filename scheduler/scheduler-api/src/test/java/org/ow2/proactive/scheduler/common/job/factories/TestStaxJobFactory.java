@@ -34,6 +34,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -49,9 +51,11 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesParser;
 import org.ow2.proactive.scheduler.common.job.factories.globalvariables.GlobalVariablesParserTest;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -98,6 +102,8 @@ public class TestStaxJobFactory {
     private static URI jobDescriptorMultipleTags;
 
     private static URI jobDescriptorInvalidTags;
+
+    private static URI jobComplexWorkflow1;
 
     private StaxJobFactory factory;
 
@@ -148,6 +154,9 @@ public class TestStaxJobFactory {
 
         jobDescriptorInvalidTags = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_invalid_tags.xml")
                                                            .toURI();
+
+        jobComplexWorkflow1 = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/ComplexFlow1.xml")
+                                                      .toURI();
 
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
@@ -738,6 +747,20 @@ public class TestStaxJobFactory {
         // the gi overrides a job gi which references a non-inherited task variable (complicated case)
         assertEquals("gi_${variable2}", unresolvedGenericInformation.get("info1"));
         assertEquals("gi_task_value1", genericInformation.get("info1"));
+    }
+
+    @Test
+    public void testFindRootAndTerminalTasks() throws URISyntaxException, JobCreationException {
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(jobComplexWorkflow1);
+        Set<Task> rootTasks = job.findRootTasks();
+        Set<String> rootTasksNames = rootTasks.stream().map(task -> task.getName()).collect(Collectors.toSet());
+        assertEquals("Only Groovy_Task should be a root task", ImmutableSet.of("Groovy_Task"), rootTasksNames);
+
+        Set<Task> terminalTasks = job.findTerminalTasks();
+        Set<String> terminalTasksNames = terminalTasks.stream().map(task -> task.getName()).collect(Collectors.toSet());
+        assertEquals("Only Task36,Task46 should be terminal tasks",
+                     ImmutableSet.of("Task36", "Task46"),
+                     terminalTasksNames);
     }
 
     private static <K, V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
