@@ -25,12 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -127,7 +122,7 @@ public class TaskFlowJob extends Job {
     /**
      * Find terminal tasks for this workflow
      *
-     * Terminal tasks are tasks without children and not targets of a If or Else branch
+     * Terminal tasks are tasks without children and not source of a If or Else branch
      * @return a set of terminal tasks
      */
     public Set<Task> findTerminalTasks() {
@@ -170,9 +165,39 @@ public class TaskFlowJob extends Job {
             if (elseChildrenTaskNames.contains(task.getName())) {
                 terminalTasks.removeAll(findSubTree(task));
             }
+
         }
         // all remaining tasks are terminal
         return terminalTasks;
+    }
+
+    /**
+     * Find root tasks for this workflow
+     *
+     * Root tasks are tasks without parent and not targets of a If, Else or Continuation branch
+     * @return a set of terminal tasks
+     */
+    public Set<Task> findRootTasks() {
+
+        Set<Task> rootTasks = new LinkedHashSet<>(tasks.values());
+
+        for (Task task : tasks.values()) {
+
+            FlowScript flowScript = task.getFlowScript();
+            if (flowScript != null && flowScript.getActionType().equals(FlowActionType.IF.toString())) {
+                if (flowScript.getActionTarget() != null) {
+                    // remove from root all tasks that are target of this task's IF, ELSE or CONTINUATION branches
+                    rootTasks.removeIf(t -> t.getName().equals(flowScript.getActionTarget()) ||
+                                            t.getName().equals(flowScript.getActionTargetElse()) ||
+                                            t.getName().equals(flowScript.getActionContinuation()));
+                }
+            }
+            if (task.getDependencesList() != null && !task.getDependencesList().isEmpty()) {
+                // remove from root the task if it has dependencies
+                rootTasks.remove(task);
+            }
+        }
+        return rootTasks;
     }
 
     /**
