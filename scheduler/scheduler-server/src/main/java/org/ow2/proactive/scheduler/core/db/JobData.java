@@ -891,11 +891,11 @@ public class JobData implements Serializable {
     }
 
     @Column(name = "CUMULATED_CORE_TIME")
-    public long getCumulatedCoreTime() {
+    public Long getCumulatedCoreTime() {
         return cumulatedCoreTime != null ? cumulatedCoreTime : 0L;
     }
 
-    public void setCumulatedCoreTime(long cumulatedCoreTime) {
+    public void setCumulatedCoreTime(Long cumulatedCoreTime) {
         this.cumulatedCoreTime = cumulatedCoreTime;
     }
 
