@@ -1538,13 +1538,12 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setTenant(jobInfoData.getTenant());
         jobInfoImpl.setDomain(jobInfoData.getDomain());
         jobInfoImpl.setProjectName(jobInfoData.getProjectName());
-        jobInfoImpl.setProjectName(jobInfoData.getProjectName());
         jobInfoImpl.setBucketName(jobInfoData.getBucketName());
-        jobInfoImpl.setCumulatedCoreTime(jobInfoData.getCumulatedCoreTime());
         jobInfoImpl.setNumberOfNodes(jobInfoData.getNumberOfNodes());
         jobInfoImpl.setNumberOfNodesInParallel(jobInfoData.getNumberOfNodesInParallel());
         jobInfoImpl.setRemovedTime(jobInfoData.getRemovedTime());
         jobInfoImpl.setStartTime(jobInfoData.getStartTime());
+        jobInfoImpl.setFinishedTime(jobInfoData.getFinishedTime());
         jobInfoImpl.setInErrorTime(jobInfoData.getInErrorTime());
         jobInfoImpl.setSubmittedTime(jobInfoData.getSubmittedTime());
         jobInfoImpl.setCumulatedCoreTime(jobInfoData.getCumulatedCoreTime());
@@ -1553,11 +1552,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setNumberOfRunningTasks(jobInfoData.getNumberOfRunningTasks());
         jobInfoImpl.setNumberOfInErrorTasks(jobInfoData.getNumberOfInErrorTasks());
         jobInfoImpl.setNumberOfFaultyTasks(jobInfoData.getNumberOfFaultyTasks());
+        jobInfoImpl.setNumberOfFailedTasks(jobInfoData.getNumberOfFailedTasks());
         jobInfoImpl.setTotalNumberOfTasks(jobInfoData.getTotalNumberOfTasks());
         jobInfoImpl.setJobPriority(JobPriority.findPriority(jobInfoData.getPriority().toString()));
         jobInfoImpl.setJobStatus(JobStatus.findStatus(jobInfoData.getStatus().toString()));
-        if (jobInfoData.isToBeRemoved())
+        if (jobInfoData.isToBeRemoved()) {
             jobInfoImpl.setToBeRemoved();
+        }
+        jobInfoImpl.setPreciousTasks(jobInfoData.getPreciousTasks());
         jobInfoImpl.setGenericInformation(jobInfoData.getGenericInformation());
         jobInfoImpl.setVariables(jobInfoData.getVariables());
         jobInfoImpl.setDetailedVariables(jobInfoData.getDetailedVariables());
@@ -1569,6 +1571,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setExternalEndpointUrls(jobInfoData.getExternalEndpointUrls());
         jobInfoImpl.setParentId(jobInfoData.getParentId());
         jobInfoImpl.setChildrenCount(jobInfoData.getChildrenCount());
+        jobInfoImpl.setResultMapPresent(jobInfoData.isResultMapPresent());
+        jobInfoImpl.setLabel(jobInfoData.getLabel());
+        jobInfoImpl.setSubmissionMode(jobInfoData.getSubmissionMode());
         return jobInfoImpl;
     }
 
