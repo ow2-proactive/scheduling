@@ -447,6 +447,9 @@ public class RMNodeStarter {
             RMNodeStarter passiveStarter = new RMNodeStarter();
             String baseNodeName = passiveStarter.configure(args);
 
+            // this is necessary to allow jruby scripts to run concurrently on the node
+            System.setProperty("org.jruby.embed.localcontext.scope", "threadsafe");
+
             keyPairProducer = new KeyPairProducer(passiveStarter.workers);
             passiveStarter.createNodesAndConnect(baseNodeName);
         } catch (Throwable t) {
