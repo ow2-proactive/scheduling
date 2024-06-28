@@ -1836,8 +1836,8 @@ public class SchedulerDBManager {
     private InternalTask toInternalTask(boolean loadFullState, InternalJob internalJob, TaskData taskData)
             throws InvalidScriptException {
         InternalTask internalTask = taskData.toInternalTask(internalJob, loadFullState);
+        internalTask.setParallelEnvironment(taskData.getParallelEnvironment());
         if (loadFullState) {
-            internalTask.setParallelEnvironment(taskData.getParallelEnvironment());
             internalTask.setGenericInformation(taskData.getGenericInformation());
             for (SelectionScriptData scriptData : taskData.getSelectionScripts()) {
                 internalTask.addSelectionScript(scriptData.createSelectionScript());
