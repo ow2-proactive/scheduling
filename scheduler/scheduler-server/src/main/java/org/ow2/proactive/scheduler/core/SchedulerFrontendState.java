@@ -839,7 +839,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     void checkChangeJobPriority(JobId jobId, JobPriority priority)
-            throws PermissionException, JobAlreadyFinishedException {
+            throws PermissionException, JobAlreadyFinishedException, UnknownJobException {
 
         UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext()
                                                                       .getCurrentRequest()
@@ -855,7 +855,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throw ex;
         }
 
-        if (Lambda.withLock(stateReadLock, () -> jobs.get(jobId).isFinished())) {
+        IdentifiedJob identifiedJob = getIdentifiedJob(jobId);
+        if (Lambda.withLock(stateReadLock, () -> identifiedJob.isFinished())) {
             String msg = " is already finished";
             jlogger.info(jobId, msg);
             throw new JobAlreadyFinishedException("Job " + jobId + msg);
