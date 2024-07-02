@@ -413,9 +413,24 @@ public class SchedulerTHelper {
         return userInt.submit(jobToSubmit);
     }
 
-    public JobId submitJobWithGI(String jobDescPath, Map<String, String> generalInformation) throws Exception {
+    /**
+     * Submits a job with a list of variables and generic info
+     *
+     * @param jobDescPath
+     * @param variables
+     * @return
+     * @throws Exception
+     */
+    public JobId submitJob(String jobDescPath, Map<String, String> variables, Map<String, String> genericInformation)
+            throws Exception {
+        Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath, variables, genericInformation);
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.submit(jobToSubmit);
+    }
+
+    public JobId submitJobWithGI(String jobDescPath, Map<String, String> genericInformation) throws Exception {
         Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath);
-        jobToSubmit.setGenericInformation(generalInformation);
+        jobToSubmit.setGenericInformation(genericInformation);
         Scheduler userInt = getSchedulerInterface();
         return userInt.submit(jobToSubmit);
     }

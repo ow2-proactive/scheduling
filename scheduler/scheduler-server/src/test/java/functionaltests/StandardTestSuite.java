@@ -112,6 +112,8 @@ import functionaltests.policy.edf.EDFPolicyExtendedTest;
 import functionaltests.policy.edf.EDFPolicyTest;
 import functionaltests.policy.license.TestLicensePolicy;
 import functionaltests.policy.license.TestLicensePolicyWithRestart;
+import functionaltests.policy.limit.TestNodeUsagePolicy;
+import functionaltests.policy.limit.TestNodeUsagePolicyWithRestart;
 import functionaltests.policy.ram.TestRamPolicy;
 import functionaltests.rm.TestNodeDiesAtSchedulerRestart;
 import functionaltests.rm.TestRMProxy;
@@ -243,7 +245,8 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestCacheSpaceCleaning.class, TestChildProcessOfNodeKilled.class, TestDisabledListenJobLogs.class,
                       TestExecuteScriptsOnBusyNode.class, TestJobKilled.class, TestJobScriptVariables.class,
                       TestKillPendingTask.class, TestLicensePolicy.class, TestLicensePolicyWithRestart.class,
-                      TestListenJobLogs.class, TestNodeDiesAtSchedulerRestart.class, TestPreemptRestartKillTask.class,
+                      TestNodeUsagePolicy.class, TestNodeUsagePolicyWithRestart.class, TestListenJobLogs.class,
+                      TestNodeDiesAtSchedulerRestart.class, TestPreemptRestartKillTask.class,
                       TestPreemptRestartKillTaskSchema33.class, TestRamPolicy.class, TestRunAsMeLinuxKey.class,
                       TestRunAsMeLinuxNone.class, TestRunAsMeLinuxPwd.class, TestRunAsMeWindows.class,
                       TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
