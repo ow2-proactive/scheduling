@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
  * - job priorities (from highest to lowest)
  * - job deadline (those that have deadline overtake those without deadline)
  *
- * Among the job with the dealine (and having same priority) we distinguish
+ * Among the job with the deadline (and having same priority) we distinguish
  * them by the fact if some task of the job is already scheduled (i.g. job has
  * a startingTime) or not. Those that started has a priority to the not yet started jobs.
  * Among the jobs that are already started we sort them by startTime.
@@ -118,10 +118,10 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
                 return job2Priority.compareTo(job1Priority);
             } else { // priorities are the same
                 if (internalJob1.getJobDeadline().isPresent() & !internalJob2.getJobDeadline().isPresent()) {
-                    // job with deadline has an advanrage to the job without deadline
+                    // job with deadline has an advantage to the job without deadline
                     return -1;
                 } else if (!internalJob1.getJobDeadline().isPresent() & internalJob2.getJobDeadline().isPresent()) {
-                    // job with deadline has an advanrage to the job without deadline
+                    // job with deadline has an advantage to the job without deadline
                     return 1;
                 } else if (noDeadlines(internalJob1, internalJob2)) {
                     // if two jobs do not have deadlines - we compare by the submitted time
@@ -141,7 +141,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
                                internalJob2.getJobInfo().getStartTime() >= 0) {
                         // priority to already started - internalJob2
                         return 1;
-                    } else { // non of the jobs are started
+                    } else { // none of the jobs are started
                         // give a priority with the smaller interval between possible end of the job
                         // and job deadline
                         final Duration gap1 = durationBetweenFinishAndDeadline(internalJob1, now);
