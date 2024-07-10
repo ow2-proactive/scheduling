@@ -148,8 +148,8 @@ public class NodeUsageSchedulingPolicy extends ExtendedSchedulerPolicy {
         LinkedList<EligibleTaskDescriptor> orderedTasksDescFromParentPolicy = super.getOrderedTasks(filteredJobDescList);
 
         // Update the number of Nodes currently used by all handled jobs, based on the jobs/tasks current status
-        removeFinishedJobsAndReleaseTokens();
         removeFinishedTasksAndReleaseTokens();
+        removeFinishedJobsAndReleaseTokens();
 
         // Retrieve a structure containing all available slots
         final NodeUsageLimitSynchronization.NodeUsageTokens nodeUsageTokens = nodeUsageSynchronization.getNodeUsageTokens();
