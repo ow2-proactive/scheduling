@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
  * and then among jobs of the same priorities policy sorts them
  * based on Job::getDeadline(). If job deadline is not set then
  * this policy considers the job as job with infinite deadline.
- * Job deadline is set by the user.  *
+ * Job deadline is set by the user.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 8.3
