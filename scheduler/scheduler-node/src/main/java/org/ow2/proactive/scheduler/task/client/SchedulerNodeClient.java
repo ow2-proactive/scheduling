@@ -1235,7 +1235,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     @Override
     public List<JobLabelInfo> setLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelValidationException {
+            throws NotConnectedException, PermissionException, LabelValidationException, LabelConflictException {
         renewSession();
         return client.setLabels(labels);
     }

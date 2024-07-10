@@ -1390,7 +1390,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public List<JobLabelInfo> setLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelValidationException {
+            throws NotConnectedException, PermissionException, LabelValidationException, LabelConflictException {
         return getScheduler().setLabels(labels);
     }
 

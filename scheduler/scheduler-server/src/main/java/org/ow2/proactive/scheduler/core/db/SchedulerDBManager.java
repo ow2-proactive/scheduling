@@ -3212,9 +3212,12 @@ public class SchedulerDBManager {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getTotalJobsLabels").setReadOnly(true);
             List<Object[]> jobLabelInfoList = query.list();
+            Set<String> uniqueLabels = new LinkedHashSet<>();
+
             return jobLabelInfoList.stream()
                                    .map(label -> new JobLabelInfo(Long.parseLong(label[0].toString()),
                                                                   label[1].toString()))
+                                   .filter(jobLabelInfo -> uniqueLabels.add(jobLabelInfo.getLabel()))
                                    .collect(Collectors.toList());
         });
     }
@@ -3247,9 +3250,13 @@ public class SchedulerDBManager {
         return jobLabelsInfo;
     }
 
-    public List<JobLabelInfo> setLabels(List<String> labels, String username) throws LabelValidationException {
+    public List<JobLabelInfo> setLabels(List<String> labels, String username)
+            throws LabelValidationException, LabelConflictException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
         for (String label : labels) {
+            if (checkIfLabelExists(label)) {
+                throw new LabelConflictException(label);
+            }
             if (!isLabelValid(label)) {
                 throw new LabelValidationException(label);
             }

@@ -2099,7 +2099,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
      */
     @RoleAdmin
     List<JobLabelInfo> setLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelValidationException;
+            throws NotConnectedException, PermissionException, LabelValidationException, LabelConflictException;
 
     /**
      * Update the given label

@@ -2907,7 +2907,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @ImmediateService
     @RoleAdmin
     public List<JobLabelInfo> setLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelValidationException {
+            throws NotConnectedException, PermissionException, LabelValidationException, LabelConflictException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
