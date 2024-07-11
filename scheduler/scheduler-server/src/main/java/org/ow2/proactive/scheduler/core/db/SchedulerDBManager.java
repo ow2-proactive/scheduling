@@ -3230,7 +3230,7 @@ public class SchedulerDBManager {
     public List<JobLabelInfo> newLabels(List<String> labels, String username)
             throws LabelConflictException, LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
-        Set<String> uniqueLabels = new HashSet<>(labels);
+        Set<String> uniqueLabels = new LinkedHashSet<>(labels);
         for (String label : uniqueLabels) {
             if (checkIfLabelExists(label)) {
                 throw new LabelConflictException(label);
