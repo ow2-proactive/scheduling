@@ -3253,10 +3253,8 @@ public class SchedulerDBManager {
     public List<JobLabelInfo> setLabels(List<String> labels, String username)
             throws LabelValidationException, LabelConflictException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
+        labels = labels.stream().map(label -> label.toLowerCase(Locale.ROOT)).distinct().collect(Collectors.toList());
         for (String label : labels) {
-            if (checkIfLabelExists(label)) {
-                throw new LabelConflictException(label);
-            }
             if (!isLabelValid(label)) {
                 throw new LabelValidationException(label);
             }
