@@ -1075,7 +1075,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable, Sch
     @Override
     @ImmediateService
     public List<JobLabelInfo> setLabels(List<String> labels)
-            throws NotConnectedException, PermissionException, LabelValidationException, LabelConflictException {
+            throws NotConnectedException, PermissionException, LabelValidationException {
         checkSchedulerConnection();
         return uischeduler.setLabels(labels);
     }
