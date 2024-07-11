@@ -42,7 +42,7 @@ public class LabelConflictException extends SchedulerException {
      *
      */
     public LabelConflictException(String label) {
-        super("Label " + label + " already exists !");
+        super("Label(s) " + label + " already exist !");
     }
 
     /**
