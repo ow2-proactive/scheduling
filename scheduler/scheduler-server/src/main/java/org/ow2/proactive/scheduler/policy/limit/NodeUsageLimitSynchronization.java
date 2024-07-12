@@ -91,6 +91,8 @@ public class NodeUsageLimitSynchronization {
 
     private ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
+    private Set<String> pendingTopLevelJobToRemove = new HashSet<>();
+
     private static RecordManager recordManager = null;
 
     NodeUsageLimitSynchronization() {
@@ -184,6 +186,7 @@ public class NodeUsageLimitSynchronization {
         try {
             writeLock.lock();
             if (persistedJobsMaxTokens.containsKey(ancestorJobId)) {
+                logger.trace("New task running " + taskId + " with " + nbNodes + " nodes");
                 // we only record the task if it's being handled
                 persistedTasksTokens.put(taskId, nbNodes);
                 persist();
@@ -275,17 +278,38 @@ public class NodeUsageLimitSynchronization {
         logger.trace("Job terminated : " + jobId);
         try {
             writeLock.lock();
-            childrenJobs.remove(jobId);
-            Set<String> tasksMatchingJobId = persistedTasksTokens.keySet()
-                                                                 .stream()
-                                                                 .filter(e -> e.startsWith(jobId + "t"))
-                                                                 .collect(Collectors.toSet());
-            for (String taskId : tasksMatchingJobId) {
-                persistedTasksTokens.remove(taskId);
-            }
             if (persistedJobsMaxTokens.containsKey(jobId)) {
-                persistedJobsMaxTokens.remove(jobId);
-                persistedJobsTokensUsage.remove(jobId);
+                Set<String> allJobs = findJobTree(jobId);
+                if (allJobs.size() == 1) {
+                    persistedJobsMaxTokens.remove(jobId);
+                    persistedJobsTokensUsage.remove(jobId);
+                } else {
+                    logger.trace("Job has children still running : " + allJobs);
+                    // if there are children jobs still running we delay the removal
+                    pendingTopLevelJobToRemove.add(jobId);
+                }
+            } else {
+                String ancestorJob = getAncestorJob(jobId);
+                childrenJobs.remove(jobId);
+                Set<String> tasksMatchingJobId = persistedTasksTokens.keySet()
+                                                                     .stream()
+                                                                     .filter(e -> e.startsWith(jobId + "t"))
+                                                                     .collect(Collectors.toSet());
+                for (String taskId : tasksMatchingJobId) {
+                    persistedTasksTokens.remove(taskId);
+                }
+                if (pendingTopLevelJobToRemove.contains(ancestorJob)) {
+                    Set<String> allJobs = findJobTree(ancestorJob);
+                    if (allJobs.size() == 1) {
+                        logger.trace("Ancestor job has no more children running " + ancestorJob);
+                        // if there are no more children jobs still running we execute the removal of the ancestor
+                        persistedJobsMaxTokens.remove(ancestorJob);
+                        persistedJobsTokensUsage.remove(ancestorJob);
+                        pendingTopLevelJobToRemove.remove(ancestorJob);
+                    } else {
+                        logger.trace("Ancestor job has children still running : " + allJobs);
+                    }
+                }
             }
             updateAncestorJobTokenUsage(jobId);
         } finally {
