@@ -3212,9 +3212,12 @@ public class SchedulerDBManager {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getTotalJobsLabels").setReadOnly(true);
             List<Object[]> jobLabelInfoList = query.list();
+            Set<String> uniqueLabels = new LinkedHashSet<>();
+
             return jobLabelInfoList.stream()
                                    .map(label -> new JobLabelInfo(Long.parseLong(label[0].toString()),
                                                                   label[1].toString()))
+                                   .filter(jobLabelInfo -> uniqueLabels.add(jobLabelInfo.getLabel()))
                                    .collect(Collectors.toList());
         });
     }
@@ -3227,7 +3230,8 @@ public class SchedulerDBManager {
     public List<JobLabelInfo> newLabels(List<String> labels, String username)
             throws LabelConflictException, LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
-        for (String label : labels) {
+        Set<String> uniqueLabels = new LinkedHashSet<>(labels);
+        for (String label : uniqueLabels) {
             if (checkIfLabelExists(label)) {
                 throw new LabelConflictException(label);
             }
@@ -3235,7 +3239,7 @@ public class SchedulerDBManager {
                 throw new LabelValidationException(label);
             }
         }
-        labels.forEach(label -> {
+        uniqueLabels.forEach(label -> {
             JobLabel jobLabel = executeReadWriteTransaction(session -> {
                 JobLabel labelData = JobLabel.createJobLabel(label);
                 session.save(labelData);
@@ -3243,19 +3247,20 @@ public class SchedulerDBManager {
             });
             jobLabelsInfo.add(jobLabel.toJobLabelInfo());
         });
-        logger.info("Labels " + labels + " have been created by " + username);
+        logger.info("Labels " + uniqueLabels + " have been created by " + username);
         return jobLabelsInfo;
     }
 
     public List<JobLabelInfo> setLabels(List<String> labels, String username) throws LabelValidationException {
         List<JobLabelInfo> jobLabelsInfo = new LinkedList<>();
-        for (String label : labels) {
+        Set<String> uniqueLabels = new HashSet<>(labels);
+        for (String label : uniqueLabels) {
             if (!isLabelValid(label)) {
                 throw new LabelValidationException(label);
             }
         }
         executeReadWriteTransaction(session -> session.getNamedQuery("deleteAllLabel").executeUpdate());
-        labels.forEach(label -> {
+        uniqueLabels.forEach(label -> {
             JobLabel jobLabel = executeReadWriteTransaction(session -> {
                 JobLabel labelData = JobLabel.createJobLabel(label);
                 session.save(labelData);
