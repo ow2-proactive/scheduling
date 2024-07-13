@@ -181,6 +181,8 @@ configure(javaSubprojects) {
         if(Boolean.valueOf(System.getProperty("java.awt.headless"))){
             exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
         }
+        // uncomment the following to enable the security manager
+        //systemProperties << ['java.security.manager' : 'java.lang.SecurityManager']
         systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
         systemProperties << ['file.encoding': 'UTF-8']
         systemProperties << ['pa.rm.home': rootDir.absolutePath]
