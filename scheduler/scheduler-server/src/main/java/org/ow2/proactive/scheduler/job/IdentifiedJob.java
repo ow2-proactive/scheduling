@@ -26,12 +26,10 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.io.Serializable;
-import java.security.Permission;
 import java.util.Map;
+import java.util.Set;
 
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
-import org.ow2.proactive.permissions.PrincipalPermission;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
@@ -115,17 +113,16 @@ public class IdentifiedJob implements Serializable {
             return false;
         }
 
-        Permission jobPermission = new PrincipalPermission(userIdentification.getUsername(),
-                                                           userIdentification.getSubject()
-                                                                             .getPrincipals(UserNamePrincipal.class));
-        try {
-            // check method call
-            userId.checkPermission(jobPermission, "");
-        } catch (PermissionException ex) {
-            return false;
-        }
+        String jobOwner = userIdentification.getUsername();
+        Set<TenantPrincipal> tenantJobPrincipals = userIdentification.getSubject().getPrincipals(TenantPrincipal.class);
+        String jobTenant = tenantJobPrincipals != null &&
+                           tenantJobPrincipals.size() == 1 ? tenantJobPrincipals.iterator().next().getName() : "EMPTY";
 
-        return true;
+        String userName = userId.getUsername();
+
+        String userTenant = userId.getTenant() != null ? userId.getTenant() : "EMPTY";
+
+        return jobOwner.equals(userName) && jobTenant.equals(userTenant);
     }
 
     /**
