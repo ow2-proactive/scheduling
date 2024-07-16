@@ -2658,15 +2658,15 @@ public interface SchedulerRestInterface {
             MultipartFormDataInput multipart) throws NotConnectedRestException;
 
     @POST
-    @Path("/credentials/{key}")
+    @Path("/credentials/")
     @Produces(MediaType.APPLICATION_JSON)
-    void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") @Encoded String key,
+    void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @FormParam("key") String key,
             @FormParam("value") String value) throws RestException;
 
     @DELETE
-    @Path("/credentials/{key}")
+    @Path("/credentials/")
     @Produces(MediaType.APPLICATION_JSON)
-    void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") @Encoded String key)
+    void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @FormParam("key") String key)
             throws RestException;
 
     @GET
