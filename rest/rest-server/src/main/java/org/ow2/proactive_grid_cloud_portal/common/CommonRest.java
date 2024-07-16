@@ -73,7 +73,7 @@ public class CommonRest implements CommonRestInterface {
                                                                                            "Automation Dashboard")
                                                                                       .put("workflow-execution",
                                                                                            "Workflow Execution")
-                                                                                      .put("catalog", "Catalog")
+                                                                                      .put("catalog-portal", "Catalog")
                                                                                       .put("health-dashboard",
                                                                                            "Health Dashboard")
                                                                                       .put("job-analytics",
