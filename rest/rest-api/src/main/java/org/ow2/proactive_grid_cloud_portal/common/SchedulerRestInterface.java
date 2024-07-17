@@ -2666,7 +2666,7 @@ public interface SchedulerRestInterface {
     @DELETE
     @Path("/credentials/")
     @Produces(MediaType.APPLICATION_JSON)
-    void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @FormParam("key") String key)
+    void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @QueryParam("key") String key)
             throws RestException;
 
     @GET
