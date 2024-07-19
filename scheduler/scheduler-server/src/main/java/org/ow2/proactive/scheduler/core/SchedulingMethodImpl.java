@@ -360,6 +360,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         schedulingMainLoopTimingLogger.end("loadAndInit");
 
+        currentPolicy.beforeIsTaskExecutable();
         while (!tasksRetrievedFromPolicy.isEmpty() &&
                (!PASchedulerProperties.SCHEDULER_POLCY_STRICT_FIFO.getValueAsBoolean() || !freeResources.isEmpty())) {
 
@@ -477,6 +478,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             schedulingMainLoopTimingLogger.end("createExecutions");
 
         }
+        currentPolicy.afterIsTaskExecutable();
 
         // number of nodes needed to start all pending tasks
         updateNeededNodes(neededNodes);

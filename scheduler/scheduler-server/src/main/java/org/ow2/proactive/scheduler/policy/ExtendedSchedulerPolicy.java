@@ -35,6 +35,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.map.LRUMap;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
@@ -44,6 +45,9 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
+import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 /**
@@ -70,7 +74,20 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                                                                                                                  true,
                                                                                                                  2));
 
-    private static final Map<String, Boolean> startAtCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STARTAT_CACHE.getValueAsInt()));
+    // cache used to wake up the scheduler for delayed jobs
+    // the key is the delayed datetime in milliseconds
+    private static final Map<Long, Boolean> delayedJobsWakeUpCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STARTAT_CACHE.getValueAsInt()));
+
+    // cache used to store the start at value of a given job or task
+    private static final Map<String, String> startAtCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STARTAT_VALUE_CACHE.getValueAsInt()));
+
+    protected MultipleTimingLogger schedulingPolicyTimingLogger = null;
+
+    private void initialize() {
+        if (schedulingPolicyTimingLogger == null) {
+            schedulingPolicyTimingLogger = new MultipleTimingLogger("SchedulingPolicyTiming", logger);
+        }
+    }
 
     /*
      * Utilize 'startAt' generic info and filter any tasks that should not be scheduled for current
@@ -78,6 +95,8 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
      */
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
+        initialize();
+        schedulingPolicyTimingLogger.start("ESP.getOrderTasks");
         Date now = new Date();
         LinkedList<EligibleTaskDescriptor> executionCycleTasks = new LinkedList<>();
         Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
@@ -106,7 +125,7 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                                                            startAt,
                                                            ISO8601DateUtil.parse(now)));
                             }
-                            scheduleWakeUp(candidate.getTaskId().toString(), now, startAtDate);
+                            scheduleWakeUp(now, startAtDate);
 
                         }
                     } catch (IllegalArgumentException e) {
@@ -121,21 +140,28 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                 }
             }
         }
+        schedulingPolicyTimingLogger.end("ESP.getOrderTasks");
+        if (!schedulingPolicyTimingLogger.isHierarchical()) {
+            schedulingPolicyTimingLogger.printTimings(Level.DEBUG);
+            schedulingPolicyTimingLogger.clear();
+        }
         return executionCycleTasks;
     }
 
-    private void scheduleWakeUp(final String taskOrJobId, Date now, Date startAtDate) {
-        if (!startAtCache.containsKey(taskOrJobId)) {
+    private void scheduleWakeUp(Date now, Date startAtDate) {
+        final long scheduledTime = startAtDate.getTime();
+        if (!delayedJobsWakeUpCache.containsKey(scheduledTime)) {
             executor.schedule(() -> {
-                startAtCache.remove(taskOrJobId);
+                delayedJobsWakeUpCache.remove(scheduledTime);
                 schedulingService.wakeUpSchedulingThread();
-            }, startAtDate.getTime() - now.getTime(), TimeUnit.MILLISECONDS);
-            startAtCache.put(taskOrJobId, true);
+            }, scheduledTime - now.getTime(), TimeUnit.MILLISECONDS);
+            delayedJobsWakeUpCache.put(scheduledTime, true);
         }
     }
 
     // To consider only non delayed jobs
     protected List<JobDescriptor> filterJobs(List<JobDescriptor> jobDescList) {
+        schedulingPolicyTimingLogger.start("ESP.filterJobs");
         Date now = new Date();
         LinkedList<JobDescriptor> executionCycleJobs = new LinkedList<>();
         Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
@@ -156,7 +182,7 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                                                        startAt,
                                                        ISO8601DateUtil.parse(now)));
                         }
-                        scheduleWakeUp(candidate.getJobId().toString(), now, startAtDate);
+                        scheduleWakeUp(now, startAtDate);
                     }
                 } catch (IllegalArgumentException e) {
                     logger.warn(String.format("An error occurred while processing 'startAt' generic info.%n" +
@@ -168,16 +194,27 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
 
             }
         }
+        schedulingPolicyTimingLogger.end("ESP.filterJobs");
         return executionCycleJobs;
     }
 
     private String getStartAtValue(JobDescriptor jobDesc) {
-        return ((JobDescriptorImpl) jobDesc).getInternal()
-                                            .getRuntimeGenericInformation()
-                                            .get(GENERIC_INFORMATION_KEY_START_AT);
+        String key = jobDesc.getJobId().value();
+        if (startAtCache.containsKey(key)) {
+            return startAtCache.get(key);
+        }
+        String startAt = ((JobDescriptorImpl) jobDesc).getInternal()
+                                                      .getRuntimeGenericInformation()
+                                                      .get(GENERIC_INFORMATION_KEY_START_AT);
+        startAtCache.put(key, startAt);
+        return startAt;
     }
 
     private String getStartAtValue(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) {
+        String key = taskDesc.getTaskId().toString();
+        if (startAtCache.containsKey(key)) {
+            return startAtCache.get(key);
+        }
         String startAt = ((EligibleTaskDescriptorImpl) taskDesc).getInternal()
                                                                 .getRuntimeGenericInformation()
                                                                 .get(GENERIC_INFORMATION_KEY_START_AT);
@@ -186,6 +223,13 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                                                    .getRuntimeGenericInformation()
                                                    .get(GENERIC_INFORMATION_KEY_START_AT);
         }
+        startAtCache.put(key, startAt);
         return startAt;
+    }
+
+    @VisibleForTesting
+    public void clearCaches() {
+        delayedJobsWakeUpCache.clear();
+        startAtCache.clear();
     }
 }
