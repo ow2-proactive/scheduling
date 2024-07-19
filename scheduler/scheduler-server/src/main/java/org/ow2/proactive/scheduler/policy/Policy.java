@@ -106,6 +106,20 @@ public abstract class Policy implements Serializable {
     }
 
     /**
+     * Can be overridden to perform actions before multiple isTaskExecutable are called
+     */
+    public void beforeIsTaskExecutable() {
+
+    }
+
+    /**
+     * Can be overridden to perform actions after multiple isTaskExecutable are called
+     */
+    public void afterIsTaskExecutable() {
+
+    }
+
+    /**
      * Set the RM state
      *
      * @param state resource manager state

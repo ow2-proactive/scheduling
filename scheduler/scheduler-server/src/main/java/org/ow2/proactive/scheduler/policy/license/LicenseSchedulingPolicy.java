@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -42,6 +43,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -64,7 +66,10 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
     // For DB persistence
     private LicenseSynchronization licenseSynchronization = null;
 
-    private void initialize() {
+    protected void initialize() {
+        if (schedulingPolicyTimingLogger == null) {
+            schedulingPolicyTimingLogger = new MultipleTimingLogger("LicenseSchedulingPolicyTiming", logger, true);
+        }
 
         if (properties == null) {
 
@@ -98,6 +103,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
     }
 
     private void removeFinishedJobsAndReleaseTokens(String requiredLicense) {
+        schedulingPolicyTimingLogger.start("LP.removeFinishedJobsAndReleaseTokens");
 
         LinkedBlockingQueue<String> eligibleJobsDescriptorsLicense = licenseSynchronization.getPersistedJobsLicense(requiredLicense);
 
@@ -126,9 +132,11 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         licenseSynchronization.setNbTokens(requiredLicense, currentNbTokens);
         licenseSynchronization.markJobLicenseChange(requiredLicense);
         licenseSynchronization.persist();
+        schedulingPolicyTimingLogger.end("LP.removeFinishedJobsAndReleaseTokens");
     }
 
     private void removeFinishedTasksAndReleaseTokens(String requiredLicense) {
+        schedulingPolicyTimingLogger.start("LP.removeFinishedTasksAndReleaseTokens");
 
         LinkedBlockingQueue<String> eligibleTasksDescriptorsLicense = licenseSynchronization.getPersistedTasksLicense(requiredLicense);
 
@@ -156,71 +164,81 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         licenseSynchronization.setNbTokens(requiredLicense, currentNbTokens);
         licenseSynchronization.markTaskLicenseChange(requiredLicense);
         licenseSynchronization.persist();
+        schedulingPolicyTimingLogger.end("LP.removeFinishedTasksAndReleaseTokens");
     }
 
     private boolean canGetToken(String currentRequiredLicense) {
-
-        if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) == -1) {
-            logger.debug("No token specified in the config file, return false");
-            return false;
-        } else if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) > 0) {
-            logger.debug("There are still remaining licenses, return true");
-            return true;
-        } else { // == 0
-            logger.debug("Removing all terminated jobs/tasks and check again if there are remaining licenses");
-            removeFinishedJobsAndReleaseTokens(currentRequiredLicense);
-            removeFinishedTasksAndReleaseTokens(currentRequiredLicense);
-
-            if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) > 0) {
-                logger.debug("There are remaining licenses after releasing tokens, return true");
+        schedulingPolicyTimingLogger.start("LP.canGetToken");
+        try {
+            if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) == -1) {
+                logger.debug("No token specified in the config file, return false");
+                return false;
+            } else if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) > 0) {
+                logger.debug("There are still remaining licenses, return true");
                 return true;
+            } else { // == 0
+                logger.debug("Removing all terminated jobs/tasks and check again if there are remaining licenses");
+                removeFinishedJobsAndReleaseTokens(currentRequiredLicense);
+                removeFinishedTasksAndReleaseTokens(currentRequiredLicense);
+
+                if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) > 0) {
+                    logger.debug("There are remaining licenses after releasing tokens, return true");
+                    return true;
+                }
+                return false;
             }
-            return false;
+        } finally {
+            schedulingPolicyTimingLogger.end("LP.canGetToken");
         }
     }
 
     private boolean acquireTokensForJob(JobDescriptorImpl job) {
+        schedulingPolicyTimingLogger.start("LP.acquireTokensForJob");
+        try {
 
-        // Retrieve required licenses names from the job generic informations
-        final String requiredLicenses = job.getInternal().getRuntimeGenericInformation().get(REQUIRED_LICENSES);
-        final String jobId = job.getJobId().value();
+            // Retrieve required licenses names from the job generic informations
+            final String requiredLicenses = job.getInternal().getRuntimeGenericInformation().get(REQUIRED_LICENSES);
+            final String jobId = job.getJobId().value();
 
-        // If it requires software licenses
-        if (requiredLicenses != null) {
+            // If it requires software licenses
+            if (requiredLicenses != null) {
 
-            logger.debug("For job considering licenses " + requiredLicenses);
+                logger.debug("For job considering licenses " + requiredLicenses);
 
-            // Do not execute if one of the required license can not be obtained
-            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split("\\s*,\\s*")));
-            boolean jobHoldsToken, canGetToken;
-            for (String requiredLicense : requiredLicensesSet) {
+                // Do not execute if one of the required license can not be obtained
+                final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split("\\s*,\\s*")));
+                boolean jobHoldsToken, canGetToken;
+                for (String requiredLicense : requiredLicensesSet) {
 
-                if (!licenseSynchronization.containsLicense(requiredLicense)) {
-                    logger.debug("The required software is not specified in the license properties file, keep job pending");
-                    return false;
+                    if (!licenseSynchronization.containsLicense(requiredLicense)) {
+                        logger.debug("The required software is not specified in the license properties file, keep job pending");
+                        return false;
+                    }
+
+                    jobHoldsToken = licenseSynchronization.containsJobId(requiredLicense, jobId);
+                    canGetToken = canGetToken(requiredLicense);
+                    if (!jobHoldsToken && !canGetToken) {
+                        logger.debug("Job does not already hold a token for " + requiredLicense +
+                                     " and cannot get a new one, keep job pending");
+                        return false;
+                    }
                 }
-
-                jobHoldsToken = licenseSynchronization.containsJobId(requiredLicense, jobId);
-                canGetToken = canGetToken(requiredLicense);
-                if (!jobHoldsToken && !canGetToken) {
-                    logger.debug("Job does not already hold a token for " + requiredLicense +
-                                 " and cannot get a new one, keep job pending");
-                    return false;
+                logger.debug("Job eligible since it can get all tokens or already hold them");
+                for (String requiredLicense : requiredLicensesSet) {
+                    if (!licenseSynchronization.containsJobId(requiredLicense, jobId)) {
+                        licenseSynchronization.addJobToLicense(requiredLicense, jobId);
+                        licenseSynchronization.markJobLicenseChange(requiredLicense);
+                    }
                 }
+                licenseSynchronization.persist();
+                return true;
+
+            } else {
+                logger.debug("Job eligible since it does not require any license");
+                return true;
             }
-            logger.debug("Job eligible since it can get all tokens or already hold them");
-            for (String requiredLicense : requiredLicensesSet) {
-                if (!licenseSynchronization.containsJobId(requiredLicense, jobId)) {
-                    licenseSynchronization.addJobToLicense(requiredLicense, jobId);
-                    licenseSynchronization.markJobLicenseChange(requiredLicense);
-                }
-            }
-            licenseSynchronization.persist();
-            return true;
-
-        } else {
-            logger.debug("Job eligible since it does not require any license");
-            return true;
+        } finally {
+            schedulingPolicyTimingLogger.end("LP.acquireTokensForJob");
         }
 
     }
@@ -280,6 +298,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
 
         initialize();
+        schedulingPolicyTimingLogger.start("LP.getOrderedTasks");
 
         // Filter jobs according to the parent policy
         List<JobDescriptor> filteredJobDescList = super.filterJobs(jobDescList);
@@ -296,62 +315,81 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
                                                                                                                       .filter(taskDesc -> notRequireLicenseOrLicenseExists(taskDesc))
                                                                                                                       .collect(Collectors.toCollection(LinkedList::new));
 
+        schedulingPolicyTimingLogger.end("LP.getOrderedTasks");
+        schedulingPolicyTimingLogger.printTimings(Level.DEBUG);
+        schedulingPolicyTimingLogger.clear();
         return filteredOrderedTasksDescFromParentPolicy;
+    }
+
+    @Override
+    public void beforeIsTaskExecutable() {
+        schedulingPolicyTimingLogger.clear();
+    }
+
+    @Override
+    public void afterIsTaskExecutable() {
+        schedulingPolicyTimingLogger.printTimings(Level.DEBUG);
+        schedulingPolicyTimingLogger.clear();
     }
 
     /* A task is executable if it does not require any license or if it can get tokens */
     @Override
     public boolean isTaskExecutable(NodeSet selectedNodes, EligibleTaskDescriptor task) {
 
-        // If it requires software licenses
-        String requiredLicenses = getRequiredLicenses(task);
-        String jobId = ((EligibleTaskDescriptorImpl) task).getInternal().getJobId().value();
-        String taskId = task.getTaskId().toString();
+        schedulingPolicyTimingLogger.start("LP.isTaskExecutable");
+        try {
+            // If it requires software licenses
+            String requiredLicenses = getRequiredLicenses(task);
+            String jobId = ((EligibleTaskDescriptorImpl) task).getInternal().getJobId().value();
+            String taskId = task.getTaskId().toString();
 
-        if (requiredLicenses != null) {
+            if (requiredLicenses != null) {
 
-            logger.debug("Try to get tokens for licenses " + requiredLicenses);
-            boolean taskHoldsToken, jobHoldsToken, canGetToken;
-            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split("\\s*,\\s*")));
-            for (String requiredLicense : requiredLicensesSet) {
+                logger.debug("Try to get tokens for licenses " + requiredLicenses);
+                boolean taskHoldsToken, jobHoldsToken, canGetToken;
+                final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split("\\s*,\\s*")));
+                for (String requiredLicense : requiredLicensesSet) {
 
-                jobHoldsToken = licenseSynchronization.containsJobId(requiredLicense, jobId);
-                taskHoldsToken = licenseSynchronization.containsTaskId(requiredLicense, taskId);
-                canGetToken = canGetToken(requiredLicense);
+                    jobHoldsToken = licenseSynchronization.containsJobId(requiredLicense, jobId);
+                    taskHoldsToken = licenseSynchronization.containsTaskId(requiredLicense, taskId);
+                    canGetToken = canGetToken(requiredLicense);
 
-                logger.debug("For license " + requiredLicense + " task " + taskId + " holds a token? " +
-                             taskHoldsToken + " job " + jobId + " holds a token? " + jobHoldsToken +
-                             " a new token is available? " + canGetToken);
+                    logger.debug("For license " + requiredLicense + " task " + taskId + " holds a token? " +
+                                 taskHoldsToken + " job " + jobId + " holds a token? " + jobHoldsToken +
+                                 " a new token is available? " + canGetToken);
 
-                if (!jobHoldsToken && !taskHoldsToken && !canGetToken) {
-                    logger.debug("Task and its job do not already hold a token for " + requiredLicense +
-                                 " and cannot get a new one, keep task pending");
-                    return false;
+                    if (!jobHoldsToken && !taskHoldsToken && !canGetToken) {
+                        logger.debug("Task and its job do not already hold a token for " + requiredLicense +
+                                     " and cannot get a new one, keep task pending");
+                        return false;
+                    }
                 }
-            }
-            for (String requiredLicense : requiredLicensesSet) {
+                for (String requiredLicense : requiredLicensesSet) {
 
-                taskHoldsToken = licenseSynchronization.containsTaskId(requiredLicense, taskId);
-                jobHoldsToken = licenseSynchronization.containsJobId(requiredLicense, jobId);
+                    taskHoldsToken = licenseSynchronization.containsTaskId(requiredLicense, taskId);
+                    jobHoldsToken = licenseSynchronization.containsJobId(requiredLicense, jobId);
 
-                logger.debug("For license " + requiredLicense + " taskHoldsToken? " + taskHoldsToken +
-                             " jobHoldsToken? " + jobHoldsToken);
+                    logger.debug("For license " + requiredLicense + " taskHoldsToken? " + taskHoldsToken +
+                                 " jobHoldsToken? " + jobHoldsToken);
 
-                if (taskHoldsToken || jobHoldsToken) {
-                    logger.debug("The license " + requiredLicense +
-                                 " is already obtained at the job level or the task level, use it without getting a new token");
-                } else {
-                    logger.debug("Task and its job do not already hold a token for " + requiredLicense +
-                                 " but acquiring a new one");
-                    licenseSynchronization.addTaskToLicense(requiredLicense, taskId);
-                    licenseSynchronization.markTaskLicenseChange(requiredLicense);
+                    if (taskHoldsToken || jobHoldsToken) {
+                        logger.debug("The license " + requiredLicense +
+                                     " is already obtained at the job level or the task level, use it without getting a new token");
+                    } else {
+                        logger.debug("Task and its job do not already hold a token for " + requiredLicense +
+                                     " but acquiring a new one");
+                        licenseSynchronization.addTaskToLicense(requiredLicense, taskId);
+                        licenseSynchronization.markTaskLicenseChange(requiredLicense);
+                    }
                 }
+                licenseSynchronization.persist();
+                return true;
+            } else {
+                logger.debug("Executable since it does not require any license");
+                return true;
             }
-            licenseSynchronization.persist();
-            return true;
-        } else {
-            logger.debug("Executable since it does not require any license");
-            return true;
+        } finally {
+            schedulingPolicyTimingLogger.end("LP.isTaskExecutable");
         }
     }
 

@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
@@ -46,6 +47,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.tests.ProActiveTestClean;
@@ -64,6 +66,8 @@ public class ExtendedSchedulerPolicyTest extends ProActiveTestClean {
 
     private int jobId = 0;
 
+    private int taskId = 0;
+
     @Before
     public void setUp() {
         policy = new ExtendedSchedulerPolicy();
@@ -71,6 +75,11 @@ public class ExtendedSchedulerPolicyTest extends ProActiveTestClean {
         now = ISO8601DateUtil.parse(new Date(0));
         // Sun Aug 17 08:12:55 CET 292278994
         later = ISO8601DateUtil.parse(new Date(Long.MAX_VALUE));
+    }
+
+    @After
+    public void after() {
+        policy.clearCaches();
     }
 
     @Test
@@ -124,7 +133,7 @@ public class ExtendedSchedulerPolicyTest extends ProActiveTestClean {
         LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
-        assertNull(startAtValue);
+        assertEquals(now, startAtValue);
     }
 
     @Test
@@ -196,8 +205,8 @@ public class ExtendedSchedulerPolicyTest extends ProActiveTestClean {
         taskFlowJob.setId(JobIdImpl.makeJobId(Integer.toString(jobId++)));
 
         ArrayList<InternalTask> tasks = new ArrayList<>();
-        tasks.add(createTask(oneTaskStartAt));
-        tasks.add(createTask(otherTaskStartAt));
+        tasks.add(createTask(taskFlowJob, oneTaskStartAt));
+        tasks.add(createTask(taskFlowJob, otherTaskStartAt));
         taskFlowJob.addTasks(tasks);
 
         if (jobStartAt != null) {
@@ -207,12 +216,9 @@ public class ExtendedSchedulerPolicyTest extends ProActiveTestClean {
         return new JobDescriptorImpl(taskFlowJob);
     }
 
-    private InternalScriptTask createTask(String taskStartAt) {
-        InternalJob job = new InternalTaskFlowJob("test-name",
-                                                  JobPriority.NORMAL,
-                                                  OnTaskError.CANCEL_JOB,
-                                                  "description");
-        InternalScriptTask task1 = new InternalScriptTask(job);
+    private InternalScriptTask createTask(InternalTaskFlowJob taskFlowJob, String taskStartAt) {
+        InternalScriptTask task1 = new InternalScriptTask(taskFlowJob);
+        task1.setId(TaskIdImpl.createTaskId(taskFlowJob.getId(), "Task" + taskId, taskId++));
         if (taskStartAt != null) {
             task1.addGenericInformation("START_AT", taskStartAt);
         }
