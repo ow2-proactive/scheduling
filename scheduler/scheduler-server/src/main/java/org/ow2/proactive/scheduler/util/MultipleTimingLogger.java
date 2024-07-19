@@ -90,6 +90,10 @@ public class MultipleTimingLogger {
         }
     }
 
+    public void clear() {
+        allTimings.clear();
+    }
+
 }
 
 class TimingModel {
