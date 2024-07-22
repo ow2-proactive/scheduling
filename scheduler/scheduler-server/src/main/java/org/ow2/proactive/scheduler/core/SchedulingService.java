@@ -140,7 +140,7 @@ public class SchedulingService {
             SynchronizationInternal synchronizationAPI) throws Exception {
         this.infrastructure = infrastructure;
         this.listener = listener;
-        this.jobs = new LiveJobs(infrastructure.getDBManager(), listener, synchronizationAPI);
+        this.jobs = new LiveJobs(infrastructure.getDBManager(), listener, synchronizationAPI, this);
         if (recoveredState != null) {
             recover(recoveredState);
         }

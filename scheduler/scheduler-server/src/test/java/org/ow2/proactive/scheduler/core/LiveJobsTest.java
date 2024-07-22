@@ -84,7 +84,7 @@ public class LiveJobsTest extends ProActiveTestClean {
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        liveJobs = new LiveJobs(dbManager, listener, null);
+        liveJobs = new LiveJobs(dbManager, listener, null, null);
     }
 
     @Test(timeout = 60000)

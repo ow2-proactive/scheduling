@@ -119,9 +119,11 @@ class LiveJobs {
 
     private final OnErrorPolicyInterpreter onErrorPolicyInterpreter = new OnErrorPolicyInterpreter();
 
-    private final StartAtUpdater startAtUpdater = new StartAtUpdater();
+    private final StartAtUpdater startAtUpdater;
 
     private final SynchronizationInternal synchronizationInternal;
+
+    private SchedulingService service;
 
     private static final String SIGNAL_ORIGINATOR = "scheduler";
 
@@ -129,10 +131,13 @@ class LiveJobs {
 
     private static final TaskId SIGNAL_TASK_ID = TaskIdImpl.makeTaskId(SIGNAL_TASK);
 
-    LiveJobs(SchedulerDBManager dbManager, SchedulerStateUpdate listener, SynchronizationInternal synchronizationAPI) {
+    LiveJobs(SchedulerDBManager dbManager, SchedulerStateUpdate listener, SynchronizationInternal synchronizationAPI,
+            SchedulingService service) {
         this.dbManager = dbManager;
         this.listener = listener;
         this.synchronizationInternal = synchronizationAPI;
+        this.service = service;
+        this.startAtUpdater = new StartAtUpdater(service);
     }
 
     Collection<RunningTaskData> getRunningTasks() {
