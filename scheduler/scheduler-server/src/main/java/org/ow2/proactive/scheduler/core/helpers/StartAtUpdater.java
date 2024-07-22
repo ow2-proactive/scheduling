@@ -32,19 +32,36 @@ import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
+import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
+import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 public class StartAtUpdater {
 
+    private SchedulingService service;
+
+    public StartAtUpdater(SchedulingService service) {
+        this.service = service;
+    }
+
     public boolean updateStartAt(InternalJob job, String startAt, SchedulerDBManager dbManager) {
 
         long scheduledTime = ISO8601DateUtil.toDate(startAt).getTime();
 
-        Set<TaskId> updatedTasks = updateStartAtAndTasksScheduledTime(job, startAt, scheduledTime);
+        ExtendedSchedulerPolicy schedulerPolicy = null;
+
+        if (service != null) {
+            Policy policy = service.getPolicy();
+            if (policy instanceof ExtendedSchedulerPolicy) {
+                schedulerPolicy = (ExtendedSchedulerPolicy) policy;
+            }
+        }
+
+        Set<TaskId> updatedTasks = updateStartAtAndTasksScheduledTime(job, startAt, scheduledTime, schedulerPolicy);
 
         boolean updatedTasksNotEmpty = !updatedTasks.isEmpty();
 
@@ -56,30 +73,39 @@ public class StartAtUpdater {
 
     }
 
-    private Set<TaskId> updateStartAtAndTasksScheduledTime(InternalJob job, String startAt, long scheduledTime) {
+    private Set<TaskId> updateStartAtAndTasksScheduledTime(InternalJob job, String startAt, long scheduledTime,
+            ExtendedSchedulerPolicy schedulerPolicy) {
 
         List<InternalTask> internalTasks = job.getITasks();
         Set<TaskId> updatedTasks = new HashSet<>(internalTasks.size());
 
-        if (resetJobGenericInformation(job, startAt)) {
+        if (resetJobGenericInformation(job, startAt, schedulerPolicy)) {
 
             for (InternalTask td : internalTasks) {
                 td.setScheduledTime(scheduledTime);
                 updatedTasks.add(td.getId());
                 job.getJobDescriptor().updateTaskScheduledTime(td.getId(), scheduledTime);
+                if (schedulerPolicy != null) {
+                    schedulerPolicy.updateStartAt(td.getId().toString(), startAt);
+                }
             }
         }
 
         return updatedTasks;
     }
 
-    private boolean resetJobGenericInformation(InternalJob job, String startAt) {
+    private boolean resetJobGenericInformation(InternalJob job, String startAt,
+            ExtendedSchedulerPolicy schedulerPolicy) {
 
         Map<String, String> genericInformation = job.getRuntimeGenericInformation();
 
         if (isValidStartAt(genericInformation, startAt)) {
             genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
             job.setGenericInformation(genericInformation);
+            if (schedulerPolicy != null) {
+                schedulerPolicy.updateStartAt(job.getId().value(), startAt);
+            }
+
             return true;
         }
 
