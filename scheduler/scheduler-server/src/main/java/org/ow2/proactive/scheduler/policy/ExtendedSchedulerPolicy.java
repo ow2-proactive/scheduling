@@ -198,6 +198,12 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
         return executionCycleJobs;
     }
 
+    public void updateStartAt(String key, String startAt) {
+        if (startAtCache.containsKey(key)) {
+            startAtCache.put(key, startAt);
+        }
+    }
+
     private String getStartAtValue(JobDescriptor jobDesc) {
         String key = jobDesc.getJobId().value();
         if (startAtCache.containsKey(key)) {

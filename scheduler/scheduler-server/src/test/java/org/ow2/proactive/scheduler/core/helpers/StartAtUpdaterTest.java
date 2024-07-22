@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
+import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -65,9 +66,12 @@ public class StartAtUpdaterTest {
     @Mock
     private SchedulerDBManager dbManager;
 
+    @Mock
+    private SchedulingService service;
+
     @Before
     public void init() {
-        this.startAtUpdater = new StartAtUpdater();
+        this.startAtUpdater = new StartAtUpdater(service);
         MockitoAnnotations.initMocks(this);
 
         when(internalJob.getJobDescriptor()).thenReturn(jobDescriptor);
