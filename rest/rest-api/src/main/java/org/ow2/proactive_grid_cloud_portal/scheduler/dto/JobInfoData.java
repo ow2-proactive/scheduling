@@ -113,6 +113,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private String submissionMode;
 
+    private Long startAt = null;
+
     public void setToBeRemoved() {
         toBeRemoved = true;
     }
@@ -425,6 +427,14 @@ public class JobInfoData implements java.io.Serializable {
         this.numberOfNodesInParallel = numberOfNodesInParallel;
     }
 
+    public Long getStartAt() {
+        return startAt;
+    }
+
+    public void setStartAt(Long startAt) {
+        this.startAt = startAt;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{ " + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
@@ -439,7 +449,7 @@ public class JobInfoData implements java.io.Serializable {
                ", detailedSignals=" + detailedSignals + ", attachedServices=" + attachedServices +
                ", externalEndpointUrls=" + externalEndpointUrls + ", cumulatedCoreTime=" + cumulatedCoreTime +
                ", numberOfNodes=" + numberOfNodes + ", numberOfNodesInParallel=" + numberOfNodesInParallel +
-               ", submissionMode=" + submissionMode + " }";
+               ", submissionMode=" + submissionMode + ", startAt=" + startAt + " }";
     }
 
 }

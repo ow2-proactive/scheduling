@@ -3526,6 +3526,20 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public boolean changeStartAtMultiple(String sessionId, String startAt, List<String> jobIdList)
+            throws RestException {
+        try {
+            final Scheduler s = checkAccess(sessionId, "PUT jobs/startat");
+            List<JobId> jobIds = jobIdList.stream()
+                                          .map(jobId -> JobIdImpl.makeJobId(jobId))
+                                          .collect(Collectors.toList());
+            return s.changeStartAt(jobIds, startAt);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
     public Map<Object, Object> getPortalConfiguration(String sessionId) throws RestException {
         try {
             final Scheduler s = checkAccess(sessionId, "GET configuration/portal");

@@ -38,10 +38,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
@@ -350,6 +347,9 @@ public class SchedulerDBManager {
                             break;
                         case STATE:
                             sortOrder = configureSortOrder(cb, root, param, "statusRank");
+                            break;
+                        case START_AT:
+                            sortOrder = configureSortOrder(cb, root, param, "startAt");
                             break;
                         case SUBMIT_TIME:
                             sortOrder = configureSortOrder(cb, root, param, "submittedTime");
@@ -2808,6 +2808,28 @@ public class SchedulerDBManager {
                           .setParameter("jobId", jobId)
                           .setParameter("amount", increaseAmount)
                           .executeUpdate();
+        });
+    }
+
+    public void updateStartAt(Long jobId, Long startAt) {
+        executeReadWriteTransaction(session -> {
+            return session.getNamedQuery("updateJobDataStartAt")
+                          .setParameter("lastUpdatedTime", new Date().getTime())
+                          .setParameter("jobId", jobId)
+                          .setParameter("startAt", startAt)
+                          .executeUpdate();
+        });
+    }
+
+    public void updateGenericInfo(Long jobId, Map<String, String> genericInfo) {
+        executeReadWriteTransaction(session -> {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaUpdate<JobData> criteriaUpdate = cb.createCriteriaUpdate(JobData.class);
+            Root<JobData> root = criteriaUpdate.from(JobData.class);
+            criteriaUpdate.set("genericInformation", genericInfo);
+            criteriaUpdate.where(cb.equal(root.get("id"), jobId));
+            session.createQuery(criteriaUpdate).executeUpdate();
+            return null;
         });
     }
 

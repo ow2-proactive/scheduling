@@ -102,6 +102,7 @@ public class DataUtility {
         impl.setNumberOfNodes(d.getNumberOfNodes());
         impl.setSubmissionMode(d.getSubmissionMode());
         impl.setLabel(d.getLabel());
+        impl.setStartAt(d.getStartAt());
         return impl;
     }
 

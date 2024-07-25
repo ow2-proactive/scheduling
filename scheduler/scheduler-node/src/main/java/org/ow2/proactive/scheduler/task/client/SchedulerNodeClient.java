@@ -965,6 +965,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public boolean changeStartAt(List<JobId> jobIdList, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        renewSession();
+        return client.changeStartAt(jobIdList, startAt);
+    }
+
+    @Override
     public String getJobContent(JobId jobId) throws SchedulerException {
         renewSession();
         return client.getJobContent(jobId);
