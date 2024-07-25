@@ -2694,6 +2694,25 @@ public interface SchedulerRestInterface {
     final String startAt) throws RestException;
 
     /**
+     * Change the START_AT generic information for multiple jobs and reset the
+     * scheduledAt at task level
+     *
+     * @param sessionId
+     *            current session
+     * @param startAt
+     *            its value should be ISO 8601 compliant
+     * @param jobIdList
+     *      a list of job ids as JSON body
+     */
+    @PUT
+    @Path("jobs/startat/{startAt}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    boolean changeStartAtMultiple(@HeaderParam("sessionid")
+    final String sessionId, @PathParam("startAt")
+    final String startAt, List<String> jobIdList) throws RestException;
+
+    /**
      * Get portal configuration properties
      */
     @GET

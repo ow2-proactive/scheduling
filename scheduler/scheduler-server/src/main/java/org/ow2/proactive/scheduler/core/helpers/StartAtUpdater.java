@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 import org.ow2.proactive.scheduler.core.SchedulingService;
@@ -66,7 +67,10 @@ public class StartAtUpdater {
         boolean updatedTasksNotEmpty = !updatedTasks.isEmpty();
 
         if (updatedTasksNotEmpty) {
+            job.setStartAt(scheduledTime);
             dbManager.updateTaskSchedulingTime(job, scheduledTime);
+            dbManager.updateStartAt(job.getId().longValue(), scheduledTime);
+            dbManager.updateGenericInfo(job.getId().longValue(), job.getRuntimeGenericInformation());
         }
 
         return updatedTasksNotEmpty;
@@ -99,7 +103,7 @@ public class StartAtUpdater {
 
         Map<String, String> genericInformation = job.getRuntimeGenericInformation();
 
-        if (isValidStartAt(genericInformation, startAt)) {
+        if (job.getStatus() == JobStatus.PENDING && isValidStartAt(genericInformation, startAt)) {
             genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
             job.setGenericInformation(genericInformation);
             if (schedulerPolicy != null) {

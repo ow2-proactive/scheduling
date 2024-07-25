@@ -363,6 +363,12 @@ public interface JobInfo extends Serializable {
     Long getParentId();
 
     /**
+     * Return the scheduled time of the job, defined by the generic information START_AT
+     * @return scheduled time of the job of the job, or null it is not defined
+     */
+    Long getStartAt();
+
+    /**
      * Return the number of children jobs
      * @return number of children jobs
      */

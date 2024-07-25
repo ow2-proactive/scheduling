@@ -112,6 +112,7 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "updateJobDataRemovedTimeInBulk", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id in (:jobIdList)"),
                 @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                @NamedQuery(name = "updateJobDataStartAt", query = "update JobData set startAt = :startAt, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "increaseJobDataChildrenCount", query = "update JobData set childrenCount = childrenCount+1, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "increaseJobDataChildrenCountAmount", query = "update JobData set childrenCount = childrenCount + :amount, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "decreaseJobDataChildrenCount", query = "update JobData set childrenCount = childrenCount-1, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
@@ -161,7 +162,8 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_JOB_NAME", columnList = "JOB_NAME"),
                                       @Index(name = "JOB_DATA_PROJECT_NAME", columnList = "PROJECT_NAME"),
                                       @Index(name = "JOB_DATA_SUBMISSION_MODE", columnList = "SUBMISSION_MODE"),
-                                      @Index(name = "JOB_DATA_LABEL", columnList = "LABEL"), })
+                                      @Index(name = "JOB_DATA_LABEL", columnList = "LABEL"),
+                                      @Index(name = "JOB_DATA_START_AT", columnList = "START_AT DESC") })
 public class JobData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobData.class);
@@ -268,6 +270,8 @@ public class JobData implements Serializable {
 
     private String submissionMode;
 
+    private Long startAt;
+
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
@@ -311,6 +315,7 @@ public class JobData implements Serializable {
         List<String> pTasks = getPreciousTasks();
         jobInfo.setPreciousTasks(pTasks);
         jobInfo.setSubmissionMode(getSubmissionMode());
+        jobInfo.setStartAt(getStartAt());
         return jobInfo;
     }
 
@@ -405,6 +410,7 @@ public class JobData implements Serializable {
             }
 
         }
+        internalJob.setStartAt(getStartAt());
         return internalJob;
     }
 
@@ -462,6 +468,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setExternalEndpointUrls(job.getExternalEndpointUrls());
         jobRuntimeData.setSubmissionMode(job.getSubmissionMode());
         jobRuntimeData.setLabel(job.getLabel());
+        jobRuntimeData.setStartAt(job.getStartAt());
 
         return jobRuntimeData;
     }
@@ -944,6 +951,15 @@ public class JobData implements Serializable {
 
     public void setExternalEndpointUrls(Map<String, ExternalEndpoint> externalEndpointUrls) {
         this.externalEndpointUrls = externalEndpointUrls;
+    }
+
+    @Column(name = "START_AT", nullable = true)
+    public Long getStartAt() {
+        return startAt;
+    }
+
+    public void setStartAt(Long startAt) {
+        this.startAt = startAt;
     }
 
     public void addJobContent(Job job) {

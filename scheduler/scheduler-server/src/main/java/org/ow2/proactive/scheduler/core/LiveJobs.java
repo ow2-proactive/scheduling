@@ -365,7 +365,13 @@ class LiveJobs {
             return false;
         }
         try {
-            return startAtUpdater.updateStartAt(jobData.job, startAt, dbManager);
+            boolean answer = startAtUpdater.updateStartAt(jobData.job, startAt, dbManager);
+            if (answer) {
+                listener.jobStateUpdated(jobData.job.getOwner(),
+                                         new NotificationData<JobInfo>(SchedulerEvent.JOB_UPDATED,
+                                                                       new JobInfoImpl((JobInfoImpl) jobData.job.getJobInfo())));
+            }
+            return answer;
         } finally {
             jobData.unlock();
         }

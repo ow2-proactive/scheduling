@@ -38,11 +38,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
@@ -75,6 +77,7 @@ public class StartAtUpdaterTest {
         MockitoAnnotations.initMocks(this);
 
         when(internalJob.getJobDescriptor()).thenReturn(jobDescriptor);
+        when(internalJob.getId()).thenReturn(JobIdImpl.makeJobId("1"));
     }
 
     @Test
@@ -86,6 +89,7 @@ public class StartAtUpdaterTest {
         internalTasks.add(internalTask);
 
         when(internalJob.getITasks()).thenReturn(internalTasks);
+        when(internalJob.getStatus()).thenReturn(JobStatus.PENDING);
         Map<String, String> genericInformation = Maps.newHashMap();
 
         genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
@@ -105,6 +109,7 @@ public class StartAtUpdaterTest {
         internalTasks.add(internalTask);
 
         when(internalJob.getITasks()).thenReturn(internalTasks);
+        when(internalJob.getStatus()).thenReturn(JobStatus.PENDING);
         Map<String, String> genericInformation = Maps.newHashMap();
         when(internalJob.getRuntimeGenericInformation()).thenReturn(genericInformation);
 
@@ -124,6 +129,7 @@ public class StartAtUpdaterTest {
         internalTasks.add(internalTask);
 
         when(internalJob.getITasks()).thenReturn(internalTasks);
+        when(internalJob.getStatus()).thenReturn(JobStatus.PENDING);
         Map<String, String> genericInformation = Maps.newHashMap();
         genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
         when(internalJob.getRuntimeGenericInformation()).thenReturn(genericInformation);
@@ -143,6 +149,7 @@ public class StartAtUpdaterTest {
 
         ArrayList<InternalTask> internalTasks = Lists.newArrayList();
         when(internalJob.getITasks()).thenReturn(internalTasks);
+        when(internalJob.getStatus()).thenReturn(JobStatus.PENDING);
         Map<String, String> genericInformation = Maps.newHashMap();
         genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
         when(internalJob.getRuntimeGenericInformation()).thenReturn(genericInformation);

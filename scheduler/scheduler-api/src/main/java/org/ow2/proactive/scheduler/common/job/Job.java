@@ -154,6 +154,11 @@ public abstract class Job extends CommonAttribute {
     protected String submissionMode = "";
 
     /**
+     * Return the scheduled time of the job, defined by the generic information START_AT
+     */
+    protected Long startAt = null;
+
+    /**
      * ProActive Empty Constructor
      */
     public Job() {
@@ -457,6 +462,14 @@ public abstract class Job extends CommonAttribute {
             replacementVariables.put(variable.getName(), variable.getValue());
         }
         return replacementVariables;
+    }
+
+    public Long getStartAt() {
+        return startAt;
+    }
+
+    public void setStartAt(Long startAt) {
+        this.startAt = startAt;
     }
 
     @Override
