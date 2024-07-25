@@ -164,6 +164,7 @@ import functionaltests.workflow.TestXMLTransformer;
 import functionaltests.workflow.javatask.ComplexTypeArgsTest;
 import functionaltests.workflow.nativetask.TestJobNativeSubmission;
 import functionaltests.workflow.nativetask.TestNativeTaskPaths;
+import functionaltests.workflow.startat.TestStartAt;
 import functionaltests.workflow.variables.TestModifyPropagatedVariables;
 import functionaltests.workflow.variables.TestNonForkedScriptTaskVariablePropagation;
 import functionaltests.workflow.variables.TestPropagatedVariables;
@@ -228,7 +229,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
                       Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class, TestTaskSynchronization.class,
                       TestMarkedAsFinished.class, RestartAllInErrorTasksTest.class, TestJobWhenSchedulerPaused.class,
-                      TestTaskForkParameter.class, TestJobLabels.class,
+                      TestTaskForkParameter.class, TestJobLabels.class, TestStartAt.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,

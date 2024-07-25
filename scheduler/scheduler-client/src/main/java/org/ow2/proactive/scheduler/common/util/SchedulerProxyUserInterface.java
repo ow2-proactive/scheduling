@@ -928,6 +928,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable, Sch
 
     @Override
     @ImmediateService
+    public boolean changeStartAt(List<JobId> jobIdList, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return uischeduler.changeStartAt(jobIdList, startAt);
+    }
+
+    @Override
+    @ImmediateService
     public String getJobContent(JobId jobId) throws SchedulerException {
         return uischeduler.getJobContent(jobId);
     }

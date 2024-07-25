@@ -1367,6 +1367,11 @@ public abstract class InternalJob extends JobState {
         jobInfo.setToBeRemoved();
     }
 
+    public void setStartAt(Long startAt) {
+        super.setStartAt(startAt);
+        jobInfo.setStartAt(startAt);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

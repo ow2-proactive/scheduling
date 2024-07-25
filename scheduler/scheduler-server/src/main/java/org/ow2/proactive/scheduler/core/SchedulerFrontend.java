@@ -2496,12 +2496,40 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     @RoleWrite
     public boolean changeStartAt(JobId jobId, String startAt)
             throws UnknownJobException, NotConnectedException, PermissionException {
+        String currentUser = frontendState.getCurrentUser();
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
         frontendState.checkPermissionsWrite(currentMethod,
                                             frontendState.getIdentifiedJob(jobId),
                                             YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_START_AT_VALUE_OF_THIS_JOB);
+        logger.info("Request to change startAt (scheduled time) on job " + jobId + " with new value " + startAt +
+                    " received from " + currentUser);
         return schedulingService.changeStartAt(jobId, startAt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
+    @RoleWrite
+    public boolean changeStartAt(List<JobId> jobIdList, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        String currentUser = frontendState.getCurrentUser();
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        for (JobId jobId : jobIdList) {
+            frontendState.checkPermissionsWrite(currentMethod,
+                                                frontendState.getIdentifiedJob(jobId),
+                                                YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_START_AT_VALUE_OF_THIS_JOB);
+        }
+        logger.info("Request to change startAt (scheduled time) on jobs " + jobIdList + " with new value " + startAt +
+                    " received from " + currentUser);
+        boolean answer = true;
+        for (JobId jobId : jobIdList) {
+            answer = answer && schedulingService.changeStartAt(jobId, startAt);
+        }
+        return answer;
     }
 
     @Override

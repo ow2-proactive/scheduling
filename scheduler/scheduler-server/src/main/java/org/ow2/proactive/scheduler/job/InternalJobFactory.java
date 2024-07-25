@@ -25,14 +25,12 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import static org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -50,6 +48,7 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 import org.ow2.proactive.scheduler.core.OnErrorPolicyInterpreter;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
@@ -369,6 +368,17 @@ public class InternalJobFactory {
         //special behavior
         jobToSet.setPriority(job.getPriority());
         jobToSet.setParentId(job.getParentId());
+        Map<String, String> genericInfo = jobToSet.getRuntimeGenericInformation();
+        if (genericInfo.containsKey(GENERIC_INFORMATION_KEY_START_AT)) {
+            String startAt = genericInfo.get(GENERIC_INFORMATION_KEY_START_AT);
+            try {
+                Date startAtDate = ISO8601DateUtil.toDate(startAt);
+                jobToSet.setStartAt(startAtDate.getTime());
+            } catch (Exception e) {
+                logger.error("Error when parsing START_AT=" + startAt + " for job " + jobToSet.getName());
+            }
+        }
+
     }
 
     /**

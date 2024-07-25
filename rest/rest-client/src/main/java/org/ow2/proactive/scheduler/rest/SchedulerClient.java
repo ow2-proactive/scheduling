@@ -1574,6 +1574,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setResultMapPresent(jobInfoData.isResultMapPresent());
         jobInfoImpl.setLabel(jobInfoData.getLabel());
         jobInfoImpl.setSubmissionMode(jobInfoData.getSubmissionMode());
+        jobInfoImpl.setStartAt(jobInfoData.getStartAt());
         return jobInfoImpl;
     }
 
@@ -1583,6 +1584,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         boolean isJobStartAtChanged = false;
         try {
             isJobStartAtChanged = restApi().changeStartAt(sid, jobId.value(), startAt);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return isJobStartAtChanged;
+    }
+
+    @Override
+    public boolean changeStartAt(List<JobId> jobIdList, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        boolean isJobStartAtChanged = false;
+        try {
+            List<String> jobIds = jobIdList.stream().map(jobId -> jobId.value()).collect(Collectors.toList());
+            isJobStartAtChanged = restApi().changeStartAtMultiple(sid, startAt, jobIds);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }

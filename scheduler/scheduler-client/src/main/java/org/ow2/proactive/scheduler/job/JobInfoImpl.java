@@ -162,6 +162,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Long parentId = null;
 
+    private Long startAt = null;
+
     private int childrenCount = 0;
 
     private String submissionMode = null;
@@ -222,6 +224,7 @@ public class JobInfoImpl implements JobInfo {
         this.preciousTasks = jobInfo.getPreciousTasks();
         this.parentId = jobInfo.getParentId();
         this.childrenCount = jobInfo.getChildrenCount();
+        this.startAt = jobInfo.getStartAt();
     }
 
     /**
@@ -685,6 +688,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    @Override
+    public Long getStartAt() {
+        return startAt;
+    }
+
+    public void setStartAt(Long startAt) {
+        this.startAt = startAt;
     }
 
     @Override

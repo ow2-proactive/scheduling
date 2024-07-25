@@ -1918,6 +1918,19 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
             throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
+     * Change the START_AT generic information for multiple jobs at job level and reset the
+     * scheduledAt at task level
+     *
+     * @param jobIdList
+     *            id of the jobs that needs to be updated
+     * @param startAt
+     *            its value should be ISO 8601 compliant
+     */
+    @RoleWrite
+    boolean changeStartAt(List<JobId> jobIdList, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException;
+
+    /**
      * @param jobId job id of existing job
      * @return copy of the xml which was submitted to the scheduler
      */

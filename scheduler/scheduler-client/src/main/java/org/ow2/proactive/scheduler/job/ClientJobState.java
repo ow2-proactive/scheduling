@@ -174,6 +174,7 @@ public class ClientJobState extends JobState {
         }
         // update job info
         this.jobInfo = new JobInfoImpl((JobInfoImpl) info);
+        this.setGenericInformation(jobInfo.getGenericInformation());
         // update skipped tasks
         if (this.jobInfo.getTasksSkipped() != null) {
             for (TaskId id : tasks.keySet()) {

@@ -86,6 +86,7 @@ public class TestJobRuntimeData extends BaseSchedulerDBTest {
         Assert.assertEquals(1, runtimeData.getNumberOfRunningTasks());
         Assert.assertEquals(0, runtimeData.getNumberOfFinishedTasks());
         Assert.assertEquals(0, runtimeData.getNumberOfPendingTasks());
+        Assert.assertNull(runtimeData.getStartAt());
         Assert.assertTrue(runtimeData.getStartTime() > 0);
 
         internalTask = runtimeData.getITasks().get(0);

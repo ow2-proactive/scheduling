@@ -717,6 +717,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public boolean changeStartAt(List<JobId> jobIdList, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return _getScheduler().changeStartAt(jobIdList, startAt);
+    }
+
+    @Override
     public String getJobContent(JobId jobId) throws SchedulerException {
         return _getScheduler().getJobContent(jobId);
     }

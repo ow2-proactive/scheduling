@@ -117,6 +117,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Long parentId;
 
+    private Long startAt;
+
     private int childrenCount;
 
     public void setFinishedTime(long finishedTime) {
@@ -495,5 +497,14 @@ public class JobInfoImpl implements JobInfo {
 
     public void setChildrenCount(int childrenCount) {
         this.childrenCount = childrenCount;
+    }
+
+    @Override
+    public Long getStartAt() {
+        return startAt;
+    }
+
+    public void setStartAt(Long startAt) {
+        this.startAt = startAt;
     }
 }
