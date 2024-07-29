@@ -81,6 +81,8 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
     private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_DESC = ImmutableList.of(new SortParameter<>(JobSortParameter.ID,
                                                                                                                       SortOrder.DESC));
 
+    private static final String JOB_DESCRIPTION = "DUMMY DESCRIPTION";
+
     private MonitorEventReceiver eventReceiver;
 
     @Before
@@ -149,6 +151,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         assertEquals(-1, job.getRemovedTime());
         assertEquals(TestUsers.DEMO.username, job.getJobOwner());
         assertEquals(JobPriority.NORMAL, job.getPriority());
+        assertEquals(JOB_DESCRIPTION, job.getDescription());
 
         JobId secondJob = scheduler.submit(createJob(fileLockPath, null));
         JobId thirdJob = scheduler.submit(createJob(fileLockPath, secondJob.value()));
@@ -291,6 +294,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
         job.setProjectName(this.getClass().getSimpleName());
+        job.setDescription(JOB_DESCRIPTION);
         if (parentJobId != null) {
             job.addGenericInformation(PARENT_JOB_ID, parentJobId);
         }

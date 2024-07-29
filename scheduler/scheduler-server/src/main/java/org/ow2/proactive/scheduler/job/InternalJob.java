@@ -1152,6 +1152,12 @@ public abstract class InternalJob extends JobState {
         jobInfo.setProjectName(projectName);
     }
 
+    @Override
+    public void setDescription(String description) {
+        super.setDescription(description);
+        jobInfo.setDescription(description);
+    }
+
     /**
      * To set the removedTime
      *

@@ -73,6 +73,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private String projectName;
 
+    private String description;
+
     private String bucketName;
 
     private String label;
@@ -217,6 +219,14 @@ public class JobInfoData implements java.io.Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getBucketName() {
