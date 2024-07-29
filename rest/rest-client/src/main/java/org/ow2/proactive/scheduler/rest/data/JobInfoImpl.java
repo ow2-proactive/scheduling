@@ -67,6 +67,8 @@ public class JobInfoImpl implements JobInfo {
 
     private String bucketName;
 
+    private String description;
+
     private String label;
 
     private String submissionMode;
@@ -177,6 +179,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

@@ -74,6 +74,7 @@ public class DataUtility {
         impl.setTenant(d.getTenant());
         impl.setDomain(d.getDomain());
         impl.setBucketName(d.getBucketName());
+        impl.setDescription(d.getDescription());
         impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());
         impl.setNumberOfPendingTasks(d.getNumberOfPendingTasks());
         impl.setNumberOfRunningTasks(d.getNumberOfRunningTasks());

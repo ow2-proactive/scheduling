@@ -561,6 +561,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         job.setDomain(ident.getDomain());
         // route project name inside job info
         job.setProjectName(job.getProjectName());
+        job.setDescription(job.getDescription());
         if (job.getGenericInformation() != null) {
             job.setSubmissionMode(job.getGenericInformation().get(SUBMISSION_MODE));
         }
