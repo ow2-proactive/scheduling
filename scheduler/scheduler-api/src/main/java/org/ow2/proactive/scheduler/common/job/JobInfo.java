@@ -82,6 +82,12 @@ public interface JobInfo extends Serializable {
     String getProjectName();
 
     /**
+     * Returns the description associated with this job
+     * @return description
+     */
+    String getDescription();
+
+    /**
      * Returns the bucket name associated with this job
      * @return bucket name
      */

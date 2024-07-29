@@ -279,6 +279,7 @@ public class JobData implements Serializable {
         jobInfo.setTenant(getTenant());
         jobInfo.setDomain(getDomain());
         jobInfo.setProjectName(getProjectName());
+        jobInfo.setDescription(getDescription());
         jobInfo.setBucketName(getBucketName());
         jobInfo.setLabel(getLabel());
         jobInfo.setStatus(getStatus());
