@@ -433,6 +433,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
         internalJob.setOwner(userName);
         internalJob.submitAction();
         internalJob.setSubmissionMode(SUBMISSION_MODE_REST_API);
+        internalJob.setStartAt(job.getStartAt());
         if (submittedTime > 0) {
             internalJob.setSubmittedTime(submittedTime);
         }
