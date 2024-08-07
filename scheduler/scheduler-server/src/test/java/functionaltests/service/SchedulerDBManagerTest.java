@@ -262,6 +262,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           0,
+                                          0,
+                                          0,
                                           0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
@@ -284,6 +286,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
+                                          0,
+                                          0,
                                           0,
                                           0);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
@@ -308,6 +312,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           0,
+                                          0,
+                                          0,
                                           0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
@@ -330,6 +336,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
+                                          0,
+                                          0,
                                           0,
                                           0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
@@ -354,6 +362,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           0,
+                                          0,
+                                          0,
                                           0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
 
@@ -376,6 +386,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
+                                          0,
+                                          0,
                                           0,
                                           0);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
@@ -400,6 +412,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           0,
+                                          0,
+                                          0,
                                           0);
         assertEquals("Incorrect jobs total number", 0, actualJobPage.getSize());
 
@@ -422,6 +436,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           null,
                                           null,
                                           null,
+                                          0,
+                                          0,
                                           0,
                                           0);
         assertEquals("Incorrect jobs total number", nbJobs, actualJobPage.getSize());
@@ -584,6 +600,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                                null,
                                                null,
                                                null,
+                                               0,
+                                               0,
                                                0,
                                                0);
 

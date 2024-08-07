@@ -237,7 +237,7 @@ public class SchedulerDBManager {
             final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
             String bucketName, Long parentId, String submissionMode, String label,
             final List<SortParameter<JobSortParameter>> sortParameters, JobStatus status, long submittedTimeGreater,
-            long submittedTimeLessThan) {
+            long submittedTimeLessThan, long startAtTimeGreater, long startAtTimeLessThan) {
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -262,7 +262,9 @@ public class SchedulerDBManager {
                                                              sortParameters,
                                                              status,
                                                              submittedTimeGreater,
-                                                             submittedTimeLessThan);
+                                                             submittedTimeLessThan,
+                                                             startAtTimeGreater,
+                                                             startAtTimeLessThan);
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<Integer> statusRanks = params.getStatusRanks();
         List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
@@ -308,6 +310,12 @@ public class SchedulerDBManager {
             }
             if (submittedTimeLessThan > 0) {
                 predicates.add(cb.lessThan(root.get("submittedTime"), submittedTimeLessThan));
+            }
+            if (startAtTimeGreater > 0) {
+                predicates.add(cb.ge(root.get("startAt"), startAtTimeGreater));
+            }
+            if (startAtTimeLessThan > 0) {
+                predicates.add(cb.lessThan(root.get("startAt"), startAtTimeLessThan));
             }
             if (childJobs && parentId != null && parentId > 0L) {
                 predicates.add(cb.equal(root.get("parentId"), parentId));
@@ -402,7 +410,6 @@ public class SchedulerDBManager {
             if (offset >= 0) {
                 query.setFirstResult(offset);
             }
-
             List<JobData> jobsList = query.list();
             return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
         }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
@@ -636,6 +643,13 @@ public class SchedulerDBManager {
                     queryString.append("and submittedTime < :submittedTimeLessThan ");
                 }
 
+                if (params.getStartAtTimeGreater() > 0) {
+                    queryString.append("and startAt >= :startAtTimeGreater ");
+                }
+
+                if (params.getStartAtTimeLessThan() > 0) {
+                    queryString.append("and startAt < :startAtTimeLessThan ");
+                }
                 Query query = session.createQuery(queryString.toString());
                 query.setParameterList("statusRanks", statusRanks);
                 if (hasUser) {
@@ -678,6 +692,14 @@ public class SchedulerDBManager {
 
                 if (params.getSubmittedTimeLessThan() > 0) {
                     query.setParameter("submittedTimeLessThan", params.getSubmittedTimeLessThan());
+                }
+
+                if (params.getStartAtTimeGreater() > 0) {
+                    query.setParameter("startAtTimeGreater", params.getStartAtTimeGreater());
+                }
+
+                if (params.getStartAtTimeLessThan() > 0) {
+                    query.setParameter("startAtTimeLessThan", params.getStartAtTimeLessThan());
                 }
 
                 Long count = (Long) query.uniqueResult();

@@ -386,7 +386,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             boolean myJobs, boolean pending, boolean running, boolean finished, boolean withIssuesOnly,
             boolean childJobs, String jobName, String projectName, String bucketName, String submissionMode,
             String label, String userName, String tenant, Long parentId, String sortParams, String status,
-            long submittedTimeGreater, long submittedTimeLessThan) throws RestException {
+            long submittedTimeGreater, long submittedTimeLessThan, long startAtTimeGreater, long startAtTimeLessThan)
+            throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();

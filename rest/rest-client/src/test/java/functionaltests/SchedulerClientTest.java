@@ -404,6 +404,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                           .status(null)
                                                                           .submittedTimeGreater(0)
                                                                           .submittedTimeLessThan(0)
+                                                                          .startAtTimeGreater(0)
+                                                                          .startAtTimeLessThan(0)
                                                                           .build();
         SortParameter jobNameDescOrder = new SortParameter<>(JobSortParameter.NAME, SortOrder.DESC);
         SortParameter jobIdAscOrder = new SortParameter<>(JobSortParameter.ID, SortOrder.ASC);
