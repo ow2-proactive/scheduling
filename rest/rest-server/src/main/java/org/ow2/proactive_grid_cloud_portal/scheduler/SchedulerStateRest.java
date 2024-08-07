@@ -425,6 +425,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                                          .status(jobStatus)
                                                                          .submittedTimeGreater(submittedTimeGreater)
                                                                          .submittedTimeLessThan(submittedTimeLessThan)
+                                                                         .startAtTimeGreater(startAtTimeGreater)
+                                                                         .startAtTimeLessThan(startAtTimeLessThan)
                                                                          .build(),
                                            sortParameterList);
             List<JobInfo> jobsInfo = page.getList();
