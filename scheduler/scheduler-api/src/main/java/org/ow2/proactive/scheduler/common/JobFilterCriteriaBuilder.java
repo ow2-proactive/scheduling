@@ -228,12 +228,12 @@ public class JobFilterCriteriaBuilder {
     }
 
     public JobFilterCriteriaBuilder startAtTimeLessThan(long startAtTimeLessThan) {
-        this.startAtTimeLessThan = submittedTimeLessThan;
+        this.startAtTimeLessThan = startAtTimeLessThan;
         return this;
     }
 
     public JobFilterCriteriaBuilder startAtTimeGreater(long startAtTimeGreater) {
-        this.startAtTimeGreater = submittedTimeGreater;
+        this.startAtTimeGreater = startAtTimeGreater;
         return this;
     }
 
