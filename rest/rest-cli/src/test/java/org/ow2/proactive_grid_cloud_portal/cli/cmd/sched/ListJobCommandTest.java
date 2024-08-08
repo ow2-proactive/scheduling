@@ -113,6 +113,8 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     0,
+                                                                    0,
+                                                                    0,
                                                                     0))
                .thenReturn(page);
 
@@ -138,6 +140,8 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
+                                    0,
+                                    0,
                                     0,
                                     0);
     }
@@ -176,6 +180,8 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     0,
+                                                                    0,
+                                                                    0,
                                                                     0))
                .thenReturn(page);
 
@@ -201,6 +207,8 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
+                                    0,
+                                    0,
                                     0,
                                     0);
 
@@ -240,6 +248,8 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     0,
+                                                                    0,
+                                                                    0,
                                                                     0))
                .thenReturn(page);
 
@@ -265,6 +275,8 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
+                                    0,
+                                    0,
                                     0,
                                     0);
     }
@@ -303,6 +315,8 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     0,
+                                                                    0,
+                                                                    0,
                                                                     0))
                .thenReturn(page);
 
@@ -328,6 +342,8 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
+                                    0,
+                                    0,
                                     0,
                                     0);
 
@@ -367,6 +383,8 @@ public class ListJobCommandTest {
                                                                     null,
                                                                     null,
                                                                     0,
+                                                                    0,
+                                                                    0,
                                                                     0))
                .thenReturn(page);
 
@@ -392,6 +410,8 @@ public class ListJobCommandTest {
                                     null,
                                     null,
                                     null,
+                                    0,
+                                    0,
                                     0,
                                     0);
     }

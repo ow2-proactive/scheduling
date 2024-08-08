@@ -62,6 +62,10 @@ public class JobFilterCriteriaBuilder {
 
     private long submittedTimeGreater;
 
+    private long startAtTimeLessThan;
+
+    private long startAtTimeGreater;
+
     private JobStatus status;
 
     public JobFilterCriteriaBuilder() {
@@ -129,6 +133,14 @@ public class JobFilterCriteriaBuilder {
 
     public long getSubmittedTimeGreater() {
         return submittedTimeGreater;
+    }
+
+    public long getStartAtTimeLessThan() {
+        return startAtTimeLessThan;
+    }
+
+    public long getStartAtTimeGreater() {
+        return startAtTimeGreater;
     }
 
     public JobStatus getStatus() {
@@ -212,6 +224,16 @@ public class JobFilterCriteriaBuilder {
 
     public JobFilterCriteriaBuilder submittedTimeGreater(long submittedTimeGreater) {
         this.submittedTimeGreater = submittedTimeGreater;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder startAtTimeLessThan(long startAtTimeLessThan) {
+        this.startAtTimeLessThan = startAtTimeLessThan;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder startAtTimeGreater(long startAtTimeGreater) {
+        this.startAtTimeGreater = startAtTimeGreater;
         return this;
     }
 

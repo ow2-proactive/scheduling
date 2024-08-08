@@ -66,6 +66,10 @@ public class JobFilterCriteria implements Serializable {
 
     private final long submittedTimeGreater;
 
+    private final long startAtTimeLessThan;
+
+    private final long startAtTimeGreater;
+
     private final JobStatus status;
 
     public JobFilterCriteria(JobFilterCriteriaBuilder builder) {
@@ -85,6 +89,8 @@ public class JobFilterCriteria implements Serializable {
         this.submissionMode = builder.getSubmissionMode();
         this.submittedTimeLessThan = builder.getSubmittedTimeLessThan();
         this.submittedTimeGreater = builder.getSubmittedTimeGreater();
+        this.startAtTimeGreater = builder.getStartAtTimeGreater();
+        this.startAtTimeLessThan = builder.getStartAtTimeLessThan();
         this.status = builder.getStatus();
     }
 
@@ -150,6 +156,14 @@ public class JobFilterCriteria implements Serializable {
 
     public long getSubmittedTimeGreater() {
         return submittedTimeGreater;
+    }
+
+    public long getStartAtTimeLessThan() {
+        return startAtTimeLessThan;
+    }
+
+    public long getStartAtTimeGreater() {
+        return startAtTimeGreater;
     }
 
     public JobStatus getStatus() {

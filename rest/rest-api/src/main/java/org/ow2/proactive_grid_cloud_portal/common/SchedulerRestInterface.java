@@ -246,7 +246,9 @@ public interface SchedulerRestInterface {
             @QueryParam("parentId") @DefaultValue("-1") Long parentId, @QueryParam("sortParams") String sortParams,
             @QueryParam("status") @DefaultValue("") String status,
             @QueryParam("submittedTimeGreater") @DefaultValue("0") long submittedTimeGreater,
-            @QueryParam("submittedTimeLessThan") @DefaultValue("0") long submittedTimeLessThan) throws RestException;
+            @QueryParam("submittedTimeLessThan") @DefaultValue("0") long submittedTimeLessThan,
+            @QueryParam("startAtTimeGreater") @DefaultValue("0") long startAtTimeGreater,
+            @QueryParam("startAtTimeLessThan") @DefaultValue("0") long startAtTimeLessThan) throws RestException;
 
     /**
      * Returns the revision number of the scheduler state
