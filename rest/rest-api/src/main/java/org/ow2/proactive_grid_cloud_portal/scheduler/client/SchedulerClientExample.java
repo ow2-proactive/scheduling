@@ -99,6 +99,7 @@ public class SchedulerClientExample {
         System.out.println(users.size());
 
         RestMapPage<Long, ArrayList<UserJobData>> page = scheduler.revisionAndJobsInfo(sessionId,
+                                                                                       -1L,
                                                                                        0,
                                                                                        50,
                                                                                        true,

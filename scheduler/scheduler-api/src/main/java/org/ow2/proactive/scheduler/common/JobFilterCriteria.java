@@ -70,6 +70,8 @@ public class JobFilterCriteria implements Serializable {
 
     private final long startAtTimeGreater;
 
+    private final Long jobId;
+
     private final JobStatus status;
 
     public JobFilterCriteria(JobFilterCriteriaBuilder builder) {
@@ -92,6 +94,7 @@ public class JobFilterCriteria implements Serializable {
         this.startAtTimeGreater = builder.getStartAtTimeGreater();
         this.startAtTimeLessThan = builder.getStartAtTimeLessThan();
         this.status = builder.getStatus();
+        this.jobId = builder.getJobId();
     }
 
     public boolean isMyJobsOnly() {
@@ -164,6 +167,10 @@ public class JobFilterCriteria implements Serializable {
 
     public long getStartAtTimeGreater() {
         return startAtTimeGreater;
+    }
+
+    public Long getJobId() {
+        return jobId;
     }
 
     public JobStatus getStatus() {

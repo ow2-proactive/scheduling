@@ -333,6 +333,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try {
             String sortParams = createJobSortParamsString(jobSortParameters);
             RestMapPage<Long, ArrayList<UserJobData>> userJobsAllRevisions = restApi().revisionAndJobsInfo(sid,
+                                                                                                           criteria.getJobId(),
                                                                                                            index,
                                                                                                            range,
                                                                                                            criteria.isMyJobsOnly(),

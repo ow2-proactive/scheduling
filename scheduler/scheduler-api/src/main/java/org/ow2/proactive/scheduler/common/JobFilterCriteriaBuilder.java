@@ -68,6 +68,8 @@ public class JobFilterCriteriaBuilder {
 
     private JobStatus status;
 
+    private Long jobId;
+
     public JobFilterCriteriaBuilder() {
     }
 
@@ -141,6 +143,10 @@ public class JobFilterCriteriaBuilder {
 
     public long getStartAtTimeGreater() {
         return startAtTimeGreater;
+    }
+
+    public Long getJobId() {
+        return jobId;
     }
 
     public JobStatus getStatus() {
@@ -239,6 +245,11 @@ public class JobFilterCriteriaBuilder {
 
     public JobFilterCriteriaBuilder status(JobStatus status) {
         this.status = status;
+        return this;
+    }
+
+    public JobFilterCriteriaBuilder jobId(Long jobId) {
+        this.jobId = jobId;
         return this;
     }
 

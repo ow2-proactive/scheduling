@@ -247,6 +247,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           0,
                                           null,
                                           null,
+                                          null,
                                           false,
                                           true,
                                           true,
@@ -272,6 +273,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
                                           0,
                                           null,
                                           null,
+                                          null,
                                           false,
                                           false,
                                           false,
@@ -295,6 +297,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         // no pagination, user = "admin", pending, running, finished
         actualJobPage = dbManager.getJobs(0,
                                           0,
+                                          null,
                                           "admin",
                                           null,
                                           false,
@@ -320,6 +323,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         // no pagination, user = "admin", pending, running, finished, jobName = "testGetTotalJobsCount-Job"
         actualJobPage = dbManager.getJobs(0,
                                           0,
+                                          null,
                                           "admin",
                                           null,
                                           false,
@@ -345,6 +349,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         // no pagination, user = "admin", pending, running, finished, jobName = "testGetTotal"
         actualJobPage = dbManager.getJobs(0,
                                           0,
+                                          null,
                                           "admin",
                                           null,
                                           false,
@@ -370,6 +375,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         // no pagination, user = "admin", pending, running, finished, jobName = "invalid_job_name"
         actualJobPage = dbManager.getJobs(0,
                                           0,
+                                          null,
                                           "admin",
                                           null,
                                           false,
@@ -395,6 +401,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         // no pagination, user = "invalid_user", pending, no running, finished
         actualJobPage = dbManager.getJobs(0,
                                           0,
+                                          null,
                                           "invalid_user",
                                           null,
                                           false,
@@ -420,6 +427,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         // pagination [0,5[, user = "admin", pending, running, finished
         actualJobPage = dbManager.getJobs(0,
                                           5,
+                                          null,
                                           "admin",
                                           null,
                                           false,
@@ -584,6 +592,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
 
         Page<JobInfo> jobs = dbManager.getJobs(0,
                                                10,
+                                               null,
                                                null,
                                                null,
                                                false,
