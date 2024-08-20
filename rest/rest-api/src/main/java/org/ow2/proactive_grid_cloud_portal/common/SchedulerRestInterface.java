@@ -178,6 +178,8 @@ public interface SchedulerRestInterface {
      *
      * @param sessionId
      *            a valid session id
+     * @param jobId
+     *            Fetch the job having this jobId
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
