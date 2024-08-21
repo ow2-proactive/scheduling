@@ -232,10 +232,10 @@ public class SchedulerDBManager {
         }
     }
 
-    public Page<JobInfo> getJobs(final int offset, final int limit, Long jobId, final String user, final String tenant,
-            final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
-            final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
-            String bucketName, Long parentId, String submissionMode, String label,
+    public Page<JobInfo> getJobs(final int offset, final int limit, final Long jobId, final String user,
+            final String tenant, final boolean isExplicitTenantFilter, final boolean pending, final boolean running,
+            final boolean finished, final boolean withIssuesOnly, final boolean childJobs, String jobName,
+            String projectName, String bucketName, Long parentId, String submissionMode, String label,
             final List<SortParameter<JobSortParameter>> sortParameters, JobStatus status, long submittedTimeGreater,
             long submittedTimeLessThan, long startAtTimeGreater, long startAtTimeLessThan) {
 
