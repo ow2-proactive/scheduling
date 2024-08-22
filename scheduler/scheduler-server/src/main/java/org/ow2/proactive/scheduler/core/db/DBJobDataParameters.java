@@ -85,9 +85,11 @@ public class DBJobDataParameters {
 
     private final long startAtTimeGreater;
 
+    private final Long jobId;
+
     private final JobStatus status;
 
-    DBJobDataParameters(int offset, int limit, String user, String tenant, boolean isExplicitTenantFilter,
+    DBJobDataParameters(int offset, int limit, Long jobId, String user, String tenant, boolean isExplicitTenantFilter,
             boolean pending, boolean running, boolean finished, boolean withIssuesOnly, boolean childJobs,
             String jobName, String projectName, String bucketName, Long parentId, String submissionMode, String label,
             List<SortParameter<JobSortParameter>> sortParameters, JobStatus status, long submittedTimeGreater,
@@ -114,6 +116,7 @@ public class DBJobDataParameters {
         this.submittedTimeLessThan = submittedTimeLessThan;
         this.startAtTimeGreater = startAtTimeGreater;
         this.startAtTimeLessThan = startAtTimeLessThan;
+        this.jobId = jobId;
 
         Set<Integer> newStatusRanks = new HashSet<Integer>();
         if (pending) {
@@ -203,6 +206,10 @@ public class DBJobDataParameters {
 
     public long getStartAtTimeGreater() {
         return startAtTimeGreater;
+    }
+
+    public Long getJobId() {
+        return jobId;
     }
 
     public JobStatus getStatus() {

@@ -1896,6 +1896,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
         Page<JobInfo> jobsInfo = dbManager.getJobs(offset,
                                                    limit,
+                                                   filterCriteria.getJobId(),
                                                    user,
                                                    tenant,
                                                    isExplicitTenantFilter,

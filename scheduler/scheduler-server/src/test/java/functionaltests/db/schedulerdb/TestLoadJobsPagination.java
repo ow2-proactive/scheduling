@@ -116,6 +116,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -141,6 +142,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -164,6 +166,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -192,6 +195,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -216,6 +220,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -243,6 +248,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -266,6 +272,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -293,6 +300,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -316,6 +324,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -342,6 +351,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -428,6 +438,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -456,6 +467,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -488,6 +500,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -514,6 +527,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(5,
                                  1,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -549,7 +563,36 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         Assert.assertEquals(SUBMISSION_MODE_REST_API, jobInfo.getSubmissionMode());
 
         jobs = dbManager.getJobs(0,
+                                 10,
+                                 4L,
+                                 null,
+                                 null,
+                                 false,
+                                 true,
+                                 true,
+                                 true,
+                                 false,
+                                 true,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 sortParameters,
+                                 null,
+                                 0,
+                                 0,
+                                 0,
+                                 0)
+                        .getList();
+
+        assertThat(jobs.size()).isEqualTo(1);
+        assertThat(jobs.get(0).getJobId().longValue()).isEqualTo(4L);
+
+        jobs = dbManager.getJobs(0,
                                  1,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -578,6 +621,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -602,6 +646,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -630,6 +675,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -654,6 +700,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -682,6 +729,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  -1,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -705,6 +753,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(-1,
                                  5,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -732,6 +781,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  -1,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -755,6 +805,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  0,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -782,6 +833,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  1,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -805,6 +857,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  3,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -832,6 +885,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -855,6 +909,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(5,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -882,6 +937,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -907,6 +963,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -930,6 +987,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  DEFAULT_USER_NAME,
                                  null,
                                  false,
@@ -955,6 +1013,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  "user1",
                                  null,
                                  false,
@@ -980,6 +1039,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  DEFAULT_USER_NAME,
                                  null,
                                  false,
@@ -1005,6 +1065,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  DEFAULT_USER_NAME,
                                  null,
                                  false,
@@ -1030,6 +1091,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  DEFAULT_USER_NAME,
                                  null,
                                  false,
@@ -1055,6 +1117,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  DEFAULT_USER_NAME,
                                  null,
                                  false,
@@ -1080,6 +1143,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  DEFAULT_USER_NAME,
                                  null,
                                  false,
@@ -1105,6 +1169,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  DEFAULT_USER_NAME,
                                  null,
                                  false,
@@ -1130,6 +1195,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  DEFAULT_USER_NAME,
                                  null,
                                  false,
@@ -1157,6 +1223,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -1180,6 +1247,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
@@ -1207,6 +1275,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -1232,6 +1301,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
                                  10,
                                  null,
                                  null,
+                                 null,
                                  false,
                                  true,
                                  true,
@@ -1255,6 +1325,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0,
                                  10,
+                                 null,
                                  null,
                                  null,
                                  false,
