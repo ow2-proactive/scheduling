@@ -232,12 +232,25 @@ public class SchedulerDBManager {
         }
     }
 
-    public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final String tenant,
-            final boolean isExplicitTenantFilter, final boolean pending, final boolean running, final boolean finished,
-            final boolean withIssuesOnly, final boolean childJobs, String jobName, String projectName,
-            String bucketName, Long parentId, String submissionMode, String label,
+    public Page<JobInfo> getJobs(final int offset, final int limit, final Long jobId, final String user,
+            final String tenant, final boolean isExplicitTenantFilter, final boolean pending, final boolean running,
+            final boolean finished, final boolean withIssuesOnly, final boolean childJobs, String jobName,
+            String projectName, String bucketName, Long parentId, String submissionMode, String label,
             final List<SortParameter<JobSortParameter>> sortParameters, JobStatus status, long submittedTimeGreater,
             long submittedTimeLessThan, long startAtTimeGreater, long startAtTimeLessThan) {
+
+        if (jobId != null && jobId > 0) {
+            List<JobInfo> lJobs = executeReadOnlyTransaction(session -> {
+                CriteriaBuilder cb = session.getCriteriaBuilder();
+                CriteriaQuery<JobData> criteriaQuery = cb.createQuery(JobData.class);
+                Root<JobData> root = criteriaQuery.from(JobData.class);
+                criteriaQuery.select(root).where(cb.equal(root.get("id"), jobId));
+                org.hibernate.query.Query<JobData> query = session.createQuery(criteriaQuery);
+                List<JobData> jobsList = query.list();
+                return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
+            }, IS_HSQLDB ? new HSQLDBOrderByInterceptor() : null);
+            return new Page<>(lJobs, 1);
+        }
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
@@ -245,6 +258,7 @@ public class SchedulerDBManager {
 
         DBJobDataParameters params = new DBJobDataParameters(offset,
                                                              limit,
+                                                             jobId,
                                                              user,
                                                              tenant,
                                                              isExplicitTenantFilter,

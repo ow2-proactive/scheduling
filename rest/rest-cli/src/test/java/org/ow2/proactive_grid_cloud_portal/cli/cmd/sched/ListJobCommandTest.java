@@ -94,6 +94,7 @@ public class ListJobCommandTest {
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
         Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    -1L,
                                                                     index,
                                                                     10,
                                                                     false,
@@ -122,6 +123,7 @@ public class ListJobCommandTest {
 
         Mockito.verify(schedulerRestInterfaceMock)
                .revisionAndJobsInfo("sessionid",
+                                    -1L,
                                     index,
                                     10,
                                     false,
@@ -161,6 +163,7 @@ public class ListJobCommandTest {
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
         Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    -1L,
                                                                     index,
                                                                     1,
                                                                     false,
@@ -189,6 +192,7 @@ public class ListJobCommandTest {
 
         Mockito.verify(schedulerRestInterfaceMock)
                .revisionAndJobsInfo("sessionid",
+                                    -1L,
                                     index,
                                     1,
                                     false,
@@ -229,6 +233,7 @@ public class ListJobCommandTest {
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
         Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    -1L,
                                                                     index,
                                                                     3,
                                                                     false,
@@ -257,6 +262,7 @@ public class ListJobCommandTest {
 
         Mockito.verify(schedulerRestInterfaceMock)
                .revisionAndJobsInfo("sessionid",
+                                    -1L,
                                     index,
                                     3,
                                     false,
@@ -296,6 +302,7 @@ public class ListJobCommandTest {
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
         Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    -1L,
                                                                     index,
                                                                     10,
                                                                     false,
@@ -324,6 +331,7 @@ public class ListJobCommandTest {
 
         Mockito.verify(schedulerRestInterfaceMock)
                .revisionAndJobsInfo("sessionid",
+                                    -1L,
                                     index,
                                     10,
                                     false,
@@ -364,6 +372,7 @@ public class ListJobCommandTest {
 
         Mockito.when(schedulerRestInterfaceMock.jobs("sessionid", index, offset)).thenReturn(restPage);
         Mockito.when(schedulerRestInterfaceMock.revisionAndJobsInfo("sessionid",
+                                                                    -1L,
                                                                     index,
                                                                     10,
                                                                     false,
@@ -392,6 +401,7 @@ public class ListJobCommandTest {
 
         Mockito.verify(schedulerRestInterfaceMock)
                .revisionAndJobsInfo("sessionid",
+                                    -1L,
                                     index,
                                     10,
                                     false,

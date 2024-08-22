@@ -382,8 +382,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, int index, int limit,
-            boolean myJobs, boolean pending, boolean running, boolean finished, boolean withIssuesOnly,
+    public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(String sessionId, Long jobId, int index,
+            int limit, boolean myJobs, boolean pending, boolean running, boolean finished, boolean withIssuesOnly,
             boolean childJobs, String jobName, String projectName, String bucketName, String submissionMode,
             String label, String userName, String tenant, Long parentId, String sortParams, String status,
             long submittedTimeGreater, long submittedTimeLessThan, long startAtTimeGreater, long startAtTimeLessThan)
@@ -408,7 +408,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobStatus jobStatus = status != null && !status.isEmpty() ? JobStatus.valueOf(status.toUpperCase()) : null;
             Page<JobInfo> page = s.getJobs(index,
                                            limit,
-                                           new JobFilterCriteriaBuilder().myJobsOnly(onlyUserJobs)
+                                           new JobFilterCriteriaBuilder().jobId(jobId)
+                                                                         .myJobsOnly(onlyUserJobs)
                                                                          .pending(pending)
                                                                          .running(running)
                                                                          .finished(finished)

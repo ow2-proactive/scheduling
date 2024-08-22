@@ -178,6 +178,8 @@ public interface SchedulerRestInterface {
      *
      * @param sessionId
      *            a valid session id
+     * @param jobId
+     *            Fetch the job having this jobId
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
@@ -230,7 +232,8 @@ public interface SchedulerRestInterface {
     @Path("revisionjobsinfo")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("index") @DefaultValue("-1") int index, @QueryParam("limit") @DefaultValue("-1") int limit,
+            @QueryParam("jobId") @DefaultValue("-1") Long jobId, @QueryParam("index") @DefaultValue("-1") int index,
+            @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("running") @DefaultValue("true") boolean running,

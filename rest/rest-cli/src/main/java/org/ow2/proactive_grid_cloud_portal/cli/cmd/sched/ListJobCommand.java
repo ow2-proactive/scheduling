@@ -90,6 +90,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
         RestMapPage<Long, ArrayList<UserJobData>> page = currentContext.getRestClient()
                                                                        .getScheduler()
                                                                        .revisionAndJobsInfo(currentContext.getSessionId(),
+                                                                                            -1L,
                                                                                             index,
                                                                                             offset,
                                                                                             false,

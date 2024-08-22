@@ -390,7 +390,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertEquals(JobStatus.FINISHED, job3Result.getJobInfo().getStatus());
 
         // Test sorts
-        JobFilterCriteria allJobsCriteria = new JobFilterCriteriaBuilder().myJobsOnly(false)
+        JobFilterCriteria allJobsCriteria = new JobFilterCriteriaBuilder().jobId(-1L)
+                                                                          .myJobsOnly(false)
                                                                           .pending(true)
                                                                           .running(true)
                                                                           .finished(true)
