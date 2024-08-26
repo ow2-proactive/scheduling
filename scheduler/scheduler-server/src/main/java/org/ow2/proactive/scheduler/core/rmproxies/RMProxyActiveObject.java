@@ -257,9 +257,12 @@ public class RMProxyActiveObject {
             //retrieve scheduler URL to bind with schedulerapi, globalspaceapi, and userspaceapi
             String schedulerUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
 
+            String schedulerPublicUrl = PASchedulerProperties.SCHEDULER_REST_PUBLIC_URL.getValueAsString();
+
             logger.debug("Binding schedulerapi...");
             SchedulerNodeClient client = new SchedulerNodeClient(decrypter,
                                                                  schedulerUrl,
+                                                                 schedulerPublicUrl,
                                                                  taskId.getJobId(),
                                                                  Collections.emptyMap(),
                                                                  Collections.emptyMap());

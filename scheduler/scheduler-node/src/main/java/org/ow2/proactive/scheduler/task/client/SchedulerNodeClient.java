@@ -30,6 +30,7 @@ import static org.ow2.proactive.scheduler.common.SchedulerConstants.PARENT_JOB_I
 import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
+import java.security.KeyException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -39,7 +40,9 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import javax.security.auth.Subject;
+import javax.security.auth.login.LoginException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
@@ -96,6 +99,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     private String schedulerRestUrl;
 
+    private String schedulerRestPublicUrl;
+
     private transient ISchedulerClient client = null;
 
     private JobId parentJobId;
@@ -106,10 +111,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     private Map<String, JobVariable> globalJobVariables = new LinkedHashMap<>();
 
-    public SchedulerNodeClient(Decrypter decrypter, String schedulerRestUrl, JobId parentJobId,
-            Map<String, JobVariable> globalVariables, Map<String, String> globalGenericInformation) {
+    private static final Logger logger = Logger.getLogger(SchedulerNodeClient.class);
+
+    public SchedulerNodeClient(Decrypter decrypter, String schedulerRestUrl, String schedulerRestPublicUrl,
+            JobId parentJobId, Map<String, JobVariable> globalVariables, Map<String, String> globalGenericInformation) {
         SchedulerNodeClient.this.decrypter = decrypter;
         SchedulerNodeClient.this.schedulerRestUrl = schedulerRestUrl;
+        SchedulerNodeClient.this.schedulerRestPublicUrl = schedulerRestPublicUrl;
         SchedulerNodeClient.this.parentJobId = parentJobId;
         if (globalVariables != null) {
             SchedulerNodeClient.this.globalVariables = new LinkedHashMap<>(Maps.transformValues(globalVariables,
@@ -127,7 +135,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
      * @throws Exception
      */
     public void connect() throws Exception {
-        connect(SchedulerNodeClient.this.schedulerRestUrl);
+        connect(SchedulerNodeClient.this.schedulerRestUrl, SchedulerNodeClient.this.schedulerRestPublicUrl, null);
     }
 
     /**
@@ -136,6 +144,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
      * @throws Exception
      */
     public void connect(String url) throws Exception {
+        connect(url, SchedulerNodeClient.this.schedulerRestUrl, SchedulerNodeClient.this.schedulerRestPublicUrl);
+    }
+
+    private void connect(String url, String backupUrl1, String backupUrl2) throws Exception {
         CredData userCreds = decrypter.decrypt();
         if (client == null) {
             client = SchedulerClient.createInstance();
@@ -143,12 +155,45 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         if (client.isConnected()) {
             return;
         }
-        client.init(new ConnectionInfo(url,
-                                       userCreds.getLogin(),
-                                       userCreds.getDomain(),
-                                       userCreds.getPassword(),
-                                       null,
-                                       true));
+        try {
+            client.init(new ConnectionInfo(url,
+                                           userCreds.getLogin(),
+                                           userCreds.getDomain(),
+                                           userCreds.getPassword(),
+                                           null,
+                                           true));
+        } catch (LoginException | KeyException | SchedulerException e) {
+            throw e;
+        } catch (Exception e) {
+            if (backupUrl1 != null) {
+                logger.warn("Could not connect to scheduler rest at " + url + " now trying with " + backupUrl1);
+                try {
+                    client.init(new ConnectionInfo(backupUrl1,
+                                                   userCreds.getLogin(),
+                                                   userCreds.getDomain(),
+                                                   userCreds.getPassword(),
+                                                   null,
+                                                   true));
+                } catch (LoginException | KeyException | SchedulerException e2) {
+                    throw e2;
+                } catch (Exception e2) {
+                    if (backupUrl2 != null) {
+                        logger.warn("Could not connect to scheduler rest url at " + backupUrl1 + " now trying with " +
+                                    backupUrl2);
+                        client.init(new ConnectionInfo(backupUrl2,
+                                                       userCreds.getLogin(),
+                                                       userCreds.getDomain(),
+                                                       userCreds.getPassword(),
+                                                       null,
+                                                       true));
+                    } else {
+                        throw e2;
+                    }
+                }
+            } else {
+                throw e;
+            }
+        }
     }
 
     private Map<String, String> addGlobalGenericInfoAndParentJobId(Map<String, String> genericInformation) {

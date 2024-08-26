@@ -30,14 +30,7 @@ import static java.lang.System.currentTimeMillis;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_WORKFLOW_API;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.statusesToString;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwSAEorUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.*;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toFilteredStatistics;
@@ -56,6 +49,7 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.KeyException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -76,6 +70,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
+import javax.security.auth.login.LoginException;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -200,7 +195,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         this.connectionInfo = connectionInfo;
         this.initialized = true;
 
-        renewSession();
+        renewSessionInternal();
     }
 
     @Override
@@ -1366,8 +1361,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
-    @Override
-    public void renewSession() throws NotConnectedException {
+    public void renewSessionInternal() throws SchedulerException, LoginException, KeyException {
         Closer closer = Closer.create();
         try {
             LoginForm loginForm = new LoginForm();
@@ -1383,13 +1377,22 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             sid = restApi().loginOrRenewSession(sid, loginForm);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throwNCEOrKEOrLEOrSE(e);
         } finally {
             try {
                 closer.close();
             } catch (IOException e) {
                 // ignore
             }
+        }
+    }
+
+    @Override
+    public void renewSession() throws NotConnectedException {
+        try {
+            renewSessionInternal();
+        } catch (LoginException | SchedulerException | KeyException e) {
+            throw new RuntimeException(e);
         }
     }
 

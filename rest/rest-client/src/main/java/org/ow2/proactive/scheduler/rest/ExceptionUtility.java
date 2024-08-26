@@ -26,23 +26,13 @@
 package org.ow2.proactive.scheduler.rest;
 
 import java.lang.reflect.Constructor;
+import java.security.KeyException;
 
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import javax.security.auth.login.LoginException;
+
+import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SignalApiRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -59,6 +49,20 @@ public class ExceptionUtility {
         } else {
             throw new RuntimeException(e);
         }
+    }
+
+    public static RuntimeException throwNCEOrKEOrLEOrSE(Exception e)
+            throws SchedulerException, LoginException, KeyException {
+        if (e instanceof LoginException) {
+            throw (LoginException) e;
+        } else if (e instanceof KeyException) {
+            throw (KeyException) e;
+        } else if (e instanceof SchedulerRestException) {
+            throw reconstructError(e, SchedulerException.class);
+        } else {
+            throwNCE(e);
+        }
+        return new RuntimeException(e);
     }
 
     public static RuntimeException throwNCEOrPE(Exception e) throws NotConnectedException, PermissionException {
