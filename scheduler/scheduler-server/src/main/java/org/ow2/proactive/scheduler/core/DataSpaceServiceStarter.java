@@ -359,24 +359,23 @@ public class DataSpaceServiceStarter implements Serializable {
         String[] urlsArray = Tools.dataSpaceConfigPropertyToUrls(urls);
 
         // create a local folder with the username
-        if (localpath != null) {
-            DefaultFileSystemManager manager = VFSFactory.createDefaultFileSystemManager(userCredentials);
+
+        DefaultFileSystemManager manager = VFSFactory.createDefaultFileSystemManager(userCredentials);
+        try {
+            ReentrantLock tmpLock = new ReentrantLock();
+            ReentrantLock returnedLock = userSpaceFolderLocks.putIfAbsent(username, tmpLock);
+            ReentrantLock lock = returnedLock != null ? returnedLock : tmpLock;
             try {
-                ReentrantLock tmpLock = new ReentrantLock();
-                ReentrantLock returnedLock = userSpaceFolderLocks.putIfAbsent(username, tmpLock);
-                ReentrantLock lock = returnedLock != null ? returnedLock : tmpLock;
-                try {
-                    lock.lockInterruptibly();
-                    FileObject folder = manager.resolveFile(urlsArray[0] + "/" + username);
-                    folder.createFolder();
-                } catch (InterruptedException e) {
-                    logger.warn("Interrupted while creating user space folder", e);
-                } finally {
-                    lock.unlock();
-                }
+                lock.lockInterruptibly();
+                FileObject folder = manager.resolveFile(urlsArray[0] + "/" + username);
+                folder.createFolder();
+            } catch (InterruptedException e) {
+                logger.warn("Interrupted while creating user space folder", e);
             } finally {
-                manager.close();
+                lock.unlock();
             }
+        } finally {
+            manager.close();
         }
 
         String[] updatedArray = urlsWithUserDir(urlsArray, username);
