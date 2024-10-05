@@ -359,7 +359,8 @@ public class DataSpaceServiceStarter implements Serializable {
         String[] urlsArray = Tools.dataSpaceConfigPropertyToUrls(urls);
 
         // if not using impersonation, create a folder with the username
-        if (!PASchedulerProperties.DATASPACE_DEFAULTUSER_IMPERSONATION.getValueAsBoolean()) {
+        if (!spaceName.startsWith(SchedulerConstants.USERSPACE_NAME) ||
+            !PASchedulerProperties.DATASPACE_DEFAULTUSER_IMPERSONATION.getValueAsBoolean()) {
             DefaultFileSystemManager manager = VFSFactory.createDefaultFileSystemManager(userCredentials);
             try {
                 ReentrantLock tmpLock = new ReentrantLock();
