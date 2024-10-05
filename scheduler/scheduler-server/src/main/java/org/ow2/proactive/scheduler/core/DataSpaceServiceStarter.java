@@ -358,24 +358,25 @@ public class DataSpaceServiceStarter implements Serializable {
         // updates the urls with the username
         String[] urlsArray = Tools.dataSpaceConfigPropertyToUrls(urls);
 
-        // create a local folder with the username
-
-        DefaultFileSystemManager manager = VFSFactory.createDefaultFileSystemManager(userCredentials);
-        try {
-            ReentrantLock tmpLock = new ReentrantLock();
-            ReentrantLock returnedLock = userSpaceFolderLocks.putIfAbsent(username, tmpLock);
-            ReentrantLock lock = returnedLock != null ? returnedLock : tmpLock;
+        // if not using impersonation, create a folder with the username
+        if (!PASchedulerProperties.DATASPACE_DEFAULTUSER_IMPERSONATION.getValueAsBoolean()) {
+            DefaultFileSystemManager manager = VFSFactory.createDefaultFileSystemManager(userCredentials);
             try {
-                lock.lockInterruptibly();
-                FileObject folder = manager.resolveFile(urlsArray[0] + "/" + username);
-                folder.createFolder();
-            } catch (InterruptedException e) {
-                logger.warn("Interrupted while creating user space folder", e);
+                ReentrantLock tmpLock = new ReentrantLock();
+                ReentrantLock returnedLock = userSpaceFolderLocks.putIfAbsent(username, tmpLock);
+                ReentrantLock lock = returnedLock != null ? returnedLock : tmpLock;
+                try {
+                    lock.lockInterruptibly();
+                    FileObject folder = manager.resolveFile(urlsArray[0] + "/" + username);
+                    folder.createFolder();
+                } catch (InterruptedException e) {
+                    logger.warn("Interrupted while creating user space folder", e);
+                } finally {
+                    lock.unlock();
+                }
             } finally {
-                lock.unlock();
+                manager.close();
             }
-        } finally {
-            manager.close();
         }
 
         String[] updatedArray = urlsWithUserDir(urlsArray, username);
