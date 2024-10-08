@@ -38,7 +38,7 @@ dependencies {
     compile 'org.rrd4j:rrd4j:2.2.1'
     compile 'commons-beanutils:commons-beanutils:1.9.4'
     compile 'net.sf.dozer:dozer:5.5.1'
-    compile 'commons-io:commons-io:2.7'
+    compile 'commons-io:commons-io:2.14.0'
     compile 'commons-codec:commons-codec:1.13'
 
     compile 'com.netiq:websockify:1.7-proactive'
