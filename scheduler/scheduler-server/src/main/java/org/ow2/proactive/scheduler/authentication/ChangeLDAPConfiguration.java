@@ -453,6 +453,13 @@ public class ChangeLDAPConfiguration {
         options.addOption(opt);
 
         opt = new Option(null,
+                         LDAP_GROUP_FILTER_USE_UID_OPTION_NAME,
+                         false,
+                         "If enabled, the group filter will use as parameter the user uid instead of its distinguished name.");
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option(null,
                          LDAP_GROUP_NAME_ATTR_OPTION_NAME,
                          false,
                          "The attribute in the group entry that matches the jaas' group name. Default is \"cn\".");
