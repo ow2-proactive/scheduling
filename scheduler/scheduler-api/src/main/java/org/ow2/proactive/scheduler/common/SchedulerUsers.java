@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,7 +56,7 @@ public class SchedulerUsers implements Serializable {
      * List of connected user.
      * Will be sorted by default as defined in the {@link UserIdentification#compareTo(UserIdentification)} method !
      */
-    private Set<UserIdentification> users = new HashSet<>();
+    private Set<UserIdentification> users = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * Return a sorted collection of all connected users.
@@ -97,5 +100,13 @@ public class SchedulerUsers implements Serializable {
         if (!user.isToRemove()) {
             users.add(user);
         }
+    }
+
+    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
+        users = Collections.synchronizedSet((Set) aInputStream.readObject());
+    }
+
+    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
+        aOutputStream.writeObject(new HashSet<>(users));
     }
 }
