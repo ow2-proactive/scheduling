@@ -222,6 +222,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Max number of lines stored from the infrastructure processes output */
     RM_INFRASTRUCTURE_PROCESS_OUTPUT_MAX_LINES("pa.rm.infrastructure.process.output.maxlines", PropertyType.INTEGER, "2000"),
 
+    /** When using legacy encryption, passwords are stored in login.cfg using symmetric key encryption, instead of hash/salt. Default to true for backward compatibility **/
+    RM_LEGACY_ENCRYPTION("pa.rm.legacy.encryption", PropertyType.BOOLEAN, "true"),
+
     /** Path to the Resource Manager credentials for adding local nodes */
     RM_CREDS("pa.rm.credentials", PropertyType.STRING, "config/authentication/rm.cred"),
 

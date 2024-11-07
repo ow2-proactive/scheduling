@@ -86,6 +86,11 @@ public class SchedulerFileLoginModule extends FileLoginModule {
         return Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
     }
 
+    @Override
+    protected boolean isLegacyPasswordEncryption() {
+        return PASchedulerProperties.SCHEDULER_LEGACY_ENCRYPTION.getValueAsBoolean();
+    }
+
     /**
      * Returns logger used for authentication
      *

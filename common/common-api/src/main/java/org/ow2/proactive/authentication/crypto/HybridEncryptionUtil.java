@@ -35,6 +35,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 
 /**
  * Encrypt data with a symmetric key that is asymmetrically encrypted.
@@ -131,6 +133,16 @@ public class HybridEncryptionUtil {
         HybridEncryptedData data = encryptString(value, publicKey);
         return Base64.encodeBase64String(data.getEncryptedData()) + separator +
                Base64.encodeBase64String(data.getEncryptedSymmetricKey());
+    }
+
+    public static String hashPassword(String password) {
+        return BCrypt.withDefaults().hashToString(12, password.toCharArray());
+    }
+
+    public static boolean verifyPassword(String inputPassword, String storedHash) {
+        BCrypt.Result result = BCrypt.verifyer().verify(inputPassword.toCharArray(), storedHash);
+
+        return result.verified;
     }
 
     public static class HybridEncryptedData {
