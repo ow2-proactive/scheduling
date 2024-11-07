@@ -168,6 +168,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */
 
+    /** When using legacy encryption, passwords are stored in login.cfg using symmetric key encryption, instead of hash/salt. Default to true for backward compatibility **/
+    SCHEDULER_LEGACY_ENCRYPTION("pa.scheduler.legacy.encryption", PropertyType.BOOLEAN, "false"),
+
     /** path to the Jaas configuration file which defines what modules are available for
      * internal authentication */
     SCHEDULER_AUTH_JAAS_PATH("pa.scheduler.auth.jaas.path", PropertyType.STRING, "config/authentication/jaas.config"),

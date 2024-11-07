@@ -61,16 +61,32 @@ escape_rhs_sed ()
 
 }
 
-escape_lhs_sed ()
+escape_lhs_sed()
 {
     echo $(printf '%s\n' "$1" | sed 's:[][\/.^$*]:\\&:g')
 
 }
 
-compute-version ()
+compute-version()
 {
     echo $(ls $1/dist/lib/scheduler-server-*.jar | sed "s/^$(escape_lhs_sed $1/dist/lib/scheduler-server-)\(.*\)\.jar$/\1/g")
 
+}
+
+compute-major-minor()
+{
+    NUMERIC_VERSION=$(echo ${1/-SNAPSHOT})
+    echo ${NUMERIC_VERSION%.*}
+}
+
+# an upgrade of the password stored format occurs when the new version is 14.1 or greater and the old version is 14.0 or lower
+is_legacy_hash_upgrade()
+{
+  if (( $(echo "$1 >= 14.1 && $2 <= 14.0" | bc -l) )); then
+    return 0
+  else
+    return 1
+  fi
 }
 
 update_node_jars()
@@ -294,6 +310,8 @@ initial_commit()
 }
 
 NEW_VERSION=$(compute-version $INSTALL_PADIR)
+
+NEW_VERSION_MAJOR=$(compute-major-minor $NEW_VERSION)
 
 echo "This will install the ProActive scheduler $NEW_VERSION as a service."
 echo "Once the installer is started, it must process until the end otherwise the installation may be corrupted."
@@ -759,6 +777,9 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
         if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
            rm -f  $PA_ROOT/default/addons/*$OLD_VERSION*.jar
            rm -f  $PA_ROOT/default/addons/*/*$OLD_VERSION*.jar
+           OLD_VERSION_MAJOR=$(compute-major-minor OLD_VERSION)
+        else
+           OLD_VERSION_MAJOR=NEW_VERSION_MAJOR
         fi
     fi
     # display the list of addons in the new installation
@@ -768,6 +789,11 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
     echo ""
 
     ls -l $PA_ROOT/default/addons/*.jar
+fi
+
+if is_legacy_hash_upgrade $NEW_VERSION_MAJOR $OLD_VERSION_MAJOR; then
+  echo "Porting $PA_ROOT/default/config/authentication/login.cfg to the new format"
+  $PA_ROOT/default/tools/regenerate-passwords -ns -ltn -d
 fi
 
 if [[ "$OLD_PADIR" != "" ]]; then
