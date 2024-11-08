@@ -29,7 +29,7 @@ import org.ow2.proactive.permissions.ClientPermission;
 
 
 /**
- * This permission allows a user to fully control the job planner
+ * This permission allows a user to fully control the catalog
  */
-public class JobPlannerAllAccessPermission extends ClientPermission {
+public class CatalogAllAccessPermission extends ClientPermission {
 }
