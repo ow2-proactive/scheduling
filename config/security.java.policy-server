@@ -270,6 +270,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
     permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
+    permission org.ow2.proactive.scheduler.permissions.CatalogAllAccessPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
