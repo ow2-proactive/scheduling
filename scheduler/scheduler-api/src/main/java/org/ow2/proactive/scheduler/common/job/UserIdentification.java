@@ -97,6 +97,11 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract boolean isAllJobPlannerPermission();
 
     /**
+     * Check if the user has all catalog permission
+     */
+    public abstract boolean isAllCatalogPermission();
+
+    /**
      * Check if the user can create a job-planner association
      */
     public abstract boolean isCanCreateAssociationPermission();

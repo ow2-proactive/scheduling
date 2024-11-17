@@ -109,6 +109,11 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isAllCatalogPermission() {
+        return false;
+    }
+
+    @Override
     public boolean isHandleOnlyMyJobsPermission() {
         return false;
     }
