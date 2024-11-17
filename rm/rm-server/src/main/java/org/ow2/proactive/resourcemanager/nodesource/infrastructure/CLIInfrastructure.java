@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
+import io.github.pixee.security.SystemCommand;
 
 import java.io.File;
 import java.io.IOException;
@@ -141,7 +142,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
         Process p;
         try {
             logger.debug("Launching the command: " + commandLine);
-            p = Runtime.getRuntime().exec(commandLine);
+            p = SystemCommand.runCommand(Runtime.getRuntime(), commandLine);
         } catch (IOException e1) {
             multipleDeclareDeployingNodeLost(depNodeURLs,
                                              "Cannot run command: " + commandLine +
@@ -227,7 +228,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                     Process p;
                     try {
                         logger.debug("Launching the command: " + commandLine);
-                        p = Runtime.getRuntime().exec(commandLine);
+                        p = SystemCommand.runCommand(Runtime.getRuntime(), commandLine);
                         // TODO add timeout behavior
                         int exitCode = p.waitFor();
                         String pOutPut = Utils.extractProcessOutput(p);

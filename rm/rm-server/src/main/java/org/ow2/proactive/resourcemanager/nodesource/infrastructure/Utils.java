@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import io.github.pixee.security.SystemCommand;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -120,11 +121,11 @@ public class Utils {
         // easier killing, prevents the client from polluting stdout
         switch (OperatingSystem.getOperatingSystem()) {
             case unix:
-                p = Runtime.getRuntime().exec(new String[] { CentralPAPropertyRepository.PA_GCMD_UNIX_SHELL.getValue(),
+                p = SystemCommand.runCommand(Runtime.getRuntime(), new String[] { CentralPAPropertyRepository.PA_GCMD_UNIX_SHELL.getValue(),
                                                              "-c", sshCmd });
                 break;
             case windows:
-                p = Runtime.getRuntime().exec(sshCmd);
+                p = SystemCommand.runCommand(Runtime.getRuntime(), sshCmd);
                 break;
         }
 

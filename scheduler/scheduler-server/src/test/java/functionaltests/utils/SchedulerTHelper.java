@@ -25,6 +25,7 @@
  */
 package functionaltests.utils;
 
+import io.github.pixee.security.SystemCommand;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
@@ -1182,7 +1183,7 @@ public class SchedulerTHelper {
     }
 
     public static void setExecutable(String filesList) throws IOException {
-        Runtime.getRuntime().exec("chmod u+x " + filesList);
+        SystemCommand.runCommand(Runtime.getRuntime(), "chmod u+x " + filesList);
     }
 
     public void disconnect() throws Exception {

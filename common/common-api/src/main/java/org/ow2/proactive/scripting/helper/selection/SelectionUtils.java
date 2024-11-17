@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scripting.helper.selection;
 
+import io.github.pixee.security.SystemCommand;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -347,7 +348,7 @@ public class SelectionUtils {
             is.close();
             fos.close();
             //execute
-            Process p = Runtime.getRuntime().exec(tmp.getAbsolutePath());
+            Process p = SystemCommand.runCommand(Runtime.getRuntime(), tmp.getAbsolutePath());
             p.waitFor();
             return (p.exitValue() > 0);
         } catch (IllegalMonitorStateException ex) {

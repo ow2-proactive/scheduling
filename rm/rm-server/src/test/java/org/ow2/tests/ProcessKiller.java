@@ -25,6 +25,7 @@
  */
 package org.ow2.tests;
 
+import io.github.pixee.security.SystemCommand;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -123,7 +124,7 @@ public abstract class ProcessKiller {
             int exitValue = p.waitFor();
             if (exitValue != 0) {
                 try {
-                    p = Runtime.getRuntime().exec(new String[] { "tskill", Integer.toString(pid) });
+                    p = SystemCommand.runCommand(Runtime.getRuntime(), new String[] { "tskill", Integer.toString(pid) });
                     p.waitFor();
                 } catch (Exception e) {
                     // ignore

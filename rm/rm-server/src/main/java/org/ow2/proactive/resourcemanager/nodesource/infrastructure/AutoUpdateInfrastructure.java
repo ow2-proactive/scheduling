@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
+import io.github.pixee.security.SystemCommand;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -121,7 +122,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         try {
             logger.debug("Deploying node: " + nodeName);
             logger.debug("Launching the command: " + filledCommand);
-            p = Runtime.getRuntime().exec(new String[] { "bash", "-c", filledCommand });
+            p = SystemCommand.runCommand(Runtime.getRuntime(), new String[] { "bash", "-c", filledCommand });
         } catch (IOException e1) {
             multipleDeclareDeployingNodeLost(depNodeURLs,
                                              "Cannot run command: " + filledCommand +
