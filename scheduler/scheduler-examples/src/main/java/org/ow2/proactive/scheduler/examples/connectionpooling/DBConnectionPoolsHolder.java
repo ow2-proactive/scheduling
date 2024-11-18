@@ -25,12 +25,15 @@
  */
 package org.ow2.proactive.scheduler.examples.connectionpooling;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
@@ -121,6 +124,44 @@ public class DBConnectionPoolsHolder {
             return stmt.executeUpdate(updateStr);
         } catch (SQLException e) {
             throw new IllegalStateException("Unable to execute update: " + updateStr, e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Executes a stored procedure with the given name and parameters.
+     *
+     * @param dbConnectionDetails The connection details for the database.
+     * @param storedProcName The name of the stored procedure.
+     * @param params The parameters to be passed to the stored procedure.
+     * @return A CachedRowSet containing the result set of the stored procedure execution.
+     */
+    public CachedRowSet executeStoredProcedure(DBConnectionDetails dbConnectionDetails, String storedProcName,
+            Object... params) {
+        try (Connection connection = dbConnectionPoolMap.get(dbConnectionDetails).getConnection()) {
+            // Construct the stored procedure call string with placeholders using Java 8 features
+            String paramPlaceholders = String.join(", ", Collections.nCopies(params.length, "?"));
+            String callString = "{call " + storedProcName + "(" + paramPlaceholders + ")}";
+
+            try (CallableStatement callableStmt = connection.prepareCall(callString)) {
+                // Set parameters for the CallableStatement using IntStream
+                IntStream.range(0, params.length).forEach(i -> {
+                    try {
+                        callableStmt.setObject(i + 1, params[i]); // Ensure index starts from 1
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Error setting parameter at index " + (i + 1), e);
+                    }
+                });
+
+                // Execute the stored procedure and handle the result set
+                ResultSet resultSet = callableStmt.executeQuery();
+                CachedRowSet crs = RowSetProvider.newFactory().createCachedRowSet();
+                crs.populate(resultSet);
+                return crs;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to execute stored procedure: " + storedProcName, e);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
