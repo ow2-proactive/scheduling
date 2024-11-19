@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.authentication;
 
 import java.io.*;
 import java.security.KeyException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.*;
 
@@ -599,9 +600,13 @@ public class ManageUsers {
     private static void updateUserPassword(PublicKey pubKey, String login, String password, Properties props)
             throws KeyException {
         String encodedPassword;
-        encodedPassword = HybridEncryptionUtil.encryptStringToBase64(password,
-                                                                     pubKey,
-                                                                     FileLoginModule.ENCRYPTED_DATA_SEP);
+        if (PASchedulerProperties.SCHEDULER_LEGACY_ENCRYPTION.getValueAsBoolean()) {
+            encodedPassword = HybridEncryptionUtil.encryptStringToBase64(password,
+                                                                         pubKey,
+                                                                         FileLoginModule.ENCRYPTED_DATA_SEP);
+        } else {
+            encodedPassword = HybridEncryptionUtil.hashPassword(password);
+        }
         props.put(login, encodedPassword);
 
     }

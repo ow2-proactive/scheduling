@@ -325,12 +325,8 @@ public class ManageUsersTest extends ProActiveTestClean {
             for (Map.Entry<String, String> user : usersToCheck.entrySet()) {
                 Assert.assertTrue("login file should contain " + user.getKey(), props.containsKey(user.getKey()));
                 String encryptedPassword = (String) props.get(user.getKey());
-                String password = HybridEncryptionUtil.decryptBase64String(encryptedPassword,
-                                                                           privateKey,
-                                                                           FileLoginModule.ENCRYPTED_DATA_SEP);
-                Assert.assertEquals("decrypted password for user " + user.getKey() + " should match",
-                                    user.getValue(),
-                                    password);
+                boolean passwordVerified = HybridEncryptionUtil.verifyPassword(user.getValue(), encryptedPassword);
+                Assert.assertTrue("Password for user " + user.getKey() + " should be verified", passwordVerified);
                 for (String group : groupsToCheck.get(user.getKey())) {
                     Assert.assertTrue("group file should contain " + user.getKey() + ":" + group,
                                       groupContent.contains(user.getKey() + ":" + group));

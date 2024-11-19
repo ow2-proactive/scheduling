@@ -5,6 +5,7 @@ dependencies {
     compile "org.objectweb.proactive:programming-util:${programmingVersion}"
     compile 'org.ow2.proactive:process-tree-killer:1.0.3'
     compile group: 'org.jasypt', name: 'jasypt', version: '1.9.3'
+    compile "at.favre.lib:bcrypt:0.10.2"
 
     testRuntime 'org.jruby:jruby-complete:9.4.3.0'
     testRuntime 'org.python:jython-standalone:2.7.3'

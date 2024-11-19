@@ -121,6 +121,13 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     protected abstract PrivateKey getPrivateKey() throws KeyException;
 
     /**
+     * Returns true if legacy password encryption is used (hybrid symetric key).
+     * Returns false if newer encryption is used (hash/salt based)
+     * @return
+     */
+    protected abstract boolean isLegacyPasswordEncryption();
+
+    /**
      * 
      * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject, javax.security.auth.callback.CallbackHandler, java.util.Map, java.util.Map)
      */
@@ -329,14 +336,24 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         } else {
             String encryptedPassword = (String) props.get(username);
             try {
-                if (!HybridEncryptionUtil.decryptBase64String(encryptedPassword, privateKey, ENCRYPTED_DATA_SEP)
-                                         .equals(password)) {
-                    return false;
-                }
-            } catch (KeyException e) {
+                return checkPassword(encryptedPassword, password, privateKey);
+            } catch (Exception e) {
                 throw new LoginException(e.toString());
             }
-            return true;
+        }
+    }
+
+    private boolean checkPassword(String encryptedPassword, String password, PrivateKey privateKey)
+            throws KeyException {
+        if (isLegacyPasswordEncryption()) {
+            if (!HybridEncryptionUtil.decryptBase64String(encryptedPassword, privateKey, ENCRYPTED_DATA_SEP)
+                                     .equals(password)) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return HybridEncryptionUtil.verifyPassword(password, encryptedPassword);
         }
     }
 

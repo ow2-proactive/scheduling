@@ -108,6 +108,11 @@ public class RMMultiLDAPLoginModule extends MultiLDAPLoginModule {
         return Credentials.getPrivateKey(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()));
     }
 
+    @Override
+    protected boolean isLegacyPasswordEncryption() {
+        return PAResourceManagerProperties.RM_LEGACY_ENCRYPTION.getValueAsBoolean();
+    }
+
     /**
      * Returns logger for authentication
      */
