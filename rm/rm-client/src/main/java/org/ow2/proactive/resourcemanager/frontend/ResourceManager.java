@@ -166,6 +166,18 @@ public interface ResourceManager extends ServiceUsingPermission {
     BooleanWrapper undeployNodeSource(String nodeSourceName, boolean preempt);
 
     /**
+     * Remove the nodes of a node source that has been deployed before, and
+     * keep the node source defined in the resource manager, then deploy the node source
+     * If the node source is undeployed, then this method does nothing.
+     *
+     * @param nodeSourceName the name of the node source to redeploy
+     * @return true if the node source was redeployed successfully, false if the
+     * node source is undeployed, runtime exception otherwise
+     */
+    @RoleNSAdmin
+    BooleanWrapper redeployNodeSource(String nodeSourceName);
+
+    /**
      * Remove a node source from the RM.
      * All nodes handled by the node source are removed.
      *
