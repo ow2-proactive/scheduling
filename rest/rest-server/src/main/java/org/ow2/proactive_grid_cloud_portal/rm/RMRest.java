@@ -706,6 +706,21 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
+    public NSState redeployNodeSource(String sessionId, String nodeSourceName)
+            throws NotConnectedException, PermissionRestException {
+        ResourceManager rm = checkAccess(sessionId);
+        NSState nsState = new NSState();
+        try {
+            nsState.setResult(rm.redeployNodeSource(nodeSourceName).getBooleanValue());
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
+        }
+        return nsState;
+    }
+
+    @Override
     public int getNodeSourcePingFrequency(String sessionId, String sourceName)
             throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
