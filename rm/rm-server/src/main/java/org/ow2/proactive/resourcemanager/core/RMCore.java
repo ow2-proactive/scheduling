@@ -1530,13 +1530,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                             new RMCoreAllPermission(),
                                             new NSAdminPermission());
             }
-            NodeSourceDescriptor nodeSourceDescriptor = this.getDefinedNodeSourceDescriptorOrFail(nodeSourceName);
-            this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
-            deployNodeSourceOrFail(nodeSourceName, nodeSourceDescriptor);
+            deployNs(nodeSourceName);
         } else {
             logger.debug(NODE_SOURCE_STRING + nodeSourceName + " is already deployed");
         }
         return new BooleanWrapper(true);
+    }
+
+    private void deployNs(String nodeSourceName) {
+        NodeSourceDescriptor nodeSourceDescriptor = this.getDefinedNodeSourceDescriptorOrFail(nodeSourceName);
+        this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
+        deployNodeSourceOrFail(nodeSourceName, nodeSourceDescriptor);
     }
 
     private void deployNodeSourceOrFail(String nodeSourceName, NodeSourceDescriptor nodeSourceDescriptor) {
@@ -1733,32 +1737,60 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                         new RMCoreAllPermission(),
                                         new NSAdminPermission());
 
-            nodeSourceToRemove.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
-
-            this.removeAllNodes(nodeSourceName, preempt);
-
-            this.updateNodeSourceDescriptorWithStatusAndPersist(this.definedNodeSources.get(nodeSourceName)
-                                                                                       .getDescriptor(),
-                                                                NodeSourceStatus.NODES_UNDEPLOYED);
-
-            this.nodeSourceUnregister(nodeSourceName,
-                                      NodeSourceStatus.NODES_UNDEPLOYED,
-                                      new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
-                                                            this.caller.getName(),
-                                                            nodeSourceName,
-                                                            nodeSourceToRemove.getDescription(),
-                                                            nodeSourceToRemove.getAdditionalInformation(),
-                                                            nodeSourceToRemove.getAdministrator().getName(),
-                                                            NodeSourceStatus.NODES_UNDEPLOYED.toString(),
-                                                            nodeSourceToRemove.getDescriptor().getInfrastructureType(),
-                                                            nodeSourceToRemove.getDescriptor().getPolicyType(),
-                                                            nodeSourceToRemove.getNodeUserAccessType().getTokens()));
-
-            // asynchronously delegate the removal process to the node source
-            nodeSourceToRemove.shutdown(this.caller);
+            undeployNS(nodeSourceToRemove, nodeSourceName, preempt);
         }
 
         return new BooleanWrapper(true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @RoleNSAdmin
+    public BooleanWrapper redeployNodeSource(String nodeSourceName) {
+
+        logger.info("Redeploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
+
+        if (!this.definedNodeSources.containsKey(nodeSourceName)) {
+            throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
+        }
+
+        if (this.deployedNodeSources.containsKey(nodeSourceName)) {
+            NodeSource nodeSourceToRemove = this.deployedNodeSources.get(nodeSourceName);
+            this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
+                                        this.caller + " is not authorized to redeploy " + nodeSourceName,
+                                        new RMCoreAllPermission(),
+                                        new NSAdminPermission());
+            undeployNS(nodeSourceToRemove, nodeSourceName, true);
+            deployNs(nodeSourceName);
+        }
+
+        return new BooleanWrapper(true);
+    }
+
+    private void undeployNS(NodeSource nodeSourceToRemove, String nodeSourceName, boolean preempt) {
+        nodeSourceToRemove.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
+
+        this.removeAllNodes(nodeSourceName, preempt);
+
+        this.updateNodeSourceDescriptorWithStatusAndPersist(this.definedNodeSources.get(nodeSourceName).getDescriptor(),
+                                                            NodeSourceStatus.NODES_UNDEPLOYED);
+
+        this.nodeSourceUnregister(nodeSourceName,
+                                  NodeSourceStatus.NODES_UNDEPLOYED,
+                                  new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
+                                                        this.caller.getName(),
+                                                        nodeSourceName,
+                                                        nodeSourceToRemove.getDescription(),
+                                                        nodeSourceToRemove.getAdditionalInformation(),
+                                                        nodeSourceToRemove.getAdministrator().getName(),
+                                                        NodeSourceStatus.NODES_UNDEPLOYED.toString(),
+                                                        nodeSourceToRemove.getDescriptor().getInfrastructureType(),
+                                                        nodeSourceToRemove.getDescriptor().getPolicyType(),
+                                                        nodeSourceToRemove.getNodeUserAccessType().getTokens()));
+
+        // asynchronously delegate the removal process to the node source
+        nodeSourceToRemove.shutdown(this.caller);
     }
 
     /**

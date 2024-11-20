@@ -532,6 +532,21 @@ public interface RMRestInterface {
             throws NotConnectedException, PermissionRestException;
 
     /**
+     * Re-deploy a node source.
+     *
+     * Remove the nodes of the node source, undeploy and then deploy the node source.
+     *
+     * @param sessionId current session
+     * @param nodeSourceName the name of the node source to redeploy
+     * @return the result of the action, possibly containing the error message
+     */
+    @PUT
+    @Path("nodesource/redeploy")
+    @Produces(MediaType.APPLICATION_JSON)
+    NSState redeployNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException, PermissionRestException;
+
+    /**
      * Ping frequency of a node source.
      *
      * Returns the ping frequency of a node source.
