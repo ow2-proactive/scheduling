@@ -2218,9 +2218,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             String jobXml = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
             Job job;
-            try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
-                job = JobFactory.getFactory().createJob(tmpWorkflowStream, null, null, scheduler, space, sessionId);
+            try {
+                try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+                    job = JobFactory.getFactory().createJob(tmpWorkflowStream, null, null, scheduler, space, sessionId);
+                }
+            } catch (Exception e) {
+                // in case of an error, create the job without scheduler or dataspace support
+                try (InputStream tmpWorkflowStream = IOUtils.toInputStream(jobXml, Charset.forName(FILE_ENCODING))) {
+                    job = JobFactory.getFactory().createJob(tmpWorkflowStream, null, null, null, null, sessionId);
+                }
             }
+
             WorkflowDescription workflowDescription = new WorkflowDescription();
             workflowDescription.setName(job.getName());
             workflowDescription.setProjectName(job.getProjectName());
