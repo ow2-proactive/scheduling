@@ -26,6 +26,7 @@
 package functionaltests.job.log;
 
 import static functionaltests.utils.SchedulerTHelper.log;
+import io.github.pixee.security.BoundedLineReader;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -240,13 +241,13 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
                 String line;
                 int i;
                 // print up to LIMIT first lines
-                for (i = 0; i < LIMIT && (line = br.readLine()) != null; ++i) {
+                for (i = 0; i < LIMIT && (line = BoundedLineReader.readLine(br, 5_000_000)) != null; ++i) {
                     System.out.println(line);
                 }
 
                 Queue<String> queue = new CircularFifoQueue<>(LIMIT);
                 // reading last LIMIT lines
-                for (; (line = br.readLine()) != null; ++i) {
+                for (; (line = BoundedLineReader.readLine(br, 5_000_000)) != null; ++i) {
                     queue.add(line);
                 }
 

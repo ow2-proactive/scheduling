@@ -25,6 +25,7 @@
  */
 package org.ow2.tests;
 
+import io.github.pixee.security.BoundedLineReader;
 import io.github.pixee.security.SystemCommand;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -117,7 +118,7 @@ public abstract class ProcessKiller {
             Reader r = new InputStreamReader(p.getInputStream());
             BufferedReader br = new BufferedReader(r);
 
-            for (String line = br.readLine(); line != null; line = br.readLine()) {
+            for (String line = BoundedLineReader.readLine(br, 5_000_000); line != null; line = BoundedLineReader.readLine(br, 5_000_000)) {
             }
 
             // SCHEDULING-1527: using tskill as fallback

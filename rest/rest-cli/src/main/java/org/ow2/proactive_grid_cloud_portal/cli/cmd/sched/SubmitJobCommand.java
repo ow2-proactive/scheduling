@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
+import io.github.pixee.security.BoundedLineReader;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE;
 import static org.ow2.proactive.scheduler.common.SchedulerConstants.SUBMISSION_MODE_CLI;
@@ -135,7 +136,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     private Boolean isFileEmpty(String pathname) {
         try (BufferedReader reader = new BufferedReader(new FileReader(pathname))) {
             if (isFileExisting(pathname)) {
-                if (reader.readLine() == null) {
+                if (BoundedLineReader.readLine(reader, 5_000_000) == null) {
                     return true;
                 }
                 return false;

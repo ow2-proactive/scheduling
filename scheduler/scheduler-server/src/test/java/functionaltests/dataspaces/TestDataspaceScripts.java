@@ -25,6 +25,7 @@
  */
 package functionaltests.dataspaces;
 
+import io.github.pixee.security.BoundedLineReader;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -184,7 +185,7 @@ public class TestDataspaceScripts extends SchedulerFunctionalTestNoRestart {
         BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
         String line;
         int i = 0;
-        while ((line = in.readLine()) != null) {
+        while ((line = BoundedLineReader.readLine(in, 5_000_000)) != null) {
             assertTrue("Original and copied files differ", fileContent[i].equals(line));
             i++;
         }

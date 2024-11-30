@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.task.utils;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -49,7 +50,7 @@ public class ThreadReader implements Runnable {
                 String str;
 
                 try {
-                    while ((str = in.readLine()) != null) {
+                    while ((str = BoundedLineReader.readLine(in, 5_000_000)) != null) {
                         out.println(str);
                     }
                 } catch (IOException e) {

@@ -25,6 +25,7 @@
  */
 package performancetests.recovery;
 
+import io.github.pixee.security.BoundedLineReader;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -109,7 +110,7 @@ public class PerformanceTestBase extends SchedulerFunctionalTestWithCustomConfig
         Map<String, Double> result = new HashMap<>(8);
 
         String line = null;
-        while ((line = br.readLine()) != null) {
+        while ((line = BoundedLineReader.readLine(br, 5_000_000)) != null) {
             final String[] values = line.split(SEPARATOR);
             String key = values[1] + "-" + values[2];
             String value = values[values.length - 2];

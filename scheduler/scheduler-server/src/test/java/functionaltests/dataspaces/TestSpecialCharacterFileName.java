@@ -25,6 +25,7 @@
  */
 package functionaltests.dataspaces;
 
+import io.github.pixee.security.BoundedLineReader;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.*;
@@ -74,7 +75,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRes
         String line;
         long startTime = System.currentTimeMillis();
 
-        while ((line = br.readLine()) != null && (System.currentTimeMillis() - startTime) / 1000 < timeout) {
+        while ((line = BoundedLineReader.readLine(br, 5_000_000)) != null && (System.currentTimeMillis() - startTime) / 1000 < timeout) {
             sb.append(line + System.getProperty("line.separator"));
             System.out.println(line);
 

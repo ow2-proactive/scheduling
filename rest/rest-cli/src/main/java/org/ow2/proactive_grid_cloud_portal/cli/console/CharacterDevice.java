@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.console;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +53,7 @@ class CharacterDevice extends AbstractDevice {
     @Override
     public String readLine(String fmt, Object... args) throws IOException {
         out.printf(fmt, args);
-        return in.readLine();
+        return BoundedLineReader.readLine(in, 5_000_000);
     }
 
     @Override

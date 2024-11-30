@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.authentication;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -350,7 +351,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         try (FileInputStream stream = new FileInputStream(groupFile)) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 String[] u2g = line.split(":");
                 if (u2g[0].trim().equals(username)) {
                     subject.getPrincipals().add(new GroupNamePrincipal(u2g[1]));
@@ -380,7 +381,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         try (FileInputStream stream = new FileInputStream(tenantFile)) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 String[] u2g = line.split(":");
                 if (groupNames.contains(u2g[0].trim())) {
                     Set<TenantPrincipal> alreadyDefinedTenants = subject.getPrincipals(TenantPrincipal.class);

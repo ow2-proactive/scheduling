@@ -26,6 +26,7 @@
 package functionaltests.job.taskkill;
 
 import static functionaltests.utils.SchedulerTHelper.log;
+import io.github.pixee.security.BoundedLineReader;
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
@@ -120,7 +121,7 @@ public class TestProcessTreeKillerUtil {
         Process p = processBuilder.start();
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         log("Scanning processes");
-        while ((line = input.readLine()) != null) {
+        while ((line = BoundedLineReader.readLine(input, 5_000_000)) != null) {
             log("Process: " + line);
             if (line.contains(executableName)) {
                 toReturn++;
@@ -135,7 +136,7 @@ public class TestProcessTreeKillerUtil {
         String line;
         Process p = Runtime.getRuntime().exec("tasklist");
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        while ((line = input.readLine()) != null) {
+        while ((line = BoundedLineReader.readLine(input, 5_000_000)) != null) {
             if (line.toLowerCase().contains(executableName.toLowerCase())) {
                 toReturn++;
             }

@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.*;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -611,7 +612,7 @@ public class ManageUsers {
         String line = null;
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(groupFilePath)))) {
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 if (!line.trim().isEmpty()) {
                     String[] u2g = line.split(":");
                     if (u2g.length == 2) {

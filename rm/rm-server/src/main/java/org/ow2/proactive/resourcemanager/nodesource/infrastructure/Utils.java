@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import io.github.pixee.security.BoundedLineReader;
 import io.github.pixee.security.SystemCommand;
 import java.io.BufferedReader;
 import java.io.File;
@@ -144,7 +145,7 @@ public class Utils {
         try {
             String lf = System.lineSeparator();
             while (br.ready()) {
-                if ((line = br.readLine()) != null) {
+                if ((line = BoundedLineReader.readLine(br, 5_000_000)) != null) {
                     sb.append(line);
                     sb.append(lf);
                 }
@@ -173,7 +174,7 @@ public class Utils {
         try {
             String lf = System.lineSeparator();
             while (br.ready()) {
-                if ((line = br.readLine()) != null) {
+                if ((line = BoundedLineReader.readLine(br, 5_000_000)) != null) {
                     sb.append(line);
                     sb.append(lf);
                 }
@@ -196,8 +197,8 @@ public class Utils {
     public static void consumeProcessStream(InputStream stream) {
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         try {
-            while (br.readLine() != null) {
-                br.readLine();
+            while (BoundedLineReader.readLine(br, 5_000_000) != null) {
+                BoundedLineReader.readLine(br, 5_000_000);
             }
         } catch (IOException e) {
         } finally {

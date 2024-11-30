@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
+import io.github.pixee.security.BoundedLineReader;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -715,7 +716,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         try {
             String lf = System.lineSeparator();
             while (br.ready()) {
-                if ((line = br.readLine()) != null) {
+                if ((line = BoundedLineReader.readLine(br, 5_000_000)) != null) {
                     sb.append(line);
                     sb.append(lf);
                 }

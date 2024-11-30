@@ -25,6 +25,7 @@
  */
 package functionaltests.dataspaces;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -339,7 +340,7 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestNoRestart
 
     private String getContent(File f) throws Exception {
         try (FileReader fr = new FileReader(f); BufferedReader br = new BufferedReader(fr)) {
-            return br.readLine();
+            return BoundedLineReader.readLine(br, 5_000_000);
         }
     }
 

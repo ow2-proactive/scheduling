@@ -25,6 +25,7 @@
  */
 package functionaltests.executables;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -56,7 +57,7 @@ public class WorkingAt3rd extends JavaExecutable {
         }
         //file exist
         BufferedReader br = new BufferedReader(new FileReader(f));
-        int n = Integer.parseInt(br.readLine());
+        int n = Integer.parseInt(BoundedLineReader.readLine(br, 5_000_000));
         br.close();
         //file number is less that 2
         if (n < 2) {

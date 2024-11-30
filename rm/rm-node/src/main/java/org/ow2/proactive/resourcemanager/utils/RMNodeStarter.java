@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
+import io.github.pixee.security.BoundedLineReader;
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 import java.io.BufferedReader;
@@ -1435,7 +1436,7 @@ public class RMNodeStarter {
             File f = new File(getNodeURLFilename(nodeName, rank));
             if (f.exists()) {
                 try (BufferedReader in = new BufferedReader(new FileReader(f))) {
-                    return in.readLine();
+                    return BoundedLineReader.readLine(in, 5_000_000);
                 } finally {
                     FileUtils.deleteQuietly(f);
                 }

@@ -25,6 +25,7 @@
  */
 package functionaltests.dataspaces;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.*;
 
 import org.junit.Assert;
@@ -124,7 +125,7 @@ public class TestWorkflowDataspace extends SchedulerFunctionalTestNoRestart {
                 Assert.assertTrue("Missing output file " + f.getName(), f.exists());
 
                 BufferedReader in = new BufferedReader(new FileReader(f));
-                String line = in.readLine();
+                String line = BoundedLineReader.readLine(in, 5_000_000);
                 Assert.assertTrue("Wrong content for " + f.getCanonicalPath(), line.equals("it " + it + " dup " + dup));
             }
         }

@@ -25,6 +25,7 @@
  */
 package functionaltests.workflow;
 
+import io.github.pixee.security.BoundedLineReader;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -187,28 +188,28 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRes
                 n--;
                 File f = new File(path + "0_0");
                 BufferedReader in = new BufferedReader(new FileReader(f));
-                checkResult(in.readLine(), "T1", "0", "0");
+                checkResult(BoundedLineReader.readLine(in, 5_000_000), "T1", "0", "0");
                 in.close();
                 f.delete();
             } else if (result.getKey().equals("T1*1")) {
                 n--;
                 File f = new File(path + "0_1");
                 BufferedReader in = new BufferedReader(new FileReader(f));
-                checkResult(in.readLine(), "T1*1", "0", "1");
+                checkResult(BoundedLineReader.readLine(in, 5_000_000), "T1*1", "0", "1");
                 in.close();
                 f.delete();
             } else if (result.getKey().equals("T1#1")) {
                 n--;
                 File f = new File(path + "1_0");
                 BufferedReader in = new BufferedReader(new FileReader(f));
-                checkResult(in.readLine(), "T1#1", "1", "0");
+                checkResult(BoundedLineReader.readLine(in, 5_000_000), "T1#1", "1", "0");
                 in.close();
                 f.delete();
             } else if (result.getKey().equals("T1#1*1")) {
                 n--;
                 File f = new File(path + "1_1");
                 BufferedReader in = new BufferedReader(new FileReader(f));
-                checkResult(in.readLine(), "T1#1*1", "1", "1");
+                checkResult(BoundedLineReader.readLine(in, 5_000_000), "T1#1*1", "1", "1");
                 in.close();
                 f.delete();
             }

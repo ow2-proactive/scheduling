@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scripting;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -541,7 +542,7 @@ public abstract class Script<E> implements Serializable {
             StringBuilder builder = new StringBuilder();
             String tmp;
 
-            while ((tmp = buf.readLine()) != null) {
+            while ((tmp = BoundedLineReader.readLine(buf, 5_000_000)) != null) {
                 builder.append(tmp).append("\n");
             }
 
@@ -644,7 +645,7 @@ public abstract class Script<E> implements Serializable {
             StringBuilder builder = new StringBuilder();
             String tmp;
 
-            while ((tmp = buf.readLine()) != null) {
+            while ((tmp = BoundedLineReader.readLine(buf, 5_000_000)) != null) {
                 builder.append(tmp).append("\n");
             }
 

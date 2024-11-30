@@ -26,6 +26,7 @@
 package functionaltests.dataspaces;
 
 import static com.google.common.truth.Truth.assertThat;
+import io.github.pixee.security.BoundedLineReader;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -163,7 +164,7 @@ public class TaskProActiveDataspacesIntegrationTest {
 
     private String readLine(InputStream iStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(iStream));
-        return bufferedReader.readLine();
+        return BoundedLineReader.readLine(bufferedReader, 5_000_000);
     }
 
     private String getSystemProperty(String name) {

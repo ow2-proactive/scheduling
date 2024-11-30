@@ -25,6 +25,7 @@
  */
 package functionaltests.nodesrecovery;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -87,7 +88,7 @@ public class NodesRecoveryProcessHelper {
         Process p = processBuilder.start();
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         StringBuilder stringBuilder = new StringBuilder();
-        while ((line = input.readLine()) != null) {
+        while ((line = BoundedLineReader.readLine(input, 5_000_000)) != null) {
             stringBuilder.append(line).append(",");
             if (line.contains(processName)) {
                 String pidString = line.split(" ")[0];
@@ -104,7 +105,7 @@ public class NodesRecoveryProcessHelper {
         Process p = Runtime.getRuntime().exec(buildJpsCommand());
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         StringBuilder stringBuilder = new StringBuilder();
-        while ((line = input.readLine()) != null) {
+        while ((line = BoundedLineReader.readLine(input, 5_000_000)) != null) {
             stringBuilder.append(line).append(",");
             if (line.toLowerCase().contains(processName.toLowerCase())) {
                 String pidString = line.split(" ")[0];

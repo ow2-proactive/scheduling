@@ -25,6 +25,7 @@
  */
 package functionaltests.utils;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +54,7 @@ public class ProcessStreamReader extends Thread {
         BufferedReader buffered = new BufferedReader(new InputStreamReader(in));
         try {
             String line;
-            while ((line = buffered.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(buffered, 5_000_000)) != null) {
                 logger.info(outputPrefix + line);
             }
         } catch (IOException ignored) {

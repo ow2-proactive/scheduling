@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -158,7 +159,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         try (BufferedReader in = new BufferedReader(new FileReader(f))) {
             String line = "";
 
-            while ((line = in.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(in, 5_000_000)) != null) {
                 if (line == "" || line.trim().length() == 0)
                     continue;
 

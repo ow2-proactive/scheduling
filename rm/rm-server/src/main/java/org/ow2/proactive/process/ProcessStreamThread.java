@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.process;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +70,7 @@ public class ProcessStreamThread extends Thread {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         String line;
         try {
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 String outputLine = outputPrefix + line;
                 if (printOutput) {
                     System.out.println(outputLine);

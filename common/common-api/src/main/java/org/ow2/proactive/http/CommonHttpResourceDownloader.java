@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.http;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -139,7 +140,7 @@ public class CommonHttpResourceDownloader {
             StringBuilder builder = new StringBuilder();
             String tmp;
 
-            while ((tmp = buf.readLine()) != null) {
+            while ((tmp = BoundedLineReader.readLine(buf, 5_000_000)) != null) {
                 builder.append(tmp).append("\n");
             }
 

@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -517,7 +518,7 @@ public class SchedulerAuthenticationGUIHelper {
             }
             try (BufferedReader br = new BufferedReader(new FileReader(TMP_AUTH_FILE))) {
                 String url;
-                while ((url = br.readLine()) != null) {
+                while ((url = BoundedLineReader.readLine(br, 5_000_000)) != null) {
                     if (!"".equals(url)) {
                         URLs.add(url);
                     }

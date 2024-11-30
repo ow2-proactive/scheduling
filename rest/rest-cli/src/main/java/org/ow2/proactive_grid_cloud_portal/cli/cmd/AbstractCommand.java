@@ -26,6 +26,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
+import io.github.pixee.security.BoundedLineReader;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
@@ -273,24 +274,24 @@ public abstract class AbstractCommand implements Command {
             BufferedReader reader = new BufferedReader(new StringReader(responseContent));
 
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 if (line.startsWith("errorMessage:")) {
                     errorView.errorMessage = line.substring(line.indexOf(':')).trim();
                     break;
                 }
             }
 
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 if (line.startsWith("httpErrorCode:")) {
                     errorView.errorCode = line.substring(line.indexOf(':')).trim();
                     break;
                 }
             }
 
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 if (line.startsWith("stackTrace:")) {
                     StringBuilder buffer = new StringBuilder();
-                    while ((line = reader.readLine()) != null) {
+                    while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                         buffer.append(line);
                     }
                     errorView.stackTrace = buffer.toString();
