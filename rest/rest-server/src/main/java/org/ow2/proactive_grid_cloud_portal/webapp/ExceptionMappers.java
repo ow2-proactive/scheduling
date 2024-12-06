@@ -45,15 +45,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelConflictRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelNotFoundRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelValidationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 
 public class ExceptionMappers {
@@ -237,6 +229,13 @@ public class ExceptionMappers {
     }
 
     public static class PatternSyntaxRestExceptionMapper extends BaseExceptionMapper<PatternSyntaxException> {
+        @Override
+        protected int getErrorCode() {
+            return HttpURLConnection.HTTP_BAD_REQUEST;
+        }
+    }
+
+    public static class ImageValidationRestExceptionMapper extends BaseExceptionMapper<ImageValidationRestException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_BAD_REQUEST;

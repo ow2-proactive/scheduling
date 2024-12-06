@@ -2037,4 +2037,12 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
+    @Override
+    public void updateLogo(byte[] image) throws NotConnectedException, PermissionException {
+        try {
+            restApi().updateLogo(sid, image);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+    }
 }

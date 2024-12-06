@@ -3702,4 +3702,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    @Override
+    public void updateLogo(String sessionId, byte[] imageData) throws RestException {
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            scheduler.updateLogo(imageData);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
 }
