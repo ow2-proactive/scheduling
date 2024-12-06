@@ -3040,6 +3040,8 @@ public interface SchedulerRestInterface {
     /**
      *
      * Replaces the logo on all portals. Restricted to administrators.
+     * The body must be of PNG or Baseline JPEG format (Progressive JPEG will result in an error).
+     *
      *
      * @param sessionId
      *            current session

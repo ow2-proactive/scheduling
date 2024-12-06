@@ -41,7 +41,7 @@ public class LogoValidator {
     private static final int MAX_HEIGHT = 1500;
 
     /**
-     *   Checks that the input image is of the correct format (PNG or JPEG), size and MIME type.
+     *   Checks that the input image is of the correct format (PNG or Baseline JPEG), size and MIME type.
      *
      *   @param byteArrayImage the PNG or JPEG image as a byte array
      *   @return a byte array of the image as a PNG
