@@ -46,19 +46,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.JobValidationException;
-import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
-import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
-import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
@@ -1116,6 +1104,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable, Sch
             throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
         uischeduler.removeJobLabels(jobIds);
+    }
+
+    @Override
+    @ImmediateService
+    public void updateLogo(byte[] image) throws NotConnectedException, PermissionException, ImageValidationException {
+        checkSchedulerConnection();
+        uischeduler.updateLogo(image);
     }
 
     @ImmediateService

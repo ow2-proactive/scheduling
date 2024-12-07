@@ -11,6 +11,7 @@ apply plugin: 'java-library-distribution'
 dependencies {
     compile 'commons-cli:commons-cli:1.5.0'
     compile 'commons-io:commons-io:2.14.0'
+    compile 'org.apache.commons:commons-imaging:1.0.0-alpha5'
     compile 'javax.mail:mail:1.4.7'
     compile 'org.apache.commons:commons-lang3:3.4'
 

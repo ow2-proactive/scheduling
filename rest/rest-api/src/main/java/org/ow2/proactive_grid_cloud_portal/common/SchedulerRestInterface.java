@@ -3037,4 +3037,19 @@ public interface SchedulerRestInterface {
     void deleteLabel(@HeaderParam("sessionid") String sessionId, @PathParam("labelId")
     final String labelId) throws RestException;
 
+    /**
+     *
+     * Replaces the logo on all portals. Restricted to administrators.
+     * The body must be of PNG or Baseline JPEG format (Progressive JPEG will result in an error).
+     *
+     *
+     * @param sessionId
+     *            current session
+     * @param imageData
+    *             PNG or JPEG image as a byte array
+     */
+    @PUT
+    @Path("logo")
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    void updateLogo(@HeaderParam("sessionid") String sessionId, byte[] imageData) throws RestException;
 }
