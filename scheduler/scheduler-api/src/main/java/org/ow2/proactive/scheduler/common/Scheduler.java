@@ -36,18 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.permissions.*;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.JobValidationException;
-import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
-import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
-import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.CompletedJobsCount;
 import org.ow2.proactive.scheduler.common.job.CompletedTasksCount;
 import org.ow2.proactive.scheduler.common.job.FilteredStatistics;
@@ -2168,4 +2157,14 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials, Servic
     @RoleWrite
     void removeJobLabels(List<String> jobIds) throws NotConnectedException, PermissionException, UnknownJobException;
 
+    /**
+     * Updates the logo on all portals
+     *
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     */
+    @RoleAdmin
+    void updateLogo(byte[] image) throws NotConnectedException, PermissionException, ImageValidationException;
 }

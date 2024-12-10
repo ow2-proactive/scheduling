@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PrivateKey;
@@ -38,6 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -62,6 +65,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.core.helpers.LogoValidator;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -107,6 +111,8 @@ public class SchedulingService {
     public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED = "SchedulingService::recoverTasksState finished";
 
     public static final int SCHEDULER_KILL_DELAY = PASchedulerProperties.SCHEDULER_KILL_DELAY.getValueAsInt();
+
+    public static final String LOGO_PATH = PASchedulerProperties.getAbsolutePath("/dist/war/getstarted/assets/image/custom-logo.png");
 
     private final SchedulingInfrastructure infrastructure;
 
@@ -862,6 +868,12 @@ public class SchedulingService {
         } catch (Exception e) {
             throw launderThrowable(e);
         }
+    }
+
+    public void updateLogo(byte[] image, String userName) throws IOException {
+        byte[] imageAsPng = LogoValidator.checkImage(image);
+        FileUtils.writeByteArrayToFile(new File(LOGO_PATH), imageAsPng);
+        logger.info(String.format("User %s has changed the logo at %s", userName, LOGO_PATH));
     }
 
     public boolean removeExternalEndpointUrl(JobId jobId, String endpointName) throws UnknownJobException {
