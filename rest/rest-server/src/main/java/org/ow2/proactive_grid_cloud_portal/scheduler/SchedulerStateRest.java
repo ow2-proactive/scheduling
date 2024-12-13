@@ -87,6 +87,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.permissions.RoleAdmin;
 import org.ow2.proactive.permissions.RoleRead;
 import org.ow2.proactive.permissions.RoleWrite;
 import org.ow2.proactive.scheduler.common.*;
@@ -3703,12 +3704,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public void updateLogo(String sessionId, byte[] imageData) throws RestException {
+    @RoleAdmin
+    public void updateLogo(String sessionId, MultipartFormDataInput multipart) throws RestException {
+        Scheduler scheduler = checkAccess(sessionId);
         try {
-            Scheduler scheduler = checkAccess(sessionId);
-            scheduler.updateLogo(imageData);
-        } catch (SchedulerException e) {
-            throw RestException.wrapExceptionToRest(e);
+            Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
+
+            List<InputPart> fCL = formDataMap.get("fileContent");
+            if ((fCL == null) || (fCL.isEmpty())) {
+                throw new IllegalArgumentException("Illegal multipart argument definition (fileContent), received " +
+                                                   fCL);
+            }
+
+            InputStream fileContent = fCL.get(0).getBody(InputStream.class, null);
+            scheduler.updateLogo(IOUtils.toByteArray(fileContent));
+        } catch (SchedulerException | IOException e) {
+            throw RestException.wrapExceptionToRest(new SchedulerException(e));
+        } finally {
+            if (multipart != null) {
+                multipart.close();
+            }
         }
     }
 }

@@ -3045,11 +3045,11 @@ public interface SchedulerRestInterface {
      *
      * @param sessionId
      *            current session
-     * @param imageData
-    *             PNG or JPEG image as a byte array
+     * @param multipart
+     *             PNG or Baseline JPEG image
      */
-    @PUT
+    @POST
     @Path("logo")
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    void updateLogo(@HeaderParam("sessionid") String sessionId, byte[] imageData) throws RestException;
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    void updateLogo(@HeaderParam("sessionid") String sessionId, MultipartFormDataInput multipart) throws RestException;
 }

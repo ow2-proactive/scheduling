@@ -229,6 +229,35 @@ public class SchedulerRestClient {
         return response.readEntity(Boolean.class);
     }
 
+    public void updateLogo(String sessionId, InputStream fileContent) throws NotConnectedRestException {
+
+        String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
+                                                             .append("scheduler/logo/")
+                                                             .toString();
+
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
+        ResteasyWebTarget target = client.target(uriTmpl);
+
+        MultipartFormDataOutput formData = new MultipartFormDataOutput();
+        formData.addFormData("fileContent", fileContent, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+
+        GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(formData) {
+        };
+
+        Response response = target.request()
+                                  .header("sessionid", sessionId)
+                                  .post(Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
+
+        if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new NotConnectedRestException("User not authenticated or session timeout.");
+            } else {
+                throwException(String.format("Update logo failed. Status code: %d", response.getStatus()), response);
+            }
+        }
+    }
+
     public void pullFile(String sessionId, String space, String path, String outputPath) throws Exception {
         String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
                                                              .append("scheduler/dataspace/")
@@ -787,6 +816,5 @@ public class SchedulerRestClient {
             }
 
         }
-
     }
 }
