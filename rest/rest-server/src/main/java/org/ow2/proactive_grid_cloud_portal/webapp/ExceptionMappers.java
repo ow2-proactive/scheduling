@@ -44,11 +44,16 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
+import org.ow2.proactive.web.WebProperties;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ExceptionMappers {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
     private static class BaseExceptionMapper<T extends Throwable> implements ExceptionMapper<T> {
         @Override
@@ -56,9 +61,14 @@ public class ExceptionMappers {
             ExceptionToJson js = new ExceptionToJson();
             js.setErrorMessage(throwable.getMessage());
             js.setHttpErrorCode(getErrorCode());
-            js.setStackTrace(ProActiveLogger.getStackTraceAsString(throwable));
-            js.setException(throwable);
-            js.setExceptionClass(throwable.getClass().getName());
+            if (!WebProperties.WEB_HIDE_EXCEPTIONS.getValueAsBoolean()) {
+                js.setStackTrace(ProActiveLogger.getStackTraceAsString(throwable));
+                js.setException(throwable);
+                js.setExceptionClass(throwable.getClass().getName());
+            } else if (WebProperties.WEB_LOG_HIDDEN_EXCEPTIONS.getValueAsBoolean()) {
+                logger.warn("REST exception", throwable);
+                js.setExceptionClass(throwable.getClass().getName());
+            }
             return Response.status(getErrorCode())
                            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                            .entity(js)
