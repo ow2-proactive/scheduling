@@ -3003,7 +3003,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                                      "You don't have permissions to update a new logo");
         try {
             schedulingService.updateLogo(image, ident.getUsername());
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new ImageValidationException(String.format("Failed to update logo uploaded by %s ",
                                                              ident.getUsername()),
                                                e);
