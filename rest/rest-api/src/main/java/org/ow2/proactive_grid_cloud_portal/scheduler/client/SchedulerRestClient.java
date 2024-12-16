@@ -715,20 +715,22 @@ public class SchedulerRestClient {
             errMsg = "An error has occurred.";
         }
 
-        if (serverException != null && exceptionClassName != null) {
+        if (exceptionClassName != null) {
             Class<?> exceptionClass = toClass(exceptionClassName);
             if (exceptionClass != null) {
                 // wrap the exception serialized in JSON inside an
                 // instance of
                 // the server exception class
                 Constructor<?> constructor = getConstructor(exceptionClass, Throwable.class);
-                if (constructor != null) {
+                if (constructor != null && serverException != null) {
                     return (Exception) constructor.newInstance(serverException);
                 }
                 constructor = getConstructor(exceptionClass, String.class);
                 if (constructor != null) {
                     Exception built = (Exception) constructor.newInstance(errMsg);
-                    built.setStackTrace(serverException.getStackTrace());
+                    if (serverException != null) {
+                        built.setStackTrace(serverException.getStackTrace());
+                    }
                     return built;
                 }
             }

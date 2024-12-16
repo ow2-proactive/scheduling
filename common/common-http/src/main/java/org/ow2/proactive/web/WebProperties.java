@@ -49,6 +49,10 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_DEPLOY("web.deploy", PropertyType.BOOLEAN, "true"),
 
+    WEB_HIDE_EXCEPTIONS("web.hide.exceptions", PropertyType.BOOLEAN, "true"),
+
+    WEB_LOG_HIDDEN_EXCEPTIONS("web.log.hidden.exceptions", PropertyType.BOOLEAN, "true"),
+
     WEB_HTTP_PORT("web.http.port", PropertyType.INTEGER, "8080"),
 
     WEB_HTTPS("web.https", PropertyType.BOOLEAN, "false"),
