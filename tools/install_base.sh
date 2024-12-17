@@ -73,16 +73,22 @@ compute-version()
 
 }
 
-compute-major-minor()
-{
-    NUMERIC_VERSION=$(echo ${1/-SNAPSHOT})
-    echo ${NUMERIC_VERSION%.*}
-}
-
-# an upgrade of the password stored format occurs when the new version is 14.1 or greater and the old version is 14.0 or lower
+# an upgrade of the password stored format occurs when the new version has pa.rm.legacy.encryption set to false and the old version has it set to true or absent
 is_legacy_hash_upgrade()
 {
-  if (( $(echo "$1 >= 14.1 && $2 <= 14.0" | bc -l) )); then
+  NEW_VERSION_LEGACY_SETTING=$( grep 'pa.rm.legacy.encryption=' $PA_ROOT/default/config/rm/settings.ini | head -n 1 | cut -d '=' -f2 )
+  OLD_VERSION_LEGACY_SETTING=$( grep 'pa.rm.legacy.encryption=' $PA_ROOT/previous/config/rm/settings.ini | head -n 1 | cut -d '=' -f2 )
+  if [ -z "$NEW_VERSION_LEGACY_SETTING" ]; then
+    NEW_VERSION_LEGACY_SETTING="true"
+  else
+    NEW_VERSION_LEGACY_SETTING=$(echo $NEW_VERSION_LEGACY_SETTING | tr -d '[:blank:]')
+  fi
+  if [ -z "$OLD_VERSION_LEGACY_SETTING" ]; then
+    OLD_VERSION_LEGACY_SETTING="true"
+  else
+    OLD_VERSION_LEGACY_SETTING=$(echo $OLD_VERSION_LEGACY_SETTING | tr -d '[:blank:]')
+  fi
+  if [ "$NEW_VERSION_LEGACY_SETTING" = "false" ] && [ "$OLD_VERSION_LEGACY_SETTING" = "true" ]; then
     return 0
   else
     return 1
@@ -310,8 +316,6 @@ initial_commit()
 }
 
 NEW_VERSION=$(compute-version $INSTALL_PADIR)
-
-NEW_VERSION_MAJOR=$(compute-major-minor $NEW_VERSION)
 
 echo "This will install the ProActive scheduler $NEW_VERSION as a service."
 echo "Once the installer is started, it must process until the end otherwise the installation may be corrupted."
@@ -777,9 +781,6 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
         if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
            rm -f  $PA_ROOT/default/addons/*$OLD_VERSION*.jar
            rm -f  $PA_ROOT/default/addons/*/*$OLD_VERSION*.jar
-           OLD_VERSION_MAJOR=$(compute-major-minor OLD_VERSION)
-        else
-           OLD_VERSION_MAJOR=NEW_VERSION_MAJOR
         fi
     fi
     # display the list of addons in the new installation
@@ -791,7 +792,7 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
     ls -l $PA_ROOT/default/addons/*.jar
 fi
 
-if is_legacy_hash_upgrade $NEW_VERSION_MAJOR $OLD_VERSION_MAJOR; then
+if is_legacy_hash_upgrade; then
   echo "Porting $PA_ROOT/default/config/authentication/login.cfg to the new format"
   $PA_ROOT/default/tools/regenerate-passwords -ns -ltn -d
 fi

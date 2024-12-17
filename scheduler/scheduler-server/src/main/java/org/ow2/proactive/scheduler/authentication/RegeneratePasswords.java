@@ -426,7 +426,7 @@ public class RegeneratePasswords {
         opt = new Option(CONVERT_LEGACY_TO_NEW_OPTION,
                          CONVERT_LEGACY_TO_NEW_OPTION_NAME,
                          true,
-                         "Automatically convert stored passwords in the legacy format to the new hash format");
+                         "Automatically convert stored passwords in the legacy format to the new hash format. Note that this operation not reversible.");
         opt.setArgs(0);
         opt.setRequired(false);
         options.addOption(opt);
