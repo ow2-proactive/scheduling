@@ -112,7 +112,7 @@ public class SchedulingService {
 
     public static final int SCHEDULER_KILL_DELAY = PASchedulerProperties.SCHEDULER_KILL_DELAY.getValueAsInt();
 
-    public static final String LOGO_PATH = PASchedulerProperties.getAbsolutePath("/dist/war/getstarted/assets/image/custom-logo.png");
+    public static final String LOGO_PATH = PASchedulerProperties.getAbsolutePath("dist/war/getstarted/assets/image/custom-logo.png");
 
     private final SchedulingInfrastructure infrastructure;
 
