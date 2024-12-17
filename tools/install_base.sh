@@ -61,16 +61,38 @@ escape_rhs_sed ()
 
 }
 
-escape_lhs_sed ()
+escape_lhs_sed()
 {
     echo $(printf '%s\n' "$1" | sed 's:[][\/.^$*]:\\&:g')
 
 }
 
-compute-version ()
+compute-version()
 {
     echo $(ls $1/dist/lib/scheduler-server-*.jar | sed "s/^$(escape_lhs_sed $1/dist/lib/scheduler-server-)\(.*\)\.jar$/\1/g")
 
+}
+
+# an upgrade of the password stored format occurs when the new version has pa.rm.legacy.encryption set to false and the old version has it set to true or absent
+is_legacy_hash_upgrade()
+{
+  NEW_VERSION_LEGACY_SETTING=$( grep 'pa.rm.legacy.encryption=' $PA_ROOT/default/config/rm/settings.ini | head -n 1 | cut -d '=' -f2 )
+  OLD_VERSION_LEGACY_SETTING=$( grep 'pa.rm.legacy.encryption=' $PA_ROOT/previous/config/rm/settings.ini | head -n 1 | cut -d '=' -f2 )
+  if [ -z "$NEW_VERSION_LEGACY_SETTING" ]; then
+    NEW_VERSION_LEGACY_SETTING="true"
+  else
+    NEW_VERSION_LEGACY_SETTING=$(echo $NEW_VERSION_LEGACY_SETTING | tr -d '[:blank:]')
+  fi
+  if [ -z "$OLD_VERSION_LEGACY_SETTING" ]; then
+    OLD_VERSION_LEGACY_SETTING="true"
+  else
+    OLD_VERSION_LEGACY_SETTING=$(echo $OLD_VERSION_LEGACY_SETTING | tr -d '[:blank:]')
+  fi
+  if [ "$NEW_VERSION_LEGACY_SETTING" = "false" ] && [ "$OLD_VERSION_LEGACY_SETTING" = "true" ]; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 update_node_jars()
@@ -768,6 +790,11 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
     echo ""
 
     ls -l $PA_ROOT/default/addons/*.jar
+fi
+
+if is_legacy_hash_upgrade; then
+  echo "Porting $PA_ROOT/default/config/authentication/login.cfg to the new format"
+  $PA_ROOT/default/tools/regenerate-passwords -ns -ltn -d
 fi
 
 if [[ "$OLD_PADIR" != "" ]]; then

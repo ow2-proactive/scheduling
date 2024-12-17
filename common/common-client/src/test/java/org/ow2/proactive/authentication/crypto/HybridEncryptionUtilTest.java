@@ -32,6 +32,7 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -48,6 +49,14 @@ public class HybridEncryptionUtilTest {
         String decryptedData = HybridEncryptionUtil.decryptString(encryptedData, privateKey);
 
         assertEquals("hello", decryptedData);
+    }
+
+    @Test
+    public void hash_verify() {
+        String password = "toto";
+        String hashed = HybridEncryptionUtil.hashPassword(password);
+        Assert.assertTrue(HybridEncryptionUtil.verifyPassword(password, hashed));
+        Assert.assertFalse(HybridEncryptionUtil.verifyPassword("tata", hashed));
     }
 
 }
