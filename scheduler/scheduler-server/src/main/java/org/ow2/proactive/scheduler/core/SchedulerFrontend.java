@@ -89,21 +89,7 @@ import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
-import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.JobValidationException;
-import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
-import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
-import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.TaskCouldNotRestartException;
-import org.ow2.proactive.scheduler.common.exception.TaskCouldNotStartException;
-import org.ow2.proactive.scheduler.common.exception.TaskSkippedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.DefaultModelJobValidatorServiceProvider;
@@ -122,6 +108,7 @@ import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.helpers.JobsMemoryMonitorRunner;
+import org.ow2.proactive.scheduler.core.helpers.LogoValidator;
 import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -3004,6 +2991,23 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_LABEL_FOR_THIS_JOB);
         }
         dbManager.removeJobLabels(jobIds, ident.getUsername());
+    }
+
+    @Override
+    @ImmediateService
+    @RoleAdmin
+    public void updateLogo(byte[] image) throws NotConnectedException, PermissionException, ImageValidationException {
+        Method currentMethod = new Object() {
+        }.getClass().getEnclosingMethod();
+        UserIdentificationImpl ident = frontendState.checkPermission(currentMethod,
+                                                                     "You don't have permissions to update a new logo");
+        try {
+            schedulingService.updateLogo(image, ident.getUsername());
+        } catch (IOException e) {
+            throw new ImageValidationException(String.format("Failed to update logo uploaded by %s ",
+                                                             ident.getUsername()),
+                                               e);
+        }
     }
 
 }

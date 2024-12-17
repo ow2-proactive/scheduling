@@ -57,18 +57,7 @@ import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.JobValidationException;
-import org.ow2.proactive.scheduler.common.exception.LabelConflictException;
-import org.ow2.proactive.scheduler.common.exception.LabelNotFoundException;
-import org.ow2.proactive.scheduler.common.exception.LabelValidationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -1319,4 +1308,9 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         client.removeJobLabels(jobIds);
     }
 
+    @Override
+    public void updateLogo(byte[] image) throws NotConnectedException, PermissionException, ImageValidationException {
+        renewSession();
+        client.updateLogo(image);
+    }
 }

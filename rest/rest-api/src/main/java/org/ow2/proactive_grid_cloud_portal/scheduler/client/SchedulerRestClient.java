@@ -229,6 +229,35 @@ public class SchedulerRestClient {
         return response.readEntity(Boolean.class);
     }
 
+    public void updateLogo(String sessionId, InputStream fileContent) throws NotConnectedRestException {
+
+        String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
+                                                             .append("scheduler/logo/")
+                                                             .toString();
+
+        ResteasyClient client = buildResteasyClient(providerFactory);
+
+        ResteasyWebTarget target = client.target(uriTmpl);
+
+        MultipartFormDataOutput formData = new MultipartFormDataOutput();
+        formData.addFormData("fileContent", fileContent, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+
+        GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(formData) {
+        };
+
+        Response response = target.request()
+                                  .header("sessionid", sessionId)
+                                  .post(Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
+
+        if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new NotConnectedRestException("User not authenticated or session timeout.");
+            } else {
+                throwException(String.format("Update logo failed. Status code: %d", response.getStatus()), response);
+            }
+        }
+    }
+
     public void pullFile(String sessionId, String space, String path, String outputPath) throws Exception {
         String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
                                                              .append("scheduler/dataspace/")
@@ -715,20 +744,22 @@ public class SchedulerRestClient {
             errMsg = "An error has occurred.";
         }
 
-        if (serverException != null && exceptionClassName != null) {
+        if (exceptionClassName != null) {
             Class<?> exceptionClass = toClass(exceptionClassName);
             if (exceptionClass != null) {
                 // wrap the exception serialized in JSON inside an
                 // instance of
                 // the server exception class
                 Constructor<?> constructor = getConstructor(exceptionClass, Throwable.class);
-                if (constructor != null) {
+                if (constructor != null && serverException != null) {
                     return (Exception) constructor.newInstance(serverException);
                 }
                 constructor = getConstructor(exceptionClass, String.class);
                 if (constructor != null) {
                     Exception built = (Exception) constructor.newInstance(errMsg);
-                    built.setStackTrace(serverException.getStackTrace());
+                    if (serverException != null) {
+                        built.setStackTrace(serverException.getStackTrace());
+                    }
                     return built;
                 }
             }
@@ -787,6 +818,5 @@ public class SchedulerRestClient {
             }
 
         }
-
     }
 }

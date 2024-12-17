@@ -187,6 +187,15 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isAllCatalogPermission() {
+        try {
+            return checkPermission(new CatalogAllAccessPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
     public boolean isCanCreateAssociationPermission() {
         try {
             return checkPermission(new JPCanCreateAssociationPermission(), "N/A");

@@ -41,11 +41,7 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
@@ -79,6 +75,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.ConnectionInfo;
@@ -2037,4 +2034,12 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
+    @Override
+    public void updateLogo(byte[] image) throws NotConnectedException, PermissionException {
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(image)) {
+            restApiClient().updateLogo(sid, byteArrayInputStream);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+    }
 }

@@ -161,6 +161,7 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
 
     // To consider only non delayed jobs
     protected List<JobDescriptor> filterJobs(List<JobDescriptor> jobDescList) {
+        initialize();
         schedulingPolicyTimingLogger.start("ESP.filterJobs");
         Date now = new Date();
         LinkedList<JobDescriptor> executionCycleJobs = new LinkedList<>();

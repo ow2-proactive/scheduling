@@ -44,19 +44,16 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.signal.SignalApiException;
+import org.ow2.proactive.web.WebProperties;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelConflictRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelNotFoundRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LabelValidationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ExceptionMappers {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
     private static class BaseExceptionMapper<T extends Throwable> implements ExceptionMapper<T> {
         @Override
@@ -64,9 +61,14 @@ public class ExceptionMappers {
             ExceptionToJson js = new ExceptionToJson();
             js.setErrorMessage(throwable.getMessage());
             js.setHttpErrorCode(getErrorCode());
-            js.setStackTrace(ProActiveLogger.getStackTraceAsString(throwable));
-            js.setException(throwable);
-            js.setExceptionClass(throwable.getClass().getName());
+            if (!WebProperties.WEB_HIDE_EXCEPTIONS.getValueAsBoolean()) {
+                js.setStackTrace(ProActiveLogger.getStackTraceAsString(throwable));
+                js.setException(throwable);
+                js.setExceptionClass(throwable.getClass().getName());
+            } else if (WebProperties.WEB_LOG_HIDDEN_EXCEPTIONS.getValueAsBoolean()) {
+                logger.warn("REST exception", throwable);
+                js.setExceptionClass(throwable.getClass().getName());
+            }
             return Response.status(getErrorCode())
                            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                            .entity(js)
@@ -237,6 +239,13 @@ public class ExceptionMappers {
     }
 
     public static class PatternSyntaxRestExceptionMapper extends BaseExceptionMapper<PatternSyntaxException> {
+        @Override
+        protected int getErrorCode() {
+            return HttpURLConnection.HTTP_BAD_REQUEST;
+        }
+    }
+
+    public static class ImageValidationRestExceptionMapper extends BaseExceptionMapper<ImageValidationRestException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_BAD_REQUEST;

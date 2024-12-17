@@ -23,13 +23,19 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.permissions;
-
-import org.ow2.proactive.permissions.ClientPermission;
-
+package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
 /**
- * This permission allows a user to fully control the job planner
+ * @author ActiveEon Team
+ * @since 11/05/2021
  */
-public class JobPlannerAllAccessPermission extends ClientPermission {
+public class ImageValidationRestException extends RestException {
+
+    public ImageValidationRestException(Throwable cause) {
+        super(cause);
+    }
+
+    public ImageValidationRestException(String message) {
+        super(message);
+    }
 }
