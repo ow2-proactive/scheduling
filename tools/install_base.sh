@@ -196,6 +196,8 @@ generate_new_accounts()
     $PA_ROOT/default/tools/proactive-users -D -l subadmin
     $PA_ROOT/default/tools/proactive-users -D -l provider
     $PA_ROOT/default/tools/proactive-users -D -l test_executor
+    $PA_ROOT/default/tools/proactive-users -D -l citizen-ds
+    $PA_ROOT/default/tools/proactive-users -D -l expert-ds
 
 }
 
