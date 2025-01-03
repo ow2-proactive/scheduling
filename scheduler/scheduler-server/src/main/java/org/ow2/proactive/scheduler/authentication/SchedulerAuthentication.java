@@ -114,6 +114,11 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         return null;
     }
 
+    @Override
+    public String getUserNameRegexp() {
+        return PASchedulerProperties.SCHEDULER_USERNAME_REGEXP.getValueAsString();
+    }
+
     private void rethrowSchedulerStubException(Exception e) throws LoginException {
         logger.error("Could not lookup stub for Scheduler interface", e);
         throw new LoginException("Could not lookup stub for Scheduler interface : " + e.getMessage());

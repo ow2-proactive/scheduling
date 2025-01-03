@@ -327,6 +327,18 @@ public class ManageUsers {
                     sourceLoginProps.put(userInfo.getLogin(), userInfo.getPassword());
                 }
             }
+            if (PASchedulerProperties.SCHEDULER_USERNAME_REGEXP.isSet()) {
+                String userNameRegexp = PASchedulerProperties.SCHEDULER_USERNAME_REGEXP.getValueAsString();
+                Enumeration<String> propertyNames = (Enumeration<String>) sourceLoginProps.propertyNames();
+                while (propertyNames.hasMoreElements()) {
+                    String loginName = propertyNames.nextElement();
+                    if (!loginName.matches(userNameRegexp)) {
+                        exitWithErrorMessage("Login name " + loginName + " does not match expression " + userNameRegexp,
+                                             null,
+                                             null);
+                    }
+                }
+            }
 
             Multimap<String, String> sourceGroupsMap = null;
 
@@ -598,8 +610,16 @@ public class ManageUsers {
     }
 
     private static void updateUserPassword(PublicKey pubKey, String login, String password, Properties props)
-            throws KeyException {
+            throws KeyException, ManageUsersException {
         String encodedPassword;
+        if (PASchedulerProperties.SCHEDULER_PASSWORD_STRENGTH_ENABLE.getValueAsBoolean()) {
+            if (!password.matches(PASchedulerProperties.SCHEDULER_PASSWORD_STRENGTH_REGEXP.getValueAsString())) {
+                exitWithErrorMessage("Password of user " + login + " does not satisfy strength requirements: " +
+                                     PASchedulerProperties.SCHEDULER_PASSWORD_STRENGTH_ERROR_MESSAGE.getValueAsString(),
+                                     null,
+                                     null);
+            }
+        }
         if (PASchedulerProperties.SCHEDULER_LEGACY_ENCRYPTION.getValueAsBoolean()) {
             encodedPassword = HybridEncryptionUtil.encryptStringToBase64(password,
                                                                          pubKey,

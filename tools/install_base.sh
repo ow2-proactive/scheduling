@@ -132,15 +132,21 @@ ask_admin_password()
     while  ! $ADMIN_PWD_ENTERED ; do
         read -s -p "Enter ProActive \"admin\" account password: " ADMIN_PWD
         echo ""
-        read -s -p "Retype \"admin\" account password: " ADMIN_PWD2
-        echo ""
-        if [[ "$ADMIN_PWD" == "$ADMIN_PWD2" ]]; then
-                ADMIN_PWD_ENTERED=true
-        else
-                ADMIN_PWD_ENTERED=false
-                echo "Passwords don't match."
+        if echo "$ADMIN_PWD" | grep -oP '^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@\$%^&(){}\[\]:;<>,.?\/~_+\-=|]).{8,32}$' > /dev/null ; then
+          read -s -p "Retype \"admin\" account password: " ADMIN_PWD2
+          echo ""
+          if [[ "$ADMIN_PWD" == "$ADMIN_PWD2" ]]; then
+                  ADMIN_PWD_ENTERED=true
+          else
+                  ADMIN_PWD_ENTERED=false
+                  echo "Passwords don't match."
 
+          fi
+        else
+          ADMIN_PWD_ENTERED=false
+          echo "Admin password must be 8 to 32 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol."
         fi
+
     done
 
 }
@@ -149,9 +155,9 @@ generate_new_accounts()
 {
     # generate random password for internal scheduler accounts
     echo "Generating random password for internal scheduler accounts."
-    RM_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
-    SCHED_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
-    WATCHER_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
+    RM_PWD=$(apg -M SNCL -m 8 -x 32 -n 1 -a 0)
+    SCHED_PWD=$(apg -M SNCL -m 8 -x 32 -n 1 -a 0)
+    WATCHER_PWD=$(apg -M SNCL -m 8 -x 32 -n 1 -a 0)
 
     ask_admin_password
 
@@ -160,6 +166,8 @@ generate_new_accounts()
 
     echo "Generating New Private/Public key pair for the scheduler"
     $PA_ROOT/default/tools/proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
+
+    sed "s/pa\.scheduler\.password\.strength\.enable=.*/pa.scheduler.password.strength.enable=true/g"  -i "$PA_ROOT/default/config/scheduler/settings.ini"
 
 
     $PA_ROOT/default/tools/proactive-users -U -l admin -p "$ADMIN_PWD"
@@ -273,6 +281,15 @@ install_binaries()
         echo "unzip is not installed on this computer and is required by the ProActive installation."
         if confirm "Do you want to install it? [Y/n] " ; then
            $PKG_TOOL -y install unzip
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+
+    if ! which apg > /dev/null 2>&1; then
+        echo "apg is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+           $PKG_TOOL -y install apg
         else
            echo "Installation aborted."; exit 1 ;
         fi

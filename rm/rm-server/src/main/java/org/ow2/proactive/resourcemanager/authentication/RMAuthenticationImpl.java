@@ -105,6 +105,11 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         return null;
     }
 
+    @Override
+    public String getUserNameRegexp() {
+        return PAResourceManagerProperties.RM_USERNAME_REGEXP.getValueAsString();
+    }
+
     private void rethrowStubException(Exception e) throws LoginException {
         logger.error("Could not lookup stub for ResourceManager interface", e);
         throw new LoginException("Could not lookup stub for ResourceManager interface : " + e.getMessage());

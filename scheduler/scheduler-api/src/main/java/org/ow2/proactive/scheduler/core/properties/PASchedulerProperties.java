@@ -234,6 +234,18 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Creates a credential file (username.cred) for each successful login in the authentication folder*/
     SCHEDULER_CREATE_CREDENTIALS_WHEN_LOGIN("pa.scheduler.create.credentials.when.login", PropertyType.BOOLEAN, "false"),
 
+    /** Regular expression used to control the username format when logging in. Always enabled to prevent injection attacks on 3rd-party authentication like LDAP */
+    SCHEDULER_USERNAME_REGEXP("pa.scheduler.username.regexp", PropertyType.STRING, "^[A-Za-z0-9_\\-@.]+$"),
+
+    /** Enable password strength check, used when a user is created or modified **/
+    SCHEDULER_PASSWORD_STRENGTH_ENABLE("pa.scheduler.password.strength.enable", PropertyType.BOOLEAN, "false"),
+
+    /** Regular expression used to control the password strength (default is 8 to 32 characters with at least an uppercase letter, a lowercase letter, a digit and a symbol) **/
+    SCHEDULER_PASSWORD_STRENGTH_REGEXP("pa.scheduler.password.strength.regexp", PropertyType.STRING, "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}\\[\\]:;<>,.?/~_+\\-=|]).{8,32}$"),
+
+    /** Textual error message when password strength is not met **/
+    SCHEDULER_PASSWORD_STRENGTH_ERROR_MESSAGE("pa.scheduler.password.strength.message", PropertyType.STRING, "The password must be 8 to 32 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol."),
+
     /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
