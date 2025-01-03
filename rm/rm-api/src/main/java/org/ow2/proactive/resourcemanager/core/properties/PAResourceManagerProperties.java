@@ -156,6 +156,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** List of domain names that can be used during a login (can be a list of windows domain names or a list of tenants in Multi-LDAP configuration) **/
     RM_ALLOWED_DOMAINS("pa.rm.allowed.domains", PropertyType.LIST),
 
+    /** Regular expression used to control the username format when logging in. Always enabled to prevent injection attacks on 3rd-party authentication like LDAP */
+    RM_USERNAME_REGEXP("pa.rm.username.regexp", PropertyType.STRING, "^[A-Za-z0-9_\\-@.]+$"),
+
     /** Name of the JMX MBean for the RM */
     RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PropertyType.STRING, "JMXRMAgent"),
 

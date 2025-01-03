@@ -79,48 +79,44 @@ public class ManageUsersTest extends ProActiveTestClean {
 
     final List<String> sourceUsers1 = ImmutableList.of("user1:pwd1",
                                                        "user2:pwd2",
-                                                       "userà:pwdà",
+                                                       "user_a:pwdà",
                                                        "admin1:pwd3",
                                                        "admin2:pwd4",
                                                        "usernopwd:",
-                                                       ":nologin",
                                                        "usernogroup:toobad");
 
     final List<String> sourceUsers2 = ImmutableList.of("user1:pwda",
                                                        "user2:pwdb",
-                                                       "userà:pwdé",
+                                                       "user_a:pwdé",
                                                        "admin1:pwdc",
                                                        "admin2:pwdd",
                                                        "usernopwd:",
-                                                       ":nologin",
                                                        "usernogroup:toobad");
 
     final List<String> sourceGroups1 = ImmutableList.of("user1:user",
                                                         "user2:user",
                                                         "user2:other",
-                                                        "userà:groupà",
+                                                        "user_a:groupà",
                                                         "admin1:admin",
                                                         "admin2:admin",
                                                         "admin2:other",
                                                         "useremptygroup:",
-                                                        ":nologin",
                                                         "userwithoutcredentials:admin");
 
     final List<String> sourceGroups2 = ImmutableList.of("user1:user",
                                                         "user1:other",
                                                         "user2:user",
-                                                        "userà:groupé",
+                                                        "user_a:groupé",
                                                         "admin1:admin",
                                                         "admin1:other",
                                                         "admin2:admin",
                                                         "useremptygroup:",
-                                                        ":nologin",
                                                         "userwithoutcredentials:admin");
 
     final Map<String, String> users = ImmutableMap.<String, String> builder()
                                                   .put("user1", "pwd1")
                                                   .put("user2", "pwd2")
-                                                  .put("userà", "pwdà")
+                                                  .put("user_a", "pwdà")
                                                   .put("admin1", "pwd3")
                                                   .put("admin2", "pwd4")
                                                   .build();
@@ -128,7 +124,7 @@ public class ManageUsersTest extends ProActiveTestClean {
     final Map<String, String> users2 = ImmutableMap.<String, String> builder()
                                                    .put("user1", "pwda")
                                                    .put("user2", "pwdb")
-                                                   .put("userà", "pwdé")
+                                                   .put("user_a", "pwdé")
                                                    .put("admin1", "pwdc")
                                                    .put("admin2", "pwdd")
                                                    .build();
@@ -136,7 +132,7 @@ public class ManageUsersTest extends ProActiveTestClean {
     final Multimap<String, String> groups = ImmutableMultimap.<String, String> builder()
                                                              .putAll("user1", "user")
                                                              .putAll("user2", "user", "other")
-                                                             .putAll("userà", "groupà")
+                                                             .putAll("user_a", "groupà")
                                                              .putAll("admin1", "admin")
                                                              .putAll("admin2", "admin", "other")
                                                              .build();
@@ -144,7 +140,7 @@ public class ManageUsersTest extends ProActiveTestClean {
     final Multimap<String, String> groups2 = ImmutableMultimap.<String, String> builder()
                                                               .putAll("user1", "user", "other")
                                                               .putAll("user2", "user")
-                                                              .putAll("userà", "groupé")
+                                                              .putAll("user_a", "groupé")
                                                               .putAll("admin1", "admin", "other")
                                                               .putAll("admin2", "admin")
                                                               .build();

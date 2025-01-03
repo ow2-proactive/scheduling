@@ -119,6 +119,8 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
         }
     }
 
+    public abstract String getUserNameRegexp();
+
     /**
      * Performs login.
      * 
@@ -144,6 +146,10 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
 
         if (username == null || username.equals("")) {
             throw new LoginException("Bad user name (user is null or empty)");
+        }
+
+        if (getUserNameRegexp() != null && !username.matches(getUserNameRegexp())) {
+            throw new LoginException("User name must match regular expression " + getUserNameRegexp());
         }
 
         try {
