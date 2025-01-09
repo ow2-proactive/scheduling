@@ -69,6 +69,8 @@ import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupport;
 import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFactory;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
+import com.google.common.base.Strings;
+
 
 public class StudioRest implements StudioInterface {
 
@@ -191,7 +193,7 @@ public class StudioRest implements StudioInterface {
     public void deleteAllWorkflows(String sessionId, String workflowName)
             throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
-        if (!workflowName.equals("")) {
+        if (Strings.isNullOrEmpty(workflowName)) {
             logger.info("Deleting workflows whose names contain " + workflowName + " as " + userName);
         } else {
             logger.info("Deleting all workflows " + " as " + userName);
