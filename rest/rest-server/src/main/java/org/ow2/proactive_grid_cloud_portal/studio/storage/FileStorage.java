@@ -80,6 +80,19 @@ public class FileStorage<T extends Named> {
         return result;
     }
 
+    public void deleteAll(String workflowName) throws IOException {
+        File[] files = rootDir.listFiles();
+        for (File f : files) {
+            T read = read(f.getName());
+            String fileName = read.getName();
+            if (workflowName.equals("")) {
+                FileUtils.forceDelete(f);
+            } else if (fileName.toLowerCase().contains(workflowName.toLowerCase())) {
+                FileUtils.forceDelete(f);
+            }
+        }
+    }
+
     private File getPathForId(String id) {
         return new File(rootDir.getAbsolutePath(), id);
     }
