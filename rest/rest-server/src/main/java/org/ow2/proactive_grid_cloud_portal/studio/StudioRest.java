@@ -188,6 +188,19 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
+    public void deleteAllWorkflows(String sessionId, String workflowName)
+            throws NotConnectedRestException, IOException {
+        String userName = getUserName(sessionId);
+        if (!workflowName.equals("")) {
+            logger.info("Deleting workflows whose names contain " + workflowName + " as " + userName);
+        } else {
+            logger.info("Deleting all workflows " + " as " + userName);
+        }
+        FileStorage<Workflow> workflowStorage = getFileStorageSupport().getWorkflowStorage(userName);
+        workflowStorage.deleteAll(workflowName);
+    }
+
+    @Override
     public List<Script> getScripts(String sessionId) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         return getFileStorageSupport().getScriptStorage(userName).readAll();

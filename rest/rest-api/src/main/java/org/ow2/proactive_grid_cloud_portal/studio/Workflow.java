@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.studio;
 
+import java.util.Objects;
+
+
 public class Workflow implements Named {
 
     private long id;
@@ -35,18 +38,21 @@ public class Workflow implements Named {
 
     private String metadata;
 
+    private long modifyDate;
+
     public Workflow() {
     }
 
-    public Workflow(long id, String name, String xml, String metadata) {
-        this(name, xml, metadata);
+    public Workflow(long id, String name, String xml, String metadata, long modifyDate) {
+        this(name, xml, metadata, modifyDate);
         this.id = id;
     }
 
-    public Workflow(String name, String xml, String metadata) {
+    public Workflow(String name, String xml, String metadata, long modifyDate) {
         this.name = name;
         this.xml = xml;
         this.metadata = metadata;
+        this.modifyDate = modifyDate;
     }
 
     public void setId(long id) {
@@ -81,10 +87,18 @@ public class Workflow implements Named {
         return metadata;
     }
 
+    public long getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(long modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+
     @Override
     public String toString() {
         return "Workflow{" + "id=" + id + ", name='" + name + '\'' + ", xml='" + xml + '\'' + ", metadata='" +
-               metadata + '\'' + '}';
+               metadata + ", modify-date ='" + modifyDate + '\'' + '}';
     }
 
     @Override
@@ -104,7 +118,8 @@ public class Workflow implements Named {
             return false;
         if (xml != null ? !xml.equals(workflow.xml) : workflow.xml != null)
             return false;
-
+        if (!Objects.equals(modifyDate, workflow.modifyDate))
+            return false;
         return true;
     }
 
@@ -114,6 +129,7 @@ public class Workflow implements Named {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (xml != null ? xml.hashCode() : 0);
         result = 31 * result + (metadata != null ? metadata.hashCode() : 0);
+        result = 31 * result + (int) (modifyDate ^ (modifyDate >>> 32));
         return result;
     }
 }

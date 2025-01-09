@@ -40,7 +40,9 @@ public class WorkflowSerializer implements Serializer<Workflow> {
 
         FileUtils.write(new File(workflowDir, "name"), workflow.getName());
         FileUtils.write(new File(workflowDir, "metadata"), workflow.getMetadata());
-        FileUtils.write(new File(workflowDir, "job.xml"), workflow.getXml());
+        File file = new File(workflowDir, "job.xml");
+        FileUtils.write(file, workflow.getXml());
+        workflow.setModifyDate(file.lastModified());
 
         workflow.setId(Long.parseLong(id));
 
@@ -50,9 +52,11 @@ public class WorkflowSerializer implements Serializer<Workflow> {
     @Override
     public Workflow deserialize(File workflowDir, String id) throws IOException {
         String name = readFile(new File(workflowDir, "name"), id);
-        String xml = readFile(new File(workflowDir, "job.xml"), id);
+        File file = new File(workflowDir, "job.xml");
+        String xml = readFile(file, id);
         String metadata = readFile(new File(workflowDir, "metadata"), id);
-        return new Workflow(Long.parseLong(workflowDir.getName()), name, xml, metadata);
+        long modifyDate = file.lastModified();
+        return new Workflow(Long.parseLong(workflowDir.getName()), name, xml, metadata, modifyDate);
     }
 
     private String readFile(File file, String id) throws IOException {
