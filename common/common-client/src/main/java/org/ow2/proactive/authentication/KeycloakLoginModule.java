@@ -191,13 +191,19 @@ public abstract class KeycloakLoginModule extends FileLoginModule implements Log
      *
      * @return Whether the login succeeded
      */
-    private boolean logUser(String username, String password) {
+    private boolean logUser(String username, String password) throws LoginException {
 
         if (keycloakProperties.isFallbackUserAuth()) {
             try {
                 return super.logUser(username, password, null, false);
             } catch (LoginException ex) {
-                return keycloakLogUser(username, password);
+                boolean answer = keycloakLogUser(username, password);
+                if (answer && keycloakProperties.isShadowUsers()) {
+                    addShadowAccount(null, username);
+                } else if (answer) {
+                    createAndStoreCredentialFile(null, username, password, false);
+                }
+                return answer;
             }
         } else {
             return keycloakLogUser(username, password);

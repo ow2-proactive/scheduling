@@ -101,6 +101,10 @@ public class LDAPDomainConfiguration {
     /** tenant fall back property, check user tenant membership using tenant file if user is not found in LDAP or if tenant LDAP attribute is not defined */
     private boolean fallbackTenantMembership;
 
+    /** When enabled, a shadow internal user will be created after a successful LDAP login
+    This prevents LDAP passwords to be stored internally by the ProActive server. */
+    private boolean shadowUsers;
+
     public LDAPDomainConfiguration(LDAPProperties ldapProperties, Logger logger) {
         ldapConnectionPooling = ldapProperties.getProperty(LDAPProperties.LDAP_CONNECTION_POOLING);
         ldapUrl = ldapProperties.getProperty(LDAPProperties.LDAP_URL);
@@ -127,6 +131,7 @@ public class LDAPDomainConfiguration {
         fallbackUserAuth = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.FALLBACK_USER_AUTH));
         fallbackGroupMembership = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.FALLBACK_GROUP_MEMBERSHIP));
         fallbackTenantMembership = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.FALLBACK_TENANT_MEMBERSHIP));
+        shadowUsers = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.SHADOW_USERS));
 
         //initialize system properties for SSL/TLS connection
         String keyStore = ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PATH);
@@ -238,5 +243,9 @@ public class LDAPDomainConfiguration {
 
     public boolean isFallbackTenantMembership() {
         return fallbackTenantMembership;
+    }
+
+    public boolean isShadowUsers() {
+        return shadowUsers;
     }
 }

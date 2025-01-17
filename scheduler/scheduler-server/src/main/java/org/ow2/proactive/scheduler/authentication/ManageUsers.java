@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
+import static org.ow2.proactive.authentication.FileLoginModule.authenticationLockFile;
+
 import java.io.*;
 import java.security.KeyException;
 import java.security.PrivateKey;
@@ -653,31 +655,30 @@ public class ManageUsers {
     /**
      * Stores the logins into login.cfg
      */
-    private static void storeLoginFile(String loginFilePath, Properties props) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(loginFilePath)))) {
-            props.store(writer, null);
-        }
-        List<String> lines = null;
-
-        try (FileInputStream stream = new FileInputStream(loginFilePath)) {
-            lines = IOUtils.readLines(stream);
-        }
-
-        TreeMap<String, String> sortedUsers = new TreeMap<>();
-        for (String line : lines) {
-            if (!(line.isEmpty() || line.startsWith("#"))) {
-                String[] loginAndPwd = line.split("=", 2);
-                sortedUsers.put(loginAndPwd[0], loginAndPwd[1]);
+    private static void storeLoginFile(String loginFilePath, Properties props)
+            throws IOException, ManageUsersException {
+        try {
+            while (authenticationLockFile.exists()) {
+                Thread.sleep(100);
             }
+            authenticationLockFile.createNewFile();
+            TreeMap<String, String> orderedProperties = new TreeMap<>();
+            for (String key : props.stringPropertyNames()) {
+                orderedProperties.put(key, props.getProperty(key));
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(loginFilePath)))) {
+                for (Map.Entry<String, String> entry : orderedProperties.entrySet()) {
+                    writer.write(entry.getKey() + ":" + entry.getValue());
+                    writer.newLine();
+                }
+            }
+            System.out.println("Stored login file in " + loginFilePath);
+        } catch (Exception e) {
+            exitWithErrorMessage("could not write login file : " + loginFilePath, null, e);
+        } finally {
+            authenticationLockFile.delete();
         }
-        List<String> modifiedLines = new ArrayList<>(sortedUsers.size());
-        for (Map.Entry entry : sortedUsers.entrySet()) {
-            modifiedLines.add(entry.getKey() + ":" + entry.getValue());
-        }
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(loginFilePath)))) {
-            IOUtils.writeLines(modifiedLines, System.getProperty("line.separator"), writer);
-        }
-        System.out.println("Stored login file in " + loginFilePath);
     }
 
     /**
@@ -685,16 +686,21 @@ public class ManageUsers {
      */
     private static void storeGroups(String groupFilePath, Multimap<String, String> groups) throws ManageUsersException {
         try {
+            while (authenticationLockFile.exists()) {
+                Thread.sleep(100);
+            }
+            authenticationLockFile.createNewFile();
             try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(groupFilePath)))) {
                 for (Map.Entry<String, String> userEntry : groups.entries()) {
                     writer.println(userEntry.getKey() + ":" + userEntry.getValue());
                 }
             }
-
-        } catch (IOException e) {
+            System.out.println("Stored group file in " + groupFilePath);
+        } catch (Exception e) {
             exitWithErrorMessage("could not write group file : " + groupFilePath, null, e);
+        } finally {
+            authenticationLockFile.delete();
         }
-        System.out.println("Stored group file in " + groupFilePath);
     }
 
     private static void exitWithErrorMessage(String errorMessage, String infoMessage, Throwable e)

@@ -93,6 +93,10 @@ public class KeycloakOidcProperties {
      * true or false */
     public static final String FALLBACK_TENANT_MEMBERSHIP = "pa.keycloak.tenant.membership.fallback";
 
+    /**  When enabled, a shadow internal user will be created after a successful Keycloak login
+     This prevents Keycloak passwords to be stored internally by the ProActive server. */
+    public static final String SHADOW_USERS = "pa.keycloak.authentication.shadow.users";
+
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     /** memory entity of the properties file. */
@@ -166,6 +170,15 @@ public class KeycloakOidcProperties {
      */
     public boolean isFallbackTenantMembership() {
         return Boolean.parseBoolean(getProperty(FALLBACK_TENANT_MEMBERSHIP));
+    }
+
+    /**
+     * Returns whether a shadow user is created after a successful login
+     *
+     * @return whether a shadow user is created after a successful login
+     */
+    public boolean isShadowUsers() {
+        return Boolean.parseBoolean(getProperty(SHADOW_USERS));
     }
 
     /**

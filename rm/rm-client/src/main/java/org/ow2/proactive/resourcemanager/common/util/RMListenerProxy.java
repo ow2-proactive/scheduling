@@ -45,6 +45,7 @@ import javax.management.openmbean.CompositeData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -56,6 +57,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.principals.ShadowCredentialsPrincipal;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -119,9 +121,22 @@ public class RMListenerProxy extends RMGroupEventListener {
 
         rebindListener();
 
+        Subject subject = target.getCurrentUserSubject();
+        if (subject.getPrincipals(ShadowCredentialsPrincipal.class).iterator().hasNext()) {
+            ShadowCredentialsPrincipal shadowCredentialsPrincipal = subject.getPrincipals(ShadowCredentialsPrincipal.class)
+                                                                           .iterator()
+                                                                           .next();
+            try {
+                this.credentials = Credentials.getCredentialsBase64(shadowCredentialsPrincipal.getCredentials());
+            } catch (Exception e) {
+                logger.error("Could not decrypt user credentials", e);
+                throw new LoginException("Could not decrypt user credentials: " + e.getMessage());
+            }
+        }
+
         // here we log on using an empty login field to ensure that
         // credentials are used.
-        this.jmxClient = new JMXClientHelper(rmAuth, new Object[] { "", credentials });
+        this.jmxClient = new JMXClientHelper(rmAuth, new Object[] { "", this.credentials });
         this.jmxClient.connect();
         return true;
     }

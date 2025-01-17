@@ -25,15 +25,14 @@
  */
 package org.ow2.proactive.authentication;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.security.KeyException;
+import java.security.Principal;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
@@ -44,16 +43,21 @@ import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
-import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.TenantPrincipal;
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.authentication.principals.*;
 import org.ow2.proactive.core.properties.PASharedProperties;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import com.google.common.collect.TreeMultimap;
 
 
 /**
@@ -67,9 +71,19 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     /** connection logger */
     private Logger logger = getLogger();
 
+    public static String DOMAIN_SEP = "@";
+
     public static final String ENCRYPTED_DATA_SEP = " ";
 
     private static Multimap<String, Long> failedAttempts = ArrayListMultimap.create();
+
+    private static final ReentrantLock createUsersLock = new ReentrantLock();
+
+    private Properties users = null;
+
+    private Multimap<String, String> groups = null;
+
+    private Map<String, String> tenants = null;
 
     /**
      *  JAAS call back handler used to get authentication request parameters 
@@ -87,6 +101,12 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
 
     /** The file where to store tenant management **/
     protected String tenantFile = getTenantFileName();
+
+    public static final String LOCK_FILE_NAME = "lock";
+
+    /** file used to prevent concurrent modification of login.cfg or group.cfg **/
+    public static File authenticationLockFile = new File(PASharedProperties.getAbsolutePath(PASharedProperties.AUTHENTICATION_DIR.getValueAsString()),
+                                                         LOCK_FILE_NAME);
 
     protected Subject subject;
 
@@ -121,6 +141,13 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     protected abstract PrivateKey getPrivateKey() throws KeyException;
 
     /**
+     * Defines public key
+     *
+     * @return public key in use
+     */
+    protected abstract PublicKey getPublicKey() throws KeyException;
+
+    /**
      * Returns true if legacy password encryption is used (hybrid symetric key).
      * Returns false if newer encryption is used (hash/salt based)
      * @return
@@ -131,12 +158,15 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * 
      * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject, javax.security.auth.callback.CallbackHandler, java.util.Map, java.util.Map)
      */
+    @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
+
         this.subject = subject;
         checkLoginFile();
         checkGroupFile();
         checkTenantFile();
+
         if (logger.isDebugEnabled()) {
             logger.debug("Using Login file at : " + this.loginFile);
             logger.debug("Using Group file at : " + this.groupFile);
@@ -169,11 +199,23 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         }
     }
 
+    private void updateCache() throws LoginException {
+        try {
+            createUsersLock.lock();
+            users = readLoginFile();
+            groups = readGroupsFromFile();
+            tenants = readTenantsFromFile();
+        } finally {
+            createUsersLock.unlock();
+        }
+    }
+
     /**
      * 
      * @see javax.security.auth.spi.LoginModule#login()
      * @throws LoginException if userName of password are not correct
      */
+    @Override
     public boolean login() throws LoginException {
         succeeded = false;
         // prompt for a user name and password
@@ -226,7 +268,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      */
     protected boolean logUser(String username, String password, String domain, boolean isNotFallbackAuthentication)
             throws LoginException {
-
+        updateCache();
         if (isNotFallbackAuthentication) {
             removeOldFailedAttempts(username);
 
@@ -238,7 +280,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             }
         }
 
-        if (!authenticateUserFromFile(username, password)) {
+        if (!authenticateUser(domain, username, password)) {
             String message = "[" + FileLoginModule.class.getSimpleName() + "] Incorrect Username/Password";
             if (isNotFallbackAuthentication) {
                 logger.info(message);
@@ -251,6 +293,9 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             throw new FailedLoginException("Incorrect Username/Password");
         } else {
             resetFailedAttempt(username);
+            if (isNotFallbackAuthentication) {
+                createAndStoreCredentialFile(domain, username, password, false);
+            }
         }
 
         subject.getPrincipals().add(new UserNamePrincipal(username));
@@ -261,8 +306,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             }
             subject.getPrincipals().add(new DomainNamePrincipal(domain));
         }
-        groupMembershipFromFile(username);
-        tenantMembershipFromFile(username);
+        groupMembership(domain, username);
+        tenantMembership(domain, username);
         logger.debug("authentication succeeded for user '" + username + "'");
         return true;
     }
@@ -306,14 +351,14 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
 
     /**
      * Check user and password from login file.
+     * @param domain user's domain
      * @param username user's login
      * @param password user's password
      * @return true if user is found in login file and its password is correct, falser otherwise
      * @throws LoginException if login file is not found or unreadable.
      */
-    private boolean authenticateUserFromFile(String username, String password) throws LoginException {
+    private boolean authenticateUser(String domain, String username, String password) throws LoginException {
 
-        Properties props = new Properties();
         PrivateKey privateKey = null;
         try {
             privateKey = getPrivateKey();
@@ -321,26 +366,36 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             throw new LoginException(e.toString());
         }
 
-        try (FileInputStream stream = new FileInputStream(loginFile)) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-            props.load(reader);
-        } catch (FileNotFoundException e) {
-            throw new LoginException(e.toString());
-        } catch (IOException e) {
-            throw new LoginException(e.toString());
+        String key = username;
+        if (!Strings.isNullOrEmpty(domain)) {
+            if (users.containsKey(username + DOMAIN_SEP + domain)) {
+                key = username + DOMAIN_SEP + domain;
+            }
         }
 
+        String encryptedPassword = (String) users.get(key);
+
         // verify the username and password
-        if (!props.containsKey(username)) {
+        if (encryptedPassword == null) {
             return false;
         } else {
-            String encryptedPassword = (String) props.get(username);
             try {
                 return checkPassword(encryptedPassword, password, privateKey);
             } catch (Exception e) {
                 throw new LoginException(e.toString());
             }
         }
+    }
+
+    private Properties readLoginFile() throws LoginException {
+        Properties props = new Properties();
+        try (FileInputStream stream = new FileInputStream(loginFile)) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            props.load(reader);
+        } catch (IOException e) {
+            throw new LoginException(e.toString());
+        }
+        return props;
     }
 
     private boolean checkPassword(String encryptedPassword, String password, PrivateKey privateKey)
@@ -358,27 +413,42 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     }
 
     /**
-     * Return corresponding group for an user from the group file.
+     * Return corresponding group for a user from the group file.
      * @param username user's login
      * @throws LoginException if group file is not found or unreadable.
      */
-    protected void groupMembershipFromFile(String username) throws LoginException {
+    protected void groupMembership(String domain, String username) throws LoginException {
+        String key = username;
+        if (!Strings.isNullOrEmpty(domain)) {
+            if (groups.containsKey(username + DOMAIN_SEP + domain)) {
+                key = username + DOMAIN_SEP + domain;
+            }
+        }
 
-        try (FileInputStream stream = new FileInputStream(groupFile)) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-            String line = null;
+        for (String group : groups.get(key)) {
+            subject.getPrincipals().add(new GroupNamePrincipal(group));
+            logger.debug("adding group principal '" + group + "' for user '" + key + "'");
+        }
+    }
+
+    private Multimap<String, String> readGroupsFromFile() throws LoginException {
+        Multimap<String, String> groupsMap = TreeMultimap.create();
+
+        String line;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(groupFile)))) {
             while ((line = reader.readLine()) != null) {
-                String[] u2g = line.split(":");
-                if (u2g[0].trim().equals(username)) {
-                    subject.getPrincipals().add(new GroupNamePrincipal(u2g[1]));
-                    logger.debug("adding group principal '" + u2g[1] + "' for user '" + username + "'");
+                if (!line.trim().isEmpty() && !line.trim().startsWith("#")) {
+                    String[] u2g = line.split(":");
+                    if (u2g.length == 2) {
+                        groupsMap.put(u2g[0].trim(), u2g[1].trim());
+                    }
                 }
             }
-        } catch (FileNotFoundException e) {
-            throw new LoginException(e.toString());
         } catch (IOException e) {
-            throw new LoginException(e.toString());
+            throw new LoginException("could not read group file " + groupFile + " : " + e.getMessage());
         }
+        return groupsMap;
     }
 
     /**
@@ -386,26 +456,34 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * @param username user's login
      * @throws LoginException if tenant file is not found or unreadable.
      */
-    protected void tenantMembershipFromFile(String username) throws LoginException {
+    protected void tenantMembership(String domain, String username) throws LoginException {
 
         Set<String> groupNames = subject.getPrincipals()
                                         .stream()
                                         .filter(principal -> principal instanceof GroupNamePrincipal)
                                         .map(principal -> principal.getName())
                                         .collect(Collectors.toSet());
+        boolean tenantDefined = false;
+        for (String groupName : groupNames) {
+            // only one tenant should be defined per user (the first tenant found)
+            if (tenants.containsKey(groupName) && !tenantDefined) {
+                String tenant = tenants.get(groupName);
+                logger.debug("adding tenant principal '" + tenant + "' for user '" + username + "'");
+                subject.getPrincipals().add(new TenantPrincipal(tenant));
+                tenantDefined = true;
+            }
+        }
+    }
 
+    private Map<String, String> readTenantsFromFile() throws LoginException {
+        Map<String, String> groupsToTenant = new TreeMap<>();
         try (FileInputStream stream = new FileInputStream(tenantFile)) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             while ((line = reader.readLine()) != null) {
-                String[] u2g = line.split(":");
-                if (groupNames.contains(u2g[0].trim())) {
-                    Set<TenantPrincipal> alreadyDefinedTenants = subject.getPrincipals(TenantPrincipal.class);
-                    if (alreadyDefinedTenants == null || alreadyDefinedTenants.size() == 0) {
-                        // only one tenant should be defined per user (the first tenant found)
-                        subject.getPrincipals().add(new TenantPrincipal(u2g[1]));
-                        logger.debug("adding tenant principal '" + u2g[1] + "' for user '" + username + "'");
-                    }
+                if (!line.trim().isEmpty() && !line.trim().startsWith("#")) {
+                    String[] u2g = line.split(":");
+                    groupsToTenant.putIfAbsent(u2g[0].trim(), u2g[1].trim());
                 }
             }
         } catch (FileNotFoundException e) {
@@ -413,6 +491,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         } catch (IOException e) {
             throw new LoginException(e.toString());
         }
+        return groupsToTenant;
     }
 
     /**
@@ -437,5 +516,328 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     public boolean logout() throws LoginException {
         succeeded = false;
         return true;
+    }
+
+    protected String generateRandomPassword() {
+        String upperCaseLetters = RandomStringUtils.random(2, 65, 90, true, true);
+        String lowerCaseLetters = RandomStringUtils.random(4, 97, 122, true, true);
+        String numbers = RandomStringUtils.randomNumeric(2);
+        String specialChar = RandomStringUtils.random(2, 33, 47, false, false);
+        String totalChars = RandomStringUtils.randomAlphanumeric(2);
+        String combinedChars = upperCaseLetters.concat(lowerCaseLetters)
+                                               .concat(numbers)
+                                               .concat(specialChar)
+                                               .concat(totalChars);
+        List<Character> pwdChars = combinedChars.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
+        Collections.shuffle(pwdChars);
+        return pwdChars.stream().collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
+    }
+
+    protected void addShadowAccount(String domain, String username) throws LoginException {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setLogin(username);
+        userInfo.setDomain(domain);
+        String rndPassword = generateRandomPassword();
+        userInfo.setPassword(rndPassword);
+        Set<String> groups = new HashSet<>();
+        for (Principal principal : subject.getPrincipals()) {
+            if (principal instanceof GroupNamePrincipal) {
+                groups.add(principal.getName());
+            }
+        }
+        userInfo.setGroups(groups);
+        createOrUpdateShadowAccount(userInfo);
+    }
+
+    protected boolean createOrUpdateShadowAccount(UserInfo userInfo) throws LoginException {
+        try {
+            createUsersLock.lock();
+            if (!userInfo.isLoginSet()) {
+                throw new LoginException("Login name not set");
+            }
+            if (!userInfo.isPasswordSet()) {
+                throw new LoginException("Password not set");
+            }
+            if (!userInfo.isGroupSet()) {
+                throw new LoginException("Groups not set");
+            }
+            String key = userInfo.getLogin() +
+                         (Strings.isNullOrEmpty(userInfo.getDomain()) ? "" : DOMAIN_SEP + userInfo.getDomain());
+            boolean userUpdated = false;
+            boolean groupsUpdated = false;
+            Properties existingUsers = users;
+            // check if the shadow account already exists, if not, a new account will be created
+            if (!existingUsers.containsKey(key)) {
+                try {
+                    updateUserPassword(getPublicKey(), key, userInfo.getPassword(), existingUsers);
+                    userUpdated = true;
+                } catch (KeyException e) {
+                    throw new LoginException("Key Error when updating user password : " + e.getMessage());
+                }
+            }
+            Multimap<String, String> existingAllUsersGroups = groups;
+            Set<String> existingUserGroups = new HashSet(existingAllUsersGroups.get(key));
+            Set<String> newUserGroups = new HashSet<>(userInfo.getGroups());
+
+            // track if the user groups have been modified, if yes, update the shadow account
+            // for a new account, this test will always return true as existingUserGroups is empty
+            if (!Sets.symmetricDifference(existingUserGroups, newUserGroups).isEmpty()) {
+                updateUserGroups(key, userInfo.getGroups(), existingAllUsersGroups);
+                groupsUpdated = true;
+            }
+            if (userUpdated) {
+                // if a new account is created store the updated login.cfg file
+                storeLoginFile(existingUsers);
+                // store as well the account credential file, this will add the shadow credentials to the subject
+                // (this will be used by rm, scheduler or rest server to update the account credentials)
+                createAndStoreCredentialFile(userInfo.getDomain(), userInfo.getLogin(), userInfo.getPassword(), true);
+            } else {
+                // if an existing shadow account is reused, add shadow credentials to the subject
+                // (this will be used by rm, scheduler or rest server to update the account credentials)
+                subject.getPrincipals().add(new ShadowCredentialsPrincipal(userInfo.getLogin(),
+                                                                           readCredentialsFile(userInfo.getLogin())));
+            }
+            if (groupsUpdated) {
+                // if the user groups have been modified store the updated group.cfg file
+                storeGroups(existingAllUsersGroups);
+            }
+            if (userUpdated || groupsUpdated) {
+                getLogger().info("Created/Updated shadow user " + userInfo.getLogin());
+            }
+            return userUpdated;
+        } finally {
+            createUsersLock.unlock();
+        }
+    }
+
+    private void storeLoginFile(Properties props) throws LoginException {
+
+        try {
+            while (authenticationLockFile.exists()) {
+                Thread.sleep(50);
+            }
+            authenticationLockFile.createNewFile();
+            TreeMap<String, String> orderedProperties = new TreeMap<>();
+            for (String key : props.stringPropertyNames()) {
+                orderedProperties.put(key, props.getProperty(key));
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(loginFile)))) {
+                for (Map.Entry<String, String> entry : orderedProperties.entrySet()) {
+                    writer.write(entry.getKey() + ":" + entry.getValue());
+                    writer.newLine();
+                }
+            }
+        } catch (Exception e) {
+            throw new LoginException("could not write login file " + loginFile + " : " + e.getMessage());
+        } finally {
+            authenticationLockFile.delete();
+        }
+    }
+
+    private void storeGroups(Multimap<String, String> groups) throws LoginException {
+        try {
+            while (authenticationLockFile.exists()) {
+                Thread.sleep(50);
+            }
+            authenticationLockFile.createNewFile();
+            try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(groupFile)))) {
+                for (Map.Entry<String, String> userEntry : groups.entries()) {
+                    writer.println(userEntry.getKey() + ":" + userEntry.getValue());
+                }
+            }
+
+        } catch (Exception e) {
+            throw new LoginException("could not write group file " + groupFile + " : " + e.getMessage());
+        } finally {
+            authenticationLockFile.delete();
+        }
+    }
+
+    protected void updateUserPassword(PublicKey pubKey, String login, String password, Properties props)
+            throws KeyException {
+        String encodedPassword;
+        if (isLegacyPasswordEncryption()) {
+            encodedPassword = HybridEncryptionUtil.encryptStringToBase64(password,
+                                                                         pubKey,
+                                                                         FileLoginModule.ENCRYPTED_DATA_SEP);
+        } else {
+            encodedPassword = HybridEncryptionUtil.hashPassword(password);
+        }
+        props.put(login, encodedPassword);
+
+    }
+
+    protected void createAndStoreCredentialFile(String domain, String username, String password,
+            boolean isShadowAccount) {
+        if (!PASharedProperties.CREATE_CREDENTIALS_WHEN_LOGIN.getValueAsBoolean()) {
+            return;
+        }
+        try {
+            createUsersLock.lock();
+            try {
+                byte[] credentialBytes = createCredentials(Strings.isNullOrEmpty(domain) ? username
+                                                                                         : domain + "\\" + username,
+                                                           password);
+
+                if (isShadowAccount) {
+                    subject.getPrincipals().add(new ShadowCredentialsPrincipal(username, credentialBytes));
+                }
+                saveCredentialsFile(domain, username, credentialBytes);
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } finally {
+            createUsersLock.unlock();
+        }
+    }
+
+    private byte[] readCredentialsFile(String username) throws LoginException {
+        File credentialsfile = new File(PASharedProperties.SHARED_HOME.getValueAsString() + "/config/authentication/" +
+                                        username + ".cred");
+        try {
+            return Credentials.getCredentials(credentialsfile.getAbsolutePath()).getBase64();
+        } catch (Exception e) {
+            throw new LoginException("Unable to decrypt credentials file: " + e.getMessage());
+        }
+    }
+
+    private void saveCredentialsFile(String domain, String username, byte[] credentialBytes) {
+        if (!PASharedProperties.CREATE_CREDENTIALS_WHEN_LOGIN.getValueAsBoolean()) {
+            return;
+        }
+        File credentialsfile = new File(PASharedProperties.SHARED_HOME.getValueAsString() + "/config/authentication/" +
+                                        username +
+                                        (Strings.isNullOrEmpty(domain) ||
+                                         !PASharedProperties.USE_DOMAIN_IN_CREDENTIALS_FILE.getValueAsBoolean() ? ""
+                                                                                                                : DOMAIN_SEP +
+                                                                                                                  domain) +
+                                        ".cred");
+
+        if (credentialsfile.exists() && sameCredentialsBytes(credentialBytes, credentialsfile)) {
+            return;
+        }
+
+        FileOutputStream fos = null;
+        try {
+            credentialsfile.delete();
+            credentialsfile.createNewFile();
+            fos = new FileOutputStream(credentialsfile);
+            fos.write(credentialBytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e1) {
+                }
+
+            }
+        }
+    }
+
+    private boolean sameCredentialsBytes(byte[] credentialBytes, File credentialsfile) {
+        try (InputStream inputStream = new FileInputStream(credentialsfile)) {
+            return Arrays.equals(credentialBytes, IOUtils.toByteArray(inputStream));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private byte[] createCredentials(String username, String password) throws KeyException {
+        PublicKey pubKey = getPublicKey();
+
+        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(username),
+                                                                      CredData.parseDomain(username),
+                                                                      password),
+                                                         pubKey);
+
+        return cred.getBase64();
+    }
+
+    protected void updateUserGroups(String login, Collection<String> groups, Multimap<String, String> groupsMap) {
+        if (!groups.isEmpty()) {
+            groupsMap.replaceValues(login, groups);
+        }
+    }
+
+    public static class UserInfo {
+        private String login;
+
+        private String password;
+
+        private String domain;
+
+        private Collection<String> groups = Collections.emptyList();
+
+        public UserInfo() {
+        }
+
+        public boolean isLoginSet() {
+            return !Strings.isNullOrEmpty(login);
+        }
+
+        public boolean isPasswordSet() {
+            return !Strings.isNullOrEmpty(password);
+        }
+
+        public boolean isGroupSet() {
+            return groups != null && !groups.isEmpty();
+        }
+
+        public String getLogin() {
+            return login;
+        }
+
+        public void setLogin(String login) {
+            this.login = login;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public Collection<String> getGroups() {
+            return groups;
+        }
+
+        public void setGroups(Collection<String> groups) {
+            this.groups = groups;
+        }
+
+        public String getDomain() {
+            return domain;
+        }
+
+        public void setDomain(String domain) {
+            this.domain = domain;
+        }
+    }
+
+    public static class ManageUsersException extends Exception {
+        public String getAdditionalInfo() {
+            return additionalInfo;
+        }
+
+        private String additionalInfo = null;
+
+        public ManageUsersException(String message) {
+            super(message);
+        }
+
+        public ManageUsersException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public ManageUsersException(String message, Throwable cause, String additionalInfo) {
+            super(message, cause);
+            this.additionalInfo = additionalInfo;
+        }
     }
 }

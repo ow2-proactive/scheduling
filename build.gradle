@@ -186,6 +186,7 @@ configure(javaSubprojects) {
         systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
         systemProperties << ['file.encoding': 'UTF-8']
         systemProperties << ['pa.rm.home': rootDir.absolutePath]
+        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     }
 
     task serialver(type: serialver.InsertSerialVersionUIDTask) {
@@ -357,7 +358,7 @@ dependencies {
     nativeBundle 'jsr223:jsr223-powershell:0.2.3:native'
 
     compile 'org.codehaus.groovy:groovy-all:2.4.21'
-    compile 'commons-io:commons-io:2.14.0'
+    compile 'commons-io:commons-io:2.16.1'
 }
 
 task dist(type: Sync) {

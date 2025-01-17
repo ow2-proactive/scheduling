@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.authentication;
 
 import java.io.IOException;
+import java.security.KeyException;
 
 import javax.management.JMException;
 import javax.security.auth.Subject;
@@ -37,6 +38,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.principals.ShadowCredentialsPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -96,6 +98,16 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
         String user = unPrincipal.getName();
 
+        if (subject.getPrincipals(ShadowCredentialsPrincipal.class).iterator().hasNext()) {
+            ShadowCredentialsPrincipal shadowCredentialsPrincipal = subject.getPrincipals(ShadowCredentialsPrincipal.class)
+                                                                           .iterator()
+                                                                           .next();
+            try {
+                cred = Credentials.getCredentialsBase64(shadowCredentialsPrincipal.getCredentials());
+            } catch (KeyException e) {
+                throw new LoginException("Could not decrypt credentials: " + e.getMessage());
+            }
+        }
         logger.info("user : " + user);
         // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);

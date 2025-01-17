@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import static org.ow2.proactive.authentication.FileLoginModule.authenticationLockFile;
 import static org.ow2.proactive.resourcemanager.RMFactory.configureJSch;
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
@@ -68,6 +69,7 @@ import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -225,6 +227,7 @@ public class SchedulerStarter {
         LOGGER.info("Activeeon ProActive version " + getSchedulerVersion());
         // force initialize the property decrypter to avoid conflicts with microservices
         PropertyDecrypter.encryptData("dummy");
+        authenticationLockFile.delete();
 
         hsqldbServer = new SchedulerHsqldbStarter();
         hsqldbServer.startIfNeeded();

@@ -199,11 +199,23 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
      * @throws LoginException if authentication and group membership fails.
      */
     protected boolean logUser(String domain, String username, String password) throws LoginException {
-        if (domain == null) {
-            return super.logUser(username, password, null, false);
+        if (Strings.isNullOrEmpty(domain)) {
+            return super.logUser(username, password, null, true);
         } else {
             if (ldapDomainConfigurations.containsKey(domain)) {
-                return internalLogUser(domain, username, password);
+                try {
+                    boolean answer = super.logUser(username, password, domain, false);
+                    if (answer && Strings.isNullOrEmpty(ldapDomainConfigurations.get(domain).getTenantAttribute())) {
+                        subject.getPrincipals().add(new TenantPrincipal(domain));
+                    }
+                    return answer;
+                } catch (LoginException ex) {
+                    boolean answer = internalLogUser(domain, username, password);
+                    if (answer && ldapDomainConfigurations.get(domain).isShadowUsers()) {
+                        addShadowAccount(domain, username);
+                    }
+                    return answer;
+                }
             } else {
                 throw new FailedLoginException("Cannot login as " + domain + "\\" + username + ". LDAP domain " +
                                                domain + " is not configured");
@@ -256,10 +268,10 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
             }
 
             if (ldapDomainConfigurations.get(domain).isFallbackGroupMembership()) {
-                super.groupMembershipFromFile(username);
+                super.groupMembership(domain, username);
             }
             if (ldapDomainConfigurations.get(domain).isFallbackTenantMembership()) {
-                super.tenantMembershipFromFile(username);
+                super.tenantMembership(domain, username);
             }
         } else {
             // authentication failed
@@ -498,15 +510,7 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
                     }
                     subject.getPrincipals().add(new UserNamePrincipal(username));
 
-                    if (!Strings.isNullOrEmpty(ldapDomainConfiguration.getTenantAttribute())) {
-                        Attribute tenantAttr = result.getAttributes().get(ldapDomainConfiguration.getTenantAttribute());
-                        if (tenantAttr != null && tenantAttr.get() != null && !tenantAttr.get().toString().isEmpty()) {
-                            subject.getPrincipals().add(new TenantPrincipal(tenantAttr.get().toString()));
-                        }
-                    } else {
-                        // if a tenant attribute is not specified, the domain is used as tenant
-                        subject.getPrincipals().add(new TenantPrincipal(domain));
-                    }
+                    addTenantPrincipal(domain, ldapDomainConfiguration, result);
 
                     // looking for the user groups
                     String groupFilter = String.format(ldapDomainConfiguration.getLdapGroupFilter(),
@@ -543,6 +547,19 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
         }
 
         return userDN;
+    }
+
+    private void addTenantPrincipal(String domain, LDAPDomainConfiguration ldapDomainConfiguration, SearchResult result)
+            throws NamingException {
+        if (!Strings.isNullOrEmpty(ldapDomainConfiguration.getTenantAttribute())) {
+            Attribute tenantAttr = result.getAttributes().get(ldapDomainConfiguration.getTenantAttribute());
+            if (tenantAttr != null && tenantAttr.get() != null && !tenantAttr.get().toString().isEmpty()) {
+                subject.getPrincipals().add(new TenantPrincipal(tenantAttr.get().toString()));
+            }
+        } else {
+            // if a tenant attribute is not specified, the domain is used as tenant
+            subject.getPrincipals().add(new TenantPrincipal(domain));
+        }
     }
 
     /**

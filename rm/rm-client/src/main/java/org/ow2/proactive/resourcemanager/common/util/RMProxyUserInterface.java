@@ -41,6 +41,7 @@ import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import javax.security.auth.Subject;
 
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.node.Node;
@@ -444,6 +445,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public StringWrapper getCurrentUser() {
         return this.target.getCurrentUser();
+    }
+
+    @Override
+    public Subject getCurrentUserSubject() {
+        return this.target.getCurrentUserSubject();
     }
 
     @Override

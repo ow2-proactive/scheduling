@@ -11,6 +11,7 @@ dependencies {
 
     // this dependency is added to allow groovy class cleanup
     compile 'org.codehaus.groovy:groovy-all:2.4.21'
+    compile 'org.apache.commons:commons-lang3:3.4'
 }
 
 task stub(type: StubTask) {
