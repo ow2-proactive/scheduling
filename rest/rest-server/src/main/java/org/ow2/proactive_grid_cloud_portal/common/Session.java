@@ -27,7 +27,9 @@ package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.security.KeyException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -37,11 +39,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.principals.ShadowCredentialsPrincipal;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -79,6 +81,8 @@ public class Session {
 
     private static PrivateKey corePrivateKey;
 
+    private static PublicKey corePublicKey;
+
     public Session(String sessionId, SchedulerRMProxyFactory schedulerRMProxyFactory, Clock clock) {
         this.sessionId = sessionId;
         this.schedulerRMProxyFactory = schedulerRMProxyFactory;
@@ -93,6 +97,13 @@ public class Session {
                 corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
             } catch (Exception e) {
                 logger.error("Could not initialize private key", e);
+            }
+        }
+        if (corePublicKey == null) {
+            try {
+                corePublicKey = Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
+            } catch (Exception e) {
+                logger.error("Could not initialize public key", e);
             }
         }
     }
@@ -118,54 +129,78 @@ public class Session {
         return scheduler;
     }
 
-    public void connectToScheduler(Credentials credentials)
-            throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException, KeyException {
-        scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
-        this.credentials = credentials;
-        setUserName(scheduler.getCurrentUser());
+    private void updateCredentials(Credentials credentials, Subject subject) throws LoginException {
+        if (subject.getPrincipals(ShadowCredentialsPrincipal.class).iterator().hasNext()) {
+            updateShadowCredentials(subject);
+        } else {
+            this.credentials = credentials;
+            try {
+                this.credData = this.credentials.decrypt(corePrivateKey);
+            } catch (Exception e) {
+                logger.error("Could not decrypt user credentials", e);
+                throw new LoginException("Could not decrypt user credentials: " + e.getMessage());
+            }
+        }
+    }
+
+    private void updateCredentials(CredData credData, Subject subject) throws LoginException {
+        if (subject != null && subject.getPrincipals(ShadowCredentialsPrincipal.class).iterator().hasNext()) {
+            updateShadowCredentials(subject);
+        } else {
+            this.credData = credData;
+            try {
+                this.credentials = Credentials.createCredentials(credData, corePublicKey);
+            } catch (Exception e) {
+                logger.error("Could not decrypt user credentials", e);
+                throw new LoginException("Could not decrypt user credentials: " + e.getMessage());
+            }
+        }
+    }
+
+    private void updateShadowCredentials(Subject subject) throws LoginException {
+        ShadowCredentialsPrincipal shadowCredentialsPrincipal = subject.getPrincipals(ShadowCredentialsPrincipal.class)
+                                                                       .iterator()
+                                                                       .next();
         try {
-            this.credData = credentials.decrypt(corePrivateKey);
+            this.credentials = Credentials.getCredentialsBase64(shadowCredentialsPrincipal.getCredentials());
+            this.credData = this.credentials.decrypt(corePrivateKey);
         } catch (Exception e) {
             logger.error("Could not decrypt user credentials", e);
+            throw new LoginException("Could not decrypt user credentials: " + e.getMessage());
         }
-        CredentialsCreator.INSTANCE.saveCredentialsFile(scheduler.getCurrentUser(), credentials.getBase64());
+    }
 
+    public void connectToScheduler(Credentials credentials)
+            throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException, KeyException {
+
+        scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
+
+        updateCredentials(credentials, scheduler.getSubject());
+        setUserName(scheduler.getCurrentUser());
     }
 
     public void connectToScheduler(CredData credData)
             throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credData);
-        this.credData = credData;
-        setUserName(credData.getLogin());
-        CredentialsCreator.INSTANCE.createAndStoreCredentialFile(credData.getLogin(),
-                                                                 credData.getDomain(),
-                                                                 credData.getPassword());
 
+        updateCredentials(credData, scheduler.getSubject());
+        setUserName(credData.getLogin());
     }
 
     public void connectToRM(Credentials credentials)
             throws LoginException, ActiveObjectCreationException, KeyException, NodeException, RMException {
         rm = schedulerRMProxyFactory.connectToRM(credentials);
-        this.credentials = credentials;
-        setUserName(rm.getCurrentUser().getStringValue());
-        try {
-            this.credData = credentials.decrypt(corePrivateKey);
-        } catch (Exception e) {
-            logger.error("Could not decrypt user credentials", e);
-        }
-        CredentialsCreator.INSTANCE.saveCredentialsFile(rm.getCurrentUser().getStringValue(), credentials.getBase64());
 
+        updateCredentials(credentials, rm.getCurrentUserSubject());
+        setUserName(rm.getCurrentUser().getStringValue());
     }
 
     public void connectToRM(CredData credData)
             throws LoginException, ActiveObjectCreationException, KeyException, NodeException, RMException {
         rm = schedulerRMProxyFactory.connectToRM(credData);
-        this.credData = credData;
-        setUserName(credData.getLogin());
-        CredentialsCreator.INSTANCE.createAndStoreCredentialFile(credData.getLogin(),
-                                                                 credData.getDomain(),
-                                                                 credData.getPassword());
 
+        updateCredentials(credData, rm.getCurrentUserSubject());
+        setUserName(credData.getLogin());
     }
 
     public RMProxyUserInterface getRM() {

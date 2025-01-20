@@ -231,9 +231,6 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Refresh time to reload the security policy file (security.java.policy-server) */
     POLICY_RELOAD_FREQUENCY_IN_SECONDS("pa.scheduler.auth.policy.refreshperiod.seconds", PropertyType.INTEGER, "30"),
 
-    /** Creates a credential file (username.cred) for each successful login in the authentication folder*/
-    SCHEDULER_CREATE_CREDENTIALS_WHEN_LOGIN("pa.scheduler.create.credentials.when.login", PropertyType.BOOLEAN, "false"),
-
     /** Regular expression used to control the username format when logging in. Always enabled to prevent injection attacks on 3rd-party authentication like LDAP */
     SCHEDULER_USERNAME_REGEXP("pa.scheduler.username.regexp", PropertyType.STRING, "^[A-Za-z0-9_\\-@.]+$"),
 

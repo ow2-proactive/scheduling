@@ -3421,6 +3421,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     @RoleBasic
+    public Subject getCurrentUserSubject() {
+        return caller.getSubject();
+    }
+
+    @Override
+    @RoleBasic
     public UserData getCurrentUserData() {
         UserData userData = new UserData();
         userData.setUserName(caller.getName());

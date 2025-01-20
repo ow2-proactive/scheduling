@@ -595,7 +595,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                      "submitted: name '" + internalJob.getName() + "', tasks '" + internalJob.getTotalNumberOfTasks() +
                                           "', owner '" +
 
-                                          internalJob.getOwner() +
+                                          (internalJob.getTenant() != null ? internalJob.getTenant() + "\\" +
+                                                                             internalJob.getOwner()
+                                                                           : internalJob.getOwner()) +
                                           "'" + (internalJob.getParentId() != null
                                                                                    ? ", parentJobId '" +
                                                                                      internalJob.getParentId() + "'"

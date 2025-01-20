@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -604,6 +606,13 @@ public interface ResourceManager extends ServiceUsingPermission {
      */
     @RoleBasic
     StringWrapper getCurrentUser();
+
+    /**
+     * Returns the current user Subject
+     * @return subject
+     */
+    @RoleBasic
+    Subject getCurrentUserSubject();
 
     /**
      * Returns the groups associated with the current connected user.

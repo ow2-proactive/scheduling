@@ -29,8 +29,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -55,10 +54,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.log4j.Logger;
-import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.TenantPrincipal;
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.authentication.principals.*;
 
 import com.google.common.base.Strings;
 
@@ -230,7 +226,13 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             try {
                 return super.logUser(username, password, domain, false);
             } catch (LoginException ex) {
-                return internalLogUser(username, password, domain);
+                boolean answer = internalLogUser(username, password, domain);
+                if (answer && ldapDomainConfiguration.isShadowUsers()) {
+                    addShadowAccount(domain, username);
+                } else if (answer) {
+                    createAndStoreCredentialFile(domain, username, password, false);
+                }
+                return answer;
             }
         } else {
             return internalLogUser(username, password, domain);
@@ -282,10 +284,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             }
 
             if (ldapDomainConfiguration.isFallbackGroupMembership()) {
-                super.groupMembershipFromFile(username);
+                super.groupMembership(domain, username);
             }
             if (ldapDomainConfiguration.isFallbackTenantMembership()) {
-                super.tenantMembershipFromFile(username);
+                super.tenantMembership(domain, username);
             }
         } else {
             // authentication failed

@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.authentication;
 import java.io.File;
 import java.security.KeyException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -103,6 +104,11 @@ public class SchedulerKeycloakLoginModule extends KeycloakLoginModule {
     @Override
     protected PrivateKey getPrivateKey() throws KeyException {
         return Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
+    }
+
+    @Override
+    protected PublicKey getPublicKey() throws KeyException {
+        return Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
     }
 
     @Override

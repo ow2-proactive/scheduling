@@ -124,6 +124,10 @@ public class LDAPProperties {
      * true or false */
     public static final String FALLBACK_TENANT_MEMBERSHIP = "pa.ldap.tenant.membership.fallback";
 
+    /**  When enabled, a shadow internal user will be created after a successful LDAP login
+     This prevents LDAP passwords to be stored internally by the ProActive server. */
+    public static final String SHADOW_USERS = "pa.ldap.authentication.shadow.users";
+
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     /** memory entity of the properties file. */

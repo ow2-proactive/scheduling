@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.authentication;
 
 import java.security.KeyException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -75,6 +76,11 @@ public class RMFileLoginModule extends FileLoginModule {
     @Override
     protected PrivateKey getPrivateKey() throws KeyException {
         return Credentials.getPrivateKey(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()));
+    }
+
+    @Override
+    protected PublicKey getPublicKey() throws KeyException {
+        return Credentials.getPublicKey(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PUBKEY_PATH.getValueAsString()));
     }
 
     @Override

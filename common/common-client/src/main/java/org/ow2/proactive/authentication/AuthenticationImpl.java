@@ -48,6 +48,8 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 
+import com.google.common.base.Strings;
+
 
 /**
  * An active object responsible for authentication.
@@ -154,7 +156,8 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
 
         try {
             // Verify that this user//password can connect to this existing scheduler
-            getLogger().info(username + " is trying to connect");
+            getLogger().info(Strings.isNullOrEmpty(domain) ? username + " is trying to connect"
+                                                           : domain + "\\" + username + " is trying to connect");
 
             Map<String, Object> params = new HashMap<>(4);
             //user name to check

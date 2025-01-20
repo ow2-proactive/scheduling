@@ -144,7 +144,11 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
         try {
             return super.logUser(username, password, null, false);
         } catch (LoginException ex) {
-            return pamLogUser(username, password);
+            boolean answer = pamLogUser(username, password);
+            if (answer) {
+                createAndStoreCredentialFile(null, username, password, false);
+            }
+            return answer;
         }
     }
 
@@ -161,8 +165,8 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
         if (answer.equals(PamReturnValue.PAM_SUCCESS)) {
             subject.getPrincipals().add(new UserNamePrincipal(username));
             resetFailedAttempt(username);
-            super.groupMembershipFromFile(username);
-            super.tenantMembershipFromFile(username);
+            super.groupMembership(null, username);
+            super.tenantMembership(null, username);
             return true;
         } else {
             logger.info("PAM authentication failed for user " + username + ": " + answer);

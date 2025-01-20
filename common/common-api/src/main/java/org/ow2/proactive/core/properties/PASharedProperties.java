@@ -54,6 +54,15 @@ public enum PASharedProperties implements PACommonProperties {
     /** time window in minutes after which a failed login attempt is forgotten **/
     FAILED_LOGIN_RENEW_MINUTES("pa.shared.failed.renew.minutes", PropertyType.INTEGER, "10"),
 
+    /** create encrypted credentials file when the user logs in, used by several components such as the job-planner **/
+    CREATE_CREDENTIALS_WHEN_LOGIN("pa.shared.credentials.when.login", PropertyType.BOOLEAN, "true"),
+
+    /** use domain in credentials file name **/
+    USE_DOMAIN_IN_CREDENTIALS_FILE("pa.shared.credentials.use.domain", PropertyType.BOOLEAN, "false"),
+
+    /** authentication home directory **/
+    AUTHENTICATION_DIR("pa.shared.authentication.dir", PropertyType.STRING, "config/authentication"),
+
     /** Key used when decrypting properties */
     PROPERTIES_CRYPT_KEY("pa.shared.properties.crypt.key", PropertyType.STRING, "activeeon"),
 

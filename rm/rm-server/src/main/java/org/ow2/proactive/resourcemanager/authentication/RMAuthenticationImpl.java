@@ -27,8 +27,10 @@ package org.ow2.proactive.resourcemanager.authentication;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.KeyException;
 
 import javax.management.JMException;
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -39,7 +41,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.principals.ShadowCredentialsPrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -80,7 +84,21 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      * Performs user authentication
      */
     public ResourceManager login(Credentials cred) throws LoginException {
-        Client client = new Client(authenticate(cred), true);
+
+        Subject subject = authenticate(cred);
+
+        if (subject.getPrincipals(ShadowCredentialsPrincipal.class).iterator().hasNext()) {
+            ShadowCredentialsPrincipal shadowCredentialsPrincipal = subject.getPrincipals(ShadowCredentialsPrincipal.class)
+                                                                           .iterator()
+                                                                           .next();
+            try {
+                cred = Credentials.getCredentialsBase64(shadowCredentialsPrincipal.getCredentials());
+            } catch (KeyException e) {
+                throw new LoginException("Could not decrypt credentials: " + e.getMessage());
+            }
+        }
+
+        Client client = new Client(subject, true);
         client.setCredentials(cred);
 
         if (RMCore.clients.containsKey(client.getId())) {

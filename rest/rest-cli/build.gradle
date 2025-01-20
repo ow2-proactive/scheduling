@@ -13,7 +13,7 @@ dependencies {
     }
     compile 'org.jenkins-ci:trilead-ssh2:build-217-jenkins-27'
 
-    compile 'commons-io:commons-io:2.14.0'
+    compile 'commons-io:commons-io:2.16.1'
     compile 'org.jsoup:jsoup:1.15.4'
     compile 'com.googlecode.json-simple:json-simple:1.1'
 
