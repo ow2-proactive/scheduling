@@ -36,6 +36,8 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.persistence.criteria.*;
@@ -53,6 +55,7 @@ import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.hibernate.type.SerializableToBlobType;
 import org.hibernate.type.StandardBasicTypes;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -109,6 +112,7 @@ import org.ow2.proactive.scheduler.util.MultipleTimingLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
+import org.ow2.proactive.utils.PAExecutors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
@@ -1740,7 +1744,8 @@ public class SchedulerDBManager {
     }
 
     private List<InternalJob> loadJobs(final boolean fullState, final Collection<JobStatus> status, final long period) {
-        return executeReadOnlyTransaction(session -> {
+
+        List<Long> ids = executeReadOnlyTransaction(session -> {
             logger.info("Loading Jobs from database");
 
             Query query;
@@ -1753,12 +1758,17 @@ public class SchedulerDBManager {
                 query = session.getNamedQuery("loadJobs").setParameterList("status", status).setReadOnly(true);
             }
 
-            List<Long> ids = query.list();
+            List<Long> tmpIds = query.list();
 
-            logger.info(ids.size() + " Jobs to fetch from database");
+            logger.info(tmpIds.size() + " Jobs to fetch from database");
 
-            return loadInternalJobs(fullState, session, ids);
+            return tmpIds;
         });
+
+        if (ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return loadInternalJobs(fullState, false, ids);
     }
 
     public List<JobId> getJobsByFinishedTime(long olderThan) {
@@ -1778,34 +1788,22 @@ public class SchedulerDBManager {
     }
 
     public List<InternalJob> loadJobWithTasksIfNotRemoved(final JobId... jobIds) {
-        ArrayList<InternalJob> answer = new ArrayList(jobIds.length);
-        List<List<JobId>> jobIdSubSets = Lists.partition(Arrays.asList(jobIds), MAX_ITEMS_IN_LIST);
-        for (List<JobId> jobIdSubList : jobIdSubSets) {
-            answer.addAll(executeReadOnlyTransaction(session -> {
-                Query jobQuery = session.getNamedQuery("loadJobDataIfNotRemoved").setReadOnly(true);
-
-                List<Long> ids = jobIdSubList.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
-
-                List<InternalJob> result = new ArrayList<>(jobIdSubList.size());
-                batchLoadJobs(session, false, jobQuery, ids, result);
-                return result;
-            }));
+        List<Long> ids = Arrays.asList(jobIds).stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
+        if (ids.isEmpty()) {
+            return new ArrayList<>();
         }
-        return answer;
+        return loadInternalJobs(false, true, ids);
     }
 
     public List<InternalJob> loadJobs(final boolean fullState, final JobId... jobIds) {
-        ArrayList<InternalJob> answer = new ArrayList(jobIds.length);
-        List<List<JobId>> jobIdSubSets = Lists.partition(Arrays.asList(jobIds), MAX_ITEMS_IN_LIST);
-        for (List<JobId> jobIdSubList : jobIdSubSets) {
-            answer.addAll(executeReadOnlyTransaction(session -> {
-                final List<Long> ids = jobIdSubList.stream()
-                                                   .map(SchedulerDBManager::jobId)
-                                                   .collect(Collectors.toList());
-                return loadInternalJobs(fullState, session, ids);
-            }));
+        final List<Long> ids = Arrays.asList(jobIds)
+                                     .stream()
+                                     .map(SchedulerDBManager::jobId)
+                                     .collect(Collectors.toList());
+        if (ids.isEmpty()) {
+            return new ArrayList<>();
         }
-        return answer;
+        return loadInternalJobs(fullState, false, ids);
     }
 
     @SuppressWarnings("unchecked")
@@ -1819,37 +1817,50 @@ public class SchedulerDBManager {
     }
 
     public List<InternalJob> loadInternalJob(Long id) {
-        return executeReadOnlyTransaction(session -> loadInternalJobs(false, session, Collections.singletonList(id)));
+        return loadInternalJobs(false, false, Collections.singletonList(id));
     }
 
     // Executed in a transaction from the caller
-    private List<InternalJob> loadInternalJobs(boolean fullState, Session session, List<Long> ids) {
-        Query jobQuery = session.getNamedQuery("loadInternalJobs");
+    private List<InternalJob> loadInternalJobs(final boolean fullState, final boolean ifNotRemoved, List<Long> ids) {
 
-        List<InternalJob> result = new ArrayList<>(ids.size());
+        List<InternalJob> answer = new ArrayList<>(ids.size());
 
-        List<Long> batchLoadIds = new ArrayList<>(RECOVERY_LOAD_JOBS_BATCH_SIZE);
+        List<List<Long>> batchLoadIds = Lists.partition(ids, RECOVERY_LOAD_JOBS_BATCH_SIZE);
 
-        int batchIndex = 1;
-        for (Long id : ids) {
-            batchLoadIds.add(id);
-            if (batchLoadIds.size() == RECOVERY_LOAD_JOBS_BATCH_SIZE) {
-                logger.info("Loading internal Jobs, batch number " + batchIndex);
-                batchLoadJobs(session, fullState, jobQuery, batchLoadIds, result);
-                batchLoadIds.clear();
-                session.clear();
-                logger.info("Fetched " + (batchIndex * RECOVERY_LOAD_JOBS_BATCH_SIZE) + " internal Jobs");
-                batchIndex++;
+        final AtomicInteger totalLoadedJobs = new AtomicInteger();
+
+        ExecutorService recoverRunningTasksThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                                               PASchedulerProperties.SCHEDULER_PARALLEL_LOAD_JOBS_NBTHREAD.getValueAsInt(),
+                                                                                               60L,
+                                                                                               TimeUnit.SECONDS,
+                                                                                               new NamedThreadFactory("LoadJobsThreadPool"));
+
+        List<Future<List<InternalJob>>> retrievedJobsFutures = new ArrayList<>(batchLoadIds.size());
+
+        for (List<Long> batch : batchLoadIds) {
+            Future<List<InternalJob>> future = recoverRunningTasksThreadPool.submit(() -> executeReadOnlyTransaction(session -> {
+                Query jobQuery = ifNotRemoved ? session.getNamedQuery("loadJobDataIfNotRemoved").setReadOnly(true)
+                                              : session.getNamedQuery("loadInternalJobs").setReadOnly(true);
+                List<InternalJob> result = new ArrayList<>(RECOVERY_LOAD_JOBS_BATCH_SIZE);
+                batchLoadJobs(session, fullState, jobQuery, batch, result);
+                int newTotal = totalLoadedJobs.addAndGet(result.size());
+                logger.info("Fetched " + newTotal + " internal Jobs");
+                return result;
+            }));
+            retrievedJobsFutures.add(future);
+        }
+        for (Future<List<InternalJob>> future : retrievedJobsFutures) {
+            try {
+                answer.addAll(future.get());
+            } catch (Throwable e) {
+                logger.error("Error when fetching jobs from the database", e);
             }
         }
-
-        if (!batchLoadIds.isEmpty()) {
-            batchLoadJobs(session, fullState, jobQuery, batchLoadIds, result);
-        }
+        recoverRunningTasksThreadPool.shutdown();
 
         logger.info(ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED);
 
-        return result;
+        return answer;
     }
 
     // Executed in a transaction from the caller
