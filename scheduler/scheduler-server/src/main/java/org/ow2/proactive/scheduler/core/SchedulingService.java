@@ -190,6 +190,7 @@ public class SchedulingService {
         }
 
         schedulingThread = new SchedulingThread(schedulingMethod, this);
+        schedulingThread.setPriority(Thread.MAX_PRIORITY);
         schedulingThread.start();
 
         pinger = new NodePingThread(this);

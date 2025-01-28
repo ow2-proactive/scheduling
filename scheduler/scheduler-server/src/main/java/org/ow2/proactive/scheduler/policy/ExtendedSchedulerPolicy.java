@@ -81,6 +81,8 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
     // cache used to store the start at value of a given job or task
     private static final Map<String, String> startAtCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STARTAT_VALUE_CACHE.getValueAsInt()));
 
+    private static final Map<String, Date> startAtConversionCache = Collections.synchronizedMap(new LRUMap<>(PASchedulerProperties.SCHEDULER_STARTAT_CACHE.getValueAsInt()));
+
     protected MultipleTimingLogger schedulingPolicyTimingLogger = null;
 
     private void initialize() {
@@ -99,7 +101,6 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
         schedulingPolicyTimingLogger.start("ESP.getOrderTasks");
         Date now = new Date();
         LinkedList<EligibleTaskDescriptor> executionCycleTasks = new LinkedList<>();
-        Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
 
         List<JobDescriptor> filteredJobs = filterJobs(jobDescList);
 
@@ -112,7 +113,13 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                     executionCycleTasks.add(candidate);
                 } else {
                     try {
-                        Date startAtDate = ISO8601DateUtil.toDate(startAt);
+                        Date startAtDate;
+                        if (startAtConversionCache.containsKey(startAt)) {
+                            startAtDate = startAtConversionCache.get(startAt);
+                        } else {
+                            startAtDate = ISO8601DateUtil.toDate(startAt);
+                            startAtConversionCache.put(startAt, startAtDate);
+                        }
                         if (now.after(startAtDate)) {
                             executionCycleTasks.add(candidate);
 
@@ -165,14 +172,19 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
         schedulingPolicyTimingLogger.start("ESP.filterJobs");
         Date now = new Date();
         LinkedList<JobDescriptor> executionCycleJobs = new LinkedList<>();
-        Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
         for (JobDescriptor candidate : jobDescList) {
             String startAt = getStartAtValue(candidate);
             if (startAt == null) {
                 executionCycleJobs.add(candidate);
             } else {
                 try {
-                    Date startAtDate = ISO8601DateUtil.toDate(startAt);
+                    Date startAtDate;
+                    if (startAtConversionCache.containsKey(startAt)) {
+                        startAtDate = startAtConversionCache.get(startAt);
+                    } else {
+                        startAtDate = ISO8601DateUtil.toDate(startAt);
+                        startAtConversionCache.put(startAt, startAtDate);
+                    }
                     if (now.after(startAtDate)) {
                         executionCycleJobs.add(candidate);
                     } else {
@@ -195,6 +207,7 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
 
             }
         }
+        Collections.sort(executionCycleJobs, FIFO_BY_PRIORITY_COMPARATOR);
         schedulingPolicyTimingLogger.end("ESP.filterJobs");
         return executionCycleJobs;
     }
