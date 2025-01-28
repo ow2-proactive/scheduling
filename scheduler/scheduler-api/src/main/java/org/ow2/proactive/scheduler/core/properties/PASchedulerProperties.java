@@ -106,6 +106,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Number of threads used to handle scheduled operations related to housekeeping */
     SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.housekeeping.scheduledpoolnbthreads", PropertyType.INTEGER, "5"),
 
+    /** maximum number of threads used to load jobs from the database, this value must not be greater than hibernate.hikari.maximumPoolSize in config/scheduler/database.properties **/
+    SCHEDULER_PARALLEL_LOAD_JOBS_NBTHREAD("pa.scheduler.core.loadjobs.nbthreads", PropertyType.INTEGER, "40"),
+
     /** Maximum number of threads in the thread pool that serves to recover running tasks in parallel at scheduler start up */
     SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_NBTHREAD("pa.scheduler.core.parallel.scheduler.state.recover.nbthreads", PropertyType.INTEGER, "100"),
 
@@ -522,7 +525,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE(
             "pa.scheduler.db.recovery.load.jobs.batch_size",
             PropertyType.INTEGER,
-            "100"),
+            "1000"),
 
     SCHEDULER_DB_ITEMS_MAX_SIZE("pa.scheduler.db.items.max.size", PropertyType.INTEGER, "1000"),
 
