@@ -161,6 +161,7 @@ public abstract class KeycloakLoginModule extends FileLoginModule implements Log
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
+            byte[] key = (byte[]) params.get("key");
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -174,7 +175,7 @@ public abstract class KeycloakLoginModule extends FileLoginModule implements Log
                 throw new FailedLoginException("No password has been specified for authentication");
             }
 
-            succeeded = logUser(username, password);
+            succeeded = logUser(username, password, key);
             return succeeded;
 
         } catch (IOException | UnsupportedCallbackException e) {
@@ -191,17 +192,17 @@ public abstract class KeycloakLoginModule extends FileLoginModule implements Log
      *
      * @return Whether the login succeeded
      */
-    private boolean logUser(String username, String password) throws LoginException {
+    private boolean logUser(String username, String password, byte[] key) throws LoginException {
 
         if (keycloakProperties.isFallbackUserAuth()) {
             try {
-                return super.logUser(username, password, null, false);
+                return super.logUser(username, password, key, null, false);
             } catch (LoginException ex) {
                 boolean answer = keycloakLogUser(username, password);
                 if (answer && keycloakProperties.isShadowUsers()) {
-                    addShadowAccount(null, username);
+                    addShadowAccount(null, username, key);
                 } else if (answer) {
-                    createAndStoreCredentialFile(null, username, password, false);
+                    createAndStoreCredentialFile(null, username, password, key, false);
                 }
                 return answer;
             }

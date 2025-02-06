@@ -112,6 +112,7 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
+            byte[] key = (byte[]) params.get("key");
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -121,7 +122,7 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            succeeded = logUser(username, password);
+            succeeded = logUser(username, password, key);
             return succeeded;
 
         } catch (java.io.IOException ioe) {
@@ -140,13 +141,13 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication and group membership fails.
      */
-    protected boolean logUser(String username, String password) throws LoginException {
+    protected boolean logUser(String username, String password, byte[] key) throws LoginException {
         try {
-            return super.logUser(username, password, null, false);
+            return super.logUser(username, password, key, null, false);
         } catch (LoginException ex) {
             boolean answer = pamLogUser(username, password);
             if (answer) {
-                createAndStoreCredentialFile(null, username, password, false);
+                createAndStoreCredentialFile(null, username, password, key, false);
             }
             return answer;
         }
