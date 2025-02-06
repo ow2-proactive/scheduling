@@ -232,6 +232,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
             String domain = (String) params.get("domain");
+            byte[] key = (byte[]) params.get("key");
             if (domain != null) {
                 domain = domain.toLowerCase();
             }
@@ -244,7 +245,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            succeeded = logUser(username, password, domain, true);
+            succeeded = logUser(username, password, key, domain, true);
             return succeeded;
 
         } catch (java.io.IOException ioe) {
@@ -266,8 +267,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication or group membership fails.
      */
-    protected boolean logUser(String username, String password, String domain, boolean isNotFallbackAuthentication)
-            throws LoginException {
+    protected boolean logUser(String username, String password, byte[] key, String domain,
+            boolean isNotFallbackAuthentication) throws LoginException {
         updateCache();
         if (isNotFallbackAuthentication) {
             removeOldFailedAttempts(username);
@@ -294,7 +295,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         } else {
             resetFailedAttempt(username);
             if (isNotFallbackAuthentication) {
-                createAndStoreCredentialFile(domain, username, password, false);
+                createAndStoreCredentialFile(domain, username, password, key, false);
             }
         }
 
@@ -533,12 +534,13 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         return pwdChars.stream().collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
     }
 
-    protected void addShadowAccount(String domain, String username) throws LoginException {
+    protected void addShadowAccount(String domain, String username, byte[] key) throws LoginException {
         UserInfo userInfo = new UserInfo();
         userInfo.setLogin(username);
         userInfo.setDomain(domain);
         String rndPassword = generateRandomPassword();
         userInfo.setPassword(rndPassword);
+        userInfo.setKey(key);
         Set<String> groups = new HashSet<>();
         for (Principal principal : subject.getPrincipals()) {
             if (principal instanceof GroupNamePrincipal) {
@@ -590,12 +592,23 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 storeLoginFile(existingUsers);
                 // store as well the account credential file, this will add the shadow credentials to the subject
                 // (this will be used by rm, scheduler or rest server to update the account credentials)
-                createAndStoreCredentialFile(userInfo.getDomain(), userInfo.getLogin(), userInfo.getPassword(), true);
+                createAndStoreCredentialFile(userInfo.getDomain(),
+                                             userInfo.getLogin(),
+                                             userInfo.getPassword(),
+                                             userInfo.getKey(),
+                                             true);
+            } else if (userInfo.getKey() != null) {
+                byte[] newCredentials = addPrivateKeyToCredentials(userInfo.getDomain(),
+                                                                   userInfo.getLogin(),
+                                                                   userInfo.getKey());
+                subject.getPrincipals().add(new ShadowCredentialsPrincipal(userInfo.getLogin(), newCredentials));
             } else {
                 // if an existing shadow account is reused, add shadow credentials to the subject
                 // (this will be used by rm, scheduler or rest server to update the account credentials)
-                subject.getPrincipals().add(new ShadowCredentialsPrincipal(userInfo.getLogin(),
-                                                                           readCredentialsFile(userInfo.getLogin())));
+                subject.getPrincipals()
+                       .add(new ShadowCredentialsPrincipal(userInfo.getLogin(),
+                                                           readCredentialsFile(userInfo.getDomain(),
+                                                                               userInfo.getLogin())));
             }
             if (groupsUpdated) {
                 // if the user groups have been modified store the updated group.cfg file
@@ -668,7 +681,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
 
     }
 
-    protected void createAndStoreCredentialFile(String domain, String username, String password,
+    protected void createAndStoreCredentialFile(String domain, String username, String password, byte[] key,
             boolean isShadowAccount) {
         if (!PASharedProperties.CREATE_CREDENTIALS_WHEN_LOGIN.getValueAsBoolean()) {
             return;
@@ -678,7 +691,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             try {
                 byte[] credentialBytes = createCredentials(Strings.isNullOrEmpty(domain) ? username
                                                                                          : domain + "\\" + username,
-                                                           password);
+                                                           password,
+                                                           key);
 
                 if (isShadowAccount) {
                     subject.getPrincipals().add(new ShadowCredentialsPrincipal(username, credentialBytes));
@@ -693,9 +707,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         }
     }
 
-    private byte[] readCredentialsFile(String username) throws LoginException {
-        File credentialsfile = new File(PASharedProperties.SHARED_HOME.getValueAsString() + "/config/authentication/" +
-                                        username + ".cred");
+    private byte[] readCredentialsFile(String domain, String username) throws LoginException {
+        File credentialsfile = getCredentialsFile(domain, username);
         try {
             return Credentials.getCredentials(credentialsfile.getAbsolutePath()).getBase64();
         } catch (Exception e) {
@@ -703,17 +716,39 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         }
     }
 
+    private byte[] addPrivateKeyToCredentials(String domain, String username, byte[] key) throws LoginException {
+        File credentialsFile = getCredentialsFile(domain, username);
+        try {
+            Credentials originalCredentials = Credentials.getCredentials(credentialsFile.getAbsolutePath());
+            CredData credData = originalCredentials.decrypt(getPrivateKey());
+            credData.setKey(key);
+
+            byte[] credentialBytes = createCredentials(Strings.isNullOrEmpty(domain) ? username
+                                                                                     : domain + "\\" + username,
+                                                       credData.getPassword(),
+                                                       key);
+
+            saveCredentialsFile(domain, username, credentialBytes);
+            return credentialBytes;
+
+        } catch (Exception e) {
+            throw new LoginException("Unable to decrypt credentials file: " + e.getMessage());
+        }
+    }
+
+    private File getCredentialsFile(String domain, String username) {
+        return new File(PASharedProperties.SHARED_HOME.getValueAsString() + "/config/authentication/" + username +
+                        (Strings.isNullOrEmpty(domain) ||
+                         !PASharedProperties.USE_DOMAIN_IN_CREDENTIALS_FILE.getValueAsBoolean() ? ""
+                                                                                                : DOMAIN_SEP + domain) +
+                        ".cred");
+    }
+
     private void saveCredentialsFile(String domain, String username, byte[] credentialBytes) {
         if (!PASharedProperties.CREATE_CREDENTIALS_WHEN_LOGIN.getValueAsBoolean()) {
             return;
         }
-        File credentialsfile = new File(PASharedProperties.SHARED_HOME.getValueAsString() + "/config/authentication/" +
-                                        username +
-                                        (Strings.isNullOrEmpty(domain) ||
-                                         !PASharedProperties.USE_DOMAIN_IN_CREDENTIALS_FILE.getValueAsBoolean() ? ""
-                                                                                                                : DOMAIN_SEP +
-                                                                                                                  domain) +
-                                        ".cred");
+        File credentialsfile = getCredentialsFile(domain, username);
 
         if (credentialsfile.exists() && sameCredentialsBytes(credentialBytes, credentialsfile)) {
             return;
@@ -746,12 +781,13 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         }
     }
 
-    private byte[] createCredentials(String username, String password) throws KeyException {
+    private byte[] createCredentials(String username, String password, byte[] key) throws KeyException {
         PublicKey pubKey = getPublicKey();
 
         Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(username),
                                                                       CredData.parseDomain(username),
-                                                                      password),
+                                                                      password,
+                                                                      key),
                                                          pubKey);
 
         return cred.getBase64();
@@ -769,6 +805,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         private String password;
 
         private String domain;
+
+        private byte[] key;
 
         private Collection<String> groups = Collections.emptyList();
 
@@ -801,6 +839,14 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+
+        public byte[] getKey() {
+            return key;
+        }
+
+        public void setKey(byte[] key) {
+            this.key = key;
         }
 
         public Collection<String> getGroups() {

@@ -145,6 +145,7 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
         String username = credentials.getLogin();
         String password = credentials.getPassword();
         String domain = credentials.getDomain();
+        byte[] key = credentials.getKey();
 
         if (username == null || username.equals("")) {
             throw new LoginException("Bad user name (user is null or empty)");
@@ -165,6 +166,7 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
             //password to check
             params.put("pw", password);
             params.put("domain", domain);
+            params.put("key", key);
 
             //Load LoginContext according to login method defined in jaas.config
             LoginContext lc = new LoginContext(getLoginMethod(), new NoCallbackHandler(params));

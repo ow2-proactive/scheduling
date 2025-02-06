@@ -167,6 +167,7 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
             String domain = (String) params.get("domain");
+            byte[] key = (byte[]) params.get("key");
             if (domain != null) {
                 domain = domain.toLowerCase();
             }
@@ -179,7 +180,7 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            succeeded = logUser(domain, username, password);
+            succeeded = logUser(domain, username, password, key);
             return succeeded;
 
         } catch (IOException ioe) {
@@ -198,13 +199,13 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication and group membership fails.
      */
-    protected boolean logUser(String domain, String username, String password) throws LoginException {
+    protected boolean logUser(String domain, String username, String password, byte[] key) throws LoginException {
         if (Strings.isNullOrEmpty(domain)) {
-            return super.logUser(username, password, null, true);
+            return super.logUser(username, password, key, null, true);
         } else {
             if (ldapDomainConfigurations.containsKey(domain)) {
                 try {
-                    boolean answer = super.logUser(username, password, domain, false);
+                    boolean answer = super.logUser(username, password, key, domain, false);
                     if (answer && Strings.isNullOrEmpty(ldapDomainConfigurations.get(domain).getTenantAttribute())) {
                         subject.getPrincipals().add(new TenantPrincipal(domain));
                     }
@@ -212,7 +213,7 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
                 } catch (LoginException ex) {
                     boolean answer = internalLogUser(domain, username, password);
                     if (answer && ldapDomainConfigurations.get(domain).isShadowUsers()) {
-                        addShadowAccount(domain, username);
+                        addShadowAccount(domain, username, key);
                     }
                     return answer;
                 }

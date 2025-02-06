@@ -189,6 +189,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
             String domain = (String) params.get("domain");
+            byte[] key = (byte[]) params.get("key");
             if (domain != null) {
                 domain = domain.toLowerCase();
             }
@@ -201,7 +202,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            succeeded = logUser(username, password, domain);
+            succeeded = logUser(username, password, key, domain);
             return succeeded;
 
         } catch (java.io.IOException ioe) {
@@ -221,16 +222,16 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication and group membership fails.
      */
-    protected boolean logUser(String username, String password, String domain) throws LoginException {
+    protected boolean logUser(String username, String password, byte[] key, String domain) throws LoginException {
         if (ldapDomainConfiguration.isFallbackUserAuth()) {
             try {
-                return super.logUser(username, password, domain, false);
+                return super.logUser(username, password, key, domain, false);
             } catch (LoginException ex) {
                 boolean answer = internalLogUser(username, password, domain);
                 if (answer && ldapDomainConfiguration.isShadowUsers()) {
-                    addShadowAccount(domain, username);
+                    addShadowAccount(domain, username, key);
                 } else if (answer) {
-                    createAndStoreCredentialFile(domain, username, password, false);
+                    createAndStoreCredentialFile(domain, username, password, key, false);
                 }
                 return answer;
             }
