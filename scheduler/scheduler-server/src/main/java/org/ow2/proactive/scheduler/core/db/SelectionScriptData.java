@@ -25,9 +25,10 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import static org.ow2.proactive.scheduler.core.db.ScriptData.getScriptUrl;
+
 import java.io.Serializable;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -89,7 +90,10 @@ public class SelectionScriptData {
     SelectionScript createSelectionScript() throws InvalidScriptException {
         if (script == null && url != null) {
             try {
-                return new SelectionScript(new URL(url), getScriptEngine(), parameters(), isSelectionScriptDynamic());
+                return new SelectionScript(getScriptUrl(url),
+                                           getScriptEngine(),
+                                           parameters(),
+                                           isSelectionScriptDynamic());
             } catch (MalformedURLException e) {
                 throw new InvalidScriptException(e);
             }
@@ -109,7 +113,7 @@ public class SelectionScriptData {
     protected static void initCommonAttributes(SelectionScriptData scriptData, Script<?> script) {
         scriptData.setScript(script.getScript());
         if (script.getScriptUrl() != null) {
-            scriptData.setURL(script.getScriptUrl().toExternalForm());
+            scriptData.setURL(ScriptData.getDBUrl(script.getScriptUrl()));
         }
         scriptData.setScriptEngine(script.getEngineName());
         if (script.getParameters() != null) {

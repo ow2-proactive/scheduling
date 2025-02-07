@@ -40,6 +40,8 @@ import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -126,7 +128,7 @@ public class ScriptData {
     FlowScript createFlowScriptByURL() throws InvalidScriptException {
         URL inputUrl;
         try {
-            inputUrl = new URL(url);
+            inputUrl = getScriptUrl(url);
         } catch (MalformedURLException e) {
             throw new InvalidScriptException(e);
         }
@@ -165,7 +167,7 @@ public class ScriptData {
     SimpleScript createSimpleScript() throws InvalidScriptException {
         if (script == null && url != null) {
             try {
-                return new SimpleScript(new URL(url), scriptEngine, parameters());
+                return new SimpleScript(getScriptUrl(url), scriptEngine, parameters());
             } catch (MalformedURLException e) {
                 throw new InvalidScriptException(e);
             }
@@ -186,11 +188,35 @@ public class ScriptData {
         scriptData.setScript(script.getScript());
         scriptData.setScriptEngine(script.getEngineName());
         if (script.getScriptUrl() != null) {
-            scriptData.setURL(script.getScriptUrl().toExternalForm());
+            scriptData.setURL(getDBUrl(script.getScriptUrl()));
         }
         if (script.getParameters() != null) {
             scriptData.setScriptParameters(Arrays.asList(script.getParameters()));
         }
+    }
+
+    static String getDBUrl(URL scriptUrl) {
+        String answer = scriptUrl.toExternalForm();
+        String catalogUrl = PASchedulerProperties.CATALOG_REST_URL.getValueAsString();
+        if (PASchedulerProperties.STORE_CATALOG_REF_IN_DB.getValueAsBoolean() && catalogUrl != null &&
+            answer.contains(catalogUrl)) {
+            return answer.replace(catalogUrl, "$" + SchedulerVars.PA_CATALOG_REST_URL.name());
+        }
+        return answer;
+    }
+
+    static URL getScriptUrl(String dbUrl) throws MalformedURLException {
+        String catalogUrl = PASchedulerProperties.CATALOG_REST_URL.getValueAsString();
+        if (PASchedulerProperties.STORE_CATALOG_REF_IN_DB.getValueAsBoolean() &&
+            dbUrl.contains("$" + SchedulerVars.PA_CATALOG_REST_URL.name())) {
+            if (catalogUrl == null) {
+                throw new IllegalStateException("When " + PASchedulerProperties.STORE_CATALOG_REF_IN_DB.getKey() +
+                                                " is set to true, " + PASchedulerProperties.CATALOG_REST_URL.getKey() +
+                                                " must be configured manually.");
+            }
+            return new URL(dbUrl.replace("$" + SchedulerVars.PA_CATALOG_REST_URL.name(), catalogUrl));
+        }
+        return new URL(dbUrl);
     }
 
     @Id
