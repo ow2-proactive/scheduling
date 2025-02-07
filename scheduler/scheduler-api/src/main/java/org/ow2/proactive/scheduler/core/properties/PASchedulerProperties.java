@@ -424,6 +424,13 @@ public enum PASchedulerProperties implements PACommonProperties {
     CATALOG_REST_URL("pa.catalog.rest.url", PropertyType.STRING),
 
     /**
+     * Store script urls in database using a reference to the catalog rest url
+     * If set to true, pa.catalog.rest.url MUST be set manually and not automatically when jetty server starts
+     * This setting should be used in HA Active/Passive configuration to prevent that urls stored in the database contain the wrong server name
+     */
+    STORE_CATALOG_REF_IN_DB("pa.store.catalog.ref.in.db", PropertyType.BOOLEAN, "false"),
+
+    /**
      * Cloud Automation rest url
      * Accessed inside workflows and tasks with the PA_CLOUD_AUTOMATION_REST_URL variable
      */
