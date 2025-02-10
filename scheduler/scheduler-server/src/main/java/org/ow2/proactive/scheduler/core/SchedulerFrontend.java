@@ -32,6 +32,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -67,6 +68,7 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -199,6 +201,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     private SchedulerStatus initialStatus = SchedulerStatus.STARTED;
 
     private PublicKey corePublicKey;
+
+    private PrivateKey corePrivateKey;
 
     private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
 
@@ -363,6 +367,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             ServerJobAndTaskLogs.getInstance().setSpacesSupport(this.spacesSupport);
 
             this.corePublicKey = Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
+            this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
             this.schedulingService = new SchedulingService(infrastructure,
                                                            frontendState,
                                                            recoveredState,
@@ -1403,9 +1408,24 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
                 return eligibleTasks;
             }
             eligibleTasks = (List) taskRetrievedFromPolicy;
+            Map<String, Credentials> cacheCredentials = new HashMap<>();
             for (TaskDescriptor descriptor : eligibleTasks) {
                 InternalTask internalTask = ((EligibleTaskDescriptorImpl) descriptor).getInternal();
                 ((EligibleTaskDescriptorImpl) descriptor).setGenericInformation(internalTask.getRuntimeGenericInformation());
+                if (cacheCredentials.containsKey(internalTask.getOwner())) {
+                    ((EligibleTaskDescriptorImpl) descriptor).setCredentials(cacheCredentials.get(internalTask.getOwner()));
+                } else {
+                    CredData decryptedUserCredentials = internalTask.getCredentials().decrypt(corePrivateKey);
+                    if (PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.isSet() &&
+                        decryptedUserCredentials.getDomain() == null) {
+                        decryptedUserCredentials.setDomain(PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.getValueAsString());
+                    }
+                    enrichWithThirdPartyCredentials(internalTask.getOwner(), decryptedUserCredentials);
+                    Credentials encryptedUserCredentials = Credentials.createCredentials(decryptedUserCredentials,
+                                                                                         corePublicKey);
+                    cacheCredentials.put(internalTask.getOwner(), encryptedUserCredentials);
+                    ((EligibleTaskDescriptorImpl) descriptor).setCredentials(encryptedUserCredentials);
+                }
             }
 
         } catch (Exception e) {
@@ -1416,6 +1436,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             schedulingService.unlockJobsToSchedule(jobMap.values());
         }
         return eligibleTasks;
+    }
+
+    private void enrichWithThirdPartyCredentials(String owner, CredData decryptedUserCredentials) throws KeyException {
+        Map<String, HybridEncryptionUtil.HybridEncryptedData> thirdPartyCredentials = schedulingService.getInfrastructure()
+                                                                                                       .getDBManager()
+                                                                                                       .thirdPartyCredentialsMap(owner);
+        for (Map.Entry<String, HybridEncryptionUtil.HybridEncryptedData> thirdPartyCredential : thirdPartyCredentials.entrySet()) {
+            String decryptedValue = HybridEncryptionUtil.decryptString(thirdPartyCredential.getValue(), corePrivateKey);
+            decryptedUserCredentials.addThirdPartyCredential(thirdPartyCredential.getKey(), decryptedValue);
+        }
     }
 
     /**
