@@ -229,6 +229,10 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
         return credentials;
     }
 
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
+    }
+
     /**
      * Add a parent to the list of parents dependence.
      *
