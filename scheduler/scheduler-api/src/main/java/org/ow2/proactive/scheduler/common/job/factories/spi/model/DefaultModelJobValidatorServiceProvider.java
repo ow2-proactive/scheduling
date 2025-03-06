@@ -36,6 +36,7 @@ import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorService;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
@@ -192,6 +193,11 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
 
             try {
                 new ModelValidator(model).validate(variable.getValue(), context, variable.isHidden());
+            } catch (ValidationException e) {
+                throw new JobValidationException((task != null ? "Task '" + task.getName() + "': " : "") +
+                                                 "Variable '" + variable.getName() + "': " +
+                                                 (e.isHideModel() ? "" : "Model " + variable.getModel() + ": ") +
+                                                 e.getMessage(), e);
             } catch (Exception e) {
                 throw new JobValidationException((task != null ? "Task '" + task.getName() + "': " : "") +
                                                  "Variable '" + variable.getName() + "': Model " + variable.getModel() +

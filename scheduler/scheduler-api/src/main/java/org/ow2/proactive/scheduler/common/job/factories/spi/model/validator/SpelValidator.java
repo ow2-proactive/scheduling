@@ -39,7 +39,14 @@ public class SpelValidator implements Validator<String> {
 
     Expression spelExpression;
 
+    String errorMessage;
+
     public SpelValidator(String spelExpression) {
+        this(null, spelExpression);
+    }
+
+    public SpelValidator(String errorMessage, String spelExpression) {
+        this.errorMessage = errorMessage;
         this.spelExpression = parser.parseExpression(spelExpression);
     }
 
@@ -80,7 +87,11 @@ public class SpelValidator implements Validator<String> {
             }
 
             if (!evaluationResult) {
-                throw new ValidationException("SPEL expression returned false, received " + parameterValue);
+                if (errorMessage != null) {
+                    throw new ValidationException(errorMessage + ", received " + parameterValue, true);
+                } else {
+                    throw new ValidationException("SPEL expression returned false, received " + parameterValue);
+                }
             }
         } catch (EvaluationException e) {
             throw new ValidationException("SPEL expression raised an error: " + e.getMessage(), e);
