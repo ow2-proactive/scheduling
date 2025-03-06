@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions;
 
 public class ValidationException extends Exception {
 
+    private boolean hideModel = false;
+
     public ValidationException() {
         super();
     }
@@ -35,11 +37,25 @@ public class ValidationException extends Exception {
         super(message);
     }
 
+    public ValidationException(String message, boolean hideModel) {
+        super(message);
+        this.hideModel = hideModel;
+    }
+
     public ValidationException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    public ValidationException(String message, boolean hideModel, Throwable cause) {
+        super(message, cause);
+        this.hideModel = hideModel;
+    }
+
     public ValidationException(Throwable cause) {
         super(cause);
+    }
+
+    public boolean isHideModel() {
+        return hideModel;
     }
 }

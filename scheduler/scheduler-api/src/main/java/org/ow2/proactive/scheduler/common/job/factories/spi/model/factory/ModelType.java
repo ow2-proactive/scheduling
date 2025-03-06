@@ -47,6 +47,7 @@ public enum ModelType {
     NOT_EMPTY_STRING(NotEmptyParserValidator.class, String.class),
     REGEXP(RegexpParserValidator.class, String.class),
     SHORT(ShortParserValidator.class, Short.class),
+    SPEL2(SPEL2ParserValidator.class, String.class),
     SPEL(SPELParserValidator.class, String.class),
     URI(URIParserValidator.class, String.class),
     URL(URLParserValidator.class, String.class),
