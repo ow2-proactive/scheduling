@@ -65,6 +65,8 @@ public class ModelValidator implements Validator<String> {
                 validator.parseAndValidate(parameterValue, context, isVariableHidden);
             }
             return parameterValue;
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage(), e.isHideModel(), e);
         } catch (Exception e) {
             throw new ValidationException(e.getMessage(), e);
         }
