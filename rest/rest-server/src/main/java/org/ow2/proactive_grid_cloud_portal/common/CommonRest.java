@@ -171,6 +171,9 @@ public class CommonRest implements CommonRestInterface {
             if (answer.isSchedulerAdminPermission()) {
                 adminRoles.add("Scheduler");
             }
+            if (answer.isAllCatalogPermission()) {
+                adminRoles.add("Catalog");
+            }
             if (answer.isAllJobPlannerPermission()) {
                 adminRoles.add("Job Planner");
             }
