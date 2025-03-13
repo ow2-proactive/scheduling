@@ -91,13 +91,9 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.proactive.utils.JettyStarter;
-import org.ow2.proactive.utils.PAMRRouterStarter;
-import org.ow2.proactive.utils.SecurityPolicyLoader;
-import org.ow2.proactive.utils.Tools;
-import org.ow2.proactive.utils.Version;
+import org.ow2.proactive.utils.*;
 import org.ow2.proactive.web.WebProperties;
+import org.ow2.proactive_grid_cloud_portal.common.CommonRest;
 
 import com.jcraft.jsch.JSch;
 
@@ -265,6 +261,8 @@ public class SchedulerStarter {
             schedulerURL = schedulerAuthenticationInterface.getHostURL();
             schedAuthInter = schedulerAuthenticationInterface;
         }
+
+        CommonRest.setJaasParserInterface(new JAASParser());
 
         if (!commandLine.hasOption(OPTION_NO_REST)) {
             long jettyStartTime = System.nanoTime();

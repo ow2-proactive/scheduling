@@ -86,10 +86,19 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract Set<String> getGroups();
 
     /**
-     *
-     * @return
+     * check if the user has access to all tenants
      */
     public abstract boolean isAllTenantPermission();
+
+    /**
+     * check if the user has the rights to read his groups roles
+     */
+    public abstract boolean isRoleReadPermission();
+
+    /**
+     * check if the user has the rights to modify existing groups/roles (super admin)
+     */
+    public abstract boolean isRoleAdminPermission();
 
     /**
      * Check if the user has all job planner permission

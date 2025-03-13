@@ -39,6 +39,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive_grid_cloud_portal.common.dto.JAASConfiguration;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
@@ -182,6 +183,40 @@ public interface CommonRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     boolean portalAccess(@HeaderParam("sessionid") String sessionId, @PathParam("portal") String portal)
             throws RestException;
+
+    /**
+     * Read existing groups roles
+     *
+     * If the user has the RoleReaderPermission, it will return the roles of the current user's groups
+     * If the user has the RoleAdminPermission, it will return all existing group roles
+     * If the user does not have either of these permissions, it will return an error
+     *
+     * @param sessionId id of a session
+     * @throws RestException if an error occurs or the session is invalid
+     * @return a structure containing the definition of group permissions
+     */
+    @GET
+    @Path("manager/groups")
+    @Produces(MediaType.APPLICATION_JSON)
+    JAASConfiguration permissionManagerGroupsRead(@HeaderParam("sessionid") String sessionId)
+            throws RestException, IOException;
+
+    /**
+     * Write groups roles
+     *
+     * If the user has the RoleAdminPermission, new roles will be written and loaded on the server
+     * If the user does not have this permission, it will return an error
+     *
+     * @param sessionId id of a session
+     * @param configuration the new role configuration
+     * @throws RestException if an error occurs or the session is invalid
+     * @return the new roles configuration
+     */
+    @PUT
+    @Path("manager/groups")
+    @Produces(MediaType.APPLICATION_JSON)
+    JAASConfiguration permissionManagerGroupsWrite(@HeaderParam("sessionid") String sessionId,
+            JAASConfiguration configuration) throws RestException, IOException;
 
     /**
      * Check if a user has admin privilege in notification service.
