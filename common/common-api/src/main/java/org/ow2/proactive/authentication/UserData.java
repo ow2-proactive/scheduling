@@ -61,6 +61,10 @@ public class UserData implements Serializable {
 
     private boolean canCreateAssociationPermission;
 
+    private boolean roleReadPermission;
+
+    private boolean roleAdminPermission;
+
     private boolean pcaAdminPermission;
 
     private boolean notificationAdminPermission;
@@ -151,6 +155,22 @@ public class UserData implements Serializable {
 
     public void setCanCreateAssociationPermission(boolean canCreateAssociationPermission) {
         this.canCreateAssociationPermission = canCreateAssociationPermission;
+    }
+
+    public boolean isRoleReadPermission() {
+        return roleReadPermission;
+    }
+
+    public void setRoleReadPermission(boolean roleReadPermission) {
+        this.roleReadPermission = roleReadPermission;
+    }
+
+    public boolean isRoleAdminPermission() {
+        return roleAdminPermission;
+    }
+
+    public void setRoleAdminPermission(boolean roleAdminPermission) {
+        this.roleAdminPermission = roleAdminPermission;
     }
 
     public boolean isPcaAdminPermission() {

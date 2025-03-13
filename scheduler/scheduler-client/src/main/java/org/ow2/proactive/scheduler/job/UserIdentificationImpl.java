@@ -35,10 +35,7 @@ import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
-import org.ow2.proactive.permissions.NotificationAdminPermission;
-import org.ow2.proactive.permissions.PcaAdminPermission;
-import org.ow2.proactive.permissions.RMCoreAllPermission;
-import org.ow2.proactive.permissions.ServiceRolePermission;
+import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -160,6 +157,24 @@ public class UserIdentificationImpl extends UserIdentification {
     public boolean isAllTenantPermission() {
         try {
             return checkPermission(new TenantAllAccessPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isRoleReadPermission() {
+        try {
+            return checkPermission(new RoleReaderPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isRoleAdminPermission() {
+        try {
+            return checkPermission(new RoleAdminPermission(), "N/A");
         } catch (PermissionException e) {
             return false;
         }

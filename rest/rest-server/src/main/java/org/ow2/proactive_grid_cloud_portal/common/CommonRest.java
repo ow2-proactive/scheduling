@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.common;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 
+import java.io.IOException;
 import java.security.KeyException;
 import java.security.Permission;
 import java.security.PrivilegedAction;
@@ -48,6 +49,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive_grid_cloud_portal.common.dto.JAASConfiguration;
+import org.ow2.proactive_grid_cloud_portal.common.dto.JAASGroup;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
@@ -98,6 +101,8 @@ public class CommonRest implements CommonRestInterface {
 
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
+    private static JAASParserInterface jaasParserInterface = null;
+
     private SchedulerStateRest schedulerRest = null;
 
     private SchedulerRestInterface scheduler() {
@@ -110,6 +115,10 @@ public class CommonRest implements CommonRestInterface {
     private String getUserName(String sessionId) throws NotConnectedRestException {
         Session ss = sessionStore.get(sessionId);
         return ss.getUserName();
+    }
+
+    public static void setJaasParserInterface(JAASParserInterface parser) {
+        jaasParserInterface = parser;
     }
 
     @Override
@@ -158,6 +167,9 @@ public class CommonRest implements CommonRestInterface {
     @Override
     public UserData currentUserData(String sessionId) {
         UserData answer = scheduler().getUserDataFromSessionId(sessionId);
+        if (answer == null) {
+            return null;
+        }
         try {
             List<String> portalPermissions = portalsAccesses(sessionId, new ArrayList<>(PORTAL_NAMES.keySet()));
             answer.setPortalAccessPermission(portalPermissions);
@@ -165,6 +177,9 @@ public class CommonRest implements CommonRestInterface {
                                                                      .map(el -> PORTAL_NAMES.get(el))
                                                                      .collect(toList()));
             List<String> adminRoles = new ArrayList<>();
+            if (answer.isRoleAdminPermission()) {
+                adminRoles.add("Role Manager");
+            }
             if (answer.isRmCoreAllPermission()) {
                 adminRoles.add("Resource Manager");
             }
@@ -210,6 +225,49 @@ public class CommonRest implements CommonRestInterface {
             }
         }
         return answer;
+    }
+
+    @Override
+    public JAASConfiguration permissionManagerGroupsRead(String sessionId) throws RestException, IOException {
+        UserData userData = currentUserData(sessionId);
+        if (userData == null) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+        if (!userData.isRoleAdminPermission() && !userData.isRoleReadPermission()) {
+            throw new PermissionRestException("You don't have necessary rights to read group roles and permissions");
+        }
+        if (jaasParserInterface == null) {
+            throw new RestException("JAAS Parser not initialized");
+        }
+        JAASConfiguration configuration = jaasParserInterface.readJAASConfiguration();
+        if (!userData.isRoleAdminPermission()) {
+            Set<String> userGroups = userData.getGroups();
+            Map<String, JAASGroup> jaasGroups = configuration.getJaasGroups();
+            Map<String, JAASGroup> filteredJaasGroups = jaasGroups.entrySet()
+                                                                  .stream()
+                                                                  .filter(e -> userGroups.contains(e.getKey()))
+                                                                  .collect(Collectors.toMap(Map.Entry::getKey,
+                                                                                            Map.Entry::getValue));
+            configuration.setJaasGroups(filteredJaasGroups);
+        }
+        return configuration;
+    }
+
+    @Override
+    public JAASConfiguration permissionManagerGroupsWrite(String sessionId, JAASConfiguration configuration)
+            throws RestException, IOException {
+        UserData userData = currentUserData(sessionId);
+        if (userData == null) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+        if (!userData.isRoleAdminPermission()) {
+            throw new PermissionRestException("You don't have necessary rights to write group roles and permissions");
+        }
+        if (jaasParserInterface == null) {
+            throw new RestException("JAAS Parser not initialized");
+        }
+        jaasParserInterface.writeJAASConfiguration(configuration);
+        return permissionManagerGroupsRead(sessionId);
     }
 
     @Override

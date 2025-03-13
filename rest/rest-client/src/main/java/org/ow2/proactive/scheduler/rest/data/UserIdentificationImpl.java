@@ -99,6 +99,16 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isRoleReadPermission() {
+        return false;
+    }
+
+    @Override
+    public boolean isRoleAdminPermission() {
+        return false;
+    }
+
+    @Override
     public boolean isCanCreateAssociationPermission() {
         return false;
     }

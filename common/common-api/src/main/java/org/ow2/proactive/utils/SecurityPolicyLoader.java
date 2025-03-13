@@ -29,11 +29,15 @@ import java.security.Policy;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.SecurityManagerConfigurator;
 
 
 public class SecurityPolicyLoader {
+
+    private static final Logger logger = Logger.getLogger(SecurityPolicyLoader.class);
 
     public static void configureSecurityManager(String securityFilePath, long refreshPeriod) {
         SecurityManagerConfigurator.configureSecurityManager(securityFilePath);
@@ -42,10 +46,23 @@ public class SecurityPolicyLoader {
 
             @Override
             public void run() {
-                Policy.getPolicy().refresh();
+                reloadPolicy();
             }
         }, 0, refreshPeriod, TimeUnit.SECONDS);
 
+    }
+
+    public static ReentrantLock lock = new ReentrantLock();
+
+    public static void reloadPolicy() {
+        try {
+            lock.lockInterruptibly();
+            Policy.getPolicy().refresh();
+        } catch (InterruptedException e) {
+            logger.warn("Load policy thread interrupted", e);
+        } finally {
+            lock.unlock();
+        }
     }
 
 }
