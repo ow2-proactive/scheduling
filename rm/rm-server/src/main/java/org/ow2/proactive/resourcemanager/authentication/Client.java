@@ -128,28 +128,38 @@ public class Client implements Serializable {
 
     public Set<String> getGroups() {
         Set<String> answer = new HashSet<>();
-        Set<GroupNamePrincipal> groupPrincipals = subject.getPrincipals(GroupNamePrincipal.class);
-        for (GroupNamePrincipal principal : groupPrincipals) {
-            answer.add(principal.getName());
+        if (subject != null) {
+            Set<GroupNamePrincipal> groupPrincipals = subject.getPrincipals(GroupNamePrincipal.class);
+            for (GroupNamePrincipal principal : groupPrincipals) {
+                answer.add(principal.getName());
+            }
         }
         return answer;
     }
 
     public String getTenant() {
-        Set<TenantPrincipal> tenantPrincipals = subject.getPrincipals(TenantPrincipal.class);
-        if (tenantPrincipals != null && tenantPrincipals.size() > 0) {
-            return tenantPrincipals.iterator().next().getName();
+        if (subject != null) {
+            Set<TenantPrincipal> tenantPrincipals = subject.getPrincipals(TenantPrincipal.class);
+            if (tenantPrincipals != null && tenantPrincipals.size() > 0) {
+                return tenantPrincipals.iterator().next().getName();
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
     }
 
     public String getDomain() {
-        Set<DomainNamePrincipal> domains = subject.getPrincipals(DomainNamePrincipal.class);
-        if (domains == null || domains.size() == 0) {
+        if (subject != null) {
+            Set<DomainNamePrincipal> domains = subject.getPrincipals(DomainNamePrincipal.class);
+            if (domains == null || domains.size() == 0) {
+                return null;
+            }
+            return domains.iterator().next().getName();
+        } else {
             return null;
         }
-        return domains.iterator().next().getName();
     }
 
     /**

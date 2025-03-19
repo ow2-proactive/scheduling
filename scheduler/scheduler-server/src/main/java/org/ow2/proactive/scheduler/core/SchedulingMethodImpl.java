@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl.ALL_TENANTS;
+import static org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl.NO_TENANT;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.PrivateKey;
@@ -42,6 +45,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -212,20 +216,47 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     private void updateNeededNodes() {
-        updateNeededNodes(0);
+        Map<String, Integer> neededNodes = new HashMap<>();
+        neededNodes.put(ALL_TENANTS, 0);
+        neededNodes.put(NO_TENANT, 0);
+        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.getValueAsBoolean() &&
+            PAResourceManagerProperties.RM_JMX_TENANT_NAMES.isSet()) {
+            PAResourceManagerProperties.RM_JMX_TENANT_NAMES.getValueAsList(",")
+                                                           .forEach(tenant -> neededNodes.put(tenant, 0));
+        }
+        updateNeededNodes(neededNodes);
     }
 
-    private int computeNeededNodes(Collection<? extends TaskDescriptor> eligibleByPolicyTasks) {
+    private Map<String, Integer> computeNeededNodes(Collection<? extends TaskDescriptor> eligibleByPolicyTasks) {
+        Map<String, Integer> neededNodes = new HashMap<>();
         // Needed nodes
-        return eligibleByPolicyTasks.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
+        neededNodes.put(ALL_TENANTS,
+                        eligibleByPolicyTasks.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum());
+        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.getValueAsBoolean() &&
+            PAResourceManagerProperties.RM_JMX_TENANT_NAMES.isSet()) {
+            neededNodes.put(NO_TENANT,
+                            eligibleByPolicyTasks.stream()
+                                                 .filter(td -> td.getTenant() == null)
+                                                 .mapToInt(TaskDescriptor::getNumberOfNodesNeeded)
+                                                 .sum());
+            PAResourceManagerProperties.RM_JMX_TENANT_NAMES.getValueAsList(",")
+                                                           .forEach(tenant -> neededNodes.put(tenant,
+                                                                                              eligibleByPolicyTasks.stream()
+                                                                                                                   .filter(td -> td.getTenant() == null ||
+                                                                                                                                 td.getTenant()
+                                                                                                                                   .equals(tenant))
+                                                                                                                   .mapToInt(TaskDescriptor::getNumberOfNodesNeeded)
+                                                                                                                   .sum()));
+        }
+        return neededNodes;
     }
 
-    private void updateNeededNodes(int neededNodes) {
+    private void updateNeededNodes(Map<String, Integer> neededNodes) {
         // for statistics used in RM portal
         getRMProxiesManager().getRmProxy().setNeededNodes(neededNodes);
 
         // for statistics used in Scheduling portal
-        schedulingService.getListener().updateNeededNodes(neededNodes);
+        schedulingService.getListener().updateNeededNodes(neededNodes.get(ALL_TENANTS));
 
     }
 
@@ -335,7 +366,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         schedulingMainLoopTimingLogger.start("updateVariablesForTasksToSchedule");
 
-        int neededNodes = computeNeededNodes(tasksRetrievedFromPolicy);
+        Map<String, Integer> neededNodes = computeNeededNodes(tasksRetrievedFromPolicy);
 
         if (logger.isDebugEnabled()) {
             loggingEligibleTasksDetails(tasksRetrievedFromPolicy);
@@ -460,7 +491,22 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             for (CreateExecutionInfo executionInfo : executionFutures) {
                 try {
                     if (executionInfo.get()) {
-                        neededNodes -= executionInfo.getTaskDescriptor().getNumberOfNodesNeeded();
+                        neededNodes.put(ALL_TENANTS,
+                                        neededNodes.get(ALL_TENANTS) -
+                                                     executionInfo.getTaskDescriptor().getNumberOfNodesNeeded());
+                        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.getValueAsBoolean() &&
+                            PAResourceManagerProperties.RM_JMX_TENANT_NAMES.isSet()) {
+                            String tenant = executionInfo.getTask().getTenant();
+                            if (tenant == null) {
+                                neededNodes.put(NO_TENANT,
+                                                neededNodes.get(NO_TENANT) -
+                                                           executionInfo.getTaskDescriptor().getNumberOfNodesNeeded());
+                            } else {
+                                neededNodes.put(tenant,
+                                                neededNodes.get(tenant) -
+                                                        executionInfo.getTaskDescriptor().getNumberOfNodesNeeded());
+                            }
+                        }
                         numberOfTaskStarted++;
                     } else {
                         releaseNodes(freeResources, executionInfo);

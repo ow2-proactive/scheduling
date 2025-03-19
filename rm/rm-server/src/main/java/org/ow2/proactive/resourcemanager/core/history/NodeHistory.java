@@ -83,6 +83,9 @@ public class NodeHistory {
     @Column(name = "defaultJmxUrl")
     protected String defaultJmxUrl;
 
+    @Column(name = "tenant")
+    protected String tenant;
+
     @Column(name = "USAGE_INFO", length = Integer.MAX_VALUE, nullable = true)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     protected Map<String, String> usageInfo;
@@ -114,6 +117,7 @@ public class NodeHistory {
         defaultJmxUrl = event.getDefaultJMXUrl();
 
         usageInfo = event.getUsageInfo();
+        tenant = event.getTenant();
 
         storeInDataBase = true;
 
@@ -214,5 +218,13 @@ public class NodeHistory {
 
     public void setUsageInfo(Map<String, String> usageInfo) {
         this.usageInfo = usageInfo;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 }

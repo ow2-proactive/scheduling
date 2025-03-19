@@ -103,6 +103,8 @@ public final class RMNodeEvent extends RMEvent {
 
     private final List<String> tokens;
 
+    private final String tenant;
+
     /**
      * ProActive empty constructor
      */
@@ -125,6 +127,7 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeLocker = null;
         this.usageInfo = null;
         this.tokens = null;
+        this.tenant = null;
     }
 
     // for testing purpose RMinitialStateTest
@@ -150,6 +153,7 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeLocker = null;
         this.usageInfo = null;
         this.tokens = null;
+        this.tenant = null;
     }
 
     // for test purpose
@@ -176,6 +180,7 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeLocker = null;
         this.usageInfo = null;
         this.tokens = null;
+        this.tenant = null;
     }
 
     /**
@@ -225,6 +230,7 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeLocker = rmNode.getLockedBy();
         this.usageInfo = rmNode.getUsageInfo();
         this.tokens = rmNode.getTokens();
+        this.tenant = rmNode.getTenant();
     }
 
     public RMNodeEvent(RMEventType eventType, NodeState state) {
@@ -249,6 +255,7 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeState = state;
         this.usageInfo = null;
         this.tokens = null;
+        this.tenant = null;
     }
 
     public RMNodeEvent(RMEventType eventType, NodeState state, NodeState previousState) {
@@ -273,11 +280,16 @@ public final class RMNodeEvent extends RMEvent {
         this.previousNodeState = previousState;
         this.usageInfo = null;
         this.tokens = null;
+        this.tenant = null;
     }
 
     @Override
     public String getKey() {
         return getNodeUrl();
+    }
+
+    public String getTenant() {
+        return tenant;
     }
 
     @Override

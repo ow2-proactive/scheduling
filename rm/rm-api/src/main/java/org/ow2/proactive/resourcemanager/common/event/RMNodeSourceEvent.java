@@ -75,6 +75,8 @@ public class RMNodeSourceEvent extends RMEvent {
 
     private List<String> accessTokens;
 
+    private String tenant;
+
     /**
      * ProActive Empty constructor.
      */
@@ -87,7 +89,7 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription,
             LinkedHashMap<String, String> additionalInformation, String nodeSourceAdmin, String nodeSourceStatus,
-            String infrastructureType, String policyType, String[] accessTokens) {
+            String infrastructureType, String policyType, String[] accessTokens, String tenant) {
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
         this.additionalInformation = new LinkedHashMap<>(additionalInformation);
@@ -96,6 +98,7 @@ public class RMNodeSourceEvent extends RMEvent {
         this.infrastructureType = infrastructureType;
         this.policyType = policyType;
         this.accessTokens = accessTokens != null ? Arrays.asList(accessTokens) : Collections.emptyList();
+        this.tenant = tenant;
     }
 
     /**
@@ -103,7 +106,7 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName, String nodeSourceDescription,
             LinkedHashMap<String, String> additionalInformation, String nodeSourceAdmin, String nodeSourceStatus,
-            String infrastructureType, String policyType, String[] accessTokens) {
+            String infrastructureType, String policyType, String[] accessTokens, String tenant) {
         super(type);
         this.initiator = initiator;
         this.nodeSourceName = nodeSourceName;
@@ -114,6 +117,7 @@ public class RMNodeSourceEvent extends RMEvent {
         this.infrastructureType = infrastructureType;
         this.policyType = policyType;
         this.accessTokens = accessTokens != null ? Arrays.asList(accessTokens) : Collections.emptyList();
+        this.tenant = tenant;
     }
 
     // for testing purpose RMinitialStateTest
@@ -125,6 +129,10 @@ public class RMNodeSourceEvent extends RMEvent {
     @Override
     public String getKey() {
         return getSourceName();
+    }
+
+    public String getTenant() {
+        return tenant;
     }
 
     @Override

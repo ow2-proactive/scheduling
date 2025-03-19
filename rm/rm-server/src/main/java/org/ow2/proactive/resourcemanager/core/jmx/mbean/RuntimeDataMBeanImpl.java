@@ -32,6 +32,7 @@ import javax.management.StandardMBean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.jmx.Chronological;
+import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.utils.RMStatistics;
 
@@ -52,6 +53,8 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      * The reference on the statistics holder.
      */
     protected final RMStatistics rmStatistics;
+
+    protected RRDDataStore dataStore;
 
     /**
      * Creates a new instance of this class.
@@ -212,6 +215,10 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getStatisticHistory()
      */
     public byte[] getStatisticHistory() throws IOException {
-        return RMJMXHelper.getInstance().getDataStore().getBytes();
+        return dataStore.getBytes();
+    }
+
+    public void setDataStore(RRDDataStore dataStore) {
+        this.dataStore = dataStore;
     }
 }

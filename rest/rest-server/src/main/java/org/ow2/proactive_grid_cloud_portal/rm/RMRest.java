@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.rm;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.ow2.proactive.utils.Lambda.mapKeys;
 import static org.ow2.proactive.utils.Lambda.mapValues;
+import static org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.NO_TENANT;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -258,9 +259,18 @@ public class RMRest implements RMRestInterface {
     @Override
     public RMStatistics getStatistics(String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
+        UserData userData = rm.getCurrentUserData();
         RMStatistics statistics = new RMStatistics();
 
-        for (RMNodeEvent node : rm.getMonitoring().getState().getNodeEvents()) {
+        List<RMNodeEvent> nodeEvents = rm.getMonitoring().getState().getNodeEvents();
+
+        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.getValueAsBoolean() && !userData.isAllTenantPermission()) {
+            nodeEvents = nodeEvents.stream()
+                                   .filter(e -> e.getTenant() == null || e.getTenant().equals(userData.getTenant()))
+                                   .collect(Collectors.toList());
+        }
+
+        for (RMNodeEvent node : nodeEvents) {
             switch (node.getNodeState()) {
                 case FREE:
                     statistics.addFreeNode();
@@ -300,15 +310,48 @@ public class RMRest implements RMRestInterface {
     @Override
     public RMStateDelta getRMStateDelta(String sessionId, String clientCounter)
             throws NotConnectedException, PermissionRestException {
-        checkAccess(sessionId);
+        ResourceManager rm = checkAccess(sessionId);
         long counter = Integer.valueOf(clientCounter);
-        return orThrowRpe(RMStateCaching.getRMStateDelta(counter));
+        return orThrowRpe(filterByTenant(rm.getCurrentUserData(), RMStateCaching.getRMStateDelta(counter)));
     }
 
     @Override
     public RMStateFull getRMStateFull(String sessionId) throws NotConnectedException, PermissionRestException {
-        checkAccess(sessionId);
-        return orThrowRpe(RMStateCaching.getRMStateFull());
+        ResourceManager rm = checkAccess(sessionId);
+
+        return orThrowRpe(filterByTenant(rm.getCurrentUserData(), RMStateCaching.getRMStateFull()));
+    }
+
+    private RMStateFull filterByTenant(UserData user, RMStateFull state) {
+        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.getValueAsBoolean() && !user.isAllTenantPermission()) {
+            state.setNodeSource(state.getNodeSource()
+                                     .stream()
+                                     .filter(nse -> nse.getTenant() == null || nse.getTenant().equals(user.getTenant()))
+                                     .collect(Collectors.toList()));
+            state.setNodesEvents(state.getNodesEvents()
+                                      .stream()
+                                      .filter(ne -> ne.getTenant() == null || ne.getTenant().equals(user.getTenant()))
+                                      .collect(Collectors.toList()));
+            return state;
+        } else {
+            return state;
+        }
+    }
+
+    private RMStateDelta filterByTenant(UserData user, RMStateDelta state) {
+        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.getValueAsBoolean() && !user.isAllTenantPermission()) {
+            state.setNodeSource(state.getNodeSource()
+                                     .stream()
+                                     .filter(nse -> nse.getTenant() == null || nse.getTenant().equals(user.getTenant()))
+                                     .collect(Collectors.toList()));
+            state.setNodesEvents(state.getNodesEvents()
+                                      .stream()
+                                      .filter(ne -> ne.getTenant() == null || ne.getTenant().equals(user.getTenant()))
+                                      .collect(Collectors.toList()));
+            return state;
+        } else {
+            return state;
+        }
     }
 
     @Override
@@ -1003,12 +1046,33 @@ public class RMRest implements RMRestInterface {
             InstanceNotFoundException, MalformedObjectNameException, IOException {
 
         String newRange = MBeanInfoViewer.possibleModifyRange(range1, dataSources, 'a');
+        RMProxyUserInterface rm = checkAccess(sessionId);
+        UserData userData = rm.getCurrentUserData();
 
-        StatHistoryCacheEntry entry = StatHistoryCaching.getInstance().getEntryOrCompute(newRange, () -> {
-            RMProxyUserInterface rm = checkAccess(sessionId);
+        StatHistoryCaching caching;
 
-            AttributeList attrs = rm.getMBeanAttributes(new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME),
-                                                        new String[] { "StatisticHistory" });
+        String beanName;
+
+        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.isSet() &&
+            PAResourceManagerProperties.RM_JMX_TENANT_NAMES.isSet()) {
+            if (userData.isAllTenantPermission()) {
+                caching = StatHistoryCaching.getInstance();
+                beanName = RMJMXBeans.RUNTIMEDATA_MBEAN_NAME;
+            } else if (userData.getTenant() == null) {
+                caching = StatHistoryCaching.getTenantInstance(NO_TENANT);
+                beanName = RMJMXBeans.RUNTIMEDATA_MBEAN_NAME + "_" + NO_TENANT;
+            } else {
+                caching = StatHistoryCaching.getTenantInstance(userData.getTenant());
+                beanName = RMJMXBeans.RUNTIMEDATA_MBEAN_NAME + "_" + userData.getTenant();
+            }
+        } else {
+            caching = StatHistoryCaching.getInstance();
+            beanName = RMJMXBeans.RUNTIMEDATA_MBEAN_NAME;
+        }
+
+        StatHistoryCacheEntry entry = caching.getEntryOrCompute(newRange, () -> {
+
+            AttributeList attrs = rm.getMBeanAttributes(new ObjectName(beanName), new String[] { "StatisticHistory" });
 
             Attribute attr = (Attribute) attrs.get(0);
 
@@ -1119,6 +1183,16 @@ public class RMRest implements RMRestInterface {
         ResourceManager rm = checkAccess(sessionId);
 
         List<RMNodeHistory> rawDataFromRM = rm.getNodesHistory(windowStart, windowEnd);
+
+        UserData userData = rm.getCurrentUserData();
+
+        // filter by tenant
+        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.getValueAsBoolean() && !userData.isAllTenantPermission()) {
+            rawDataFromRM = rawDataFromRM.stream()
+                                         .filter(e -> e.getTenant() == null ||
+                                                      e.getTenant().equals(userData.getTenant()))
+                                         .collect(Collectors.toList());
+        }
 
         // grouped by node source name, host name, and node name
         Map<String, Map<String, Map<String, List<RMNodeHistory>>>> grouped = rawDataFromRM.stream()

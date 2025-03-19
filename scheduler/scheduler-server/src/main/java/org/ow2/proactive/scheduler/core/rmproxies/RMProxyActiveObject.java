@@ -368,7 +368,7 @@ public class RMProxyActiveObject {
     }
 
     @ImmediateService
-    public boolean setNeededNodes(int neededNodes) {
+    public boolean setNeededNodes(Map<String, Integer> neededNodes) {
         rm.setNeededNodes(neededNodes);
         return true;
     }

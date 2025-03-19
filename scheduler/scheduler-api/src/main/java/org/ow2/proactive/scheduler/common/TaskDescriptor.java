@@ -104,6 +104,12 @@ public interface TaskDescriptor extends Serializable {
     String getOwner();
 
     /**
+     * Get the owner's tenant
+     * @return tenant
+     */
+    String getTenant();
+
+    /**
      * Get the task owner encrypted credentials
      * @return encrypted credentials
      */

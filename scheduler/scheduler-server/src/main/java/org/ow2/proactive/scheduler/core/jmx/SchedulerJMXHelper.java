@@ -109,7 +109,7 @@ public class SchedulerJMXHelper extends AbstractJMXHelper {
 
             String dataBaseName = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
                                   System.getProperty("file.separator") +
-                                  PASchedulerProperties.SCHEDULER_RRD_DATABASE_NAME.getValueAsString();
+                                  PASchedulerProperties.SCHEDULER_RRD_DATABASE_NAME.getValueAsString() + ".rrd";
 
             FileUtils.forceMkdir(new File(dataBaseName).getParentFile());
             if (PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean()) {

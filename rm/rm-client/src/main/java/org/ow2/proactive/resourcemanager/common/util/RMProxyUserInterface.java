@@ -473,7 +473,7 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
-    public void setNeededNodes(int neededNodes) {
+    public void setNeededNodes(Map<String, Integer> neededNodes) {
         this.target.setNeededNodes(neededNodes);
     }
 

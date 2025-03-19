@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_JMX_TENANT_NAMES;
+
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -80,6 +82,25 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     /** Resource Manager's statistics */
     public static final RMStatistics rmStatistics = new RMStatistics();
+
+    private static final Map<String, RMStatistics> rmStatisticsByTenant = new HashMap<>();
+
+    public static final String NO_TENANT = "NO_TENANT";
+
+    public static final String ALL_TENANTS = "ALL_TENANTS";
+
+    static {
+        if (RM_JMX_TENANT_NAMES.isSet()) {
+            rmStatisticsByTenant.put(NO_TENANT, new RMStatistics());
+            RM_JMX_TENANT_NAMES.getValueAsList(",")
+                               .stream()
+                               .forEach(tenant -> rmStatisticsByTenant.put(tenant, new RMStatistics()));
+        }
+    }
+
+    public static RMStatistics getRmStatistics(String tenant) {
+        return rmStatisticsByTenant.get(tenant);
+    }
 
     // ----------------------------------------------------------------------//
     // CONSTRUTORS
@@ -418,12 +439,29 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         RMMonitoringImpl.rmStatistics.nodeEvent(event);
+        if (!rmStatisticsByTenant.isEmpty()) {
+            String tenant = event.getTenant();
+            if (tenant == null) {
+                // a node event with no tenant must be registered in all statistics
+                rmStatisticsByTenant.values().forEach(rmstats -> rmstats.nodeEvent(event));
+            } else if (!rmStatisticsByTenant.containsKey(tenant)) {
+                logger.error("Event received with tenant " + tenant +
+                             " cannot be handled by the current configuration. Ensure it is defined in " +
+                             RM_JMX_TENANT_NAMES.getKey() + ".");
+            } else {
+                rmStatisticsByTenant.get(tenant).nodeEvent(event);
+            }
+        }
         RMDBManager.getInstance().saveNodeHistory(new NodeHistory(event));
         queueEvent(event);
     }
 
-    public void setNeededNodes(int neededNodes) {
-        RMMonitoringImpl.rmStatistics.setNeededNodes(neededNodes);
+    public void setNeededNodes(Map<String, Integer> neededNodes) {
+        RMMonitoringImpl.rmStatistics.setNeededNodes(neededNodes.get(ALL_TENANTS));
+        if (!rmStatisticsByTenant.isEmpty()) {
+            rmStatisticsByTenant.entrySet()
+                                .forEach(entry -> entry.getValue().setNeededNodes(neededNodes.get(entry.getKey())));
+        }
     }
 
     public int getNeededNodes() {
@@ -442,6 +480,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void rmEvent(RMEvent event) {
         RMMonitoringImpl.rmStatistics.rmEvent(event);
+        if (!rmStatisticsByTenant.isEmpty()) {
+            rmStatisticsByTenant.entrySet().forEach(entry -> entry.getValue().rmEvent(event));
+        }
         queueEvent(event);
     }
 

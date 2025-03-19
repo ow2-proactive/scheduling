@@ -185,6 +185,11 @@ public class NodeSource implements InitActive, RunActive {
     private NodeSourceData nodeSourceData;
 
     /**
+     * Administrator's tenant
+     */
+    private String tenant;
+
+    /**
      * Creates a new instance of NodeSource.
      * This constructor is used by Proactive as one of requirements for active objects.
      */
@@ -200,6 +205,7 @@ public class NodeSource implements InitActive, RunActive {
         monitoring = null;
         descriptor = null;
         additionalInformation = new LinkedHashMap<>();
+        tenant = null;
     }
 
     /**
@@ -248,10 +254,18 @@ public class NodeSource implements InitActive, RunActive {
 
         this.additionalInformation = Optional.ofNullable(nodeSourceDescriptor.getAdditionalInformation())
                                              .orElse(new LinkedHashMap<>());
+
+        this.tenant = administrator.getTenant();
     }
 
+    @ImmediateService
     public AccessType getNodeUserAccessType() {
         return nodeUserAccessType;
+    }
+
+    @ImmediateService
+    public String getTenant() {
+        return tenant;
     }
 
     public static void initThreadPools() {
@@ -646,7 +660,8 @@ public class NodeSource implements InitActive, RunActive {
                                                                   this.getStatus().toString(),
                                                                   this.getDescriptor().getInfrastructureType(),
                                                                   this.getDescriptor().getPolicyType(),
-                                                                  this.nodeUserAccessType.getTokens()));
+                                                                  this.nodeUserAccessType.getTokens(),
+                                                                  this.administrator.getTenant()));
         }
     }
 
@@ -959,6 +974,7 @@ public class NodeSource implements InitActive, RunActive {
      * Gets the nodes size excluding down nodes.
      * @return the node size
      */
+    @ImmediateService
     public int getNodesCount() {
         return this.nodes.values().size();
     }
@@ -1095,6 +1111,7 @@ public class NodeSource implements InitActive, RunActive {
         return this.registrationURL;
     }
 
+    @ImmediateService
     public RMNodeSourceEvent createNodeSourceEvent() {
         return new RMNodeSourceEvent(this.name,
                                      getDescription(),
@@ -1103,6 +1120,7 @@ public class NodeSource implements InitActive, RunActive {
                                      this.getStatus().toString(),
                                      this.descriptor.getInfrastructureType(),
                                      this.descriptor.getPolicyType(),
-                                     this.nodeUserAccessType.getTokens());
+                                     this.nodeUserAccessType.getTokens(),
+                                     this.administrator.getTenant());
     }
 }

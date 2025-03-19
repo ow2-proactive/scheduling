@@ -69,7 +69,7 @@ public class JAASParserTest extends ProActiveTestClean {
                                                      of("studio", true),
                                                      of("automation-dashboard", false),
                                                      of("workflow-execution", false),
-                                                     of("catalog", false),
+                                                     of("catalog-portal", false),
                                                      of("health-dashboard", false),
                                                      of("job-analytics", false),
                                                      of("job-gantt", false),

@@ -70,6 +70,8 @@ public final class RMNodeDescriptor {
 
     private Set<String> tags;
 
+    private String tenant;
+
     public String getNodeURL() {
         return nodeURL;
     }
@@ -212,5 +214,13 @@ public final class RMNodeDescriptor {
 
     public void setTags(Set<String> tags) {
         this.tags = tags;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 }

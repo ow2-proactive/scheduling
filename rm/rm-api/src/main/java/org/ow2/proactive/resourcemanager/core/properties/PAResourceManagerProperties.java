@@ -116,6 +116,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Resource Manager home directory */
     RM_HOME("pa.rm.home", PropertyType.STRING, "."),
 
+    /** Filter resource manager by tenant **/
+    RM_FILTER_BY_TENANT("pa.rm.tenant.filter", PropertyType.BOOLEAN, "false"),
+
     /** Path to the Jaas configuration file which defines what modules are available for
      * internal authentication */
     RM_AUTH_JAAS_PATH("pa.rm.auth.jaas.path", PropertyType.STRING, "config/authentication/jaas.config"),
@@ -165,8 +168,11 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Port of the JMX service. Random if not set */
     RM_JMX_PORT("pa.rm.jmx.port", PropertyType.INTEGER, "5822"),
 
+    /** Name of tenants to differentiate resource manager statistics history. Must be set when pa.rm.tenant.filter is true **/
+    RM_JMX_TENANT_NAMES("pa.rm.jmx.tenant.names", PropertyType.LIST),
+
     /** RRD data base with statistic history */
-    RM_RRD_DATABASE_NAME("pa.rm.jmx.rrd.name", PropertyType.STRING, "data/rm_statistics.rrd"),
+    RM_RRD_DATABASE_NAME("pa.rm.jmx.rrd.name", PropertyType.STRING, "data/rm_statistics"),
 
     /** RRD data base step in seconds */
     RM_RRD_STEP("pa.rm.jmx.rrd.step", PropertyType.INTEGER, "4"),

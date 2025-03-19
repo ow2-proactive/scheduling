@@ -74,6 +74,9 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     /** owner of this task **/
     private String owner;
 
+    /** owner's tenant **/
+    private String tenant;
+
     /** task owner credentials **/
     private Credentials credentials;
 
@@ -97,6 +100,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
         this.numberOfNodesNeeded = td.getNumberOfNodesNeeded();
         this.genericInformation = td.getRuntimeGenericInformation();
         this.owner = td.getOwner();
+        this.tenant = td.getTenant();
         this.credentials = td.getCredentials();
     }
 
@@ -222,6 +226,11 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     @Override
     public String getOwner() {
         return owner;
+    }
+
+    @Override
+    public String getTenant() {
+        return tenant;
     }
 
     @Override
