@@ -650,10 +650,10 @@ public interface ResourceManager extends ServiceUsingPermission {
 
     /**
      * Set the amount of nodes currently needed by the resource manager
-     * @param neededNodes number of nodes needed
+     * @param neededNodes number of nodes needed (by tenant when configured)
      */
     @RoleWrite
-    void setNeededNodes(int neededNodes);
+    void setNeededNodes(Map<String, Integer> neededNodes);
 
     /**
      * Return the associations of infrastructures and policy

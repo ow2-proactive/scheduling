@@ -216,7 +216,7 @@ public class RMProxy {
         }
     }
 
-    public boolean setNeededNodes(int neededNodes) {
+    public boolean setNeededNodes(Map<String, Integer> neededNodes) {
         if (proxyActiveObject != null) {
             return proxyActiveObject.setNeededNodes(neededNodes);
         } else {

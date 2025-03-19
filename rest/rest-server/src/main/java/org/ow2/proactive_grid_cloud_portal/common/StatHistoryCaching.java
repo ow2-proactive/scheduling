@@ -27,6 +27,7 @@ package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.management.InstanceNotFoundException;
@@ -35,6 +36,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ReflectionException;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 
 
@@ -53,6 +55,8 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 public class StatHistoryCaching {
 
     private static final Logger LOGGER = Logger.getLogger(StatHistoryCaching.class);
+
+    public static final String NO_TENANT = "NO_TENANT";
 
     // invalidate entry after MAX_DURATION millis
     private static final long MAX_DURATION = 5000;
@@ -88,6 +92,18 @@ public class StatHistoryCaching {
 
     private static StatHistoryCaching instance = null;
 
+    private static final Map<String, StatHistoryCaching> tenantInstances = new HashMap<>();
+
+    static {
+        if (PAResourceManagerProperties.RM_FILTER_BY_TENANT.getValueAsBoolean() &&
+            PAResourceManagerProperties.RM_JMX_TENANT_NAMES.isSet()) {
+            tenantInstances.put(NO_TENANT, new StatHistoryCaching());
+            PAResourceManagerProperties.RM_JMX_TENANT_NAMES.getValueAsList(",")
+                                                           .forEach(tenant -> tenantInstances.put(tenant,
+                                                                                                  new StatHistoryCaching()));
+        }
+    }
+
     private StatHistoryCaching() {
         this.statHistoryCache = new HashMap<>();
     }
@@ -96,6 +112,10 @@ public class StatHistoryCaching {
         if (instance == null)
             instance = new StatHistoryCaching();
         return instance;
+    }
+
+    public static StatHistoryCaching getTenantInstance(String tenant) {
+        return tenantInstances.get(tenant);
     }
 
     /**

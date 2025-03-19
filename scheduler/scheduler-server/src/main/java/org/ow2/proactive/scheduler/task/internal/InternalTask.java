@@ -159,6 +159,10 @@ public abstract class InternalTask extends TaskState {
         return internalJob.getOwner();
     }
 
+    public String getTenant() {
+        return internalJob.getTenant();
+    }
+
     public Credentials getCredentials() {
         return internalJob.getCredentials();
     }

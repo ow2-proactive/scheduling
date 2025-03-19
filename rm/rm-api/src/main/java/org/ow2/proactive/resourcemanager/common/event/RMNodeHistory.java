@@ -53,6 +53,8 @@ public class RMNodeHistory implements Serializable {
 
     protected Map<String, String> usageInfo;
 
+    protected String tenant;
+
     public RMNodeHistory() {
     }
 
@@ -134,5 +136,13 @@ public class RMNodeHistory implements Serializable {
 
     public void setUsageInfo(Map<String, String> usageInfo) {
         this.usageInfo = usageInfo;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 }

@@ -249,9 +249,9 @@ public abstract class SelectionManager {
         // can throw Exception if topology is disabled
         TopologyHandler handler = RMCore.topologyManager.getHandler(criteria.getTopology());
 
-        int totalNumberOfAliveNodesRightNow = rmcore.getTotalAliveNodesNumber();
+        int totalNumberOfAliveNodesRightNow = rmcore.getTotalAliveNodesNumber(client);
 
-        List<RMNode> freeNodes = rmcore.getFreeNodes();
+        List<RMNode> freeNodes = rmcore.getFreeNodes(client);
         // filtering out the "free node list"
         // removing exclusion and checking permissions
         List<RMNode> filteredNodes = filterOut(freeNodes, criteria, client);

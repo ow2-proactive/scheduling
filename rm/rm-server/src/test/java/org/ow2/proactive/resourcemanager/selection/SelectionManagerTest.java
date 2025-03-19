@@ -92,7 +92,7 @@ public class SelectionManagerTest {
         ArrayList<RMNode> freeNodes = new ArrayList<>();
         freeNodes.add(createMockedNode("admin"));
         freeNodes.add(createMockedNode("user"));
-        when(rmCore.getFreeNodes()).thenReturn(freeNodes);
+        when(rmCore.getFreeNodes(any())).thenReturn(freeNodes);
 
         Criteria criteria = new Criteria(2);
         criteria.setTopology(TopologyDescriptor.ARBITRARY);
@@ -233,7 +233,7 @@ public class SelectionManagerTest {
             for (int i = 0; i < nbNodes; i++) {
                 freeNodes.add(createMockedNode("user", "mocked-node-" + (i + 1), "mocked-node-" + (i + 1)));
             }
-            when(mockedRMCore.getFreeNodes()).thenReturn(freeNodes);
+            when(mockedRMCore.getFreeNodes(any())).thenReturn(freeNodes);
         }
 
         return mockedRMCore;

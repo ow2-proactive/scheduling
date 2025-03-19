@@ -122,7 +122,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_JMX_PORT("pa.scheduler.core.jmx.port", PropertyType.INTEGER, "5822"),
 
     /** RRD data base with statistic history */
-    SCHEDULER_RRD_DATABASE_NAME("pa.scheduler.jmx.rrd.name", PropertyType.STRING, "data/scheduler_statistics.rrd"),
+    SCHEDULER_RRD_DATABASE_NAME("pa.scheduler.jmx.rrd.name", PropertyType.STRING, "data/scheduler_statistics"),
 
     /** RRD data base step in seconds */
     SCHEDULER_RRD_STEP("pa.scheduler.jmx.rrd.step", PropertyType.INTEGER, "4"),

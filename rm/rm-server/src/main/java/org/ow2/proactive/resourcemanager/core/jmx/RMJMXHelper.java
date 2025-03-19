@@ -25,13 +25,13 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx;
 
+import static org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl.NO_TENANT;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectName;
-import javax.management.StandardMBean;
+import javax.management.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -93,18 +93,27 @@ public final class RMJMXHelper extends AbstractJMXHelper {
     public void registerMBeans(final MBeanServer mbs) {
         // Register all mbeans into the server
         try {
-            final RuntimeDataMBean anonymMBean = new RuntimeDataMBeanImpl(RMMonitoringImpl.rmStatistics);
+            final RuntimeDataMBeanImpl anonymMBean = new RuntimeDataMBeanImpl(RMMonitoringImpl.rmStatistics);
             // Uniquely identify the MBean and register it to the MBeanServer
             final ObjectName name = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME);
             mbs.registerMBean(anonymMBean, name);
 
-            String dataBaseName = PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
+            String dataBaseName = PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString() +
+                                                                              ".rrd");
             FileUtils.forceMkdir(new File(dataBaseName).getParentFile());
+            RRDDataStore dataStore = new RRDDataStore((StandardMBean) anonymMBean,
+                                                      dataBaseName,
+                                                      PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(),
+                                                      Logger.getLogger(RMJMXHelper.class));
+            anonymMBean.setDataStore(dataStore);
+            if (PAResourceManagerProperties.RM_JMX_TENANT_NAMES.isSet()) {
+                registerTenantMBean(NO_TENANT, mbs);
 
-            setDataStore(new RRDDataStore((StandardMBean) anonymMBean,
-                                          dataBaseName,
-                                          PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(),
-                                          Logger.getLogger(RMJMXHelper.class)));
+                for (String tenant : PAResourceManagerProperties.RM_JMX_TENANT_NAMES.getValueAsList(",")) {
+                    registerTenantMBean(tenant, mbs);
+                }
+            }
+            setDataStore(dataStore);
         } catch (Exception e) {
             LOGGER.error("Unable to register the ResourceManagerRuntimeMBean", e);
         }
@@ -135,6 +144,20 @@ public final class RMJMXHelper extends AbstractJMXHelper {
         } catch (Exception e) {
             LOGGER.error("Unable to register the ManagementMBean", e);
         }
+    }
+
+    private void registerTenantMBean(String tenant, MBeanServer mbs) throws NotCompliantMBeanException,
+            MalformedObjectNameException, InstanceAlreadyExistsException, MBeanRegistrationException, IOException {
+        final RuntimeDataMBeanImpl anonymTenantMBean = new RuntimeDataMBeanImpl(RMMonitoringImpl.getRmStatistics(tenant));
+        final ObjectName tenantMBeanName = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME + "_" + tenant);
+        mbs.registerMBean(anonymTenantMBean, tenantMBeanName);
+        String tenantDataBaseName = PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString() +
+                                                                                "_" + tenant + ".rrd");
+        RRDDataStore tenantDataStore = new RRDDataStore((StandardMBean) anonymTenantMBean,
+                                                        tenantDataBaseName,
+                                                        PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(),
+                                                        Logger.getLogger(RMJMXHelper.class));
+        anonymTenantMBean.setDataStore(tenantDataStore);
     }
 
     /**

@@ -97,6 +97,8 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
 
     protected Map<String, String> usageInfo;
 
+    protected String tenant;
+
     public AbstractRMNode() {
         this.nodeName = null;
         this.nodeURL = null;
@@ -114,6 +116,9 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         this.nodeName = nodeName;
         this.nodeURL = nodeURL;
         this.provider = provider;
+        if (provider != null) {
+            this.tenant = provider.getTenant();
+        }
     }
 
     public void copyLockStatusFrom(RMNode node) {
@@ -352,6 +357,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         rmNodeDescriptor.setUsageInfo(getUsageInfo());
         rmNodeDescriptor.setTokens(getNodeTokens());
         rmNodeDescriptor.setTags(getNodeTags());
+        rmNodeDescriptor.setTenant(getTenant());
         return rmNodeDescriptor;
     }
 
@@ -378,5 +384,10 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
     @Override
     public void setStateChangeTime(long time) {
         this.stateChangeTime = time;
+    }
+
+    @Override
+    public String getTenant() {
+        return tenant;
     }
 }
