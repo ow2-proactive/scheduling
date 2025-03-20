@@ -1,27 +1,21 @@
-// SCHEDULER AND RESOURCE MANAGER CLIENTS POLICY
-//
-// USERS PERMISSIONS (EXAMPLE)
-//
-//grant principal org.ow2.proactive.authentication.principals.UserNamePrincipal "user" {
-//    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "scheduler,rm";
-//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
-//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
-//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.releaseNode";
-//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.releaseNodes";
-//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodePermission";
-//    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.checkNodeSourcePermission";
-//};
-
-//
-// GROUPS PERMISSIONS
-//
-// Members of "guest" group can get/free nodes and monitor the state submit jobs
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "guests" {
+    // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "automation-dashboard,workflow-execution";
 
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    // ****** Scheduler permissions ******
+    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
 
+    // ****** Resource Manager permissions ******
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
+
+    // ****** User and Global Space permissions ******
+
+
+    // ****** JMX permissions ******
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -31,16 +25,10 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+
+    // ****** Default permissions ******
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
-
-	// --------------------------- scheduling related permission
-	//use the following line to allow a user to download full scheduler state and get events from any user
-	//"true" means that this user can get only its job in the state and listen for its events
-	//"false" means user can get full state and listen for any events.
-    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
 
     // API - access to database
     permission java.sql.SQLPermission "setLog";
@@ -49,69 +37,49 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "setNetworkTimeout";
     permission java.util.PropertyPermission "*", "read, write";
     permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
 };
 
-// Members of "user" group can get/free nodes and monitor the state, submit jobs and see jobs of other people
+
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "user" {
+    // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
 
-    // AuthPermission is requires for those who would like to access any mbean
-    permission javax.security.auth.AuthPermission "getSubject";
-    permission java.lang.RuntimePermission "setContextClassLoader";
-    permission javax.management.MBeanPermission "-#-[-]", "queryNames";
-    permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
-    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
-    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
-    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
-    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
-    // Granting file reading permission i.e. to read RRD database via JMX
-    permission java.io.FilePermission "<<ALL FILES>>", "read";
-
-	// --------------------------- scheduling related permission
-	//use the following line to allow a user to download full scheduler state and get events from any user
-	//"true" means that this user can get only its job in the state and listen for its events
-	//"false" means user can get full state and listen for any events.
+    // ****** Scheduler permissions ******
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.write";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
 
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
+    // ****** Resource Manager permissions ******
 
-    // API - access to database
-    permission java.sql.SQLPermission "setLog";
-    permission java.sql.SQLPermission "callAbort";
-    permission java.sql.SQLPermission "setSyncFactory";
-    permission java.sql.SQLPermission "setNetworkTimeout";
-    permission java.util.PropertyPermission "*", "read, write";
-    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
-};
-
-
-// Resource providers have the same permissions as users + an ability to add remove node
-grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "providers" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "rm";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.provider";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
 
+    // ****** User and Global Space permissions ******
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
+
+    // ****** JMX permissions ******
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
     permission java.lang.RuntimePermission "setContextClassLoader";
     permission javax.management.MBeanPermission "-#-[-]", "queryNames";
     permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
+    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
 
+    // ****** Default permissions ******
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
 
@@ -122,20 +90,123 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "setNetworkTimeout";
     permission java.util.PropertyPermission "*", "read, write";
     permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
 };
 
-// Members of "nsadmins" can create/remove node sources (according to their policies)
+grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "scheduler" {
+    // ****** Global permissions ******
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
+    permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
+
+    // ****** Scheduler permissions ******
+    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
+    permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.write";
+
+    // ****** Resource Manager permissions ******
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
+
+    // ****** User and Global Space permissions ******
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
+
+    // ****** JMX permissions ******
+    // AuthPermission is requires for those who would like to access any mbean
+    permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
+    permission javax.management.MBeanPermission "-#-[-]", "queryNames";
+    permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
+    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+
+    // ****** Default permissions ******
+    // Granting file reading permission i.e. to read RRD database via JMX
+    permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
+};
+
+
+grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "providers" {
+    // ****** Global permissions ******
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "rm";
+
+    // ****** Scheduler permissions ******
+
+    // ****** Resource Manager permissions ******
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.provider";
+
+    // ****** User and Global Space permissions ******
+
+
+    // ****** JMX permissions ******
+    // AuthPermission is requires for those who would like to access any mbean
+    permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
+    permission javax.management.MBeanPermission "-#-[-]", "queryNames";
+    permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
+    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+
+    // ****** Default permissions ******
+    // Granting file reading permission i.e. to read RRD database via JMX
+    permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
+};
+
+
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "nsadmins" {
+    // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "rm";
     permission org.ow2.proactive.permissions.PcaAdminPermission;
+
+    // ****** Scheduler permissions ******
+
+    // ****** Resource Manager permissions ******
     permission org.ow2.proactive.permissions.NSAdminPermission;
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.provider";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.nsadmin";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+
+    // ****** User and Global Space permissions ******
 
 
+    // ****** JMX permissions ******
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -144,6 +215,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
 
+    // ****** Default permissions ******
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
 
@@ -154,21 +226,26 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "setNetworkTimeout";
     permission java.util.PropertyPermission "*", "read, write";
     permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
 };
 
-// Members of "rmcoreadmins" can call any method of rmcore
-grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "rmcoreadmins" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "rm";
 
+grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "rmcoreadmins" {
+    // ****** Global permissions ******
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "rm";
     permission org.ow2.proactive.permissions.PcaAdminPermission;
+
+    // ****** Scheduler permissions ******
+
+    // ****** Resource Manager permissions ******
+    permission org.ow2.proactive.permissions.RMCoreAllPermission;
 
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.*";
 
-    permission org.ow2.proactive.permissions.RMCoreAllPermission;
+    // ****** User and Global Space permissions ******
 
-    // the following permission is disabled by default to enforce node selection restrictions for admins
-    // permission org.ow2.proactive.permissions.NodeUserAllPermission;
 
+    // ****** JMX permissions ******
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -179,6 +256,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.AllAccountsMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBeanImpl#*[*:*]", "*";
 
+    // ****** Default permissions ******
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
 
@@ -189,36 +267,40 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "setNetworkTimeout";
     permission java.util.PropertyPermission "*", "read, write";
     permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
 };
 
-// Members of "scheduleradmins" can call any method of the scheduler
+
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "scheduleradmins" {
+    // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
-
+    permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
     permission org.ow2.proactive.permissions.PcaAdminPermission;
-    // Notification service administrator permission
     permission org.ow2.proactive.permissions.NotificationAdminPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
+    permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
 
-    //use the following line to allow a user to download full scheduler state and get events from any user
-    //"true" means that this user can get only its job in the state and listen for its events
-    //"false" means user can get full state and listen for any events.
+    // ****** Scheduler permissions ******
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "false";
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "0,1,2,3,4,5";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
     permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
     permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
-    permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
-    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
-    permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
+    // ****** Resource Manager permissions ******
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
 
+    // ****** User and Global Space permissions ******
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
+
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
 
+    // ****** JMX permissions ******
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -231,7 +313,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
 
-
+    // ****** Default permissions ******
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
 
@@ -242,41 +324,40 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "setNetworkTimeout";
     permission java.util.PropertyPermission "*", "read, write";
     permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
 };
 
-// Members of "server-admins" act as administrators of both the resource manager and scheduler
+
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "server-admins" {
+    // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
-
-    permission org.ow2.proactive.permissions.PcaAdminPermission;
-
-    // Notification service administrator permission
-    permission org.ow2.proactive.permissions.NotificationAdminPermission;
-
-    //use the following line to allow a user to download full scheduler state and get events from any user
-    //"true" means that this user can get only its job in the state and listen for its events
-    //"false" means user can get full state and listen for any events.
-    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "false";
-    permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "0,1,2,3,4,5";
-    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
-    permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
-    permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
+    permission org.ow2.proactive.permissions.RoleAdminPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+    permission org.ow2.proactive.permissions.PcaAdminPermission;
+    permission org.ow2.proactive.permissions.NotificationAdminPermission;
     permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.scheduler.permissions.CatalogAllAccessPermission;
+
+    // ****** Scheduler permissions ******
+    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "false";
+    permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "0,1,2,3,4,5";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
+    permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
+    permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
+    // ****** Resource Manager permissions ******
+    permission org.ow2.proactive.permissions.RMCoreAllPermission;
 
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.*";
 
-    permission org.ow2.proactive.permissions.RMCoreAllPermission;
+    // ****** User and Global Space permissions ******
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
 
-    // the following permission is disabled by default to enforce node selection restrictions for admins
-    // permission org.ow2.proactive.permissions.NodeUserAllPermission;
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
 
+    // ****** JMX permissions ******
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -291,6 +372,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.AllAccountsMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBeanImpl#*[*:*]", "*";
 
+    // ****** Default permissions ******
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
 
@@ -301,48 +383,42 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "setNetworkTimeout";
     permission java.util.PropertyPermission "*", "read, write";
     permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
 };
 
-// Members of "admin" group possess permissions to perform any actions
-grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "admin" {
-    permission org.ow2.proactive.permissions.AllPermission;
 
-    // API - access to database
-    permission java.sql.SQLPermission "setLog";
-    permission java.sql.SQLPermission "callAbort";
-    permission java.sql.SQLPermission "setSyncFactory";
-    permission java.sql.SQLPermission "setNetworkTimeout";
-    permission java.util.PropertyPermission "*", "read, write";
-    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
-};
-
-// Members of "watchers" group have only a read access to the scheduler and RM state
-// and the authorization to register a listener in order to receive updates of the scheduler state
-grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "watchers" {
+grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "subadmin" {
+    // ****** Global permissions ******
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
+    permission org.ow2.proactive.permissions.RoleReaderPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    permission org.ow2.proactive.permissions.PcaAdminPermission;
+    permission org.ow2.proactive.permissions.NotificationAdminPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
+    permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
+
+    // ****** Scheduler permissions ******
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "false";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
+    permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "0,1,2,3,4,5";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
+    permission org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
+    permission org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.*";
 
-    // API - access to database
-    permission java.sql.SQLPermission "setLog";
-    permission java.sql.SQLPermission "callAbort";
-    permission java.sql.SQLPermission "setSyncFactory";
-    permission java.sql.SQLPermission "setNetworkTimeout";
-    permission java.util.PropertyPermission "*", "read, write";
-    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
-};
+    // ****** Resource Manager permissions ******
+    permission org.ow2.proactive.permissions.RMCoreAllPermission;
 
-// Data scientist permissions
-grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "citizen-ds" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,catalog-portal,workflow-execution,job-analytics";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.*";
 
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    // ****** User and Global Space permissions ******
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
 
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
+
+    // ****** Advanced permissions ******
+    permission org.ow2.proactive.permissions.DeniedMethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.executeScript";
+
+    // ****** JMX permissions ******
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -350,45 +426,127 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
     permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.AllAccountsMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.ManagementMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.AllAccountsMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBeanImpl#*[*:*]", "*";
+
+    // ****** Default permissions ******
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
 
-    // --------------------------- scheduling related permission
-    //use the following line to allow a user to download full scheduler state and get events from any user
-    //"true" means that this user can get only its job in the state and listen for its events
-    //"false" means user can get full state and listen for any events.
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
+};
+
+
+grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "admin" {
+    // ****** Global permissions ******
+    permission org.ow2.proactive.permissions.AllPermission;
+
+    // ****** Scheduler permissions ******
+
+    // ****** Resource Manager permissions ******
+
+
+    // ****** User and Global Space permissions ******
+
+
+    // ****** JMX permissions ******
+    // AuthPermission is requires for those who would like to access any mbean
+    permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
+    permission javax.management.MBeanPermission "-#-[-]", "queryNames";
+    permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
+
+    // ****** Default permissions ******
+    // Granting file reading permission i.e. to read RRD database via JMX
+    permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
+};
+
+
+grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "watchers" {
+    // ****** Global permissions ******
+    permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
+
+    // ****** Scheduler permissions ******
+    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "false";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
+
+    // ****** Resource Manager permissions ******
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
+
+    // ****** User and Global Space permissions ******
+
+
+    // ****** JMX permissions ******
+    // AuthPermission is requires for those who would like to access any mbean
+    permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
+    permission javax.management.MBeanPermission "-#-[-]", "queryNames";
+    permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
+
+    // ****** Default permissions ******
+    // Granting file reading permission i.e. to read RRD database via JMX
+    permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
+};
+
+
+grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "citizen-ds" {
+    // ****** Global permissions ******
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,workflow-execution,catalog-portal,job-analytics";
+
+    // ****** Scheduler permissions ******
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
-    //required to set job priority to normal
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
     permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
-
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.write";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
 
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
+    // ****** Resource Manager permissions ******
 
-    // API - access to database
-    permission java.sql.SQLPermission "setLog";
-    permission java.sql.SQLPermission "callAbort";
-    permission java.sql.SQLPermission "setSyncFactory";
-    permission java.sql.SQLPermission "setNetworkTimeout";
-    permission java.util.PropertyPermission "*", "read, write";
-    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
-};
-
-grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "expert-ds" {
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,scheduler,catalog-portal,workflow-execution,service-automation,job-analytics,job-gantt,job-planner-calendar-def,job-planner-calendar-def-workflows,job-planner-execution-planning,job-planner-gantt-chart,notification-portal";
-
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
     permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
 
+    // ****** User and Global Space permissions ******
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
+
+    // ****** JMX permissions ******
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -398,25 +556,10 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+
+    // ****** Default permissions ******
     // Granting file reading permission i.e. to read RRD database via JMX
     permission java.io.FilePermission "<<ALL FILES>>", "read";
-
-    // --------------------------- scheduling related permission
-    //use the following line to allow a user to download full scheduler state and get events from any user
-    //"true" means that this user can get only its job in the state and listen for its events
-    //"false" means user can get full state and listen for any events.
-    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "false";
-    permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "0,1,2,3,4";
-    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
-    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
-    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
-
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.write";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
-
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
-    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
 
     // API - access to database
     permission java.sql.SQLPermission "setLog";
@@ -425,13 +568,67 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission java.sql.SQLPermission "setNetworkTimeout";
     permission java.util.PropertyPermission "*", "read, write";
     permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
 };
+
+
+grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "expert-ds" {
+    // ****** Global permissions ******
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "scheduler,studio,workflow-execution,catalog-portal,job-analytics,job-gantt,job-planner-calendar-def,job-planner-calendar-def-workflows,job-planner-execution-planning,job-planner-gantt-chart,service-automation,notification-portal";
+    permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
+
+    // ****** Scheduler permissions ******
+    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
+    permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "0,1,2,3,4";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission "";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithBucketNamePermission "";
+    permission org.ow2.proactive.scheduler.permissions.HandleJobsWithGroupNamePermission "";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.read";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.write";
+
+    // ****** Resource Manager permissions ******
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.basic";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.read";
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive.resourcemanager.core.RMCore.write";
+
+    // ****** User and Global Space permissions ******
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.user.*";
+
+    permission org.ow2.proactive.permissions.ServiceRolePermission "org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl.global.*";
+
+    // ****** JMX permissions ******
+    // AuthPermission is requires for those who would like to access any mbean
+    permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
+    permission javax.management.MBeanPermission "-#-[-]", "queryNames";
+    permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
+    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
+    permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
+
+    // ****** Default permissions ******
+    // Granting file reading permission i.e. to read RRD database via JMX
+    permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // API - access to database
+    permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "callAbort";
+    permission java.sql.SQLPermission "setSyncFactory";
+    permission java.sql.SQLPermission "setNetworkTimeout";
+    permission java.util.PropertyPermission "*", "read, write";
+    permission java.net.SocketPermission "*", "accept, connect, listen, resolve";
+
+};
+
 
 //
 // OTHER PERMISSIONS
 //
 // Allow all actions to subjects without principals above
 grant {
-	permission java.security.AllPermission;
+    permission java.security.AllPermission;
 };
-
