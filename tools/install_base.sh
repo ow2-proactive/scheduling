@@ -811,9 +811,11 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
     ls -l $PA_ROOT/default/addons/*.jar
 fi
 
-if is_legacy_hash_upgrade; then
-  echo "Porting $PA_ROOT/default/config/authentication/login.cfg to the new format"
-  $PA_ROOT/default/tools/regenerate-passwords -ns -ltn -d
+if [[ "$OLD_PADIR" != "" ]]; then
+  if is_legacy_hash_upgrade; then
+    echo "Porting $PA_ROOT/default/config/authentication/login.cfg to the new format"
+    $PA_ROOT/default/tools/regenerate-passwords -ns -ltn -d
+  fi
 fi
 
 if [[ "$OLD_PADIR" != "" ]]; then
