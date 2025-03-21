@@ -52,22 +52,25 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 public class SchedulerSpacesSupport {
     public static final Logger logger = Logger.getLogger(SchedulingService.class);
 
+    public static String NO_TENANT = "NO_TENANT";
+
     /** Scheduler's Global Space */
-    private DataSpacesFileObject globalSpace;
+    private final Map<String, DataSpacesFileObject> globalSpacesMap;
 
     private static volatile Set<String> internalUsers;
 
     /** Map that link uniqueID to user global spaces */
-    private final Map<String, DataSpacesFileObject> userGlobalSpaces;
+    private final Map<String, DataSpacesFileObject> userSpacesMap;
 
     private static PrivateKey corePrivateKey;
 
     public SchedulerSpacesSupport() {
-        this.userGlobalSpaces = new ConcurrentHashMap<>();
+        this.userSpacesMap = new ConcurrentHashMap<>();
+        this.globalSpacesMap = new ConcurrentHashMap<>();
 
         // get Global Space
         try {
-            this.globalSpace = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+            this.globalSpacesMap.put(NO_TENANT, PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME));
         } catch (Exception e) {
             logger.error("", e);
         }
@@ -114,8 +117,12 @@ public class SchedulerSpacesSupport {
     /**
      * @return the list of uris of the globalspace
      */
-    public List<String> getGlobalSpaceURIs() {
-        return this.globalSpace.getAllRealURIs();
+    public List<String> getGlobalSpaceURIs(String tenant) {
+        DataSpacesFileObject o = getGlobalSpace(tenant);
+        if (o != null) {
+            return o.getAllRealURIs();
+        }
+        return null;
     }
 
     /**
@@ -125,10 +132,10 @@ public class SchedulerSpacesSupport {
     public DataSpacesFileObject getUserSpace(String username, Credentials userCredentials) {
         Validate.notBlank(username);
         registerUserSpace(username, userCredentials);
-        if (this.userGlobalSpaces.containsKey(username)) {
-            return this.userGlobalSpaces.get(username);
+        if (this.userSpacesMap.containsKey(username)) {
+            return this.userSpacesMap.get(username);
         } else {
-            return this.globalSpace;
+            return this.globalSpacesMap.get(NO_TENANT);
         }
 
     }
@@ -136,8 +143,70 @@ public class SchedulerSpacesSupport {
     /**
      * @return the default globalspace
      */
-    public DataSpacesFileObject getGlobalSpace() {
-        return this.globalSpace;
+    public DataSpacesFileObject getGlobalSpace(String tenant) {
+        if (tenant == null) {
+            tenant = NO_TENANT;
+        }
+        registerGlobalSpace(tenant);
+        if (this.globalSpacesMap.containsKey(tenant)) {
+            return this.globalSpacesMap.get(tenant);
+        } else {
+            return this.globalSpacesMap.get(NO_TENANT);
+        }
+    }
+
+    public void registerGlobalSpace(String tenant) {
+        if (tenant == null) {
+            tenant = NO_TENANT;
+        }
+        if (this.globalSpacesMap.get(tenant) == null && shouldRegisterGlobalSpace()) {
+            synchronized (this) {
+                DataSpacesFileObject globalSpace;
+
+                String globalSpaceName = SchedulerConstants.GLOBALSPACE_NAME + "_" + tenant;
+
+                if (!PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.isSet()) {
+                    logger.warn("URL of the root GLOBAL space is not set, cannot create a GLOBAL space for tenant " +
+                                tenant);
+                    return;
+                }
+
+                String localpath = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH.getValueAsStringOrNull();
+                String hostname = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME.getValueAsStringOrNull();
+
+                try {
+
+                    try {
+
+                        DataSpaceServiceStarter.getDataSpaceServiceStarter()
+                                               .createSpaceWithTenantSubfolder(tenant,
+                                                                               SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
+                                                                               globalSpaceName,
+                                                                               PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.getValueAsString(),
+                                                                               localpath,
+                                                                               hostname,
+                                                                               false,
+                                                                               true);
+
+                    } catch (SpaceAlreadyRegisteredException e) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(e.getMessage(), e);
+                        } else {
+                            logger.info(e.getMessage());
+                        }
+                    }
+
+                    // immediately retrieve the User Space
+                    globalSpace = PADataSpaces.resolveOutput(globalSpaceName);
+                    logger.info("GLOBAL space for tenant " + tenant + " is at " + globalSpace.getAllRealURIs());
+                    // register the GlobalSpace to the frontend state
+                    this.globalSpacesMap.put(tenant, globalSpace);
+                } catch (Exception e) {
+                    logger.error("", e);
+                    return;
+                }
+            }
+        }
     }
 
     /**
@@ -149,7 +218,7 @@ public class SchedulerSpacesSupport {
      * @param credentials credentials of the user
      */
     public void registerUserSpace(String username, Credentials credentials) {
-        if (this.userGlobalSpaces.get(username) == null && shouldRegisterUserSpace(username)) {
+        if (this.userSpacesMap.get(username) == null && shouldRegisterUserSpace(username)) {
             synchronized (this) {
                 DataSpacesFileObject userSpace;
 
@@ -191,7 +260,7 @@ public class SchedulerSpacesSupport {
                     userSpace = PADataSpaces.resolveOutput(userSpaceName, userCredentials);
                     logger.info("USER space for user " + username + " is at " + userSpace.getAllRealURIs());
                     // register the user GlobalSpace to the frontend state
-                    this.userGlobalSpaces.put(username, userSpace);
+                    this.userSpacesMap.put(username, userSpace);
                 } catch (Exception e) {
                     logger.error("", e);
                     return;
@@ -233,11 +302,11 @@ public class SchedulerSpacesSupport {
      * @return the file object
      * @throws FileSystemException On error parsing the file path.
      */
-    public DataSpacesFileObject resolveFile(String dataspace, String username, Credentials credentials, String pathname)
-            throws FileSystemException {
+    public DataSpacesFileObject resolveFile(String dataspace, String username, String tenant, Credentials credentials,
+            String pathname) throws FileSystemException {
         switch (dataspace) {
             case SchedulerConstants.GLOBALSPACE_NAME:
-                return this.getGlobalSpace().resolveFile(pathname);
+                return this.getGlobalSpace(tenant).resolveFile(pathname);
             case SchedulerConstants.USERSPACE_NAME:
                 return this.getUserSpace(username, credentials).resolveFile(pathname);
             default:
@@ -252,5 +321,9 @@ public class SchedulerSpacesSupport {
     private boolean shouldRegisterUserSpace(String username) {
         return !PASchedulerProperties.DATASPACE_DEFAULTUSER_IMPERSONATION.getValueAsBoolean() ||
                !isInternalUser(username);
+    }
+
+    private boolean shouldRegisterGlobalSpace() {
+        return PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean();
     }
 }

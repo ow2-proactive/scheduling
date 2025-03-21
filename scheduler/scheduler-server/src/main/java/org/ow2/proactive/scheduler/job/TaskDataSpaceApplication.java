@@ -68,10 +68,11 @@ public class TaskDataSpaceApplication implements Serializable {
      * @param globalURL the url of the global space given in the job, if null default scheduler GLOBAL space URL will be used
      * @param userURL   the url of the user space given in the job, if null default scheduler USER space URL will be used
      * @param username  the owner of the job
+     * @param tenant    the owner's tenant
      * @param jobId     unique identifier for the current job; can used to separated GLOBAL space among jobs
      */
     public void startDataSpaceApplication(String inputURL, String outputURL, String globalURL, String userURL,
-            String username, UserCredentials userCredentials, JobId jobId) {
+            String username, String tenant, UserCredentials userCredentials, JobId jobId) {
         if (!alreadyRegistered) {
             try {
 
@@ -146,17 +147,19 @@ public class TaskDataSpaceApplication implements Serializable {
                                                                                      false);
                 } else {
                     String localPath = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH.getValueAsStringOrNull();
-                    localPath = handleLocalFolder(localPath, false, username);
+                    localPath = (new File(localPath)).getCanonicalPath();
 
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME.getValueAsStringOrNull();
 
-                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpace(applicationId,
-                                                                                     SchedulerConstants.GLOBALSPACE_NAME,
-                                                                                     PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.getValueAsString(),
-                                                                                     localPath,
-                                                                                     hostname,
-                                                                                     false,
-                                                                                     false);
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter()
+                                           .createSpaceWithTenantSubfolder(tenant,
+                                                                           applicationId,
+                                                                           SchedulerConstants.GLOBALSPACE_NAME,
+                                                                           PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.getValueAsString(),
+                                                                           localPath,
+                                                                           hostname,
+                                                                           false,
+                                                                           false);
                 }
 
                 // create USER space for this job, the application ID of this user space will be the AppId of the job
@@ -193,23 +196,6 @@ public class TaskDataSpaceApplication implements Serializable {
                 logger.warn("", e);
             }
         }
-    }
-
-    private String handleLocalFolder(String localpath, boolean createUserDir, String username) throws IOException {
-        String localPathModified = null;
-        if (localpath != null) {
-            File localFile;
-            if (createUserDir) {
-                localFile = new File(localpath, username);
-            } else {
-                localFile = new File(localpath);
-            }
-            if (!localFile.exists()) {
-                localFile.mkdirs();
-            }
-            localPathModified = localFile.getCanonicalPath();
-        }
-        return localPathModified;
     }
 
     public void terminateDataSpaceApplication() {

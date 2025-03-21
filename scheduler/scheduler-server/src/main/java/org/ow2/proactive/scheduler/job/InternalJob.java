@@ -345,6 +345,7 @@ public abstract class InternalJob extends JobState {
                                                                    getGlobalSpace(),
                                                                    getUserSpace(),
                                                                    getOwner(),
+                                                                   getTenant(),
                                                                    userCredentials,
                                                                    getId());
             }

@@ -653,8 +653,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
     public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
         Method currentMethod = new Object() {
         }.getClass().getEnclosingMethod();
-        frontendState.checkPermission(currentMethod, "You don't have permissions to read the GLOBAL Space URI");
-        return this.spacesSupport.getGlobalSpaceURIs();
+        UserIdentificationImpl user = frontendState.checkPermission(currentMethod,
+                                                                    "You don't have permissions to read the GLOBAL Space URI");
+        return this.spacesSupport.getGlobalSpaceURIs(user.getTenant());
     }
 
     /**
@@ -2694,10 +2695,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials(currentMethod,
                                                                                                                              "You don't have permissions to check the file type in the DataSpace",
                                                                                                                              false);
+            UserIdentificationImpl user = userAndCredentials.getListeningUser().getUser();
             DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace,
-                                                                       userAndCredentials.getListeningUser()
-                                                                                         .getUser()
-                                                                                         .getUsername(),
+                                                                       user.getUsername(),
+                                                                       user.getTenant(),
                                                                        userAndCredentials.getCredentials(),
                                                                        pathname);
             return file.isFolder();
@@ -2718,10 +2719,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
             SchedulerFrontendState.UserAndCredentials userAndCredentials = frontendState.checkPermissionReturningCredentials(currentMethod,
                                                                                                                              "You don't have permissions to check the file existence in the DataSpace",
                                                                                                                              false);
+            UserIdentificationImpl user = userAndCredentials.getListeningUser().getUser();
             DataSpacesFileObject file = this.spacesSupport.resolveFile(dataspace,
-                                                                       userAndCredentials.getListeningUser()
-                                                                                         .getUser()
-                                                                                         .getUsername(),
+                                                                       user.getUsername(),
+                                                                       user.getTenant(),
                                                                        userAndCredentials.getCredentials(),
                                                                        pathname);
             return file.exists();
