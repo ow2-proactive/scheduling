@@ -87,6 +87,8 @@ public class DataSpaceServiceStarter implements Serializable {
 
     private Map<String, ReentrantLock> userSpaceFolderLocks = new ConcurrentHashMap<>();
 
+    private Map<String, ReentrantLock> globalSpaceFolderLocks = new ConcurrentHashMap<>();
+
     /**
      * Naming service
      */
@@ -390,6 +392,59 @@ public class DataSpaceServiceStarter implements Serializable {
     }
 
     /**
+     * Similar to createSpace, but in addition it will use a provided tenant to append it to the given urls
+     * If the localpath is provided, it will also create sub folders to the dataspace root with this tenant
+     *
+     * @param tenant tenant name used to update urls and create folders
+     * @param appID the Application ID
+     * @param spaceName the name of the dataspace
+     * @param urls the url list of the Virtual File Systems (for different protocols)
+     * @param localpath the path to the dataspace in the localfilesystem
+     * @param hostname the host where the file server is deployed
+     * @param inputConfiguration if the configuration is an InputSpace configuration (read-only)
+     * @param localConfiguration if the local node needs to be configured for the provided application
+     * @throws URISyntaxException
+     * @throws MalformedURLException
+     * @throws ProActiveException
+     * @throws FileSystemException
+     */
+    public void createSpaceWithTenantSubfolder(String tenant, String appID, String spaceName, String urls,
+            String localpath, String hostname, boolean inputConfiguration, boolean localConfiguration)
+            throws URISyntaxException, IOException, ProActiveException {
+        String newPropertyValue = urls;
+        if (tenant != null && PASchedulerProperties.SCHEDULER_TENANT_FILTER.getValueAsBoolean()) {
+            // updates the urls with the username
+            String[] urlsArray = Tools.dataSpaceConfigPropertyToUrls(urls);
+
+            DefaultFileSystemManager manager = VFSFactory.createDefaultFileSystemManager();
+            try {
+                ReentrantLock tmpLock = new ReentrantLock();
+                ReentrantLock returnedLock = globalSpaceFolderLocks.putIfAbsent(tenant, tmpLock);
+                ReentrantLock lock = returnedLock != null ? returnedLock : tmpLock;
+                try {
+                    lock.lockInterruptibly();
+                    FileObject folder = manager.resolveFile(urlsArray[0] + "/" + tenant);
+                    folder.createFolder();
+                } catch (InterruptedException e) {
+                    logger.warn("Interrupted while creating global space folder", e);
+                } finally {
+                    lock.unlock();
+                }
+            } finally {
+                manager.close();
+            }
+
+            String[] updatedArray = urlsWithTenant(urlsArray, tenant);
+
+            newPropertyValue = urlsToDSConfigProperty(updatedArray);
+        }
+
+        // create the Global Space for the given tenant
+        createSpace(appID, spaceName, newPropertyValue, localpath, hostname, inputConfiguration, localConfiguration);
+
+    }
+
+    /**
      * Converts url array to a property separated by spaces
      * @param urls url array
      * @return property
@@ -432,6 +487,31 @@ public class DataSpaceServiceStarter implements Serializable {
                 urlToAdd = url + "/" + username;
             } else {
                 urlToAdd = url + username;
+            }
+
+            output[i] = URIHelper.convertToEncodedURIString(urlToAdd);
+        }
+
+        return output;
+    }
+
+    /**
+     * Appends the given tenant into each member of the url array
+     * @param inputUrls
+     * @param tenant
+     * @return an url array with the userName appended
+     */
+    public static String[] urlsWithTenant(String[] inputUrls, String tenant) {
+        String[] output = new String[inputUrls.length];
+
+        for (int i = 0; i < inputUrls.length; i++) {
+            String url = inputUrls[i];
+
+            String urlToAdd;
+            if (!url.endsWith("/")) {
+                urlToAdd = url + "/" + tenant;
+            } else {
+                urlToAdd = url + tenant;
             }
 
             output[i] = URIHelper.convertToEncodedURIString(urlToAdd);
