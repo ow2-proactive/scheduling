@@ -370,7 +370,7 @@ public class JobData implements Serializable {
         internalJob.setInputSpace(getInputSpace());
         internalJob.setOutputSpace(getOutputSpace());
         internalJob.setGlobalSpace(getGlobalSpace());
-        internalJob.setUserSpace(getGlobalSpace());
+        internalJob.setUserSpace(getUserSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
         if (getTaskRetryDelay() != null) {
