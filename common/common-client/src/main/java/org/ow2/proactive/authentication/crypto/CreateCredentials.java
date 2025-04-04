@@ -43,7 +43,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.utils.SecurityManagerConfigurator;
-import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.Tools;
@@ -226,12 +226,12 @@ public class CreateCredentials {
 
         if (url != null) {
             try {
-                Connection<AuthenticationImpl> conn = new Connection<AuthenticationImpl>(AuthenticationImpl.class) {
+                Connection<Authentication> conn = new Connection<Authentication>(Authentication.class) {
                     public Logger getLogger() {
                         return Logger.getLogger("pa.scheduler.credentials");
                     }
                 };
-                AuthenticationImpl auth = conn.connect(url);
+                Authentication auth = conn.connect(url);
                 pubKey = auth.getPublicKey();
             } catch (Exception e) {
                 System.err.println("ERROR : Could not retrieve public key from '" + url + "'");

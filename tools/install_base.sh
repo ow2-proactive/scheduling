@@ -76,8 +76,13 @@ compute-version()
 # an upgrade of the password stored format occurs when the new version has pa.rm.legacy.encryption set to false and the old version has it set to true or absent
 is_legacy_hash_upgrade()
 {
-  NEW_VERSION_LEGACY_SETTING=$( grep 'pa.rm.legacy.encryption=' $PA_ROOT/default/config/rm/settings.ini | head -n 1 | cut -d '=' -f2 )
-  OLD_VERSION_LEGACY_SETTING=$( grep 'pa.rm.legacy.encryption=' $PA_ROOT/previous/config/rm/settings.ini | head -n 1 | cut -d '=' -f2 )
+  NEW_VERSION_LEGACY_SETTING=$( grep 'pa.legacy.encryption=' $PA_ROOT/default/config/shared/settings.ini | head -n 1 | cut -d '=' -f2 )
+  OLD_VERSION_LEGACY_SETTING=$( grep 'pa.legacy.encryption=' $PA_ROOT/previous/config/shared/settings.ini | head -n 1 | cut -d '=' -f2 )
+  if [ -z "$OLD_VERSION_LEGACY_SETTING" ]; then
+    # as the property moved, check as well the old location
+    OLD_VERSION_LEGACY_SETTING=$( grep 'pa.rm.legacy.encryption=' $PA_ROOT/previous/config/rm/settings.ini | head -n 1 | cut -d '=' -f2 )
+  fi
+
   if [ -z "$NEW_VERSION_LEGACY_SETTING" ]; then
     NEW_VERSION_LEGACY_SETTING="true"
   else
@@ -167,7 +172,7 @@ generate_new_accounts()
     echo "Generating New Private/Public key pair for the scheduler"
     $PA_ROOT/default/tools/proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
 
-    sed "s/pa\.scheduler\.password\.strength\.enable=.*/pa.scheduler.password.strength.enable=true/g"  -i "$PA_ROOT/default/config/scheduler/settings.ini"
+    sed "s/pa\.password\.strength\.enable=.*/pa.scheduler.password.strength.enable=true/g"  -i "$PA_ROOT/default/config/shared/settings.ini"
 
 
     $PA_ROOT/default/tools/proactive-users -U -l admin -p "$ADMIN_PWD"

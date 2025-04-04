@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.ShadowCredentialsPrincipal;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.scheduler.common.SchedulerSpaceInterface;
@@ -94,14 +95,14 @@ public class Session {
     private static synchronized void initPrivateKey() {
         if (corePrivateKey == null) {
             try {
-                corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
+                corePrivateKey = Credentials.getPrivateKey(PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PRIVKEY_PATH.getValueAsString()));
             } catch (Exception e) {
                 logger.error("Could not initialize private key", e);
             }
         }
         if (corePublicKey == null) {
             try {
-                corePublicKey = Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
+                corePublicKey = Credentials.getPublicKey(PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PUBKEY_PATH.getValueAsString()));
             } catch (Exception e) {
                 logger.error("Could not initialize public key", e);
             }

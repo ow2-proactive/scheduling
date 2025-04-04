@@ -25,12 +25,14 @@
  */
 package org.ow2.proactive.authentication;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -56,6 +58,7 @@ import org.ow2.proactive.authentication.principals.DomainNamePrincipal;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.TenantPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.core.properties.PASharedProperties;
 
 import com.google.common.base.Strings;
 
@@ -581,7 +584,25 @@ public abstract class MultiLDAPLoginModule extends FileLoginModule implements Lo
      *
      * @return a map of (domain_name,configuration_file)
      */
-    protected abstract Map<String, String> getMultiLDAPConfig();
+    protected Map<String, String> getMultiLDAPConfig() {
+        Map<String, String> answer = new HashMap<>();
+        List<String> ldapConfigList = PASharedProperties.MULTI_LDAP_CONFIG.getValueAsList(",");
+        for (String config : ldapConfigList) {
+            String[] configPair = config.split("\\s*:\\s*");
+            if (configPair.length != 2) {
+                throw new IllegalArgumentException("invalid multi-ldap configuration string : " + config);
+            }
+            String domain = configPair[0];
+            String ldapFile = configPair[1];
+            //test that ldap file path is an absolute path or not
+            if (!(new File(ldapFile).isAbsolute())) {
+                //file path is relative, so we complete the path with the scheduler home
+                ldapFile = PASharedProperties.getAbsolutePath(ldapFile);
+            }
+            answer.put(domain, ldapFile);
+        }
+        return answer;
+    }
 
     private Hashtable<String, String> createBasicEnvForInitalContext(String domain) {
         Hashtable<String, String> env = new Hashtable<>(6, 1f);

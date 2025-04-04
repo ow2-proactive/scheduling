@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.authentication;
+package org.ow2.proactive.authentication;
 
 import java.io.File;
 import java.util.Collections;
@@ -31,50 +31,50 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.core.properties.PASharedProperties;
 
 
-public class SchedulerJaasConfigUtils {
+public class JaasConfigUtils {
 
     static String getLoginFileName() {
-        String loginFile = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME.getValueAsString();
+        String loginFile = PASharedProperties.LOGIN_FILENAME.getValueAsString();
         //test that login file path is an absolute path or not
         if (!(new File(loginFile).isAbsolute())) {
             //file path is relative, so we complete the path with the prefix RM_Home constant
-            loginFile = PASchedulerProperties.getAbsolutePath(loginFile);
+            loginFile = PASharedProperties.getAbsolutePath(loginFile);
         }
 
         return loginFile;
     }
 
     static String getGroupFileName() {
-        String groupFile = PASchedulerProperties.SCHEDULER_GROUP_FILENAME.getValueAsString();
+        String groupFile = PASharedProperties.GROUP_FILENAME.getValueAsString();
         //test that group file path is an absolute path or not
         if (!(new File(groupFile).isAbsolute())) {
             //file path is relative, so we complete the path with the prefix RM_Home constant
-            groupFile = PASchedulerProperties.getAbsolutePath(groupFile);
+            groupFile = PASharedProperties.getAbsolutePath(groupFile);
         }
 
         return groupFile;
     }
 
     static String getTenantFileName() {
-        String tenantFile = PASchedulerProperties.SCHEDULER_TENANT_FILENAME.getValueAsString();
+        String tenantFile = PASharedProperties.TENANT_FILENAME.getValueAsString();
         //test that group file path is an absolute path or not
         if (!(new File(tenantFile).isAbsolute())) {
             //file path is relative, so we complete the path with the prefix RM_Home constant
-            tenantFile = PASchedulerProperties.getAbsolutePath(tenantFile);
+            tenantFile = PASharedProperties.getAbsolutePath(tenantFile);
         }
 
         return tenantFile;
     }
 
     static Set<String> getConfiguredDomains() {
-        if (PASchedulerProperties.SCHEDULER_ALLOWED_DOMAINS.isSet()) {
-            return PASchedulerProperties.SCHEDULER_ALLOWED_DOMAINS.getValueAsList(",")
-                                                                  .stream()
-                                                                  .map(domain -> domain.toLowerCase())
-                                                                  .collect(Collectors.toSet());
+        if (PASharedProperties.ALLOWED_DOMAINS.isSet()) {
+            return PASharedProperties.ALLOWED_DOMAINS.getValueAsList(",")
+                                                     .stream()
+                                                     .map(domain -> domain.toLowerCase())
+                                                     .collect(Collectors.toSet());
         } else {
             // windows current machine domain
             String currentMachineDomain = System.getenv("USERDOMAIN");

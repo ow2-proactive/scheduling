@@ -43,11 +43,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.ow2.proactive.authentication.FileLoginModule;
+import org.ow2.proactive.authentication.ManageUsers;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.authentication.crypto.KeyGen;
-import org.ow2.tests.ProActiveTestClean;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -58,7 +57,7 @@ import com.google.common.collect.Multimap;
 /**
  * Tests creation, modification and deletion of users with ManageUsers tool
  */
-public class ManageUsersTest extends ProActiveTestClean {
+public class ManageUsersTest {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();

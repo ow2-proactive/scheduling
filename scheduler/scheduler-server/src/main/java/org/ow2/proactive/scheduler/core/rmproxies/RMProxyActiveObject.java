@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -221,7 +222,7 @@ public class RMProxyActiveObject {
             this.nodesTaskId.put(nodes, taskId);
 
             //create a decrypter to access scheduler and retrieve Third Party User Credentials
-            String privateKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+            String privateKeyPath = PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PRIVKEY_PATH.getValueAsString());
             Decrypter decrypter = new Decrypter(Credentials.getPrivateKey(privateKeyPath));
             decrypter.setCredentials(creds);
 

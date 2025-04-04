@@ -47,6 +47,10 @@ public enum PASharedProperties implements PACommonProperties {
     /** reusing existing rm home property **/
     SHARED_HOME("pa.rm.home", PropertyType.STRING),
 
+    /* ***************************************************************** */
+    /* ********************** AUTHENTICATION PROPERTIES **************** */
+    /* ***************************************************************** */
+
     /** maximum number of failed attempts accepted in the given time window (to prevent brute force attacks). The mechanism can be disabled
      * by using a zero or negative value **/
     FAILED_LOGIN_MAX_ATTEMPTS("pa.shared.failed.max.attempts", PropertyType.INTEGER, "3"),
@@ -60,8 +64,70 @@ public enum PASharedProperties implements PACommonProperties {
     /** use domain in credentials file name **/
     USE_DOMAIN_IN_CREDENTIALS_FILE("pa.shared.credentials.use.domain", PropertyType.BOOLEAN, "false"),
 
+    /** When using legacy encryption, passwords are stored in login.cfg using symmetric key encryption, instead of hash/salt. Default to true for backward compatibility **/
+    LEGACY_ENCRYPTION("pa.legacy.encryption", PropertyType.BOOLEAN, "false"),
+
     /** authentication home directory **/
-    AUTHENTICATION_DIR("pa.shared.authentication.dir", PropertyType.STRING, "config/authentication"),
+    AUTHENTICATION_DIR("pa.authentication.dir", PropertyType.STRING, "config/authentication"),
+
+    /** path to the Jaas configuration file which defines what modules are available for
+     * internal authentication */
+    AUTH_JAAS_PATH("pa.auth.jaas.path", PropertyType.STRING, "config/authentication/jaas.config"),
+
+    /**
+     * LDAP Authentication configuration file path, used to set LDAP configuration properties
+     * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
+     * with the variable defined below : pa.scheduler.home.
+     * else, the path is absolute, so the path is directly interpreted
+     */
+    LDAP_CONFIG_FILE_PATH("pa.ldap.config.path", PropertyType.STRING, "config/authentication/ldap.cfg"),
+
+    /**
+     * Keycloak configuration file path, used to set Keycloak configuration properties
+     * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
+     * with the variable defined below : pa.scheduler.home.
+     * else, the path is absolute, so the path is directly interpreted
+     */
+    KEYCLOAK_CONFIG_FILE_PATH("pa.keycloak.config.path", PropertyType.STRING, "config/authentication/keycloak.cfg"),
+
+    /** List of domain names that can be used during a login (can be a list of windows domain names or a list of tenants in Multi-LDAP configuration) **/
+    ALLOWED_DOMAINS("pa.allowed.domains", PropertyType.LIST),
+
+    /**
+     * Support for multi-ldap login configuration.
+     * This property must be defined using a list of the following form:
+     * domain1:path_to_domain1.cfg,domain2:path_to_domain2.cfg, etc
+     *
+     * domain names must be lowercase and must also be configured in pa.allowed.domains
+     */
+    MULTI_LDAP_CONFIG("pa.multi.ldap.config", PropertyType.LIST),
+
+    /** Path to the private key file which is used to decrypt credentials passed to the jaas module */
+    AUTH_PRIVKEY_PATH("pa.auth.privkey.path", PropertyType.STRING, "config/authentication/keys/priv.key"),
+
+    /** Path to the public key file which is used to encrypt credentials for authentication */
+    AUTH_PUBKEY_PATH("pa.auth.pubkey.path", PropertyType.STRING, "config/authentication/keys/pub.key"),
+
+    /** Regular expression used to control the username format when logging in. Always enabled to prevent injection attacks on 3rd-party authentication like LDAP */
+    USERNAME_REGEXP("pa.username.regexp", PropertyType.STRING, "^[A-Za-z0-9_\\-@.]+$"),
+
+    /** Enable password strength check, used when a user is created or modified **/
+    PASSWORD_STRENGTH_ENABLE("pa.password.strength.enable", PropertyType.BOOLEAN, "false"),
+
+    /** Regular expression used to control the password strength (default is 8 to 32 characters with at least an uppercase letter, a lowercase letter, a digit and a symbol) **/
+    PASSWORD_STRENGTH_REGEXP("pa.password.strength.regexp", PropertyType.STRING, "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}\\[\\]:;<>,.?/~_+\\-=|]).{8,32}$"),
+
+    /** Textual error message when password strength is not met **/
+    PASSWORD_STRENGTH_ERROR_MESSAGE("pa.password.strength.message", PropertyType.STRING, "The password must be 8 to 32 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol."),
+
+    /** login file name */
+    LOGIN_FILENAME("pa.core.defaultloginfilename", PropertyType.STRING, "config/authentication/login.cfg"),
+
+    /** group file name */
+    GROUP_FILENAME("pa.core.defaultgroupfilename", PropertyType.STRING, "config/authentication/group.cfg"),
+
+    /** tenant file name */
+    TENANT_FILENAME("pa.core.defaulttenantfilename", PropertyType.STRING, "config/authentication/tenant.cfg"),
 
     /** Key used when decrypting properties */
     PROPERTIES_CRYPT_KEY("pa.shared.properties.crypt.key", PropertyType.STRING, "activeeon"),

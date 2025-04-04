@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
@@ -151,7 +152,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                         new NamedThreadFactory("DoTask_Action",
                                                                                                true,
                                                                                                7));
-        this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
+        this.corePrivateKey = Credentials.getPrivateKey(PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PRIVKEY_PATH.getValueAsString()));
     }
 
     RMProxiesManager getRMProxiesManager() {

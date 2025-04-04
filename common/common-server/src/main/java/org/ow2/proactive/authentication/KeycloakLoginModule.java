@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.authentication;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.Principal;
@@ -52,6 +53,7 @@ import org.ow2.proactive.authentication.keycloak.KeycloakOidcProperties;
 import org.ow2.proactive.authentication.keycloak.KeycloakOidcRestClient;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.core.properties.PASharedProperties;
 
 import com.google.common.base.Strings;
 
@@ -384,7 +386,15 @@ public abstract class KeycloakLoginModule extends FileLoginModule implements Log
      * Retrieves Keycloak configuration file name.
      * @return name of the file with Keycloak configuration.
      */
-    protected abstract String getKeycloakConfigFileName();
+    protected String getKeycloakConfigFileName() {
+        String keycloakFile = PASharedProperties.KEYCLOAK_CONFIG_FILE_PATH.getValueAsString();
+        //test that KeycloakFile file path is an absolute path or not
+        if (!(new File(keycloakFile).isAbsolute())) {
+            //file path is relative, so we complete the path with the scheduler home
+            keycloakFile = PASharedProperties.getAbsolutePath(keycloakFile);
+        }
+        return keycloakFile;
+    }
 
     /**
      * Holds the Keycloak refresh token

@@ -115,44 +115,58 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * 
      * @return the login file name
      */
-    protected abstract String getLoginFileName();
+    protected String getLoginFileName() {
+        return JaasConfigUtils.getLoginFileName();
+    }
 
     /**
      * Defines group file name
      * 
      * @return the group file name
      */
-    protected abstract String getGroupFileName();
+    protected String getGroupFileName() {
+        return JaasConfigUtils.getGroupFileName();
+    }
 
     /**
      * Defines tenant file name
      *
      * @return the tenant file name
      */
-    protected abstract String getTenantFileName();
+    protected String getTenantFileName() {
+        return JaasConfigUtils.getTenantFileName();
+    }
 
-    protected abstract Set<String> getConfiguredDomains();
+    protected Set<String> getConfiguredDomains() {
+        return JaasConfigUtils.getConfiguredDomains();
+    }
 
     /**
      * Defines private key
      *
      * @return private key in use
      */
-    protected abstract PrivateKey getPrivateKey() throws KeyException;
+    protected PrivateKey getPrivateKey() throws KeyException {
+        return Credentials.getPrivateKey(PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PRIVKEY_PATH.getValueAsString()));
+    }
 
     /**
      * Defines public key
      *
      * @return public key in use
      */
-    protected abstract PublicKey getPublicKey() throws KeyException;
+    protected PublicKey getPublicKey() throws KeyException {
+        return Credentials.getPublicKey(PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PUBKEY_PATH.getValueAsString()));
+    }
 
     /**
      * Returns true if legacy password encryption is used (hybrid symetric key).
      * Returns false if newer encryption is used (hash/salt based)
      * @return
      */
-    protected abstract boolean isLegacyPasswordEncryption();
+    protected boolean isLegacyPasswordEncryption() {
+        return PASharedProperties.LEGACY_ENCRYPTION.getValueAsBoolean();
+    }
 
     /**
      * 

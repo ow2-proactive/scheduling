@@ -25,16 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
-import java.io.File;
-import java.security.KeyException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.KeycloakLoginModule;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
 /**
@@ -46,71 +38,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  * @since ProActive Scheduling 14.0
  */
 public class RMKeycloakLoginModule extends KeycloakLoginModule {
-    /**
-     * Returns Keycloak configuration file name defined in scheduler configuration file
-     *
-     * @return Keycloak configuration file name defined in scheduler configuration file
-     */
-    @Override
-    protected String getKeycloakConfigFileName() {
-        String keycloakFile = PAResourceManagerProperties.RM_KEYCLOAK_CONFIG.getValueAsString();
-        //test that KeycloakFile file path is an absolute path or not
-        if (!(new File(keycloakFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the scheduler home
-            keycloakFile = PAResourceManagerProperties.getAbsolutePath(keycloakFile);
-        }
-        return keycloakFile;
-    }
-
-    /**
-     * Returns login file name from scheduler configuration file
-     * Used for authentication fall-back
-     * @return login file name from scheduler configuration file
-     */
-    @Override
-    protected String getLoginFileName() {
-        return RMJaasConfigUtils.getLoginFileName();
-    }
-
-    /**
-     * Returns group file name from scheduler configuration file
-     * Used for group membership verification fall-back.
-     * @return group file name from scheduler configuration file
-     */
-    @Override
-    protected String getGroupFileName() {
-        return RMJaasConfigUtils.getGroupFileName();
-    }
-
-    /**
-     * Returns tenant file name from scheduler configuration file
-     *
-     * @return tenant file name from scheduler configuration file
-     */
-    @Override
-    protected String getTenantFileName() {
-        return RMJaasConfigUtils.getTenantFileName();
-    }
-
-    @Override
-    protected Set<String> getConfiguredDomains() {
-        return RMJaasConfigUtils.getConfiguredDomains();
-    }
-
-    @Override
-    protected PrivateKey getPrivateKey() throws KeyException {
-        return Credentials.getPrivateKey(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected PublicKey getPublicKey() throws KeyException {
-        return Credentials.getPublicKey(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PUBKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected boolean isLegacyPasswordEncryption() {
-        return PAResourceManagerProperties.RM_LEGACY_ENCRYPTION.getValueAsBoolean();
-    }
 
     /**
      * Returns logger for authentication

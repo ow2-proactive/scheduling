@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.authentication;
+package org.ow2.proactive.authentication;
 
 import java.io.*;
 import java.security.KeyException;
@@ -40,7 +40,7 @@ import org.ow2.proactive.authentication.crypto.CreateCredentials;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.utils.Tools;
 
 import com.google.common.base.Strings;
@@ -535,22 +535,22 @@ public class RegeneratePasswords {
     }
 
     private static String getLoginFilePath() {
-        return getSchedulerFile(PASchedulerProperties.SCHEDULER_LOGIN_FILENAME.getValueAsString());
+        return getSchedulerFile(PASharedProperties.LOGIN_FILENAME.getValueAsString());
     }
 
     private static String getPublicKeyFilePath() {
-        return getSchedulerFile(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString());
+        return getSchedulerFile(PASharedProperties.AUTH_PUBKEY_PATH.getValueAsString());
     }
 
     private static String getPrivateKeyFilePath() {
-        return getSchedulerFile(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+        return getSchedulerFile(PASharedProperties.AUTH_PRIVKEY_PATH.getValueAsString());
     }
 
     private static String getSchedulerFile(String path) {
         String schedulerFile = path;
         if (!(new File(schedulerFile).isAbsolute())) {
             //file path is relative, so we complete the path with the prefix Scheduler_Home constant
-            schedulerFile = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + path;
+            schedulerFile = PASharedProperties.SHARED_HOME.getValueAsString() + File.separator + path;
         }
         return schedulerFile;
     }

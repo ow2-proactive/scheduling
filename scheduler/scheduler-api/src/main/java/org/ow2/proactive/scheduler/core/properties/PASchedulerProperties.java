@@ -171,59 +171,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */
 
-    /** When using legacy encryption, passwords are stored in login.cfg using symmetric key encryption, instead of hash/salt. Default to true for backward compatibility **/
-    SCHEDULER_LEGACY_ENCRYPTION("pa.scheduler.legacy.encryption", PropertyType.BOOLEAN, "false"),
-
-    /** path to the Jaas configuration file which defines what modules are available for
-     * internal authentication */
-    SCHEDULER_AUTH_JAAS_PATH("pa.scheduler.auth.jaas.path", PropertyType.STRING, "config/authentication/jaas.config"),
-
-    /** path to the private key file which is used to decrypt credentials passed to the jaas module */
-    SCHEDULER_AUTH_PRIVKEY_PATH("pa.scheduler.auth.privkey.path", PropertyType.STRING, "config/authentication/keys/priv.key"),
-
-    /** path to the public key file which is used to encrypt credentials for authentication */
-    SCHEDULER_AUTH_PUBKEY_PATH("pa.scheduler.auth.pubkey.path", PropertyType.STRING, "config/authentication/keys/pub.key"),
-
     /** a domain name (windows active directory) which can be configured globally at the scheduler level **/
-    /** Deprecated: consider using pa.scheduler.allowed.domains instead **/
+    /** Deprecated: consider using pa.allowed.domains in config/shared/settings.ini instead **/
     SCHEDULER_AUTH_GLOBAL_DOMAIN("pa.scheduler.auth.global.domain", PropertyType.STRING),
-
-    /** 
-     * LDAP Authentication configuration file path, used to set LDAP configuration properties
-     * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
-     * with the variable defined below : pa.scheduler.home.
-     * else, the path is absolute, so the path is directly interpreted
-     */
-    SCHEDULER_LDAP_CONFIG_FILE_PATH("pa.scheduler.ldap.config.path", PropertyType.STRING, "config/authentication/ldap.cfg"),
-
-    /**
-     * Keycloak configuration file path, used to set Keycloak configuration properties
-     * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
-     * with the variable defined below : pa.scheduler.home.
-     * else, the path is absolute, so the path is directly interpreted
-     */
-    SCHEDULER_KEYCLOAK_CONFIG_FILE_PATH("pa.scheduler.keycloak.config.path", PropertyType.STRING, "config/authentication/keycloak.cfg"),
-
-    /**
-     * Support for multi-ldap login configuration.
-     * This property must be defined using a list of the following form:
-     * domain1:path_to_domain1.cfg,domain2:path_to_domain2.cfg, etc
-     *
-     * domain names must be lowercase and must also be configured in pa.scheduler.allowed.domains
-     */
-    SCHEDULER_MULTI_LDAP_CONFIG("pa.scheduler.multi.ldap.config", PropertyType.LIST),
-
-    /** Login default file name */
-    SCHEDULER_LOGIN_FILENAME("pa.scheduler.core.defaultloginfilename", PropertyType.STRING, "config/authentication/login.cfg"),
-
-    /** Group default filename */
-    SCHEDULER_GROUP_FILENAME("pa.scheduler.core.defaultgroupfilename", PropertyType.STRING, "config/authentication/group.cfg"),
-
-    /** Tenant default filename */
-    SCHEDULER_TENANT_FILENAME("pa.scheduler.core.defaulttenantfilename", PropertyType.STRING, "config/authentication/tenant.cfg"),
-
-    /** List of domain names that can be used during a login (can be a list of windows domain names or a list of tenants in Multi-LDAP configuration) **/
-    SCHEDULER_ALLOWED_DOMAINS("pa.scheduler.allowed.domains", PropertyType.LIST),
 
     /** If enabled, filter jobs according to user tenant */
     SCHEDULER_TENANT_FILTER("pa.scheduler.core.tenant.filter", PropertyType.BOOLEAN, "false"),
@@ -233,18 +183,6 @@ public enum PASchedulerProperties implements PACommonProperties {
 
     /** Refresh time to reload the security policy file (security.java.policy-server) */
     POLICY_RELOAD_FREQUENCY_IN_SECONDS("pa.scheduler.auth.policy.refreshperiod.seconds", PropertyType.INTEGER, "30"),
-
-    /** Regular expression used to control the username format when logging in. Always enabled to prevent injection attacks on 3rd-party authentication like LDAP */
-    SCHEDULER_USERNAME_REGEXP("pa.scheduler.username.regexp", PropertyType.STRING, "^[A-Za-z0-9_\\-@.]+$"),
-
-    /** Enable password strength check, used when a user is created or modified **/
-    SCHEDULER_PASSWORD_STRENGTH_ENABLE("pa.scheduler.password.strength.enable", PropertyType.BOOLEAN, "false"),
-
-    /** Regular expression used to control the password strength (default is 8 to 32 characters with at least an uppercase letter, a lowercase letter, a digit and a symbol) **/
-    SCHEDULER_PASSWORD_STRENGTH_REGEXP("pa.scheduler.password.strength.regexp", PropertyType.STRING, "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}\\[\\]:;<>,.?/~_+\\-=|]).{8,32}$"),
-
-    /** Textual error message when password strength is not met **/
-    SCHEDULER_PASSWORD_STRENGTH_ERROR_MESSAGE("pa.scheduler.password.strength.message", PropertyType.STRING, "The password must be 8 to 32 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol."),
 
     /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */

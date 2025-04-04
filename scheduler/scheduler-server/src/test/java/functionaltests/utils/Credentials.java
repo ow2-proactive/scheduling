@@ -25,6 +25,7 @@
  */
 package functionaltests.utils;
 
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.tests.ProActiveTest;
 
@@ -39,7 +40,7 @@ public final class Credentials extends ProActiveTest {
         if (defaultCredentials == null) {
             defaultCredentials = org.ow2.proactive.authentication.crypto.Credentials.createCredentials(DEFAULT_USER_NAME,
                                                                                                        "admin",
-                                                                                                       PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
+                                                                                                       PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PUBKEY_PATH.getValueAsString()));
         }
 
         return defaultCredentials;
