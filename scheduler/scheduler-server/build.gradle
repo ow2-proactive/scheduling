@@ -32,6 +32,7 @@ dependencies {
     compile project(':common:common-client')
     compile project(':common:common-db')
     compile project(':common:common-http')
+    compile project(':common:common-server')
     compile project(':scheduler:scheduler-api')
     compile project(':scheduler:scheduler-client')
     compile project(':scheduler:scheduler-node')

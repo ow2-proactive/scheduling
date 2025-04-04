@@ -1,0 +1,6 @@
+dependencies {
+    compile project(":common:common-client")
+
+    compile "org.keycloak:keycloak-adapter-core:24.0.2"
+    compile group: 'net.sf.jpam', name: 'jpam', version: '1.1'
+}

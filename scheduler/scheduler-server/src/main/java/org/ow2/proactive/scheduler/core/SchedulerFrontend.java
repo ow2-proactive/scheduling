@@ -71,6 +71,7 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.permissions.*;
@@ -366,8 +367,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive, EndA
 
             ServerJobAndTaskLogs.getInstance().setSpacesSupport(this.spacesSupport);
 
-            this.corePublicKey = Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
-            this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
+            this.corePublicKey = Credentials.getPublicKey(PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PUBKEY_PATH.getValueAsString()));
+            this.corePrivateKey = Credentials.getPrivateKey(PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PRIVKEY_PATH.getValueAsString()));
             this.schedulingService = new SchedulingService(infrastructure,
                                                            frontendState,
                                                            recoveredState,

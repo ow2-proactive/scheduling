@@ -44,6 +44,7 @@ import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.ShadowCredentialsPrincipal;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -74,9 +75,9 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     }
 
     public RMAuthenticationImpl(RMCore rmcore) {
-        super(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_JAAS_PATH.getValueAsString()),
-              PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()),
-              PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PUBKEY_PATH.getValueAsString()));
+        super(PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_JAAS_PATH.getValueAsString()),
+              PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PRIVKEY_PATH.getValueAsString()),
+              PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PUBKEY_PATH.getValueAsString()));
         this.rmcore = rmcore;
     }
 
@@ -125,7 +126,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
 
     @Override
     public String getUserNameRegexp() {
-        return PAResourceManagerProperties.RM_USERNAME_REGEXP.getValueAsString();
+        return PASharedProperties.USERNAME_REGEXP.getValueAsString();
     }
 
     private void rethrowStubException(Exception e) throws LoginException {

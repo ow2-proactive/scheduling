@@ -25,15 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
-import java.security.KeyException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.PAMLoginModule;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
 /**
@@ -43,54 +36,10 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 public class RMPAMLoginModule extends PAMLoginModule {
 
     /**
-     * Returns login file name from resource manager configuration file
-     */
-    @Override
-    protected String getLoginFileName() {
-        return RMJaasConfigUtils.getLoginFileName();
-    }
-
-    /**
-     * Returns group file name from resource manager configuration file
-     */
-    @Override
-    protected String getGroupFileName() {
-        return RMJaasConfigUtils.getGroupFileName();
-    }
-
-    /**
-     * Returns tenant file name from resource manager configuration file
-     */
-    @Override
-    protected String getTenantFileName() {
-        return RMJaasConfigUtils.getTenantFileName();
-    }
-
-    @Override
-    protected Set<String> getConfiguredDomains() {
-        return RMJaasConfigUtils.getConfiguredDomains();
-    }
-
-    /**
      * Returns logger used for authentication
      */
     public Logger getLogger() {
         return Logger.getLogger(RMPAMLoginModule.class);
-    }
-
-    @Override
-    protected PrivateKey getPrivateKey() throws KeyException {
-        return Credentials.getPrivateKey(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected PublicKey getPublicKey() throws KeyException {
-        return Credentials.getPublicKey(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PUBKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected boolean isLegacyPasswordEncryption() {
-        return PAResourceManagerProperties.RM_LEGACY_ENCRYPTION.getValueAsBoolean();
     }
 
 }

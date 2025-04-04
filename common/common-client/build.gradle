@@ -1,11 +1,8 @@
 dependencies {
     compile 'org.rrd4j:rrd4j:2.2.1'
-    compile group: 'net.sf.jpam', name: 'jpam', version: '1.1'
 
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
-
-    compile "org.keycloak:keycloak-adapter-core:24.0.2"
 
     compile project(':common:common-api')
 

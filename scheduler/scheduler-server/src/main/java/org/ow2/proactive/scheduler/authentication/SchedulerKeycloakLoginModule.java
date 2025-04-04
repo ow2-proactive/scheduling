@@ -25,16 +25,8 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
-import java.io.File;
-import java.security.KeyException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.KeycloakLoginModule;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -49,72 +41,6 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * Keycloak login module implementation for scheduling.
  */
 public class SchedulerKeycloakLoginModule extends KeycloakLoginModule {
-
-    /**
-     * Returns Keycloak configuration file name defined in scheduler configuration file
-     *
-     * @return Keycloak configuration file name defined in scheduler configuration file
-     */
-    @Override
-    protected String getKeycloakConfigFileName() {
-        String keycloakFile = PASchedulerProperties.SCHEDULER_KEYCLOAK_CONFIG_FILE_PATH.getValueAsString();
-        //test that KeycloakFile file path is an absolute path or not
-        if (!(new File(keycloakFile).isAbsolute())) {
-            //file path is relative, so we complete the path with the scheduler home
-            keycloakFile = PASchedulerProperties.getAbsolutePath(keycloakFile);
-        }
-        return keycloakFile;
-    }
-
-    /**
-     * Returns login file name from scheduler configuration file
-     * Used for authentication fall-back
-     * @return login file name from scheduler configuration file
-     */
-    @Override
-    protected String getLoginFileName() {
-        return SchedulerJaasConfigUtils.getLoginFileName();
-    }
-
-    /**
-     * Returns group file name from scheduler configuration file
-     * Used for group membership verification fall-back.
-     * @return group file name from scheduler configuration file
-     */
-    @Override
-    protected String getGroupFileName() {
-        return SchedulerJaasConfigUtils.getGroupFileName();
-    }
-
-    /**
-     * Returns tenant file name from scheduler configuration file
-     *
-     * @return tenant file name from scheduler configuration file
-     */
-    @Override
-    protected String getTenantFileName() {
-        return SchedulerJaasConfigUtils.getTenantFileName();
-    }
-
-    @Override
-    protected Set<String> getConfiguredDomains() {
-        return SchedulerJaasConfigUtils.getConfiguredDomains();
-    }
-
-    @Override
-    protected PrivateKey getPrivateKey() throws KeyException {
-        return Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected PublicKey getPublicKey() throws KeyException {
-        return Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected boolean isLegacyPasswordEncryption() {
-        return PASchedulerProperties.SCHEDULER_LEGACY_ENCRYPTION.getValueAsBoolean();
-    }
 
     /**
      * Returns logger for authentication

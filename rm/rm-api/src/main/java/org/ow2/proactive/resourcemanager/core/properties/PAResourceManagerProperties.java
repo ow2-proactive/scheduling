@@ -119,48 +119,8 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Filter resource manager by tenant **/
     RM_FILTER_BY_TENANT("pa.rm.tenant.filter", PropertyType.BOOLEAN, "false"),
 
-    /** Path to the Jaas configuration file which defines what modules are available for
-     * internal authentication */
-    RM_AUTH_JAAS_PATH("pa.rm.auth.jaas.path", PropertyType.STRING, "config/authentication/jaas.config"),
-
-    /** Path to the private key file which is used to decrypt credentials passed to the jaas module */
-    RM_AUTH_PRIVKEY_PATH("pa.rm.auth.privkey.path", PropertyType.STRING, "config/authentication/keys/priv.key"),
-
-    /** Path to the public key file which is used to encrypt credentials for authentication */
-    RM_AUTH_PUBKEY_PATH("pa.rm.auth.pubkey.path", PropertyType.STRING, "config/authentication/keys/pub.key"),
-
     /** Resource Manager authentication method */
     RM_LOGIN_METHOD("pa.rm.authentication.loginMethod", PropertyType.STRING, "RMFileLoginMethod"),
-
-    /** Resource Manager ldap configuration file */
-    RM_LDAP_CONFIG("pa.rm.ldap.config.path", PropertyType.STRING, "config/authentication/ldap.cfg"),
-
-    /** Resource Manager Keycloak configuration file path */
-    RM_KEYCLOAK_CONFIG("pa.rm.keycloak.config.path", PropertyType.STRING, "config/authentication/keycloak.cfg"),
-
-    /**
-     * Support for multi-ldap login configuration.
-     * This property must be defined using a list of the following form:
-     * domain1:path_to_domain1.cfg,domain2:path_to_domain2.cfg, etc
-     *
-     * domain names must be lowercase and must also be configured in pa.rm.allowed.domains
-     */
-    RM_MULTI_LDAP_CONFIG("pa.rm.multi.ldap.config", PropertyType.LIST),
-
-    /** Resource Manager login file name */
-    RM_LOGIN_FILE("pa.rm.defaultloginfilename", PropertyType.STRING, "config/authentication/login.cfg"),
-
-    /** Resource Manager group file name */
-    RM_GROUP_FILE("pa.rm.defaultgroupfilename", PropertyType.STRING, "config/authentication/group.cfg"),
-
-    /** Resource Manager tenant file name */
-    RM_TENANT_FILE("pa.rm.defaulttenantfilename", PropertyType.STRING, "config/authentication/tenant.cfg"),
-
-    /** List of domain names that can be used during a login (can be a list of windows domain names or a list of tenants in Multi-LDAP configuration) **/
-    RM_ALLOWED_DOMAINS("pa.rm.allowed.domains", PropertyType.LIST),
-
-    /** Regular expression used to control the username format when logging in. Always enabled to prevent injection attacks on 3rd-party authentication like LDAP */
-    RM_USERNAME_REGEXP("pa.rm.username.regexp", PropertyType.STRING, "^[A-Za-z0-9_\\-@.]+$"),
 
     /** Name of the JMX MBean for the RM */
     RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PropertyType.STRING, "JMXRMAgent"),

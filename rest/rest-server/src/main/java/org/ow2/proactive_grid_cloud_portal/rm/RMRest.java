@@ -74,6 +74,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -159,8 +160,8 @@ public class RMRest implements RMRestInterface {
 
     @Override
     public List<String> getDomains() {
-        if (PAResourceManagerProperties.RM_ALLOWED_DOMAINS.isSet()) {
-            return PAResourceManagerProperties.RM_ALLOWED_DOMAINS.getValueAsList(",", true);
+        if (PASharedProperties.ALLOWED_DOMAINS.isSet()) {
+            return PASharedProperties.ALLOWED_DOMAINS.getValueAsList(",", true);
         }
 
         // windows current machine domain

@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.authentication;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -55,6 +56,7 @@ import javax.security.auth.login.LoginException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.principals.*;
+import org.ow2.proactive.core.properties.PASharedProperties;
 
 import com.google.common.base.Strings;
 
@@ -577,11 +579,19 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     }
 
     /**
-     * Retrieves LDAP configuration file name.
+     * Retrieves LDAP configuration file path.
      *
-     * @return name of the file with LDAP configuration.
+     * @return path of the file with LDAP configuration.
      */
-    protected abstract String getLDAPConfigFileName();
+    protected String getLDAPConfigFileName() {
+        String ldapFile = PASharedProperties.LDAP_CONFIG_FILE_PATH.getValueAsString();
+        //test that ldap file path is an absolute path or not
+        if (!(new File(ldapFile).isAbsolute())) {
+            //file path is relative, so we complete the path with the scheduler home
+            ldapFile = PASharedProperties.getAbsolutePath(ldapFile);
+        }
+        return ldapFile;
+    }
 
     private Hashtable<String, String> createBasicEnvForInitalContext() {
         Hashtable<String, String> env = new Hashtable<>(6, 1f);

@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
+import static org.ow2.proactive.core.properties.PASharedProperties.*;
+
 import java.io.IOException;
 import java.security.KeyException;
 
@@ -40,6 +42,7 @@ import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.ShadowCredentialsPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -83,9 +86,9 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
      * @param frontend the scheduler front-end on which to connect the user after authentication success.
      */
     public SchedulerAuthentication(SchedulerFrontend frontend) {
-        super(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_JAAS_PATH.getValueAsString()),
-              PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()),
-              PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
+        super(PASharedProperties.getAbsolutePath(AUTH_JAAS_PATH.getValueAsString()),
+              PASharedProperties.getAbsolutePath(AUTH_PRIVKEY_PATH.getValueAsString()),
+              PASharedProperties.getAbsolutePath(AUTH_PUBKEY_PATH.getValueAsString()));
         this.frontend = frontend;
     }
 
@@ -128,7 +131,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
 
     @Override
     public String getUserNameRegexp() {
-        return PASchedulerProperties.SCHEDULER_USERNAME_REGEXP.getValueAsString();
+        return PASharedProperties.USERNAME_REGEXP.getValueAsString();
     }
 
     private void rethrowSchedulerStubException(Exception e) throws LoginException {

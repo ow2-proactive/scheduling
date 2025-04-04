@@ -85,6 +85,7 @@ import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.permissions.RoleAdmin;
@@ -232,8 +233,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public List<String> getDomains() {
-        if (PASchedulerProperties.SCHEDULER_ALLOWED_DOMAINS.isSet()) {
-            return PASchedulerProperties.SCHEDULER_ALLOWED_DOMAINS.getValueAsList(",", true);
+        if (PASharedProperties.ALLOWED_DOMAINS.isSet()) {
+            return PASharedProperties.ALLOWED_DOMAINS.getValueAsList(",", true);
         }
 
         // windows current machine domain

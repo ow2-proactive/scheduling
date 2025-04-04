@@ -339,8 +339,8 @@ public class SchedulingService {
      */
     Credentials addThirdPartyCredentials(Credentials creds) throws KeyException, IllegalAccessException {
         //retrieve scheduler key pair
-        String privateKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
-        String publicKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString());
+        String privateKeyPath = PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PRIVKEY_PATH.getValueAsString());
+        String publicKeyPath = PASharedProperties.getAbsolutePath(PASharedProperties.AUTH_PUBKEY_PATH.getValueAsString());
 
         //get keys from task
         PrivateKey privateKey = Credentials.getPrivateKey(privateKeyPath);

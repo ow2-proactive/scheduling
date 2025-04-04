@@ -48,6 +48,7 @@ dependencies {
 
     compile project(":scheduler:scheduler-client")
     compile project(":rm:rm-client")
+    compile project(":common:common-server")
     compile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"

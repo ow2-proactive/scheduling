@@ -25,16 +25,8 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
-import java.io.File;
-import java.security.KeyException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.MultiLDAPLoginModule;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -42,82 +34,6 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * scheduler configuration and uses it to authenticate users.
  */
 public class SchedulerMultiLDAPLoginModule extends MultiLDAPLoginModule {
-
-    /**
-     * Returns Multiple LDAP configuration defined in scheduler configuration file
-     *
-     * @return a map of (domain_name,configuration_file)
-     */
-    @Override
-    protected Map<String, String> getMultiLDAPConfig() {
-        Map<String, String> answer = new HashMap<>();
-        List<String> ldapConfigList = PASchedulerProperties.SCHEDULER_MULTI_LDAP_CONFIG.getValueAsList(",");
-        for (String config : ldapConfigList) {
-            String[] configPair = config.split("\\s*:\\s*");
-            if (configPair.length != 2) {
-                throw new IllegalArgumentException("invalid multi-ldap configuration string : " + config);
-            }
-            String domain = configPair[0];
-            String ldapFile = configPair[1];
-            //test that ldap file path is an absolute path or not
-            if (!(new File(ldapFile).isAbsolute())) {
-                //file path is relative, so we complete the path with the scheduler home
-                ldapFile = PASchedulerProperties.getAbsolutePath(ldapFile);
-            }
-            answer.put(domain, ldapFile);
-        }
-        return answer;
-    }
-
-    /**
-     * Returns login file name from scheduler configuration file
-     * Used for authentication fall-back
-     * @return login file name from scheduler configuration file
-     */
-    @Override
-    protected String getLoginFileName() {
-        return SchedulerJaasConfigUtils.getLoginFileName();
-    }
-
-    /**
-     * Returns group file name from scheduler configuration file
-     * Used for group membership verification fall-back.
-     * @return group file name from scheduler configuration file
-     */
-    @Override
-    protected String getGroupFileName() {
-        return SchedulerJaasConfigUtils.getGroupFileName();
-    }
-
-    /**
-     * Returns tenant file name from scheduler configuration file
-     *
-     * @return tenant file name from scheduler configuration file
-     */
-    @Override
-    protected String getTenantFileName() {
-        return SchedulerJaasConfigUtils.getTenantFileName();
-    }
-
-    @Override
-    protected Set<String> getConfiguredDomains() {
-        return SchedulerJaasConfigUtils.getConfiguredDomains();
-    }
-
-    @Override
-    protected PrivateKey getPrivateKey() throws KeyException {
-        return Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected PublicKey getPublicKey() throws KeyException {
-        return Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected boolean isLegacyPasswordEncryption() {
-        return PASchedulerProperties.SCHEDULER_LEGACY_ENCRYPTION.getValueAsBoolean();
-    }
 
     /**
      * Returns logger for authentication

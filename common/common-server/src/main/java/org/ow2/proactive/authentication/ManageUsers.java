@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.authentication;
+package org.ow2.proactive.authentication;
 
 import static org.ow2.proactive.authentication.FileLoginModule.authenticationLockFile;
 
@@ -34,13 +34,12 @@ import java.security.PublicKey;
 import java.util.*;
 
 import org.apache.commons.cli.*;
-import org.apache.commons.io.IOUtils;
 import org.objectweb.proactive.utils.SecurityManagerConfigurator;
 import org.ow2.proactive.authentication.FileLoginModule;
 import org.ow2.proactive.authentication.crypto.CreateCredentials;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.utils.Tools;
 
 import com.google.common.base.Strings;
@@ -329,8 +328,8 @@ public class ManageUsers {
                     sourceLoginProps.put(userInfo.getLogin(), userInfo.getPassword());
                 }
             }
-            if (PASchedulerProperties.SCHEDULER_USERNAME_REGEXP.isSet()) {
-                String userNameRegexp = PASchedulerProperties.SCHEDULER_USERNAME_REGEXP.getValueAsString();
+            if (PASharedProperties.USERNAME_REGEXP.isSet()) {
+                String userNameRegexp = PASharedProperties.USERNAME_REGEXP.getValueAsString();
                 Enumeration<String> propertyNames = (Enumeration<String>) sourceLoginProps.propertyNames();
                 while (propertyNames.hasMoreElements()) {
                     String loginName = propertyNames.nextElement();
@@ -614,15 +613,13 @@ public class ManageUsers {
     private static void updateUserPassword(PublicKey pubKey, String login, String password, Properties props)
             throws KeyException, ManageUsersException {
         String encodedPassword;
-        if (PASchedulerProperties.SCHEDULER_PASSWORD_STRENGTH_ENABLE.getValueAsBoolean()) {
-            if (!password.matches(PASchedulerProperties.SCHEDULER_PASSWORD_STRENGTH_REGEXP.getValueAsString())) {
+        if (PASharedProperties.PASSWORD_STRENGTH_ENABLE.getValueAsBoolean()) {
+            if (!password.matches(PASharedProperties.PASSWORD_STRENGTH_REGEXP.getValueAsString())) {
                 exitWithErrorMessage("Password of user " + login + " does not satisfy strength requirements: " +
-                                     PASchedulerProperties.SCHEDULER_PASSWORD_STRENGTH_ERROR_MESSAGE.getValueAsString(),
-                                     null,
-                                     null);
+                                     PASharedProperties.PASSWORD_STRENGTH_ERROR_MESSAGE.getValueAsString(), null, null);
             }
         }
-        if (PASchedulerProperties.SCHEDULER_LEGACY_ENCRYPTION.getValueAsBoolean()) {
+        if (PASharedProperties.LEGACY_ENCRYPTION.getValueAsBoolean()) {
             encodedPassword = HybridEncryptionUtil.encryptStringToBase64(password,
                                                                          pubKey,
                                                                          FileLoginModule.ENCRYPTED_DATA_SEP);
@@ -713,22 +710,22 @@ public class ManageUsers {
     }
 
     private static String getLoginFilePath() {
-        return getSchedulerFile(PASchedulerProperties.SCHEDULER_LOGIN_FILENAME.getValueAsString());
+        return getSchedulerFile(PASharedProperties.LOGIN_FILENAME.getValueAsString());
     }
 
     private static String getGroupFilePath() {
-        return getSchedulerFile(PASchedulerProperties.SCHEDULER_GROUP_FILENAME.getValueAsString());
+        return getSchedulerFile(PASharedProperties.GROUP_FILENAME.getValueAsString());
     }
 
     private static String getPublicKeyFilePath() {
-        return getSchedulerFile(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString());
+        return getSchedulerFile(PASharedProperties.AUTH_PUBKEY_PATH.getValueAsString());
     }
 
     private static String getSchedulerFile(String path) {
         String schedulerFile = path;
         if (!(new File(schedulerFile).isAbsolute())) {
             //file path is relative, so we complete the path with the prefix Scheduler_Home constant
-            schedulerFile = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + path;
+            schedulerFile = PASharedProperties.SHARED_HOME.getValueAsString() + File.separator + path;
         }
         return schedulerFile;
     }

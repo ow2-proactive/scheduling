@@ -25,15 +25,8 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
-import java.security.KeyException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.PAMLoginModule;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -41,56 +34,6 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * scheduler configuration and uses them to authenticate users.
  */
 public class SchedulerPAMLoginModule extends PAMLoginModule {
-
-    /**
-     * Returns login file name from scheduler configuration file
-     *
-     * @return login file name from scheduler configuration file
-     */
-    @Override
-    protected String getLoginFileName() {
-        return SchedulerJaasConfigUtils.getLoginFileName();
-    }
-
-    /**
-     * Returns group file name from scheduler configuration file
-     *
-     * @return group file name from scheduler configuration file
-     */
-    @Override
-    protected String getGroupFileName() {
-        return SchedulerJaasConfigUtils.getGroupFileName();
-    }
-
-    /**
-     * Returns tenant file name from scheduler configuration file
-     *
-     * @return tenant file name from scheduler configuration file
-     */
-    @Override
-    protected String getTenantFileName() {
-        return SchedulerJaasConfigUtils.getTenantFileName();
-    }
-
-    @Override
-    protected Set<String> getConfiguredDomains() {
-        return SchedulerJaasConfigUtils.getConfiguredDomains();
-    }
-
-    @Override
-    protected PrivateKey getPrivateKey() throws KeyException {
-        return Credentials.getPrivateKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected PublicKey getPublicKey() throws KeyException {
-        return Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
-    }
-
-    @Override
-    protected boolean isLegacyPasswordEncryption() {
-        return PASchedulerProperties.SCHEDULER_LEGACY_ENCRYPTION.getValueAsBoolean();
-    }
 
     /**
      * Returns logger used for authentication
