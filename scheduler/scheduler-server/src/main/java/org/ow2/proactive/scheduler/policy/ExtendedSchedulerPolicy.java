@@ -98,7 +98,7 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
         initialize();
-        schedulingPolicyTimingLogger.start("ESP.getOrderTasks");
+        schedulingPolicyTimingLogger.start("ESP.getOrderedTasks");
         Date now = new Date();
         LinkedList<EligibleTaskDescriptor> executionCycleTasks = new LinkedList<>();
 
@@ -147,7 +147,7 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                 }
             }
         }
-        schedulingPolicyTimingLogger.end("ESP.getOrderTasks");
+        schedulingPolicyTimingLogger.end("ESP.getOrderedTasks");
         if (!schedulingPolicyTimingLogger.isHierarchical()) {
             schedulingPolicyTimingLogger.printTimings(Level.DEBUG);
             schedulingPolicyTimingLogger.clear();

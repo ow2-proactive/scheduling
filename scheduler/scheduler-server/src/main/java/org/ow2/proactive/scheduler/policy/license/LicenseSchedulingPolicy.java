@@ -93,9 +93,9 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
                 if (nbTokens > 0) {
                     licenseSynchronization.addSoftware(software, nbTokens);
                 } else {
-                    // In order to distinguish the case where there is no more token (all are used)
-                    // and the case where it is set to <= 0 in the config file
-                    licenseSynchronization.addSoftware(software, -1);
+                    logger.error("In " + LicenseConfiguration.getConfiguration().getPath() + ": software " + software +
+                                 " has incorrect value " + nbTokens);
+                    continue;
                 }
             }
             licenseSynchronization.persist();
