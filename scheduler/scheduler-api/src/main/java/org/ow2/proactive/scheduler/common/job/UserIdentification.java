@@ -147,6 +147,16 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract boolean isOtherUsersJobReadPermission();
 
     /**
+     * Check if the user has permission to manage users
+     */
+    public abstract boolean isManageUsersPermission();
+
+    /**
+     * Check if the user has permission to change a user's password
+     */
+    public abstract boolean isChangePasswordPermission();
+
+    /**
      * Return the tenant associated with the current user, or null if no tenant is associated
      *
      * @return user tenant

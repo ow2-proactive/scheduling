@@ -32,6 +32,8 @@ import java.security.PublicKey;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -129,6 +131,12 @@ public class RegeneratePasswords {
 
     private static boolean regenerateSystemAccounts = false;
 
+    private static PublicKey pubKey = null;
+
+    private static PrivateKey privKey = null;
+
+    private static String loginFilePath = null;
+
     /**
      * Entry point
      *
@@ -163,11 +171,9 @@ public class RegeneratePasswords {
         /**
          * default values
          */
-        String pubKeyPath = null;
-        String privKeyPath = null;
-        PublicKey pubKey = null;
-        PrivateKey privKey = null;
-        String loginFilePath = getLoginFilePath();
+        String pubKeyPath = getPublicKeyFilePath();
+        String privKeyPath = getPrivateKeyFilePath();
+        loginFilePath = getLoginFilePath();
         String sourceLoginFilePath = null;
 
         Options options = new Options();
@@ -205,13 +211,6 @@ public class RegeneratePasswords {
             sourceLoginFilePath = cmd.getOptionValue(SOURCE_LOGINFILE_OPTION_NAME);
         }
 
-        if (pubKeyPath == null) {
-            pubKeyPath = getPublicKeyFilePath();
-        }
-        if (privKeyPath == null) {
-            privKeyPath = getPrivateKeyFilePath();
-        }
-
         try {
             pubKey = Credentials.getPublicKey(pubKeyPath);
         } catch (KeyException e) {
@@ -228,7 +227,7 @@ public class RegeneratePasswords {
 
         convertLegacyToNew = cmd.hasOption(CONVERT_LEGACY_TO_NEW_OPTION_NAME);
 
-        updateAccounts(pubKey, privKey, loginFilePath, sourceLoginFilePath);
+        updateAccounts(sourceLoginFilePath);
     }
 
     /**
@@ -236,8 +235,7 @@ public class RegeneratePasswords {
      *
      * @throws UpdatePasswordsException
      */
-    private static void updateAccounts(final PublicKey pubKey, final PrivateKey privKey, final String loginFilePath,
-            final String sourceLoginFile) throws UpdatePasswordsException {
+    private static void updateAccounts(final String sourceLoginFile) throws UpdatePasswordsException {
         Properties destinationLoginProps = new Properties();
         try {
             try (InputStreamReader stream = new InputStreamReader(new FileInputStream(loginFilePath))) {
@@ -286,10 +284,10 @@ public class RegeneratePasswords {
                 sourceUserInfo.setLogin(user);
                 sourceUserInfo.setPassword((String) sourceLoginProps.get(user));
 
-                updateAccountPassword(pubKey, sourceUserInfo, loginFilePath, destinationLoginProps);
+                updateAccountPassword(sourceUserInfo, destinationLoginProps);
             }
 
-            storeLoginFile(loginFilePath, destinationLoginProps);
+            storeLoginFile(destinationLoginProps);
 
             if (regenerateSystemAccounts) {
                 updateConfigurationFilesForWatcherAccount(sourceLoginProps.getProperty("watcher"));
@@ -324,8 +322,8 @@ public class RegeneratePasswords {
         }
     }
 
-    private static void updateAccountPassword(PublicKey pubKey, UserInfo userInfo, String loginFilePath,
-            Properties props) throws UpdatePasswordsException, KeyException {
+    private static void updateAccountPassword(UserInfo userInfo, Properties props)
+            throws UpdatePasswordsException, KeyException {
         if (!userInfo.isLoginSet()) {
             warnWithMessage(PROVIDED_USERNAME + IS_EMPTY_SKIPPING);
             return;
@@ -498,30 +496,10 @@ public class RegeneratePasswords {
     /**
      * Stores the logins into login.cfg
      */
-    private static void storeLoginFile(String loginFilePath, Properties props) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(loginFilePath)))) {
-            props.store(writer, null);
-        }
-        List<String> lines = null;
-
-        try (FileInputStream stream = new FileInputStream(loginFilePath)) {
-            lines = IOUtils.readLines(stream);
-        }
-
-        TreeMap<String, String> sortedUsers = new TreeMap<>();
-        for (String line : lines) {
-            if (!(line.isEmpty() || line.startsWith("#"))) {
-                String[] loginAndPwd = line.split("=", 2);
-                sortedUsers.put(loginAndPwd[0], loginAndPwd[1]);
-            }
-        }
-        List<String> modifiedLines = new ArrayList<>(sortedUsers.size());
-        for (Map.Entry entry : sortedUsers.entrySet()) {
-            modifiedLines.add(entry.getKey() + ":" + entry.getValue());
-        }
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(loginFilePath)))) {
-            IOUtils.writeLines(modifiedLines, System.getProperty("line.separator"), writer);
-        }
+    private static void storeLoginFile(Properties props) throws LoginException {
+        UsersServiceImpl usersService = UsersServiceImpl.getInstance();
+        usersService.setLoginFilePath(loginFilePath);
+        usersService.storeLoginFile(props);
         System.out.println("Stored login file in " + loginFilePath);
     }
 

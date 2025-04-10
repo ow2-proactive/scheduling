@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.List;
@@ -38,10 +39,11 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.authentication.ManageUsers;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -155,6 +157,18 @@ public class ManageUsersTest {
         publicKeyFile = tmpFolder.newFile("pub.key");
         KeyGen.main(new String[] { "-P", publicKeyFile.getAbsolutePath(), "-p", privateKeyFile.getAbsolutePath() });
         privateKey = Credentials.getPrivateKey(privateKeyFile.getAbsolutePath());
+        Logger.getRootLogger().getLoggerRepository().resetConfiguration();
+        BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%m%n")));
+    }
+
+    @After
+    public void after() throws Exception {
+        loginFile.delete();
+        groupFile.delete();
+        sourceLoginFile.delete();
+        sourceGroupFile.delete();
+        privateKeyFile.delete();
+        publicKeyFile.delete();
     }
 
     @Test
@@ -314,6 +328,9 @@ public class ManageUsersTest {
     private void validateContents(Map<String, String> usersToCheck, Multimap<String, String> groupsToCheck)
             throws IOException, KeyException {
         Properties props = new Properties();
+        String fileContents = FileUtils.readFileToString(loginFile, Charset.defaultCharset());
+        System.out.println("File contents:");
+        System.out.println(fileContents);
         try (Reader reader = new InputStreamReader(new FileInputStream(loginFile))) {
             props.load(reader);
             String groupContent = IOUtils.toString(groupFile.toURI());

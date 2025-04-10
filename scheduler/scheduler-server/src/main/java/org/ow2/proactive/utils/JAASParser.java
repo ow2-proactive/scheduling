@@ -196,6 +196,10 @@ public class JAASParser implements JAASParserInterface {
                         answer.setRoleAdmin(true);
                     } else if (RoleReaderPermission.class.getCanonicalName().equals(permissionName)) {
                         answer.setRoleReader(true);
+                    } else if (ManageUsersPermission.class.getCanonicalName().equals(permissionName)) {
+                        answer.setManageUsersPermission(true);
+                    } else if (ChangePasswordPermission.class.getCanonicalName().equals(permissionName)) {
+                        answer.setChangePasswordPermission(true);
                     } else if (PcaAdminPermission.class.getCanonicalName().equals(permissionName)) {
                         answer.setPcaAdmin(true);
                     } else if (NotificationAdminPermission.class.getCanonicalName().equals(permissionName)) {
@@ -399,6 +403,12 @@ public class JAASParser implements JAASParserInterface {
         }
         if (group.isRoleReader()) {
             answer.append(I + P + RoleReaderPermission.class.getCanonicalName() + ";" + NL);
+        }
+        if (group.isManageUsersPermission()) {
+            answer.append(I + P + ManageUsersPermission.class.getCanonicalName() + ";" + NL);
+        }
+        if (group.isChangePasswordPermission()) {
+            answer.append(I + P + ChangePasswordPermission.class.getCanonicalName() + ";" + NL);
         }
         if (group.isTenantAllAccess()) {
             answer.append(I + P + TenantAllAccessPermission.class.getCanonicalName() + ";" + NL);

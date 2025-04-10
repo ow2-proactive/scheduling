@@ -45,6 +45,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
     permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.permissions.ChangePasswordPermission;
     permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
 
     // ****** Scheduler permissions ******
@@ -97,6 +98,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
     permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.permissions.ChangePasswordPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
     permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
 
@@ -275,6 +277,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
     permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.permissions.ChangePasswordPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
     permission org.ow2.proactive.permissions.PcaAdminPermission;
     permission org.ow2.proactive.permissions.NotificationAdminPermission;
@@ -335,6 +338,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
     permission org.ow2.proactive.permissions.PcaAdminPermission;
     permission org.ow2.proactive.permissions.NotificationAdminPermission;
+    permission org.ow2.proactive.permissions.ManageUsersPermission;
+    permission org.ow2.proactive.permissions.ChangePasswordPermission;
     permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
     permission org.ow2.proactive.scheduler.permissions.JobPlannerAllAccessPermission;
     permission org.ow2.proactive.scheduler.permissions.CatalogAllAccessPermission;
@@ -391,6 +396,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     // ****** Global permissions ******
     permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "*";
     permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.permissions.ChangePasswordPermission;
     permission org.ow2.proactive.scheduler.permissions.TenantAllAccessPermission;
     permission org.ow2.proactive.permissions.PcaAdminPermission;
     permission org.ow2.proactive.permissions.NotificationAdminPermission;
@@ -523,7 +529,10 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "citizen-ds" {
     // ****** Global permissions ******
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,workflow-execution,catalog-portal,job-analytics";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "studio,workflow-execution,catalog-portal,job-analytics,user-management";
+
+    permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.permissions.ChangePasswordPermission;
 
     // ****** Scheduler permissions ******
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
@@ -574,8 +583,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "expert-ds" {
     // ****** Global permissions ******
-    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "scheduler,studio,workflow-execution,catalog-portal,job-analytics,job-gantt,job-planner-calendar-def,job-planner-calendar-def-workflows,job-planner-execution-planning,job-planner-gantt-chart,service-automation,notification-portal";
+    permission org.ow2.proactive_grid_cloud_portal.common.PortalAccessPermission "scheduler,studio,workflow-execution,catalog-portal,job-analytics,job-gantt,job-planner-calendar-def,job-planner-calendar-def-workflows,job-planner-execution-planning,job-planner-gantt-chart,service-automation,notification-portal,user-management";
     permission org.ow2.proactive.permissions.RoleReaderPermission;
+    permission org.ow2.proactive.permissions.ChangePasswordPermission;
     permission org.ow2.proactive.scheduler.permissions.JPCanCreateAssociationPermission;
 
     // ****** Scheduler permissions ******

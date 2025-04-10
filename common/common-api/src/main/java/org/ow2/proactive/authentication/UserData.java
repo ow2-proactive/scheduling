@@ -77,6 +77,10 @@ public class UserData implements Serializable {
 
     private boolean otherUsersJobReadPermission;
 
+    private boolean manageUsersPermission;
+
+    private boolean changePasswordPermission;
+
     private List<String> prioritiesPermission;
 
     private List<String> portalAccessPermission = new ArrayList<>();
@@ -203,6 +207,22 @@ public class UserData implements Serializable {
 
     public void setSchedulerAdminPermission(boolean schedulerAdminPermission) {
         this.schedulerAdminPermission = schedulerAdminPermission;
+    }
+
+    public boolean isManageUsersPermission() {
+        return manageUsersPermission;
+    }
+
+    public void setManageUsersPermission(boolean manageUsersPermission) {
+        this.manageUsersPermission = manageUsersPermission;
+    }
+
+    public boolean isChangePasswordPermission() {
+        return changePasswordPermission;
+    }
+
+    public void setChangePasswordPermission(boolean changePasswordPermission) {
+        this.changePasswordPermission = changePasswordPermission;
     }
 
     public boolean isHandleOnlyMyJobsPermission() {
