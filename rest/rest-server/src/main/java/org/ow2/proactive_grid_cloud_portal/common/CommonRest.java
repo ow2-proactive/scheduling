@@ -43,7 +43,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.authentication.*;
+import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -53,11 +54,9 @@ import org.ow2.proactive_grid_cloud_portal.common.dto.JAASConfiguration;
 import org.ow2.proactive_grid_cloud_portal.common.dto.JAASGroup;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 
@@ -97,7 +96,11 @@ public class CommonRest implements CommonRestInterface {
                                                                                            "Service Automation")
                                                                                       .put("notification-portal",
                                                                                            "Notifications")
+                                                                                      .put("user-management",
+                                                                                           "User Management")
                                                                                       .build();
+
+    private static String DOMAIN_SEP = "@";
 
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
@@ -179,6 +182,9 @@ public class CommonRest implements CommonRestInterface {
             List<String> adminRoles = new ArrayList<>();
             if (answer.isRoleAdminPermission()) {
                 adminRoles.add("Role Manager");
+            }
+            if (answer.isManageUsersPermission()) {
+                adminRoles.add("Users Manager");
             }
             if (answer.isRmCoreAllPermission()) {
                 adminRoles.add("Resource Manager");
@@ -580,6 +586,241 @@ public class CommonRest implements CommonRestInterface {
             throw new PermissionRestException("Resource Manager administrative rights is required");
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
+
+    @Override
+    public List<OutputUserInfo> createUser(String sessionId, InputUserInfo userInfo)
+            throws PermissionRestException, NotConnectedRestException, LoginRestException {
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        UsersService usersService = UsersServiceImpl.getInstance();
+        try {
+            checkPermission(scheduler.getSubject(), new ManageUsersPermission(), "Manage Users rights is required");
+            usersService.refresh();
+            List<OutputUserInfo> answer = usersService.addUser(userInfo);
+            usersService.commit();
+            return answer;
+        } catch (PermissionException e) {
+            throw new PermissionRestException("You don't have necessary rights to create an user");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        } catch (LoginException e) {
+            throw new LoginRestException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<OutputUserInfo> listUsers(String sessionId)
+            throws PermissionRestException, NotConnectedRestException, LoginRestException {
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        UsersService usersService = UsersServiceImpl.getInstance();
+
+        try {
+            usersService.refresh();
+            if (isManageUser(scheduler.getSubject())) {
+                return usersService.listUsers();
+            } else if (isChangePassword(scheduler.getSubject())) {
+                String key = getUserLogin(usersService, scheduler.getCurrentUserData());
+                return Collections.singletonList(usersService.getUser(key));
+            } else {
+                throw new PermissionRestException("You don't have necessary rights to list users");
+            }
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        } catch (LoginException e) {
+            throw new LoginRestException(e.getMessage());
+        }
+    }
+
+    @Override
+    public OutputUserInfo getUserDetails(String sessionId, String username)
+            throws PermissionRestException, NotConnectedRestException, LoginRestException {
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        UsersService usersService = UsersServiceImpl.getInstance();
+        try {
+            usersService.refresh();
+            if (isManageUser(scheduler.getSubject())) {
+                return usersService.getUser(username);
+            } else if (isChangePassword(scheduler.getSubject())) {
+                String key = getUserLogin(usersService, scheduler.getCurrentUserData());
+                if (!username.equals(key)) {
+                    throw new PermissionRestException("You don't have the permission to read another user's information");
+                }
+                return usersService.getUser(username);
+            } else {
+                throw new PermissionRestException("You don't have necessary rights to get a user's information");
+            }
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        } catch (LoginException e) {
+            throw new LoginRestException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<OutputUserInfo> editUser(String sessionId, String username, InputUserInfo userInfo)
+            throws PermissionRestException, NotConnectedRestException, LoginRestException {
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        UsersService usersService = UsersServiceImpl.getInstance();
+        try {
+            usersService.refresh();
+            List<OutputUserInfo> answer;
+            if (isManageUser(scheduler.getSubject())) {
+                if (!username.equals(userInfo.getLogin())) {
+                    throw new IllegalArgumentException("username " + username +
+                                                       " does not match user info login name " + userInfo.getLogin());
+                }
+                answer = usersService.updateUser(userInfo);
+            } else if (isChangePassword(scheduler.getSubject())) {
+                String key = getUserLogin(usersService, scheduler.getCurrentUserData());
+                if (!username.equals(key)) {
+                    throw new PermissionRestException("You don't have the permission to edit another user's information");
+                }
+                if (!username.equals(userInfo.getLogin())) {
+                    throw new IllegalArgumentException("username " + username +
+                                                       " does not match user info login name " + userInfo.getLogin());
+                }
+                if (userInfo.getGroups() != null) {
+                    throw new PermissionRestException("You don't have the permission to edit your groups");
+                }
+                if (Strings.isNullOrEmpty(userInfo.getPassword())) {
+                    throw new IllegalArgumentException("Password must not be null or empty");
+                }
+
+                answer = usersService.updateUser(userInfo);
+                answer.removeIf(ui -> !ui.getLogin().equals(username));
+            } else {
+                throw new PermissionRestException("You don't have necessary rights to get a user's information");
+            }
+            usersService.commit();
+            return answer;
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        } catch (LoginException e) {
+            throw new LoginRestException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<OutputUserInfo> deleteUser(String sessionId, String username)
+            throws PermissionRestException, NotConnectedRestException, LoginRestException {
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        UsersService usersService = UsersServiceImpl.getInstance();
+        try {
+            checkPermission(scheduler.getSubject(),
+                            new ManageUsersPermission(),
+                            "Manage Users rights is required to delete a user");
+            usersService.refresh();
+            List<OutputUserInfo> answer = usersService.deleteUser(username);
+            usersService.commit();
+            return answer;
+        } catch (PermissionException e) {
+            throw new PermissionRestException("You don't have necessary rights to delete an user");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        } catch (LoginException e) {
+            throw new LoginRestException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, String> listGroupsToTenantAssociations(String sessionId)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException {
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        UsersService usersService = UsersServiceImpl.getInstance();
+        try {
+            checkPermission(scheduler.getSubject(),
+                            new ManageUsersPermission(),
+                            "Manage Users rights is required to list group to tenant association");
+            usersService.refresh();
+            return usersService.listGroupsToTenant();
+        } catch (PermissionException e) {
+            throw new PermissionRestException("You don't have necessary rights to list groups to tenants associations");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        } catch (LoginException e) {
+            throw new LoginRestException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, String> addGroupToTenantAssociation(String sessionId, String group, String tenant)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException {
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        UsersService usersService = UsersServiceImpl.getInstance();
+        try {
+            checkPermission(scheduler.getSubject(),
+                            new ManageUsersPermission(),
+                            "Manage Users rights is required to list group to tenant association");
+            if (Strings.isNullOrEmpty(group)) {
+                throw new IllegalArgumentException("group cannot be empty");
+            }
+            if (Strings.isNullOrEmpty(tenant)) {
+                throw new IllegalArgumentException("tenant cannot be empty");
+            }
+            usersService.refresh();
+            Map<String, String> answer = usersService.addGroupTenantAssociation(group, tenant);
+            usersService.commit();
+            return answer;
+        } catch (PermissionException e) {
+            throw new PermissionRestException("You don't have necessary rights to add group to tenant association");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        } catch (LoginException e) {
+            throw new LoginRestException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, String> removeGroupToTenantAssociation(String sessionId, String group)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException {
+        Scheduler scheduler = checkSchedulerAccess(sessionId);
+        UsersService usersService = UsersServiceImpl.getInstance();
+        try {
+            checkPermission(scheduler.getSubject(),
+                            new ManageUsersPermission(),
+                            "Manage Users rights is required to list group to tenant association");
+            if (Strings.isNullOrEmpty(group)) {
+                throw new IllegalArgumentException("group cannot be empty");
+            }
+            usersService.refresh();
+            Map<String, String> answer = usersService.removeGroupTenantAssociation(group);
+            usersService.commit();
+            return answer;
+        } catch (PermissionException e) {
+            throw new PermissionRestException("You don't have necessary rights to remove group to tenant association");
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        } catch (LoginException e) {
+            throw new LoginRestException(e.getMessage());
+        }
+    }
+
+    private String getUserLogin(UsersService usersService, UserData userData) {
+        String key = userData.getUserName();
+        if (!Strings.isNullOrEmpty(userData.getDomain())) {
+            if (usersService.userExists(userData.getUserName() + DOMAIN_SEP + userData.getDomain())) {
+                key = userData.getUserName() + DOMAIN_SEP + userData.getDomain();
+            }
+        }
+        return key;
+    }
+
+    private boolean isManageUser(Subject subject) {
+        try {
+            checkPermission(subject, new ManageUsersPermission(), "Manage Users rights is required");
+            return true;
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    private boolean isChangePassword(Subject subject) {
+        try {
+            checkPermission(subject, new ChangePasswordPermission(), "Change Password rights is required");
+            return true;
+        } catch (PermissionException e) {
+            return false;
         }
     }
 }

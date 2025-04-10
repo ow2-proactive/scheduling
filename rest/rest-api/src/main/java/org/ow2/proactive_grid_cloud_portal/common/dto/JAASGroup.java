@@ -57,11 +57,16 @@ public class JAASGroup {
                                                                        of("job-planner-gantt-chart", false),
                                                                        of("event-orchestration", false),
                                                                        of("service-automation", false),
-                                                                       of("notification-portal", false));
+                                                                       of("notification-portal", false),
+                                                                       of("user-management", false));
 
     private boolean roleAdmin = false;
 
     private boolean roleReader = false;
+
+    private boolean manageUsersPermission = false;
+
+    private boolean changePasswordPermission = false;
 
     private boolean pcaAdmin = false;
 
@@ -119,6 +124,22 @@ public class JAASGroup {
 
     public void setRoleReader(boolean roleReader) {
         this.roleReader = roleReader;
+    }
+
+    public boolean isManageUsersPermission() {
+        return manageUsersPermission;
+    }
+
+    public void setManageUsersPermission(boolean manageUsersPermission) {
+        this.manageUsersPermission = manageUsersPermission;
+    }
+
+    public boolean isChangePasswordPermission() {
+        return changePasswordPermission;
+    }
+
+    public void setChangePasswordPermission(boolean changePasswordPermission) {
+        this.changePasswordPermission = changePasswordPermission;
     }
 
     public boolean isPcaAdmin() {

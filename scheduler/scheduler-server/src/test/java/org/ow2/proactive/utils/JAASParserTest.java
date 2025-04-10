@@ -80,7 +80,8 @@ public class JAASParserTest extends ProActiveTestClean {
                                                      of("job-planner-gantt-chart", false),
                                                      of("event-orchestration", false),
                                                      of("service-automation", false),
-                                                     of("notification-portal", false)));
+                                                     of("notification-portal", false),
+                                                     of("user-management", false)));
         group.setRoleReader(true);
         group.setPcaAdmin(true);
         group.setNotificationAdmin(true);

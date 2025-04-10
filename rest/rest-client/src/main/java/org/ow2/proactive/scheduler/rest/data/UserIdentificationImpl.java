@@ -134,6 +134,16 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     @Override
+    public boolean isManageUsersPermission() {
+        return false;
+    }
+
+    @Override
+    public boolean isChangePasswordPermission() {
+        return false;
+    }
+
+    @Override
     public boolean isPcaAdminPermission() {
         return false;
     }

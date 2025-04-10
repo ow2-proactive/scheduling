@@ -1623,6 +1623,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                                                         .collect(Collectors.toList()));
         userData.setHandleOnlyMyJobsPermission(userSessionInfo.getRight().isHandleOnlyMyJobsPermission());
         userData.setOtherUsersJobReadPermission(userSessionInfo.getRight().isOtherUsersJobReadPermission());
+        userData.setManageUsersPermission(userSessionInfo.getRight().isManageUsersPermission());
+        userData.setChangePasswordPermission(userSessionInfo.getRight().isChangePasswordPermission());
         return userData;
     }
 

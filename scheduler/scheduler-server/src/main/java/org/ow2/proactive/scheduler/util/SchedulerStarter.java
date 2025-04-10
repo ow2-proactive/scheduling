@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import static org.ow2.proactive.authentication.FileLoginModule.authenticationLockFile;
+import static org.ow2.proactive.authentication.UsersServiceImpl.authenticationLockFile;
 import static org.ow2.proactive.resourcemanager.RMFactory.configureJSch;
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
@@ -41,10 +41,7 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
@@ -69,7 +66,6 @@ import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -94,8 +90,6 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.utils.*;
 import org.ow2.proactive.web.WebProperties;
 import org.ow2.proactive_grid_cloud_portal.common.CommonRest;
-
-import com.jcraft.jsch.JSch;
 
 
 /**

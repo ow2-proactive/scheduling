@@ -38,11 +38,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.ow2.proactive.authentication.InputUserInfo;
+import org.ow2.proactive.authentication.OutputUserInfo;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive_grid_cloud_portal.common.dto.JAASConfiguration;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 
 @Path("/common")
@@ -331,5 +332,105 @@ public interface CommonRestInterface {
     @Produces(MediaType.APPLICATION_JSON)
     Map<String, Boolean> checkRolePermissions(@HeaderParam("sessionid") String sessionId, List<String> roles)
             throws RestException;
+
+    /**
+     * Create user
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param userInfo new account details
+     * @return the list of internal users after adding the user
+     */
+    @POST
+    @Path("manager/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    List<OutputUserInfo> createUser(@HeaderParam("sessionid") String sessionId, InputUserInfo userInfo)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException;
+
+    /**
+     * List users
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @return the list of internal users
+     */
+    @GET
+    @Path("manager/users")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<OutputUserInfo> listUsers(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException;
+
+    /**
+     * Get user details
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param username username of the user
+     * @return a single user details
+     */
+    @GET
+    @Path("manager/users/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    OutputUserInfo getUserDetails(@HeaderParam("sessionid") String sessionId, @PathParam("username") String username)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException;
+
+    /**
+     * Edit user
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param username username of the user
+     * @param userInfo input modifications to the user
+     * @return the list of internal users after editing the user
+     */
+    @PUT
+    @Path("manager/users/{username}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    List<OutputUserInfo> editUser(@HeaderParam("sessionid") String sessionId, @PathParam("username") String username,
+            InputUserInfo userInfo) throws NotConnectedRestException, PermissionRestException, LoginRestException;
+
+    /**
+     * Delete user
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param username username of the user
+     * @return the list of internal users after deleting the user
+     */
+    @DELETE
+    @Path("manager/users/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<OutputUserInfo> deleteUser(@HeaderParam("sessionid") String sessionId, @PathParam("username") String username)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException;
+
+    /**
+     * List group to tenant association
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @return the group to tenant association list
+     */
+    @GET
+    @Path("manager/tenants")
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, String> listGroupsToTenantAssociations(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException;
+
+    /**
+     * Add group to tenant association
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param group group to associate
+     * @param tenant tenant to associate
+     * @return the group to tenant association list after modification
+     */
+    @POST
+    @Path("manager/tenants")
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, String> addGroupToTenantAssociation(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("group") String group, @QueryParam("tenant") String tenant)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException;
+
+    /**
+     * Delete group to tenant association
+     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param group group to associate
+     * @return the group to tenant association list after modification
+     */
+    @DELETE
+    @Path("manager/tenants")
+    @Produces(MediaType.APPLICATION_JSON)
+    Map<String, String> removeGroupToTenantAssociation(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("group") String group)
+            throws NotConnectedRestException, PermissionRestException, LoginRestException;
 
 }

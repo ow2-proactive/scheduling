@@ -275,6 +275,24 @@ public class UserIdentificationImpl extends UserIdentification {
         }
     }
 
+    @Override
+    public boolean isManageUsersPermission() {
+        try {
+            return checkPermission(new ManageUsersPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isChangePasswordPermission() {
+        try {
+            return checkPermission(new ChangePasswordPermission(), "N/A");
+        } catch (PermissionException e) {
+            return false;
+        }
+    }
+
     /**
      * Add one to the submit number
      */
