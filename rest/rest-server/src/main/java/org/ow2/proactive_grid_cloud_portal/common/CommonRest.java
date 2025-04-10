@@ -664,7 +664,7 @@ public class CommonRest implements CommonRestInterface {
         UsersService usersService = UsersServiceImpl.getInstance();
         try {
             usersService.refresh();
-            List<OutputUserInfo> answer = null;
+            List<OutputUserInfo> answer;
             if (isManageUser(scheduler.getSubject())) {
                 if (!username.equals(userInfo.getLogin())) {
                     throw new IllegalArgumentException("username " + username +

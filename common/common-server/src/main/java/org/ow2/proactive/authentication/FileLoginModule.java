@@ -475,7 +475,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         String key = userLoginInfo.getLogin() +
                      (Strings.isNullOrEmpty(userLoginInfo.getDomain()) ? "" : DOMAIN_SEP + userLoginInfo.getDomain());
         boolean newUser = false;
-        boolean userChanged = false;
+        boolean userChanged;
         if (!usersService.userExists(key)) {
             usersService.addUser(new InputUserInfo(key, userLoginInfo.getPassword(), userLoginInfo.getGroups()));
             newUser = true;
