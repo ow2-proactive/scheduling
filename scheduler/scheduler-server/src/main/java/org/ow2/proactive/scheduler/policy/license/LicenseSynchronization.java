@@ -29,8 +29,11 @@ import static jdbm.RecordManagerFactory.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.commons.collections.set.SynchronizedSet;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
@@ -64,10 +67,14 @@ public class LicenseSynchronization {
      * JDBM maps
      */
     // < <software0, <jobid2>> <software1, <jobid1, jobid3>> ... >
-    private static PrimaryHashMap<String, LinkedBlockingQueue<String>> persistedJobsLicenses = null;
+    private static PrimaryHashMap<String, LinkedBlockingQueue<String>> persistedJobsLicensesInternal = null;
 
     // < <software0, <taskid0, taskid2>> <software1, <taskid0, taskid1, taskid3>> ... >
-    private static PrimaryHashMap<String, LinkedBlockingQueue<String>> persistedTasksLicenses = null;
+    private static PrimaryHashMap<String, LinkedBlockingQueue<String>> persistedTasksLicensesInternal = null;
+
+    private static Map<String, Set<String>> persistedJobsLicenses = null;
+
+    private static Map<String, Set<String>> persistedTasksLicenses = null;
 
     private static PrimaryHashMap<String, Integer> remainingTokens = null;
 
@@ -97,8 +104,14 @@ public class LicenseSynchronization {
         close();
         try {
             recordManager = createRecordManager(storeFile.getCanonicalPath());
-            persistedJobsLicenses = recordManager.hashMap(JOBS_LICENSES);
-            persistedTasksLicenses = recordManager.hashMap(TASKS_LICENSES);
+            persistedJobsLicensesInternal = recordManager.hashMap(JOBS_LICENSES);
+            persistedTasksLicensesInternal = recordManager.hashMap(TASKS_LICENSES);
+            persistedJobsLicenses = new ConcurrentHashMap<>();
+            persistedJobsLicensesInternal.forEach((k,
+                    v) -> persistedJobsLicenses.put(k, Collections.synchronizedSet(new HashSet<>(v))));
+            persistedTasksLicenses = new ConcurrentHashMap<>();
+            persistedTasksLicensesInternal.forEach((k,
+                    v) -> persistedTasksLicenses.put(k, Collections.synchronizedSet(new HashSet<>(v))));
             remainingTokens = recordManager.hashMap(REMAINING_TOKENS);
 
             recordManager.commit();
@@ -121,8 +134,10 @@ public class LicenseSynchronization {
     }
 
     void addSoftware(String software, int nbTokens) {
-        persistedJobsLicenses.put(software, new LinkedBlockingQueue<>(nbTokens));
-        persistedTasksLicenses.put(software, new LinkedBlockingQueue<>(nbTokens));
+        persistedJobsLicensesInternal.put(software, new LinkedBlockingQueue<>(nbTokens));
+        persistedTasksLicensesInternal.put(software, new LinkedBlockingQueue<>(nbTokens));
+        persistedJobsLicenses.put(software, Collections.synchronizedSet(new HashSet<>()));
+        persistedTasksLicenses.put(software, Collections.synchronizedSet(new HashSet<>()));
         remainingTokens.put(software, nbTokens);
     }
 
@@ -135,18 +150,19 @@ public class LicenseSynchronization {
     }
 
     LinkedBlockingQueue<String> getPersistedJobsLicense(String license) {
-        return persistedJobsLicenses.get(license);
+        return persistedJobsLicensesInternal.get(license);
     }
 
     boolean containsJobId(String license, String jobId) {
-        return persistedJobsLicenses.get(license).stream().anyMatch(jid -> jid.equals(jobId));
+        return persistedJobsLicenses.get(license).contains(jobId);
     }
 
     boolean containsTaskId(String license, String taskId) {
-        return persistedTasksLicenses.get(license).stream().anyMatch(tid -> tid.equals(taskId));
+        return persistedTasksLicenses.get(license).contains(taskId);
     }
 
     void addJobToLicense(String license, String jobId) {
+        persistedJobsLicensesInternal.get(license).add(jobId);
         persistedJobsLicenses.get(license).add(jobId);
         remainingTokens.put(license, remainingTokens.get(license) - 1);
     }
@@ -155,15 +171,18 @@ public class LicenseSynchronization {
         // Record Manager mark as dirty (uncommited) entries which have be modified via a put call
         // Thus, such operation as persistedJobsLicenses.get(license).dosomething() will not be committed
         // by the following trick, we mark the entry as dirty and commit
-        persistedJobsLicenses.put(license, persistedJobsLicenses.get(license));
+        persistedJobsLicensesInternal.put(license, persistedJobsLicensesInternal.get(license));
+        persistedJobsLicenses.put(license,
+                                  Collections.synchronizedSet(new HashSet<>(persistedJobsLicensesInternal.get(license))));
     }
 
     LinkedBlockingQueue<String> getPersistedTasksLicense(String license) {
-        return persistedTasksLicenses.get(license);
+        return persistedTasksLicensesInternal.get(license);
     }
 
     void addTaskToLicense(String license, String taskId) {
-        persistedTasksLicenses.get(license).add(taskId);
+        persistedTasksLicensesInternal.get(license).add(taskId);
+        persistedJobsLicenses.get(license).add(taskId);
         remainingTokens.put(license, remainingTokens.get(license) - 1);
     }
 
@@ -171,7 +190,9 @@ public class LicenseSynchronization {
         // Record Manager mark as dirty (uncommited) entries which have be modified via a put call
         // Thus, such operation as persistedTasksLicenses.get(license).dosomething() will not be committed
         // by the following trick, we mark the entry as dirty and commit
-        persistedTasksLicenses.put(license, persistedTasksLicenses.get(license));
+        persistedTasksLicensesInternal.put(license, persistedTasksLicensesInternal.get(license));
+        persistedTasksLicenses.put(license,
+                                   Collections.synchronizedSet(new HashSet<>(persistedTasksLicensesInternal.get(license))));
     }
 
     int getRemainingTokens(String license) {
