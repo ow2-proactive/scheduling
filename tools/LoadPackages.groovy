@@ -109,7 +109,7 @@ class LoadPackages {
 
         // Create buckets following the ordered bucket list
         new File(examples_dir, "ordered_bucket_list").text.trim().split("\\s*,\\s*").each { bucket ->
-            package_loader.createBucketIfNotExist(bucket)
+            package_loader.createBucketIfNotExist(bucket, package_loader.BUCKET_OWNER)
         }
 
         // Load all packages

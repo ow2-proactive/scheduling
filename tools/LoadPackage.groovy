@@ -12,7 +12,6 @@ import javax.net.ssl.*
 import java.util.zip.ZipFile
 
 
-
 class LoadPackage {
 
     private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/admin_user.cred"
@@ -86,15 +85,15 @@ class LoadPackage {
     }
 
     def unzipPackage(packageDir) {
-      // Create a temporary dir
-      def packageTempDir = Files.createTempDirectory(TMP_DIR_PREFIX).toFile()
-      packageTempDir.deleteOnExit()
-      // Unzip the package into it
-      unzipFile(packageDir, packageTempDir.getPath())
-      writeToOutput(" " + packageDir + " extracted!")
-      // Return the unzipped package
-      def packageDirNameNoExt = FilenameUtils.removeExtension(packageDir.name)
-      return new File(packageTempDir, packageDirNameNoExt)
+        // Create a temporary dir
+        def packageTempDir = Files.createTempDirectory(TMP_DIR_PREFIX).toFile()
+        packageTempDir.deleteOnExit()
+        // Unzip the package into it
+        unzipFile(packageDir, packageTempDir.getPath())
+        writeToOutput(" " + packageDir + " extracted!")
+        // Return the unzipped package
+        def packageDirNameNoExt = FilenameUtils.removeExtension(packageDir.name)
+        return new File(packageTempDir, packageDirNameNoExt)
     }
 
 
@@ -161,7 +160,7 @@ class LoadPackage {
 
         // Commit message
         def commitMessageStarting = packageMetadataMap.get("commitMessage")
-        def commitMessageEnding  = " (" + SCHEDULER_VERSION + ")"
+        def commitMessageEnding = " (" + SCHEDULER_VERSION + ")"
 
         // If the object does not exist in the catalog bucket
         if (!objectFound) {
@@ -179,11 +178,11 @@ class LoadPackage {
 
             // Create part of the POST query
             def pushObjectQuery = this.CATALOG_URL + "/buckets/" + bucketName + "/resources?name=" + objectName + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&objectContentType=" + contentType
-            if(projectName != null) {
-                pushObjectQuery = pushObjectQuery + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
+            if (projectName != null) {
+                pushObjectQuery = pushObjectQuery + "&projectName=" + java.net.URLEncoder.encode(projectName, "UTF-8")
             }
-            if(tags != null) {
-                pushObjectQuery = pushObjectQuery + "&tags=" +  java.net.URLEncoder.encode(tags, "UTF-8")
+            if (tags != null) {
+                pushObjectQuery = pushObjectQuery + "&tags=" + java.net.URLEncoder.encode(tags, "UTF-8")
             }
 
             // Create the POST query and execute it
@@ -191,7 +190,7 @@ class LoadPackage {
             writeToOutput(" " + objectFile.getName() + " created!")
 
             // If the object exists in the catalog and its last commit is not a user commit
-        } else if (objectFound.commit_message.startsWith(commitMessageStarting)){
+        } else if (objectFound.commit_message.startsWith(commitMessageStarting)) {
 
             // Retrieve object metadata
             def commitMessageEncoded = java.net.URLEncoder.encode(commitMessageStarting + commitMessageEnding, "UTF-8")
@@ -200,9 +199,9 @@ class LoadPackage {
             // Create part of the POST query
             this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.14.jar").absolutePath);
             def boundary = "---------------" + UUID.randomUUID().toString();
-            def pushObjectQuery = this.CATALOG_URL + "/buckets/" + bucketName + "/resources/"+ objectName + "/revisions?commitMessage=" + commitMessageEncoded
-            if(projectName != null) {
-                pushObjectQuery = pushObjectQuery + "&projectName=" +  java.net.URLEncoder.encode(projectName, "UTF-8")
+            def pushObjectQuery = this.CATALOG_URL + "/buckets/" + bucketName + "/resources/" + objectName + "/revisions?commitMessage=" + commitMessageEncoded
+            if (projectName != null) {
+                pushObjectQuery = pushObjectQuery + "&projectName=" + java.net.URLEncoder.encode(projectName, "UTF-8")
             }
 
             // Create the POST query and execute it
@@ -212,8 +211,7 @@ class LoadPackage {
     }
 
 
-
-    def createBucketIfNotExist(bucket){
+    def createBucketIfNotExist(bucket, bucketOwner) {
 
         // Does the bucket already exist? -------------
         // GET QUERY
@@ -237,9 +235,9 @@ class LoadPackage {
 
         // Create a bucket if needed -------------
         if (bucketFound) {
-            if(!this.BUCKET_OWNER.equals("GROUP:public-objects")){
-                writeToOutput("Bucket to update: "+bucket)
-                def updateBucketQuery = this.CATALOG_URL + "/buckets/" + bucket + "?owner=" + this.BUCKET_OWNER
+            if (!bucketOwner.equals("GROUP:public-objects")) {
+                writeToOutput("Bucket to update: " + bucket)
+                def updateBucketQuery = this.CATALOG_URL + "/buckets/" + bucket + "?owner=" + bucketOwner
                 def put = new org.apache.http.client.methods.HttpPut(updateBucketQuery)
                 put.addHeader("sessionId", this.sessionId)
                 put.addHeader("Accept", "application/json")
@@ -260,7 +258,7 @@ class LoadPackage {
             return bucketFound.name
         } else {
             // POST QUERY
-            def createBucketQuery = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
+            def createBucketQuery = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + bucketOwner
             def post = new org.apache.http.client.methods.HttpPost(createBucketQuery)
             post.addHeader("Accept", "application/json")
             post.addHeader("Content-Type", "application/json")
@@ -302,12 +300,13 @@ class LoadPackage {
 
         packageBucketsList.each { bucket ->
 
+            def bucketOwner = this.BUCKET_OWNER
             // Check user group
-            if (packageCatalogMap.containsKey("userGroup") && !packageCatalogMap.get("userGroup").isEmpty()) {
-                this.BUCKET_OWNER = "GROUP:" + packageCatalogMap.get("userGroup")
+            if (packageCatalogMap.containsKey("userGroup") && !packageCatalogMap.get("userGroup").isEmpty() && bucketOwner.equals("GROUP:public-objects")) {
+                bucketOwner = "GROUP:" + packageCatalogMap.get("userGroup")
             }
 
-            def bucketName = createBucketIfNotExist(bucket)
+            def bucketName = createBucketIfNotExist(bucket, bucketOwner)
 
             // GET the bucket resources from the catalog
             // Create part of the GET query
@@ -349,11 +348,10 @@ class LoadPackage {
         writeToOutput(" Loading " + packageDir)
         def packageDirExt = FilenameUtils.getExtension(packageDir.name)
         def unzippedPackageDir
-        if (packageDirExt == "zip"){
+        if (packageDirExt == "zip") {
             unzippedPackageDir = unzipPackage(packageDir)
             packageDirExt = "." + packageDirExt
-        }
-        else if (packageDirExt.isEmpty())
+        } else if (packageDirExt.isEmpty())
             unzippedPackageDir = packageDir
         else {
             writeToOutput(" package dir extension not supported")
@@ -370,12 +368,11 @@ class LoadPackage {
         if (loadDependencies) {
             def dependenciesList = packageMetadataMap.get("dependencies")
 
-            if (dependenciesList != null)
-            {
+            if (dependenciesList != null) {
                 def parentPackageDir = packageDir.getAbsoluteFile().getParentFile()
                 dependenciesList.each { packageName ->
 
-                    this.run( new File(parentPackageDir, packageName + packageDirExt), loadDependencies)
+                    this.run(new File(parentPackageDir, packageName + packageDirExt), loadDependencies)
                 }
             }
         }
