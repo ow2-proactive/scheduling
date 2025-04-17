@@ -44,7 +44,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.*;
-import org.ow2.proactive.core.properties.PASharedProperties;
 import org.ow2.proactive.permissions.*;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -724,7 +723,7 @@ public class CommonRest implements CommonRestInterface {
     }
 
     @Override
-    public Map<String, String> listGroupsToTenantAssociations(String sessionId)
+    public Map<String, Collection<String>> listTenants(String sessionId)
             throws NotConnectedRestException, PermissionRestException, LoginRestException {
         Scheduler scheduler = checkSchedulerAccess(sessionId);
         UsersService usersService = UsersServiceImpl.getInstance();
@@ -733,7 +732,7 @@ public class CommonRest implements CommonRestInterface {
                             new ManageUsersPermission(),
                             "Manage Users rights is required to list group to tenant association");
             usersService.refresh();
-            return usersService.listGroupsToTenant();
+            return usersService.listTenants().asMap();
         } catch (PermissionException e) {
             throw new PermissionRestException("You don't have necessary rights to list groups to tenants associations");
         } catch (NotConnectedException e) {
@@ -744,7 +743,7 @@ public class CommonRest implements CommonRestInterface {
     }
 
     @Override
-    public Map<String, String> addGroupToTenantAssociation(String sessionId, String group, String tenant)
+    public Map<String, Collection<String>> addOrEditTenant(String sessionId, String tenant, Collection<String> groups)
             throws NotConnectedRestException, PermissionRestException, LoginRestException {
         Scheduler scheduler = checkSchedulerAccess(sessionId);
         UsersService usersService = UsersServiceImpl.getInstance();
@@ -752,14 +751,15 @@ public class CommonRest implements CommonRestInterface {
             checkPermission(scheduler.getSubject(),
                             new ManageUsersPermission(),
                             "Manage Users rights is required to list group to tenant association");
-            if (Strings.isNullOrEmpty(group)) {
-                throw new IllegalArgumentException("group cannot be empty");
-            }
             if (Strings.isNullOrEmpty(tenant)) {
                 throw new IllegalArgumentException("tenant cannot be empty");
             }
+            if (groups == null || groups.isEmpty()) {
+                throw new IllegalArgumentException("groups cannot be empty");
+            }
             usersService.refresh();
-            Map<String, String> answer = usersService.addGroupTenantAssociation(group, tenant);
+            Map<String, Collection<String>> answer = usersService.addOrEditTenant(tenant, new TreeSet<>(groups))
+                                                                 .asMap();
             usersService.commit();
             return answer;
         } catch (PermissionException e) {
@@ -772,7 +772,7 @@ public class CommonRest implements CommonRestInterface {
     }
 
     @Override
-    public Map<String, String> removeGroupToTenantAssociation(String sessionId, String group)
+    public Map<String, Collection<String>> removeTenant(String sessionId, String tenant)
             throws NotConnectedRestException, PermissionRestException, LoginRestException {
         Scheduler scheduler = checkSchedulerAccess(sessionId);
         UsersService usersService = UsersServiceImpl.getInstance();
@@ -780,11 +780,11 @@ public class CommonRest implements CommonRestInterface {
             checkPermission(scheduler.getSubject(),
                             new ManageUsersPermission(),
                             "Manage Users rights is required to list group to tenant association");
-            if (Strings.isNullOrEmpty(group)) {
-                throw new IllegalArgumentException("group cannot be empty");
+            if (Strings.isNullOrEmpty(tenant)) {
+                throw new IllegalArgumentException("tenant cannot be empty");
             }
             usersService.refresh();
-            Map<String, String> answer = usersService.removeGroupTenantAssociation(group);
+            Map<String, Collection<String>> answer = usersService.removeTenant(tenant).asMap();
             usersService.commit();
             return answer;
         } catch (PermissionException e) {

@@ -29,6 +29,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.io.IOException;
 import java.security.KeyException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -335,7 +336,7 @@ public interface CommonRestInterface {
 
     /**
      * Create user
-     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param sessionId id of a session
      * @param userInfo new account details
      * @return the list of internal users after adding the user
      */
@@ -348,7 +349,7 @@ public interface CommonRestInterface {
 
     /**
      * List users
-     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param sessionId id of a session
      * @return the list of internal users
      */
     @GET
@@ -359,7 +360,7 @@ public interface CommonRestInterface {
 
     /**
      * Get user details
-     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param sessionId id of a session
      * @param username username of the user
      * @return a single user details
      */
@@ -371,7 +372,7 @@ public interface CommonRestInterface {
 
     /**
      * Edit user
-     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param sessionId id of a session
      * @param username username of the user
      * @param userInfo input modifications to the user
      * @return the list of internal users after editing the user
@@ -385,7 +386,7 @@ public interface CommonRestInterface {
 
     /**
      * Delete user
-     * @param sessionId id of a session (tokens will be associated with this session)
+     * @param sessionId id of a session
      * @param username username of the user
      * @return the list of internal users after deleting the user
      */
@@ -396,41 +397,42 @@ public interface CommonRestInterface {
             throws NotConnectedRestException, PermissionRestException, LoginRestException;
 
     /**
-     * List group to tenant association
-     * @param sessionId id of a session (tokens will be associated with this session)
-     * @return the group to tenant association list
+     * List tenants association
+     * @param sessionId id of a session
+     * @return the tenants to group associations
      */
     @GET
     @Path("manager/tenants")
     @Produces(MediaType.APPLICATION_JSON)
-    Map<String, String> listGroupsToTenantAssociations(@HeaderParam("sessionid") String sessionId)
+    Map<String, Collection<String>> listTenants(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedRestException, PermissionRestException, LoginRestException;
 
     /**
-     * Add group to tenant association
-     * @param sessionId id of a session (tokens will be associated with this session)
-     * @param group group to associate
-     * @param tenant tenant to associate
-     * @return the group to tenant association list after modification
+     * Add or Edit a tenant
+     * @param sessionId id of a session
+     * @param tenant tenant name
+     * @param groups set of groups to associate
+     * @return the tenants to group associations after modification
      */
-    @POST
-    @Path("manager/tenants")
+    @PUT
+    @Path("manager/tenants/{tenant}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    Map<String, String> addGroupToTenantAssociation(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("group") String group, @QueryParam("tenant") String tenant)
+    Map<String, Collection<String>> addOrEditTenant(@HeaderParam("sessionid") String sessionId,
+            @PathParam("tenant") String tenant, Collection<String> groups)
             throws NotConnectedRestException, PermissionRestException, LoginRestException;
 
     /**
-     * Delete group to tenant association
-     * @param sessionId id of a session (tokens will be associated with this session)
-     * @param group group to associate
-     * @return the group to tenant association list after modification
+     * Delete a tenant
+     * @param sessionId id of a session
+     * @param tenant tenant name
+     * @return the tenants to group associations after modification
      */
     @DELETE
-    @Path("manager/tenants")
+    @Path("manager/tenants/{tenant}")
     @Produces(MediaType.APPLICATION_JSON)
-    Map<String, String> removeGroupToTenantAssociation(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("group") String group)
+    Map<String, Collection<String>> removeTenant(@HeaderParam("sessionid") String sessionId,
+            @PathParam("tenant") String tenant)
             throws NotConnectedRestException, PermissionRestException, LoginRestException;
 
 }
