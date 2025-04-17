@@ -31,6 +31,8 @@ import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
+import com.google.common.collect.Multimap;
+
 
 public interface UsersService {
 
@@ -100,26 +102,26 @@ public interface UsersService {
     List<OutputUserInfo> deleteUser(String userName) throws LoginException;
 
     /**
-     * List the groups to tenant associations
-     * @return map of group to tenant associations
+     * List the tenant associations
+     * @return multimap of tenant to group associations
      */
-    Map<String, String> listGroupsToTenant();
+    Multimap<String, String> listTenants();
 
     /**
-     * Add a group to tenant association
-     * If the group had already a tenant associated, it will be overridden by the new tenant
-     * @param group group name
+     * Add a tenant or edit an existing tenant
+     * If the tenant already exists, its set of associated groups will be updated
      * @param tenant tenant name
-     * @return map of group to tenant associations after update
+     * @param groups set of groups associated with this tenant
+     * @return multimap of tenant to group associations after update
      */
-    Map<String, String> addGroupTenantAssociation(String group, String tenant);
+    Multimap<String, String> addOrEditTenant(String tenant, Set<String> groups);
 
     /**
-     * Remove group to tenant association
-     * @param group group name
-     * @return map of group to tenant associations after update
+     * Remove a tenant and all its group associations
+     * @param tenant tenant name
+     * @return multimap of tenant to group associations after update
      */
-    Map<String, String> removeGroupTenantAssociation(String group);
+    Multimap<String, String> removeTenant(String tenant);
 
     /**
      * Check the user's password

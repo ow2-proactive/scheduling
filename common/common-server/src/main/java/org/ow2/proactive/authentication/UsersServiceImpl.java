@@ -284,40 +284,39 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public Map<String, String> listGroupsToTenant() {
+    public Multimap<String, String> listTenants() {
         try {
             readLock.lock();
-            return new TreeMap<>(tenants);
+            return tenantsToMMap();
         } finally {
             readLock.unlock();
         }
     }
 
     @Override
-    public Map<String, String> addGroupTenantAssociation(String group, String tenant) {
+    public Multimap<String, String> addOrEditTenant(String tenant, Set<String> groups) {
         try {
-            writeLock.lock();
-            if (!tenants.containsKey(group) || !tenants.get(group).equals(tenant)) {
-                tenants.put(group, tenant);
-                tenantsChanged = true;
-                updateUsersTenant();
+            if (groups == null) {
+                throw new IllegalArgumentException("groups cannot be null");
             }
-            return new TreeMap<>(tenants);
+            writeLock.lock();
+            tenants.entrySet().removeIf(e -> e.getValue().equals(tenant));
+            groups.forEach(g -> tenants.put(g, tenant));
+            tenantsChanged = true;
+            updateUsersTenant();
+            return tenantsToMMap();
         } finally {
             writeLock.unlock();
         }
     }
 
     @Override
-    public Map<String, String> removeGroupTenantAssociation(String group) {
+    public Multimap<String, String> removeTenant(String tenant) {
         try {
             writeLock.lock();
-            if (tenants.containsKey(group)) {
-                tenants.remove(group);
-                tenantsChanged = true;
-                updateUsersTenant();
-            }
-            return new TreeMap<>(tenants);
+            tenantsChanged = tenants.entrySet().removeIf(e -> e.getValue().equals(tenant));
+            updateUsersTenant();
+            return tenantsToMMap();
         } finally {
             writeLock.unlock();
         }
@@ -629,6 +628,12 @@ public class UsersServiceImpl implements UsersService {
             logger.error("Exception while refreshing users", e);
             throw buildLoginException("Exception while refreshing users", e);
         }
+    }
+
+    private Multimap<String, String> tenantsToMMap() {
+        Multimap<String, String> answer = TreeMultimap.create();
+        tenants.entrySet().forEach(e -> answer.put(e.getValue(), e.getKey()));
+        return answer;
     }
 
     private String findTenant(Set<String> groups) {
