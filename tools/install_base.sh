@@ -172,6 +172,8 @@ generate_new_accounts()
     echo "Generating New Private/Public key pair for the scheduler"
     $PA_ROOT/default/tools/proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
 
+    rm -f $AUTH_ROOT/*.cred
+
     sed "s/pa\.password\.strength\.enable=.*/pa.scheduler.password.strength.enable=true/g"  -i "$PA_ROOT/default/config/shared/settings.ini"
 
 
