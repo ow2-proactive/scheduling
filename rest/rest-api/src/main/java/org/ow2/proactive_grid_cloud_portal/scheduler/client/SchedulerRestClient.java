@@ -765,7 +765,7 @@ public class SchedulerRestClient {
             }
         }
 
-        Exception built = new Exception(errMsg);
+        RuntimeException built = new RuntimeException(errMsg);
         if (serverException != null) {
             built.setStackTrace(serverException.getStackTrace());
         }
